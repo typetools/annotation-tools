@@ -1,0 +1,210 @@
+<?xml version="1.0"?>
+<project name="scene-lib" default="bin">
+
+    <property environment="env"/>
+
+    <property name="java-source-version" value="7"/>
+    <property name="java-target-version" value="1.5"/>
+    
+    <target name="init-properties">
+        <condition property="exists.build.properties">
+            <available file="build.properties"/>
+        </condition>
+        <fail
+            unless="exists.build.properties" 
+            message="Local build.properites file is missing."/>
+        
+        <property file="build.properties"/>
+        
+        <fail 
+            unless="global.build.properties" 
+            message="Local build.properties file did not define global buildfile in property global.build.properties"/>
+        <condition property="exists.global.build.properties">
+            <available file="${global.build.properties}"/>
+        </condition>
+        <fail 
+            unless="exists.global.build.properties"
+        message="File ${global.build.properties} file not found."/>
+        <property file="${global.build.properties}"/>
+
+        <fail 
+           unless="user.build.properties" 
+            message="Local build.properties file did not define global buildfile in property user.build.properties"/>
+        <condition property="exists.user.build.properties">
+            <available file="${user.build.properties}"/>
+        </condition>
+        <fail 
+            unless="exists.user.build.properties"
+            message="File ${user.build.properties} file not found."/>            
+        <property file="${user.build.properties}"/>
+
+    </target>
+    
+    <target name="init-dependencies"
+            depends="init-properties">
+        <!-- I should reinstate this after figuring out how to make
+        it remake only when necessary, not always.  (I should
+        probably do that outside ASM rather than modifying ASM itself?)
+        And, supply -Dproduct.noshrink to asmx ant command, at least when
+        testing.
+        -->
+        <!--
+        <ant dir="${asmx}" inheritAll="false" target="bin"/>
+        -->
+        <!-- Next 2 lines only for repository version. -->
+        <!--
+        <ant dir="${annotations-compiler}" antfile="make/build.xml" inheritAll="false" target="build"/>
+        <ant dir="${checkers}" inheritAll="false" target="build"/>
+        -->
+    </target>
+    
+    <target name="init" depends="init-properties, init-dependencies">
+        <path id="sourcepath">
+            <pathelement location="src"/>
+            <pathelement location="src-devel"/>
+        </path>
+
+        <!-- Only for repository version. -->
+        <fileset dir="." id="source-files">
+           <include name="src/**/*.java"/>
+            <include name="src-devel/**/*.java"/>
+            <exclude name="**/.svn"/>
+        </fileset>
+    
+        <path id="javadoc-sourcepath">
+            <pathelement location="src"/>
+        </path>
+                        
+        <path id="libpath">
+            <pathelement location="${asmx}/bin"/>
+            <pathelement location="${junit}"/>
+            <!-- remainder only for repository version -->
+            <pathelement location="${annotations-compiler}/dist/lib/javac.jar"/>
+            <pathelement location="${annotations-compiler}/dist/lib/javap.jar"/>
+            <pathelement location="${checkers}/build"/>
+            <pathelement location="bin"/>
+        </path>
+    </target>
+        
+    <target name="bin-clean">
+        <delete dir="bin"/>
+    </target>
+    
+    <target name="bin" depends="init, bin-clean">
+        <mkdir dir="bin"/>
+        <copy todir="bin">
+            <fileset dir="src" excludes="**/*.java"/>
+            <fileset dir="src-devel" excludes="**/*.java"/>
+        </copy>
+
+<!-- Optional lines for "javac":
+  executable="/afs/csail.mit.edu/u/j/jaimeq/research/annotations/langtools/dist/bin/javac"
+  executable="/DS/home-0/mernst/research/typequals/annotations/langtools/dist/bin/javac"
+-->
+        <javac 
+               destdir="bin" 
+               source="${java-source-version}" 
+               target="${java-target-version}" 
+               debug="true" 
+               classpathref="libpath"
+               bootclasspath="${libpath}"
+               classpath="${libpath}">
+            <src refid="sourcepath"/>
+            <classpath refid="libpath"/>
+            <bootclasspath refid="libpath"/>
+        </javac> 
+
+        <!-- TODO: This relies on jsr308 compiler being first in your PATH. 
+             We should figure out how to call jsr 308 properly from Ant. -->
+<!--
+       <pathconvert property="libpath" refid="libpath"/>
+       <pathconvert property="source-files" refid="source-files" pathsep=" "/>
+        <exec executable="javac" failonerror="true">
+          <arg value="-version"/>
+          <arg value="-d"/>
+          <arg value="bin"/>
+          <arg value="-g"/>
+          <arg value="-cp"/>
+          <arg value="${libpath}"/>
+          <arg line="${source-files}"/>
+        </exec>
+-->
+    </target>
+    
+    <target name="test-scene-lib" depends="init, bin">
+        <mkdir dir="reports"/>
+        <junit showoutput="true" fork="yes" dir="." haltonfailure="yes">
+            <classpath refid="libpath"/>
+            <formatter type="plain"/>
+            <test name="annotations.tests.TestSceneLib" todir="reports"/>
+        </junit>
+    </target>
+    
+    <target name="test-classfile" depends="init, bin">
+        <mkdir dir="reports"/>
+        <junit showoutput="true" fork="yes" dir="." haltonfailure="yes">
+            <classpath refid="libpath"/>
+            <formatter type="plain"/>
+            <test name="annotations.tests.classfile.AnnotationsTest" todir="reports"/>
+        </junit>
+    </target>
+    
+    <target name="test-clean">
+        <delete dir="reports"/>
+    </target>
+    
+    <target name="test" depends="test-scene-lib, test-classfile"/>
+    <target name="clean" depends="bin-clean, javadoc-clean, test-clean"/>
+    
+    <target name="javadoc-clean">
+        <delete dir="javadoc"/>
+    </target>
+    
+    <target name="javadoc" depends="javadoc-clean, init">
+        <javadoc sourcepathref="javadoc-sourcepath" classpathref="libpath" packagenames="*" Overview="overview.html" destdir="javadoc" access="public" source="${java-source-version}" noqualifier="annotations:annotations.el:annotations.field:annotations.io:annotations.io.classfile:annotations.util:annotations.util.coll:java.lang"/>
+    </target>
+
+    <target name="test-package" depends="bin">
+        <property name="test-package" value="scene-lib-test"/>
+        <mkdir dir="${test-package}"/>
+        <mkdir dir="${test-package}/src"/>
+        <copy todir="${test-package}/src">
+            <fileset dir="src" excludes="**/.svn"/>
+        </copy>
+        <jar destfile="${test-package}/deps.jar">
+            <fileset dir="${asmx}/bin" includes="org/**"/>
+        </jar>
+        <zip destfile="${test-package}.zip">
+            <zipfileset dir="${test-package}" prefix="${test-package}"/>
+        </zip>
+        <delete dir="${test-package}"/>
+    </target>
+
+    <!-- = = = = = = = = = = = = = = = = =
+         macrodef: echopath
+         Use as:    <echopath pathid="mypath"/>
+         = = = = = = = = = = = = = = = = = -->
+    <macrodef name="echopath">
+      <attribute name="pathid"/>
+      <sequential>
+        <property name="line.pathprefix" value="| |-- "/>
+        <!-- get given path in a printable form -->
+        <pathconvert pathsep="${line.separator}${line.pathprefix}"
+             property="echo.@{pathid}"
+             refid="@{pathid}">
+        </pathconvert>
+        <echo>Path @{pathid}</echo>
+        <echo>${line.pathprefix}${echo.@{pathid}}</echo>
+      </sequential>
+    </macrodef>
+
+  <target name="etags" depends="tags">
+  </target>
+  <target name="tags" description="Create Emacs TAGS table">
+    <exec executable="/bin/sh">
+      <arg value="-c"/>
+      <arg value="etags `find -name '*.java' | sort-directory-order.pl`"/>
+    </exec>
+  </target>
+
+</project>

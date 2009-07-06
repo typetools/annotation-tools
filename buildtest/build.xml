@@ -1,0 +1,191 @@
+<project name="buildtest" default="test-all">
+    <!-- 
+        Repository locations of all projects.
+    -->
+    <!-- The ant file uses the existence of the pag-daikon.bashrc file
+           as a test to see if it is running on a PAG computer.  If it is
+           on a PAG computer, it uses the local svn/cvs prefixes.  
+           Else, it uses the remote prefixes. -->
+    <property name="svn-repository-prefix-remote"
+        value="svn+ssh://login.csail.mit.edu" />
+    <property name="svn-repository-prefix-local"
+        value="file://" />
+    <property name="cvs-repository-prefix-remote"
+        value=":ext:login.csail.mit.edu:" />
+    <property name="cvs-repository-prefix-local"
+        value="" />
+
+   <condition property="svn-repository-prefix"
+         value="${svn-repository-prefix-local}">
+        <available file="/afs/csail/group/pag/software/bin/pag-daikon.bashrc"/>
+   </condition>
+
+   <condition property="svn-repository-prefix"
+         value="${svn-repository-prefix-remote}">
+        <not>
+          <available file="/afs/csail/group/pag/software/bin/pag-daikon.bashrc"/>
+        </not>
+   </condition>
+
+   <condition property="cvs-repository-prefix"
+         value="${cvs-repository-prefix-local}">
+        <available file="/afs/csail/group/pag/software/bin/pag-daikon.bashrc"/>
+   </condition>
+
+   <condition property="cvs-repository-prefix"
+         value="${cvs-repository-prefix-remote}">
+        <not>
+          <available file="/afs/csail/group/pag/software/bin/pag-daikon.bashrc"/>
+        </not>
+   </condition>
+
+    <property name="annotations-repository" 
+        location="/afs/csail.mit.edu/group/pag/projects/annotations"/>
+    <property name="qualifiers-repository" 
+        location="/afs/csail.mit.edu/group/pag/projects/javari/REPOS/qualifiers"/>
+    <property name="javari-repository"
+        location = "/afs/csail.mit.edu/group/pag/projects/javari/.CVS"/>
+    
+    <!-- 
+        Initial target to setup the build directory.
+    -->
+    <target name="init">
+        <tstamp/>
+        
+        <property name="builddir" location="build-current-${DSTAMP}" />
+        <mkdir dir="${builddir}"/>
+
+        <property name="asmx" location="${builddir}/annotations/asmx" />
+        <property name="scene-lib" location="${builddir}/annotations/scene-lib" />
+        <property name="annotations-compiler" location="${builddir}/annotations/langtools/src/share/opensource/javac" />
+        <property name="annotations-disassembler" location="${builddir}/annotations/disassembler" />
+        <property name="annotator" location="${builddir}/annotations/annotator" />
+        <property name="annotated-jdk" location="${builddir}/qualifiers/annotated-jdk" />
+        <property name="javarifier" location="${builddir}/javari/javarifier" />
+
+    </target>
+    
+    <!--
+        Targets to checkout all the projects.
+    -->
+    <target name="checkout-annotations" depends="init">
+        <exec dir="${builddir}" executable="svn">
+            <arg value="co"/>
+            <arg value="-q"/>
+            <arg value="${svn-repository-prefix}${annotations-repository}"/>
+            <arg value="annotations"/>
+        </exec>
+    </target>
+        
+    <target name="checkout-qualifiers" depends="init">
+        <exec dir="${builddir}" executable="svn">
+            <arg value="co"/>
+            <arg value="-q"/>
+            <arg value="${svn-repository-prefix}${qualifiers-repository}"/>
+            <arg value="qualifiers"/>
+        </exec>
+    </target>
+    
+    <target name="checkout-javari" depends="init">
+        <cvs cvsRoot="${cvs-repository-prefix}${javari-repository}"
+                 quiet="true"
+                 package="."
+                 dest="${builddir}/javari"
+        />
+    </target>
+    
+    <target name="checkout-all" depends="checkout-annotations, checkout-qualifiers, checkout-javari"/>
+    
+    <!-- 
+        Targets to build all the projects.
+    -->
+    <target name="build-asmx" depends="checkout-annotations">
+        <ant dir="${asmx}" inheritAll="false" target="bin"/>
+    </target>
+    
+    <target name="build-scene-lib" depends="checkout-annotations">
+        <ant dir="${scene-lib}" inheritAll="false" target="bin"/>
+    </target>
+    
+    <target name="build-annotations-compiler" depends="checkout-annotations">
+        <ant dir="${annotations-compiler}" inheritAll="false" target="build"/>
+    </target>
+    
+    <target name="build-annotations-disassembler" depends="checkout-annotations">
+        <ant dir="${annotations-disassembler}" inheritAll="false" target="bin"/>
+    </target>
+    
+    <target name="build-annotated-jdk" depends="checkout-qualifiers">
+        <ant dir="${annotated-jdk}" inheritAll="false" target="bin"/>
+    </target>
+    
+    <target name="build-javarifier" depends="checkout-javari">
+        <ant dir="${javarifier}" inheritAll="false" target="bin"/>
+        <!--        
+        <ant dir="${javarifier}" inheritAll="false" target="tests-compile"/> 
+        -->
+    </target>
+    
+    <target name="build-annotator" depends="checkout-annotations">
+        <ant dir="${annotator}" inheritAll="false" target="bin"/>
+    </target>
+    <target name="build-all" depends="build-asmx,
+        build-scene-lib, build-annotations-compiler, 
+        build-annotated-jdk, build-annotator, build-javarifier">
+    </target>
+    
+    <!--
+        Targets to actually run the tests.
+    -->
+    <!-- Runs the tests on the extensions to ASM. -->
+    <target name="test-asmx" depends="build-asmx">
+        <ant dir="${asmx}" inheritAll="false" target="test">
+            <property name="test.group" value="conform/xannotation"/>
+        </ant>
+        <copy todir="./reports">
+            <fileset dir="${asmx}/output/test/reports" includes="**/*"/>
+        </copy>
+    </target>
+    
+    <!-- Runs the tests on the annotation scene library, and also
+        on the classfile to index file and vice versa part of the 
+        annotation file utilities. -->
+    <target name="test-scene-lib" depends="build-scene-lib">
+        <ant dir="${scene-lib}" inheritAll="false" target="test-scene-lib"/>
+        <ant dir="${scene-lib}" inheritAll="false" target="test-classfile"/>
+        <copy todir="./reports">
+            <fileset dir="${scene-lib}/reports" includes="**/*"/>
+        </copy>
+    </target>
+
+    <!-- Runs the tests on the annotator - the index file to source code tool
+        of the annotation file utilities. -->
+    <target name="test-annotator" depends="build-annotator">
+        <exec dir="${annotator}/tests" executable="make"
+            output="./reports/test-annotator.result">
+            <arg value="all"/>
+        </exec>
+    </target>
+    
+    <!-- Runs the tests on the javarifier, including the unit tests, jolden
+         and the annotation scene library. -->
+    <target name="test-javarifier" depends="build-javarifier">
+        <exec dir="${javarifier}/tests" executable="make"
+            output="./reports/test-javarifier.result">
+            <arg value="all"/>
+        </exec>
+    </target>
+
+    <target name="test-all-annotations" depends="test-asmx, test-scene-lib, test-annotator"/> 
+
+    <target name="test-all" depends="test-all-annotations, test-javarifier"/>
+    
+    <target name="help">
+        <echo message="Buildfile for the Extended Annotations/Javari project"/>
+        <echo message="Targets: "/>
+        <echo message="checkout-all: Checkout all known projects from cvs or svn." />
+        <echo message="build-all: Build all projects." />
+        <echo message="test-all: Run all known tests." />
+    </target>
+
+</project>

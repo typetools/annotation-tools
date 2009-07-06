@@ -1,0 +1,249 @@
+package annotator.specification;
+
+import java.io.*;
+import java.util.*;
+import java.util.Map.Entry;
+
+import org.objectweb.asm.ClassReader;
+
+import annotations.AnnotationDef;
+import annotations.RetentionPolicy;
+import annotations.Annotation;
+import annotations.AnnotationFactory;
+import annotations.Annotation;
+import annotations.AnnotationDef;
+import annotations.el.AClass;
+import annotations.el.AElement;
+import annotations.el.AMethod;
+import annotations.el.AScene;
+import annotations.el.ATypeElement;
+import annotations.el.BoundLocation;
+import annotations.el.InnerTypeLocation;
+import annotations.el.LocalLocation;
+import annotations.io.IndexFileParser;
+import annotations.util.coll.VivifyingMap;
+import annotator.find.Criteria;
+import annotator.find.Insertion;
+import annotator.scanner.MethodOffsetClassVisitor;
+
+import utilMDE.FileIOException;
+
+public class IndexFileSpecification implements Specification {
+
+  private List<Insertion> insertions = new ArrayList<Insertion>();
+  private Properties keywords;
+  private AScene scene = new AScene();
+  private String indexFileName;
+
+  private static boolean debug = false;
+
+  public IndexFileSpecification(String indexFileName) {
+    this.indexFileName = indexFileName;
+    scene = new AScene();
+  }
+
+  public List<Insertion> parse() throws FileIOException {
+    try {
+      IndexFileParser.parseFile(indexFileName, scene);
+    } catch(FileIOException e) {
+      throw e;
+    } catch(Exception e) {
+      throw new RuntimeException("Exception while parsing index file", e);
+    }
+
+    parseScene();
+//    debug("---------------------------------------------------------");
+    return this.insertions;
+  }
+
+  private static void debug(String s) {
+    if (debug) {
+      System.out.println(s);
+    }
+  }
+
+  private void parseScene() {
+    // fill in this.insertions with insertion pairs
+    CriterionList clist = new CriterionList();
+
+    VivifyingMap<String, AClass> classes = scene.classes;
+    for (Map.Entry<String, AClass> entry : classes.entrySet()) {
+      parseClass(clist, entry.getKey(), entry.getValue());
+    }
+  }
+
+  private void parseClass(CriterionList clist, String className, AClass clazz) {
+
+    //  load extra info using asm
+    debug("want extra information for class: " + className);
+    try {
+      ClassReader classReader = new ClassReader(className);
+      MethodOffsetClassVisitor cv = new MethodOffsetClassVisitor();
+      classReader.accept(cv, false);
+    } catch(IOException e) {
+      // If extra information not found, still proceed, in case
+      // user only wants method signature annotations.
+      System.out.println("Warning: did not find classfile for: " + className);
+      // throw new RuntimeException("IndexFileSpecification.parseClass: " + e);
+    } catch (RuntimeException e) {
+      System.err.println("Problem reading class: " + className);
+      throw e;
+    }
+//    CriterionList classClist = clist.add(Criteria.is(Tree.Kind.CLASS, className)); // TODO: correct Tree.Kind?
+//    parseElement(classClist, clazz);
+
+    VivifyingMap<BoundLocation, ATypeElement> bounds = clazz.bounds;
+    for (Entry<BoundLocation, ATypeElement> entry : bounds.entrySet()) {
+      BoundLocation boundLoc = entry.getKey();
+      ATypeElement bound = entry.getValue();
+      CriterionList boundList = clist.add(Criteria.classBound(className, boundLoc));
+      for (Entry<InnerTypeLocation, AElement> innerEntry : bound.innerTypes.entrySet()) {
+        InnerTypeLocation innerLoc = innerEntry.getKey();
+        AElement ae = innerEntry.getValue();
+        CriterionList innerBoundList = boundList.add(Criteria.atLocation(innerLoc));
+        parseElement(innerBoundList, ae);
+      }
+      CriterionList outerClist = boundList.add(Criteria.atLocation());
+      parseElement(outerClist, bound);
+    }
+
+
+    // TODO: fix in class criterion to accept fully qualified names?
+//    if (className.contains(".")) {
+//      className = className.substring(className.lastIndexOf(".") + 1);
+//    }
+    clist = clist.add(Criteria.inClass(className));
+
+    for (Map.Entry<String, ATypeElement> entry : clazz.fields.entrySet()) {
+//      clist = clist.add(Criteria.notInMethod()); // TODO: necessary? what is in class but not in method?
+      parseField(clist, entry.getKey(), entry.getValue());
+    }
+    for (Map.Entry<String, AMethod> entry : clazz.methods.entrySet()) {
+      parseMethod(clist, entry.getKey(), entry.getValue());
+    }
+  }
+
+  private void parseField(CriterionList clist, String fieldName, ATypeElement field) {
+    clist = clist.add(Criteria.field(fieldName));
+    parseInnerAndOuterElements(clist, field);
+  }
+
+  private void parseElement(CriterionList clist, AElement element) {
+     String annotationString = getElementAnnotation(element);
+      if (annotationString.trim().equals("")) {
+        // Don't add any empty annotations.  This case arises when the
+        // index file verbosely includes all program elements, even unannotated
+        // elements.
+        return;
+      }
+      Insertion ins = new Insertion(annotationString, clist.criteria());
+      debug("parsed: " + ins);
+      this.insertions.add(ins);
+  }
+
+  private void parseInnerAndOuterElements(CriterionList clist, ATypeElement typeElement) {
+    for (Entry<InnerTypeLocation, AElement> innerEntry: typeElement.innerTypes.entrySet()) {
+      InnerTypeLocation innerLoc = innerEntry.getKey();
+      AElement innerElement = innerEntry.getValue();
+      CriterionList innerClist = clist.add(Criteria.atLocation(innerLoc));
+      parseElement(innerClist, innerElement);
+    }
+    CriterionList outerClist = clist.add(Criteria.atLocation());
+    parseElement(outerClist, typeElement);
+  }
+
+  // Returns a string representation of the annotations at the element.
+  private String getElementAnnotation(AElement element) {
+    String annotationsString = " ";
+    for (Annotation tla : element.tlAnnotationsHere) {
+      AnnotationDef tldef = tla.def;
+      AnnotationDef adef = tldef;
+      Annotation sa = tla;
+      String annotationName = adef.name;
+
+      String keywordProperty = "@" + annotationName;
+      // if (keywords.containsKey(annotationName)) {
+      //   keywordProperty = keywords.getProperty(annotationName);
+      // }
+      annotationsString += keywordProperty;
+
+      if (sa.fieldValues.size() > 0) {
+        annotationsString += "(";
+        boolean first = true;
+        for (Entry<String, Object> entry : sa.fieldValues.entrySet()) {
+          // parameters of the annotation
+          if (!first) {
+            annotationsString += ", ";
+          }
+          annotationsString += entry.getKey() + "=" + entry.getValue();
+          first = false;
+        }
+        annotationsString += ") ";
+      }
+    }
+    return annotationsString;
+  }
+
+  private void parseMethod(CriterionList clist, String methodName, AMethod method) {
+    // Being "in" a method refers to being somewhere in the
+    // method's tree, which includes return types, parameters, receiver, and
+    // elements inside the method body.
+    clist = clist.add(Criteria.inMethod(methodName));
+
+    // parse receiver
+    CriterionList receiverClist = clist.add(Criteria.receiver(methodName));
+    parseElement(receiverClist, method.receiver);
+
+    // parse return type
+    CriterionList returnClist = clist.add(Criteria.returnType(methodName));
+    parseInnerAndOuterElements(returnClist, method);
+
+    // parse bounds of method
+    for (Entry<BoundLocation, ATypeElement> entry : method.bounds.entrySet()) {
+      BoundLocation boundLoc = entry.getKey();
+      ATypeElement bound = entry.getValue();
+      CriterionList boundClist = clist.add(Criteria.methodBound(methodName, boundLoc));
+      parseInnerAndOuterElements(boundClist, bound);
+    }
+
+    // parse parameters of method
+    for (Entry<Integer, ATypeElement> entry : method.parameters.entrySet()) {
+      Integer index = entry.getKey();
+      ATypeElement param = entry.getValue();
+      CriterionList paramClist = clist.add(Criteria.param(methodName, index));
+      parseInnerAndOuterElements(paramClist, param);
+    }
+
+    // parse locals of method
+    for (Entry<LocalLocation, ATypeElement> entry : method.locals.entrySet()) {
+      LocalLocation loc = entry.getKey();
+      ATypeElement var = entry.getValue();
+      CriterionList varClist = clist.add(Criteria.local(methodName, loc));
+      parseInnerAndOuterElements(varClist, var);
+    }
+
+    // parse typecasts of method
+    for (Entry<Integer, ATypeElement> entry : method.typecasts.entrySet()) {
+      Integer offset = entry.getKey();
+      ATypeElement cast = entry.getValue();
+      CriterionList castClist = clist.add(Criteria.cast(methodName, offset));
+      parseInnerAndOuterElements(castClist, cast);
+    }
+
+    // parse news (object creation) of method
+    for (Entry<Integer, ATypeElement> entry : method.news.entrySet()) {
+      Integer offset = entry.getKey();
+      ATypeElement newObject = entry.getValue();
+      CriterionList newClist = clist.add(Criteria.newObject(methodName, offset));
+      parseInnerAndOuterElements(newClist, newObject);
+    }
+
+    // parse instanceofs of method
+    for (Entry<Integer, ATypeElement> entry : method.instanceofs.entrySet()) {
+      Integer offset = entry.getKey();
+      ATypeElement instanceOf = entry.getValue();
+      CriterionList instanceOfClist = clist.add(Criteria.instanceOf(methodName, offset));
+      parseInnerAndOuterElements(instanceOfClist, instanceOf);
+    }
+  }
+}

@@ -1,0 +1,5 @@
+package annotator.tests;
+
+public class FieldSimple {
+  private @java.lang.Mutable Integer field;
+}

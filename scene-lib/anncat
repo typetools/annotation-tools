@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# Concatenates multiple descriptions of annotations into a single one.
+
+SCENE_LIB=$(dirname $0)
+WORKSPACE=$SCENE_LIB/..
+ASMX=$WORKSPACE/asmx
+
+export CLASSPATH=$SCENE_LIB/bin:$ASMX/bin
+java annotations.tools.AnncatMain "$@"
