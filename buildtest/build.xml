@@ -57,7 +57,7 @@
 
         <property name="asmx" location="${builddir}/annotations/asmx" />
         <property name="scene-lib" location="${builddir}/annotations/scene-lib" />
-        <property name="annotations-compiler" location="${builddir}/annotations/langtools/src/share/opensource/javac" />
+        <property name="annotations-compiler" location="${builddir}/jsr308-langtools/src/share/opensource/javac" />
         <property name="annotations-disassembler" location="${builddir}/annotations/disassembler" />
         <property name="annotator" location="${builddir}/annotations/annotator" />
         <property name="annotated-jdk" location="${builddir}/qualifiers/annotated-jdk" />

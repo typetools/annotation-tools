@@ -20,11 +20,9 @@ Documentation for the compiler may be found at
   langtools/README-jsr308.html
 which is also file "README-jsr308.html" in the compiler distribution.
 
-By convention, the langtools repository is checked out as a subdiretory of
-annotations/, so that it is a sibling of checkers/ just as recommeded for
-users.  To check out a copy of the langtools repository, use these commands:
-  cd annotations
-  hg clone http://hg.openjdk.java.net/type-annotations/type-annotations/langtools
+The jsr308-langtools repository should be a sibling of checker-framework.
+To check out a copy of the jsr308-langtools repository, use these commands:
+  hg clone https://jsr308-langtools.googlecode.com/hg/ jsr308-langtools  
 
 
 JSR 308 specification
@@ -130,8 +128,8 @@ project.
 
 
 Documentation for the jsr308 compiler and the annotation file utilities are:
-  annotations/langtools/README-jsr308.html
-  annotations/annotation-file-utilities/annotation-file-utilities.html
+  jsr308-langtools/README-jsr308.html
+  annotation-tools/annotation-file-utilities/annotation-file-utilities.html
 
 Building and running Javarifier:  see javari/javarifier/README
 

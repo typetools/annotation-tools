@@ -13,7 +13,7 @@ function problem {
 
 
 ANNCAT=../scene-lib/anncat
-XJAVAC="../langtools/dist/bin/javac -g"
+XJAVAC="../../jsr308-langtools/dist/bin/javac -g"
 
 ./clean.sh
 

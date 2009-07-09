@@ -98,8 +98,7 @@
         </copy>
 
 <!-- Optional lines for "javac":
-  executable="/afs/csail.mit.edu/u/j/jaimeq/research/annotations/langtools/dist/bin/javac"
-  executable="/DS/home-0/mernst/research/typequals/annotations/langtools/dist/bin/javac"
+  executable=".../research/types/jsr308-langtools/dist/bin/javac"
 -->
         <javac 
                destdir="bin" 
