@@ -111,6 +111,10 @@ primarily to enable testing by the Javari developers.
 % OuterClass\$InnerClass}'' pattern as the ``.class'' file.
 
 
+By convention, an annotation file ends with ``\code{.jaif}'' (for ``Java
+annotation index file''), but this is not required.
+
+
 % \verbdef\lineend|"\n"|
 
 %BEGIN LATEX
@@ -177,8 +181,14 @@ annotations and classes in that package.
 \qquad    \bnfnt{package-definition}+
 \end{tabbing}
 
+The annotation file may omit certain program elements --- for instance, it
+may mention only some of the packages in your program, or only some of the
+classes in a package, or only some of the fields or methods of a class.
+Program elements that do not appear in the annotation file are treated as
+unannotated.
 
-\subsection{Package Definitions}
+
+\subsection{Package definitions}
 \label{sec:package-definition}
 
 Package definitions describe a package containing a list of annotation
@@ -196,7 +206,7 @@ annotations on the package itself (such as those from a
 \end{tabbing}
 
 
-\subsection{Annotation Definitions}
+\subsection{Annotation definitions}
 \label{sec:annotation-definition}
 
 An annotation definition describes the annotation's fields and their
@@ -205,6 +215,10 @@ annotation file.
 An annotation must be defined in an annotation file before it may be
 used, either on a program element or as a field of another annotation
 definition.
+The annotation definition appears within the package that
+defines the annotation.  The annotation may be applied to elements of any
+package.
+
 
 If an annotation file uses an annotation type at least once to directly annotate a
 program element, the annotation definition must include a retention policy;
@@ -227,12 +241,12 @@ the retention policy is optional.
 \qquad    \bnfor{} \bnflit{source} \bnfcmt Equivalent to \code{@Retention(SOURCE)} in source
 \end{tabbing}
 
-\subsection{Class Definitions}
+\subsection{Class definitions}
 
 Class definitions describe the annotations present on the various
 program elements.  It is organized according to the hierarchy of fields
-and methods in the class.  Program elements that are not annotated may be
-present or may be omitted.  Class definitions
+and methods in the class.
+Class definitions
 are defined by the \code{class-definition} production of the following grammar.
 
 Inner classes are treated as ordinary classes whose names happen to contain
@@ -278,8 +292,9 @@ inner class or the outer class.)
 \qquad        \bnfnt{type-argument-or-array-definition}* \\
 \\
 \bnfnt{method-definition} ::= \\
-\qquad    \bnfcmt The method key consists of the name followed by the signature \\
-\qquad    \bnfcmt in JVML format, for example: \code{foo([ILjava/lang/String;)V} \\
+\qquad    \bnfcmt The method-key consists of the name followed by the signature \\
+\qquad    \bnfcmt in JVML format, for example: ``\code{foo([ILjava/lang/String;)V}''. \\
+\qquad    \bnfcmt The annotation on the \bnflit{method} line is that on the method or the return value. \\
 \qquad    \bnflit{method} \bnfnt{method-key} \bnflit{:} \bnfnt{annotation}* \lineend \\
 \qquad        \bnfnt{bound-definition}* \\
 \qquad        \bnfnt{type-argument-or-array-definition}* \\
@@ -396,7 +411,7 @@ class Foo: @A(value=12)
     field baz: @B
         inner-type 0: @C
 
-    method <init>:
+    method <init>():
         parameter #0: @B
             inner-type 0: @C
         receiver: @D(value="spam")
@@ -450,7 +465,8 @@ class Foo:
 \label{fig:annotation-file-examples}
 \end{figure}
 
-\section{Types and Values}
+
+\section{Types and values}
 \label{sec:typesvalues}
 
 The Java language permits several types for annotation fields: primitives,
@@ -579,4 +595,5 @@ described in this document primarily for method bodies.
 \end{document}
 
 % LocalWords:  java javac OuterClass InnerClass TODO Kleene MP subannotations
-% LocalWords:  enum arr quined int pt instanceof
+% LocalWords:  enum arr quined int pt instanceof RUNTIME JVML ILjava boolean
+% LocalWords:  programmatically jml ernst jaif whitespace

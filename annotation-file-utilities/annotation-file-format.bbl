@@ -1,9 +1,9 @@
 \begin{thebibliography}{LBR06}
 
-\bibitem[Ern07]{JSR308}
+\bibitem[Ern08]{JSR308}
 Michael~D. Ernst.
-\newblock Annotations on {Java} types: {JSR} 308 working document.
-\newblock \url{http://pag.csail.mit.edu/jsr308/}, November~12, 2007.
+\newblock {Type Annotations} specification ({JSR} 308).
+\newblock \url{http://pag.csail.mit.edu/jsr308/}, September~12, 2008.
 
 \bibitem[LBR06]{LeavensBR2006:JML}
 Gary~T. Leavens, Albert~L. Baker, and Clyde Ruby.
