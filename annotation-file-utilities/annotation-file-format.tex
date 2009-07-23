@@ -111,6 +111,27 @@ primarily to enable testing by the Javari developers.
 % OuterClass\$InnerClass}'' pattern as the ``.class'' file.
 
 
+% \verbdef\lineend|"\n"|
+
+%BEGIN LATEX
+\DefineShortVerb{\|}
+\SaveVerb{newline}|\n|
+\UndefineShortVerb{\|}
+\newcommand{\lineend}{\bnflit{\UseVerb{newline}}}
+%END LATEX
+%HEVEA \newcommand{\bs}{\char"5C}
+%HEVEA \newcommand{\lineend}{\bnflit{\bs{}n}}
+
+% literal
+\newcommand{\bnflit}[1]{\textrm{``}\textbf{#1}\textrm{''}}
+% non-terminal
+\newcommand{\bnfnt}[1]{\textsf{\emph{#1}}}
+% comment
+\newcommand{\bnfcmt}{\rm \# }
+% alternative
+\newcommand{\bnfor}{\ensuremath{|}}
+
+
 \section{Grammar conventions}
 
 % TODO: How is "[...]" different from "(...)?" ?  Why are two versions
@@ -123,6 +144,7 @@ valid Java constant, and quoted strings are literal values.
 The Kleene qualifiers ``*'' (zero or more), ``?'' (zero or one), and ``+''
 (one or more) denote plurality of a grammar element.
 %
+A vertical bar (``\bnfor'') separates alternatives.
 Parentheses (``()'') denote grouping, and square brackets (``[]'')
 denote optional syntax, which is equivalent to ``( ... ) ?''.
 
@@ -143,26 +165,7 @@ Block comments (``/* ... */'') are not allowed.
 
 
 
-\subsection{annotation file}
-
-% \verbdef\lineend|"\n"|
-
-%BEGIN LATEX
-\DefineShortVerb{\|}
-\SaveVerb{newline}|\n|
-\UndefineShortVerb{\|}
-\newcommand{\lineend}{\bnflit{\UseVerb{newline}}}
-%END LATEX
-%HEVEA \newcommand{\bs}{\char"5C}
-%HEVEA \newcommand{\lineend}{\bnflit{\bs{}n}}
-
-% literal
-\newcommand{\bnflit}[1]{\textrm{``}\textbf{#1}\textrm{''}}
-% non-terminal
-\newcommand{\bnfnt}[1]{\textsf{\emph{#1}}}
-% comment
-\newcommand{\bnfcmt}{\rm \# }
-
+\subsection{Annotation file}
 
 The annotation file itself contains one or more
 package definitions; each package definition describes one or more
@@ -189,7 +192,7 @@ annotations on the package itself (such as those from a
 \qquad    \bnfcmt{To specify the default package, omit the name.} \\
 \qquad    \bnfcmt{Annotations on the default package are not allowed.} \\
 \qquad    \bnflit{package} [ \bnfnt{name}? \bnflit{:} \bnfnt{annotation}* ] \lineend \\
-\qquad    ( \bnfnt{annotation-definition} | \bnfnt{class-definition} ) *
+\qquad    ( \bnfnt{annotation-definition} \bnfor{} \bnfnt{class-definition} ) *
 \end{tabbing}
 
 
@@ -220,8 +223,8 @@ the retention policy is optional.
 \\
 \bnfnt{retention-policy} ::= \\
 \qquad    \bnflit{visible}     \bnfcmt Equivalent to \code{@Retention(RUNTIME)} in source \\
-\qquad    | \bnflit{invisible} \bnfcmt Equivalent to \code{@Retention(CLASS)} in source \\
-\qquad    | \bnflit{source} \bnfcmt Equivalent to \code{@Retention(SOURCE)} in source
+\qquad    \bnfor{} \bnflit{invisible} \bnfcmt Equivalent to \code{@Retention(CLASS)} in source \\
+\qquad    \bnfor{} \bnflit{source} \bnfcmt Equivalent to \code{@Retention(SOURCE)} in source
 \end{tabbing}
 
 \subsection{Class Definitions}
