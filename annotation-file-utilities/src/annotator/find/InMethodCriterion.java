@@ -1,5 +1,7 @@
 package annotator.find;
 
+import annotator.Main;
+
 import com.sun.source.tree.*;
 import com.sun.source.util.TreePath;
 
@@ -29,10 +31,12 @@ final class InMethodCriterion implements Criterion {
      */
     public boolean isSatisfiedBy(TreePath path) {
 
-        debug("InMethodCriterion.isSatisfiedBy(" + path.getClass() + ") for " + this);
-
         if (path == null)
             return false;
+
+        if (Criteria.debug) {
+            debug("InMethodCriterion.isSatisfiedBy(" + Main.pathToString(path) + "); this=" + this);
+        }
 
         do {
 //            Tree tree = path.getLeaf();

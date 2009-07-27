@@ -1,7 +1,6 @@
 package annotator.find;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import annotations.el.BoundLocation;
 import annotations.el.InnerTypeLocation;
@@ -51,8 +50,12 @@ public final class Criteria {
      */
     public boolean isSatisfiedBy(TreePath path) {
         for (Criterion c : criteria)
-            if (! c.isSatisfiedBy(path))
+            if (! c.isSatisfiedBy(path)) {
+                if (debug) {
+                    System.out.println("unsatisfied criterion: " + c);
+                }
                 return false;
+            }
         return true;
     }
 

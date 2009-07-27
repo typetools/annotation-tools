@@ -1,5 +1,7 @@
 package annotator.find;
 
+import annotator.Main;
+
 import java.io.*;
 import java.util.*;
 
@@ -18,9 +20,9 @@ import com.sun.tools.javac.tree.JCTree.*;
  */
 public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
 
-  static final private boolean debug = false;
+  static private boolean debug = false;
 
-  private void debug(String message) {
+  private static void debug(String message) {
     if (debug)
       System.out.println(message);
   }
@@ -178,7 +180,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
             throw new RuntimeException(e);
           }
         } else {
-          throw new RuntimeException("Unrecognized throws type: " + et);
+          throw new RuntimeException("Unrecognized throws (kind=" + et.getKind() + "): " + et);
         }
       }
 
@@ -267,7 +269,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
 
       debug("Considering insertion at tree:");
       debug("  " + i);
-      debug("  " + node);
+      debug("  " + Main.firstLine(node.toString()));
 
       if (!i.getCriteria().isSatisfiedBy(path)) {
         debug("  ... not satisfied");

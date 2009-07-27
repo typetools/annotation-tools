@@ -1,5 +1,7 @@
 package annotator.find;
 
+import annotator.Main;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,6 +15,8 @@ import com.sun.source.tree.Tree;
 import com.sun.source.tree.TypeParameterTree;
 import com.sun.source.tree.VariableTree;
 import com.sun.source.util.TreePath;
+
+import utilMDE.UtilMDE;
 
 public class IsSigMethodCriterion implements Criterion {
 
@@ -29,6 +33,7 @@ public class IsSigMethodCriterion implements Criterion {
 
   private String fullMethodName;
   private String simpleMethodName;
+  // ?? // list of parameters in JVML format
   private List<String> fullyQualifiedParams;
 
   public IsSigMethodCriterion(String methodName) {
@@ -52,14 +57,17 @@ public class IsSigMethodCriterion implements Criterion {
     }
   }
 
+  // params is in JVML format
   private void parseParams(String params) {
     while (params.length() != 0) {
+      // nextParam is in JVML format
       String nextParam = readNext(params);
-      fullyQualifiedParams.add(nextParam);
       params = params.substring(nextParam.length());
+      fullyQualifiedParams.add(UtilMDE.classnameFromJvm(nextParam));
     }
   }
 
+  // strip a JVML type off a string containing multiple concatenated JVML types
   private String readNext(String restOfParams) {
     String firstChar = restOfParams.substring(0, 1);
     if (isPrimitiveLetter(firstChar)) {
@@ -118,6 +126,7 @@ public class IsSigMethodCriterion implements Criterion {
         }
       }
       if (!haveMatch) {
+        debug(String.format("matchTypeParams() => false:%n  vt = %s%n  simpleType = %s%n  fullType = %s%n", vt, simpleType, fullType));
         return false;
       }
     }
@@ -125,13 +134,16 @@ public class IsSigMethodCriterion implements Criterion {
   }
 
 
+  // It looks like both fullType and simpleType are expected to be in Java, not JVML, format
   private boolean matchSimpleType(String fullType, String simpleType, Context context) {
+    debug(String.format("matchSimpleType(%s, %s, %s)%n", fullType, simpleType, context));
 
     // must strip off generics, is all of this necessary, though?
     // do you ever have generics anywhere but at the end?
     while (simpleType.contains("<")) {
-      String beforeBracket = simpleType.substring(0, simpleType.indexOf("<"));
-      String afterBracket = simpleType.substring(simpleType.indexOf(">") + 1);
+      int bracketIndex = simpleType.lastIndexOf("<");
+      String beforeBracket = simpleType.substring(0, bracketIndex);
+      String afterBracket = simpleType.substring(simpleType.indexOf(">", bracketIndex) + 1);
       simpleType = beforeBracket + afterBracket;
     }
 
@@ -202,22 +214,20 @@ public class IsSigMethodCriterion implements Criterion {
     return matchable;
   }
 
+  // simpleType is in JVML format ??
   private boolean matchWithPrefix(String fullType, String simpleType, String prefix) {
-    String possibleFullType = turnTypeToString(prefix, simpleType);
+
+    // quick return if simpleType is in Java format
+    if (fullType.equals(prefix + simpleType)) {
+      return true;
+    }
+
+    // maybe simpleType is in JVML format
+    String possibleFullType = prefix + UtilMDE.classnameToJvm(simpleType);
     possibleFullType = possibleFullType.replace(".", "/");
     boolean b = fullType.equals(possibleFullType);
+    debug(String.format("matchWithPrefix(%s, %s, %s) => %s)%n", fullType, simpleType, prefix, b));
     return b;
-  }
-
-  private String turnTypeToString(String prefix, String simpleType) {
-    if (simpleType.contains("[")) {
-      return "[" + turnTypeToString(prefix,
-          simpleType.substring(0, simpleType.lastIndexOf("[")));
-    } else if (isPrimitive(simpleType)) {
-      return primitiveLetter(simpleType);
-    } else {
-      return "L" + prefix + simpleType + ";";
-    }
   }
 
   public boolean isSatisfiedBy(TreePath path) {
@@ -229,49 +239,50 @@ public class IsSigMethodCriterion implements Criterion {
 
     Tree leaf = path.getLeaf();
 
-    if (leaf.getKind() == Tree.Kind.METHOD) {
-      MethodTree mt = (MethodTree) leaf;
-
-      if (simpleMethodName.equals(mt.getName().toString())) {
-
-        List<? extends VariableTree> sourceParams = mt.getParameters();
-        if (fullyQualifiedParams.size() == sourceParams.size()) {
-
-          // now go through all type parameters declared by method
-          // and for each one, create a mapping from the type to the
-          // first declared extended class, defaulting to Object
-          // for example,
-          // <T extends Date> void foo(T t)
-          //  creates mapping: T -> Date
-          // <T extends Date & List> void foo(Object o)
-          //  creates mapping: T -> Date
-          // <T extends Date, U extends List> foo(Object o)
-          //  creates mappings: T -> Date, U -> List
-          // <T> void foo(T t)
-          //  creates mapping: T -> Object
-
-          Map<String, String> typeToClassMap = new HashMap<String, String>();
-          for (TypeParameterTree param : mt.getTypeParameters()) {
-            String paramName = param.getName().toString();
-            String paramClass = "Object";
-            List<? extends Tree> paramBounds = param.getBounds();
-            if (paramBounds != null && paramBounds.size() >= 1) {
-              paramClass = paramBounds.get(0).toString();
-            }
-            typeToClassMap.put(paramName, paramClass);
-          }
-
-          if (matchTypeParams(sourceParams, typeToClassMap, context)) {
-            debug("IsSigMethodCriterion => true");
-            return true;
-          }
-        }
-      }
-    } else {
-      debug("IsSigMethodCriterion: not a METHOD tree");
+    if (leaf.getKind() != Tree.Kind.METHOD) {
+      debug("IsSigMethodCriterion.isSatisfiedBy(" + Main.pathToString(path) + ") => false: not a METHOD tree");
+      return false;
     }
 
-    debug("IsSigMethodCriterion => false");
+    MethodTree mt = (MethodTree) leaf;
+
+    if (simpleMethodName.equals(mt.getName().toString())) {
+
+      List<? extends VariableTree> sourceParams = mt.getParameters();
+      if (fullyQualifiedParams.size() == sourceParams.size()) {
+
+        // now go through all type parameters declared by method
+        // and for each one, create a mapping from the type to the
+        // first declared extended class, defaulting to Object
+        // for example,
+        // <T extends Date> void foo(T t)
+        //  creates mapping: T -> Date
+        // <T extends Date & List> void foo(Object o)
+        //  creates mapping: T -> Date
+        // <T extends Date, U extends List> foo(Object o)
+        //  creates mappings: T -> Date, U -> List
+        // <T> void foo(T t)
+        //  creates mapping: T -> Object
+
+        Map<String, String> typeToClassMap = new HashMap<String, String>();
+        for (TypeParameterTree param : mt.getTypeParameters()) {
+          String paramName = param.getName().toString();
+          String paramClass = "Object";
+          List<? extends Tree> paramBounds = param.getBounds();
+          if (paramBounds != null && paramBounds.size() >= 1) {
+            paramClass = paramBounds.get(0).toString();
+          }
+          typeToClassMap.put(paramName, paramClass);
+        }
+
+        if (matchTypeParams(sourceParams, typeToClassMap, context)) {
+          debug("IsSigMethodCriterion => true");
+          return true;
+        }
+      }
+    }
+
+    debug("IsSigMethodCriterion.isSatisfiedBy => false");
     return false;
   }
 

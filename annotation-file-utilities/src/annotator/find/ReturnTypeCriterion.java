@@ -30,7 +30,11 @@ public class ReturnTypeCriterion implements Criterion {
     if (Criteria.debug) {
       System.err.println("ReturnTypeCriterion.isSatisfiedBy deferring to inMethodCriterion");
     }
-    return inMethodCriterion.isSatisfiedBy(path);
+    boolean result = inMethodCriterion.isSatisfiedBy(path);
+    if (Criteria.debug) {
+      System.err.println("ReturnTypeCriterion.isSatisfiedBy() => " + result);
+    }
+    return result;
   }
 
   public Kind getKind() {

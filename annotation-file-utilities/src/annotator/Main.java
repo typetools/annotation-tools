@@ -13,6 +13,7 @@ import annotator.specification.IndexFileSpecification;
 import annotator.specification.Specification;
 
 import com.sun.source.tree.CompilationUnitTree;
+import com.sun.source.util.TreePath;
 
 /**
  * This is the main class for the annotator, which inserts annotations in
@@ -254,6 +255,34 @@ public class Main {
         e.printStackTrace();
         System.exit(1);
       }
+    }
+  }
+
+  ///
+  /// Utility methods
+  ///
+
+  public static String pathToString(TreePath path) {
+    if (path == null)
+      return "null";
+    String asString = path.getLeaf().toString();
+    String oneLine = firstLine(asString);
+    return "\"" + oneLine + "\"";
+  }
+
+  /**
+   * Return the first non-empty line of the string, adding an ellipsis
+   * (...) if the string was truncated.
+   */
+  public static String firstLine(String s) {
+    while (s.startsWith("\n")) {
+      s = s.substring(1);
+    }
+    int newlineIndex = s.indexOf('\n');
+    if (newlineIndex == -1) {
+      return s;
+    } else {
+      return s.substring(0, newlineIndex) + "...";
     }
   }
 

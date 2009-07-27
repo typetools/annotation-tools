@@ -5,11 +5,7 @@ import java.util.List;
 
 import annotations.el.InnerTypeLocation;
 
-import com.sun.source.tree.ArrayTypeTree;
-import com.sun.source.tree.IdentifierTree;
-import com.sun.source.tree.ParameterizedTypeTree;
-import com.sun.source.tree.PrimitiveTypeTree;
-import com.sun.source.tree.Tree;
+import com.sun.source.tree.*;
 import com.sun.source.util.TreePath;
 
 /**
@@ -61,46 +57,48 @@ public class GenericArrayLocationCriterion implements Criterion {
     if (path == null) {
       return false;
     }
-      Tree leaf = path.getLeaf();
-      if (locationInParent == null) {
-        // no inner type location, want to annotate outermost type
-        // i.e.   @Readonly List list;
-        //        @Readonly List<String> list;
-        if (leaf instanceof ParameterizedTypeTree
-            || leaf instanceof IdentifierTree
-            || leaf instanceof ArrayTypeTree
-            || leaf instanceof PrimitiveTypeTree) {
-          return true;
-        }
-      } else {
-        // annotating an inner type
-        TreePath parentPath = path.getParentPath();
-        if (parentPath != null) {
-          Tree parent = parentPath.getLeaf();
-          if (parent instanceof ParameterizedTypeTree) {
-            // annotating List<@A Integer>
-            ParameterizedTypeTree ptt = (ParameterizedTypeTree) parent;
-            List<? extends Tree> childTrees = ptt.getTypeArguments();
-            if (childTrees.size() > locationInParent) {
-              boolean b = childTrees.get(locationInParent).equals(leaf);
-              if (parentCriterion != null) {
-                b = b && parentCriterion.isSatisfiedBy(parentPath);
-              }
-              return b;
-            }
-          } else if (parent instanceof ArrayTypeTree) {
-            // annotating @A Integer []
-            ArrayTypeTree att = (ArrayTypeTree) parent;
-            Tree typeOfVtt = att.getType();
-            boolean b =  typeOfVtt.equals(leaf);
+    Tree leaf = path.getLeaf();
+    if (locationInParent == null) {
+      // no inner type location, want to annotate outermost type
+      // i.e.   @Readonly List list;
+      //        @Readonly List<String> list;
+      if (leaf instanceof ParameterizedTypeTree
+          || leaf instanceof IdentifierTree
+          || leaf instanceof ArrayTypeTree
+          || leaf instanceof PrimitiveTypeTree
+          || leaf instanceof MethodTree // for return value
+          ) {
+        return true;
+      }
+    } else {
+      // annotating an inner type
+      TreePath parentPath = path.getParentPath();
+      if (parentPath != null) {
+        Tree parent = parentPath.getLeaf();
+        if (parent instanceof ParameterizedTypeTree) {
+          // annotating List<@A Integer>
+          ParameterizedTypeTree ptt = (ParameterizedTypeTree) parent;
+          List<? extends Tree> childTrees = ptt.getTypeArguments();
+          if (childTrees.size() > locationInParent) {
+            boolean b = childTrees.get(locationInParent).equals(leaf);
             if (parentCriterion != null) {
-              b = b &&
-              parentCriterion.isSatisfiedBy(parentPath);
+              b = b && parentCriterion.isSatisfiedBy(parentPath);
             }
             return b;
           }
+        } else if (parent instanceof ArrayTypeTree) {
+          // annotating @A Integer []
+          ArrayTypeTree att = (ArrayTypeTree) parent;
+          Tree typeOfVtt = att.getType();
+          boolean b =  typeOfVtt.equals(leaf);
+          if (parentCriterion != null) {
+            b = b &&
+              parentCriterion.isSatisfiedBy(parentPath);
+          }
+          return b;
         }
       }
+    }
 
     return false;
   }
@@ -111,6 +109,8 @@ public class GenericArrayLocationCriterion implements Criterion {
 
   public String toString() {
     return "GenericArrayLocationCriterion at " +
-    ((locationInParent == null) ? " outermost type" : location.toString());
+    ((locationInParent == null)
+     ? "outermost type"
+     : ("( " + location.toString() + " )"));
   }
 }
