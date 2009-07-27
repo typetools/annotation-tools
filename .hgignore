@@ -1,0 +1,16 @@
+# use glob syntax.
+syntax: glob
+
+bin
+*.class
+*~
+TAGS
+
+annotation-file-format.aux
+annotation-file-format.blg
+annotation-file-format.dvi
+annotation-file-format.html
+annotation-file-format.log
+annotation-file-format.pdf
+annotation-file-utilities.jar
+annotation-file-utilities.zip
