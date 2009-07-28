@@ -139,7 +139,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
         // return first [, plus 1
         for (int j=i; j < s.length(); j++) {
           if (s.charAt(j) == '[') {
-            return j + 1;
+            return j;
           }
         }
       } catch(Exception e) {
@@ -160,8 +160,6 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
         ArrayTypeTree att = (ArrayTypeTree) parent;
         JCIdent jcid = (JCIdent) node;
         i = jcid.pos;
-        i = getFirstBracketAfter(i);
-        // TODO: i += jcid.toString().length() + 1;
       } else {
         i = ((JCIdent) node).pos;
       }
@@ -180,8 +178,6 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
         ArrayTypeTree att = (ArrayTypeTree) parent;
         JCTree jcid = (JCTree) node;
         i = jcid.pos;
-        i = getFirstBracketAfter(i);
-        // TODO: i += jcid.toString().length() + 1;
       } else {
         i = ((JCTree) node).pos;
       }
@@ -200,11 +196,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
         ArrayTypeTree att = (ArrayTypeTree) parent;
         Tree baseType = att.getType();
         i = ((JCTypeApply) node).getType().pos;
-
-
         debug("BASE TYPE: " + baseType.toString());
-        i = getFirstBracketAfter(i);
-        // TODO: i += baseType.toString().length() + 1;
       } else {
         i = ((JCTypeApply)node).getType().pos;
       }
@@ -370,8 +362,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
 
       if ((node instanceof MethodTree) && ! i.getCriteria().isOnReceiver()) {
         // we must be looking for the return type
-        pos = ((JCMethodDecl)node).getReturnType().pos;
-        assert node != null;
+        pos = tpf.scan(((MethodTree)node).getReturnType(), null);
         assert handled(node);
         // System.out.println("return type node: " + ((JCMethodDecl)node).getReturnType().getClass());
       } else {

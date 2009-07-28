@@ -5,7 +5,7 @@ public class ReceiverWithThrows {
     
   }
   
-  public void bar()@java.lang.ReadOnly  /* @ReadOnly*/ throws Exception {
+  public void bar() @java.lang.ReadOnly  /* @ReadOnly*/ throws Exception {
     
   }
 }
