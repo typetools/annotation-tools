@@ -12,7 +12,7 @@ import annotator.Source.CompilerException;
 import annotator.specification.IndexFileSpecification;
 import annotator.specification.Specification;
 
-import com.sun.source.tree.CompilationUnitTree;
+import com.sun.source.tree.*;
 import com.sun.source.util.TreePath;
 
 /**
@@ -265,7 +265,11 @@ public class Main {
   public static String pathToString(TreePath path) {
     if (path == null)
       return "null";
-    String asString = path.getLeaf().toString();
+    return treeToString(path.getLeaf());
+  }
+
+  public static String treeToString(Tree node) {
+    String asString = node.toString();
     String oneLine = firstLine(asString);
     return "\"" + oneLine + "\"";
   }

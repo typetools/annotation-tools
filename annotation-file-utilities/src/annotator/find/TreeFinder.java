@@ -51,15 +51,86 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       return ((JCVariableDecl)node).getType().pos;
     }
 
+    // When a method is visited, it is visited for the receiver, not the return value.
     @Override
       public Integer visitMethod(MethodTree node, Void p) {
       super.visitMethod(node, p);
       // System.out.println("node: " + node);
       // System.out.println("return: " + node.getReturnType());
-      if (node.getReturnType() == null) {
-        return 0;
+
+
+      int rightBeforeBlock = ((JCMethodDecl) node).getBody().pos;
+      // Will be adjusted if a throws statement exists.
+      int afterParamList = -1;
+
+      // TODO: figure out how to better place reciever annotation!!!
+      //          List<? extends VariableTree> vars = node.getParameters();
+      //
+      //          VariableTree vt = vars.get(0);
+      //          vt.getName().length();
+      List<? extends ExpressionTree> throwsExpressions = node.getThrows();
+      if (throwsExpressions.isEmpty()) {
+        afterParamList = rightBeforeBlock;
+      } else {
+        ExpressionTree et = throwsExpressions.get(0);
+        while (afterParamList == -1) {
+          switch (et.getKind()) {
+          case IDENTIFIER:
+            afterParamList = this.visitIdentifier((IdentifierTree) et, p);
+            afterParamList -= 7; // for the 'throws' clause
+
+            JavaFileObject jfo = tree.getSourceFile();
+            try {
+              String s = String.valueOf(jfo.getCharContent(true));
+              for (int i = afterParamList; i >= 0; i--) {
+                if (s.charAt(i) == ')') {
+                  afterParamList = i + 1;
+                  break;
+                }
+              }
+            } catch(IOException e) {
+              throw new RuntimeException(e);
+            }
+            break;
+          case MEMBER_SELECT:
+            et = ((MemberSelectTree) et).getExpression();
+            break;
+          default:
+            throw new RuntimeException("Unrecognized throws (kind=" + et.getKind() + "): " + et);
+          }
+        }
       }
-      return ((JCMethodDecl)node).getReturnType().pos;
+
+      // TODO:
+      //debugging: System.out.println("result: " + afterParamList);
+      return afterParamList;
+
+
+
+
+//       // old implementations scans characters in the source (which is error-prone).
+//       if (i.getCriteria().isOnReceiver()) {
+//         CharSequence s = null;
+//         try {
+//           s = path.getCompilationUnit().getSourceFile().getCharContent(true);
+//         } catch(Exception e) {
+//           throw new RuntimeException("problem with receiver: " + e.getMessage(), e);
+//         }
+//
+//         // For a receiver, the match is on the method name.
+//         // Therefore, scan forward until after the first ')' encountered
+//         for (int j = pos; j < s.length(); j++) {
+//           if (s.charAt(j) == ')') {
+//             pos = j + 1;
+//             break;
+//           }
+//         }
+//       }
+
+
+
+
+//      return ((JCMethodDecl)node).getReturnType().pos;
     }
 
     private int getFirstBracketAfter(int i) {
@@ -140,54 +211,62 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       return i;
     }
 
-    @Override
-      public Integer visitBlock(BlockTree node, Void p) {
-      //debugging: System.out.println("visitBlock");
-      Integer rightBeforeBlock = ((JCBlock) node).pos;
-      // Will be adjusted if a throws statement exists.
-      Integer afterParamList = rightBeforeBlock;
-      TreePath path = TreePath.getPath(tree, node);
-      Tree methodTree = path.getParentPath().getLeaf();
-      if (!(methodTree.getKind() == Tree.Kind.METHOD)) {
-        throw new RuntimeException("BlockTree has non-method parent");
-      }
-      MethodTree mt = (MethodTree) methodTree;
+//     @Override
+//       public Integer visitBlock(BlockTree node, Void p) {
+//       //debugging: System.out.println("visitBlock");
+//       int rightBeforeBlock = ((JCBlock) node).pos;
+//       // Will be adjusted if a throws statement exists.
+//       int afterParamList = -1;
+//       TreePath path = TreePath.getPath(tree, node);
+//       Tree methodTree = path.getParentPath().getLeaf();
+//       if (!(methodTree.getKind() == Tree.Kind.METHOD)) {
+//         throw new RuntimeException("BlockTree has non-method parent");
+//       }
+//       MethodTree mt = (MethodTree) methodTree;
+//
+//       // TODO: figure out how to better place reciever annotation!!!
+//       //          List<? extends VariableTree> vars = mt.getParameters();
+//       //
+//       //          VariableTree vt = vars.get(0);
+//       //          vt.getName().length();
+//       List<? extends ExpressionTree> throwsExpressions = mt.getThrows();
+//       if (throwsExpressions.isEmpty()) {
+//         afterParamList = rightBeforeBlock;
+//       } else {
+//         ExpressionTree et = throwsExpressions.get(0);
+//         while (afterParamList == -1) {
+//           switch (et.getKind()) {
+//           case IDENTIFIER:
+//             afterParamList = this.visitIdentifier((IdentifierTree) et, p);
+//             afterParamList -= 7; // for the 'throws' clause
+//
+//             JavaFileObject jfo = tree.getSourceFile();
+//             try {
+//               String s = String.valueOf(jfo.getCharContent(true));
+//               for (int i = afterParamList; i >= 0; i--) {
+//                 if (s.charAt(i) == ')') {
+//                   afterParamList = i + 1;
+//                   break;
+//                 }
+//               }
+//             } catch(IOException e) {
+//               throw new RuntimeException(e);
+//             }
+//             break;
+//           case MEMBER_SELECT:
+//             et = ((MemberSelectTree) et).getExpression();
+//             break;
+//           default:
+//             throw new RuntimeException("Unrecognized throws (kind=" + et.getKind() + "): " + et);
+//           }
+//         }
+//       }
+//
+//       // TODO:
+//       //debugging: System.out.println("result: " + afterParamList);
+//       return afterParamList;
+//     }
 
-      // TODO: figure out how to better place reciever annotation!!!
-      //          List<? extends VariableTree> vars = mt.getParameters();
-      //
-      //          VariableTree vt = vars.get(0);
-      //          vt.getName().length();
-      List<? extends ExpressionTree> throwsExpressions = mt.getThrows();
-      if (throwsExpressions.isEmpty()) {
-        afterParamList = rightBeforeBlock;
-      } else {
-        ExpressionTree et = throwsExpressions.get(0);
-        if (et.getKind() == Tree.Kind.IDENTIFIER) {
-          afterParamList = this.visitIdentifier((IdentifierTree) et, p);
-          afterParamList -= 7; // for the 'throws' clause
-
-          JavaFileObject jfo = tree.getSourceFile();
-          try {
-            String s = String.valueOf(jfo.getCharContent(true));
-            for (int i = afterParamList; i >= 0; i--) {
-              if (s.charAt(i) == ')') {
-                afterParamList = i + 1;
-                break;
-              }
-            }
-          } catch(IOException e) {
-            throw new RuntimeException(e);
-          }
-        } else {
-          throw new RuntimeException("Unrecognized throws (kind=" + et.getKind() + "): " + et);
-        }
-      }
-
-      // TODO:
-      //debugging: System.out.println("result: " + afterParamList);
-      return afterParamList;
-    }
 
     @Override
       public Integer visitArrayType(ArrayTypeTree node, Void p) {
@@ -225,6 +304,16 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     this.satisfied = new HashSet<Insertion>();
   }
 
+  boolean handled(Tree node) {
+    return (node instanceof MethodTree
+            || node instanceof VariableTree
+            || node instanceof IdentifierTree
+            || node instanceof ParameterizedTypeTree
+            || node instanceof BlockTree
+            || node instanceof ArrayTypeTree
+            || node instanceof PrimitiveTypeTree);
+  }
+
   /**
    * Scans this tree, using the list of insertions to generate the source
    * position to insertion text mapping.
@@ -235,13 +324,8 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       return null;
     }
 
-    if (! (node instanceof MethodTree
-           || node instanceof VariableTree
-           || node instanceof IdentifierTree
-           || node instanceof ParameterizedTypeTree
-           || node instanceof BlockTree
-           || node instanceof ArrayTypeTree
-           || node instanceof PrimitiveTypeTree)) {
+    if (! handled(node)) {
+      // nothing to do
       return super.scan(node, p);
     }
 
@@ -267,37 +351,36 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       if (satisfied.contains(i))
         continue;
 
-      debug("Considering insertion at tree:");
-      debug("  " + i);
-      debug("  " + Main.firstLine(node.toString()));
+      if (debug) {
+        debug("Considering insertion at tree:");
+        debug("  " + i);
+        debug("  " + Main.firstLine(node.toString()));
+      }
 
       if (!i.getCriteria().isSatisfiedBy(path)) {
         debug("  ... not satisfied");
         continue;
       }
 
-      Integer pos = tpf.scan(node, null);
+      // If this is a method, then it might have been selected because of
+      // the receiver, or because of the return value.  Distinguish those.
+      // One way would be to set a global variable here.  Another would be
+      // to look for a particular different node.  I will do the latter.
+      Integer pos;
 
-      debug("  ... satisfied! at " + pos + " for node " + node.getClass());
-
-      if (i.getCriteria().isOnReceiver()) {
-        CharSequence s = null;
-        try {
-          s = path.getCompilationUnit().getSourceFile().getCharContent(true);
-        } catch(Exception e) {
-          throw new RuntimeException("problem with receiver: " + e.getMessage(), e);
-        }
-
-        // For a receiver, the match is on the method name.
-        // Therefore, scan forward until after the first ')' encountered
-        for (int j = pos; j < s.length(); j++) {
-          if (s.charAt(j) == ')') {
-            pos = j + 1;
-            break;
-          }
-        }
-
+      if ((node instanceof MethodTree) && ! i.getCriteria().isOnReceiver()) {
+        // we must be looking for the return type
+        pos = ((JCMethodDecl)node).getReturnType().pos;
+        assert node != null;
+        assert handled(node);
+        // System.out.println("return type node: " + ((JCMethodDecl)node).getReturnType().getClass());
+      } else {
+        pos = tpf.scan(node, null);
+        assert pos != null;
       }
+      assert pos > 0;
+
+      debug("  ... satisfied! at " + pos + " for node of type " + node.getClass() + ": " + Main.treeToString(node));
 
       if (pos != null && !positions.containsKey(pos)) {
         positions.put(pos, i.getText());

@@ -126,7 +126,7 @@ public class IsSigMethodCriterion implements Criterion {
         }
       }
       if (!haveMatch) {
-        debug(String.format("matchTypeParams() => false:%n  vt = %s%n  simpleType = %s%n  fullType = %s%n", vt, simpleType, fullType));
+        if (Criteria.debug) debug(String.format("matchTypeParams() => false:%n  vt = %s%n  simpleType = %s%n  fullType = %s%n", vt, simpleType, fullType));
         return false;
       }
     }
@@ -136,7 +136,7 @@ public class IsSigMethodCriterion implements Criterion {
 
   // It looks like both fullType and simpleType are expected to be in Java, not JVML, format
   private boolean matchSimpleType(String fullType, String simpleType, Context context) {
-    debug(String.format("matchSimpleType(%s, %s, %s)%n", fullType, simpleType, context));
+    if (Criteria.debug) debug(String.format("matchSimpleType(%s, %s, %s)%n", fullType, simpleType, context));
 
     // must strip off generics, is all of this necessary, though?
     // do you ever have generics anywhere but at the end?
@@ -226,7 +226,7 @@ public class IsSigMethodCriterion implements Criterion {
     String possibleFullType = prefix + UtilMDE.classnameToJvm(simpleType);
     possibleFullType = possibleFullType.replace(".", "/");
     boolean b = fullType.equals(possibleFullType);
-    debug(String.format("matchWithPrefix(%s, %s, %s) => %s)%n", fullType, simpleType, prefix, b));
+    if (Criteria.debug) debug(String.format("matchWithPrefix(%s, %s, %s) => %s)%n", fullType, simpleType, prefix, b));
     return b;
   }
 
@@ -240,7 +240,7 @@ public class IsSigMethodCriterion implements Criterion {
     Tree leaf = path.getLeaf();
 
     if (leaf.getKind() != Tree.Kind.METHOD) {
-      debug("IsSigMethodCriterion.isSatisfiedBy(" + Main.pathToString(path) + ") => false: not a METHOD tree");
+      if (Criteria.debug) debug("IsSigMethodCriterion.isSatisfiedBy(" + Main.pathToString(path) + ") => false: not a METHOD tree");
       return false;
     }
 
