@@ -36,6 +36,13 @@ public class Main {
   @Option("-d <directory> Directory in which output files are written")
   public static String outdir = "annotated/";
 
+  // It's already possible to emulate this (without the backing up) via
+  //   -d .
+  // but the --in-place argument is more convenient and explicit.
+  /** Directory in which output files are written. */
+  @Option("-i Overwrite original source files")
+  public static boolean in_place = false;
+
   @Option("-h Print usage information and exit")
   public static boolean help = false;
 
@@ -68,20 +75,25 @@ public class Main {
    */
   public static void main(String[] args) {
 
-    Options options = new Options("Main [options] ann-file... java-file...", Main.class);
-    String[] file_args = options.parse_and_usage (args);
-
     if (verbose) {
       System.out.println(INDEX_UTILS_VERSION);
     }
+
+    Options options = new Options("Main [options] ann-file... java-file...", Main.class);
+    String[] file_args = options.parse_and_usage (args);
 
     if (help) {
       options.print_usage();
       System.exit(0);
     }
 
+    if (in_place && outdir != "annotated/") { // interned
+      options.print_usage("The --outdir and --in-place options are mutually exclusive.");
+      System.exit(1);
+    }
+
     if (file_args.length < 2) {
-      options.print_usage("Supplied %d arguments, at least 2 needeed", file_args.length);
+      options.print_usage("Supplied %d arguments, at least 2 needed%n", file_args.length);
       System.exit(1);
     }
 
@@ -127,11 +139,41 @@ public class Main {
 
     for (String javafilename : javafiles) {
 
-      Set<String> imports = new LinkedHashSet<String>();
-
       if (verbose) {
         System.out.println("Processing " + javafilename);
       }
+
+      File javafile = new File(javafilename);
+
+      File outfile;
+      File unannotated = new File(javafilename + ".unannotated");
+      if (in_place) {
+        // It doesn't make sense to check timestamps;
+        // if the .java.unannotated file exists, then just use it.
+        // A user can rename that file back to just .java to cause the
+        // .java file to be read.
+        if (unannotated.exists()) {
+          if (verbose) {
+            System.out.printf("Renaming %s to %s%n", unannotated, javafile);
+          }
+          boolean success = unannotated.renameTo(javafile);
+          if (! success) {
+            throw new Error(String.format("Failed renaming %s to %s",
+                                          unannotated, javafile));
+          }
+        }
+        outfile = javafile;
+      } else {
+        String baseName;
+        if (javafile.isAbsolute()) {
+          baseName = javafile.getName();
+        } else {
+          baseName = javafile.getPath();
+        }
+        outfile = new File(outdir, baseName);
+      }
+
+      Set<String> imports = new LinkedHashSet<String>();
 
       String fileLineSep = System.getProperty("line.separator");
       Source src;
@@ -235,21 +277,26 @@ public class Main {
         }
       }
 
-      File javafile = new File(javafilename);
-
-      String baseName;
-      if (javafile.isAbsolute()) {
-        baseName = javafile.getName();
-      } else {
-        baseName = javafile.getPath();
-      }
-      File outfile = new File(outdir, baseName);
-
       // Write the source file.
       try {
-        outfile.getParentFile().mkdirs();
+        if (in_place) {
+          if (verbose) {
+            System.out.printf("Renaming %s to %s%n", javafile, unannotated);
+          }
+          boolean success = javafile.renameTo(unannotated);
+          if (! success) {
+            throw new Error(String.format("Failed renaming %s to %s",
+                                          javafile, unannotated));
+          }
+        } else {
+          outfile.getParentFile().mkdirs();
+        }
         OutputStream output = new FileOutputStream(outfile);
+        if (verbose) {
+          System.out.printf("Writing %s%n", outfile);
+        }
         src.write(output);
+        output.close();
       } catch (IOException e) {
         System.err.println("Problem while writing file " + outfile);
         e.printStackTrace();

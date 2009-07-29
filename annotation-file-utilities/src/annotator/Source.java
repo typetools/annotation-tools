@@ -38,7 +38,6 @@ public final class Source {
     /**
      * Sets up a compiler for parsing the given Java source file.
      *
-     * @param srcList the source files to parse
      * @throws CompilerException if the input file couldn't be read
      */
     public Source(String src) throws CompilerException, IOException {
@@ -62,6 +61,7 @@ public final class Source {
         List<String> optsList = Arrays.asList(stringOpts);
 
         // Create a task.
+        // This seems to require that the file names end in .java
         CompilationTask cTask =
             compiler.getTask(null, fileManager, null, optsList, null, fileObjs);
         if (!(cTask instanceof JavacTask))
@@ -134,6 +134,7 @@ public final class Source {
     public void write(OutputStream out) throws IOException {
         out.write(source.toString().getBytes());
         out.flush();
+        out.close();
     }
 
 }
