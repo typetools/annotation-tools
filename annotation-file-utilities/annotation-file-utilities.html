@@ -6,9 +6,6 @@
 </head>
 <body>
 <h1>Annotation File Utilities</h1>
-<p>
-Developed by Jaime Quinonez (<a href="mailto:jaimeq@mit.edu">jaimeq@mit.edu</a>) for use in collaboration with <a href="http://groups.csail.mit.edu/pag/jsr308/">JSR 308</a>.
-</p>
 
 <p>Contents:</p>
 <!-- start toc.  do not edit; run html-update-toc instead -->
@@ -27,8 +24,8 @@ Developed by Jaime Quinonez (<a href="mailto:jaimeq@mit.edu">jaimeq@mit.edu</a>)
         </ul></li>
       <li><a href="#feedback">Feedback</a>
         <ul>
-          <li><a href="#bugs">Known Bugs/Limitations</a></li>
           <li><a href="#change-log">Change Log</a></li>
+          <li><a href="#credits">Credits</a></li>
         </ul></li>
     </ul>
 <!-- end toc -->
@@ -62,8 +59,8 @@ the annotations outside the source code or the <code>.class</code> file.
 The document
 &ldquo;Annotation
 File Specification&rdquo; (<a
-    href="http://pag.csail.mit.edu/jsr308/annotation-file-utilities/annotation-file-format.pdf">PDF</a>, <a
-    href="http://pag.csail.mit.edu/jsr308/annotation-file-utilities/annotation-file-format.html">HTML</a>)
+    href="http://types.cs.washington.edu/annotation-file-utilities/annotation-file-format.pdf">PDF</a>, <a
+    href="http://types.cs.washington.edu/annotation-file-utilities/annotation-file-format.html">HTML</a>)
 defines a textual format for annotations,
 and it also motivates reasons why such a file format is necessary in
 addition to the <code>.java</code> and <code>.class</code> formats.  The
@@ -119,13 +116,13 @@ The following instructions assume either a Linux or Windows system using a comma
 
 <p>
 The current distribution is <code>Annotation File Utilities version
-2.2</code>, released December 7, 2008.
+2.3</code>, released July 29, 2009.
 </p>
 
 <ol>
 <li>
   Download 
-  <a href="http://pag.csail.mit.edu/jsr308/annotation-file-utilities/annotation-file-utilities.zip">annotation-file-utilities.zip</a>.
+  <a href="http://types.cs.washington.edu/annotation-file-utilities/annotation-file-utilities.zip">annotation-file-utilities.zip</a>.
 </li>
 
 <li>
@@ -298,18 +295,19 @@ for full usage information.  Note that you must have the associated class <code>
 <h2 id="feedback"> Feedback </h2>
 
 <p>
-Please send questions, comments, bug reports, and feature requests to
-jsr308-bugs@lists.csail.mit.edu.  When reporting a bug, please include exact
-instructions in how to reproduce it, and please also send us relevant input
-files.  This will let us resolve the issue quickly.
+To submit a bug report or request a new feature, use the
+<a href="http://code.google.com/p/annotation-tools/issues/list">issue
+  tracker</a>.  When reporting a bug, please include exact instructions in
+how to reproduce it, and please also attach relevant input files.  This
+will let us resolve the issue quickly.
 </p>
 
-<h3 id="bugs"> Known Bugs/Limitations </h3>
-
 <p>
-There are no known bugs at this time.  Please report any bugs you
-encounter, along with instructions on how to reproduce them, to
-jsr308-bugs@lists.csail.mit.edu.
+You can also reach the developers at 
+<a href="mailto:annotation-tools-dev@googlegroups.com">annotation-tools-dev@googlegroups.com</a>.
+But please use the
+  <a href="http://code.google.com/p/annotation-tools/issues/list">issue
+  tracker</a> for bug reports and feature requests.
 </p>
 
 
@@ -338,8 +336,8 @@ jsr308-bugs@lists.csail.mit.edu.
   <li>
   Version 2.1.2: (Released April 28, 2008)
   Minor updates to the &ldquo;Annotation File Specification&rdquo; (<a
-    href="http://pag.csail.mit.edu/jsr308/annotation-file-utilities/annotation-file-format.pdf">PDF</a>, <a
-    href="http://pag.csail.mit.edu/jsr308/annotation-file-utilities/annotation-file-format.html">HTML</a>).
+    href="http://types.cs.washington.edu/annotation-file-utilities/annotation-file-format.pdf">PDF</a>, <a
+    href="http://types.cs.washington.edu/annotation-file-utilities/annotation-file-format.html">HTML</a>).
   </li>
   <li>
   Version 2.2: (Released December 7, 2008)
@@ -354,12 +352,31 @@ jsr308-bugs@lists.csail.mit.edu.
           added complexity without commensurate functionality.</li>
     </ul>
   </li>
+  <li>
+  Version 2.3: (Released July 29, 2009)
+    <ul>
+      <li>Support -i --in-place argument.</li>
+      <li>Fix incorrect array brackets in tests.</li>
+      <li>Fix inserting annotations on receivers.</li>
+      <li>Improve documentation.</li>
+      <li>Improve error handling.</li>
+    </ul>
+  </li>
 </ul>
+
+<h3 id="credits"> Credits </h3>
+
+<p>
+Originally developed by Jaime Quinonez for use in collaboration with
+<a href="http://groups.csail.mit.edu/pag/jsr308/">JSR 308</a>.
+</p>
+
+
 
 <hr/>
 
 <p>
-Last revised: December 7, 2008
+Last revised: July 29, 2009
 </p>
 
 </body>

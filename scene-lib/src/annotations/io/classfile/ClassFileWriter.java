@@ -22,7 +22,7 @@ import annotations.io.IndexFileParser;
 public class ClassFileWriter {
 
   public static final String INDEX_UTILS_VERSION =
-    "Annotation file utilties: insert-annotations v2.2";
+    "Annotation file utilities: insert-annotations v2.3";
   /**
    * Main method meant to a a convenient way to write annotations from an index
    * file to a class file.  For programmatic access to this
@@ -129,11 +129,12 @@ public class ClassFileWriter {
      } catch(Exception e) {
        System.out.println("Uknown error trying to insert annotations from: " +
            indexFileName + " to " + className);
-       System.out.println("Please send a copy the following output trace, " +
-         "along with instructions on how to reproduce this error, " +
-         "to the Javari mailing list at javari@csail.mit.edu");
        System.out.println(e.getMessage());
        e.printStackTrace();
+       System.out.println("Please submit a bug report at");
+       System.out.println("  http://code.google.com/p/annotation-tools/issues");
+       System.out.println("Be sure to include a copy of the following output trace, instructions on how");
+       System.out.println("to reproduce this error, and all input files.  Thanks!");
        return;
      }
     }

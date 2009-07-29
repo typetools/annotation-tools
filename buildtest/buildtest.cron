@@ -5,8 +5,8 @@
 # You can install this crontab by running:
 #  crontab buildtest.cron
 
-USER=jaimeq
-MAILTO=javari@csail.mit.edu
+USER=mernst
+MAILTO=mernst@cs.washington.edu
 AFS=/afs/csail.mit.edu/u/j/jaimeq/bin/afs-cron-wrapper
 # AFS is a wrapper to be able to execute the build script under
 # unix user jaimeq and afs user jaimeq.cron (which is a member the pag group).

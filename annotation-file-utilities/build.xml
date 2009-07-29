@@ -22,8 +22,12 @@
        having this separate directory? -->
   <property name="temp-jarfile" value="${java.io.tmpdir}/annotation-file-utilities-jarfile" />
 
+<!--
   <property name="jsr308-www"
     value="/afs/csail/group/pag/www/jsr308"/>
+-->
+  <property name="jsr308-www"
+    value="/cse/www2/types"/>
   <property name="jsr308-www-annotation-file-utilities"
     value="${jsr308-www}/annotation-file-utilities"/>
 
@@ -134,7 +138,7 @@
 
   <target name="jarfile"
           depends="init,clean,build"
-          description="creates the class library annotation-file-utilities.jar">
+          description="create the class library annotation-file-utilities.jar">
 
     <echo message="Using temporary directory: ${temp-jarfile}"/>
     <mkdir dir="${temp-jarfile}"/>
@@ -171,7 +175,7 @@
 
   <target name="zipfile"
           depends="jarfile,update-workspace,annotation-file-format"
-          description="creates the distribution as annotation-file-utilities.zip">
+          description="create the distribution: annotation-file-utilities.zip">
     <!-- Create a new directory containing all the files and then zip that
          directory, so that when the user unzips they extract exactly one
          directory. -->
@@ -210,7 +214,7 @@
   </target>
 
    <target name="export" depends="clean,zipfile"
-          description="creates the distribution zipfile and exports it to jsr308 website">
+          description="export the zipfile, etc. to its website">
     <echo message="Export location: ${jsr308-www-annotation-file-utilities}"/>
     <echo message="Copying annotation-file-utilities.zip"/>
     <copy file="annotation-file-utilities.zip"
@@ -227,10 +231,15 @@
       todir="${jsr308-www-annotation-file-utilities}"/>
 
     <echo message="Updating link dates"/>
+<!--
+  TEMPORARY
+-->
+<!--
     <exec executable="update-link-dates"
           failonerror="true">
       <arg value="${jsr308-www}/jsr308-webpage.html"/>
     </exec>
+-->
 
     <echo message="Checking HTML links"/>
     <exec executable="/usr/bin/make"
@@ -260,7 +269,7 @@
   </target>
 
   <target name="clean"
-          description="removes previous .jar and .zip files and any other temporary files">
+          description="removes generated files (e.g., .jar, .zip)">
     <delete dir="bin"/>
 
     <!-- <echo message="Deleting temporary directory: ${temp-jarfile}"/> -->
@@ -282,7 +291,7 @@
 
   <target name="build"
           depends="init"
-          description="compiles all source files necessary to run the modified javac">
+          description="compile all source files">
 
     <mkdir dir="bin"/>
 
@@ -296,7 +305,7 @@
   <target name="etags" depends="tags">
   </target>
   <target name="tags"
-          description="Create Emacs TAGS table, including all scene library files">
+          description="create Emacs TAGS table, including scene library files">
     <exec executable="/bin/sh">
       <arg value="-c"/>
       <arg value="etags `find src -name '*.java' | sort-directory-order.pl` `find ../scene-lib -name '*.java' | sort-directory-order.pl`"/>

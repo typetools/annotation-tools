@@ -30,7 +30,7 @@ import com.sun.source.util.TreePath;
 public class Main {
 
   public static final String INDEX_UTILS_VERSION =
-    "Annotation file utilties: insert-annotations-to-source v2.2";
+    "Annotation file utilities: insert-annotations-to-source v2.3";
 
   /** Directory in which output files are written. */
   @Option("-d <directory> Directory in which output files are written")
