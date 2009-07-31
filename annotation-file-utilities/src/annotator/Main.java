@@ -207,14 +207,13 @@ public class Main {
             throw new Error("Insertion doesn't start with '@': " + toInsert);
           }
           if (abbreviate) {
-            int dotIndex = toInsert.lastIndexOf(".");
+            int nameEnd = toInsert.indexOf("(");
+            if (nameEnd == -1) {
+              nameEnd = toInsert.length();
+            }
+            int dotIndex = toInsert.lastIndexOf(".", nameEnd);
             if (dotIndex != -1) {
-              int parenIndex = toInsert.indexOf("(");
-              if (parenIndex == -1) {
-                imports.add(toInsert.substring(1));
-              } else {
-                imports.add(toInsert.substring(1, parenIndex));
-              }
+              imports.add(toInsert.substring(1, nameEnd));
               toInsert = "@" + toInsert.substring(dotIndex + 1);
             }
           }
