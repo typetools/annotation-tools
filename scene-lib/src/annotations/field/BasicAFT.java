@@ -68,4 +68,16 @@ public final /*@ReadOnly*/ class BasicAFT extends ScalarAFT {
             return type.getName();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String format(Object o) {
+        if (type == String.class) {
+            return "\"" + (String)o + "\"";
+        } else {
+            return o.toString();
+        }
+    }
+
 }

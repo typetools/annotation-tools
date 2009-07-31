@@ -18,7 +18,12 @@ public abstract /*@ReadOnly*/ class AnnotationFieldType extends EqualByStringRep
      * index file. Used by {@link annotations.io.IndexFileWriter}.
      */
     @Override
-    public abstract  String toString();
+    public abstract String toString();
+
+
+    /** Formats an annotation field value. */
+    public abstract String format(Object o);
+
 
     /**
      * Returns an {@link AnnotationFieldType} containing all the

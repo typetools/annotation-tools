@@ -34,4 +34,23 @@ public final /*@ReadOnly*/ class ArrayAFT extends AnnotationFieldType {
         return (elementType == null ? "unknown" :
             ((ScalarAFT) elementType).toString()) + "[]";
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String format(Object o) {
+        Object[] asArray = (Object[]) o;
+        StringBuilder result = new StringBuilder();
+        result.append("{");
+        for (int i = 0; i<asArray.length; i++) {
+            if (i != 0) {
+                result.append(",");
+            }
+            result.append(elementType.format(asArray[i]));
+        }
+        result.append("}");
+        return result.toString();
+    }
+
 }

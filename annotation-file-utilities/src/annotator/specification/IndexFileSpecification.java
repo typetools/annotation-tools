@@ -20,6 +20,7 @@ import annotations.el.ATypeElement;
 import annotations.el.BoundLocation;
 import annotations.el.InnerTypeLocation;
 import annotations.el.LocalLocation;
+import annotations.field.AnnotationFieldType;
 import annotations.io.IndexFileParser;
 import annotations.util.coll.VivifyingMap;
 import annotator.find.Criteria;
@@ -175,7 +176,10 @@ public class IndexFileSpecification implements Specification {
           if (!first) {
             annotationsString += ", ";
           }
-          annotationsString += entry.getKey() + "=" + entry.getValue();
+          annotationsString += entry.getKey() + "=";
+          AnnotationFieldType fieldType = sa.def.fieldTypes.get(entry.getKey());
+          assert fieldType != null;
+          annotationsString += fieldType.format(entry.getValue());
           first = false;
         }
         annotationsString += ") ";

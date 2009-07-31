@@ -35,4 +35,13 @@ public final /*@ReadOnly*/ class AnnotationAFT extends ScalarAFT {
     public  String toString() {
         return "@" + annotationDef.name;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String format(Object o) {
+        return o.toString();
+    }
+
 }

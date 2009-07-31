@@ -7,5 +7,5 @@ import checkers.javari.quals.*;
  * {@link ArrayAFT} can accept only scalar element types, enforcing the Java
  * language's prohibition of multidimensional arrays as annotation field types.
  */
-public abstract /*@ReadOnly*/ class ScalarAFT extends AnnotationFieldType {
+public abstract /*@ReadOnly*/ class ScalarAFT extends AnnotationFieldType  {
 }

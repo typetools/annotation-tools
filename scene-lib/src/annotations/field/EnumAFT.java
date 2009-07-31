@@ -30,4 +30,13 @@ public final /*@ReadOnly*/ class EnumAFT extends ScalarAFT {
     public  String toString() {
         return "enum " + typeName;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String format(Object o) {
+        return o.toString();
+    }
+
 }
