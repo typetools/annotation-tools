@@ -174,7 +174,7 @@
   </target>
 
   <target name="zipfile"
-          depends="jarfile,update-workspace,annotation-file-format"
+          depends="jarfile,run-tests,update-workspace,annotation-file-format"
           description="create the distribution: annotation-file-utilities.zip">
     <!-- Create a new directory containing all the files and then zip that
          directory, so that when the user unzips they extract exactly one
