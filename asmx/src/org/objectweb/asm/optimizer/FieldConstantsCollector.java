@@ -71,7 +71,7 @@ public class FieldConstantsCollector implements FieldVisitor {
         final boolean visible) {
       cp.newUTF8(desc);
       if(visible) {
-        cp.newUTF8("RuntimeVisiblExtendedAnnotations");
+        cp.newUTF8("RuntimeVisibleTypeAnnotations");
       } else {
         cp.newUTF8("RuntimeInvisibleTypeAnnotations");
       }
