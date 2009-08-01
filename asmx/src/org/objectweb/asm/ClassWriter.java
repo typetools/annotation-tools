@@ -749,12 +749,12 @@ public class ClassWriter implements ClassVisitor {
         if(xanns != null) {
           ++attributeCount;
           size += 8 + xanns.getSize();
-          newUTF8("RuntimeVisibleExtendedAnnotations");
+          newUTF8("RuntimeVisibleTypeAnnotations");
         }
         if(ixanns != null) {
           ++attributeCount;
           size += 8 + ixanns.getSize();
-          newUTF8("RuntimeInvisibleExtendedAnnotations");
+          newUTF8("RuntimeInvisibleTypeAnnotations");
         }
         
         if (attrs != null) {
@@ -830,11 +830,11 @@ public class ClassWriter implements ClassVisitor {
             ianns.put(out);
         }
         if(xanns != null) {
-          out.putShort(newUTF8("RuntimeVisibleExtendedAnnotations"));
+          out.putShort(newUTF8("RuntimeVisibleTypeAnnotations"));
           xanns.put(out);
         }
         if(ixanns != null) {
-          out.putShort(newUTF8("RuntimeInvisibleExtendedAnnotations"));
+          out.putShort(newUTF8("RuntimeInvisibleTypeAnnotations"));
           ixanns.put(out);
         }
         if (attrs != null) {

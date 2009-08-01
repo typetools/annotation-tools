@@ -73,8 +73,8 @@ public final class JavapParser {
         RIA("RuntimeInvisibleAnnotations", RetentionPolicy.CLASS, TargetMode.ORIGINAL),
         RVPA("RuntimeVisibleParameterAnnotations", RetentionPolicy.RUNTIME, TargetMode.PARAMETER),
         RIPA("RuntimeInvisibleParameterAnnotations", RetentionPolicy.CLASS, TargetMode.PARAMETER),
-        RVEA("RuntimeVisibleExtendedAnnotations", RetentionPolicy.RUNTIME, TargetMode.EXTENDED),
-        RIEA("RuntimeInvisibleExtendedAnnotations", RetentionPolicy.CLASS, TargetMode.EXTENDED),
+        RVEA("RuntimeVisibleTypeAnnotations", RetentionPolicy.RUNTIME, TargetMode.EXTENDED),
+        RIEA("RuntimeInvisibleTypeAnnotations", RetentionPolicy.CLASS, TargetMode.EXTENDED),
         ;
 
         final String secTitle;
