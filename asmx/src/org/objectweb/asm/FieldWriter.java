@@ -229,11 +229,11 @@ final class FieldWriter implements FieldVisitor {
         }
         //jaime
         if (xanns != null) {
-          cw.newUTF8("RuntimeVisibleExtendedAnnotations");
+          cw.newUTF8("RuntimeVisibleTypeAnnotations");
           size += 8 + xanns.getSize();
         }
         if (ixanns != null) {
-          cw.newUTF8("RuntimeInvisibleExtendedAnnotations");
+          cw.newUTF8("RuntimeInvisibleTypeAnnotations");
           size += 8 + ixanns.getSize();
         }
         // end jaime
@@ -316,11 +316,11 @@ final class FieldWriter implements FieldVisitor {
         }
         //jaime
         if (xanns != null) {
-          out.putShort(cw.newUTF8("RuntimeVisibleExtendedAnnotations"));
+          out.putShort(cw.newUTF8("RuntimeVisibleTypeAnnotations"));
           xanns.put(out);
         }
         if (ixanns != null) {
-          out.putShort(cw.newUTF8("RuntimeInvisibleExtendedAnnotations"));
+          out.putShort(cw.newUTF8("RuntimeInvisibleTypeAnnotations"));
           ixanns.put(out);
         }
         // end jaime

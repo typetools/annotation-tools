@@ -1297,11 +1297,11 @@ class MethodWriter implements MethodVisitor {
             size += 8 + ianns.getSize();
         }
         if(xanns != null) {
-          cw.newUTF8("RuntimeVisibleExtendedAnnotations");
+          cw.newUTF8("RuntimeVisibleTypeAnnotations");
           size += 8 + xanns.getSize();
         }
         if(ixanns != null) {
-          cw.newUTF8("RuntimeInvisibleExtendedAnnotations");
+          cw.newUTF8("RuntimeInvisibleTypeAnnotations");
           size += 8 + ixanns.getSize();
         }
         if (panns != null) {
@@ -1495,11 +1495,11 @@ class MethodWriter implements MethodVisitor {
             ianns.put(out);
         }
         if (xanns != null) {
-          out.putShort(cw.newUTF8("RuntimeVisibleExtendedAnnotations"));
+          out.putShort(cw.newUTF8("RuntimeVisibleTypeAnnotations"));
           xanns.put(out);
         }
         if (ixanns != null) {
-          out.putShort(cw.newUTF8("RuntimeInvisibleExtendedAnnotations"));
+          out.putShort(cw.newUTF8("RuntimeInvisibleTypeAnnotations"));
           ixanns.put(out);
         }
         if (panns != null) {

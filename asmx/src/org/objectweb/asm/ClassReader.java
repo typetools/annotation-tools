@@ -416,9 +416,9 @@ public class ClassReader {
                 anns = v + 6;
             } else if (attrName.equals("RuntimeInvisibleAnnotations")) {
                 ianns = v + 6;
-            } else if (attrName.equals("RuntimeVisibleExtendedAnnotations")) {
+            } else if (attrName.equals("RuntimeVisibleTypeAnnotations")) {
                 xanns = v + 6;
-            } else if (attrName.equals("RuntimeInvisibleExtendedAnnotations")) {
+            } else if (attrName.equals("RuntimeInvisibleTypeAnnotations")) {
                 ixanns = v + 6;
             } else {
                 attr = readAttribute(attrs,
@@ -547,9 +547,9 @@ public class ClassReader {
                     anns = u + 6;
                 } else if (attrName.equals("RuntimeInvisibleAnnotations")) {
                     ianns = u + 6;
-                } else if (attrName.equals("RuntimeVisibleExtendedAnnotations")) {
+                } else if (attrName.equals("RuntimeVisibleTypeAnnotations")) {
                   xanns = u + 6;
-                } else if (attrName.equals("RuntimeInvisibleExtendedAnnotations")) {
+                } else if (attrName.equals("RuntimeInvisibleTypeAnnotations")) {
                   ixanns = u + 6;
                 } else {
 
@@ -679,10 +679,10 @@ public class ClassReader {
                     anns = u;
                 } else if (attrName.equals("RuntimeInvisibleAnnotations")) {
                     ianns = u;
-                } else if (attrName.equals("RuntimeVisibleExtendedAnnotations"))
+                } else if (attrName.equals("RuntimeVisibleTypeAnnotations"))
                 {
                   xanns = u;
-                } else if (attrName.equals("RuntimeInvisibleExtendedAnnotations"))
+                } else if (attrName.equals("RuntimeInvisibleTypeAnnotations"))
                 {
                   ixanns = u;
                 } else if (attrName.equals("RuntimeVisibleParameterAnnotations"))
