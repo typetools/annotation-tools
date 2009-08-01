@@ -18,7 +18,7 @@ all : $(DIFFS) system-test results
 
 .PHONY: system-test
 system-test:
-	(cd system-test; ./run-test.sh)
+	${MAKE} -C system-test
 
 # Display results of all .diff files.
 .PHONY: results

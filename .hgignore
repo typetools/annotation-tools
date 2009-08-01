@@ -17,5 +17,7 @@ annotation-file-utilities.zip
 annotation-file-utilities/tests/*.diff
 annotation-file-utilities/tests/*.log
 annotation-file-utilities/tests/*.output
+annotation-file-utilities/tests/system-test/out2.diff
 annotation-file-utilities/tests/system-test/out2.jann
+annotation-file-utilities/tests/system-test/out5.diff
 annotation-file-utilities/tests/system-test/out5.jann
