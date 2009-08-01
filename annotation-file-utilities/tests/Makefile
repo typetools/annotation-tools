@@ -14,28 +14,37 @@ DIFFS := $(patsubst %.goal, %.diff, $(DIFFS))
 default : all
 
 .PHONY: all
-all : clean compile $(DIFFS) results
+all : $(DIFFS) system-test results
+
+.PHONY: system-test
+system-test:
+	(cd system-test; ./run-test.sh)
 
 # Display results of all .diff files.
 .PHONY: results
-results: VerifyDiffs.class
+results: bin/VerifyDiffs.class
 	@echo ""
 	@echo "=== RESULTS ==="
 	@echo ""
-	@java VerifyDiffs --show_all
+	@java -cp bin VerifyDiffs --show_all
 
 # Remakes the little java program that checks and compares diffs
-VerifyDiffs.class : VerifyDiffs.java
-	@javac VerifyDiffs.java
+bin/VerifyDiffs.class : VerifyDiffs.java
+	@javac -g -d bin VerifyDiffs.java
 
-# Compiles the test cases as needed (by verbose about this).
+# Compiles all the test cases (be verbose about this).
 compile :
-	javac -g -d . *.java
+	mkdir -p bin
+	javac -g -d bin *.java
+
+bin/annotator/tests/%.class: %.java
+	mkdir -p bin
+	javac -g -d bin $*.java
 
 # Actually runs the annotator to create the annotated java file.
 .PRECIOUS: %.output
-%.output:
-	java -cp ../lib/utilMDE.jar:.:../bin:${CLASSPATH} \
+%.output: %.jaif %.java bin/annotator/tests/%.class ../lib/utilMDE.jar ../bin
+	java -cp ../lib/utilMDE.jar:bin:../bin:${CLASSPATH} \
 	annotator.Main \
 	--abbreviate=false \
 	-d $*-output \
@@ -52,7 +61,7 @@ compile :
 # Remove all .diff, .log files from the tests directory.
 .PHONY: clean
 clean :
-	rm -rf *.class
+	rm -rf bin
 	rm -f *.diff
 	rm -f *.log
 	rm -f *.output

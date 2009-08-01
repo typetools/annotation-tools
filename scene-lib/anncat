@@ -6,5 +6,5 @@ SCENE_LIB=$(dirname $0)
 WORKSPACE=$SCENE_LIB/..
 ASMX=$WORKSPACE/asmx
 
-export CLASSPATH=$SCENE_LIB/bin:$ASMX/bin
-java annotations.tools.AnncatMain "$@"
+export CLASSPATH=$SCENE_LIB/bin:$ASMX/bin:$WORKSPACE/annotation-file-utilities/lib/utilMDE.jar
+java annotations.tools.Anncat "$@"

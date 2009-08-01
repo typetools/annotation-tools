@@ -14,10 +14,11 @@ import annotations.io.classfile.*;
 import checkers.nullness.quals.*;
 
 /** Concatenates multiple descriptions of annotations into a single one. **/
-public class AnncatMain {
+public class Anncat {
     private static void usage() {
         System.err.print(
-                "anncat, by the PAG Annotations project\n" +
+                "anncat, part of the Annotation File Utilities\n" +
+                "(http://types.cs.washington.edu/annotation-file-utilities/)\n" +
                 "usage: anncat <inspec>* [ --out <outspec> ], where:\n" +
                 "    <inspec> ::=\n" +
                 "        ( --javap <in.javap> )\n" +

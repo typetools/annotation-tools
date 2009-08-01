@@ -61,13 +61,11 @@
     <target name="init" depends="init-properties, init-dependencies">
         <path id="sourcepath">
             <pathelement location="src"/>
-            <pathelement location="src-devel"/>
         </path>
 
         <!-- Only for repository version. -->
         <fileset dir="." id="source-files">
            <include name="src/**/*.java"/>
-            <include name="src-devel/**/*.java"/>
             <exclude name="**/.svn"/>
         </fileset>
     
@@ -94,7 +92,6 @@
         <mkdir dir="bin"/>
         <copy todir="bin">
             <fileset dir="src" excludes="**/*.java"/>
-            <fileset dir="src-devel" excludes="**/*.java"/>
         </copy>
 
 <!-- Optional lines for "javac":

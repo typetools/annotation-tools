@@ -2,14 +2,11 @@ package annotations.io.classfile;
 
 import checkers.nullness.quals.*;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 
 import org.objectweb.asm.ClassReader;
 
-import annotations.Annotation;
-import annotations.AnnotationFactory;
+import annotations.*;
 import annotations.el.AScene;
 import annotations.io.IndexFileWriter;
 /**
@@ -21,18 +18,31 @@ public class ClassFileReader {
   public static final String INDEX_UTILS_VERSION =
     "Annotation file utilities: extract-annotations v2.3";
 
+  static String usage
+    = "usage: extract-annotations\n"
+    + "            <options> \n"
+    + "            <space-separated list of classes to analyze>\n"
+    + "\n"
+    + "       <options> include: \n"
+    + "         -h, --help       print usage information and exit\n"
+    + "         --version        print version information and exit\n"
+    + "\n"
+    + "For each class a.b.C given, extracts the annotations from that\n"
+    + " class and prints them in index-file format to a.b.C.jaif .\n"
+    + "Note that the class a.b.C must be located in your classpath.\n";
+
+
   /**
-   * Main method meant to a a convenient way to read annotations from a class
-   * file and write them to an index file.  For programmatic access to this
-   * tool, one should probably use the read() methods instead.
+   * From the command line, read annotations from a class file and write
+   * them to an index file.  Also see the Anncat tool, which is more
+   * versatile (and which calls this as a subroutine).
+   * <p>
    *
-   * Usage: java annotations.io.ClassFileReader
-   *  <options>
-   *  <space-separated list of classes to analyze>
+   * For usage information, supply the -h or --help option.
+   * <p>
    *
-   * <options> include:
-   *   -h, --help   print usage information and exit
-   *   --version    print version information and exit
+   * For programmatic access to this tool, use the read() methods instead.
+   * <p>
    *
    * @param args options and classes to analyze;
    * @throws IOException if a class file cannot be found
@@ -57,17 +67,7 @@ public class ClassFileReader {
     }
 
     if (args.length == 0 || printUsage) {
-      System.out.println("usage: extract-annotations");
-      System.out.println("            <options> ");
-      System.out.println("            <space-separated list of classes to analyze>");
-      System.out.println("");
-      System.out.println("       <options> include: ");
-      System.out.println("         -h, --help       print usage information and exit");
-      System.out.println("         --version        print version information and exit");
-      System.out.println("");
-      System.out.println("For each class a.b.C given, extracts the annotations from that");
-      System.out.println(" class and prints them in index-file format to a.b.C.jaif");
-      System.out.println("Note that the class a.b.C must be located in your classpath");
+      System.out.println(usage);
       return;
     }
 

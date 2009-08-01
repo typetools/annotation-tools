@@ -54,7 +54,7 @@ public class AnnotationsTest extends TestCase {
    * The directory in which to find the index files to test.
    */
   private static final String INDEX_FILE_BASE =
-    "src-devel/annotations/tests/classfile/cases/";
+    "src/annotations/tests/classfile/cases/";
 
   /**
    * The directory in which to find the class files (both .class and .generated)

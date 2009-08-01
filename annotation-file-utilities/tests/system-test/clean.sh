@@ -3,4 +3,4 @@
 set -e
 cd $(dirname $0)
 
-rm -rf tmp*
+rm -rf out[1-5]*

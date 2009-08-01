@@ -36,9 +36,11 @@ public class Main {
   @Option("-d <directory> Directory in which output files are written")
   public static String outdir = "annotated/";
 
-  // It's already possible to emulate this (without the backing up) via
+  // It's already possible to emulate this via
   //   -d .
-  // but the --in-place argument is more convenient and explicit.
+  // but the --in-place argument is more convenient and explicit, and it
+  // makes a backup so it can be run multiple times without restoring the
+  // original state of the .java files.
   /** Directory in which output files are written. */
   @Option("-i Overwrite original source files")
   public static boolean in_place = false;
