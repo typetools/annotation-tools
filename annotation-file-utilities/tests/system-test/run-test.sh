@@ -24,7 +24,7 @@ $XJAVAC -d out1 source-ann/AnnotationTest.java || problem "TEST 1: ERROR"
 # Step 2: Convert the annotated class file to an annotation file.
 # Do we get the right annotations?
 $ANNCAT --class out1/annotations/tests/AnnotationTest.class --out --index out2.jann || problem "TEST 2: ERROR"
-diff -u expected-annos.jann out2.jann || problem "TEST 2: FAILURE"
+diff -u expected-annos.jann out2.jann | tee out2.diff || problem "TEST 2: FAILURE"
 
 # Step 3: Compile the source without annotations.
 mkdir out3
@@ -39,7 +39,7 @@ $ANNCAT --index expected-annos.jann --out --class out3/annotations/tests/Annotat
 # for stupid reasons (e.g., order of items in the constant pool), so we don't
 # compare them.)
 $ANNCAT --class out4.class --out --index out5.jann || problem "TEST 5: ERROR"
-diff -u expected-annos.jann out5.jann || problem "TEST 5: FAILURE"
+diff -u expected-annos.jann out5.jann | tee out5.diff || problem "TEST 5: FAILURE"
 
 if [ $OK ]; then
 	echo "All tests succeeded."

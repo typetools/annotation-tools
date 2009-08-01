@@ -5,6 +5,12 @@ package annotations.tests:
 annotation invisible @CClass:
 
 package annotations.tests:
+annotation invisible @A0A:
+
+package annotations.tests:
+annotation invisible @C0A:
+
+package annotations.tests:
 annotation invisible @A0B:
 
 package annotations.tests:
@@ -21,6 +27,12 @@ annotation invisible @A0C:
 
 package annotations.tests:
 annotation invisible @C0C:
+
+package annotations.tests:
+annotation invisible @A0D:
+
+package annotations.tests:
+annotation invisible @C0D:
 
 package annotations.tests:
 annotation invisible @A08:
@@ -82,17 +94,18 @@ class AnnotationTest: @annotations.tests.AClass @annotations.tests.CClass
     field field: @annotations.tests.A0E @annotations.tests.C0E
         inner-type 0: @annotations.tests.A0F @annotations.tests.C0F
 
-    method <init>():
+    method <init>()V:
 
-    method doSomething(Ljava/util/Set;):
+    method doSomething(Ljava/util/Set;)Ljava/util/HashSet;: @annotations.tests.A0A @annotations.tests.C0A
         inner-type 0: @annotations.tests.A0B @annotations.tests.C0B
         parameter #0: @annotations.tests.A0C @annotations.tests.C0C
+            inner-type 0: @annotations.tests.A0D @annotations.tests.C0D
         receiver: @annotations.tests.A06 @annotations.tests.C06
-        local 2 #26+2: @annotations.tests.A08 @annotations.tests.C08
+        local 2 #23+2: @annotations.tests.A08 @annotations.tests.C08
             inner-type 0: @annotations.tests.A09 @annotations.tests.C09
-        typecast #11: @annotations.tests.A00 @annotations.tests.C00
+        typecast #7: @annotations.tests.A00 @annotations.tests.C00
             inner-type 0: @annotations.tests.A01 @annotations.tests.C01
-        instanceof #1: @annotations.tests.A02 @annotations.tests.C02
-        new #18: @annotations.tests.A04 @annotations.tests.C04
+        instanceof #0: @annotations.tests.A02 @annotations.tests.C02
+        new #15: @annotations.tests.A04 @annotations.tests.C04
             inner-type 0: @annotations.tests.A05 @annotations.tests.C05
 
