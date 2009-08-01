@@ -2,49 +2,6 @@
     <!-- 
         Repository locations of all projects.
     -->
-    <!-- The ant file uses the existence of the pag-daikon.bashrc file
-           as a test to see if it is running on a PAG computer.  If it is
-           on a PAG computer, it uses the local svn/cvs prefixes.  
-           Else, it uses the remote prefixes. -->
-    <property name="svn-repository-prefix-remote"
-        value="svn+ssh://login.csail.mit.edu" />
-    <property name="svn-repository-prefix-local"
-        value="file://" />
-    <property name="cvs-repository-prefix-remote"
-        value=":ext:login.csail.mit.edu:" />
-    <property name="cvs-repository-prefix-local"
-        value="" />
-
-   <condition property="svn-repository-prefix"
-         value="${svn-repository-prefix-local}">
-        <available file="/afs/csail/group/pag/software/bin/pag-daikon.bashrc"/>
-   </condition>
-
-   <condition property="svn-repository-prefix"
-         value="${svn-repository-prefix-remote}">
-        <not>
-          <available file="/afs/csail/group/pag/software/bin/pag-daikon.bashrc"/>
-        </not>
-   </condition>
-
-   <condition property="cvs-repository-prefix"
-         value="${cvs-repository-prefix-local}">
-        <available file="/afs/csail/group/pag/software/bin/pag-daikon.bashrc"/>
-   </condition>
-
-   <condition property="cvs-repository-prefix"
-         value="${cvs-repository-prefix-remote}">
-        <not>
-          <available file="/afs/csail/group/pag/software/bin/pag-daikon.bashrc"/>
-        </not>
-   </condition>
-
-    <property name="annotations-repository" 
-        location="/afs/csail.mit.edu/group/pag/projects/annotations"/>
-    <property name="qualifiers-repository" 
-        location="/afs/csail.mit.edu/group/pag/projects/javari/REPOS/qualifiers"/>
-    <property name="javari-repository"
-        location = "/afs/csail.mit.edu/group/pag/projects/javari/.CVS"/>
     
     <!-- 
         Initial target to setup the build directory.
@@ -68,33 +25,40 @@
     <!--
         Targets to checkout all the projects.
     -->
-    <target name="checkout-annotations" depends="init">
-        <exec dir="${builddir}" executable="svn">
-            <arg value="co"/>
-            <arg value="-q"/>
-            <arg value="${svn-repository-prefix}${annotations-repository}"/>
-            <arg value="annotations"/>
-        </exec>
-    </target>
-        
-    <target name="checkout-qualifiers" depends="init">
-        <exec dir="${builddir}" executable="svn">
-            <arg value="co"/>
-            <arg value="-q"/>
-            <arg value="${svn-repository-prefix}${qualifiers-repository}"/>
-            <arg value="qualifiers"/>
+
+    <target name="checkout-jsr308-langtools" depends="init">
+        <exec dir="${builddir}" executable="hg">
+            <arg value="clone"/>
+            <arg value="https://jsr308-langtools.googlecode.com/hg/"/>
+            <arg value="jsr308-langtools"/>
         </exec>
     </target>
     
-    <target name="checkout-javari" depends="init">
-        <cvs cvsRoot="${cvs-repository-prefix}${javari-repository}"
-                 quiet="true"
-                 package="."
-                 dest="${builddir}/javari"
-        />
+    <target name="checkout-annotation-tools" depends="init">
+        <exec dir="${builddir}" executable="hg">
+            <arg value="clone"/>
+            <arg value="https://annotation-tools.googlecode.com/hg/"/>
+            <arg value="annotation-tools"/>
+        </exec>
     </target>
     
-    <target name="checkout-all" depends="checkout-annotations, checkout-qualifiers, checkout-javari"/>
+    <target name="checkout-checker-framework" depends="init">
+        <exec dir="${builddir}" executable="hg">
+            <arg value="clone"/>
+            <arg value="https://checker-framework.googlecode.com/hg/"/>
+            <arg value="checker-framework"/>
+        </exec>
+    </target>
+    
+    <target name="checkout-javarifier" depends="init">
+        <exec dir="${builddir}" executable="hg">
+            <arg value="clone"/>
+            <arg value="https://javarifier.googlecode.com/hg/"/>
+            <arg value="javarifier"/>
+        </exec>
+    </target>
+    
+    <target name="checkout-all" depends="checkout-jsr308-langtools, checkout-annotation-tools, checkout-checker-framework, checkout-javarifier"/>
     
     <!-- 
         Targets to build all the projects.

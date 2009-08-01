@@ -2,9 +2,8 @@
 
 # Simple shell file that runs the regression tests and displays output only 
 # if tests fail.  You can run the entire test yourself by executing this file:
-#  ./buildtest
-# This is not a fast script; the svn/cvs checkout step alone takes about 40
-# minutes to run (as of 6/2/2007).
+#   ./buildtest
+# This takes a long time to run.
 
 # Note: To only run tests on the annotations projects and not Javarifier,
 # instead of executing this script, run:
@@ -13,17 +12,13 @@
 # present directory, and will checkout, build and test all the annotations
 # projects in that directory.  To run those tests locally, pass in your
 # working directory to Ant as follows:
-#     ant -Dbuilddir=${JAVARI_ANNOTATION_WORKSPACE} test-all-annotations
+#     ant -Dbuilddir=$HOME/research/types test-all-annotations
 
 
 # Remove last night's results.
 rm -rf reports
 rm -rf build-current*
 mkdir reports
-
-# This is a minimal setup file that follows the directions for Javarifier and
-# the annotations project.
-source buildtest.bashrc 2>&1 > bashrc.log
 
 ant checkout-all 2>&1 > checkout-all.log
 ant build-all 2>&1 > build-all.log
