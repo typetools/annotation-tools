@@ -49,7 +49,7 @@ import annotations.field.*;
 public class ClassAnnotationSceneReader
 extends EmptyVisitor {
   // general strategy:
-  // -only "Runtime[In]visible[Extended]Annotations" are supported
+  // -only "Runtime[In]visible[Type]Annotations" are supported
   // -use an empty visitor for everything besides annotations, fields and
   //  methods for those three, use a special visitor that does all the work
   //  and inserts the annotations correctly into the specified AElement
