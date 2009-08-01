@@ -30,16 +30,16 @@ results: bin/VerifyDiffs.class
 
 # Remakes the little java program that checks and compares diffs
 bin/VerifyDiffs.class : VerifyDiffs.java
-	@javac -g -d bin VerifyDiffs.java
+	@javac -g -cp ../bincompile -d bin VerifyDiffs.java
 
 # Compiles all the test cases (be verbose about this).
 compile :
 	mkdir -p bin
-	javac -g -d bin *.java
+	javac -g -cp ../bin -d bin *.java
 
 bin/annotator/tests/%.class: %.java
 	mkdir -p bin
-	javac -g -d bin $*.java
+	javac -g -cp ../bin -d bin $*.java
 
 # Actually runs the annotator to create the annotated java file.
 .PRECIOUS: %.output

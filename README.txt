@@ -1,3 +1,6 @@
+### This file is out of date and needs to be updated, particularly with
+### respect to directories, checkouts, and environment variables.
+
 Annotations Repository README file
 ----------------------------------
 
@@ -105,33 +108,15 @@ and not "1.5":
   java -version 
   javac -version
 
-1. Define the environment variable $JAVARI_ANNOTATION_WORKSPACE to be
-the directory that will contain the annotations, javari, and other directories.
-Note that for this and all other environment variables, you can put them in
-your startup file once and not have to set them each time you build/run a
-project.
+1. Checkout all the projects required to build and run the Javarifier:
 
-2. Checkout all the projects required to build and run the Javarifier:
+ant checkout-all
 
-  cd $JAVARI_ANNOTATION_WORKSPACE
-  # Checkout annotations project.
-  svn checkout svn+ssh://manioc.csail.mit.edu/afs/csail/group/pag/projects/annotations/
-  # Alternate checkout command that only works when run on the PAG filesystem.
-  # svn checkout file:///afs/csail.mit.edu/group/pag/projects/annotations/buildtest
-  # Checkout javari project.
-  # TODO: Figure out cvs/ssh options, but it should be cvs equivalent of above.
-  mkdir $JAVARI_ANNOTATION_WORKSPACE/javari
-  cd $JAVARI_ANNOTATION_WORKSPACE/javari
-  cvs -d :ext:login.csail.mit.edu:/afs/csail.mit.edu/group/pag/projects/javari/.CVS/ checkout -P .
-  # Alternate checkout command that only works when run on the PAG filesystem.
-  # cvs -d /afs/csail.mit.edu/group/pag/projects/javari/.CVS/ co .
-
-
-Documentation for the jsr308 compiler and the annotation file utilities are:
+Documentation appears at:
   jsr308-langtools/README-jsr308.html
   annotation-tools/annotation-file-utilities/annotation-file-utilities.html
-
-Building and running Javarifier:  see javari/javarifier/README
+  checker-framework/checkers/manual/
+  javarifier/README
 
 
 asmx
