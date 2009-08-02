@@ -844,7 +844,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
           aParameter.innerTypes.entrySet()) {
           InnerTypeLocation aParameterLocation = e.getKey();
           AElement aInnerType = e.getValue();
-          for (Annotation tla : aParameter.tlAnnotationsHere) {
+          for (Annotation tla : aInnerType.tlAnnotationsHere) {
             if (shouldSkip(tla)) continue;
 
             ExtendedAnnotationVisitor xav = visitExtendedAnnotation(tla);
