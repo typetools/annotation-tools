@@ -400,6 +400,14 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
     xav.visitXOffset(offset);
   }
 
+  private void visitParameterIndex(ExtendedAnnotationVisitor xav, int index) {
+	  xav.visitXParamIndex(index);
+  }
+
+  private void visitTypeIndex(ExtendedAnnotationVisitor xav, int index) {
+	  xav.visitXTypeIndex(index);
+  }
+
   /**
    * Has xav visit the type parameter bound information in loc.
    */
@@ -846,6 +854,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
             // information for raw type (parameter)
             //  (none)
             // information for generic/array (on parameter)
+            visitParameterIndex(xav, index);
             visitLocations(xav, aParameterLocation);
             xav.visitEnd();
           }
