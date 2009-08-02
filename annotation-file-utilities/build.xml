@@ -10,14 +10,6 @@
 
   <property name="java-version" value="7"/>
 
-  <!-- for distribution version:
-  <property name="asmx" value="./asmx"/>
-  <property name="annotations-compiler" value="./lib"/>
-  <property name="scene-lib" value="./scene-lib"/>
-  <property name="annotator" value="./annotator"/>
-  <property name="workspace" value="."/>
-  -->
-
   <!-- Can't I just reuse temp-annotation-file-utilities, rather than
        having this separate directory? -->
   <property name="temp-jarfile" value="${java.io.tmpdir}/annotation-file-utilities-jarfile" />
