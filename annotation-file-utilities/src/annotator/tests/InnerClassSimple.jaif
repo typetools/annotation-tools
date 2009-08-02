@@ -1,0 +1,10 @@
+package java.lang:
+annotation visible @ReadOnly:
+
+package annotator.tests:
+class InnerClassSimple$ActualInnerClass:
+
+    field d: @java.lang.ReadOnly
+
+	
+

@@ -1,0 +1,6 @@
+package annotator.tests;
+
+public class BoundClassSimple<T extends @java.lang.ReadOnly Date> {
+  T field = null;
+  Date misleadingField = new Date();
+}
