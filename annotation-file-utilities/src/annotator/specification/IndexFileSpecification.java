@@ -27,6 +27,8 @@ import annotator.find.Criteria;
 import annotator.find.Insertion;
 import annotator.scanner.MethodOffsetClassVisitor;
 
+import com.sun.source.tree.Tree;
+
 import utilMDE.FileIOException;
 
 public class IndexFileSpecification implements Specification {
@@ -63,9 +65,14 @@ public class IndexFileSpecification implements Specification {
     }
   }
 
+  // fill in this.insertions with insertion pairs
   private void parseScene() {
-    // fill in this.insertions with insertion pairs
     CriterionList clist = new CriterionList();
+
+    VivifyingMap<String, AElement> packages = scene.packages;
+    for (Map.Entry<String, AElement> entry : packages.entrySet()) {
+      parsePackage(clist, entry.getKey(), entry.getValue());
+    }
 
     VivifyingMap<String, AClass> classes = scene.classes;
     for (Map.Entry<String, AClass> entry : classes.entrySet()) {
@@ -73,6 +80,17 @@ public class IndexFileSpecification implements Specification {
     }
   }
 
+  // There is no .class file corresponding to the package-info.java file.
+  private void parsePackage(CriterionList clist, String packageName, AElement element) {
+    // There is no Tree.Kind.PACKAGE, only Tree.Kind.COMPILATION_UNIT.
+    // CompilationUnitTree has getPackageName and getPackageAnnotations
+    CriterionList packageClist = clist.add(Criteria.packageDecl(packageName));
+    parseElement(packageClist, element);
+  }
+
+
+
+  // fill in this.insertions with insertion pairs
   private void parseClass(CriterionList clist, String className, AClass clazz) {
 
     //  load extra info using asm
@@ -90,8 +108,8 @@ public class IndexFileSpecification implements Specification {
       System.err.println("Problem reading class: " + className);
       throw e;
     }
-//    CriterionList classClist = clist.add(Criteria.is(Tree.Kind.CLASS, className)); // TODO: correct Tree.Kind?
-//    parseElement(classClist, clazz);
+    CriterionList classClist = clist.add(Criteria.is(Tree.Kind.CLASS, className)); // TODO: correct Tree.Kind?
+    parseElement(classClist, clazz);
 
     VivifyingMap<BoundLocation, ATypeElement> bounds = clazz.bounds;
     for (Entry<BoundLocation, ATypeElement> entry : bounds.entrySet()) {
@@ -124,11 +142,13 @@ public class IndexFileSpecification implements Specification {
     }
   }
 
+  // fill in this.insertions with insertion pairs
   private void parseField(CriterionList clist, String fieldName, ATypeElement field) {
     clist = clist.add(Criteria.field(fieldName));
     parseInnerAndOuterElements(clist, field);
   }
 
+  // fill in this.insertions with insertion pairs
   private void parseElement(CriterionList clist, AElement element) {
      String annotationString = getElementAnnotation(element);
       if (annotationString.trim().equals("")) {
@@ -142,6 +162,7 @@ public class IndexFileSpecification implements Specification {
       this.insertions.add(ins);
   }
 
+  // fill in this.insertions with insertion pairs
   private void parseInnerAndOuterElements(CriterionList clist, ATypeElement typeElement) {
     for (Entry<InnerTypeLocation, AElement> innerEntry: typeElement.innerTypes.entrySet()) {
       InnerTypeLocation innerLoc = innerEntry.getKey();

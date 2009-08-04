@@ -37,14 +37,15 @@ compile :
 	mkdir -p bin
 	javac -g -cp ../bin -d bin *.java
 
+.PRECIOUS : bin/annotator/tests/%.class
 bin/annotator/tests/%.class: %.java
 	mkdir -p bin
-	javac -g -cp ../bin -d bin $*.java
+	javac -g -cp bin:../bin -d bin -sourcepath . $*.java
 
 # Actually runs the annotator to create the annotated java file.
 .PRECIOUS: %.output
 %.output: %.jaif %.java bin/annotator/tests/%.class ../lib/utilMDE.jar ../bin
-	java -cp ../lib/utilMDE.jar:bin:../bin:${CLASSPATH} \
+	java -cp ../lib/utilMDE.jar:.:bin:../bin:${CLASSPATH} \
 	annotator.Main \
 	--abbreviate=false \
 	-d $*-output \

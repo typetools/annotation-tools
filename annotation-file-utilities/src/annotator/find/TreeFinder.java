@@ -266,6 +266,34 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       return att.getPreferredPosition();
     }
 
+    @Override
+      public Integer visitCompilationUnit(CompilationUnitTree node, Void p) {
+      JCCompilationUnit cu = (JCCompilationUnit) node;
+      JCTree.JCExpression pid = cu.pid;
+      while (pid instanceof JCTree.JCFieldAccess) {
+        pid = ((JCTree.JCFieldAccess) pid).selected;
+      }
+      JCTree.JCIdent firstComponent = (JCTree.JCIdent) pid;
+      int result = firstComponent.getPreferredPosition();
+
+      // Now back up over the word "package" and the preceding newline
+      JavaFileObject jfo = tree.getSourceFile();
+      String fileContent;
+      try {
+        fileContent = String.valueOf(jfo.getCharContent(true));
+      } catch(IOException e) {
+        throw new RuntimeException(e);
+      }
+      while (java.lang.Character.isWhitespace(fileContent.charAt(result-1))) {
+        result--;
+      }
+      result -= 7;
+      String packageString = fileContent.substring(result, 7);
+      assert "package".equals(packageString) : "unexpected: " + packageString;
+      assert result == 0 || java.lang.Character.isWhitespace(fileContent.charAt(result-1));
+      return result;
+    }
+
   }
 
   /**
@@ -297,7 +325,8 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
   }
 
   boolean handled(Tree node) {
-    return (node instanceof MethodTree
+    return (node instanceof CompilationUnitTree
+            || node instanceof MethodTree
             || node instanceof VariableTree
             || node instanceof IdentifierTree
             || node instanceof ParameterizedTypeTree
@@ -327,16 +356,17 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       path = paths.get(tree);
     else
       path = TreePath.getPath(tree, node);
-
-    if (path == null)
-      return super.scan(node, p);
+    assert path == null || path.getLeaf() == node :
+      String.format("Mismatch: '%s' '%s' '%s' '%s'%n", path, tree, paths.containsKey(tree), node);
 
     // To avoid annotating existing annotations right before
     // the element you wish to annotate, skip anything inside of
     // an annotation.
-    Tree parent = path.getParentPath().getLeaf();
-    if (parent.getKind() == Tree.Kind.ANNOTATION) {
-      return super.scan(node, p);
+    if (path != null) {
+      Tree parent = path.getParentPath().getLeaf();
+      if (parent.getKind() == Tree.Kind.ANNOTATION) {
+        return super.scan(node, p);
+      }
     }
 
     for (Insertion i : p) {
@@ -349,7 +379,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
         debug("  " + Main.firstLine(node.toString()));
       }
 
-      if (!i.getCriteria().isSatisfiedBy(path)) {
+      if (!i.getCriteria().isSatisfiedBy(path, node)) {
         debug("  ... not satisfied");
         continue;
       }
@@ -369,7 +399,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
         pos = tpf.scan(node, null);
         assert pos != null;
       }
-      assert pos > 0;
+      assert pos >= 0 : pos;
 
       debug("  ... satisfied! at " + pos + " for node of type " + node.getClass() + ": " + Main.treeToString(node));
 

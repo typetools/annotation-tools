@@ -1,8 +1,0 @@
-package java.lang:
-annotation visible @ReadOnly:
-
-package annotator.tests:
-class InnerClassAnonymous$1:
-
-    field serialVersionUID: @java.lang.ReadOnly
-
