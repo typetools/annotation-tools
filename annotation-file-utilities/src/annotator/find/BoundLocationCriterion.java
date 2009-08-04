@@ -32,11 +32,17 @@ public class BoundLocationCriterion implements Criterion {
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  /** {@inheritDoc} */
+  @Override
+  public boolean isSatisfiedBy(TreePath path, Tree leaf) {
+    assert path == null || path.getLeaf() == leaf;
+    return isSatisfiedBy(path);
+  }
+
+  /** {@inheritDoc} */
+  @Override
   public boolean isSatisfiedBy(TreePath path) {
-   if (path == null) {
+    if (path == null) {
       return false;
     }
 
@@ -93,16 +99,12 @@ public class BoundLocationCriterion implements Criterion {
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  /** {@inheritDoc} */
   public Kind getKind() {
     return Kind.BOUND_LOCATION;
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  /** {@inheritDoc} */
   public String toString() {
     return "BoundCriterion: at param index: " + paramIndex +
       " at bound index: " + boundIndex;

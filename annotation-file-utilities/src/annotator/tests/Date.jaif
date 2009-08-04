@@ -1,7 +1,0 @@
-package annotator.tests:
-class Date:
-
-    field t:
-
-    method <init>()V:
-

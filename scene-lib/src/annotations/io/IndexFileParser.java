@@ -47,13 +47,24 @@ public final class IndexFileParser {
         if (i >= 0)
             return i;
         else
-            throw new ParseException("Expected a nonnegative integer");
+            throw new ParseException("Expected a nonnegative integer, got " + i);
     }
 
+    /** True if the next thing from st is the given character. */
     private boolean checkChar(char c) /*@ReadOnly*/ {
         return st.ttype == c;
     }
 
+    /** True if the next thing from st is the given string token. */
+    private boolean checkKeyword(String s) /*@ReadOnly*/ {
+        return st.ttype == TT_WORD && st.sval.equals(s);
+    }
+
+    /**
+     * Return true if the next thing to be read from st is the given string.
+     * In that case, also read past the given string.
+     * If the result is false, reads nothing from st.
+     */
     private boolean matchChar(char c) throws IOException {
         if (checkChar(c)) {
             st.nextToken();
@@ -62,16 +73,11 @@ public final class IndexFileParser {
             return false;
     }
 
-    private void expectChar(char c) throws IOException, ParseException {
-        if (! matchChar(c)) {
-            throw new ParseException("Expected '" + c + "', found '" + ((char) st.ttype) + "'");
-        }
-    }
-
-    private boolean checkKeyword(String s) /*@ReadOnly*/ {
-        return st.ttype == TT_WORD && st.sval.equals(s);
-    }
-
+    /**
+     * Return true if the next thing to be read from st is the given string.
+     * In that case, also read past the given string.
+     * If the result is false, reads nothing from st.
+     */
     private boolean matchKeyword(String s) throws IOException {
         if (checkKeyword(s)) {
             st.nextToken();
@@ -80,6 +86,14 @@ public final class IndexFileParser {
             return false;
     }
 
+    /** Reads from st.  If the result is not c, throws an exception. */
+    private void expectChar(char c) throws IOException, ParseException {
+        if (! matchChar(c)) {
+            throw new ParseException("Expected '" + c + "', found '" + ((char) st.ttype) + "'");
+        }
+    }
+
+    /** Reads from st.  If the result is not s, throws an exception. */
     private void expectKeyword(String s) throws IOException,
             ParseException {
         if (! matchKeyword(s)) {
@@ -643,8 +657,7 @@ public final class IndexFileParser {
             } else {
                 while (matchChar('.'))
                     pkg += '.' + expectIdentifier();
-                AElement p =
-                        scene.packages.vivify(pkg);
+                AElement p = scene.packages.vivify(pkg);
                 expectChar(':');
                 parseAnnotations(p);
             }
