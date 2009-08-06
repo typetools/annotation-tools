@@ -41,6 +41,22 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       this.tree = tree;
     }
 
+    /** et should be an expression for a type */
+    private JCTree leftmostIdentifier(JCTree t) {
+      while (true) {
+        switch (t.getKind()) {
+        case IDENTIFIER:
+        case PRIMITIVE_TYPE:
+          return t;
+        case MEMBER_SELECT:
+          t = ((JCFieldAccess) t).getExpression();
+          break;
+        default:
+          throw new RuntimeException(String.format("Unrecognized type (kind=%s, class=%s): %s", t.getKind(), t.getClass(), t));
+        }
+      }
+    }
+
     @Override
       public Integer visitVariable(VariableTree node, Void p) {
       JCTree jt = ((JCVariableDecl) node).getType();
@@ -48,64 +64,52 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
         JCTypeApply vt = (JCTypeApply) jt;
         return vt.clazz.pos;
       }
-      return ((JCVariableDecl)node).getType().pos;
+      JCExpression type = (JCExpression) (((JCVariableDecl)node).getType());
+      return leftmostIdentifier(type).pos;
     }
 
     // When a method is visited, it is visited for the receiver, not the return value.
     @Override
-      public Integer visitMethod(MethodTree node, Void p) {
+    public Integer visitMethod(MethodTree node, Void p) {
       super.visitMethod(node, p);
       // System.out.println("node: " + node);
       // System.out.println("return: " + node.getReturnType());
 
 
-      int rightBeforeBlock = ((JCMethodDecl) node).getBody().pos;
-      // Will be adjusted if a throws statement exists.
-      int afterParamList = -1;
+      int afterParamList;
 
       // TODO: figure out how to better place reciever annotation!!!
       //          List<? extends VariableTree> vars = node.getParameters();
       //
       //          VariableTree vt = vars.get(0);
       //          vt.getName().length();
-      List<? extends ExpressionTree> throwsExpressions = node.getThrows();
+      JCMethodDecl jcnode = (JCMethodDecl) node;
+      List<JCExpression> throwsExpressions = jcnode.thrown;
       if (throwsExpressions.isEmpty()) {
+        int rightBeforeBlock = jcnode.getBody().pos;
         afterParamList = rightBeforeBlock;
       } else {
-        ExpressionTree et = throwsExpressions.get(0);
-        while (afterParamList == -1) {
-          switch (et.getKind()) {
-          case IDENTIFIER:
-            afterParamList = this.visitIdentifier((IdentifierTree) et, p);
-            afterParamList -= 7; // for the 'throws' clause
+        IdentifierTree it = (IdentifierTree) leftmostIdentifier(throwsExpressions.get(0));
+        afterParamList = this.visitIdentifier(it, p);
+        afterParamList -= 7; // for the 'throws' clause
 
-            JavaFileObject jfo = tree.getSourceFile();
-            try {
-              String s = String.valueOf(jfo.getCharContent(true));
-              for (int i = afterParamList; i >= 0; i--) {
-                if (s.charAt(i) == ')') {
-                  afterParamList = i + 1;
-                  break;
-                }
-              }
-            } catch(IOException e) {
-              throw new RuntimeException(e);
+        JavaFileObject jfo = tree.getSourceFile();
+        try {
+          String s = String.valueOf(jfo.getCharContent(true));
+          for (int i = afterParamList; i >= 0; i--) {
+            if (s.charAt(i) == ')') {
+              afterParamList = i + 1;
+              break;
             }
-            break;
-          case MEMBER_SELECT:
-            et = ((MemberSelectTree) et).getExpression();
-            break;
-          default:
-            throw new RuntimeException("Unrecognized throws (kind=" + et.getKind() + "): " + et);
           }
+        } catch(IOException e) {
+          throw new RuntimeException(e);
         }
       }
 
       // TODO:
       //debugging: System.out.println("result: " + afterParamList);
       return afterParamList;
-
-
 
 
 //       // old implementations scans characters in the source (which is error-prone).
@@ -126,8 +130,6 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
 //           }
 //         }
 //       }
-
-
 
 
 //      return ((JCMethodDecl)node).getReturnType().pos;
@@ -195,10 +197,10 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
         // want to annotate the first level of this array
         ArrayTypeTree att = (ArrayTypeTree) parent;
         Tree baseType = att.getType();
-        i = ((JCTypeApply) node).getType().pos;
+        i = leftmostIdentifier(((JCTypeApply) node).getType()).pos;
         debug("BASE TYPE: " + baseType.toString());
       } else {
-        i = ((JCTypeApply)node).getType().pos;
+        i = leftmostIdentifier(((JCTypeApply)node).getType()).pos;
       }
       return i;
     }
@@ -288,10 +290,20 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
         result--;
       }
       result -= 7;
-      String packageString = fileContent.substring(result, 7);
-      assert "package".equals(packageString) : "unexpected: " + packageString;
+      String packageString = fileContent.substring(result, result+7);
+      assert "package".equals(packageString) : "expected 'package', got: " + packageString;
       assert result == 0 || java.lang.Character.isWhitespace(fileContent.charAt(result-1));
       return result;
+    }
+
+    @Override
+    public Integer visitClass(ClassTree node, Void p) {
+      JCClassDecl cd = (JCClassDecl) node;
+      if (cd.mods != null) {
+        return cd.mods.getPreferredPosition();
+      } else {
+        return cd.getPreferredPosition();
+      }
     }
 
   }
@@ -326,6 +338,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
 
   boolean handled(Tree node) {
     return (node instanceof CompilationUnitTree
+            || node instanceof ClassTree
             || node instanceof MethodTree
             || node instanceof VariableTree
             || node instanceof IdentifierTree
