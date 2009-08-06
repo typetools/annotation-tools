@@ -4,8 +4,8 @@ import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
 
 /**
- * Represents the criterion that a program element is enclosed by a program
- * element of a certain type.
+ * Represents the criterion that a program element is enclosed (directly or
+ * indirect) by a program element of a certain type.
  */
 final class EnclosedByCriterion implements Criterion {
 
@@ -34,7 +34,6 @@ final class EnclosedByCriterion implements Criterion {
     if (path == null)
       return false;
 
-    // XFIXME iteration of TreePaths is broken in JSR-269 -- use a do/while
     for (Tree tree : path) {
       if (tree.getKind() == kind)
         return true;

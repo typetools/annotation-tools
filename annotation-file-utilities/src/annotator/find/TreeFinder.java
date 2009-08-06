@@ -20,7 +20,7 @@ import com.sun.tools.javac.tree.JCTree.*;
  */
 public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
 
-  static private boolean debug = false;
+  static public boolean debug = false;
 
   private static void debug(String message) {
     if (debug)

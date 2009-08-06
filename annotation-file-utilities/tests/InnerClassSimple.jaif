@@ -1,10 +1,13 @@
 package java.lang:
 annotation visible @ReadOnly:
+annotation visible @DoesNotExist:
 
 package annotator.tests:
 class InnerClassSimple$ActualInnerClass: @java.lang.ReadOnly
 
     field d: @java.lang.ReadOnly
 
+package annotator.tests.InnerClassSimple:
+class ActualInnerClass: @java.lang.DoesNotExist
 	
 

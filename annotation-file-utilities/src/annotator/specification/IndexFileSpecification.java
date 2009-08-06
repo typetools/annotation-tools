@@ -65,7 +65,7 @@ public class IndexFileSpecification implements Specification {
     }
   }
 
-  // fill in this.insertions with insertion pairs
+  /** Fill in this.insertions with insertion pairs. */
   private void parseScene() {
     CriterionList clist = new CriterionList();
 
@@ -90,7 +90,9 @@ public class IndexFileSpecification implements Specification {
 
 
 
-  // fill in this.insertions with insertion pairs
+  /** Fill in this.insertions with insertion pairs.
+   * @param className is fully qualified
+   */
   private void parseClass(CriterionList clist, String className, AClass clazz) {
 
     //  load extra info using asm
@@ -108,7 +110,25 @@ public class IndexFileSpecification implements Specification {
       System.err.println("Problem reading class: " + className);
       throw e;
     }
-    CriterionList classClist = clist.add(Criteria.is(Tree.Kind.CLASS, className)); // TODO: correct Tree.Kind?
+    String packageName;
+    String classNameUnqualified;
+    int lastdot = className.lastIndexOf('.');
+    if (lastdot == -1) {
+      packageName = "";
+      classNameUnqualified = className;
+    } else {
+      packageName = className.substring(0, lastdot);
+      classNameUnqualified = className.substring(lastdot+1);
+    }
+
+    CriterionList classClist = clist;
+    clist = clist.add(Criteria.inPackage(packageName));
+    int dollarpos;
+    while ((dollarpos = classNameUnqualified.lastIndexOf('$')) != -1) {
+      classClist = classClist.add(Criteria.inClass(classNameUnqualified.substring(0, dollarpos)));
+      classNameUnqualified = classNameUnqualified.substring(dollarpos+1);
+    }
+    classClist = clist.add(Criteria.is(Tree.Kind.CLASS, classNameUnqualified));
     parseElement(classClist, clazz);
 
     VivifyingMap<BoundLocation, ATypeElement> bounds = clazz.bounds;
@@ -142,13 +162,13 @@ public class IndexFileSpecification implements Specification {
     }
   }
 
-  // fill in this.insertions with insertion pairs
+  /** Fill in this.insertions with insertion pairs. */
   private void parseField(CriterionList clist, String fieldName, ATypeElement field) {
     clist = clist.add(Criteria.field(fieldName));
     parseInnerAndOuterElements(clist, field);
   }
 
-  // fill in this.insertions with insertion pairs
+  /** Fill in this.insertions with insertion pairs. */
   private void parseElement(CriterionList clist, AElement element) {
      String annotationString = getElementAnnotation(element);
       if (annotationString.trim().equals("")) {
@@ -162,7 +182,7 @@ public class IndexFileSpecification implements Specification {
       this.insertions.add(ins);
   }
 
-  // fill in this.insertions with insertion pairs
+  /** Fill in this.insertions with insertion pairs. */
   private void parseInnerAndOuterElements(CriterionList clist, ATypeElement typeElement) {
     for (Entry<InnerTypeLocation, AElement> innerEntry: typeElement.innerTypes.entrySet()) {
       InnerTypeLocation innerLoc = innerEntry.getKey();

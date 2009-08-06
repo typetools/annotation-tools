@@ -39,22 +39,26 @@ final class IsCriterion implements Criterion {
     Tree tree = path.getLeaf();
     if (tree.getKind() != kind)
       return false;
-    if (tree.getKind() == Tree.Kind.VARIABLE) {
-      if (((VariableTree)tree).getName().toString().equals(this.name))
-        return true;
-    } else if (tree.getKind() == Tree.Kind.METHOD) {
-      if (((MethodTree)tree).getName().toString().equals(this.name))
-        return true;
+    switch (tree.getKind()) {
+    case VARIABLE:
+      String varName = ((VariableTree)tree).getName().toString();
+      return varName.equals(name);
+    case METHOD:
+      String methodName = ((MethodTree)tree).getName().toString();
+      return methodName.equals(name);
+    case CLASS:
+      String className = ((ClassTree)tree).getSimpleName().toString();
+      return className.equals(name);
+    default:
+      throw new Error("unknown tree kind " + kind);
     }
-
-    return false;
   }
 
   /**
    * {@inheritDoc}
    */
   public String toString() {
-    return kind.toString().toLowerCase() + " '" + name + "'";
+    return "is " + kind.toString().toLowerCase() + " '" + name + "'";
   }
 
 }
