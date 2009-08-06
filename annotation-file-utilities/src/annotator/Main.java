@@ -196,6 +196,9 @@ public class Main {
 
         // Create a finder, and use it to get positions.
         TreeFinder finder = new TreeFinder(tree);
+        if (debug) {
+          finder.debug = true;
+        }
         Map<Integer, String> positions = finder.getPositions(tree, insertions);
 
         // Apply the positions to the source file.

@@ -132,6 +132,17 @@ public final class Criteria {
   }
 
   /**
+   * Creates an "in package" criterion: that a program element is enclosed
+   * by the specified package.
+   *
+   * @param name the name of the enclosing package
+   * @return an "in package" criterion
+   */
+  public final static Criterion inPackage(String name) {
+    return new InPackageCriterion(name);
+  }
+
+  /**
    * Creates an "in class" criterion: that a program element is enclosed
    * by the specified class.
    *
