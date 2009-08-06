@@ -2,7 +2,7 @@ package java.lang:
 annotation visible @ReadOnly:
 
 package annotator.tests:
-class InnerClassSimple$ActualInnerClass:
+class InnerClassSimple$ActualInnerClass: @java.lang.ReadOnly
 
     field d: @java.lang.ReadOnly
 

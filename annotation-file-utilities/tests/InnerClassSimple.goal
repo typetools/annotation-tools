@@ -5,7 +5,7 @@ import java.util.Date;
 public class InnerClassSimple {
   public Integer field;
 
-  public class ActualInnerClass {
+  public @java.lang.ReadOnly class ActualInnerClass {
     @java.lang.ReadOnly Date d;
   }
 }
