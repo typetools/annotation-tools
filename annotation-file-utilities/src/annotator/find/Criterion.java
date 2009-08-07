@@ -1,6 +1,7 @@
 package annotator.find;
 
 import com.sun.source.util.TreePath;
+import com.sun.source.tree.Tree;
 
 /**
  * A criterion for locating a program element in an AST.  A Criterion does
@@ -31,8 +32,20 @@ public interface Criterion {
         INSTANCE_OF,
         BOUND_LOCATION,
         METHOD_BOUND,
-        CLASS_BOUND;
+        CLASS_BOUND,
+        IN_PACKAGE,
+        CLASS,
+        PACKAGE;
     }
+
+    /**
+     * Determines if the given tree path is satisfied by this criterion.
+     *
+     * @param path the tree path to check against
+     * @return true if this criterion is satisfied by the given path,
+     * false otherwise
+     */
+    public boolean isSatisfiedBy(TreePath path, Tree tree);
 
     /**
      * Determines if the given tree path is satisfied by this criterion.

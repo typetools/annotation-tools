@@ -19,6 +19,15 @@ public class CastCriterion implements Criterion {
     this.offset = offset;
   }
 
+  /** {@inheritDoc} */
+  @Override
+  public boolean isSatisfiedBy(TreePath path, Tree leaf) {
+    assert path == null || path.getLeaf() == leaf;
+    return isSatisfiedBy(path);
+  }
+
+  /** {@inheritDoc} */
+  @Override
   public boolean isSatisfiedBy(TreePath path) {
     if (path == null) {
       return false;

@@ -23,6 +23,15 @@ public class LocalVariableCriterion implements Criterion {
     this.loc = loc;
   }
 
+  /** {@inheritDoc} */
+  @Override
+  public boolean isSatisfiedBy(TreePath path, Tree leaf) {
+    assert path == null || path.getLeaf() == leaf;
+    return isSatisfiedBy(path);
+  }
+
+  /** {@inheritDoc} */
+  @Override
   public boolean isSatisfiedBy(TreePath path) {
     if (path == null) {
       return false;

@@ -37,12 +37,12 @@ public class VerifyDiffs {
                 if(f.toString().endsWith(".diff")) {
                     FileReader fr = new FileReader(f);
                     if(fr.read() != -1) { // if not empty, output error message
-                        System.out.println(f.toString() + "...FAILED");
+                        System.out.println(f.toString() + " ...FAILED");
                         pass = false;
                         failCount++;
                     } else {
                         if(VerifyDiffs.show_all) {
-                            System.out.println(f.toString() + "...OK");
+                            System.out.println(f.toString() + " ...OK");
                         }
                         passCount++;
                     }

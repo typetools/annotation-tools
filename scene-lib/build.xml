@@ -76,6 +76,7 @@
         <path id="libpath">
             <pathelement location="${asmx}/bin"/>
             <pathelement location="${junit}"/>
+            <pathelement location="${annotation-tools}/annotation-file-utilities/lib/utilMDE.jar"/>
             <!-- remainder only for repository version -->
             <pathelement location="${annotations-compiler}/dist/lib/javac.jar"/>
             <pathelement location="${annotations-compiler}/dist/lib/javap.jar"/>

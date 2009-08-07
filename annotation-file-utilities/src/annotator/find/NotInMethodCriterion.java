@@ -9,35 +9,41 @@ import com.sun.source.util.TreePath;
  */
 final class NotInMethodCriterion implements Criterion {
 
-    /**
-     * {@inheritDoc}
-     */
-    public Kind getKind() {
-        return Kind.NOT_IN_METHOD;
-    }
+  /**
+   * {@inheritDoc}
+   */
+  public Kind getKind() {
+    return Kind.NOT_IN_METHOD;
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    public boolean isSatisfiedBy(TreePath path) {
-        do {
-            Tree tree = path.getLeaf();
-            if (tree.getKind() == Tree.Kind.METHOD)
-                return false;
-            if (tree.getKind() == Tree.Kind.CLASS || tree.getKind() == Tree.Kind.NEW_CLASS) {
-              return true;
-            }
-            path = path.getParentPath();
-        } while (path != null && path.getLeaf() != null);
+  /** {@inheritDoc} */
+  @Override
+  public boolean isSatisfiedBy(TreePath path, Tree leaf) {
+    assert path == null || path.getLeaf() == leaf;
+    return isSatisfiedBy(path);
+  }
 
+  /** {@inheritDoc} */
+  @Override
+  public boolean isSatisfiedBy(TreePath path) {
+    do {
+      Tree tree = path.getLeaf();
+      if (tree.getKind() == Tree.Kind.METHOD)
+        return false;
+      if (tree.getKind() == Tree.Kind.CLASS || tree.getKind() == Tree.Kind.NEW_CLASS) {
         return true;
-    }
+      }
+      path = path.getParentPath();
+    } while (path != null && path.getLeaf() != null);
 
-    /**
-     * {@inheritDoc}
-     */
-    public String toString() {
-        return "not in method";
-    }
+    return true;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public String toString() {
+    return "not in method";
+  }
 
 }
