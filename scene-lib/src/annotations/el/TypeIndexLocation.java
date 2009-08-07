@@ -22,9 +22,7 @@ public class TypeIndexLocation {
               && equals((TypeIndexLocation) o);
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  /** {@inheritDoc} */
   @Override
   public int hashCode() /*@ReadOnly*/ {
        Hasher h = new Hasher();

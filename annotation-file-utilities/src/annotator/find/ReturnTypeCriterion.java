@@ -22,6 +22,15 @@ public class ReturnTypeCriterion implements Criterion {
     this.inMethodCriterion = Criteria.inMethod(methodName);
   }
 
+  /** {@inheritDoc} */
+  @Override
+  public boolean isSatisfiedBy(TreePath path, Tree leaf) {
+    assert path == null || path.getLeaf() == leaf;
+    return isSatisfiedBy(path);
+  }
+
+  /** {@inheritDoc} */
+  @Override
   public boolean isSatisfiedBy(TreePath path) {
     if (path == null) {
       return false;

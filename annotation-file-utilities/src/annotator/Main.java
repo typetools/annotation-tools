@@ -112,7 +112,7 @@ public class Main {
           Specification spec = new IndexFileSpecification(arg);
           List<Insertion> parsedSpec = spec.parse();
           insertions.addAll(parsedSpec);
-          if (verbose) {
+          if (verbose || debug) {
             System.out.printf("Read %d annotations from %s%n",
                               parsedSpec.size(), arg);
           }
@@ -196,6 +196,9 @@ public class Main {
 
         // Create a finder, and use it to get positions.
         TreeFinder finder = new TreeFinder(tree);
+        if (debug) {
+          finder.debug = true;
+        }
         Map<Integer, String> positions = finder.getPositions(tree, insertions);
 
         // Apply the positions to the source file.
@@ -223,25 +226,37 @@ public class Main {
             toInsert = "/*" + toInsert + "*/";
           }
 
-          char precedingChar = src.charAt(pos-1);
-          if (! (Character.isWhitespace(precedingChar)
-                 // No space if it's the first formal or generic parameter
-                 || precedingChar == '('
-                 || precedingChar == '<')) {
-            toInsert = " " + toInsert;
+          // Possibly add a leading space before the insertion
+          if (pos != 0) {
+            char precedingChar = src.charAt(pos-1);
+            if (! (Character.isWhitespace(precedingChar)
+                   // No space if it's the first formal or generic parameter
+                   || precedingChar == '('
+                   || precedingChar == '<')) {
+              toInsert = " " + toInsert;
+            }
           }
           // If it's already there, don't re-insert.  This is a hack!
-          String precedingTextPlusChar
-            = src.getString().substring(pos-toInsert.length()-1, pos);
-          // System.out.println("Inserting " + toInsert + " at " + pos + " in code of length " + src.getString().length() + " with preceding text '" + precedingTextPlusChar + "'");
-          if (toInsert.equals(precedingTextPlusChar.substring(0, toInsert.length()))
-              || toInsert.equals(precedingTextPlusChar.substring(1))) {
-            if (debug) {
-              System.out.println("Already present, skipping");
+          int precedingTextPos = pos-toInsert.length()-1;
+          if (precedingTextPos >= 0) {
+            String precedingTextPlusChar
+              = src.getString().substring(precedingTextPos, pos);
+            // System.out.println("Inserting " + toInsert + " at " + pos + " in code of length " + src.getString().length() + " with preceding text '" + precedingTextPlusChar + "'");
+            if (toInsert.equals(precedingTextPlusChar.substring(0, toInsert.length()))
+                || toInsert.equals(precedingTextPlusChar.substring(1))) {
+              if (debug) {
+                System.out.println("Already present, skipping");
+              }
+              continue;
             }
-            continue;
           }
-          src.insert(pos, toInsert + " ");
+          // add trailing whitespace
+          if (pos==0) {
+            toInsert = toInsert + fileLineSep;
+          } else {
+            toInsert = toInsert + " ";
+          }
+          src.insert(pos, toInsert);
           if (debug) {
             System.out.println("Post-insertion source: " + src.getString());
           }

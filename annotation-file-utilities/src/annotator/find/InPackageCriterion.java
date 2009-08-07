@@ -6,24 +6,22 @@ import com.sun.source.tree.*;
 import com.sun.source.util.TreePath;
 
 /**
- * Represents the criterion that a program element is in a method with a
+ * Represents the criterion that a program element is in a package with a
  * certain name.
  */
-final class InMethodCriterion implements Criterion {
+final class InPackageCriterion implements Criterion {
 
   private final String name;
-  private final IsSigMethodCriterion sigMethodCriterion;
 
-  InMethodCriterion(String name) {
+  InPackageCriterion(String name) {
     this.name = name;
-    sigMethodCriterion = new IsSigMethodCriterion(name);
   }
 
   /**
    * {@inheritDoc}
    */
   public Kind getKind() {
-    return Kind.IN_METHOD;
+    return Kind.IN_PACKAGE;
   }
 
   /** {@inheritDoc} */
@@ -41,23 +39,20 @@ final class InMethodCriterion implements Criterion {
       return false;
 
     if (Criteria.debug) {
-      debug("InMethodCriterion.isSatisfiedBy(" + Main.pathToString(path) + "); this=" + this);
+      debug("InPackageCriterion.isSatisfiedBy(" + Main.pathToString(path) + "); this=" + this);
     }
 
     do {
-//      Tree tree = path.getLeaf();
-//      if (tree.getKind() == Tree.Kind.METHOD) {
-//        MethodTree m = (MethodTree)tree;
-//        if (this.name.equals(m.getName().toString()))
-//          return true;
-//      }
-      if (sigMethodCriterion.isSatisfiedBy(path)) {
-        debug("InMethodCriterion.isSatisfiedBy => true");
-        return true;
+      Tree tree = path.getLeaf();
+      if (tree.getKind() == Tree.Kind.COMPILATION_UNIT) {
+        CompilationUnitTree cu = (CompilationUnitTree)tree;
+        String packageName = cu.getPackageName().toString();
+        if (name.equals(packageName))
+          return true;
       }
       path = path.getParentPath();
     } while (path != null && path.getLeaf() != null);
-    debug("InMethodCriterion.isSatisfiedBy => false");
+    debug("InPackageCriterion.isSatisfiedBy => false");
     return false;
   }
 
@@ -65,7 +60,7 @@ final class InMethodCriterion implements Criterion {
    * {@inheritDoc}
    */
   public String toString() {
-    return "in method '" + name + "'";
+    return "in package '" + name + "'";
   }
 
   private static void debug(String s) {

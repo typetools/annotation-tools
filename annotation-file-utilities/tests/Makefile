@@ -29,7 +29,6 @@ results: bin/VerifyDiffs.class
 	@java -cp bin VerifyDiffs --show_all
 
 # Remakes the little java program that checks and compares diffs
-.PRECIOUS: bin/VerifyDiffs.class
 bin/VerifyDiffs.class : VerifyDiffs.java
 	@javac -g -cp ../bincompile -d bin VerifyDiffs.java
 
@@ -38,15 +37,16 @@ compile :
 	mkdir -p bin
 	javac -g -cp ../bin -d bin *.java
 
-.PRECIOUS: %.class
+.PRECIOUS : bin/annotator/tests/%.class
 bin/annotator/tests/%.class: %.java
 	mkdir -p bin
-	javac -g -cp ../bin -d bin $*.java
+	javac -g -cp bin:../bin -d bin -sourcepath . $*.java
 
 # Actually runs the annotator to create the annotated java file.
 .PRECIOUS: %.output
 %.output: %.jaif %.java bin/annotator/tests/%.class ../lib/utilMDE.jar ../bin
-	java -cp bin:../annotation-file-utilities.jar \
+	java \
+	-cp ../annotation-file-utilities.jar \
 	annotator.Main \
 	--abbreviate=false \
 	-d $*-output \
