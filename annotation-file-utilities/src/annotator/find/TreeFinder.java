@@ -13,6 +13,8 @@ import com.sun.source.util.TreeScanner;
 import com.sun.tools.javac.tree.*;
 import com.sun.tools.javac.tree.JCTree.*;
 
+import com.google.common.collect.*;
+
 /**
  * A {@code TreeScanner} that is able to locate program elements in an
  * AST based on {@code Criteria}. It is used to scan a tree and return a
@@ -311,7 +313,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
   /**
    * A comparator for sorting integers in reverse
    */
-  private static class ReverseIntegerComparator implements Comparator<Integer> {
+  public static class ReverseIntegerComparator implements Comparator<Integer> {
     public int compare(Integer o1, Integer o2) {
       return o1.compareTo(o2) * -1;
     }
@@ -320,7 +322,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
   private Map<Tree, TreePath> paths;
   private TypePositionFinder tpf;
   private CompilationUnitTree tree;
-  private SortedMap<Integer, String> positions;
+  private SetMultimap<Integer, String> positions;
   private Set<Insertion> satisfied;
 
   /**
@@ -330,7 +332,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
    */
   public TreeFinder(CompilationUnitTree tree) {
     this.tree = tree;
-    this.positions = new TreeMap<Integer, String>(new ReverseIntegerComparator());
+    this.positions = LinkedHashMultimap.create();
     this.tpf = new TypePositionFinder(tree);
     this.paths = new HashMap<Tree, TreePath>();
     this.satisfied = new HashSet<Insertion>();
@@ -416,7 +418,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
 
       debug("  ... satisfied! at " + pos + " for node of type " + node.getClass() + ": " + Main.treeToString(node));
 
-      if (pos != null && !positions.containsKey(pos)) {
+      if (pos != null) {
         positions.put(pos, i.getText());
       }
 
@@ -440,7 +442,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
    * @param p the list of insertion criteria
    * @return the source position to insertion text mapping
    */
-  public Map<Integer, String> getPositions(Tree node, List<Insertion> p) {
+  public SetMultimap<Integer, String> getPositions(Tree node, List<Insertion> p) {
     this.scan(node, p);
     // This needs to be optional, because there may be many extra
     // annotations in a .jaif file.
@@ -452,6 +454,6 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
         }
       }
     }
-    return Collections.unmodifiableMap(positions);
+    return Multimaps.unmodifiableSetMultimap(positions);
   }
 }
