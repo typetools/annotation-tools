@@ -80,6 +80,7 @@
       -->
       <pathelement location="${annotations-compiler}/dist/lib/javac.jar"/>
       <pathelement location="${annotation-tools}/annotation-file-utilities/lib/utilMDE.jar"/>
+      <pathelement location="${annotation-tools}/annotation-file-utilities/lib/google-collect-1.0-rc2.jar"/>
       <pathelement location="${scene-lib}/bin"/>
       <pathelement location="${asmx}/bin"/>
       <!-- additional for distribution:
@@ -145,6 +146,12 @@
     </copy>
     <!-- Also need to get class files in libraries -->
     <unjar src="lib/utilMDE.jar" dest="${temp-jarfile}">
+      <patternset>
+        <include name="**/*.class"/>
+        <exclude name="META-INF/" />
+      </patternset>
+    </unjar>
+    <unjar src="lib/google-collect-1.0-rc2.jar" dest="${temp-jarfile}">
       <patternset>
         <include name="**/*.class"/>
         <exclude name="META-INF/" />

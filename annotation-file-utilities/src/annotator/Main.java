@@ -15,6 +15,8 @@ import annotator.specification.Specification;
 import com.sun.source.tree.*;
 import com.sun.source.util.TreePath;
 
+import com.google.common.collect.*;
+
 /**
  * This is the main class for the annotator, which inserts annotations in
  * Java source code.  It takes as input
@@ -199,15 +201,20 @@ public class Main {
         if (debug) {
           finder.debug = true;
         }
-        Map<Integer, String> positions = finder.getPositions(tree, insertions);
+        SetMultimap<Integer, String> positions = finder.getPositions(tree, insertions);
 
         // Apply the positions to the source file.
         if (debug) {
           System.err.printf("%d positions in tree for %s%n", positions.size(), javafilename);
         }
 
-        for (Integer pos : positions.keySet()) {
-          String toInsert = positions.get(pos).trim();
+        Set<Integer> positionKeysUnsorted = positions.keySet();
+        Set<Integer> positionKeysSorted = new TreeSet<Integer>(new TreeFinder.ReverseIntegerComparator());
+        positionKeysSorted.addAll(positionKeysUnsorted);
+        for (Integer pos : positionKeysSorted) {
+         List<String> toInsertList = new ArrayList(positions.get(pos));
+         Collections.reverse(toInsertList);
+         for (String toInsert : toInsertList) {
           if (! toInsert.startsWith("@")) {
             throw new Error("Insertion doesn't start with '@': " + toInsert);
           }
@@ -261,12 +268,16 @@ public class Main {
             System.out.println("Post-insertion source: " + src.getString());
           }
         }
+       }
       }
 
       // insert import statements
       {
         if (debug) {
           System.out.println(imports.size() + " imports to insert");
+          for (String classname : imports) {
+            System.out.println("  " + classname);
+          }
         }
         Pattern importPattern = Pattern.compile("(?m)^import\\b");
         Pattern packagePattern = Pattern.compile("(?m)^package\\b.*;(\\n|\\r\\n?)");
