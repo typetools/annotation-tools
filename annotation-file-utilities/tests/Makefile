@@ -46,7 +46,7 @@ bin/annotator/tests/%.class: %.java
 .PRECIOUS: %.output
 %.output: %.jaif %.java bin/annotator/tests/%.class ../lib/utilMDE.jar ../bin
 	java \
-	-cp ../annotation-file-utilities.jar \
+	-cp bin:../annotation-file-utilities.jar \
 	annotator.Main \
 	--abbreviate=false \
 	-d $*-output \

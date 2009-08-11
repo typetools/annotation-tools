@@ -102,7 +102,7 @@ public class IndexFileSpecification implements Specification {
       MethodOffsetClassVisitor cv = new MethodOffsetClassVisitor();
       classReader.accept(cv, false);
     } catch(IOException e) {
-      // If extra information not found, still proceed, in case
+      // If .class file not found, still proceed, in case
       // user only wants method signature annotations.
       System.out.println("Warning: did not find classfile for: " + className);
       // throw new RuntimeException("IndexFileSpecification.parseClass: " + e);
@@ -170,16 +170,11 @@ public class IndexFileSpecification implements Specification {
 
   /** Fill in this.insertions with insertion pairs. */
   private void parseElement(CriterionList clist, AElement element) {
-     String annotationString = getElementAnnotation(element);
-      if (annotationString.trim().equals("")) {
-        // Don't add any empty annotations.  This case arises when the
-        // index file verbosely includes all program elements, even unannotated
-        // elements.
-        return;
-      }
+    for (String annotationString : getElementAnnotation(element)) {
       Insertion ins = new Insertion(annotationString, clist.criteria());
       debug("parsed: " + ins);
       this.insertions.add(ins);
+    }
   }
 
   /** Fill in this.insertions with insertion pairs. */
@@ -195,8 +190,8 @@ public class IndexFileSpecification implements Specification {
   }
 
   // Returns a string representation of the annotations at the element.
-  private String getElementAnnotation(AElement element) {
-    String annotationsString = " ";
+  private Set<String> getElementAnnotation(AElement element) {
+    Set<String> result = new LinkedHashSet<String>(element.tlAnnotationsHere.size());
     for (Annotation tla : element.tlAnnotationsHere) {
       AnnotationDef tldef = tla.def;
       AnnotationDef adef = tldef;
@@ -207,26 +202,29 @@ public class IndexFileSpecification implements Specification {
       // if (keywords.containsKey(annotationName)) {
       //   keywordProperty = keywords.getProperty(annotationName);
       // }
-      annotationsString += keywordProperty;
+
+      String annotationString = keywordProperty;
 
       if (sa.fieldValues.size() > 0) {
-        annotationsString += "(";
+        annotationString += "(";
         boolean first = true;
         for (Entry<String, Object> entry : sa.fieldValues.entrySet()) {
           // parameters of the annotation
           if (!first) {
-            annotationsString += ", ";
+            annotationString += ", ";
           }
-          annotationsString += entry.getKey() + "=";
+          annotationString += entry.getKey() + "=";
           AnnotationFieldType fieldType = sa.def.fieldTypes.get(entry.getKey());
           assert fieldType != null;
-          annotationsString += fieldType.format(entry.getValue());
+          annotationString += fieldType.format(entry.getValue());
           first = false;
         }
-        annotationsString += ") ";
+        annotationString += ")";
       }
+      // annotationString += " ";
+      result.add(annotationString);
     }
-    return annotationsString;
+    return result;
   }
 
   private void parseMethod(CriterionList clist, String methodName, AMethod method) {
