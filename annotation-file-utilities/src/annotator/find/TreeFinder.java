@@ -53,6 +53,9 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
         case MEMBER_SELECT:
           t = ((JCFieldAccess) t).getExpression();
           break;
+        case ARRAY_TYPE:
+          t = ((JCArrayTypeTree) t).elemtype;
+          break;
         default:
           throw new RuntimeException(String.format("Unrecognized type (kind=%s, class=%s): %s", t.getKind(), t.getClass(), t));
         }
@@ -78,29 +81,59 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       // System.out.println("return: " + node.getReturnType());
 
 
-      int afterParamList;
+      // location for the receiver annotation
+      int receiverLoc;
 
-      // TODO: figure out how to better place reciever annotation!!!
-      //          List<? extends VariableTree> vars = node.getParameters();
-      //
-      //          VariableTree vt = vars.get(0);
-      //          vt.getName().length();
       JCMethodDecl jcnode = (JCMethodDecl) node;
       List<JCExpression> throwsExpressions = jcnode.thrown;
-      if (throwsExpressions.isEmpty()) {
-        int rightBeforeBlock = jcnode.getBody().pos;
-        afterParamList = rightBeforeBlock;
-      } else {
-        IdentifierTree it = (IdentifierTree) leftmostIdentifier(throwsExpressions.get(0));
-        afterParamList = this.visitIdentifier(it, p);
-        afterParamList -= 7; // for the 'throws' clause
+      JCBlock body = jcnode.getBody();
+      List<JCTypeAnnotation> receiverAnnotations = jcnode.receiverAnnotations;
 
+      if (! throwsExpressions.isEmpty()) {
+        // has a throws expression
+        IdentifierTree it = (IdentifierTree) leftmostIdentifier(throwsExpressions.get(0));
+        receiverLoc = this.visitIdentifier(it, p);
+        receiverLoc -= 7; // for the 'throws' clause
+
+        // Search backwards for the close paren.  Hope for no problems with
+        // comments.
         JavaFileObject jfo = tree.getSourceFile();
         try {
           String s = String.valueOf(jfo.getCharContent(true));
-          for (int i = afterParamList; i >= 0; i--) {
+          for (int i = receiverLoc; i >= 0; i--) {
             if (s.charAt(i) == ')') {
-              afterParamList = i + 1;
+              receiverLoc = i + 1;
+              break;
+            }
+          }
+        } catch(IOException e) {
+          throw new RuntimeException(e);
+        }
+      } else if (body != null) {
+        // has a body
+        receiverLoc = body.pos;
+      } else if (! receiverAnnotations.isEmpty()) {
+        // has receiver annotations.  After them would be better, but for
+        // now put the new one at the front.
+        receiverLoc = receiverAnnotations.get(0).pos;
+      } else {
+        // try the last parameter, or failing that the return value
+        List<? extends VariableTree> params = jcnode.getParameters();
+        if (! params.isEmpty()) {
+          VariableTree lastParam = params.get(params.size()-1);
+          receiverLoc = ((JCVariableDecl) lastParam).pos;
+        } else {
+          receiverLoc = jcnode.restype.pos;
+        }
+
+        // Search forwards for the close paren.  Hope for no problems with
+        // comments.
+        JavaFileObject jfo = tree.getSourceFile();
+        try {
+          String s = String.valueOf(jfo.getCharContent(true));
+          for (int i = receiverLoc; i < s.length(); i++) {
+            if (s.charAt(i) == ')') {
+              receiverLoc = i + 1;
               break;
             }
           }
@@ -110,8 +143,8 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       }
 
       // TODO:
-      //debugging: System.out.println("result: " + afterParamList);
-      return afterParamList;
+      //debugging: System.out.println("result: " + receiverLoc);
+      return receiverLoc;
 
 
 //       // old implementations scans characters in the source (which is error-prone).
