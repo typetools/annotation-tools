@@ -32,7 +32,7 @@ import com.google.common.collect.*;
 public class Main {
 
   public static final String INDEX_UTILS_VERSION =
-    "Annotation file utilities: insert-annotations-to-source v2.3";
+    "Annotation file utilities: insert-annotations-to-source v2.3.1";
 
   /** Directory in which output files are written. */
   @Option("-d <directory> Directory in which output files are written")
