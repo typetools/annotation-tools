@@ -22,15 +22,13 @@ import annotations.io.IndexFileParser;
 public class ClassFileWriter {
 
   public static final String INDEX_UTILS_VERSION =
-    "Annotation file utilities: insert-annotations v2.3";
+    "Annotation file utilities: insert-annotations v2.3.1";
   /**
    * Main method meant to a a convenient way to write annotations from an index
    * file to a class file.  For programmatic access to this
    * tool, one should probably use the insert() methods instead.
    *
-   * Usage: java annotations.io.ClassFileWriter
-   *  <options>
-   *  <space-separated list of pairs of classes and index files>
+   * Usage: java annotations.io.ClassFileWriter options [classfile indexfile] ...
    *
    * <options> include:
    *   -h, --help   print usage information and exit
