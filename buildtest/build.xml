@@ -1,8 +1,5 @@
 <project name="buildtest" default="test-all">
-    <!-- 
-        Repository locations of all projects.
-    -->
-    
+
     <!-- 
         Initial target to setup the build directory.
     -->

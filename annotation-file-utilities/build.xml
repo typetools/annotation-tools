@@ -10,6 +10,9 @@
 
   <property name="java-version" value="7"/>
 
+  <!-- The distribution is the result of zipping this directory. -->
+  <property name="temp-annotation-tools" value="${java.io.tmpdir}/annotation-tools" />
+
   <!-- Can't I just reuse temp-annotation-file-utilities, rather than
        having this separate directory? -->
   <property name="temp-jarfile" value="${java.io.tmpdir}/annotation-file-utilities-jarfile" />
@@ -89,46 +92,6 @@
     </path>
   </target>
 
-  <!-- Copy files from repository to temporary directory from which they will be
-  packaged up. -->
-  <target name="update-workspace" depends="init-properties">
-    <delete dir="${temp-annotation-file-utilities}" />
-    <mkdir dir="${temp-annotation-file-utilities}" />
-
-    <copy todir="${temp-annotation-file-utilities}">
-      <fileset dir=".">
-        <include name="build.xml"/>
-        <include name="**/src/**"/>
-        <include name="**/scripts/**"/>
-        <include name="**/lib/**"/>
-        <include name="**/test/**"/>
-        <include name="**/tests/**"/>
-        <exclude name="**/.svn/**"/>
-      </fileset>
-    </copy>
-
-    <copy todir="${temp-annotation-file-utilities}/asmx">
-      <fileset dir="${asmx}">
-	<include name="build.xml"/>
-        <include name="*.jar"/>
-        <include name="./build.*"/>
-        <include name="**/src/**"/>
-        <include name="**/core/**"/>
-        <include name="**/config/**"/>
-        <exclude name="**/.svn/**"/>
-      </fileset>
-    </copy>
-
-    <copy todir="${temp-annotation-file-utilities}/scene-lib">
-      <fileset dir="${scene-lib}">
-        <include name="build.xml"/>
-        <include name="**/src**"/>
-        <exclude name="**/.svn/**"/>
-      </fileset>
-    </copy>
-
-  </target>
-
   <target name="jarfile"
           depends="init,clean,build"
           description="create the class library annotation-file-utilities.jar">
@@ -172,44 +135,71 @@
     </delete>
   </target>
 
+  <!-- Copy files from repository to temporary directory from which they
+  will be packaged up.  Commit first!  Any uncommitted files will not
+  appear in the archive. -->
+  <target name="update-workspace" depends="init-properties">
+    <delete dir="${temp-annotation-tools}" />
+    <exec executable="hg">
+      <arg value="archive" />
+      <arg value="${temp-annotation-tools}" />
+    </exec>
+    <delete dir="${temp-annotation-tools}/scene-lib.orig-hand-annos" />
+    <delete file="${temp-annotation-tools}/.hg_archival.txt" />
+    <delete file="${temp-annotation-tools}/.hgignore" />
+
+    <copy todir="${temp-annotation-tools}/annotation-file-utilities">
+      <fileset dir="${afu}">
+        <include name="annotation-file-format.dvi"/>
+        <include name="annotation-file-format.html"/>
+        <include name="annotation-file-format.pdf"/>
+        <include name="annotation-file-utilities.jar"/>
+        <include name="bin/**"/>
+      </fileset>
+    </copy>
+
+    <copy todir="${temp-annotation-tools}/asmx">
+      <fileset dir="${asmx}">
+        <include name="bin/**"/>
+      </fileset>
+    </copy>
+
+    <copy todir="${temp-annotation-tools}/scene-lib">
+      <fileset dir="${scene-lib}">
+        <include name="bin/**"/>
+      </fileset>
+    </copy>
+
+  </target>
+
   <target name="zipfile"
-          depends="jarfile,run-tests,update-workspace,annotation-file-format"
+          depends="jarfile,annotation-file-format,run-tests,update-workspace"
           description="create the distribution: annotation-file-utilities.zip">
     <!-- Create a new directory containing all the files and then zip that
          directory, so that when the user unzips they extract exactly one
          directory. -->
-    <!-- Copy all files from workspace, plus a few other files. -->
-    <copy todir="${temp-annotation-file-utilities}">
-      <fileset dir=".">
-        <include name="$/"/>
-        <exclude name="**/.svn/*"/>
-      </fileset>
-      <fileset file="annotation-file-utilities.jar"/>
-      <fileset dir="scripts" excludes="**/.svn/*"/>
-      <fileset file="annotation-file-utilities.html"/>
-      <fileset file="annotation-file-format.pdf"/>
-      <fileset file="annotation-file-format.html"/>
-    </copy>
 
     <!-- In order for the shell scripts to have the proper execution bit set,
          include them specifically with the right permissions.  Ant presently
          does not use the file's permissions themselves to do this. -->
-    <zip destfile="annotation-file-utilities.zip" compress="true">
+    <zip destfile="annotation-tools.zip" compress="true">
       <fileset dir="${java.io.tmpdir}">
-        <include name="annotation-file-utilities/"/>
-        <exclude name="annotation-file-utilities/extract-annotations"/>
-        <exclude name="annotation-file-utilities/insert-annotations"/>
-        <exclude name="annotation-file-utilities/insert-annotations-to-source"/>
+        <include name="annotation-tools/"/>
+        <exclude name="annotation-tools/annotation-file-utilities/scripts/extract-annotations"/>
+        <exclude name="annotation-tools/annotation-file-utilities/scripts/insert-annotations"/>
+        <exclude name="annotation-tools/annotation-file-utilities/scripts/insert-annotations-to-source"/>
       </fileset>
       <zipfileset dir="${java.io.tmpdir}" filemode="755">
-        <include name="annotation-file-utilities/extract-annotations"/>
-        <include name="annotation-file-utilities/insert-annotations"/>
-        <include name="annotation-file-utilities/insert-annotations-to-source"/>
+        <include name="annotation-tools/annotation-file-utilities/scripts/extract-annotations"/>
+        <include name="annotation-tools/annotation-file-utilities/scripts/insert-annotations"/>
+        <include name="annotation-tools/annotation-file-utilities/scripts/insert-annotations-to-source"/>
       </zipfileset>
     </zip>
 
     <!-- Delete temporary files once they have been zipped. -->
+<!--
     <delete dir="${temp-annotation-file-utilities}"/>
+-->
   </target>
 
    <target name="export" depends="clean,zipfile"
@@ -221,7 +211,7 @@
 
     <echo message="Copying annotation-file-utilities.html as index.html"/>
     <copy file="annotation-file-utilities.html"
-      tofile="${jsr308-www-annotation-file-utilities}/index.html"/>
+      todir="${jsr308-www-annotation-file-utilities}"/>
 
     <echo message="Copying annotation-file-format.{html,pdf"/>
     <copy file="annotation-file-format.html"
