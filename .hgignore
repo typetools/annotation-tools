@@ -12,7 +12,7 @@ annotation-file-format.html
 annotation-file-format.log
 annotation-file-format.pdf
 annotation-file-utilities.jar
-annotation-file-utilities.zip
+annotation-tools.zip
 
 annotation-file-utilities/tests/*.diff
 annotation-file-utilities/tests/*.log

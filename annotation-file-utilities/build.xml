@@ -174,7 +174,7 @@
 
   <target name="zipfile"
           depends="jarfile,annotation-file-format,run-tests,update-workspace"
-          description="create the distribution: annotation-file-utilities.zip">
+          description="create the distribution: annotation-tools.zip">
     <!-- Create a new directory containing all the files and then zip that
          directory, so that when the user unzips they extract exactly one
          directory. -->
@@ -205,8 +205,8 @@
    <target name="export" depends="clean,zipfile"
           description="export the zipfile, etc. to its website">
     <echo message="Export location: ${jsr308-www-annotation-file-utilities}"/>
-    <echo message="Copying annotation-file-utilities.zip"/>
-    <copy file="annotation-file-utilities.zip"
+    <echo message="Copying annotation-tools.zip"/>
+    <copy file="annotation-tools.zip"
       todir="${jsr308-www-annotation-file-utilities}"/>
 
     <echo message="Copying annotation-file-utilities.html as index.html"/>
@@ -267,7 +267,7 @@
 
     <!-- <echo message="Deleting previous distribution:  annotation-file-utilities.{jar,zip}"/> -->
     <delete file="annotation-file-utilities.jar"/>
-    <delete file="annotation-file-utilities.zip"/>
+    <delete file="annotation-tools.zip"/>
   </target>
 
   <target name="run-tests" description="run tests for the annotator">
