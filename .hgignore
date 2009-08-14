@@ -5,14 +5,19 @@ bin
 *~
 TAGS
 
-annotation-file-format.aux
-annotation-file-format.blg
-annotation-file-format.dvi
-annotation-file-format.html
-annotation-file-format.log
-annotation-file-format.pdf
-annotation-file-utilities.jar
-annotation-tools.zip
+annotation-file-utilities/annotation-file-format.aux
+annotation-file-utilities/annotation-file-format.blg
+annotation-file-utilities/annotation-file-format.dvi
+annotation-file-utilities/annotation-file-format.haux
+annotation-file-utilities/annotation-file-format.html
+annotation-file-utilities/annotation-file-format.htoc
+annotation-file-utilities/annotation-file-format.log
+annotation-file-utilities/annotation-file-format.pdf
+annotation-file-utilities/annotation-file-format.ps
+annotation-file-utilities/annotation-file-format.toc
+annotation-file-utilities/annotation-file-utilities.jar
+annotation-file-utilities/annotation-tools.zip
+# not annotation-file-utilities/annotation-file-utilities.zip which is outdated
 
 annotation-file-utilities/tests/*.diff
 annotation-file-utilities/tests/*.log
