@@ -3,7 +3,7 @@
 \bibitem[Ern08]{JSR308}
 Michael~D. Ernst.
 \newblock {Type Annotations} specification ({JSR} 308).
-\newblock \url{http://pag.csail.mit.edu/jsr308/}, September~12, 2008.
+\newblock \url{http://types.cs.washington.edu/jsr308/}, September~12, 2008.
 
 \bibitem[LBR06]{LeavensBR2006:JML}
 Gary~T. Leavens, Albert~L. Baker, and Clyde Ruby.
