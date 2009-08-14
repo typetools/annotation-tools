@@ -38,12 +38,24 @@ public class Main {
   @Option("-d <directory> Directory in which output files are written")
   public static String outdir = "annotated/";
 
-  // It's already possible to emulate this via
-  //   -d .
-  // but the --in-place argument is more convenient and explicit, and it
-  // makes a backup so it can be run multiple times without restoring the
-  // original state of the .java files.
-  /** Directory in which output files are written. */
+  /**
+   * If true, overwrite original source files (making a backup first).
+   * Furthermore, if the backup files already exist, they are used instead
+   * of the .java files.  This behavior permits a user to tweak the .jaif
+   * file and re-run the annotator.
+   * <p>
+   *
+   * Note that if the user runs the annotator with --in-place, makes edits,
+   * and then re-runs the annotator with this --in-place option, those
+   * edits are lost.  Similarly, if the user runs the annotator twice in a
+   * row with --in-place, only the last set of annotations will appear in
+   * the codebase at the end.
+   * <p>
+   *
+   * To preserve changes when using the --in-place option, first remove the
+   * backup files.  Or, use the <tt>-d .</tt> option, which makes (and
+   * reads) no backup, instead of --in-place.
+   */
   @Option("-i Overwrite original source files")
   public static boolean in_place = false;
 
