@@ -21,3 +21,5 @@ annotation-file-utilities/tests/system-test/out2.diff
 annotation-file-utilities/tests/system-test/out2.jann
 annotation-file-utilities/tests/system-test/out5.diff
 annotation-file-utilities/tests/system-test/out5.jann
+
+scene-lib/javadoc
