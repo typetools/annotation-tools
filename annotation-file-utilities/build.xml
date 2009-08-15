@@ -135,11 +135,29 @@
     </delete>
   </target>
 
+  <target name="check-hg-status" depends="init-properties">
+    <exec executable="hg"
+	  outputproperty="status.output">
+      <arg value="status" />
+    </exec>
+
+    <condition property="status.output.empty">
+      <equals
+        arg1="${status.output}"
+        arg2=""/>
+    </condition>
+
+    <fail unless="status.output.empty"
+          message="`hg status' did not return empty output.
+  Commit/add/remove files as appropriate, then re-try.
+  "/>
+  </target>
+
   <!-- Copy files from repository to temporary directory from which they
-  will be packaged up.  Commit first!  Any uncommitted files will not
-  appear in the archive. -->
-  <target name="update-workspace" depends="init-properties">
+  will be packaged up. -->
+  <target name="update-workspace" depends="init-properties,check-hg-status">
     <delete dir="${temp-annotation-tools}" />
+
     <exec executable="hg">
       <arg value="archive" />
       <arg value="${temp-annotation-tools}" />
@@ -202,7 +220,7 @@
 -->
   </target>
 
-   <target name="export" depends="clean,zipfile"
+   <target name="web" depends="check-hg-status,clean,zipfile"
           description="export the zipfile, etc. to its website">
     <echo message="Export location: ${jsr308-www-annotation-file-utilities}"/>
     <echo message="Copying annotation-tools.zip"/>
