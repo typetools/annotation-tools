@@ -575,17 +575,24 @@ public final class IndexFileParser {
         parseInnerTypes(m);
         parseBounds(m.bounds);
 
-        while (matchKeyword("parameter")) {
-            expectChar('#');
-            int idx = expectNonNegative(matchNNInteger());
-            ATypeElement p = m.parameters.vivify(idx);
-            expectChar(':');
-            parseAnnotations(p);
-            parseInnerTypes(p);
-        }
-        if (matchKeyword("receiver")) {
-            expectChar(':');
-            parseAnnotations(m.receiver);
+        // Permit receiver and parameters in any order.
+        while (checkKeyword("receiver") || checkKeyword("parameter")) {
+            if (matchKeyword("parameter")) {
+                // make "#" optional
+                if (checkChar('#')) {
+                    matchChar('#');
+                }
+                int idx = expectNonNegative(matchNNInteger());
+                ATypeElement p = m.parameters.vivify(idx);
+                expectChar(':');
+                parseAnnotations(p);
+                parseInnerTypes(p);
+            } else if (matchKeyword("receiver")) {
+                expectChar(':');
+                parseAnnotations(m.receiver);
+            } else {
+                throw new Error("This can't happen");
+            }
         }
         while (matchKeyword("local")) {
             int index = expectNonNegative(matchNNInteger());
@@ -676,7 +683,7 @@ public final class IndexFileParser {
                     break;
                 else
                     throw new ParseException(
-                                             "Expected `annotation', `class', or `package', found " + st.sval + ", ttype:" + st.ttype);
+                                             "Expected `annotation', `class', or `package', found `" + st.sval + "', ttype:" + st.ttype);
             }
         }
     }
