@@ -130,6 +130,14 @@ public class Main {
             System.out.printf("Read %d annotations from %s%n",
                               parsedSpec.size(), arg);
           }
+        } catch (RuntimeException e) {
+          if (e.getCause() != null
+              && e.getCause() instanceof FileNotFoundException) {
+            System.err.println("File not found: " + arg);
+            System.exit(1);
+          } else {
+            throw e;
+          }
         } catch (FileIOException e) {
           System.err.println("Error while parsing annotation file " + arg);
           if (e.getMessage() != null) {
