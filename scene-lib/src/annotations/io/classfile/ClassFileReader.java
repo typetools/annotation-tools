@@ -16,7 +16,7 @@ import annotations.io.IndexFileWriter;
 public class ClassFileReader {
 
   public static final String INDEX_UTILS_VERSION =
-    "Annotation file utilities: extract-annotations v2.3.1";
+    "Annotation file utilities: extract-annotations v2.3.2";
 
   static String usage
     = "usage: extract-annotations\n"
