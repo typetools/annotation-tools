@@ -104,10 +104,10 @@ public class IndexFileSpecification implements Specification {
     } catch(IOException e) {
       // If .class file not found, still proceed, in case
       // user only wants method signature annotations.
-      System.out.println("Warning: did not find classfile for: " + className);
+      System.out.println("Warning: IndexFileSpecification did not find classfile for: " + className);
       // throw new RuntimeException("IndexFileSpecification.parseClass: " + e);
     } catch (RuntimeException e) {
-      System.err.println("Problem reading class: " + className);
+      System.err.println("IndexFileSpecification had a problem reading class: " + className);
       throw e;
     }
     String packageName;

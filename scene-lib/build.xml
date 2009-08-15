@@ -82,6 +82,7 @@
             <pathelement location="${annotations-compiler}/dist/lib/javap.jar"/>
             <pathelement location="${checkers}/build"/>
             <pathelement location="bin"/>
+            <pathelement location="${jre1.6.0}"/>
         </path>
     </target>
         

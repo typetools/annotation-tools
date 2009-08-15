@@ -115,7 +115,7 @@ The following instructions assume either a Linux or Windows system using a comma
 
 <p>
 The current distribution is <code>Annotation File Utilities version
-2.3.1</code>, released August 12, 2009.
+2.3.2</code>, released August 14, 2009.
 </p>
 
 <ol>
@@ -280,19 +280,22 @@ To insert annotations specified by an annotation file into a Java source file,
 use the insert-annotations-to-source tool.  Running:
 </p>
 
-<pre><code>insert-annotations-to-source indexFile.jaif mypackage/MyClass.java annotated/mypackage/MyClass.java</code></pre>
+<pre><code>insert-annotations-to-source indexFile.jaif mypackage/MyClass.java</code></pre>
 
 <p>
 will read all the annotations from <code>indexFile.jaif</code>, insert them
 into their appropriate locations in <code>mypackage/MyClass.java</code>,
-and write the results to
-<code>mypackage/MyClass.java.with-annotations</code>.  Run:
+and write the results to <code>annotated/mypackage/MyClass.java</code>.
+For full usage information, run:
 </p>
 
 <pre><code>insert-annotations-to-source --help</code></pre>
 
 <p>
-for full usage information.  Note that you must have the associated class <code>mypackage.MyClass.class</code> on your classpath for this tool to fully work.
+If you wish to insert annotations into method bodies, you must have the
+associated class <code>mypackage.MyClass.class</code> on your classpath.
+You can insert annotations on class/field/method declarations and
+signatures without the class on your classpath.
 </p>
 
 
@@ -374,6 +377,13 @@ But please use the
       <li>Fix many bugs.</li>
     </ul>
   </li>
+  <li>
+  Version 2.3.2: (Released August 14, 2009)
+    <ul>
+      <li>Relax file format:  receiver may predede parameters (in spec &
+          implementation), parameters may omit "#" (in implementation only)</li>
+    </ul>
+  </li>
 </ul>
 
 <h3 id="credits"> Credits </h3>
@@ -388,7 +398,7 @@ Originally developed by Jaime Quinonez for use in collaboration with
 <hr/>
 
 <p>
-Last revised: August 13, 2009
+Last revised: August 14, 2009
 </p>
 
 </body>
