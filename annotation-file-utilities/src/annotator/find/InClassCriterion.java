@@ -1,7 +1,6 @@
 package annotator.find;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import annotator.scanner.ClassScanner;
 
@@ -36,13 +35,13 @@ final class InClassCriterion implements Criterion {
       this.className = className;
     }
 
-    listOfClassNames = new ArrayList<String>();
-    // String you want to split against is just the single character: $
-    // The regex is: \$
-    // Of course, you need to escape the first backslash in the .java file
-    for (String s : this.className.split("\\$")) {
-      listOfClassNames.add(s);
-    }
+    // If there are dollar signs in a name, then there are two
+    // possibilities regarding how the dollar sign got there.
+    //  1. Inserted by the compiler, for inner classes.
+    //  2. Written by the programmer (or by a tool that creates .class files).
+    // We need to account for both possibilities (and all combinations of them).
+
+    listOfClassNames = split(this.className, '$');
   }
 
   /**
@@ -69,23 +68,22 @@ final class InClassCriterion implements Criterion {
     List<String> remainingClassNamesToMatch =
       new ArrayList<String>(listOfClassNames);
 
-
-    Tree tree = path.getLeaf();
-
+    // This loop works from the leaf up to the root of the tree.
     do {
-      tree = path.getLeaf();
+      Tree tree = path.getLeaf();
       boolean checkAnon = false;
-      if (tree.getKind() == Tree.Kind.COMPILATION_UNIT) {
+      switch (tree.getKind()) {
+      case COMPILATION_UNIT:
         ExpressionTree packageTree = ((CompilationUnitTree) tree).getPackageName();
         if (packageTree == null) { // compilation unit is in default package
-        return remainingClassNamesToMatch.isEmpty();
+          return remainingClassNamesToMatch.isEmpty();
         }
         String declaredPackage = packageTree.toString();
-        boolean b= remainingClassNamesToMatch.isEmpty() &&
-        declaredPackage.equals(packageName);
+        boolean b = (remainingClassNamesToMatch.isEmpty()
+                     && declaredPackage.equals(packageName));
         return b;
-      }
-      if (tree.getKind() == Tree.Kind.CLASS) {
+        // unreachable: break;
+      case CLASS:
         ClassTree c = (ClassTree)tree;
         String lowestClassName = c.getSimpleName().toString();
         if (remainingClassNamesToMatch.isEmpty()) {
@@ -94,23 +92,32 @@ final class InClassCriterion implements Criterion {
         int lastIndex = remainingClassNamesToMatch.size() - 1;
         String lastClassNameToMatch =
           remainingClassNamesToMatch.get(lastIndex).trim();
-        checkAnon = lastClassNameToMatch.isEmpty() ||
-        (parseInt(lastClassNameToMatch) != null);
+        // True if name has length 0 (why?) or is a number
+        checkAnon = (lastClassNameToMatch.isEmpty()
+                     || (parseInt(lastClassNameToMatch) != null));
 
         if (checkAnon) {
+          // This seems to be adding a duplicate.  Why?
           remainingClassNamesToMatch.add(lastClassNameToMatch);
+        } else {
+          List<String> lowestParts = split(lowestClassName, '$');
+          int idx = Collections.lastIndexOfSubList(remainingClassNamesToMatch, lowestParts);
+          if (idx != remainingClassNamesToMatch.size() - lowestParts.size()) {
+            return false;
+          }
+          for (String lowestPart : lowestParts) {
+            assert lowestPart.equals(remainingClassNamesToMatch.get(idx));
+            remainingClassNamesToMatch.remove(idx);
+          }
         }
-        if (!checkAnon && !lowestClassName.equals(lastClassNameToMatch)) {
-          return false;
-        }
-
-        if (!checkAnon) {
-          remainingClassNamesToMatch.remove(lastIndex);
-        }
-      }
-      if (tree.getKind() == Tree.Kind.NEW_CLASS) {
+        break;
+      case NEW_CLASS:
         NewClassTree nc = (NewClassTree) tree;
         checkAnon = nc.getClassBody() != null;
+        break;
+      default:
+        // nothing to do
+        break;
       }
 
       if (checkAnon) {
@@ -118,24 +125,24 @@ final class InClassCriterion implements Criterion {
         // anonymous class index, see if they match
         int lastIndex = remainingClassNamesToMatch.size() - 1;
         String lastClassNameToMatch =
-        remainingClassNamesToMatch.get(lastIndex);
-//        remainingClassNamesToMatch.add(lastIndex, "");
+          remainingClassNamesToMatch.get(lastIndex);
+        //        remainingClassNamesToMatch.add(lastIndex, "");
         remainingClassNamesToMatch.remove(lastIndex);
 
         Integer lastIndexToMatch = null;
         try {
-        lastIndexToMatch = Integer.parseInt(lastClassNameToMatch);
+          lastIndexToMatch = Integer.parseInt(lastClassNameToMatch);
         } catch(Exception e) {
-        return false;
+          return false;
         }
 
         if (lastIndexToMatch != null) {
-        Integer actualIndexInSource = ClassScanner.indexOfClassTree(path, tree);
+          Integer actualIndexInSource = ClassScanner.indexOfClassTree(path, tree);
 
-        boolean b= lastIndexToMatch.equals(actualIndexInSource);
-        if (!b) {
-          return false;
-        }
+          boolean b= lastIndexToMatch.equals(actualIndexInSource);
+          if (!b) {
+            return false;
+          }
         }
       }
       // TODO: what if tree isn't ClassTree, but rather anonymous class
@@ -162,4 +169,22 @@ final class InClassCriterion implements Criterion {
     }
     return i;
   }
+
+  /**
+   * Return an array of Strings representing the characters between
+   * successive instances of the delimiter character.
+   * Always returns an array of length at least 1 (it might contain only the
+   * empty string).
+   * @see #split(String s, String delim)
+   **/
+  private static List<String> split(String s, char delim) {
+    List<String> result = new ArrayList<String>();
+    for (int delimpos = s.indexOf(delim); delimpos != -1; delimpos = s.indexOf(delim)) {
+      result.add(s.substring(0, delimpos));
+      s = s.substring(delimpos+1);
+    }
+    result.add(s);
+    return result;
+  }
+
 }
