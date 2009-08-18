@@ -4,6 +4,6 @@
 
 set ANNOTATION_FILE_UTILS=%~d0
 set ANNOTATION_FILE_UTILS=%ANNOTATION_FILE_UTILS%%~p0
-set ANNOTATION_FILE_UTILS=%ANNOTATION_FILE_UTILS%annotation-file-utilities.jar
+set ANNOTATION_FILE_UTILS=%ANNOTATION_FILE_UTILS%..\annotation-file-utilities.jar
 
-java -Xbootclasspath/p:"%ANNOTATION_FILE_UTILS%" -cp "%ANNOTATION_FILE_UTILS%;%CLASSPATH%" annotator.IndexFileMain %*
+java -Xbootclasspath/p:"%ANNOTATION_FILE_UTILS%" -cp "%ANNOTATION_FILE_UTILS%;%CLASSPATH%" annotator.Main %*
