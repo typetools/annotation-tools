@@ -155,7 +155,7 @@
 
   <!-- Copy files from repository to temporary directory from which they
   will be packaged up. -->
-  <target name="update-workspace" depends="init-properties,check-hg-status">
+  <target name="update-workspace" depends="init-properties">
     <delete dir="${temp-annotation-tools}" />
 
     <exec executable="hg">
@@ -220,7 +220,7 @@
 -->
   </target>
 
-   <target name="web" depends="check-hg-status,clean,zipfile"
+   <target name="web" depends="check-hg-status,clean,zipfile,check-hg-status"
           description="export the zipfile, etc. to its website">
     <echo message="Export location: ${jsr308-www-annotation-file-utilities}"/>
     <echo message="Copying annotation-tools.zip"/>
