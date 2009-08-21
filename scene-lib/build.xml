@@ -3,9 +3,6 @@
 
     <property environment="env"/>
 
-    <property name="java-source-version" value="6"/>
-    <property name="java-target-version" value="1.6"/>
-    
     <target name="init-properties">
         <condition property="exists.build.properties">
             <available file="build.properties"/>
@@ -101,8 +98,6 @@
 -->
         <javac 
                destdir="bin" 
-               source="${java-source-version}" 
-               target="${java-target-version}" 
                debug="true" 
                classpathref="libpath"
                bootclasspath="${libpath}"
@@ -159,7 +154,14 @@
     </target>
     
     <target name="javadoc" depends="javadoc-clean, init">
-        <javadoc sourcepathref="javadoc-sourcepath" classpathref="libpath" packagenames="*" Overview="overview.html" destdir="javadoc" access="public" source="${java-source-version}" noqualifier="annotations:annotations.el:annotations.field:annotations.io:annotations.io.classfile:annotations.util:annotations.util.coll:java.lang"/>
+        <javadoc sourcepathref="javadoc-sourcepath" 
+		classpathref="libpath"
+		packagenames="*"
+		Overview="overview.html"
+		destdir="javadoc" 
+		access="public"
+		noqualifier="annotations:annotations.el:annotations.field:annotations.io:annotations.io.classfile:annotations.util:annotations.util.coll:java.lang"
+		/>
     </target>
 
     <target name="test-package" depends="bin">
