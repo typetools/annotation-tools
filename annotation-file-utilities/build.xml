@@ -93,7 +93,7 @@
   </target>
 
   <target name="jarfile"
-          depends="init,clean,build"
+          depends="init,build"
           description="create the class library annotation-file-utilities.jar">
 
     <echo message="Using temporary directory: ${temp-jarfile}"/>
@@ -104,8 +104,9 @@
       <fileset dir="bin" />
       <fileset dir="${asmx}/bin" excludes="tmp/**"/>
       <fileset dir="${scene-lib}/bin" />
+      <!-- Why are the classes included from both build and bootstrap?? -->
       <fileset dir="${annotations-compiler}/build/classes" />
-      <fileset dir="${annotations-compiler}/build/bootstrap"/>
+      <fileset dir="${annotations-compiler}/build/bootstrap/classes" />
     </copy>
     <!-- Also need to get class files in libraries -->
     <unjar src="lib/utilMDE.jar" dest="${temp-jarfile}">
