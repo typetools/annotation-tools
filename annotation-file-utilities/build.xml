@@ -276,6 +276,8 @@
     </exec>
     <exec executable="hevea">
       <arg value="-fix"/>
+      <arg value="-exec"/>
+      <arg value="xxdate.exe"/>
       <arg value="urlhref.hva"/>
       <arg value="annotation-file-format.tex"/>
     </exec>
