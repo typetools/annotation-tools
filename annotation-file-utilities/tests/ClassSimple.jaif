@@ -1,0 +1,9 @@
+package java.lang:
+annotation visible @ReadOnly:
+annotation visible @DoesNotExist:
+
+package annotator.tests:
+class ClassSimple: @java.lang.ReadOnly
+
+package:
+class ClassSimple: @java.lang.DoesNotExist

@@ -1,0 +1,4 @@
+package java.lang:
+annotation visible @Mutable:
+
+package annotator.tests: @java.lang.Mutable
