@@ -98,6 +98,10 @@ public class Main {
     Options options = new Options("Main [options] ann-file... java-file...", Main.class);
     String[] file_args = options.parse_and_usage (args);
 
+    if (debug) {
+      TreeFinder.debug = true;
+    }
+
     if (help) {
       options.print_usage();
       System.exit(0);
