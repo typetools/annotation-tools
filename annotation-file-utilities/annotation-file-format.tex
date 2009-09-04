@@ -3,6 +3,7 @@
 \usepackage{fullpage}
 \usepackage{relsize}
 \usepackage{url}
+\usepackage{hevea}
 % \usepackage{verbdef}
 
 \def\topfraction{.9}
@@ -310,7 +311,7 @@ inner class or the outer class.)
 \qquad        \bnfnt{new-definition}* \\
 \\
 \bnfnt{type-argument-or-array-definition} ::= \\
-\qquad    \bnfcmt The integer list here contains the values of the ``location'' array~\cite{JSR308}. \\ % Section 4.3.12
+\qquad    \bnfcmt The integer list here contains the values of the ``\ahref{http://types.cs.washington.edu/jsr308/specification/java-annotation-design.html#class-file:ext:ri:typearg}{location}'' array~\cite{JSR308}. \\ % Section 4.3.12
 \qquad    \bnflit{inner-type} \bnfnt{integer} [ \bnflit{,} \bnfnt{integer} ]+ \bnflit{:} \bnfnt{annotation}* \lineend \\
 \\
 \bnfnt{bound-definition} ::= \\
