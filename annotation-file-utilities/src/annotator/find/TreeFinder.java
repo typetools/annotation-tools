@@ -356,6 +356,8 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
   private TypePositionFinder tpf;
   private CompilationUnitTree tree;
   private SetMultimap<Integer, String> positions;
+  // Set of insertions that got added; any insertion not in this set could
+  // not be added.
   private Set<Insertion> satisfied;
 
   /**
@@ -411,9 +413,10 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     // the element you wish to annotate, skip anything inside of
     // an annotation.
     if (path != null) {
-      Tree parent = path.getParentPath().getLeaf();
-      if (parent.getKind() == Tree.Kind.ANNOTATION) {
-        return super.scan(node, p);
+      for (Tree t : path) {
+        if (t.getKind() == Tree.Kind.ANNOTATION) {
+          return super.scan(node, p);
+        }
       }
     }
 
@@ -430,6 +433,36 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       if (!i.getCriteria().isSatisfiedBy(path, node)) {
         debug("  ... not satisfied");
         continue;
+      } else {
+        debug("  ... satisfied!");
+      }
+
+      // Question:  is this particular annotation already present at this location?
+      // If so, we don't want to insert a duplicate.
+      ModifiersTree mt = null;
+      for (Tree n : path) {
+        if (n instanceof ClassTree) {
+          mt = ((ClassTree) n).getModifiers();
+          break;
+        } else if (n instanceof MethodTree) {
+          mt = ((MethodTree) n).getModifiers();
+          break;
+        } else if (n instanceof VariableTree) {
+          mt = ((VariableTree) n).getModifiers();
+          break;
+        }
+      }
+      // System.out.printf("mt = %s for %s%n", mt, node.getKind());
+      // printPath(path);
+      if (mt != null) {
+        for (AnnotationTree at : mt.getAnnotations()) {
+          String ann = at.toString();
+          if (ann.equals(i.getText())
+              || ann.equals(i.getText() + "()")) {
+            satisfied.add(i);
+            return super.scan(node, p);
+          }
+        }
       }
 
       // If this is a method, then it might have been selected because of
@@ -489,4 +522,15 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     }
     return Multimaps.unmodifiableSetMultimap(positions);
   }
+
+  private static void printPath(TreePath path) {
+    System.out.printf("-----path:%n");
+    if (path != null) {
+      for (Tree t : path) {
+        System.out.printf("%s %s%n", t.getKind(), t);
+      }
+    }
+    System.out.printf("-----end path.%n");
+  }
+
 }
