@@ -1,0 +1,22 @@
+package java.lang:
+annotation visible @A:
+annotation visible @B:
+annotation visible @C:
+annotation visible @D:
+annotation visible @E:
+annotation visible @F:
+annotation visible @G:
+annotation visible @H:
+
+package annotator.tests:
+class ComplexLocationTwo:
+
+    field field: @java.lang.A
+	inner-type 0: @B
+	inner-type 0, 0: @D
+	inner-type 0, 0, 0: @E
+	inner-type 0, 0, 1: @F
+	inner-type 0, 0, 2: @C
+	inner-type 1: @G
+	inner-type 1, 0: @H
+

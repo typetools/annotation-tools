@@ -1,0 +1,23 @@
+# This is the crontab for the nightly build test for Javarifier and
+# annotations (scene library, asm extension, file utilities).
+# 
+# This file needs to be installed before changes will take effect.  
+# You can install this crontab by running:
+#  crontab buildtest.cron
+
+USER=mernst
+MAILTO=mernst@cs.washington.edu
+AFS=/afs/csail.mit.edu/u/j/jaimeq/bin/afs-cron-wrapper
+# AFS is a wrapper to be able to execute the build script under
+# unix user jaimeq and afs user jaimeq.cron (which is a member the pag group).
+# Basically, all file access should be taken care of.
+
+
+# Update the actual buildtest files before they are run.
+# (The build files are tiny and this should be fast,
+#   but budget half an hour just to be safe.)
+30 0 * * * cd $HOME/research/annotations/buildtest; $AFS ./svn-update-and-log
+
+# Run the tests nightly at 1:00 am.
+0 1 * * * cd $HOME/research/annotations/buildtest; $AFS ./buildtest
+

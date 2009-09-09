@@ -1,0 +1,26 @@
+package java.lang:
+annotation visible @A:
+
+package java.lang:
+annotation visible @B:
+
+package java.lang:
+annotation visible @C:
+
+package java.lang:
+annotation visible @D:
+
+package java.lang:
+annotation visible @E:
+
+package annotator.tests:
+class ComplexLocationOne:
+
+    field field: @java.lang.A
+        inner-type 0,0: @java.lang.C
+        inner-type 0,1,0: @java.lang.D
+        inner-type 0,1: @java.lang.E
+        inner-type 0: @java.lang.B
+
+    method <init>()V:
+

@@ -1,0 +1,18 @@
+package java.lang:
+annotation visible @A:
+annotation visible @B:
+annotation visible @C:
+annotation visible @D:
+annotation visible @E:
+annotation visible @F:
+annotation visible @G:
+annotation visible @H:
+
+package annotator.tests:
+class MultiDimArray:
+
+    field field: @D
+	inner-type 0: @E
+	inner-type 1: @F
+	inner-type 2: @C
+
