@@ -1326,7 +1326,7 @@ public class ClassReader {
         for (; i > 0; --i) {
             String name = readUTF8(v, buf);
             v += 2;
-            // can use the same method as for regular annotations because
+            // can use the same method as for declaration annotations because
             // the first part of an extended annotation matches the normal
             // annotations
             v = readAnnotationValue(v, buf, name, xav);

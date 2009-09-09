@@ -512,7 +512,7 @@ extends EmptyVisitor {
 //        @Deprecated METHOD_TYPE_PARAMETER_GENERIC_OR_ARRAY,
 
         default:
-          // Rather than throw an error here, since you a regular annotation
+          // Rather than throw an error here, since a declaration annotation
           // is being used as an extended annotation, just make the
           // annotation and place it in the given aElement as usual.
           aElement.tlAnnotationsHere.add(makeAnnotation());
