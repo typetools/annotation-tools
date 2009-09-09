@@ -506,7 +506,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
      * Has this visit the annotations on the corresponding field in scene.
      */
     private void ensureVisitSceneFieldAnnotations() {
-      // First do regular annotations on a field.
+      // First do declaration annotations on a field.
       for (Annotation tla : aField.tlAnnotationsHere) {
         if ((!overwrite) && existingFieldAnnotations.contains(name(tla))) {
           continue;
