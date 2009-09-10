@@ -156,12 +156,12 @@ public class Main {
     }
 
     if (debug) {
-      System.err.printf("%d insertions, %d .java files%n", insertions.size(), javafiles.size());
+      System.out.printf("%d insertions, %d .java files%n", insertions.size(), javafiles.size());
     }
     if (debug) {
-      System.err.printf("Insertions:%n");
+      System.out.printf("Insertions:%n");
       for (Insertion insertion : insertions) {
-        System.err.printf("  %s%n", insertion);
+        System.out.printf("  %s%n", insertion);
       }
     }
 
