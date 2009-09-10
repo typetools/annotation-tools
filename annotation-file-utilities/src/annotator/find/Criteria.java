@@ -28,7 +28,7 @@ public final class Criteria {
    * Creates a new {@code Criteria} without any {@code Criterion}.
    */
   public Criteria() {
-    this.criteria = new HashSet<Criterion>();
+    this.criteria = new LinkedHashSet<Criterion>();
   }
 
   /**
