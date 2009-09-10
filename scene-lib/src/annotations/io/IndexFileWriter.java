@@ -14,8 +14,9 @@ import annotations.util.*;
 import static annotations.io.IOUtils.*;
 
 /**
- * <code>IndexFileWriter</code> provides a static method that writes a given
- * {@link AScene} to a given {@link Writer} in index file format.
+ * IndexFileWriter provides two static methods named <code>write</code>
+ * that write a given {@link AScene} to a given {@link Writer} or filename,
+ * in index file format.
  */
 public final class IndexFileWriter {
     final /*@ReadOnly*/ AScene scene;
