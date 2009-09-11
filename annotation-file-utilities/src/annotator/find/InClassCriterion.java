@@ -2,7 +2,7 @@ package annotator.find;
 
 import java.util.*;
 
-import annotator.scanner.ClassScanner;
+import annotator.scanner.AnonymousClassScanner;
 
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.CompilationUnitTree;
@@ -121,32 +121,27 @@ final class InClassCriterion implements Criterion {
       }
 
       if (checkAnon) {
-        // if block is anonymous class, and last number is an
-        // anonymous class index, see if they match
+        // If block is anonymous class, and last number is an
+        // anonymous class index, see if they match.
         int lastIndex = remainingClassNamesToMatch.size() - 1;
         String lastClassNameToMatch =
           remainingClassNamesToMatch.get(lastIndex);
         //        remainingClassNamesToMatch.add(lastIndex, "");
         remainingClassNamesToMatch.remove(lastIndex);
 
-        Integer lastIndexToMatch = null;
+        int lastIndexToMatch;
         try {
           lastIndexToMatch = Integer.parseInt(lastClassNameToMatch);
-        } catch(Exception e) {
+        } catch (NumberFormatException e) {
           return false;
         }
 
-        if (lastIndexToMatch != null) {
-          Integer actualIndexInSource = ClassScanner.indexOfClassTree(path, tree);
+        int actualIndexInSource = AnonymousClassScanner.indexOfClassTree(path, tree);
 
-          boolean b= lastIndexToMatch.equals(actualIndexInSource);
-          if (!b) {
-            return false;
-          }
+        if (lastIndexToMatch != actualIndexInSource) {
+          return false;
         }
       }
-      // TODO: what if tree isn't ClassTree, but rather anonymous class
-      // and so corresponding name is Class$0?
       path = path.getParentPath();
     } while (path != null && path.getLeaf() != null);
 

@@ -1,8 +1,20 @@
 package java.lang:
-annotation visible @ReadOnly:
+annotation @ReadOnly:
+
+package:
+annotation @NonNegative:
+annotation @InnerlyAnnotated:
 
 package annotator.tests:
 class InnerClassAnonymous$1:
 
     field serialVersionUID: @java.lang.ReadOnly
+
+class InnerClassAnonymous$2:
+
+    field serialVersionUID: @NonNegative
+
+class InnerClassAnonymous$3:
+
+    field serialVersionUID: @InnerlyAnnotated
 

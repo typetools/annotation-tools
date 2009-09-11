@@ -439,6 +439,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
 
       // Question:  is this particular annotation already present at this location?
       // If so, we don't want to insert a duplicate.
+      if (path != null) {
       ModifiersTree mt = null;
       for (Tree n : path) {
         if (n instanceof ClassTree) {
@@ -463,6 +464,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
             return super.scan(node, p);
           }
         }
+      }
       }
 
       // If this is a method, then it might have been selected because of
