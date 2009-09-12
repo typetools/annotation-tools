@@ -19,7 +19,7 @@ out1:
 # Step 2: Convert the annotated class file to an annotation file.
 # Do we get the right annotations?
 out2.jann:
-	${ANNCAT} --class out1/annotations/tests/AnnotationTest.class --out --index out2.jann
+	CLASSPATH=`pwd`/out1 ${ANNCAT} --class out1/annotations/tests/AnnotationTest.class --out --index out2.jann
 
 out2.diff: out2.jann
 	diff -u expected-annos.jann out2.jann > out2.diff
@@ -36,7 +36,7 @@ out3:
 
 # Step 4: Insert annotations into the class file.
 out4.class:
-	${ANNCAT} --index expected-annos.jann --out --class out3/annotations/tests/AnnotationTest.class --to out4.class
+	CLASSPATH=`pwd`/out1 ${ANNCAT} --index expected-annos.jann --out --class out3/annotations/tests/AnnotationTest.class --to out4.class
 
 # Step 5: Convert the annotation-inserted class file to an annotation file.
 # Do we get the right annotations?
@@ -44,7 +44,7 @@ out4.class:
 # for stupid reasons (e.g., order of items in the constant pool), so we don't
 # compare them.)
 out5.jann:
-	${ANNCAT} --class out4.class --out --index out5.jann
+	CLASSPATH=`pwd`/out1 ${ANNCAT} --class out4.class --out --index out5.jann
 
 out5.diff: out5.jann
 	diff -u expected-annos.jann out5.jann > out5.diff
