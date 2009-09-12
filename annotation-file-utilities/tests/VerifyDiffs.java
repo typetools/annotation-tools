@@ -11,6 +11,7 @@
  * output.
  */
 import java.io.*;
+import java.util.*;
 
 public class VerifyDiffs {
     private static boolean show_all = false;
@@ -33,21 +34,26 @@ public class VerifyDiffs {
 
             File dir = new File(".");
 
-            for(File f : dir.listFiles()) {
-                if(f.toString().endsWith(".diff")) {
-                    FileReader fr = new FileReader(f);
-                    if(fr.read() != -1) { // if not empty, output error message
-                        System.out.println(f.toString() + " ...FAILED");
-                        pass = false;
-                        failCount++;
-                    } else {
-                        if(VerifyDiffs.show_all) {
-                            System.out.println(f.toString() + " ...OK");
-                        }
-                        passCount++;
-                    }
-                    fr.close();
+            List<File> allDiffs = new ArrayList<File>();
+            gatherDiffs(allDiffs, dir);
+            Collections.sort(allDiffs);
+            for(File f : allDiffs) {
+                String fileName = f.toString();
+                if (fileName.startsWith("./")) {
+                    fileName = fileName.substring(2);
                 }
+                FileReader fr = new FileReader(f);
+                if(fr.read() != -1) { // if not empty, output error message
+                    System.out.println(fileName + " ...FAILED");
+                    pass = false;
+                    failCount++;
+                } else {
+                    if(VerifyDiffs.show_all) {
+                        System.out.println(fileName + " ...OK");
+                    }
+                    passCount++;
+                }
+                fr.close();
             }
         } catch(Exception e) {
             System.out.println("verify diffs failed due to exception: "
@@ -64,5 +70,23 @@ public class VerifyDiffs {
             System.out.println("Tests failed.");
             System.exit(1);
         }
+    }
+
+    /**
+     * Recursively adds all files in directory dir ending in .diff to
+     * the list diffs.
+     *
+     * @param diffs the array to place all diff files in
+     * @param dir the directory to start gathering diffs
+     */
+    private static void gatherDiffs(List<File> diffs, File dir) {
+      for(File f : dir.listFiles()) {
+        if(f.toString().endsWith(".diff")) {
+          diffs.add(f);
+        }
+        if(f.isDirectory()) {
+          gatherDiffs(diffs, f);
+        }
+      }
     }
 }
