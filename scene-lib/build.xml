@@ -130,6 +130,9 @@
             <classpath refid="libpath"/>
             <formatter type="plain"/>
             <test name="annotations.tests.TestSceneLib" todir="reports"/>
+	    <assertions>
+	      <enable/>
+	    </assertions>
         </junit>
     </target>
     
@@ -139,6 +142,9 @@
             <classpath refid="libpath"/>
             <formatter type="plain"/>
             <test name="annotations.tests.classfile.AnnotationsTest" todir="reports"/>
+	    <assertions>
+	      <enable/>
+	    </assertions>
         </junit>
     </target>
     
