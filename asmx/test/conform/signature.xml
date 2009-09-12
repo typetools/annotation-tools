@@ -15,6 +15,9 @@
       <classpath refid="test.classpath"/>
       <jvmarg value="-Dasm.test=${asm.test}"/>
       <jvmarg value="-Dasm.test.class=${asm.test.class}"/>
+      <assertions>
+	<enable/>
+      </assertions>
     </junit>  
   </target>
 

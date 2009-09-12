@@ -500,7 +500,7 @@ public class AnnotationVerifier {
   /**
    * An AnnotationMismatchException is an Exception that indicates that
    * two versions of the same class do not have the same annotations on
-   * either the class, it's field, or it's methods.
+   * either the class, its field, or its methods.
    */
   public class AnnotationMismatchException extends RuntimeException {
     private static final long serialVersionUID = 20060714L; // today's date
