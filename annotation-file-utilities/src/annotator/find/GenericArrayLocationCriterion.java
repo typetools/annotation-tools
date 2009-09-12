@@ -22,9 +22,9 @@ public class GenericArrayLocationCriterion implements Criterion {
   /**
    * Creates a new GenericArrayLocationCriterion specifying that the element
    * is an outer type, such as:
-   *  @A List<Integer>
+   *  <code>@A List<Integer></code>
    * or
-   *  @A Integer []
+   *  <code>@A Integer []</code>
    */
   public GenericArrayLocationCriterion() {
     this(new ArrayList<Integer>());
