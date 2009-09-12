@@ -12,6 +12,9 @@
       </batchtest>
       <formatter type="xml"/>
       <classpath refid="test.classpath"/>
+      <assertions>
+	<enable/>
+      </assertions>
     </junit>  
   </target>
 
