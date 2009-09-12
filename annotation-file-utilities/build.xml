@@ -92,6 +92,28 @@
     </path>
   </target>
 
+  <path id="javadoc-sourcepath">
+    <pathelement location="src"/>
+  </path>
+
+  <target name="javadoc-clean">
+      <delete dir="javadoc"/>
+  </target>
+
+  <target name="javadoc" depends="javadoc-clean, init">
+      <javadoc sourcepathref="javadoc-sourcepath" 
+	      classpathref="libpath"
+	      packagenames="*"
+	      Overview="overview.html"
+	      destdir="javadoc" 
+	      access="public"
+	      />
+<!--
+	      noqualifier="annotations:annotations.el:annotations.field:annotations.io:annotations.io.classfile:annotations.util:annotations.util.coll:java.lang"
+-->
+  </target>
+
+
   <target name="jarfile"
           depends="init,build"
           description="create the class library annotation-file-utilities.jar">
@@ -310,8 +332,9 @@
 
     <mkdir dir="bin"/>
 
-    <javac srcdir="src" destdir="bin" debug="true" encoding="8859_1">
-      <classpath refid="libpath"/>
+    <javac srcdir="src" destdir="bin" debug="true" encoding="8859_1"
+      classpathref="libpath">
+      <compilerarg value="-version"/>
     </javac>
 
   </target>
