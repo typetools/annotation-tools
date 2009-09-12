@@ -440,16 +440,18 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       // Question:  is this particular annotation already present at this location?
       // If so, we don't want to insert a duplicate.
       ModifiersTree mt = null;
-      for (Tree n : path) {
-        if (n instanceof ClassTree) {
-          mt = ((ClassTree) n).getModifiers();
-          break;
-        } else if (n instanceof MethodTree) {
-          mt = ((MethodTree) n).getModifiers();
-          break;
-        } else if (n instanceof VariableTree) {
-          mt = ((VariableTree) n).getModifiers();
-          break;
+      if (path != null) {
+        for (Tree n : path) {
+          if (n instanceof ClassTree) {
+            mt = ((ClassTree) n).getModifiers();
+            break;
+          } else if (n instanceof MethodTree) {
+            mt = ((MethodTree) n).getModifiers();
+            break;
+          } else if (n instanceof VariableTree) {
+            mt = ((VariableTree) n).getModifiers();
+            break;
+          }
         }
       }
       // System.out.printf("mt = %s for %s%n", mt, node.getKind());
