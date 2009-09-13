@@ -40,7 +40,9 @@ public final class IndexFileParser {
 
     /**
      * Holds definitions we've seen so far.  Maps from annotation name to
-     * the definition itself.  */
+     * the definition itself.  Maps from both the qualified name and the
+     * unqualified name.  If the unqualified name is not unique, it maps
+     * to null and the qualified name should be used instead. */
     private final HashMap<String, AnnotationDef> defs;
 
     private int expectNonNegative(int i) throws ParseException {
@@ -89,7 +91,16 @@ public final class IndexFileParser {
     /** Reads from st.  If the result is not c, throws an exception. */
     private void expectChar(char c) throws IOException, ParseException {
         if (! matchChar(c)) {
-            throw new ParseException("Expected '" + c + "', found '" + ((char) st.ttype) + "'");
+            // Alternately, could use st.toString().
+            String found;
+            switch (st.ttype) {
+            case StreamTokenizer.TT_WORD: found = st.sval; break;
+            case StreamTokenizer.TT_NUMBER: found = "" + st.nval; break;
+            case StreamTokenizer.TT_EOL: found = "end of line"; break;
+            case StreamTokenizer.TT_EOF: found = "end of file"; break;
+            default: found = "'" + ((char) st.ttype) + "'"; break;
+            }
+            throw new ParseException("Expected '" + c + "', found " + found);
         }
     }
 
@@ -149,11 +160,18 @@ public final class IndexFileParser {
             return null;
     }
 
-    private String expectIdentifier() throws IOException,
-            ParseException {
+    private String expectIdentifier() throws IOException, ParseException {
         String id = matchIdentifier();
         if (id == null) { throw new ParseException("Expected an identifier"); }
         return id;
+    }
+
+    // an identifier, or a sequence of dot-separated identifiers
+    private String expectQualifiedName() throws IOException, ParseException {
+        String name = expectIdentifier();
+        while (matchChar('.'))
+            name += '.' + expectIdentifier();
+        return name;
     }
 
     private int checkNNInteger() /*@ReadOnly*/ {
@@ -236,6 +254,7 @@ public final class IndexFileParser {
                     throw new ParseException(
                             "Expected a number literal");
             }
+            assert aft.isValidValue(val);
             return val;
         } else if (aft instanceof ClassTokenAFT) {
             if (st.ttype != TT_WORD) {
@@ -275,16 +294,18 @@ public final class IndexFileParser {
                 expectChar('.');
                 expectKeyword("class");
             }
+            assert aft.isValidValue(tokenType);
             return tokenType;
         } else if (aft instanceof EnumAFT) {
-            String name = expectIdentifier();
+            String name = expectQualifiedName();
+            assert aft.isValidValue(name);
             return name;
         } else if (aft instanceof AnnotationAFT) {
             AnnotationAFT aaft = (AnnotationAFT) aft;
             AnnotationDef d = parseAnnotationHead();
             if (! d.name.equals(aaft.annotationDef.name)) {
-                throw new ParseException("Got a(n) " + d.name
-                    + " subannotation where a(n) " + aaft.annotationDef.name
+                throw new ParseException("Got an " + d.name
+                    + " subannotation where an " + aaft.annotationDef.name
                     + " was expected");
             }
             AnnotationBuilder ab = AnnotationFactory.saf.beginAnnotation(d);
@@ -293,9 +314,11 @@ public final class IndexFileParser {
             assert ab != null;
             AnnotationBuilder ab2 = (AnnotationBuilder) ab;
             Annotation suba = parseAnnotationBody(d, ab2);
+            assert aft.isValidValue(suba);
             return suba;
-        } else
+        } else {
             throw new AssertionError();
+        }
     }
 
     private void parseAndAddArrayAFV(ArrayAFT aaft, ArrayBuilder arrb) throws IOException, ParseException {
@@ -304,17 +327,33 @@ public final class IndexFileParser {
             comp = aaft.elementType;
         else
             throw new IllegalArgumentException("array AFT has null elementType");
-        expectChar('{');
-        while (!matchChar('}')) {
+        if (matchChar('{')) {
+            // read an array
+            while (!matchChar('}')) {
+                arrb.appendElement(parseScalarAFV(comp));
+                if (!checkChar('}'))
+                    expectChar(',');
+            }
+        } else {
+            // not an array, so try reading just one value as an array
             arrb.appendElement(parseScalarAFV(comp));
-            if (!checkChar('}'))
-                expectChar(',');
         }
         arrb.finish();
     }
 
+    // parses a field such as "f1=5" in "@A(f1=5, f2=10)".
     private void parseAnnotationField(AnnotationDef d, AnnotationBuilder ab) throws IOException, ParseException {
-        String fieldName = expectIdentifier();
+        String fieldName;
+        if (d.fieldTypes.size() == 1
+            && d.fieldTypes.containsKey("value")) {
+            fieldName = "value";
+            if (matchKeyword("value")) {
+                expectChar('=');
+            }
+        } else {
+            fieldName = expectIdentifier();
+            expectChar('=');
+        }
         // HMMM let's hope the builder checks for duplicate fields
         // because we can't do it any more
         AnnotationFieldType aft1 = d.fieldTypes.get(fieldName);
@@ -323,7 +362,6 @@ public final class IndexFileParser {
                 + " has no field called " + fieldName);
         }
         AnnotationFieldType aft = (AnnotationFieldType) aft1;
-        expectChar('=');
         if (aft instanceof ArrayAFT) {
             ArrayAFT aaft = (ArrayAFT) aft;
             if (aaft.elementType == null) {
@@ -341,18 +379,19 @@ public final class IndexFileParser {
             throw new AssertionError();
     }
 
+    // reads the "@A" part of an annotation such as "@A(f1=5, f2=10)".
     private AnnotationDef parseAnnotationHead() throws IOException,
             ParseException {
         expectChar('@');
-        String name = expectIdentifier();
-        while (matchChar('.'))
-            name += '.' + expectIdentifier();
+        String name = expectQualifiedName();
         AnnotationDef d = defs.get(name);
         if (d == null) {
-            System.err.printf("defs contains %d entries%n", defs.size());
-            for (AnnotationDef ad : defs.values()) {
-                System.err.printf("defs entry (name: %s): %s%n",
-                                  ((ad == null) ? "(NONE)" : ad.name), ad);
+            if (false) {
+                System.err.println("No definition for annotation type " + name);
+                System.err.printf("  defs contains %d entries%n", defs.size());
+                for (Map.Entry<String,AnnotationDef> entry : defs.entrySet()) {
+                    System.err.printf("    defs entry: %s => %s%n", entry.getKey(), entry.getValue());
+                }
             }
             throw new ParseException("No definition for annotation type " + name);
         }
@@ -367,13 +406,13 @@ public final class IndexFileParser {
             expectChar(')');
         }
         Annotation ann = ab.finish();
+        if (! ann.def.equals(d)) {
+            throw new ParseException(
+                "parseAnnotationBody: Annotation def isn't as it should be.\n" + d + "\n" + ann.def);
+        }
         if (ann.def().fieldTypes.size() != d.fieldTypes.size()) {
             throw new ParseException(
                 "At least one annotation field is missing");
-        }
-        if (! ann.def.equals(d)) {
-            throw new ParseException(
-                "parseAnnotationBody: Annotation def isn't as it should be.");
         }
         return ann;
     }
@@ -405,98 +444,114 @@ public final class IndexFileParser {
         }
     }
 
-    private AnnotationFieldType parseAFT() throws IOException,
+    private ScalarAFT parseScalarAFT() throws IOException,
             ParseException {
-        ScalarAFT t1 = null;
-        ScalarAFT t2;
         for (BasicAFT baft : BasicAFT.bafts.values()) {
             if (matchKeyword(baft.toString())) {
-                t1 = baft;
-                break;
+                return baft;
             }
         }
-        if (t1 == null) {
-            // wasn't a BasicAFT
-            if (matchKeyword("unknown")) {
-                // Handle unknown[]; see AnnotationBuilder#addEmptyArrayField
-                expectChar('[');
-                expectChar(']');
-                return new ArrayAFT(null);
-            } else if (matchKeyword("Class"))
-                t2 = ClassTokenAFT.ctaft/* dumpParameterization() */;
-            else if (matchKeyword("enum")) {
-                String name = expectIdentifier();
-                while (matchChar('.'))
-                    name += '.' + expectIdentifier();
-                t2 = new EnumAFT(name);
-            } else if (matchChar('@')) {
-                String name = expectIdentifier();
-                while (matchChar('.'))
-                    name += '.' + expectIdentifier();
-                AnnotationDef ad = defs.get(name);
-                if (ad == null) {
-                    throw new ParseException("Annotation type " + name + " used as a field before it is defined");
-                }
-                t2 = new AnnotationAFT((AnnotationDef) ad);
-            } else
-                throw new ParseException(
-                        "Expected the beginning of an annotation field type: "
-                        + "a primitive type, `String', `Class', `enum', or `@'");
-        } else
-            t2 = t1;
+        // wasn't a BasicAFT
+        if (matchKeyword("Class")) {
+            return ClassTokenAFT.ctaft/* dumpParameterization() */;
+        } else if (matchKeyword("enum")) {
+            String name = expectQualifiedName();
+            return new EnumAFT(name);
+        } else if (matchKeyword("annotation-field")) {
+            String name = expectQualifiedName();
+            AnnotationDef ad = defs.get(name);
+            if (ad == null) {
+                throw new ParseException("Annotation type " + name + " used as a field before it is defined");
+            }
+            return new AnnotationAFT((AnnotationDef) ad);
+        } else {
+            throw new ParseException(
+                    "Expected the beginning of an annotation field type: "
+                    + "a primitive type, `String', `Class', `enum', or `annotation-field'");
+        }
+    }
+
+    private AnnotationFieldType parseAFT() throws IOException,
+            ParseException {
+        if (matchKeyword("unknown")) {
+            // Handle unknown[]; see AnnotationBuilder#addEmptyArrayField
+            expectChar('[');
+            expectChar(']');
+            return new ArrayAFT(null);
+        }
+        ScalarAFT baseAFT = parseScalarAFT();
+        // only one level of array is permitted
         if (matchChar('[')) {
             expectChar(']');
-            return new ArrayAFT(t2);
+            return new ArrayAFT(baseAFT);
         } else
-            return t2;
+            return baseAFT;
     }
 
     private void parseAnnotationDef() throws IOException, ParseException {
         expectKeyword("annotation");
 
-        RetentionPolicy retention = null;
-        for (RetentionPolicy r : RetentionPolicy.values())
-            if (matchKeyword(r.ifname)) {
-                retention = r;
-                break;
-            }
-
         expectChar('@');
         String basename = expectIdentifier();
         String fullName = curPkgPrefix + basename;
 
+        AnnotationDef ad = new AnnotationDef(fullName);
+        expectChar(':');
+        parseAnnotations(ad);
+
         Map<String, AnnotationFieldType> fields =
                 new LinkedHashMap<String, AnnotationFieldType>();
 
-        if (matchChar(':')) {
-            // yuck; it would be nicer to do a positive match
-            while (st.ttype != TT_EOF && !checkKeyword("annotation")
-                    && !checkKeyword("class") && !checkKeyword("package")) {
-                AnnotationFieldType type = parseAFT();
-                String name = expectIdentifier();
-                if (fields.containsKey(name)) {
-                    throw new ParseException("Duplicate definition of field "
-                        + name);
-                }
-                fields.put(name, type);
+        // yuck; it would be nicer to do a positive match
+        while (st.ttype != TT_EOF && !checkKeyword("annotation")
+               && !checkKeyword("class") && !checkKeyword("package")) {
+            AnnotationFieldType type = parseAFT();
+            String name = expectIdentifier();
+            if (fields.containsKey(name)) {
+                throw new ParseException("Duplicate definition of field "
+                                         + name);
             }
+            fields.put(name, type);
         }
 
-        AnnotationDef ad = new AnnotationDef(fullName, retention, fields);
+        ad.setFieldTypes(fields);
 
         // Now add the definition to the map of all definitions.
-        if (defs.containsKey(fullName)) {
-            throw new ParseException("Duplicate definition of annotation type " + fullName);
+        addDef(ad, basename);
+
+    }
+
+    // Add the definition to the map of all definitions.
+    // also see addDef(AnnotationDef, String).
+    public void addDef(AnnotationDef ad) throws ParseException {
+        String basename = ad.name;
+        int dotPos = basename.lastIndexOf('.');
+        if (dotPos != -1) {
+            basename = basename.substring(dotPos + 1);
         }
-        defs.put(fullName, ad);
+        addDef(ad, basename);
+    }
+
+    // Add the definition to the map of all definitions.
+    public void addDef(AnnotationDef ad, String basename) throws ParseException {
+        // System.out.println("addDef:" + ad);
+
+        if (defs.containsKey(ad.name)) {
+            // TODO:  permit identical re-definition
+            throw new ParseException("Duplicate definition of annotation type " + ad.name);
+        }
+        defs.put(ad.name, ad);
         // Add short name; but if it's already there, remove it to avoid ambiguity.
-        if (! basename.equals(fullName)) {
+        if (! basename.equals(ad.name)) {
             if (defs.containsKey(basename))
+                // not "defs.remove(basename)" because then a subsequent
+                // one could get added, which would be wrong.
                 defs.put(basename, null);
             else
                 defs.put(basename, ad);
         }
     }
+
 
     private void parseInnerTypes(ATypeElement e)
             throws IOException, ParseException {
@@ -554,8 +609,9 @@ public final class IndexFileParser {
             }
             expectChar('>');
             key = "<" + basename + ">";
-        } else
+        } else {
             key = expectIdentifier();
+        }
 
         expectChar('(');
         key += '(';
@@ -572,12 +628,16 @@ public final class IndexFileParser {
         AMethod m = c.methods.vivify(key);
 
         parseAnnotations(m);
-        parseInnerTypes(m);
+
         parseBounds(m.bounds);
 
-        // Permit receiver and parameters in any order.
-        while (checkKeyword("receiver") || checkKeyword("parameter")) {
-            if (matchKeyword("parameter")) {
+        // Permit return value, receiver, and parameters in any order.
+        while (checkKeyword("return") || checkKeyword("receiver") || checkKeyword("parameter")) {
+            if (matchKeyword("return")) {
+                expectChar(':');
+                parseAnnotations(m.returnType);
+                parseInnerTypes(m.returnType);
+            } else if (matchKeyword("parameter")) {
                 // make "#" optional
                 if (checkChar('#')) {
                     matchChar('#');
@@ -648,6 +708,7 @@ public final class IndexFileParser {
             parseField(c);
         while (checkKeyword("method"))
             parseMethod(c);
+        c.methods.prune();
     }
 
     // Reads the index file in this.st and puts the information in this.scene.
@@ -657,13 +718,13 @@ public final class IndexFileParser {
         while (st.ttype != TT_EOF) {
             expectKeyword("package");
 
-            String pkg = matchIdentifier();
-            if (pkg == null) {
+            String pkg;
+            if (checkIdentifier() == null) {
+                pkg = null;
                 // the default package cannot be annotated
                 matchChar(':');
             } else {
-                while (matchChar('.'))
-                    pkg += '.' + expectIdentifier();
+                pkg = expectQualifiedName();
                 AElement p = scene.packages.vivify(pkg);
                 expectChar(':');
                 parseAnnotations(p);
@@ -690,6 +751,13 @@ public final class IndexFileParser {
 
     private IndexFileParser(Reader in, AScene scene) {
         defs = new LinkedHashMap<String, AnnotationDef>();
+        for (AnnotationDef ad : Annotations.standardDefs) {
+            try {
+                addDef(ad);
+            } catch (ParseException e) {
+                throw new Error(e);
+            }
+        }
 
         st = new StreamTokenizer(in);
         st.slashSlashComments(true);

@@ -6,14 +6,19 @@ import checkers.javari.quals.ReadOnly;
 import annotations.*;
 import annotations.util.coll.*;
 
+import java.util.HashMap;
+
 /**
  * An annotated method; contains parameters, receiver, locals, typecasts, and
  * news.
  */
-public final class AMethod extends ATypeElement {
+public final class AMethod extends AElement {
     /** The method's annotated type parameter bounds */
     public final VivifyingMap<BoundLocation, ATypeElement> bounds =
             ATypeElement.<BoundLocation>newVivifyingLHMap_ATE();
+
+    /** The method's annotated return type */
+    public final ATypeElement returnType; // initialized in constructor
 
     /** The method's annotated receiver */
     public final AElement receiver; // initialized in constructor
@@ -48,7 +53,8 @@ public final class AMethod extends ATypeElement {
     AMethod(String methodName) {
       super("method: " + methodName);
       this.methodName = methodName;
-      receiver = new AElement("receiver of methodName");
+      returnType = new ATypeElement("return type of " + methodName);
+      receiver = new AElement("receiver of " + methodName);
     }
 
     /**
@@ -61,10 +67,18 @@ public final class AMethod extends ATypeElement {
     }
 
     boolean equalsMethod(/*@ReadOnly*/ AMethod o) /*@ReadOnly*/ {
-        return equalsTypeElement(o) && bounds.equals(o.bounds)
-            && receiver.equals(o.receiver) && parameters.equals(o.parameters)
-            && locals.equals(o.locals) && typecasts.equals(o.typecasts)
-            && instanceofs.equals(o.instanceofs) && news.equals(o.news)
+        parameters.prune();
+        o.parameters.prune();
+
+        return tlAnnotationsHere.equals(o.tlAnnotationsHere)
+            && returnType.equalsTypeElement(o.returnType)
+            && bounds.equals(o.bounds)
+            && receiver.equals(o.receiver)
+            && parameters.equals(o.parameters)
+            && locals.equals(o.locals)
+            && typecasts.equals(o.typecasts)
+            && instanceofs.equals(o.instanceofs)
+            && news.equals(o.news)
             && throwsException.equals(o.throwsException);
     }
 
@@ -86,6 +100,7 @@ public final class AMethod extends ATypeElement {
     @Override
     public boolean prune() {
         return super.prune() & bounds.prune()
+            & returnType.prune()
             & receiver.prune() & parameters.prune()
             & locals.prune() & typecasts.prune()
             & instanceofs.prune() & news.prune()

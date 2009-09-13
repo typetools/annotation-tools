@@ -1,27 +1,28 @@
 package annotations.tests.classfile.foo:
-annotation visible @A
+annotation @A: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
 
-annotation visible @B:
+annotation @B: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
 	String value
 
-annotation visible @C:
+// annotation @C: @Retention(value=CLASS) @java.lang.annotation.Target(value={TYPE_USE})
+annotation @C: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
 	int fieldA
 	String fieldB
 
-annotation visible @D:
+annotation @D: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
 	int fieldA
 	String fieldB
 	int[] fieldC
 
-annotation visible @E:
+annotation @E: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
 	int fieldA
 	String fieldB
 
-annotation visible @F:
+annotation @F: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
 	int fieldA
 	String fieldB
 
-annotation visible @G:
+annotation @G: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
 	int fieldA
 	String fieldB
 	boolean[] fieldC

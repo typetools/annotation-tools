@@ -27,6 +27,15 @@ public final /*@ReadOnly*/ class EnumAFT extends ScalarAFT {
      * {@inheritDoc}
      */
     @Override
+    public boolean isValidValue(Object o) {
+        // return o instanceof Enum;
+        return o instanceof String;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public  String toString() {
         return "enum " + typeName;
     }
