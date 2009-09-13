@@ -25,28 +25,28 @@ import annotations.tests.classfile.foo.A;
 
 /**
  * This class is the testing framework for the class file/ index file
- * annotations converter.  {@link #testAll()} runs tests on all classes in
- * {@link #allTests}, so all that is necessary to add a test for a class is to
- * put the proper .class file (for the base version of the class) and .expected
- * file (for the annotated version of the class) in {@link #CLASS_FILE_BASE},
- * and the right index file in {@link #INDEX_FILE_BASE} and add the class name
- * to {@link #allTests}.  However, in order for JUnit to have an accurate count
- * of all tests, one should also manually add a <code>testc*()</code>
- * method to test against class file and a <code>testi*()</code> method to test
- * against index file.
+ * annotations converter.  To add a new test,
+ * <ul>
+ *  <li>add the class name to array {@link #allTests}
+ *  <li>place two files in directory {@link #CLASS_FILE_BASE}:
+ *    a .class file (for the base version of the class), an _Expected.class
+ *    file (for the annotated version of the class)
+ *  <li>place one file in directory {@link #INDEX_FILE_BASE}: a .jann index file.
+ *  <li>Add a <code>testc*()</code> method to test against class file and a
+ *    <code>testi*()</code> method to test against index file; this is just so
+ *     that JUnit has an accurate count of all tests.
+ * </ul>
  *
- * <p>
- *  Each test requires three files: a <code>name.class</code>,
- *  <code>name.expected</code> and a <code>name.jann</code> file.  The first two
- *  are valid class files, and the third is an index file with annotations for
- *  that class.  Two types of tests are performed.  The first is to read in
- *  the annotations from <code>name.jann</code>, insert them into
- *  <code>name.class</code>, writing the results out to a temporary file, and
- *  then comparing this generated class file with <code>name.expected</code>,
- *  asserting that they have the same annotations.  The second test is to read
- *  in the annotations from the generated class file, and checking them against
- *  the annotations from the index file.
- * </p>
+ * Two types of tests are performed:
+ * <ul>
+ *   <li>Read the annotations from <code>name.jann</code>, insert them into
+ *      <code>name.class</code>, write the results to a temporary file
+ *      (name_Generated.class), and compare this generated class file with
+ *      <code>name_Expected.class</code>, asserting that they have the same
+ *      annotations.
+ *   <li>Read the annotations from the generated class file, and check them
+ *      against the annotations from the index file.
+ * </ul>
  */
 public class AnnotationsTest extends TestCase {
 
@@ -57,7 +57,7 @@ public class AnnotationsTest extends TestCase {
     "src/annotations/tests/classfile/cases/";
 
   /**
-   * The directory in which to find the class files (both .class and .generated)
+   * The directory in which to find the class files (both .class and _Generated.class)
    * to test.
    */
   private static final String CLASS_FILE_BASE =
@@ -66,7 +66,7 @@ public class AnnotationsTest extends TestCase {
   /**
    * An array of all the classes to test.  For each name in this array, there
    * must be a corresponding .jann file in {@link #INDEX_FILE_BASE} and
-   * .class and .expected files in {@link #CLASS_FILE_BASE}
+   * .class and _Expected.class files in {@link #CLASS_FILE_BASE}
    */
   public static final String[] allTests = {
     "TestClassEmpty",
@@ -149,7 +149,7 @@ public class AnnotationsTest extends TestCase {
     } catch(Exception e) {
       System.err.println("caught exception: ");
       e.printStackTrace();
-      fail();
+      fail("caught exception: " + e.toString());
     }
   }
 
@@ -225,8 +225,8 @@ public class AnnotationsTest extends TestCase {
   }
 
   /**
-   * Asserts that the annotations in one class file match the annotations in
-   * another class file.  This method will cause this test to fail if there
+   * Asserts that the annotations in two class files match.
+   * This method will cause this test to fail if there
    * is a mismatch in annotations, or if there is a mismatch in either field
    * or method information that means these classes cannot reasonably be
    * compared.
@@ -249,24 +249,29 @@ public class AnnotationsTest extends TestCase {
       crCorrect.accept(av.originalVisitor(), false);
       crGenerated.accept(av.newVisitor(), false);
 
-      av.verify();
+      try {
+        av.verify();
+      } catch(AnnotationVerifier.AnnotationMismatchException e) {
+        av.verifyPrettyPrint();
+        fail(String.format("assertClassAnnotations (consider running javap on the two .class files):%n  correctClass %s%n  generatedClass %s%n%s", correctClass, generatedClass, e.toString()));
+      }
+
     } catch(IOException e) {
       fail("IOException caught: " + e);
-    } catch(AnnotationVerifier.AnnotationMismatchException e) {
-      fail(String.format("assertClassAnnotations%n  correctClass %s%n  generatedClass %s%n%s", correctClass, generatedClass, e.toString()));
     }
   }
 
   /**
-   * Runs a test that reads annotations from <code>indexFileName</code>, inserts
-   * them into <code>baseClassName.class</code>, writes the result out to
-   * <code>baseClassName.generated</code> and asserts that the results written
-   * out match <code>baseClassName.expected</code>.
+   * Runs a test that:
+   *  <li> reads annotations from indexFileName,
+   *  <li> inserts them into baseClassName.class,
+   *  <li> writes the result out to baseClassName_Generated.class, and
+   *  <li> asserts that the results written out match baseClassName_Expected.class
    */
   private void testAgainstClass(String indexFileName, String baseClassName) {
     String base = baseClassName + ".class";
-    String expected = baseClassName + ".expected";
-    String generated = baseClassName + ".generated";
+    String expected = baseClassName + "_Expected.class";
+    String generated = baseClassName + "_Generated.class";
 
     AScene scene = new AScene();
 
@@ -282,15 +287,22 @@ public class AnnotationsTest extends TestCase {
   }
 
   /**
-   * Runs a test that reads annotations from <code>indexFileName</code>,
-   * inserts them into <code>className</code>, writes results out to a
-   * temporary class file, reads in annotations from that class file,
-   * and asserts that results written out match the annotations the index file.
+   * Runs a test that:
+   *  <li> reads annotations from indexFileName,
+   *  <li> inserts them into className
+   *  <li> writes results out to a temporary class file
+   *  <li> reads annotations from that class file, and
+   *  <li> asserts that results written out match the annotations in the index file.
    */
   private void testAgainstIndexFile(String indexFileName, String className) {
     AScene correctScene = createScene(indexFileName);
 
-    File tempFile = new File(className+".temp");
+    String basename = className;
+    if (basename.endsWith(".class")) {
+      basename = basename.substring(0, basename.length() - 6);
+    }
+
+    File tempFile = new File(basename+"_temp.class");
 
     writeClass(className, tempFile.toString(), correctScene, true);
 
@@ -298,16 +310,19 @@ public class AnnotationsTest extends TestCase {
 
     readClass(tempFile.toString(), generatedScene);
 
-    tempFile.delete();
-
     correctScene.prune();
     generatedScene.prune();
 
     if (!correctScene.equals(generatedScene)) {
-      writeScene(className+"-generated-scene.txt", generatedScene);
-      writeScene(className+"-correct-scene.txt", correctScene);
-      fail("Scene generated from class file does not match index file.");
+      String fname1 = className+"-from-indexfile.txt";
+      String fname2 = className+"-via-classfile-scene.txt";
+      writeScene(fname1, correctScene);
+      writeScene(fname2, generatedScene);
+      fail(String.format("For annotations read from %s :%n  After writing to class file and re-reading, result differed.%n  Scene read from index file is in %s .%n  Scene generated from class file is in %s .%n  Also consider running javap -v on %s .%n", indexFileName, fname1, fname2, tempFile));
     }
+
+    tempFile.delete();
+
   }
 
   /**
@@ -316,8 +331,8 @@ public class AnnotationsTest extends TestCase {
    */
   public void testAll() throws Exception {
     for (String s : allTests) {
-      testAgainstClass(nameIndex(s + ".jann"), nameClass(s));
       testAgainstIndexFile(nameIndex(s + ".jann"), nameClass(s+".class"));
+      testAgainstClass(nameIndex(s + ".jann"), nameClass(s));
     }
   }
 
@@ -528,4 +543,14 @@ public class AnnotationsTest extends TestCase {
     testAgainstIndexFile(nameIndex("TestMethodReturnTypeGenericArray.jann"),
         nameClass("TestMethodReturnTypeGenericArray.class"));
   }
+
+//   // Call javap programmatically.
+//   public static void javap(InputStream is, PrintStream ps) {
+//     JavapEnvironment env = new JavapEnvironment();
+//     PrintWriter pw = new PrintWriter(ps);
+//     JavapPrinter javapPrinter = new JavapPrinter(is, pw, env);
+//     javapPrinter.print();
+//     pw.flush();
+//   }
+
 }

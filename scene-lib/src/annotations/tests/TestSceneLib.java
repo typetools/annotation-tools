@@ -6,6 +6,7 @@ import checkers.javari.quals.ReadOnly;
 
 import java.io.*;
 import java.util.*;
+import java.lang.annotation.RetentionPolicy;
 
 import junit.framework.*;
 import annotations.*;
@@ -23,11 +24,28 @@ public /*@ReadOnly*/ class TestSceneLib extends TestCase {
     }
 
     static final String fooIndexContents =
-            "package:\n" + "annotation visible @ReadOnly:\n"
-                    + "annotation invisible @Author:\n" + "String value\n"
-                    + "class Foo:\n" + "field x: @ReadOnly\n" + "method y()Z:\n"
+            "package:\n" + "annotation @Ready: @Retention(RUNTIME)\n"
+                    + "annotation @Author: @Retention(CLASS)\n" + "String value\n"
+                    + "class Foo:\n" + "field x: @Ready\n" + "method y()Z:\n"
                     + "parameter #5:\n" + "inner-type 1, 2:\n"
                     + "@Author(value=\"Matt M.\")\n";
+
+    public static AnnotationDef adAuthor
+      = Annotations.createValueAnnotationDef("Author",
+                                             Annotations.asRetentionClass,
+                                             BasicAFT.forType(String.class));
+
+    static final AnnotationDef ready =
+                    new AnnotationDef(
+                            "Ready",
+                            Annotations.asRetentionRuntime,
+                            Annotations.noFieldTypes);
+    static final AnnotationDef readyClassRetention =
+                    new AnnotationDef(
+                            "Ready",
+                            Annotations.asRetentionClass,
+                            Annotations.noFieldTypes);
+
 
     /**
      * Parse indexFileContents as an annotation file, merging the results
@@ -65,33 +83,6 @@ public /*@ReadOnly*/ class TestSceneLib extends TestCase {
         doParseTest(index, s, expectScene);
     }
 
-    static final AnnotationDef readOnly =
-                    new AnnotationDef(
-                            "ReadOnly",
-                            RetentionPolicy.RUNTIME,
-                            Collections
-                                    .<String, AnnotationFieldType> emptyMap());
-
-    static final AnnotationDef ReadOnlyClassRetention =
-                    new AnnotationDef(
-                            "ReadOnly",
-                            RetentionPolicy.CLASS,
-                            Collections
-                                    .<String, AnnotationFieldType> emptyMap());
-
-    static final AnnotationDef nonnull =
-                    new AnnotationDef(
-                            "Nonnull",
-                            RetentionPolicy.RUNTIME,
-                            Collections
-                            .<String, AnnotationFieldType> emptyMap());
-
-    static final AnnotationDef author =
-        new AnnotationDef("Author", RetentionPolicy.CLASS,
-Collections
-                    .<String, AnnotationFieldType> singletonMap("value",
-                            BasicAFT.forType(String.class)));
-
     private Annotation createEmptyAnnotation(AnnotationDef def) {
         return new Annotation(def, Collections.<String, Object> emptyMap());
     }
@@ -100,17 +91,17 @@ Collections
         AScene s1 = newScene(), s2 = newScene();
 
         s1.classes.vivify("Foo").fields.vivify("x").tlAnnotationsHere
-                .add(createEmptyAnnotation(readOnly));
+                .add(createEmptyAnnotation(ready));
 
         s2.classes.vivify("Foo").fields.vivify("x").tlAnnotationsHere
-                .add(createEmptyAnnotation(nonnull));
+                .add(Annotations.aNonNull);
         s2.classes.vivify("Foo").fields.vivify("x").tlAnnotationsHere
-                .add(createEmptyAnnotation(readOnly));
+                .add(createEmptyAnnotation(ready));
 
         assertEquals(false, s1.equals(s2));
 
         s1.classes.vivify("Foo").fields.vivify("x").tlAnnotationsHere
-                .add(createEmptyAnnotation(nonnull));
+                .add(Annotations.aNonNull);
 
         assertEquals(true, s1.equals(s2));
     }
@@ -119,10 +110,8 @@ Collections
         AScene s1 = newScene();
 
         s1.classes.vivify("Foo").fields.vivify("x").tlAnnotationsHere
-                .add(createEmptyAnnotation(readOnly));
-        Map<String, Object> authorfields = new LinkedHashMap<String, Object>();
-        authorfields.put("value", "Matt M.");
-        Annotation myAuthor = new Annotation(author, authorfields);
+                .add(createEmptyAnnotation(ready));
+        Annotation myAuthor = Annotations.createValueAnnotation(adAuthor, "Matt M.");
         s1.classes.vivify("Foo").methods.vivify("y()Z").parameters.vivify(5).innerTypes
                 .vivify(new InnerTypeLocation(Arrays
                                 .asList(new Integer[] { 1, 2 }))).tlAnnotationsHere
@@ -134,11 +123,9 @@ Collections
     private void checkConstructor(AMethod constructor) {
         Annotation ann = ((Annotation) constructor.receiver.lookup("p2.D"));
         assertEquals(Collections.singletonMap("value", "spam"), ann.fieldValues);
-        ATypeElement l =
-                (ATypeElement) constructor.locals
+        ATypeElement l = (ATypeElement) constructor.locals
                         .get(new LocalLocation(1, 3, 5));
-        AElement i =
-                (AElement) l.innerTypes
+        AElement i = (AElement) l.innerTypes
                         .get(new InnerTypeLocation(
                                 Collections.singletonList(0)));
         assertNotNull(i.lookup("p2.C"));
@@ -154,11 +141,9 @@ Collections
 
         AClass foo1 = s1.classes.get("p1.Foo");
         assertNotNull("Didn't find foo1", foo1);
-        AClass foo =
-                (AClass) foo1;
+        AClass foo = (AClass) foo1;
         boolean sawConstructor = false;
-        for (Map.Entry<String, AMethod> me : foo.methods
-                .entrySet()) {
+        for (Map.Entry<String, AMethod> me : foo.methods.entrySet()) {
             if (me.getKey().equals("<init>(Ljava/util/Set;)V")) {
                 assertFalse(sawConstructor);
                 AMethod constructor = me.getValue();
@@ -221,7 +206,7 @@ Collections
 
         // now look at p2.E because it has some rather complex types
         AnnotationDef tle = (AnnotationDef) tdc.e;
-        assertEquals(RetentionPolicy.CLASS, tle.retention);
+        assertEquals(RetentionPolicy.CLASS, tle.retention());
         AnnotationDef e = tle;
         assertEquals(new ArrayAFT(new AnnotationAFT(tdc.a)), e.fieldTypes
                 .get("first"));
@@ -233,7 +218,7 @@ Collections
         assertEquals(ClassTokenAFT.ctaft, e.fieldTypes.get("fifth"));
 
         AnnotationDef tla = (AnnotationDef) tdc.a;
-        assertEquals(RetentionPolicy.RUNTIME, tla.retention);
+        assertEquals(RetentionPolicy.RUNTIME, tla.retention());
         AnnotationDef a = tla;
         assertEquals(BasicAFT.forType(int.class), a.fieldTypes.get("value"));
         AnnotationDef d = tdc.d;
@@ -288,17 +273,18 @@ Collections
     public void testConflictedDefinition() throws Exception {
         AScene s1 = newScene();
         s1.classes.vivify("Foo").tlAnnotationsHere
-                .add(createEmptyAnnotation(readOnly));
+                .add(createEmptyAnnotation(ready));
         s1.classes.vivify("Bar").tlAnnotationsHere
-                .add(createEmptyAnnotation(ReadOnlyClassRetention));
+                .add(createEmptyAnnotation(readyClassRetention));
         StringWriter sbw = new StringWriter();
         try {
             IndexFileWriter.write(s1, sbw);
-            fail(); // an exception should have been thrown
+            fail("an exception should have been thrown");
         } catch (DefException de) {
-            assertEquals("ReadOnly", de.annotationType);
+            assertEquals("Ready", de.annotationType);
             // success
         }
+
     }
 
     public void testParseErrorMissingColon() throws Exception {
@@ -318,8 +304,8 @@ Collections
     public void testParseErrorMissingDefinition() throws Exception {
         AScene s1 = newScene();
         String fileContents
-          = "package p1:\n" + "annotation @A:\n"
-          + "class Foo:\n" + "@A\n" + "@B\n";
+          = "package p1:\n" + "annotation @AIsDefined:\n"
+          + "class Foo:\n" + "@AIsDefined\n" + "@BIsNotDefined\n";
         try {
             IndexFileParser.parseString(fileContents, s1);
             fail(); // an exception should have been thrown
@@ -352,7 +338,7 @@ Collections
     //     // Suppose we care only about @ReadOnly annotations
     //     AScene s1 = new AScene();
     //     // instead we have to put the definitions in the index file
-    //     // s1.annotationDefs.add(readOnly);
+    //     // s1.annotationDefs.add(ready);
     //     // s1.annotationDefs.add(author);
     //
     //     IndexFileParser.parseString(fooIndexContents, s1);
@@ -376,14 +362,14 @@ Collections
 
         // One annotation with an empty array of unknown type...
         AnnotationBuilder ab1 =
-            AnnotationFactory.saf.beginAnnotation("foo.ArrayAnno", RetentionPolicy.CLASS);
+          AnnotationFactory.saf.beginAnnotation("foo.ArrayAnno", Annotations.asRetentionClass);
         ab1.addEmptyArrayField("array");
         Annotation a1 = ab1.finish();
         Annotation tla1 = a1;
 
         // ... and another with an empty array of known type
         AnnotationBuilder ab2 =
-            AnnotationFactory.saf.beginAnnotation("foo.ArrayAnno", RetentionPolicy.CLASS);
+          AnnotationFactory.saf.beginAnnotation("foo.ArrayAnno", Annotations.asRetentionClass);
         ArrayBuilder ab2ab = ab2.beginArrayField("array",
                 new ArrayAFT(BasicAFT.forType(int.class)));
         ab2ab.finish();
@@ -393,7 +379,7 @@ Collections
         // And they're both fields of another annotation to make sure that
         // unification works recursively.
         AnnotationBuilder ab3 =
-            AnnotationFactory.saf.beginAnnotation("foo.CombinedAnno", RetentionPolicy.RUNTIME);
+          AnnotationFactory.saf.beginAnnotation("foo.CombinedAnno", Annotations.asRetentionRuntime);
         ab3.addScalarField("fieldOne", new AnnotationAFT(a1.def()), a1);
         ab3.addScalarField("fieldTwo", new AnnotationAFT(a2.def()), a2);
         Annotation a3 = ab3.finish();
@@ -420,7 +406,7 @@ Collections
 
         // Yet another annotation with an array of a different known type
         AnnotationBuilder ab4 =
-            AnnotationFactory.saf.beginAnnotation("foo.ArrayAnno", RetentionPolicy.CLASS);
+          AnnotationFactory.saf.beginAnnotation("foo.ArrayAnno", Annotations.asRetentionClass);
         ArrayBuilder ab4ab = ab4.beginArrayField("array",
                 new ArrayAFT(BasicAFT.forType(double.class)));
         ab4ab.appendElement(5.0);
@@ -463,13 +449,13 @@ Collections
 
     public void testEmptyArrayIO() throws Exception {
         // should succeed
-        String index1 = "package: annotation invisible @Foo: unknown[] arr\n" +
+        String index1 = "package: annotation @Foo: @Retention(CLASS)\n  unknown[] arr\n" +
             "class Bar: @Foo(arr={})";
         AScene scene1 = newScene();
         IndexFileParser.parseString(index1, scene1);
 
         // should reject nonempty array
-        String index2 = "package: annotation invisible @Foo: unknown[] arr\n" +
+        String index2 = "package: annotation @Foo:  @Retention(CLASS)\n unknown[] arr\n" +
             "class Bar: @Foo(arr={1})";
         AScene scene2 = newScene();
         try {
@@ -485,7 +471,7 @@ Collections
         AClass clazz3 =
             scene3.classes.vivify("Bar");
         AnnotationBuilder ab =
-            AnnotationFactory.saf.beginAnnotation("Foo", RetentionPolicy.CLASS);
+          AnnotationFactory.saf.beginAnnotation("Foo", Annotations.asRetentionClass);
         ab.addEmptyArrayField("arr");
         Annotation a = ab.finish();
         Annotation tla = a;
@@ -516,7 +502,7 @@ Collections
         assertTrue(s1.prune());
         assertTrue(s1.equals(s2));
 
-        Annotation sa = AnnotationFactory.saf.beginAnnotation("Anno", RetentionPolicy.CLASS).finish();
+        Annotation sa = AnnotationFactory.saf.beginAnnotation("Anno", Annotations.asRetentionClass).finish();
         Annotation tla = sa;
 
         AClass clazz2 = s2.classes.vivify("Bar");
@@ -553,7 +539,7 @@ Collections
         new AnnotationDef("IdAnno", null, Collections.singletonMap(
                 "id", BasicAFT.forType(int.class)));
     private static final AnnotationDef idAnnoTLDef =
-        new AnnotationDef("IdAnno", RetentionPolicy.CLASS,
+      new AnnotationDef("IdAnno", Annotations.asRetentionClass,
                           Collections.singletonMap(
                 "id", BasicAFT.forType(int.class)));
 

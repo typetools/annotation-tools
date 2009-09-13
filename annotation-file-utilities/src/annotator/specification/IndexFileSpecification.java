@@ -6,20 +6,10 @@ import java.util.Map.Entry;
 
 import org.objectweb.asm.ClassReader;
 
-import annotations.AnnotationDef;
-import annotations.RetentionPolicy;
 import annotations.Annotation;
 import annotations.AnnotationFactory;
 import annotations.Annotation;
-import annotations.AnnotationDef;
-import annotations.el.AClass;
-import annotations.el.AElement;
-import annotations.el.AMethod;
-import annotations.el.AScene;
-import annotations.el.ATypeElement;
-import annotations.el.BoundLocation;
-import annotations.el.InnerTypeLocation;
-import annotations.el.LocalLocation;
+import annotations.el.*;
 import annotations.field.AnnotationFieldType;
 import annotations.io.IndexFileParser;
 import annotations.util.coll.VivifyingMap;
@@ -35,7 +25,7 @@ public class IndexFileSpecification implements Specification {
 
   private List<Insertion> insertions = new ArrayList<Insertion>();
   private Properties keywords;
-  private AScene scene = new AScene();
+  private AScene scene;
   private String indexFileName;
 
   private static boolean debug = false;
@@ -239,7 +229,7 @@ public class IndexFileSpecification implements Specification {
 
     // parse return type
     CriterionList returnClist = clist.add(Criteria.returnType(methodName));
-    parseInnerAndOuterElements(returnClist, method);
+    parseInnerAndOuterElements(returnClist, method.returnType);
 
     // parse bounds of method
     for (Entry<BoundLocation, ATypeElement> entry : method.bounds.entrySet()) {

@@ -16,11 +16,7 @@ import annotations.util.coll.*;
  * <p>
  * Each client of the annotation library may wish to use its own representation
  * for certain kinds of annotations instead of a simple name-value map; thus, a
- * layer of abstraction in the storage of annotations was introduced. Any object
- * that implements {@link annotations.Annotation} can serve as an annotation in
- * a scene; the client should specify the common supertype of all the annotation
- * objects in the scene via the type parameter <code>A</code> of
- * <code>AScene</code> and all <code>AElement</code> subclasses.
+ * layer of abstraction in the storage of annotations was introduced.
  *
  * <p>
  * <code>AScene</code>s and many {@link AElement}s can contain other
@@ -45,7 +41,7 @@ import annotations.util.coll.*;
  *
  * <pre>
  * m.annotationsHere.add(new Annotation(
- *     new AnnotationDef(readOnlyDef, RetentionPolicy.RUNTIME),
+ *     new AnnotationDef(readOnlyDef, RetentionPolicy.RUNTIME, true),
  *     new Annotation(readOnlyDef, Collections.emptyMap())
  * ));
  * </pre>

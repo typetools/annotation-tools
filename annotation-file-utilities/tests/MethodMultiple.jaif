@@ -1,5 +1,5 @@
 package java.lang:
-annotation visible @Mutable:
+annotation @Mutable: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
 
 package annotator.tests:
 class MethodMultiple:
@@ -8,5 +8,6 @@ class MethodMultiple:
 
     method foo()Ljava/lang/String;:
 
-    method foo(Ljava/lang/String;)Ljava/lang/String;: @java.lang.Mutable
+    method foo(Ljava/lang/String;)Ljava/lang/String;:
+        return: @java.lang.Mutable
 

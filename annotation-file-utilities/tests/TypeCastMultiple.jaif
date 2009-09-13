@@ -1,8 +1,8 @@
 package java.lang:
-annotation visible @Mutable:
+annotation @Mutable: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
 
 package java.lang:
-annotation visible @ReadOnly:
+annotation @ReadOnly: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
 
 package annotator.tests:
 class TypeCastMultiple:

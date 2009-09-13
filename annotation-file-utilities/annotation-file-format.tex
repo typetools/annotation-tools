@@ -217,33 +217,29 @@ annotations on the package itself (such as those from a
 An annotation definition describes the annotation's fields and their
 types, so that they may be referenced in a compact way throughout the
 annotation file.
-An annotation must be defined in an annotation file before it may be
-used, either on a program element or as a field of another annotation
-definition.
-The annotation definition appears within the package that
-defines the annotation.  The annotation may be applied to elements of any
-package.
 
+The Annotation File Utilities can read annotation definitions from the
+classpath, so it is optional to define them in the annotation file.
 
-If an annotation file uses an annotation type at least once to directly annotate a
-program element, the annotation definition must include a retention policy;
-if the annotation type is used only as a field of other annotations,
-the retention policy is optional.
+If an annotation is defined in the annotation file, then it must be defined
+before it is used.
+% either on a program element or as a field of another annotation definition.
+(This requirement makes it impossible to define, in an
+annotation file, an annotation that is meta-annotated with itself.)
+In the annotation file, the annotation definition appears within the
+package that defines the annotation.  The annotation may be applied to
+elements of any package.
+
 
 \begin{tabbing}
 \qquad \= \kill
 \bnfnt{annotation-definition} ::= \\
-\qquad    \bnflit{annotation} [ \bnfnt{retention-policy} ] \bnflit{@}\bnfnt{name} \\
+\qquad    \bnflit{annotation} \bnflit{@}\bnfnt{name} \\
 \qquad    [ \bnflit{:} \bnfnt{annotation-field-definition}+ ] \\
 \qquad    \lineend \\
 \\
 \bnfnt{annotation-field-definition} ::= \\
-\qquad    \bnfnt{type} \bnfnt{name} \lineend \\
-\\
-\bnfnt{retention-policy} ::= \\
-\qquad    \bnflit{visible}     \bnfcmt Equivalent to \code{@Retention(RUNTIME)} in source \\
-\qquad    \bnfor{} \bnflit{invisible} \bnfcmt Equivalent to \code{@Retention(CLASS)} in source \\
-\qquad    \bnfor{} \bnflit{source} \bnfcmt Equivalent to \code{@Retention(SOURCE)} in source
+\qquad    \bnfnt{type} \bnfnt{name} \lineend
 \end{tabbing}
 
 \subsection{Class definitions}
@@ -280,10 +276,12 @@ inner class or the outer class.)
 \qquad    \bnflit{@}\bnfnt{name} [ \bnflit{(} \bnfnt{annotation-field} [ \bnflit{,} \bnfnt{annotation-field} ]+ \bnflit{)} ] \\
 \\
 \bnfnt{annotation-field} ::= \\
-\qquad    \bnfcmt In Java, single-field annotations often have the field \\
-\qquad    \bnfcmt name ``\texttt{value}'', and that field name is elided in uses of the \\
-\qquad    \bnfcmt annotation:   ``\texttt{@A(12)}'' rather than ``\texttt{@A(value=12)}''.  In an \\
-\qquad    \bnfcmt annotation file, however, the ``\texttt{value=}'' is always required. \\
+\qquad    \bnfcmt In Java, if a single-field annotation has a field named \\
+\qquad    \bnfcmt ``\texttt{value}'', and that field name may be elided in uses of the \\
+\qquad    \bnfcmt annotation:   ``\texttt{@A(12)}'' rather than ``\texttt{@A(value=12)}''. \\
+\qquad    \bnfcmt Furthermore
+
+\qquad    \bnfcmt The same convention holdss in an annotation file. \\
 \qquad    \bnfnt{name} \bnflit{=} \bnfnt{value} \\
 \\
 \bnfnt{class-definition} ::= \\
@@ -302,7 +300,7 @@ inner class or the outer class.)
 \qquad    \bnfcmt The annotation on the \bnflit{method} line is that on the method or the return value. \\
 \qquad    \bnflit{method} \bnfnt{method-key} \bnflit{:} \bnfnt{annotation}* \lineend \\
 \qquad        \bnfnt{bound-definition}* \\
-\qquad        \bnfnt{type-argument-or-array-definition}* \\
+\qquad        \bnfnt{return-definition}? \\
 \qquad        \bnfnt{receiver-definition}? \\
 \qquad        \bnfnt{parameter-definition}* \\
 \qquad        \bnfnt{variable-definition}* \\
@@ -320,8 +318,12 @@ inner class or the outer class.)
 \qquad    \bnflit{bound} ,\bnfnt{integer} \&\bnfnt{integer} \bnflit{:} \bnfnt{annotation}* \lineend \\
 \qquad    \bnfnt{type-argument-or-array-definition}* \\
 \\
+\bnfnt{return-definition} ::=  \\
+\qquad    \bnflit{return:} \bnfnt{annotation}* \lineend \\
+\qquad        \bnfnt{type-argument-or-array-definition}* \\
+\\
 \bnfnt{receiver-definition} ::=  \\
-\qquad    \bnflit{receiver} \bnfnt{annotation}* \lineend \\
+\qquad    \bnflit{receiver:} \bnfnt{annotation}* \lineend \\
 \\
 \bnfnt{parameter-definition} ::= \\
 \qquad    \bnfcmt the integer is the index of the parameter in the method \\
@@ -348,7 +350,6 @@ inner class or the outer class.)
 \qquad    \bnfcmt the integer is the offset field of the annotation~\cite{JSR308}. \\
 \qquad    \bnflit{new} \bnflit{\#} \bnfnt{integer} \bnflit{:} \bnfnt{annotation}* \lineend  \\
 \qquad    \bnfnt{type-argument-or-array-definition}*
-
 \end{tabbing}
 
 
@@ -476,7 +477,8 @@ class Foo:
 The Java language permits several types for annotation fields: primitives,
 \code{String}s, \code{java.lang.Class} tokens (possibly parameterized),
 enumeration constants, subannotations, and one-dimensional arrays of these.
-These types are represented in an annotation file as follows:
+
+These \textbf{types} are represented in an annotation file as follows:
 \begin{itemize}
 \item Primitive: the name of the primitive type, such as \code{boolean}.
 \item String: \code{String}.
@@ -496,7 +498,8 @@ class file, there is no way to determine the element type of \code{arr} from the
 class file.  This exception makes it possible to define \code{X} when the class
 file is converted to an annotation file.}
 \end{itemize}
-Annotation field values are represented in an annotation file as follows:
+
+Annotation field \textbf{values} are represented in an annotation file as follows:
 \begin{itemize}
 \item Numeric primitive value: literals as they would appear in Java source
 code.
@@ -514,7 +517,9 @@ and \code{int.class}.
 \code{RUNNABLE}.
 \item Array: a sequence of elements inside \code{\char`\{\char`\}} with a comma
 between each pair of adjacent elements; a comma following the last element is
-optional as in Java.  Examples: \code{\char`\{1\char`\}},
+optional as in Java.  Also as in Java, the braces may be omitted if the
+array has only one element.
+Examples: \code{\char`\{1\char`\}}, \code{1},
 \code{\char`\{true, false,\char`\}} and \code{\char`\{\char`\}}.
 \end{itemize}
 
