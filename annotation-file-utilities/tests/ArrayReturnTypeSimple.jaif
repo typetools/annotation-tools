@@ -1,5 +1,5 @@
 package java.lang:
-annotation visible @Mutable:
+annotation @Mutable: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
 
 package annotator.tests:
 class ArrayReturnTypeSimple:
@@ -7,5 +7,6 @@ class ArrayReturnTypeSimple:
     method <init>()V:
 
     method foo()[Ljava/lang/Object;:
-        inner-type 0: @java.lang.Mutable
+        return:
+            inner-type 0: @java.lang.Mutable
 

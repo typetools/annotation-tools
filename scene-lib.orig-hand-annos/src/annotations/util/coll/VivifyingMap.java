@@ -34,10 +34,11 @@ public abstract class VivifyingMap<K, V> extends WrapperMap<K, V> {
             return v;
         }
     }
-    
+
     /**
      * Prunes this map by deleting entries with empty values (i.e., entries
      * that could be recreated by {@link #vivify} without information loss).
+     * @return true if the map is now empty
      */
     public boolean prune() {
         boolean empty = true;
@@ -58,7 +59,7 @@ public abstract class VivifyingMap<K, V> extends WrapperMap<K, V> {
      * mapped; subclasses must implement.
      */
     protected abstract V createValueFor(K k);
-    
+
     /**
      * Returns whether the given value is "empty" and thus may be discarded
      * by {@link #prune}.  Before returning, {@link #subPrune} may carry out

@@ -99,7 +99,7 @@ public final class AClass extends AElement {
 
     @Override
     public String toString() {
-      return className;
+        return "AClass: " + className;
     }
 
     public String unparse() {
@@ -108,6 +108,9 @@ public final class AClass extends AElement {
 
     public String unparse(String linePrefix) {
         StringBuilder sb = new StringBuilder();
+        sb.append(linePrefix);
+        sb.append(toString());
+        sb.append("\n");
         sb.append(linePrefix);
         sb.append("Annotations:\n");
         for (Annotation a : tlAnnotationsHere) {

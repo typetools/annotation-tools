@@ -4,8 +4,10 @@ import checkers.nullness.quals.*;
 import checkers.javari.quals.*;
 
 import java.util.*;
+import java.lang.annotation.RetentionPolicy;
 
 import annotations.field.*;
+import annotations.el.AnnotationDef;
 
 /**
  * A very simple {@link annotations.AnnotationFactory AnnotationFactory} that
@@ -20,22 +22,31 @@ public final /*@ReadOnly*/ class AnnotationFactory {
     /**
      * The singleton {@link AnnotationFactory}.
      */
-    public static final AnnotationFactory saf =
-            new AnnotationFactory();
+    public static final AnnotationFactory saf = new AnnotationFactory();
 
     /**
      * Returns an {@link AnnotationBuilder} appropriate for building a
      * {@link Annotation} of the given type name.
      */
     public AnnotationBuilder beginAnnotation(AnnotationDef def) {
-        return new AnnotationBuilder(def.name, def.retention);
+        return new AnnotationBuilder(def);
     }
 
     /**
      * Returns an {@link AnnotationBuilder} appropriate for building a
      * {@link Annotation} of the given type name.
      */
-    public AnnotationBuilder beginAnnotation(String typeName, RetentionPolicy retention) {
-        return new AnnotationBuilder(typeName, retention);
+    public AnnotationBuilder beginAnnotation(java.lang.annotation.Annotation a, Map<String, AnnotationDef> adefs) {
+        AnnotationDef def = AnnotationDef.fromClass(a.getClass(), adefs);
+        return new AnnotationBuilder(def);
+    }
+
+    /**
+     * Returns an {@link AnnotationBuilder} appropriate for building a
+     * {@link Annotation} of the given type name.
+     */
+    public AnnotationBuilder beginAnnotation(String typeName, Set<Annotation> tlAnnotationsHere) {
+        assert typeName != null;
+        return new AnnotationBuilder(typeName, tlAnnotationsHere);
     }
 }

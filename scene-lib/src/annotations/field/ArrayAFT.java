@@ -5,6 +5,8 @@ import checkers.javari.quals.*;
 
 import annotations.*;
 
+import java.util.Collection;
+
 /**
  * An {@link ArrayAFT} represents an annotation field type that is an array.
  */
@@ -24,6 +26,26 @@ public final /*@ReadOnly*/ class ArrayAFT extends AnnotationFieldType {
      */
     public ArrayAFT(ScalarAFT elementType) {
         this.elementType = elementType;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isValidValue(Object o) {
+        if (! (o instanceof Collection)) {
+            return false;
+        }
+        Collection<?> asCollection = (Collection<?>) o;
+        if (elementType == null) {
+            return (asCollection.size() == 0);
+        }
+        for (Object elt : asCollection) {
+            if (! elementType.isValidValue(elt)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**

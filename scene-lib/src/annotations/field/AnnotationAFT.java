@@ -4,6 +4,9 @@ import checkers.nullness.quals.*;
 import checkers.javari.quals.*;
 
 import annotations.*;
+import annotations.el.AnnotationDef;
+
+import java.lang.annotation.RetentionPolicy;
 
 /**
  * An {@link AnnotationAFT} represents a subannotation as the type of an
@@ -25,6 +28,14 @@ public final /*@ReadOnly*/ class AnnotationAFT extends ScalarAFT {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isValidValue(Object o) {
+        return o instanceof Annotation;
+    }
+
+    /**
      * The string representation of an {@link AnnotationAFT} looks like
      * <code>&#64;Foo</code> even though the subannotation definition is
      * logically part of the {@link AnnotationAFT}.  This is because the
@@ -33,7 +44,7 @@ public final /*@ReadOnly*/ class AnnotationAFT extends ScalarAFT {
      */
     @Override
     public  String toString() {
-        return "@" + annotationDef.name;
+        return "annotation-field " + annotationDef.name;
     }
 
     /**

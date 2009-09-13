@@ -1,11 +1,11 @@
 package :
-annotation visible @OuterMostType:
+annotation @OuterMostType: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
 
 package :
-annotation visible @InsideArray:
+annotation @InsideArray: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
 
 package :
-annotation visible @GenericType:
+annotation @GenericType: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
 
 package annotator.tests:
 class FieldGenericArray:

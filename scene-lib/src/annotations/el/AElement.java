@@ -74,7 +74,8 @@ public class AElement {
      * </ul>
      */
     @Override
-    public final boolean equals(/*@ReadOnly*/ Object o) /*@ReadOnly*/ {
+    // Was final.  Removed that so that AnnotationDef can redefine.
+    public boolean equals(/*@ReadOnly*/ Object o) /*@ReadOnly*/ {
         return o instanceof AElement &&
             equals((/*@ReadOnly*/ AElement) o);
     }

@@ -1,19 +1,18 @@
 package java.lang:
-annotation visible @A:
-annotation visible @B:
-annotation visible @C:
-annotation visible @D:
-annotation visible @E:
-annotation visible @F:
-annotation visible @G:
-annotation visible @H:
+annotation @A: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+annotation @B: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+annotation @C: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+annotation @D: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+annotation @E: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+annotation @F: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+annotation @G: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+annotation @H: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
 
 package annotator.tests:
 class MultiLevelGeneric:
 
     field field: @java.lang.A
-	inner-type 0: @B
-	inner-type 0, 0: @C
-	inner-type 1: @G
-	inner-type 1, 0: @H
-
+        inner-type 0: @B
+        inner-type 0, 0: @C
+        inner-type 1: @G
+        inner-type 1, 0: @H
