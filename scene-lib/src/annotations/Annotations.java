@@ -4,8 +4,10 @@ import checkers.nullness.quals.*;
 import checkers.javari.quals.*;
 
 import java.util.*;
+import java.lang.annotation.*;
 
 import annotations.field.*;
+import annotations.el.*;
 
 /**
  * This noninstantiable class provides useful static methods related to
@@ -13,6 +15,125 @@ import annotations.field.*;
  */
 public abstract class Annotations {
     private Annotations() {}
+
+    public static Set<Annotation> noAnnotations;
+    public static Map<String, ? extends AnnotationFieldType> noFieldTypes;
+    public static Map<String, ? extends Object> noFieldValues;
+    public static Set<Annotation> typeQualifierMetaAnnotations;
+
+    public static EnumAFT aftRetentionPolicy;
+    public static AnnotationDef adRetention;
+    public static Annotation aRetentionClass;
+    public static Annotation aRetentionRuntime;
+    public static Annotation aRetentionSource;
+    public static Set<Annotation> asRetentionClass;
+    public static Set<Annotation> asRetentionRuntime;
+    public static Set<Annotation> asRetentionSource;
+
+    public static AnnotationDef adTarget;
+    public static Annotation aTargetTypeUse;
+
+    public static AnnotationDef adNonNull;
+    public static Annotation aNonNull;
+
+    public static AnnotationDef adTypeQualifier;
+    public static Annotation aTypeQualifier;
+
+    public static Set<AnnotationDef> standardDefs;
+
+    // the field types for an annotation with only one field, named "value".
+    static Map<String, ? extends AnnotationFieldType>
+                          valueFieldTypeOnly(AnnotationFieldType aft) {
+        return Collections.singletonMap("value", aft);
+    }
+
+    // the field values for an annotation with only one field, named "value".
+    public static Map<String, ? extends Object> valueFieldOnly(Object valueValue) {
+        return Collections.singletonMap("value", valueValue);
+    }
+
+    // Create an annotation definition with only a value field.
+    public static AnnotationDef createValueAnnotationDef(String name, Set<Annotation> metaAnnotations, AnnotationFieldType aft) {
+        return new AnnotationDef(name, metaAnnotations, valueFieldTypeOnly(aft));
+    }
+
+    // Create an annotation with only a value field.
+    public static Annotation createValueAnnotation(AnnotationDef ad, Object value) {
+        return new Annotation(ad, valueFieldOnly(value));
+    }
+
+    public static Annotation getRetentionPolicyMetaAnnotation(RetentionPolicy rp) {
+        switch (rp) {
+        case CLASS: return aRetentionClass;
+        case RUNTIME: return aRetentionRuntime;
+        case SOURCE: return aRetentionSource;
+        default:
+            throw new Error("This can't happen");
+        }
+    }
+
+    public static Set<Annotation> getRetentionPolicyMetaAnnotationSet(RetentionPolicy rp) {
+        switch (rp) {
+        case CLASS: return asRetentionClass;
+        case RUNTIME: return asRetentionRuntime;
+        case SOURCE: return asRetentionSource;
+        default:
+            throw new Error("This can't happen");
+        }
+    }
+
+    static {
+        noAnnotations = Collections.<Annotation> emptySet();
+        noFieldTypes = Collections.<String, AnnotationFieldType> emptyMap();
+        noFieldValues = Collections.<String, Object> emptyMap();
+
+        // This is slightly complicated becase Retention's definition is
+        // meta-annotated by itself, we have to define the annotation
+        // before we can create the annotation on it.
+        aftRetentionPolicy = new EnumAFT("java.lang.annotation.RetentionPolicy");
+        adRetention = new AnnotationDef("java.lang.annotation.Retention");
+        adRetention.setFieldTypes(valueFieldTypeOnly(aftRetentionPolicy));
+        aRetentionRuntime = createValueAnnotation(adRetention, "RUNTIME");
+        adRetention.tlAnnotationsHere.add(aRetentionRuntime);
+        aRetentionClass = createValueAnnotation(adRetention, "CLASS");
+        aRetentionSource = createValueAnnotation(adRetention, "SOURCE");
+        asRetentionClass = Collections.singleton(aRetentionClass);
+        asRetentionRuntime = Collections.singleton(aRetentionRuntime);
+        asRetentionSource = Collections.singleton(aRetentionSource);
+
+        adTarget = createValueAnnotationDef("java.lang.annotation.Target",
+                                            asRetentionRuntime,
+                                            new ArrayAFT(new EnumAFT("java.lang.annotation.ElementType")));
+        aTargetTypeUse = createValueAnnotation(adTarget,
+                                               // Problem:  ElementType.TYPE_USE is defined only in JDK 7.
+                                               // need to decide what the canonical format for these strings is.
+                                               // Collections.singletonList("java.lang.annotation.ElementType.TYPE_USE")
+                                               // This is the way that naively reading them from classfile gives.
+                                               Collections.singletonList("TYPE_USE")
+                                               );
+
+        typeQualifierMetaAnnotations = new HashSet<Annotation>();
+        typeQualifierMetaAnnotations.add(aRetentionRuntime);
+        typeQualifierMetaAnnotations.add(aTargetTypeUse);
+
+        adNonNull = new AnnotationDef("checkers.nullness.quals.NonNull",
+                                      typeQualifierMetaAnnotations,
+                                      noFieldTypes);
+        aNonNull = new Annotation(adNonNull, noFieldValues);
+
+        adTypeQualifier = new AnnotationDef("checkers.quals.TypeQualifier",
+                                            asRetentionRuntime,
+                                            noFieldTypes);
+        aTypeQualifier = new Annotation(adTypeQualifier, noFieldValues);
+
+        standardDefs = new LinkedHashSet<AnnotationDef>();
+        standardDefs.add(adTarget);
+        standardDefs.add(adRetention);
+        // Because annotations can be read from classfiles, it isn't really
+        // necessary to add any more here.
+
+    }
+
 
     /**
      * Converts the given scalar annotation field value to one appropriate for
@@ -83,130 +204,4 @@ public abstract class Annotations {
             return null;
     }
 
-    /**
-     * A map of field names to values backed by an {@link Annotation};
-     * {@link #fieldValuesMap(Annotation)} is the public factory.
-     */
-    private static /*@ReadOnly*/ class FieldValuesMap extends AbstractMap<String, /*@ReadOnly*/ Object> {
-        /**
-         * The backing {@link Annotation}.
-         */
-        final Annotation a;
-
-        FieldValuesMap(Annotation a) {
-            this.a = a;
-        }
-
-        /**
-         * A field name-to-value entry backed by {@link #a}.
-         */
-        /*@ReadOnly*/ class FVEntry implements Map.Entry<String, Object> {
-            final String fieldName;
-
-            FVEntry(String fieldName) {
-                this.fieldName = fieldName;
-            }
-
-            public String getKey() {
-                return fieldName;
-            }
-
-            public /*@ReadOnly*/ Object getValue() {
-                return FieldValuesMap.this.get(getKey());
-            }
-
-            public /*@ReadOnly*/ Object setValue(/*@ReadOnly*/ Object value) {
-                throw new UnsupportedOperationException();
-            }
-
-            public boolean equals(Object o) {
-                if (! (o instanceof FVEntry)) {
-                    return false;
-                }
-                FVEntry e1 = this;
-                FVEntry e2 = (FVEntry) o;
-                return (e1.getKey()==null ?
-                        e2.getKey()==null : e1.getKey().equals(e2.getKey()))  &&
-                    (e1.getValue()==null ?
-                     e2.getValue()==null : e1.getValue().equals(e2.getValue()));
-            }
-
-            public int hashCode() {
-                return (getKey()==null   ? 0 : getKey().hashCode()) ^
-                    (getValue()==null ? 0 : getValue().hashCode());
-            }
-
-        }
-
-        /**
-         * An iterator for {@link EntrySet}.
-         */
-        /*@ReadOnly*/ class EntryIterator implements Iterator</*@ReadOnly*/ Entry<String, /*@ReadOnly*/ Object>> {
-            final /*@ReadOnly*/ Iterator<String> fieldNames =
-                    keySet().iterator();
-
-            public boolean hasNext() /*@ReadOnly*/ {
-                return fieldNames.hasNext();
-            }
-
-            public /*@ReadOnly*/ Map.Entry<String, /*@ReadOnly*/ Object> next() /*@ReadOnly*/ {
-                return new FVEntry(fieldNames.next());
-            }
-
-            public void remove() {
-                throw new UnsupportedOperationException();
-            }
-        }
-
-        /**
-         * The entry set of a {@link FieldValuesMap}, which contains
-         * {@link FVEntry}s.
-         */
-        /*@ReadOnly*/ class EntrySet
-            extends AbstractSet</*@ReadOnly*/ Entry<String, /*@ReadOnly*/ Object>> {
-            @Override
-            public /*@ReadOnly*/ Iterator</*@ReadOnly*/
-                Map.Entry<String, /*@ReadOnly*/ Object>> iterator() {
-                return new EntryIterator();
-            }
-
-            @Override
-            public int size() {
-                return FieldValuesMap.this.keySet().size();
-            }
-        }
-
-        @Override
-        public /*@ReadOnly*/ Object get(/*@ReadOnly*/ Object key) {
-            if (key instanceof String)
-                return a.getFieldValue((String) key);
-            else
-                return null;
-        }
-
-        // works because field values are never null
-        @Override
-        public boolean containsKey(/*@ReadOnly*/ Object key) {
-            return get(key) != null;
-        }
-
-        @Override
-        public /*@ReadOnly*/ Set<String> keySet() {
-            return a.def().fieldTypes.keySet();
-        }
-
-        @Override
-        public /*@ReadOnly*/ Set</*@ReadOnly*/ Entry<String, /*@ReadOnly*/ Object>> entrySet() {
-            return new EntrySet();
-        }
-    }
-
-    /**
-     * Returns a map of field names to values for the given annotation. The map
-     * is backed by the annotation, so this operation is fast. Attempting to
-     * modify the returned map will result in an exception.
-     */
-    public static final /*@ReadOnly*/ Map<String, /*@ReadOnly*/ Object> fieldValuesMap(Annotation a) {
-        return new FieldValuesMap(a);
-    }
 }

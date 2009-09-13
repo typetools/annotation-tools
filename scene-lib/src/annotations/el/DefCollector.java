@@ -69,16 +69,15 @@ public abstract class DefCollector {
                 collect(((AnnotationAFT) aft).annotationDef);
 
         AnnotationDef oldD = getDef(d.name);
-        if (oldD == null)
+        if (oldD == null) {
             defs.add(d);
-        else {
+        } else {
             AnnotationDef ud = AnnotationDef.unify(oldD, d);
-            if (ud != null) {
-                defs.remove(oldD);
-                defs.add(ud);
-            } else {
+            if (ud == null) {
                 throw new DefException(d.name);
             }
+            defs.remove(oldD);
+            defs.add(ud);
         }
     }
 
@@ -98,12 +97,11 @@ public abstract class DefCollector {
                 defs.add(tld);
             else {
                 AnnotationDef utld = AnnotationDef.unify(oldTld, tld);
-                if (utld != null) {
-                    defs.remove(oldTld);
-                    defs.add(utld);
-                } else {
+                if (utld == null) {
                     throw new DefException(d.name);
                 }
+                defs.remove(oldTld);
+                defs.add(utld);
             }
         }
     }
@@ -119,7 +117,8 @@ public abstract class DefCollector {
             throws DefException {
         for (ATypeElement b : m.bounds.values())
             collect(b);
-        collect((/*@ReadOnly*/ ATypeElement) m);
+        collect((/*@ReadOnly*/ AElement) m);
+        collect((/*@ReadOnly*/ ATypeElement) m.returnType);
         collect(m.receiver);
         for (ATypeElement p : m.parameters.values())
             collect(p);

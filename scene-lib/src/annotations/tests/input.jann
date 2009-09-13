@@ -1,6 +1,6 @@
 package:
-annotation visible @ReadOnly:
-annotation visible @NonNull:
+annotation @ReadOnly: @Retention(RUNTIME)
+annotation @NonNull: @Retention(RUNTIME)
 
 package foo:
 class Bar:

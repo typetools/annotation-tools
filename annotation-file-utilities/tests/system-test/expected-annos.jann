@@ -1,92 +1,98 @@
 package annotations.tests:
-annotation invisible @AClass:
+annotation @AClass:
 
 package annotations.tests:
-annotation invisible @CClass:
+annotation @CClass:
 
 package annotations.tests:
-annotation invisible @A0A:
+annotation @A0A:
 
 package annotations.tests:
-annotation invisible @C0A:
+annotation @C0A:
 
 package annotations.tests:
-annotation invisible @A0B:
+annotation @A0AT: @java.lang.annotation.Target(value={TYPE_USE})
 
 package annotations.tests:
-annotation invisible @C0B:
+annotation @C0AT: @java.lang.annotation.Target(value={TYPE_USE})
 
 package annotations.tests:
-annotation invisible @A06:
+annotation @A0B:
 
 package annotations.tests:
-annotation invisible @C06:
+annotation @C0B:
 
 package annotations.tests:
-annotation invisible @A0C:
+annotation @A06:
 
 package annotations.tests:
-annotation invisible @C0C:
+annotation @C06:
 
 package annotations.tests:
-annotation invisible @A0D:
+annotation @A0C:
 
 package annotations.tests:
-annotation invisible @C0D:
+annotation @C0C:
 
 package annotations.tests:
-annotation invisible @A08:
+annotation @A0D:
 
 package annotations.tests:
-annotation invisible @C08:
+annotation @C0D:
 
 package annotations.tests:
-annotation invisible @A09:
+annotation @A08:
 
 package annotations.tests:
-annotation invisible @C09:
+annotation @C08:
 
 package annotations.tests:
-annotation invisible @A00:
+annotation @A09:
 
 package annotations.tests:
-annotation invisible @C00:
+annotation @C09:
 
 package annotations.tests:
-annotation invisible @A01:
+annotation @A00:
 
 package annotations.tests:
-annotation invisible @C01:
+annotation @C00:
 
 package annotations.tests:
-annotation invisible @A02:
+annotation @A01:
 
 package annotations.tests:
-annotation invisible @C02:
+annotation @C01:
 
 package annotations.tests:
-annotation invisible @A04:
+annotation @A02:
 
 package annotations.tests:
-annotation invisible @C04:
+annotation @C02:
 
 package annotations.tests:
-annotation invisible @A05:
+annotation @A04:
 
 package annotations.tests:
-annotation invisible @C05:
+annotation @C04:
 
 package annotations.tests:
-annotation invisible @A0E:
+annotation @A05:
 
 package annotations.tests:
-annotation invisible @C0E:
+annotation @C05:
 
 package annotations.tests:
-annotation invisible @A0F:
+annotation @A0E:
 
 package annotations.tests:
-annotation invisible @C0F:
+annotation @C0E:
+
+package annotations.tests:
+annotation @A0F:
+
+package annotations.tests:
+annotation @C0F:
 
 package annotations.tests:
 class AnnotationTest: @annotations.tests.AClass @annotations.tests.CClass
@@ -95,12 +101,14 @@ class AnnotationTest: @annotations.tests.AClass @annotations.tests.CClass
         inner-type 0: @annotations.tests.A0F @annotations.tests.C0F
 
     method <init>()V:
+        return:
 
     method doSomething(Ljava/util/Set;)Ljava/util/HashSet;: @annotations.tests.A0A @annotations.tests.C0A
-        inner-type 0: @annotations.tests.A0B @annotations.tests.C0B
+        return: @annotations.tests.A0AT @annotations.tests.C0AT
+            inner-type 0: @annotations.tests.A0B @annotations.tests.C0B
+        receiver: @annotations.tests.A06 @annotations.tests.C06
         parameter #0: @annotations.tests.A0C @annotations.tests.C0C
             inner-type 0: @annotations.tests.A0D @annotations.tests.C0D
-        receiver: @annotations.tests.A06 @annotations.tests.C06
         local 2 #23+2: @annotations.tests.A08 @annotations.tests.C08
             inner-type 0: @annotations.tests.A09 @annotations.tests.C09
         typecast #7: @annotations.tests.A00 @annotations.tests.C00

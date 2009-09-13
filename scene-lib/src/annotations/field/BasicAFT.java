@@ -61,6 +61,22 @@ public final /*@ReadOnly*/ class BasicAFT extends ScalarAFT {
      * {@inheritDoc}
      */
     @Override
+    public boolean isValidValue(Object o) {
+        return (   (type == byte.class && o instanceof Byte)
+                || (type == short.class && o instanceof Short)
+                || (type == int.class && o instanceof Integer)
+                || (type == long.class && o instanceof Long)
+                || (type == float.class && o instanceof Float)
+                || (type == double.class && o instanceof Double)
+                || (type == char.class && o instanceof Character)
+                || (type == boolean.class && o instanceof Boolean)
+                || (type == String.class && o instanceof String));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String toString() {
         if (type == String.class)
             return "String";

@@ -45,7 +45,7 @@ public final class Criteria {
    * specified path is satisfied by these criteria.
    *
    * @param path the tree path to check against
-   * @param tree the tree at the leaf of the path; only relevant when the path
+   * @param leaf the tree at the leaf of the path; only relevant when the path
    *        is null, in which case the leaf is a CompilationUnitTree
    * @return true if all of these criteria are satisfied by the given path,
    * false otherwise
