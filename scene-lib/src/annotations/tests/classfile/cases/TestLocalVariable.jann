@@ -1,10 +1,11 @@
 package annotations.tests.classfile.foo:
-annotation visible @A
+annotation @A: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
 
-annotation visible @B:
+annotation @B: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
 	String value
 
-annotation visible @C:
+// annotation @C: @Retention(value=CLASS) @java.lang.annotation.Target(value={TYPE_USE})
+annotation @C: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
 	int fieldA
 	String fieldB
 	
@@ -24,7 +25,8 @@ class TestLocalVariable: @annotations.tests.classfile.foo.A
 		
 	method i()I:
 	
-	method j()I : @annotations.tests.classfile.foo.A
+	method j()I :
+		return : @annotations.tests.classfile.foo.A
 		local 1 # 2 + 5 : @annotations.tests.classfile.foo.B(value="hello")
  
   method someMethod()V:

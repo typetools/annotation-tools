@@ -5,6 +5,7 @@ import checkers.nullness.quals.*;
 import java.io.*;
 import java.util.*;
 import java.util.regex.*;
+import java.lang.annotation.RetentionPolicy;
 
 import annotations.*;
 import annotations.el.*;
@@ -68,6 +69,7 @@ public final class JavapParser {
         ORIGINAL, PARAMETER, EXTENDED
     }
 
+    // This name comes from the section of the javap output that is being read.
     private enum AnnotationSection {
         RVA("RuntimeVisibleAnnotations", RetentionPolicy.RUNTIME, TargetMode.ORIGINAL),
         RIA("RuntimeInvisibleAnnotations", RetentionPolicy.CLASS, TargetMode.ORIGINAL),
@@ -256,12 +258,12 @@ public final class JavapParser {
         while (inData()) {
             String annoTypeName = parseAnnotationHead();
             RetentionPolicy retention = sec.retention;
-            AnnotationBuilder ab = AnnotationFactory.saf.beginAnnotation(annoTypeName, retention);
+            AnnotationBuilder ab = AnnotationFactory.saf.beginAnnotation(annoTypeName, Annotations.getRetentionPolicyMetaAnnotationSet(retention));
             if (ab == null) {
                 // don't care about the result
                 // but need to skip over it anyway
                 parseAnnotationBody(
-                        AnnotationFactory.saf.beginAnnotation(annoTypeName, null),
+                        AnnotationFactory.saf.beginAnnotation(annoTypeName, Annotations.noAnnotations),
                         SECTION_DATA_PREFIX);
             } else {
                 // Wrap it in a TLA with the appropriate retention policy

@@ -1,9 +1,9 @@
 package java.lang:
-annotation @ReadOnly:
+annotation @ReadOnly: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
 
 package:
-annotation @NonNegative:
-annotation @InnerlyAnnotated:
+annotation @NonNegative: @java.lang.annotation.Target(value={TYPE_USE})
+annotation @InnerlyAnnotated: @java.lang.annotation.Target(value={TYPE_USE})
 
 package annotator.tests:
 class InnerClassAnonymous$1:

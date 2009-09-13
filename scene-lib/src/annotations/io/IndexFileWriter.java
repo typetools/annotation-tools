@@ -24,9 +24,10 @@ public final class IndexFileWriter {
     private static final String INDENT = "    ";
 
     void printAnnotationDefBody(AnnotationDef d) {
-        for (/*@ReadOnly*/ Map.Entry<String, AnnotationFieldType> f : d.fieldTypes
-                .entrySet()) {
-            pw.println(INDENT + f.getValue().toString() + " " + f.getKey());
+        for (/*@ReadOnly*/ Map.Entry<String, AnnotationFieldType> f : d.fieldTypes.entrySet()) {
+            String fieldname = f.getKey();
+            AnnotationFieldType fieldType = f.getValue();
+            pw.println(INDENT + fieldType + " " + fieldname);
         }
         pw.println();
     }
@@ -39,11 +40,9 @@ public final class IndexFileWriter {
         @Override
         protected void visitAnnotationDef(AnnotationDef d) {
             pw.println("package " + packagePart(d.name) + ":");
-            pw.print("annotation ");
-            if (d.retention != null) {
-                pw.print(d.retention.ifname);
-            }
-            pw.println(" @" + basenamePart(d.name) + ":");
+            pw.print("annotation @" + basenamePart(d.name) + ":");
+            printAnnotations(d);
+            pw.println();
             printAnnotationDefBody(d);
         }
     }
@@ -56,20 +55,24 @@ public final class IndexFileWriter {
         else if (aft instanceof ArrayAFT) {
             ArrayAFT aaft = (ArrayAFT) aft;
             pw.print('{');
-            /*@ReadOnly*/ List<?> l =
-                (/*@ReadOnly*/ List<?>) o;
-            // watch out--could be an empty array of unknown type
-            // (see AnnotationBuilder#addEmptyArrayField)
-            if (aaft.elementType == null) {
-                if (l.size() != 0)
-                    throw new AssertionError();
+            if (!(o instanceof List)) {
+                printValue(aaft.elementType, o);
             } else {
-                boolean first = true;
-                for (/*@ReadOnly*/ Object o2 : l) {
-                    if (!first)
-                        pw.print(',');
-                    printValue(aaft.elementType, o2);
-                    first = false;
+                /*@ReadOnly*/ List<?> l =
+                    (/*@ReadOnly*/ List<?>) o;
+                // watch out--could be an empty array of unknown type
+                // (see AnnotationBuilder#addEmptyArrayField)
+                if (aaft.elementType == null) {
+                    if (l.size() != 0)
+                        throw new AssertionError();
+                } else {
+                    boolean first = true;
+                    for (/*@ReadOnly*/ Object o2 : l) {
+                        if (!first)
+                            pw.print(',');
+                        printValue(aaft.elementType, o2);
+                        first = false;
+                    }
                 }
             }
             pw.print('}');
@@ -83,13 +86,11 @@ public final class IndexFileWriter {
 
     private void printAnnotation(Annotation a) {
         pw.print("@" + a.def().name);
-        /*@ReadOnly*/ Map<String, /*@ReadOnly*/ Object> fieldValues
-            = Annotations.fieldValuesMap(a);
-        if (!fieldValues.isEmpty()) {
+        if (!a.fieldValues.isEmpty()) {
             pw.print('(');
             boolean first = true;
             for (/*@ReadOnly*/ Map.Entry<String, /*@ReadOnly*/ Object> f
-                    : fieldValues.entrySet()) {
+                    : a.fieldValues.entrySet()) {
                 if (!first)
                     pw.print(',');
                 pw.print(f.getKey() + "=");
@@ -171,8 +172,8 @@ public final class IndexFileWriter {
                 : scene.classes.entrySet()) {
             String cname = ce.getKey();
             /*@ReadOnly*/ AClass c = ce.getValue();
-            String pkg = packagePart(cname),
-                basename = basenamePart(cname);
+            String pkg = packagePart(cname);
+            String basename = basenamePart(cname);
             pw.println("package " + pkg + ":");
             pw.print("class " + basename + ":");
             printAnnotations(c);
@@ -190,11 +191,12 @@ public final class IndexFileWriter {
                 String mkey = me.getKey();
                 /*@ReadOnly*/ AMethod m = me.getValue();
                 pw.println();
-                printElementAndInnerTypes(INDENT, "method " + mkey, m);
+                printElement(INDENT, "method " + mkey, m);
                 printBounds(INDENT + INDENT, m.bounds);
-                printNumberedElements(INDENT + INDENT, "parameter", m.parameters);
+                printElementAndInnerTypes(INDENT + INDENT, "return", m.returnType);
                 if (!m.receiver.tlAnnotationsHere.isEmpty())
                     printElement(INDENT + INDENT, "receiver", m.receiver);
+                printNumberedElements(INDENT + INDENT, "parameter", m.parameters);
                 for (/*@ReadOnly*/ Map.Entry<LocalLocation, /*@ReadOnly*/ ATypeElement> le
                         : m.locals.entrySet()) {
                     LocalLocation loc = le.getKey();
@@ -206,6 +208,7 @@ public final class IndexFileWriter {
                 printNumberedElements(INDENT + INDENT, "typecast", m.typecasts);
                 printNumberedElements(INDENT + INDENT, "instanceof", m.instanceofs);
                 printNumberedElements(INDENT + INDENT, "new", m.news);
+                // throwsException field is not processed.  Why?
             }
             pw.println();
         }

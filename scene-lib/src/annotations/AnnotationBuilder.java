@@ -4,13 +4,14 @@ import checkers.nullness.quals.*;
 import checkers.javari.quals.*;
 
 import java.util.*;
+import java.lang.annotation.RetentionPolicy;
 
 import annotations.field.*;
+import annotations.el.AnnotationDef;
 
 /**
  * An {@link AnnotationBuilder} builds a single annotation object after the
- * annotation's fields have been supplied one by one.  <code>A</code> is a
- * supertype of the built annotation object.
+ * annotation's fields have been supplied one by one.
  *
  * <p>
  * It is not possible to specify the type name or the retention policy.
@@ -25,18 +26,38 @@ import annotations.field.*;
  */
 public class AnnotationBuilder {
 
-    String typeName;
-    RetentionPolicy retention;
+    // Sometimes, we build the AnnotationDef at the very end, and sometimes
+    // we have it before starting.
+    AnnotationDef def;
+
+    private String typeName;
+    Set<Annotation> tlAnnotationsHere;
 
     boolean arrayInProgress = false;
 
     boolean active = true;
 
-    Map<String, AnnotationFieldType> fieldTypes =
+    private Map<String, AnnotationFieldType> fieldTypes =
         new LinkedHashMap<String, AnnotationFieldType>();
 
     Map<String, /*@ReadOnly*/ Object> fieldValues =
         new LinkedHashMap<String, /*@ReadOnly*/ Object>();
+
+    public String typeName() {
+        if (def != null) {
+            return def.name;
+        } else {
+            return typeName;
+        }
+    }
+
+    public Map<String, AnnotationFieldType> fieldTypes() {
+        if (def != null) {
+            return def.fieldTypes;
+        } else {
+            return fieldTypes;
+        }
+    }
 
     class SimpleArrayBuilder implements ArrayBuilder {
         boolean abActive = true;
@@ -71,7 +92,7 @@ public class AnnotationBuilder {
             throw new IllegalStateException("Already finished");
         if (arrayInProgress)
             throw new IllegalStateException("Array in progress");
-        if (fieldTypes.containsKey(fieldName))
+        if (fieldValues.containsKey(fieldName))
             throw new IllegalArgumentException("Duplicate field "
                                                + fieldName);
     }
@@ -79,9 +100,7 @@ public class AnnotationBuilder {
     /**
      * Supplies a scalar field of the given name, type, and value for inclusion
      * in the annotation returned by {@link #finish}. See the rules for values
-     * on {@link Annotation#getFieldValue}. Furthermore, a subannotation must
-     * have been created by the same factory as the annotation of which it is a
-     * field; in particular, it must be an instance of <code>A</code>.
+     * on {@link Annotation#getFieldValue}.
      *
      * <p>
      * Each field may be supplied only once. This method may throw an exception
@@ -94,7 +113,9 @@ public class AnnotationBuilder {
         if (x instanceof Annotation && !(x instanceof Annotation))
             throw new IllegalArgumentException(
                                                "All subannotations must be Annotations");
-        fieldTypes.put(fieldName, aft);
+        if (def == null) {
+            fieldTypes.put(fieldName, aft);
+        }
         fieldValues.put(fieldName, x);
     }
 
@@ -114,7 +135,9 @@ public class AnnotationBuilder {
      */
     public ArrayBuilder beginArrayField(String fieldName, ArrayAFT aft) {
         checkAddField(fieldName);
-        fieldTypes.put(fieldName, aft);
+        if (def == null) {
+            fieldTypes.put(fieldName, aft);
+        }
         arrayInProgress = true;
         return new SimpleArrayBuilder(fieldName);
     }
@@ -132,7 +155,9 @@ public class AnnotationBuilder {
      */
     public void addEmptyArrayField(String fieldName) {
         checkAddField(fieldName);
-        fieldTypes.put(fieldName, new ArrayAFT(null));
+        if (def == null) {
+            fieldTypes.put(fieldName, new ArrayAFT(null));
+        }
         fieldValues.put(fieldName, Collections.emptyList());
     }
 
@@ -149,17 +174,36 @@ public class AnnotationBuilder {
         if (arrayInProgress)
             throw new IllegalStateException("Array in progress");
         active = false;
-        return new Annotation(
-                              new AnnotationDef(typeName, retention, fieldTypes), fieldValues);
+        if (def == null) {
+            def = new AnnotationDef(typeName, tlAnnotationsHere, fieldTypes);
+        } else {
+            assert typeName == null;
+            assert fieldTypes.isEmpty();
+        }
+        return new Annotation(def, fieldValues);
+    }
+
+    AnnotationBuilder(AnnotationDef def) {
+        assert def != null;
+        this.def = def;
     }
 
     AnnotationBuilder(String typeName) {
+        assert typeName != null;
         this.typeName = typeName;
-        this.retention = null;
     }
 
-    AnnotationBuilder(String typeName, RetentionPolicy retention) {
+    AnnotationBuilder(String typeName, Set<Annotation> tlAnnotationsHere) {
+        assert typeName != null;
         this.typeName = typeName;
-        this.retention = retention;
+        this.tlAnnotationsHere = tlAnnotationsHere;
     }
+
+    public String toString() {
+        if (def != null) {
+            return String.format("AnnotationBuilder %s", def);
+        } else
+            return String.format("(AnnotationBuilder %s : %s)", typeName, tlAnnotationsHere);
+    }
+
 }

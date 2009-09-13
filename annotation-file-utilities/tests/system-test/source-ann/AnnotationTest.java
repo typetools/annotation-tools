@@ -1,6 +1,7 @@
 package annotations.tests;
 
-import java.util.*; 
+import java.util.*;
+import java.lang.annotation.*;
 
 @interface AClass {}
 @interface A00 {}
@@ -12,6 +13,8 @@ import java.util.*;
 @interface A08 {}
 @interface A09 {}
 @interface A0A {}
+@Target(ElementType.TYPE_USE)
+@interface A0AT {}
 @interface A0B {}
 @interface A0C {}
 @interface A0D {}
@@ -31,6 +34,8 @@ import java.util.*;
 @interface C08 {}
 @interface C09 {}
 @interface C0A {}
+@Target(ElementType.TYPE_USE)
+@interface C0AT {}
 @interface C0B {}
 @interface C0C {}
 @interface C0D {}
@@ -42,10 +47,10 @@ import java.util.*;
 @interface C13 {}
 
 public @AClass /*@CClass*/ class AnnotationTest<Foo extends /*A10*/ /*C10*/ Comparable</*A11*/ /*C11*/ Integer>> {
-    
+
     @A0E /*@C0E*/ Iterable<@A0F /*@C0F*/ String> field;
-    
-    <Bar extends /*A12*/ /*C12*/ Comparable</*A13*/ /*C13*/ Integer>> @A0A /*@C0A*/ HashSet<@A0B /*@C0B*/ Integer>
+
+    <Bar extends /*A12*/ /*C12*/ Comparable</*A13*/ /*C13*/ Integer>> @A0A /*@C0A*/ @A0AT /*@C0AT*/ HashSet<@A0B /*@C0B*/ Integer>
         doSomething(@A0C /*@C0C*/ Set<@A0D /*@C0D*/ Integer> param) @A06 /*@C06*/ {
         @A08 /*@C08*/ HashSet<@A09 /*@C09*/ Integer> local;
         if (param instanceof @A02 /*@C02*/ HashSet)

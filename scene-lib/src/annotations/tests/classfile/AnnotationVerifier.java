@@ -23,6 +23,8 @@ import org.objectweb.asm.commons.EmptyVisitor;
  */
 public class AnnotationVerifier {
 
+  private static final String lineSep = System.getProperty("line.separator");
+
   /**
    * The "correct" version of the class to verify against.
    */
@@ -73,16 +75,24 @@ public class AnnotationVerifier {
   public void verify() {
     if (!newVisitor.name.equals(originalVisitor.name)) {
       throw new AnnotationMismatchException(
-          "Cannot verify two different classes " +
-          newVisitor.name + " cannot be verified against " +
-          originalVisitor.name);
+          "Cannot verify two different classes:\n  " +
+          newVisitor.name + "\n  " + originalVisitor.name);
     }
     newVisitor.verifyAgainst(originalVisitor);
   }
 
+  // print the expected and found annotations to standard out
+  public void verifyPrettyPrint() {
+    System.out.println("expected:");
+    System.out.println(originalVisitor.prettyPrint());
+    System.out.println("actual:");
+    System.out.println(newVisitor.prettyPrint());
+  }
+
+
   /**
    * A ClassRecorder records all the annotations that it visits, and serves
-   * as a ClassVisitor, FieldVisitor and MethodVisitor.
+   * as a ClassVisitor, FieldVisitor, and MethodVisitor.
    */
   private class ClassRecorder extends EmptyVisitor {
 
@@ -102,11 +112,11 @@ public class AnnotationVerifier {
     private Map<String, AnnotationRecorder> xanns;
 
     //method specific annotations
-    private Set<AnnotationRecorder> danns;
-    private Map<ParameterDescription, AnnotationRecorder> panns;
+    private Set<AnnotationRecorder> danns; // default annotations
+    private Map<ParameterDescription, AnnotationRecorder> panns; // parameter annotations
 
     public ClassRecorder() {
-      this("[class: ","","");
+      this("class: ","","");
     }
 
     public ClassRecorder(String internalDescription, String name, String signature) {
@@ -201,8 +211,8 @@ public class AnnotationVerifier {
         AnnotationRecorder correctAnn = entry.getValue();
         AnnotationRecorder questionableAnn = questionableAnns.get(name);
         if (questionableAnn == null) {
-          throw new AnnotationMismatchException(description +
-              " does not contain expected annotation: " + correctAnn);
+          throw new AnnotationMismatchException("{" + description + "}" +
+              "\n  does not contain expected annotation:\n  " + "{" + correctAnn + "}");
         }
 
         questionableAnn.verifyAgainst(correctAnn);
@@ -211,8 +221,8 @@ public class AnnotationVerifier {
       }
 
       for (AnnotationRecorder unexpectedAnnOnThis : unresolvedQuestionableAnns) {
-        throw new AnnotationMismatchException(description +
-            " contains unexpected annotation : " + unexpectedAnnOnThis);
+        throw new AnnotationMismatchException("{" + description + "}" +
+            "\n  contains unexpected annotation:\n  " + "{" + unexpectedAnnOnThis + "}");
       }
     }
 
@@ -228,8 +238,8 @@ public class AnnotationVerifier {
         ClassRecorder correctMember = entry.getValue();
         ClassRecorder questionableMember = questionableMembers.get(name);
         if (questionableMember == null) {
-          throw new AnnotationMismatchException(description +
-              " does not contain expected member: " + correctMember);
+          throw new AnnotationMismatchException("{" + description + "}" +
+              "\n  does not contain expected member:\n  " + "{" + correctMember + "}");
         }
 
         questionableMember.verifyAgainst(correctMember);
@@ -242,15 +252,60 @@ public class AnnotationVerifier {
         System.out.println("questionable: " + questionableMembers);
         System.out.println("correct: " + correctMembers);
 
-        throw new AnnotationMismatchException(description +
-            " contains unexpected member: " + unexpectedMemberOnThis);
+        throw new AnnotationMismatchException("{" + description + "}" +
+            "\n  contains unexpected member:\n  " + "{" + unexpectedMemberOnThis + "}");
       }
     }
 
     public String toString() {
       return description;
     }
+
+    public String prettyPrint() {
+      StringBuilder sb = new StringBuilder();
+      prettyPrint(sb, "");
+      return sb.toString();
+    }
+
+    // pretty-prints this into the given list of lines
+    public void prettyPrint(StringBuilder sb, String indent) {
+
+      // avoid boilerplate of adding indent and lineSep every time
+      List<String> lines = new ArrayList<String>();
+
+      lines.add("description: " + description);
+      lines.add("  name: " + name);
+      lines.add("  signature: " + signature);
+      if (! anns.isEmpty()) {
+        lines.add("  anns:");
+        for (Map.Entry<String, AnnotationRecorder> e : anns.entrySet()) {
+          // in the future, maybe get a fuller description
+          lines.add("    " + e.getKey() + ": " + e.getValue().description);
+        }
+      }
+      if (! xanns.isEmpty()) {
+        lines.add("  xanns:");
+        for (Map.Entry<String, AnnotationRecorder> e : xanns.entrySet()) {
+          // in the future, maybe get a fuller description
+          lines.add("    " + e.getKey() + ": " + e.getValue().description);
+        }
+      }
+      for (String line : lines) {
+        sb.append(indent);
+        sb.append(line);
+        sb.append(lineSep);
+      }
+      for (Map.Entry<String, ClassRecorder> e : fieldRecorders.entrySet()) {
+        sb.append(indent + "  " + e.getKey() + ":" + lineSep);
+        e.getValue().prettyPrint(sb, indent + "    ");
+      }
+      for (Map.Entry<String, ClassRecorder> e : methodRecorders.entrySet()) {
+        sb.append(indent + "  " + e.getKey() + ":" + lineSep);
+        e.getValue().prettyPrint(sb, indent + "    ");
+      }
+    }
   }
+
 
   /**
    * An AnnotationRecorder is an ExtendedAnnotationVisitor that records all the
@@ -259,15 +314,15 @@ public class AnnotationVerifier {
   private class AnnotationRecorder implements ExtendedAnnotationVisitor {
     private String description;
 
-    private List<String> fieldArgs1;
-    private List<Object> fieldArgs2;
+    private List<String> fieldArgsName;
+    private List<Object> fieldArgsValue;
 
-    private List<String> enumArgs1;
-    private List<String> enumArgs2;
-    private List<String> enumArgs3;
+    private List<String> enumArgsName;
+    private List<String> enumArgsDesc;
+    private List<String> enumArgsValue;
 
-    private List<String> innerAnnotationArgs1;
-    private List<String> innerAnnotationArgs2;
+    private List<String> innerAnnotationArgsName;
+    private List<String> innerAnnotationArgsDesc;
     private Map<String, AnnotationRecorder> innerAnnotationMap;
 
     private List<String> arrayArgs;
@@ -286,15 +341,15 @@ public class AnnotationVerifier {
 
     public AnnotationRecorder(String description) {
       this.description = description;
-      fieldArgs1 = new ArrayList<String>();
-      fieldArgs2 = new ArrayList<Object>();
+      fieldArgsName = new ArrayList<String>();
+      fieldArgsValue = new ArrayList<Object>();
 
-      enumArgs1 = new ArrayList<String>();
-      enumArgs2 = new ArrayList<String>();
-      enumArgs3 = new ArrayList<String>();
+      enumArgsName = new ArrayList<String>();
+      enumArgsDesc = new ArrayList<String>();
+      enumArgsValue = new ArrayList<String>();
 
-      innerAnnotationArgs1 = new ArrayList<String>();
-      innerAnnotationArgs2 = new ArrayList<String>();
+      innerAnnotationArgsName = new ArrayList<String>();
+      innerAnnotationArgsDesc = new ArrayList<String>();
       innerAnnotationMap = new HashMap<String, AnnotationRecorder>();
 
       arrayArgs = new ArrayList<String>();
@@ -356,13 +411,13 @@ public class AnnotationVerifier {
     }
 
     public void visit(String name, Object value) {
-      fieldArgs1.add(name);
-      fieldArgs2.add(value);
+      fieldArgsName.add(name);
+      fieldArgsValue.add(value);
     }
 
     public AnnotationVisitor visitAnnotation(String name, String desc) {
-      innerAnnotationArgs1.add(name);
-      innerAnnotationArgs2.add(name);
+      innerAnnotationArgsName.add(name);
+      innerAnnotationArgsDesc.add(desc);
 
       AnnotationRecorder av= new AnnotationRecorder(description + name);
       innerAnnotationMap.put(name, av);
@@ -380,9 +435,9 @@ public class AnnotationVerifier {
     }
 
     public void visitEnum(String name, String desc, String value) {
-      enumArgs1.add(name);
-      enumArgs2.add(desc);
-      enumArgs3.add(value);
+      enumArgsName.add(name);
+      enumArgsDesc.add(desc);
+      enumArgsValue.add(value);
     }
 
     public String toString() {
@@ -402,15 +457,15 @@ public class AnnotationVerifier {
      */
     public void verifyAgainst(AnnotationRecorder ar) {
       StringBuilder sb = new StringBuilder();
-      verifyList(sb, "visit()", 1, this.fieldArgs1, ar.fieldArgs1);
-      verifyList(sb, "visit()", 2, this.fieldArgs2, ar.fieldArgs2);
+      verifyList(sb, "visit()", 1, this.fieldArgsName, ar.fieldArgsName);
+      verifyList(sb, "visit()", 2, this.fieldArgsValue, ar.fieldArgsValue);
 
-      verifyList(sb, "visitEnum()", 1, this.enumArgs1, ar.enumArgs1);
-      verifyList(sb, "visitEnum()", 2, this.enumArgs2, ar.enumArgs2);
-      verifyList(sb, "visitEnum()", 3, this.enumArgs3, ar.enumArgs3);
+      verifyList(sb, "visitEnum()", 1, this.enumArgsName, ar.enumArgsName);
+      verifyList(sb, "visitEnum()", 2, this.enumArgsDesc, ar.enumArgsDesc);
+      verifyList(sb, "visitEnum()", 3, this.enumArgsValue, ar.enumArgsValue);
 
-      verifyList(sb, "visitAnnotation()", 1, this.innerAnnotationArgs1, ar.innerAnnotationArgs1);
-      verifyList(sb, "visitAnnotation()", 2, this.innerAnnotationArgs2, ar.innerAnnotationArgs2);
+      verifyList(sb, "visitAnnotation()", 1, this.innerAnnotationArgsName, ar.innerAnnotationArgsName);
+      verifyList(sb, "visitAnnotation()", 2, this.innerAnnotationArgsDesc, ar.innerAnnotationArgsDesc);
 
       verifyList(sb, "visitArray()", 1, this.arrayArgs, ar.arrayArgs);
 
@@ -503,7 +558,7 @@ public class AnnotationVerifier {
   /**
    * An AnnotationMismatchException is an Exception that indicates that
    * two versions of the same class do not have the same annotations on
-   * either the class, it's field, or it's methods.
+   * either the class, its field, or its methods.
    */
   public class AnnotationMismatchException extends RuntimeException {
     private static final long serialVersionUID = 20060714L; // today's date

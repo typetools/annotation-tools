@@ -5,6 +5,10 @@ import checkers.javari.quals.*;
 
 import annotations.*;
 import annotations.util.*;
+import annotations.el.AnnotationDef;
+
+import java.lang.annotation.RetentionPolicy;
+import java.util.Map;
 
 /**
  * An {@link AnnotationFieldType} represents a type that can be the type
@@ -23,6 +27,29 @@ public abstract /*@ReadOnly*/ class AnnotationFieldType extends EqualByStringRep
 
     /** Formats an annotation field value. */
     public abstract String format(Object o);
+
+
+    /** Returns true if this value is valid for this AnnotationFieldType. */
+    public abstract boolean isValidValue(Object o);
+
+    // TODO: add a cache?
+    public static AnnotationFieldType fromClass(Class<?> c, Map<String,AnnotationDef> adefs) {
+        if (c.isAnnotation()) {
+            Class<? extends java.lang.annotation.Annotation> cAnno
+                = (Class<? extends java.lang.annotation.Annotation>) c;
+            return new AnnotationAFT(AnnotationDef.fromClass(cAnno, adefs));
+        } else if (c.isArray()) {
+            return new ArrayAFT((ScalarAFT) fromClass(c.getComponentType(), adefs));
+        } else if (BasicAFT.bafts.containsKey(c)) {
+            return BasicAFT.bafts.get(c);
+        } else if (c == Class.class) {
+            return ClassTokenAFT.ctaft;
+        } else if (c.isEnum()) {
+            return new EnumAFT(c.getName());
+        } else {
+            throw new Error("Unrecognized class: " + c);
+        }
+    }
 
 
     /**

@@ -50,8 +50,7 @@ public class ATypeElement extends AElement {
     public boolean equals(/*@ReadOnly*/ AElement o) /*@ReadOnly*/ {
         if (!(o instanceof ATypeElement))
             return false;
-         /*@ReadOnly*/ ATypeElement o2
-            = (/*@ReadOnly*/ ATypeElement) o;
+        /*@ReadOnly*/ ATypeElement o2 = (/*@ReadOnly*/ ATypeElement) o;
         return o2.equalsTypeElement(this);
     }
 
@@ -80,20 +79,24 @@ public class ATypeElement extends AElement {
 
     @Override
     public String toString() {
-      StringBuilder sb = new StringBuilder();
-      sb.append("ATypeElement: ");
-      sb.append(description);
-      sb.append(" : ");
-      sb.append("{");
+        StringBuilder sb = new StringBuilder();
+        sb.append("ATypeElement: ");
+        sb.append(description);
+        sb.append(" : ");
+        for (Annotation a : tlAnnotationsHere) {
+          sb.append(a.toString());
+          sb.append(" ");
+        }
+        sb.append("{");
         String linePrefix = "  ";
         for (Map.Entry<InnerTypeLocation, AElement> entry : innerTypes.entrySet()) {
-          sb.append(linePrefix);
-          sb.append(entry.getKey().toString());
-          sb.append(" => ");
-          sb.append(entry.getValue().toString());
-          sb.append(lineSep);
+            sb.append(linePrefix);
+            sb.append(entry.getKey().toString());
+            sb.append(" => ");
+            sb.append(entry.getValue().toString());
+            sb.append(lineSep);
         }
-      sb.append("{");
-      return sb.toString();
+        sb.append("}");
+        return sb.toString();
     }
 }

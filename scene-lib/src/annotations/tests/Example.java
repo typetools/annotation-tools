@@ -5,6 +5,7 @@ import checkers.javari.quals.ReadOnly;
 
 import java.io.*;
 import java.util.*;
+import java.lang.annotation.RetentionPolicy;
 
 import annotations.*;
 import annotations.el.*;
@@ -63,17 +64,7 @@ public class Example {
                 System.out.println("Annotating first parameter of "
                         + me.getKey() + " nonnull");
 
-                AnnotationDef nonnullDef =
-                        new AnnotationDef(
-                                "NonNull",
-                                RetentionPolicy.RUNTIME,
-                                Collections
-                                        .<String, AnnotationFieldType> emptyMap());
-                Annotation p1nn2 =
-                        new Annotation(
-                                nonnullDef,
-                                Collections.<String, Object> emptyMap());
-                param1.tlAnnotationsHere.add(p1nn2);
+                param1.tlAnnotationsHere.add(Annotations.aNonNull);
             }
         }
 

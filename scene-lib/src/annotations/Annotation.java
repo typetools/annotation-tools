@@ -3,7 +3,12 @@ package annotations;
 import checkers.nullness.quals.Nullable;
 import checkers.javari.quals.ReadOnly;
 
+import annotations.el.AnnotationDef;
+import annotations.field.AnnotationFieldType;
+
 import java.util.*;
+import java.lang.reflect.*;
+
 
 /**
  * A very simple annotation representation constructed with a map of field names
@@ -28,6 +33,34 @@ public final /*@ReadOnly*/ class Annotation {
      */
     public final /*@ReadOnly*/ Map<String, /*@ReadOnly*/ Object> fieldValues;
 
+    /** Check the representation, throw assertion failure if it is violated. */
+    public void checkRep() {
+        if (! fieldValues.keySet().equals(def.fieldTypes.keySet())) {
+            for (String s : fieldValues.keySet()) {
+                assert def.fieldTypes.containsKey(s)
+                    : String.format("Annotation contains field %s but AnnotationDef does not%n  annotation: %s%n  def: %s%n", s, this, this.def);
+            }
+            for (String s : def.fieldTypes.keySet()) {
+                assert fieldValues.containsKey(s)
+                    : String.format("Annotation contains field %s but AnnotationDef does not", s);
+            }
+            assert false : "This can't happen.";
+        }
+
+        for (String fieldname : fieldValues.keySet()) {
+            AnnotationFieldType aft = def.fieldTypes.get(fieldname);
+            Object value = fieldValues.get(fieldname);
+            String valueString;
+            if (value instanceof Object[]) {
+                valueString = Arrays.toString((Object[]) value);
+            } else {
+                valueString = value.toString();
+            }
+            assert aft.isValidValue(value)
+                : String.format("Bad value%n %s (%s)%nfor%n %s (%s)", valueString, value.getClass(), aft, aft.getClass());
+        }
+    }
+
     // TODO make sure the field values are valid?
     /**
      * Constructs a {@link Annotation} with the given definition and
@@ -41,6 +74,49 @@ public final /*@ReadOnly*/ class Annotation {
         this.def = def;
         this.fieldValues = Collections.unmodifiableMap(
                 new LinkedHashMap<String, /*@ReadOnly*/ Object>(fields));
+        checkRep();
+    }
+
+    /** Use adefs to look up (or insert into it) missing AnnotationDefs. */
+    public Annotation(java.lang.annotation.Annotation ja, Map<String, AnnotationDef> adefs) {
+        Class<? extends java.lang.annotation.Annotation> jaType = ja.annotationType();
+        String name = jaType.getName();
+        if (adefs.containsKey(name)) {
+            def = adefs.get(name);
+        } else {
+            def = AnnotationDef.fromClass(jaType, adefs);
+            adefs.put(name, def);
+        }
+        fieldValues = new LinkedHashMap<String,Object>();
+        try {
+            for (String fieldname : def.fieldTypes.keySet()) {
+                AnnotationFieldType aft = def.fieldTypes.get(fieldname);
+                Method m = jaType.getDeclaredMethod(fieldname);
+                Object val = m.invoke(ja);
+                if (! aft.isValidValue(val)) {
+                    if (val instanceof Object[]) {
+                        Object[] vala = (Object[]) val;
+                        List<Object> vall = new ArrayList<Object>(vala.length);
+                        for (Object elt : vala) {
+                            vall.add(elt.toString());
+                        }
+                        val = vall;
+                    } else {
+                        val = val.toString();
+                    }
+                }
+                assert aft.isValidValue(val)
+                    : String.format("invalid value %s for field %s of type %s; ja=%s", val, fieldname, aft, ja);
+                fieldValues.put(fieldname, val);
+            }
+        } catch (NoSuchMethodException e) {
+            throw new Error(String.format("no such method (annotation field) in %s%n  from: %s %s", jaType, ja, adefs), e);
+        } catch (InvocationTargetException e) {
+            throw new Error(e);
+        } catch (IllegalAccessException e) {
+            throw new Error(e);
+        }
+        checkRep();
     }
 
     /**
@@ -87,34 +163,25 @@ public final /*@ReadOnly*/ class Annotation {
     }
 
     /**
-     * A field map created in advance to make {@link #equals(Annotation)} and
-     * {@link #hashCode} slightly faster.
-     */
-    private final /*@ReadOnly*/ Map<String, /*@ReadOnly*/ Object> myFieldMap =
-            Annotations.fieldValuesMap(this);
-
-    /**
      * Returns whether this annotation equals <code>o</code>; a slightly faster
      * variant of {@link #equals(Object)} for when the argument is statically
-     * known to be another nonnull {@link Annotation}. Implemented by comparing
-     * the maps from {@link Annotations#fieldValuesMap}. Subclasses may wish to
+     * known to be another nonnull {@link Annotation}. Subclasses may wish to
      * override this with a hard-coded "&amp;&amp;" of field comparisons to improve
      * performance.
      */
     public boolean equals(Annotation o) /*@ReadOnly*/ {
         return def.equals(o.def())
-                && myFieldMap.equals(Annotations.fieldValuesMap(o));
+            && fieldValues.equals(o.fieldValues);
     }
 
     /**
      * Returns the hash code of this annotation as defined on
-     * {@link Annotation#hashCode}. Implemented by taking the hash code of the
-     * map from {@link Annotations#fieldValuesMap}. Subclasses may wish to override
+     * {@link Annotation#hashCode}.  Subclasses may wish to override
      * this with a hard-coded XOR/addition of fields to improve performance.
      */
     @Override
     public int hashCode() /*@ReadOnly*/ {
-        return def.hashCode() + myFieldMap.hashCode();
+        return def.hashCode() + fieldValues.hashCode();
     }
 
     /**
@@ -128,9 +195,9 @@ public final /*@ReadOnly*/ class Annotation {
     public String toString() /*@ReadOnly*/ {
         StringBuilder sb = new StringBuilder("@");
         sb.append(def.name);
-        if (!def.fieldTypes.isEmpty()) {
+        if (!fieldValues.isEmpty()) {
             sb.append('(');
-            sb.append(myFieldMap.toString());
+            sb.append(fieldValues.toString());
             sb.append(')');
         }
         return sb.toString();

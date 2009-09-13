@@ -133,8 +133,8 @@ with this file <code>input.jann</code>:
 
 <pre>
 package:
-annotation visible @ReadOnly:
-annotation visible @NonNull:
+annotation @ReadOnly: @Retention(RUNTIME)
+annotation @NonNull: @Retention(RUNTIME)
 
 package foo:
 class Bar:
@@ -163,10 +163,10 @@ and this file <code>output.jann</code>:
 
 <pre>
 package :
-annotation visible @ReadOnly:
+annotation @ReadOnly: @Retention(RUNTIME)
 
 package :
-annotation visible @NonNull:
+annotation @NonNull: @Retention(RUNTIME)
 
 package foo:
 class Bar:

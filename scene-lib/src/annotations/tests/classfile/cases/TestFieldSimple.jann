@@ -1,6 +1,6 @@
 package annotations.tests.classfile.foo:
-annotation visible @A
-annotation visible @B:
+annotation @A: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+annotation @B: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
 	String value
 
 package annotations.tests.classfile.cases:
