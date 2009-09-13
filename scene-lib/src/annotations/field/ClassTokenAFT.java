@@ -36,6 +36,15 @@ public final /*@ReadOnly*/ class ClassTokenAFT extends ScalarAFT {
      * {@inheritDoc}
      */
     @Override
+    public boolean isValidValue(Object o) {
+        // return o instanceof Class;
+        return o instanceof String;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String toString() {
         return "Class"/* + parameterization */;
     }

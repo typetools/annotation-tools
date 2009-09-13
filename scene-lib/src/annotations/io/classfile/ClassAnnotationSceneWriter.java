@@ -9,6 +9,8 @@ import checkers.nullness.quals.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.io.*;
+import java.lang.annotation.RetentionPolicy;
 
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Attribute;
@@ -24,63 +26,57 @@ import annotations.*;
 import annotations.el.*;
 
 /**
- * A <code>ClassAnnotationSceneWriter</code> is a
- * {@link org.objectweb.asm.ClassVisitor}
- * that can be used to write out
- * a class file that is the combination of an existing class file and
- * annotations in an {@link AScene}.  <code>A</code> is the type of
- * {@link annotations.Annotation}s expected in the
- * {@link AScene}, which presently must be a simple name-value mapping
- * {@link Annotation}.
- *
- * The "write" in <code> ClassAnnotationSceneWriter </code> refers to a
- * class file being rewritten with information from a scene.
- * Also see {@link ClassAnnotationSceneReader}.
+ * A ClassAnnotationSceneWriter is a {@link org.objectweb.asm.ClassVisitor}
+ * that can be used to write a class file that is the combination of an
+ * existing class file and annotations in an {@link AScene}.  The "write"
+ * in <code> ClassAnnotationSceneWriter </code> refers to a class file
+ * being rewritten with information from a scene.  Also see {@link
+ * ClassAnnotationSceneReader}.
  *
  * <p>
  *
  * The proper usage of this class is to construct a
- * <code>ClassAnnotationSceneWriter}</code> with an {@link AScene} that
- * already contains all its annotations, pass this as a
- * {@link org.objectweb.asm.ClassVisitor} to
- * {@link org.objectweb.asm.ClassReader#accept}, and then obtain the resulting
- * class, ready to be written to a file, with {@link #toByteArray}.
- * </p>
+ * <code>ClassAnnotationSceneWriter}</code> with a {@link AScene} that
+ * already contains all its annotations, pass this as a {@link
+ * org.objectweb.asm.ClassVisitor} to {@link
+ * org.objectweb.asm.ClassReader#accept}, and then obtain the resulting
+ * class, ready to be written to a file, with {@link #toByteArray}.  </p>
  *
  * <p>
  *
  * All other methods are intended to be called only by
  * {@link org.objectweb.asm.ClassReader#accept},
  * and should not be called anywhere else, due to the order in which
- *  {@link org.objectweb.asm.ClassVisitor} methods should be called.
+ * {@link org.objectweb.asm.ClassVisitor} methods should be called.
  *
- * </p>
+ * <p>
  *
  * Throughout this class, "scene" refers to the {@link AScene} this class is
  * merging into a class file.
  */
 public class ClassAnnotationSceneWriter extends ClassAdapter {
-  /**
-   * Strategy for interleaving the necessary calls to visit annotations
-   * from scene into the parsing done by ClassReader
-   *  (the difficulty is that the entire call sequence to every data structure
-   *   to visit annotations is in ClassReader, which should not be modified
-   *   by this library):
-   *
-   * A ClassAnnotationSceneWriter is a ClassAdapter around a ClassWriter.
-   *  - To visit the class' annotations in the scene, right before the code for
-   *     ClassWriter.visit{InnerClass, Field, Method, End} is called,
-   *     ensure that all extended annotations in the scene are visited once.
-   *  - To visit every field's annotations,
-   *     ClassAnnotationSceneWriter.visitField() returns a
-   *     FieldAnnotationSceneWriter that in a similar fashion makes sure
-   *     that each of that field's annotations is visited once on the call
-   *     to visitEnd();
-   *  - To visit every method's annotations,
-   *     ClassAnnotationSceneWriter.visitMethod() returns a
-   *     MethodAnnotationSceneWriter that visits all of that method's
-   *     annotations in the scene at the first call of visit{Code, End}.
-   */
+
+  // Strategy for interleaving the necessary calls to visit annotations
+  // from scene into the parsing done by ClassReader
+  //  (the difficulty is that the entire call sequence to every data structure
+  //   to visit annotations is in ClassReader, which should not be modified
+  //   by this library):
+  //
+  // A ClassAnnotationSceneWriter is a ClassAdapter around a ClassWriter.
+  //  - To visit the class' annotations in the scene, right before the code for
+  //     ClassWriter.visit{InnerClass, Field, Method, End} is called,
+  //     ensure that all extended annotations in the scene are visited once.
+  //  - To visit every field's annotations,
+  //     ClassAnnotationSceneWriter.visitField() returns a
+  //     FieldAnnotationSceneWriter that in a similar fashion makes sure
+  //     that each of that field's annotations is visited once on the call
+  //     to visitEnd();
+  //  - To visit every method's annotations,
+  //     ClassAnnotationSceneWriter.visitMethod() returns a
+  //     MethodAnnotationSceneWriter that visits all of that method's
+  //     annotations in the scene at the first call of visit{Code, End}.
+  //
+
   // None of these classes fields should be null, except for aClass, which
   //  can't be vivified until the first visit() is called.
 
@@ -291,13 +287,14 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
 
   /**
    * The following methods are utility methods for accessing
-   *  information useful to asm from scene-library data structures.
+   * information useful to asm from scene-library data structures.
    *
-   *  @return true iff tla is visible at runtime
+   * @return true iff tla is visible at runtime
    */
-  private static boolean visible(Annotation tla) {
-    if (tla.def.retention == null) return false; // temporary
-    return tla.def.retention.equals(RetentionPolicy.RUNTIME);
+  private static boolean isRuntimeRetention(Annotation tla) {
+    if (tla.def.retention() == null)
+      return false; // TODO: temporary
+    return tla.def.retention().equals(RetentionPolicy.RUNTIME);
   }
 
   /**
@@ -325,14 +322,14 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
    * Returns an AnnotationVisitor over the given top-level annotation.
    */
   private AnnotationVisitor visitAnnotation(Annotation tla) {
-    return super.visitAnnotation(classNameToDesc(name(tla)), visible(tla));
+    return super.visitAnnotation(classNameToDesc(name(tla)), isRuntimeRetention(tla));
   }
 
   /**
    * Returns an ExtendedAnnotationVisitor over the given top-level annotation.
    */
   private ExtendedAnnotationVisitor visitExtendedAnnotation(Annotation tla) {
-    return super.visitExtendedAnnotation(classNameToDesc(name(tla)), visible(tla));
+    return super.visitExtendedAnnotation(classNameToDesc(name(tla)), isRuntimeRetention(tla));
   }
 
   /**
@@ -418,7 +415,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
 
   /**
    * A FieldAnnotationSceneWriter is a wrapper class around a FieldVisitor that
-   * delegates all calls to it's internal FieldVisitor, and on a call to
+   * delegates all calls to its internal FieldVisitor, and on a call to
    * visitEnd(), also has its internal FieldVisitor visit all the
    * corresponding field annotations in scene.
    */
@@ -511,7 +508,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
         if ((!overwrite) && existingFieldAnnotations.contains(name(tla))) {
           continue;
         }
-        AnnotationVisitor av = fv.visitAnnotation(classNameToDesc(name(tla)), visible(tla));
+        AnnotationVisitor av = fv.visitAnnotation(classNameToDesc(name(tla)), isRuntimeRetention(tla));
         visitFields(av, tla);
         av.visitEnd();
       }
@@ -525,7 +522,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
             continue;
           }
           ExtendedAnnotationVisitor xav =
-            fv.visitExtendedAnnotation(classNameToDesc(name(tla)), visible(tla));
+            fv.visitExtendedAnnotation(classNameToDesc(name(tla)), isRuntimeRetention(tla));
           visitFields(xav, tla);
           visitTargetType(xav, TargetType.FIELD_GENERIC_OR_ARRAY);
           visitLocations(xav, fieldInnerEntry.getKey());
@@ -620,6 +617,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
      */
     @Override
     public ExtendedAnnotationVisitor visitExtendedAnnotation(String desc, boolean visible) {
+
       existingMethodAnnotations.add(desc);
 
       // If annotation exists in scene, and in overwrite mode,
@@ -653,7 +651,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
      * Has this visit the annotation in tla, and returns the resulting visitor.
      */
     private AnnotationVisitor visitAnnotation(Annotation tla) {
-      return super.visitAnnotation(classNameToDesc(name(tla)), visible(tla));
+      return super.visitAnnotation(classNameToDesc(name(tla)), isRuntimeRetention(tla));
     }
 
     /**
@@ -662,7 +660,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
      */
     private ExtendedAnnotationVisitor
     visitExtendedAnnotation(Annotation tla) {
-      return super.visitExtendedAnnotation(classNameToDesc(name(tla)), visible(tla));
+      return super.visitExtendedAnnotation(classNameToDesc(name(tla)), isRuntimeRetention(tla));
     }
 
     /**
@@ -670,15 +668,30 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
      * resulting visitor.
      */
     private AnnotationVisitor visitParameterAnnotation(int index, Annotation tla) {
-      return super.visitParameterAnnotation(index, classNameToDesc(name(tla)), visible(tla));
+      return super.visitParameterAnnotation(index, classNameToDesc(name(tla)), isRuntimeRetention(tla));
     }
 
     /**
-     * Has this visit the normal and extended annotations on return type.
+     * Has this visit the declaration annotation and the type annotations on the return type.
+     */
+    private void ensureVisitMethodDeclarationAnnotations() {
+      // Annotations on method declaration.
+      for (Annotation tla : aMethod.tlAnnotationsHere) {
+        if (shouldSkip(tla)) continue;
+
+        AnnotationVisitor av = visitAnnotation(tla);
+        visitFields(av, tla);
+        av.visitEnd();
+      }
+
+    }
+
+    /**
+     * Has this visit the declaration annotations and the type annotations on the return type.
      */
     private void ensureVisitReturnTypeAnnotations() {
       // Standard annotations on return type.
-      for (Annotation tla : aMethod.tlAnnotationsHere) {
+      for (Annotation tla : aMethod.returnType.tlAnnotationsHere) {
         if (shouldSkip(tla)) continue;
 
         AnnotationVisitor av = visitAnnotation(tla);
@@ -688,7 +701,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
 
       // Now do generic/array information on return type
       for (Map.Entry<InnerTypeLocation, AElement> e :
-        aMethod.innerTypes.entrySet()) {
+        aMethod.returnType.innerTypes.entrySet()) {
         InnerTypeLocation loc = e.getKey();
         AElement innerType = e.getValue();
 
@@ -704,6 +717,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
           xav.visitEnd();
         }
       }
+
     }
 
     /**
@@ -963,7 +977,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
       if (!hasVisitedMethodAnnotations) {
         hasVisitedMethodAnnotations = true;
 
-        // normal and extended return type annotations
+        ensureVisitMethodDeclarationAnnotations();
         ensureVisitReturnTypeAnnotations();
 
         // Now iterate through method's locals, news, parameter, receiver,

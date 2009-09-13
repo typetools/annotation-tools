@@ -441,16 +441,18 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       // If so, we don't want to insert a duplicate.
       if (path != null) {
       ModifiersTree mt = null;
-      for (Tree n : path) {
-        if (n instanceof ClassTree) {
-          mt = ((ClassTree) n).getModifiers();
-          break;
-        } else if (n instanceof MethodTree) {
-          mt = ((MethodTree) n).getModifiers();
-          break;
-        } else if (n instanceof VariableTree) {
-          mt = ((VariableTree) n).getModifiers();
-          break;
+      if (path != null) {
+        for (Tree n : path) {
+          if (n instanceof ClassTree) {
+            mt = ((ClassTree) n).getModifiers();
+            break;
+          } else if (n instanceof MethodTree) {
+            mt = ((MethodTree) n).getModifiers();
+            break;
+          } else if (n instanceof VariableTree) {
+            mt = ((VariableTree) n).getModifiers();
+            break;
+          }
         }
       }
       // System.out.printf("mt = %s for %s%n", mt, node.getKind());

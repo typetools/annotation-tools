@@ -19,6 +19,8 @@ annotation-file-utilities/annotation-file-utilities.jar
 annotation-file-utilities/annotation-tools.zip
 # not annotation-file-utilities/annotation-file-utilities.zip which is outdated
 
+annotation-file-utilities/javadoc
+
 annotation-file-utilities/tests/*.diff
 annotation-file-utilities/tests/*.log
 annotation-file-utilities/tests/*.output
@@ -28,3 +30,9 @@ annotation-file-utilities/tests/system-test/out5.diff
 annotation-file-utilities/tests/system-test/out5.jann
 
 scene-lib/javadoc
+scene-lib/reports
+
+*.class-via-classfile-scene.txt
+*.class-correct-scene.txt
+*.class-from-indexfile.txt
+*.class-generated-scene.txt

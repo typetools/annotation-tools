@@ -1,12 +1,12 @@
 package p2:
-annotation visible @A:
+annotation @A: @Retention(RUNTIME)
     int value
 
 package p2:
-annotation invisible @B:
+annotation @B: @Retention(CLASS)
 
 package p2:
-annotation visible @C:
+annotation @C: @Retention(RUNTIME)
 
 package p2:
 annotation @D:

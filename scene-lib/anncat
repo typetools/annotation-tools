@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Concatenates multiple descriptions of annotations into a single one.
 
@@ -6,5 +6,5 @@ SCENE_LIB=$(dirname $0)
 WORKSPACE=$SCENE_LIB/..
 ASMX=$WORKSPACE/asmx
 
-export CLASSPATH=$SCENE_LIB/bin:$ASMX/bin:$WORKSPACE/annotation-file-utilities/lib/utilMDE.jar
+export CLASSPATH=$SCENE_LIB/bin:$ASMX/bin:$WORKSPACE/annotation-file-utilities/lib/utilMDE.jar:$CLASSPATH
 java annotations.tools.Anncat "$@"

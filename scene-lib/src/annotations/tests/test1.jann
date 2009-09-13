@@ -1,15 +1,15 @@
 package p2:
-annotation visible @A:
+annotation @A: @Retention(RUNTIME)
     int value
-annotation visible @B:
-annotation visible @C:
-annotation invisible @D:
+annotation @B: @Retention(RUNTIME)
+annotation @C: @Retention(RUNTIME)
+annotation @D: @Retention(CLASS)
     String value
 annotation @F:
     String value
-annotation invisible @E:
-    @p2.A[] first
-    @p2.F second
+annotation @E: @Retention(CLASS)
+    annotation-field p2.A[] first
+    annotation-field p2.F second
     enum Foo third
     Class fourth // <? extends java.util.Map<?,?>>
     Class fifth
