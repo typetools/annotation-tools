@@ -67,7 +67,12 @@ public final /*@ReadOnly*/ class AnnotationDef extends AElement {
 
         // An annotation can be meta-annotated with itself, so add
         // meta-annotations after putting the annotation in the map.
-        java.lang.annotation.Annotation[] jannos = annoType.getDeclaredAnnotations();
+        java.lang.annotation.Annotation[] jannos;
+        try {
+            jannos = annoType.getDeclaredAnnotations();
+        } catch (Exception e) {
+            throw new Error("Exception in getDeclaredAnnotations for " + annoType, e);
+        }
         for (java.lang.annotation.Annotation ja : jannos) {
             result.tlAnnotationsHere.add(new Annotation(ja, adefs));
         }
