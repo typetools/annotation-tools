@@ -3,6 +3,7 @@ package annotations.el;
 import checkers.nullness.quals.Nullable;
 import checkers.javari.quals.ReadOnly;
 
+import java.io.File;
 import java.util.*;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.reflect.Field;
@@ -71,6 +72,7 @@ public final /*@ReadOnly*/ class AnnotationDef extends AElement {
         try {
             jannos = annoType.getDeclaredAnnotations();
         } catch (Exception e) {
+            printClasspath();
             throw new Error("Exception in getDeclaredAnnotations for " + annoType, e);
         }
         for (java.lang.annotation.Annotation ja : jannos) {
@@ -253,4 +255,14 @@ public final /*@ReadOnly*/ class AnnotationDef extends AElement {
         sb.append(")");
         return sb.toString();
     }
+
+    public static void printClasspath() {
+        System.out.println("\nClasspath:");
+        StringTokenizer tokenizer =
+            new StringTokenizer(System.getProperty("java.class.path"), File.pathSeparator);
+        while (tokenizer.hasMoreTokens()) {
+            System.out.println(tokenizer.nextToken());
+        }
+    }
+
 }
