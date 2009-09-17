@@ -257,11 +257,12 @@ public final /*@ReadOnly*/ class AnnotationDef extends AElement {
     }
 
     public static void printClasspath() {
-        System.out.println("\nClasspath:");
+        System.out.println();
+        System.out.println("Classpath:");
         StringTokenizer tokenizer =
             new StringTokenizer(System.getProperty("java.class.path"), File.pathSeparator);
         while (tokenizer.hasMoreTokens()) {
-            System.out.println(tokenizer.nextToken());
+            System.out.println("  " + tokenizer.nextToken());
         }
     }
 
