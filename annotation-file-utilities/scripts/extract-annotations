@@ -5,6 +5,8 @@
 # See the annotation file utilities documentation for more information.
 
 ANNOTATION_FILE_UTILS=$(dirname $0)/annotation-file-utilities.jar
+# Contains Java 7 version of java.lang.annotation.ElementType.
+JAVAC_JAR=$(dirname $0)/../../../jsr308-langtools/dist/lib/javac.jar
 
 # Needs CLASSPATH to find user files
-java -cp ${ANNOTATION_FILE_UTILS}:${CLASSPATH} annotations.io.classfile.ClassFileReader $@
+java -Xbootclasspath/p:${ANNOTATION_FILE_UTILS}:${JAVAC_JAR} -cp ${ANNOTATION_FILE_UTILS}:${CLASSPATH} annotations.io.classfile.ClassFileReader $@
