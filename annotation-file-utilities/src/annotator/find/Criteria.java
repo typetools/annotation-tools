@@ -88,9 +88,24 @@ public final class Criteria {
    */
   public boolean isOnReceiver() {
     for (Criterion c : criteria) {
-    if (c.getKind() == Criterion.Kind.RECEIVER) {
-      return true;
+      if (c.getKind() == Criterion.Kind.RECEIVER) {
+        return true;
+      }
     }
+
+    return false;
+  }
+
+  /**
+   * Determines whether this is the criteria on a return type.
+   *
+   * @return true iff this is the criteria on a return type
+   */
+  public boolean isOnReturnType() {
+    for (Criterion c : criteria) {
+      if (c.getKind() == Criterion.Kind.RETURN_TYPE) {
+        return true;
+      }
     }
 
     return false;
