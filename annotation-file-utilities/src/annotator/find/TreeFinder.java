@@ -12,6 +12,7 @@ import com.sun.source.util.*;
 import com.sun.source.util.TreeScanner;
 import com.sun.tools.javac.tree.*;
 import com.sun.tools.javac.tree.JCTree.*;
+import javax.lang.model.element.Modifier;
 
 import com.google.common.collect.*;
 
@@ -29,10 +30,15 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       System.out.println(message);
   }
 
+  private static void debug(String message, Object... args) {
+    if (debug)
+      System.out.printf(message, args);
+  }
+
   /**
-   * Used to determine the insertion position for various elements. For
-   * instance, variable annotations should be placed before the variable's
-   * <i>type</i> rather than its name.
+   * Determines the insertion position for tye annotations on various
+   * elements.  For instance, variable annotations should be placed before
+   * the variable's <i>type</i> rather than its name.
    */
   private static class TypePositionFinder extends TreeScanner<Integer, Void> {
 
@@ -73,7 +79,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       return leftmostIdentifier(type).pos;
     }
 
-    // When a method is visited, it is visited for the receiver, not the return value.
+    // When a method is visited, it is visited for the receiver, not the return value and not the declaration itself.
     @Override
     public Integer visitMethod(MethodTree node, Void p) {
       super.visitMethod(node, p);
@@ -145,29 +151,6 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       // TODO:
       //debugging: System.out.println("result: " + receiverLoc);
       return receiverLoc;
-
-
-//       // old implementations scans characters in the source (which is error-prone).
-//       if (i.getCriteria().isOnReceiver()) {
-//         CharSequence s = null;
-//         try {
-//           s = path.getCompilationUnit().getSourceFile().getCharContent(true);
-//         } catch(Exception e) {
-//           throw new RuntimeException("problem with receiver: " + e.getMessage(), e);
-//         }
-//
-//         // For a receiver, the match is on the method name.
-//         // Therefore, scan forward until after the first ')' encountered
-//         for (int j = pos; j < s.length(); j++) {
-//           if (s.charAt(j) == ')') {
-//             pos = j + 1;
-//             break;
-//           }
-//         }
-//       }
-
-
-//      return ((JCMethodDecl)node).getReturnType().pos;
     }
 
     private int getFirstBracketAfter(int i) {
@@ -344,6 +327,90 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
   }
 
   /**
+   * Determine the insertion position for declaration annotations on
+   * various elements.  For instance, method declaration annotations should
+   * be placed before all the other modifiers and annotations.
+   */
+  private static class DeclarationPositionFinder extends TreeScanner<Integer, Void> {
+
+    private CompilationUnitTree tree;
+
+    public DeclarationPositionFinder(CompilationUnitTree tree) {
+      super();
+      this.tree = tree;
+    }
+
+    // When a method is visited, it is visited for the declaration itself.
+    @Override
+    public Integer visitMethod(MethodTree node, Void p) {
+      super.visitMethod(node, p);
+
+      // System.out.printf("DeclarationPositionFinder.visitMethod()%n");
+
+      ModifiersTree mt = node.getModifiers();
+
+      // actually List<JCAnnotation>.
+      List<? extends AnnotationTree> annos = mt.getAnnotations();
+      Set<Modifier> flags = mt.getFlags();
+
+      int declPos;
+      if (annos.size() > 1) {
+        declPos = ((JCAnnotation) annos.get(0)).pos;
+      } else {
+        declPos = ((JCTree) node.getReturnType()).pos;
+      }
+      // There is no source code location information for Modifiers, so
+      // cannot iterate through the modifiers.  But we don't have to.
+
+      int modsPos = ((JCModifiers)mt).pos().getStartPosition();
+      if (modsPos != -1) {
+        declPos = Math.min(declPos, modsPos);
+      }
+
+      return declPos;
+    }
+
+    @Override
+      public Integer visitCompilationUnit(CompilationUnitTree node, Void p) {
+      JCCompilationUnit cu = (JCCompilationUnit) node;
+      JCTree.JCExpression pid = cu.pid;
+      while (pid instanceof JCTree.JCFieldAccess) {
+        pid = ((JCTree.JCFieldAccess) pid).selected;
+      }
+      JCTree.JCIdent firstComponent = (JCTree.JCIdent) pid;
+      int result = firstComponent.getPreferredPosition();
+
+      // Now back up over the word "package" and the preceding newline
+      JavaFileObject jfo = tree.getSourceFile();
+      String fileContent;
+      try {
+        fileContent = String.valueOf(jfo.getCharContent(true));
+      } catch(IOException e) {
+        throw new RuntimeException(e);
+      }
+      while (java.lang.Character.isWhitespace(fileContent.charAt(result-1))) {
+        result--;
+      }
+      result -= 7;
+      String packageString = fileContent.substring(result, result+7);
+      assert "package".equals(packageString) : "expected 'package', got: " + packageString;
+      assert result == 0 || java.lang.Character.isWhitespace(fileContent.charAt(result-1));
+      return result;
+    }
+
+    @Override
+    public Integer visitClass(ClassTree node, Void p) {
+      JCClassDecl cd = (JCClassDecl) node;
+      if (cd.mods != null) {
+        return cd.mods.getPreferredPosition();
+      } else {
+        return cd.getPreferredPosition();
+      }
+    }
+
+  }
+
+  /**
    * A comparator for sorting integers in reverse
    */
   public static class ReverseIntegerComparator implements Comparator<Integer> {
@@ -354,6 +421,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
 
   private Map<Tree, TreePath> paths;
   private TypePositionFinder tpf;
+  private DeclarationPositionFinder dpf;
   private CompilationUnitTree tree;
   private SetMultimap<Integer, String> positions;
   // Set of insertions that got added; any insertion not in this set could
@@ -369,6 +437,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     this.tree = tree;
     this.positions = LinkedHashMultimap.create();
     this.tpf = new TypePositionFinder(tree);
+    this.dpf = new DeclarationPositionFinder(tree);
     this.paths = new HashMap<Tree, TreePath>();
     this.satisfied = new HashSet<Insertion>();
   }
@@ -475,20 +544,38 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       // to look for a particular different node.  I will do the latter.
       Integer pos;
 
-      if ((node instanceof MethodTree) && ! i.getCriteria().isOnReceiver()) {
-        // we must be looking for the return type
-        pos = tpf.scan(((MethodTree)node).getReturnType(), null);
-        assert handled(node);
-        // System.out.println("return type node: " + ((JCMethodDecl)node).getReturnType().getClass());
+      // System.out.printf("node: %s%ncritera: %s%n", node, i.getCriteria());
+      if (node instanceof MethodTree) {
+        if (i.getCriteria().isOnReceiver()) {
+          // looking for the receiver (identical to the standard case!)
+          pos = tpf.scan(node, null);
+          assert handled(node);
+          debug("pos = %d at receiver node: %s%n", pos, node.getClass());
+        } else if (i.getCriteria().isOnReturnType()) {
+          // looking for the return type
+          pos = tpf.scan(((MethodTree)node).getReturnType(), null);
+          assert handled(node);
+          debug("pos = %d at return type node: %s%n", pos, ((JCMethodDecl)node).getReturnType().getClass());
+        } else {
+          // looking for the declaration
+          pos = dpf.scan(node, null);
+          assert pos != null;
+          debug("pos = %d at declaration node: %s%n", pos, node.getClass());
+        }
       } else {
+        // Standard case:  looking for the type.
         pos = tpf.scan(node, null);
         assert pos != null;
+        debug("pos = %d at non-method node: %s%n", pos, node.getClass());
       }
-      assert pos >= 0 : pos;
 
-      debug("  ... satisfied! at " + pos + " for node of type " + node.getClass() + ": " + Main.treeToString(node));
+      debug("  ... satisfied! at %d for node of type %s: %s", pos, node.getClass(), Main.treeToString(node));
 
       if (pos != null) {
+        if (pos < 0) {
+          System.out.printf("pos: %s%nnode: %s%n", pos, node);
+        }
+        assert pos >= 0 : pos;
         positions.put(pos, i.getText());
       }
 
