@@ -44,6 +44,11 @@ public class IndexFileSpecification implements Specification {
       throw new RuntimeException("Exception while parsing index file", e);
     }
 
+    if (debug) {
+      System.out.printf("Scene parsed from %s:%n", indexFileName);
+      System.out.println(scene.unparse());
+    }
+
     parseScene();
 //    debug("---------------------------------------------------------");
     return this.insertions;
@@ -55,8 +60,17 @@ public class IndexFileSpecification implements Specification {
     }
   }
 
+  private static void debug(String s, Object... args) {
+    if (debug) {
+      System.out.printf(s, args);
+    }
+  }
+
   /** Fill in this.insertions with insertion pairs. */
   private void parseScene() {
+    debug("parseScene()");
+
+    // Empty criterion to work from.
     CriterionList clist = new CriterionList();
 
     VivifyingMap<String, AElement> packages = scene.packages;
@@ -86,11 +100,12 @@ public class IndexFileSpecification implements Specification {
   private void parseClass(CriterionList clist, String className, AClass clazz) {
 
     //  load extra info using asm
-    debug("want extra information for class: " + className);
+    debug("parseClass(" + className + ")");
     try {
       ClassReader classReader = new ClassReader(className);
       MethodOffsetClassVisitor cv = new MethodOffsetClassVisitor();
       classReader.accept(cv, false);
+      debug("Done reading " + className + ".class");
     } catch(IOException e) {
       // If .class file not found, still proceed, in case
       // user only wants method signature annotations.
@@ -150,6 +165,8 @@ public class IndexFileSpecification implements Specification {
     for (Map.Entry<String, AMethod> entry : clazz.methods.entrySet()) {
       parseMethod(clist, entry.getKey(), entry.getValue());
     }
+
+    debug("parseClass(" + className + "):  done");
   }
 
   /** Fill in this.insertions with insertion pairs. */
@@ -222,6 +239,9 @@ public class IndexFileSpecification implements Specification {
     // method's tree, which includes return types, parameters, receiver, and
     // elements inside the method body.
     clist = clist.add(Criteria.inMethod(methodName));
+
+    // parse declaration annotations
+    parseElement(clist, method);
 
     // parse receiver
     CriterionList receiverClist = clist.add(Criteria.receiver(methodName));
