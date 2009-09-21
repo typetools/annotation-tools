@@ -109,6 +109,11 @@ public final class AMethod extends AElement {
 
     @Override
     public String toString() {
-      return methodName;
+        String result = methodName;
+        result += ":  " + super.toString();
+        return result;
     }
+
+
+
 }

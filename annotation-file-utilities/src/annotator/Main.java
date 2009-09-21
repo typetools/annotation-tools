@@ -257,6 +257,11 @@ public class Main {
             toInsert = "/*" + toInsert + "*/";
           }
 
+          assert pos >= 0 : "pos is negative: " + pos;
+          if (pos < 0) {
+            System.out.println("Assertions are not enabled; pos is " + pos);
+          }
+
           // Possibly add a leading space before the insertion
           if (pos != 0) {
             char precedingChar = src.charAt(pos-1);
