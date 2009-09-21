@@ -179,7 +179,7 @@ public class JavariOutputSpecification implements Specification {
             if (method != null)
                 c.add(Criteria.inMethod(method));
             else c.add(Criteria.notInMethod());
-            insertion.add(new Insertion(modifier, c));
+            insertion.add(new Insertion(modifier, c, false));
         }
     }
 
@@ -202,7 +202,7 @@ public class JavariOutputSpecification implements Specification {
             Criteria c = new Criteria();
             c.add(Criteria.is(Tree.Kind.METHOD, method));
             c.add(Criteria.inClass(clazz));
-            insertion.add(new Insertion(modifier, c));
+            insertion.add(new Insertion(modifier, c, false));
         }
 
         accept("(");
@@ -239,7 +239,7 @@ public class JavariOutputSpecification implements Specification {
                 c.add(Criteria.is(Tree.Kind.VARIABLE, name));
                 c.add(Criteria.inMethod(method));
                 c.add(Criteria.inClass(clazz));
-                insertion.add(new Insertion(modifier, c));
+                insertion.add(new Insertion(modifier, c, false));
                 System.out.println("added var");
             }
         }

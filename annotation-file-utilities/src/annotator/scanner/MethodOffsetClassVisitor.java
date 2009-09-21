@@ -70,8 +70,7 @@ public class MethodOffsetClassVisitor extends ClassWriter {
         int index)  {
       super.visitLocalVariable(name, desc, signature, start, end, index);
       LocalVariableScanner.addToMethodNameIndexMap(
-          new Pair<String, Pair<Integer,Integer>>(methodName,
-                new Pair<Integer, Integer>(index, start.getOffset())),
+          Pair.of(methodName, Pair.of(index, start.getOffset())),
           name);
       LocalVariableScanner.addToMethodNameCounter(
           methodName, name, start.getOffset());

@@ -121,6 +121,10 @@ public final class Source {
         return source.charAt(index);
     }
 
+    public String substring(int start, int end) {
+        return source.substring(start, end);
+    }
+
     public String getString() {
         return source.toString();
     }

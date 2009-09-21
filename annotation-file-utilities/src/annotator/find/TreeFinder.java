@@ -423,7 +423,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
   private TypePositionFinder tpf;
   private DeclarationPositionFinder dpf;
   private CompilationUnitTree tree;
-  private SetMultimap<Integer, String> positions;
+  private SetMultimap<Integer, Insertion> positions;
   // Set of insertions that got added; any insertion not in this set could
   // not be added.
   private Set<Insertion> satisfied;
@@ -576,7 +576,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
           System.out.printf("pos: %s%nnode: %s%n", pos, node);
         }
         assert pos >= 0 : pos;
-        positions.put(pos, i.getText());
+        positions.put(pos, i);
       }
 
       satisfied.add(i);
@@ -599,7 +599,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
    * @param p the list of insertion criteria
    * @return the source position to insertion text mapping
    */
-  public SetMultimap<Integer, String> getPositions(Tree node, List<Insertion> p) {
+  public SetMultimap<Integer, Insertion> getPositions(Tree node, List<Insertion> p) {
     this.scan(node, p);
     // This needs to be optional, because there may be many extra
     // annotations in a .jaif file.
