@@ -1,4 +1,4 @@
 package java.lang:
-annotation @Mutable: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+annotation @OnThePackage: @Retention(value=RUNTIME)
 
 package annotator.tests: @java.lang.Mutable

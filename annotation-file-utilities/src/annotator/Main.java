@@ -225,7 +225,7 @@ public class Main {
         if (debug) {
           finder.debug = true;
         }
-        SetMultimap<Integer, String> positions = finder.getPositions(tree, insertions);
+        SetMultimap<Integer, Insertion> positions = finder.getPositions(tree, insertions);
 
         // Apply the positions to the source file.
         if (debug) {
@@ -236,68 +236,90 @@ public class Main {
         Set<Integer> positionKeysSorted = new TreeSet<Integer>(new TreeFinder.ReverseIntegerComparator());
         positionKeysSorted.addAll(positionKeysUnsorted);
         for (Integer pos : positionKeysSorted) {
-         List<String> toInsertList = new ArrayList(positions.get(pos));
-         Collections.reverse(toInsertList);
-         for (String toInsert : toInsertList) {
-          if (! toInsert.startsWith("@")) {
-            throw new Error("Insertion doesn't start with '@': " + toInsert);
-          }
-          if (abbreviate) {
-            int nameEnd = toInsert.indexOf("(");
-            if (nameEnd == -1) {
-              nameEnd = toInsert.length();
+          List<Insertion> toInsertList = new ArrayList<Insertion>(positions.get(pos));
+          Collections.reverse(toInsertList);
+          for (Insertion iToInsert : toInsertList) {
+            String toInsert = iToInsert.getText();
+            if (! toInsert.startsWith("@")) {
+              throw new Error("Insertion doesn't start with '@': " + toInsert);
             }
-            int dotIndex = toInsert.lastIndexOf(".", nameEnd);
-            if (dotIndex != -1) {
-              imports.add(toInsert.substring(1, nameEnd));
-              toInsert = "@" + toInsert.substring(dotIndex + 1);
-            }
-          }
-          if (comments) {
-            toInsert = "/*" + toInsert + "*/";
-          }
-
-          assert pos >= 0 : "pos is negative: " + pos;
-          if (pos < 0) {
-            System.out.println("Assertions are not enabled; pos is " + pos);
-          }
-
-          // Possibly add a leading space before the insertion
-          if (pos != 0) {
-            char precedingChar = src.charAt(pos-1);
-            if (! (Character.isWhitespace(precedingChar)
-                   // No space if it's the first formal or generic parameter
-                   || precedingChar == '('
-                   || precedingChar == '<')) {
-              toInsert = " " + toInsert;
-            }
-          }
-          // If it's already there, don't re-insert.  This is a hack!
-          int precedingTextPos = pos-toInsert.length()-1;
-          if (precedingTextPos >= 0) {
-            String precedingTextPlusChar
-              = src.getString().substring(precedingTextPos, pos);
-            // System.out.println("Inserting " + toInsert + " at " + pos + " in code of length " + src.getString().length() + " with preceding text '" + precedingTextPlusChar + "'");
-            if (toInsert.equals(precedingTextPlusChar.substring(0, toInsert.length()))
-                || toInsert.equals(precedingTextPlusChar.substring(1))) {
-              if (debug) {
-                System.out.println("Already present, skipping");
+            if (abbreviate) {
+              int nameEnd = toInsert.indexOf("(");
+              if (nameEnd == -1) {
+                nameEnd = toInsert.length();
               }
-              continue;
+              int dotIndex = toInsert.lastIndexOf(".", nameEnd);
+              if (dotIndex != -1) {
+                imports.add(toInsert.substring(1, nameEnd));
+                toInsert = "@" + toInsert.substring(dotIndex + 1);
+              }
             }
-          }
-          // add trailing whitespace
-          if (pos==0) {
-            toInsert = toInsert + fileLineSep;
-          } else {
-            toInsert = toInsert + " ";
-          }
-          src.insert(pos, toInsert);
-          if (debug) {
-            System.out.println("Post-insertion source: " + src.getString());
+            if (comments) {
+              toInsert = "/*" + toInsert + "*/";
+            }
+
+            assert pos >= 0 : "pos is negative: " + pos;
+            if (pos < 0) {
+              System.out.println("Assertions are not enabled; pos is " + pos);
+            }
+
+            // Possibly add whitespace after the insertion
+            boolean gotSeparateLine = false;
+            if (iToInsert.getSeparateLine()) {
+              int indentation = 0;
+              while ((pos - indentation != 0)
+                     // horizontal whitespace
+                     && (src.charAt(pos-indentation-1) == ' '
+                         || src.charAt(pos-indentation-1) == '\t')) {
+                indentation++;
+              }
+              if ((pos - indentation == 0)
+                  // horizontal whitespace
+                  || (src.charAt(pos-indentation-1) == '\f'
+                      || src.charAt(pos-indentation-1) == '\n'
+                      || src.charAt(pos-indentation-1) == '\r')) {
+                toInsert = toInsert + fileLineSep + src.substring(pos-indentation, pos);
+                gotSeparateLine = true;
+              }
+            }
+
+            // Possibly add a leading space before the insertion
+            if ((! gotSeparateLine) && (pos != 0)) {
+              char precedingChar = src.charAt(pos-1);
+              if (! (Character.isWhitespace(precedingChar)
+                     // No space if it's the first formal or generic parameter
+                     || precedingChar == '('
+                     || precedingChar == '<')) {
+                toInsert = " " + toInsert;
+              }
+            }
+
+            // If it's already there, don't re-insert.  This is a hack!
+            // Also, I think this is already checked when constructing the
+            // innertions.
+            int precedingTextPos = pos-toInsert.length()-1;
+            if (precedingTextPos >= 0) {
+              String precedingTextPlusChar
+                = src.getString().substring(precedingTextPos, pos);
+              // System.out.println("Inserting " + toInsert + " at " + pos + " in code of length " + src.getString().length() + " with preceding text '" + precedingTextPlusChar + "'");
+              if (toInsert.equals(precedingTextPlusChar.substring(0, toInsert.length()))
+                  || toInsert.equals(precedingTextPlusChar.substring(1))) {
+                if (debug) {
+                  System.out.println("Already present, skipping");
+                }
+                continue;
+              }
+            }
+            // add trailing whitespace
+            if (! gotSeparateLine) {
+              toInsert = toInsert + " ";
+            }
+            src.insert(pos, toInsert);
+            if (debug) {
+              System.out.println("Post-insertion source: " + src.getString());
+            }
           }
         }
-       }
       }
 
       // insert import statements
