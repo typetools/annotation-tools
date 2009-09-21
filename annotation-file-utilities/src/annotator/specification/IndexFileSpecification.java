@@ -20,11 +20,11 @@ import annotator.scanner.MethodOffsetClassVisitor;
 import com.sun.source.tree.Tree;
 
 import utilMDE.FileIOException;
+import utilMDE.Pair;
 
 public class IndexFileSpecification implements Specification {
 
   private List<Insertion> insertions = new ArrayList<Insertion>();
-  private Properties keywords;
   private AScene scene;
   private String indexFileName;
 
@@ -177,8 +177,11 @@ public class IndexFileSpecification implements Specification {
 
   /** Fill in this.insertions with insertion pairs. */
   private void parseElement(CriterionList clist, AElement element) {
-    for (String annotationString : getElementAnnotation(element)) {
-      Insertion ins = new Insertion(annotationString, clist.criteria());
+    for (Pair<String,Boolean> p : getElementAnnotation(element)) {
+      String annotationString = p.a;
+      Boolean isDeclarationAnnotation = p.b;
+      Insertion ins = new Insertion(annotationString, clist.criteria(),
+                                    isDeclarationAnnotation);
       debug("parsed: " + ins);
       this.insertions.add(ins);
     }
@@ -197,41 +200,38 @@ public class IndexFileSpecification implements Specification {
   }
 
   // Returns a string representation of the annotations at the element.
-  private Set<String> getElementAnnotation(AElement element) {
-    Set<String> result = new LinkedHashSet<String>(element.tlAnnotationsHere.size());
-    for (Annotation tla : element.tlAnnotationsHere) {
-      AnnotationDef tldef = tla.def;
-      AnnotationDef adef = tldef;
-      Annotation sa = tla;
-      String annotationName = adef.name;
+  private Set<Pair<String,Boolean>> getElementAnnotation(AElement element) {
+    Set<Pair<String,Boolean>> result = new LinkedHashSet<Pair<String,Boolean>>(element.tlAnnotationsHere.size());
+    for (Annotation a : element.tlAnnotationsHere) {
+      AnnotationDef adef = a.def;
+      String annotationString = "@" + adef.name;
 
-      String keywordProperty = "@" + annotationName;
-      // if (keywords.containsKey(annotationName)) {
-      //   keywordProperty = keywords.getProperty(annotationName);
-      // }
-
-      String annotationString = keywordProperty;
-
-      if (sa.fieldValues.size() > 0) {
+      if (a.fieldValues.size() == 1 && a.fieldValues.containsKey("value")) {
+        annotationString += "(" + formatFieldValue(a, "value") + ")";
+      } else if (a.fieldValues.size() > 0) {
         annotationString += "(";
         boolean first = true;
-        for (Entry<String, Object> entry : sa.fieldValues.entrySet()) {
+        for (String field : a.fieldValues.keySet()) {
           // parameters of the annotation
           if (!first) {
             annotationString += ", ";
           }
-          annotationString += entry.getKey() + "=";
-          AnnotationFieldType fieldType = sa.def.fieldTypes.get(entry.getKey());
-          assert fieldType != null;
-          annotationString += fieldType.format(entry.getValue());
+          annotationString += field + "=" + formatFieldValue(a, field);
           first = false;
         }
         annotationString += ")";
       }
       // annotationString += " ";
-      result.add(annotationString);
+      result.add(new Pair<String,Boolean>(annotationString,
+                                          ! adef.isTypeAnnotation()));
     }
     return result;
+  }
+
+  private String formatFieldValue(Annotation a, String field) {
+    AnnotationFieldType fieldType = a.def.fieldTypes.get("value");
+    assert fieldType != null;
+    return fieldType.format(a.fieldValues.get("value"));
   }
 
   private void parseMethod(CriterionList clist, String methodName, AMethod method) {

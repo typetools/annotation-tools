@@ -47,8 +47,7 @@ public class LocalVariableCriterion implements Criterion {
           VariableTree vtt = (VariableTree) parent;
           String varName = vtt.getName().toString();
           Pair<String, Pair<Integer, Integer>> key =
-            new Pair<String, Pair<Integer, Integer>>(fullMethodName,
-                new Pair<Integer, Integer>(loc.index, loc.scopeStart));
+            Pair.of(fullMethodName, Pair.of(loc.index, loc.scopeStart));
           String potentialVarName =
             LocalVariableScanner.getFromMethodNameIndexMap(key);
           if (potentialVarName != null) {
