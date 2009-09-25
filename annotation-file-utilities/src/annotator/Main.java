@@ -238,6 +238,8 @@ public class Main {
         for (Integer pos : positionKeysSorted) {
           List<Insertion> toInsertList = new ArrayList<Insertion>(positions.get(pos));
           Collections.reverse(toInsertList);
+          assert pos >= 0
+            : "pos is negative: " + pos + " " + toInsertList.get(0) + " " + javafilename;
           for (Insertion iToInsert : toInsertList) {
             String toInsert = iToInsert.getText();
             if (! toInsert.startsWith("@")) {
@@ -256,11 +258,6 @@ public class Main {
             }
             if (comments) {
               toInsert = "/*" + toInsert + "*/";
-            }
-
-            assert pos >= 0 : "pos is negative: " + pos + " " + iToInsert + " " + javafilename;
-            if (pos < 0) {
-              System.out.printf("Assertions are not enabled; pos is " + pos + " for " + iToInsert + " in " + javafilename);
             }
 
             // Possibly add whitespace after the insertion
