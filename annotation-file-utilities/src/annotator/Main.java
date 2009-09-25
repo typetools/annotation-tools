@@ -258,9 +258,9 @@ public class Main {
               toInsert = "/*" + toInsert + "*/";
             }
 
-            assert pos >= 0 : "pos is negative: " + pos;
+            assert pos >= 0 : "pos is negative: " + pos + " " + iToInsert + " " + javafilename;
             if (pos < 0) {
-              System.out.println("Assertions are not enabled; pos is " + pos);
+              System.out.printf("Assertions are not enabled; pos is " + pos + " for " + iToInsert + " in " + javafilename);
             }
 
             // Possibly add whitespace after the insertion
