@@ -49,7 +49,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       this.tree = tree;
     }
 
-    /** et should be an expression for a type */
+    /** @param t an expression for a type */
     private JCTree leftmostIdentifier(JCTree t) {
       while (true) {
         switch (t.getKind()) {
@@ -401,11 +401,20 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     @Override
     public Integer visitClass(ClassTree node, Void p) {
       JCClassDecl cd = (JCClassDecl) node;
-      if (cd.mods != null) {
-        return cd.mods.getPreferredPosition();
+      int result;
+      if (cd.mods != null
+          && (cd.mods.flags != 0 || cd.mods.annotations.size() > 0)) {
+        result = cd.mods.getPreferredPosition();
+        assert result >= 0
+          : String.format("%d %d %d%n", cd.getStartPosition(),
+                          cd.getPreferredPosition(), cd.pos);
       } else {
-        return cd.getPreferredPosition();
+        result = cd.getPreferredPosition();
+        assert result >= 0
+          : String.format("%d %d %d%n", cd.getStartPosition(),
+                          cd.getPreferredPosition(), cd.pos);
       }
+      return result;
     }
 
   }
@@ -545,37 +554,37 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       Integer pos;
 
       // System.out.printf("node: %s%ncritera: %s%n", node, i.getCriteria());
-      if (node instanceof MethodTree) {
-        if (i.getCriteria().isOnReceiver()) {
-          // looking for the receiver (identical to the standard case!)
-          pos = tpf.scan(node, null);
-          assert handled(node);
-          debug("pos = %d at receiver node: %s%n", pos, node.getClass());
-        } else if (i.getCriteria().isOnReturnType()) {
+
+      if ((node instanceof MethodTree) && (i.getCriteria().isOnReturnType())) {
           // looking for the return type
           pos = tpf.scan(((MethodTree)node).getReturnType(), null);
           assert handled(node);
           debug("pos = %d at return type node: %s%n", pos, ((JCMethodDecl)node).getReturnType().getClass());
+      } else {
+        boolean typeScan = true;
+        if (node instanceof MethodTree) {
+          // looking for the receiver or the declaration
+          typeScan = i.getCriteria().isOnReceiver();
+        } else if (node instanceof ClassTree) {
+          typeScan = ! i.getSeparateLine(); // hacky check
+        }
+        if (typeScan) {
+          // looking for the type
+          pos = tpf.scan(node, null);
+          assert handled(node);
+          debug("pos = %d at type: %s%n", pos, node.getClass());
         } else {
           // looking for the declaration
           pos = dpf.scan(node, null);
           assert pos != null;
-          debug("pos = %d at declaration node: %s%n", pos, node.getClass());
+          debug("pos = %d at declaration: %s%n", pos, node.getClass());
         }
-      } else {
-        // Standard case:  looking for the type.
-        pos = tpf.scan(node, null);
-        assert pos != null;
-        debug("pos = %d at non-method node: %s%n", pos, node.getClass());
       }
 
       debug("  ... satisfied! at %d for node of type %s: %s", pos, node.getClass(), Main.treeToString(node));
 
       if (pos != null) {
-        if (pos < 0) {
-          System.out.printf("pos: %s%nnode: %s%n", pos, node);
-        }
-        assert pos >= 0 : pos;
+        assert pos >= 0 : String.format("pos: %s%nnode: %s%ninsertion: %s%n", pos, node, i);
         positions.put(pos, i);
       }
 
