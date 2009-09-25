@@ -28,6 +28,10 @@ public class IndexFileSpecification implements Specification {
   private AScene scene;
   private String indexFileName;
 
+  // If set, do not attempt to read class files with Asm.
+  // Mostly for debugging and workarounds.
+  public static boolean noAsm = false;
+
   private static boolean debug = false;
 
   public IndexFileSpecification(String indexFileName) {
@@ -99,21 +103,23 @@ public class IndexFileSpecification implements Specification {
    */
   private void parseClass(CriterionList clist, String className, AClass clazz) {
 
-    //  load extra info using asm
-    debug("parseClass(" + className + ")");
-    try {
-      ClassReader classReader = new ClassReader(className);
-      MethodOffsetClassVisitor cv = new MethodOffsetClassVisitor();
-      classReader.accept(cv, false);
-      debug("Done reading " + className + ".class");
-    } catch(IOException e) {
-      // If .class file not found, still proceed, in case
-      // user only wants method signature annotations.
-      System.out.println("Warning: IndexFileSpecification did not find classfile for: " + className);
-      // throw new RuntimeException("IndexFileSpecification.parseClass: " + e);
-    } catch (RuntimeException e) {
-      System.err.println("IndexFileSpecification had a problem reading class: " + className);
-      throw e;
+    if (! noAsm) {
+      //  load extra info using asm
+      debug("parseClass(" + className + ")");
+      try {
+        ClassReader classReader = new ClassReader(className);
+        MethodOffsetClassVisitor cv = new MethodOffsetClassVisitor();
+        classReader.accept(cv, false);
+        debug("Done reading " + className + ".class");
+      } catch(IOException e) {
+        // If .class file not found, still proceed, in case
+        // user only wants method signature annotations.
+        System.out.println("Warning: IndexFileSpecification did not find classfile for: " + className);
+        // throw new RuntimeException("IndexFileSpecification.parseClass: " + e);
+      } catch (RuntimeException e) {
+        System.err.println("IndexFileSpecification had a problem reading class: " + className);
+        throw e;
+      }
     }
     String packageName;
     String classNameUnqualified;
