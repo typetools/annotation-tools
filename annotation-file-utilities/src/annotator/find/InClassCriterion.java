@@ -1,6 +1,7 @@
 package annotator.find;
 
 import java.util.*;
+import java.util.regex.*;
 
 import annotator.scanner.AnonymousClassScanner;
 
@@ -11,37 +12,32 @@ import com.sun.source.tree.NewClassTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
 
+// If there are dollar signs in a name, then there are two
+// possibilities regarding how the dollar sign got there.
+//  1. Inserted by the compiler, for inner classes.
+//  2. Written by the programmer (or by a tool that creates .class files).
+// We need to account for both possibilities (and all combinations of them).
+
+// Example names
+//   annotator.tests.FullClassName
+//   annotator.tests.FullClassName$InnerClass
+//   annotator.tests.FullClassName$0
+
 /**
  * Represents the criterion that a program element is in a class with a
  * particular name.
  */
 final class InClassCriterion implements Criterion {
 
-  // does include package
-  // either:
-  //  annotator.tests.FullClassName
-  //  annotator.tests.FullClassName$InnerClass
-  //  annotator.tests.FullClassName$0
+  static boolean debug = false;
+
   private String className;
-  private String packageName;
-  private List<String> listOfClassNames;
+  boolean exactMatch;
 
-  public InClassCriterion(String className) {
-    if (className.contains(".")) {
-      this.packageName = className.substring(0, className.lastIndexOf("."));
-      this.className = className.substring(className.lastIndexOf(".")+1);
-    } else {
-      this.packageName = "";
-      this.className = className;
-    }
-
-    // If there are dollar signs in a name, then there are two
-    // possibilities regarding how the dollar sign got there.
-    //  1. Inserted by the compiler, for inner classes.
-    //  2. Written by the programmer (or by a tool that creates .class files).
-    // We need to account for both possibilities (and all combinations of them).
-
-    listOfClassNames = split(this.className, '$');
+  /** The argument is a fully-qualified class name. */
+  public InClassCriterion(String className, boolean exactMatch) {
+    this.className = className;
+    this.exactMatch = exactMatch;
   }
 
   /**
@@ -61,57 +57,75 @@ final class InClassCriterion implements Criterion {
   /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path) {
+    return InClassCriterion.isSatisfiedBy(path, className, exactMatch);
+  }
 
+  static Pattern anonclassPattern;
+  static {
+    anonclassPattern = Pattern.compile("^(?<num>[0-9]+)(\\$(?<remaining>.*))?$");
+  }
+
+  public static boolean isSatisfiedBy(TreePath path, String className, boolean exactMatch) {
     if (path == null)
       return false;
 
-    List<String> remainingClassNamesToMatch =
-      new ArrayList<String>(listOfClassNames);
+    // However much of the class name remains to match.
+    String cname = className;
 
-    // This loop works from the leaf up to the root of the tree.
-    do {
-      Tree tree = path.getLeaf();
+    // It is wrong to work from the leaf up to the root of the tree, which
+    // would fail if the criterion is a.b.c and the actual is a.b.c.c.
+    List<Tree> trees = new ArrayList<Tree>();
+    for (Tree tree : path) {
+      trees.add(tree);
+    }
+    Collections.reverse(trees);
+
+    for (Tree tree : trees) {
       boolean checkAnon = false;
+
       switch (tree.getKind()) {
       case COMPILATION_UNIT:
+        debug("InClassCriterion.isSatisfiedBy:%n  cname=%s%n  tree=%s%n", cname, tree);
         ExpressionTree packageTree = ((CompilationUnitTree) tree).getPackageName();
-        if (packageTree == null) { // compilation unit is in default package
-          return remainingClassNamesToMatch.isEmpty();
-        }
-        String declaredPackage = packageTree.toString();
-        boolean b = (remainingClassNamesToMatch.isEmpty()
-                     && declaredPackage.equals(packageName));
-        return b;
-        // unreachable: break;
-      case CLASS:
-        ClassTree c = (ClassTree)tree;
-        String lowestClassName = c.getSimpleName().toString();
-        if (remainingClassNamesToMatch.isEmpty()) {
-          return false;
-        }
-        int lastIndex = remainingClassNamesToMatch.size() - 1;
-        String lastClassNameToMatch =
-          remainingClassNamesToMatch.get(lastIndex).trim();
-        // True if name has length 0 (why?) or is a number
-        checkAnon = (lastClassNameToMatch.isEmpty()
-                     || (parseInt(lastClassNameToMatch) != null));
-
-        if (checkAnon) {
-          // This seems to be adding a duplicate.  Why?
-          remainingClassNamesToMatch.add(lastClassNameToMatch);
+        if (packageTree == null) {
+          // compilation unit is in default package; nothing to do
         } else {
-          List<String> lowestParts = split(lowestClassName, '$');
-          int idx = Collections.lastIndexOfSubList(remainingClassNamesToMatch, lowestParts);
-          if (idx != remainingClassNamesToMatch.size() - lowestParts.size()) {
+          String declaredPackage = packageTree.toString();
+          if (cname.startsWith(declaredPackage + ".")) {
+            cname = cname.substring(declaredPackage.length()+1);
+          } else {
+            debug("false InClassCriterion.isSatisfiedBy:%n  cname=%s%n  tree=%s%n", cname, tree);
             return false;
-          }
-          for (String lowestPart : lowestParts) {
-            assert lowestPart.equals(remainingClassNamesToMatch.get(idx));
-            remainingClassNamesToMatch.remove(idx);
           }
         }
         break;
+      case CLASS:
+        debug("InClassCriterion.isSatisfiedBy:%n  cname=%s%n  tree=%s%n", cname, tree);
+        ClassTree c = (ClassTree)tree;
+        if (c.getSimpleName() == null) {
+          debug("empty getSimpleName: InClassCriterion.isSatisfiedBy:%n  cname=%s%n  tree=%s%n", cname, tree);
+          checkAnon = true;
+          break;
+        }
+        String treeClassName = c.getSimpleName().toString();
+        if (cname.equals(treeClassName)) {
+          if (exactMatch) {
+            cname = "";
+          } else {
+            debug("true InClassCriterion.isSatisfiedBy:%n  cname=%s%n  tree=%s%n", cname, tree);
+            return true;
+          }
+        } else if (cname.startsWith(treeClassName + "$")
+                   || (cname.startsWith(treeClassName + "."))) {
+          cname = cname.substring(treeClassName.length()+1);
+        } else {
+          // System.out.println("cname else: " + cname);
+          debug("false InClassCriterion.isSatisfiedBy:%n  cname=%s%n  tree=%s%n", cname, tree);
+          return false;
+        }
+        break;
       case NEW_CLASS:
+        debug("InClassCriterion.isSatisfiedBy:%n  cname=%s%n  tree=%s%n", cname, tree);
         NewClassTree nc = (NewClassTree) tree;
         checkAnon = nc.getClassBody() != null;
         break;
@@ -121,48 +135,44 @@ final class InClassCriterion implements Criterion {
       }
 
       if (checkAnon) {
-        // If block is anonymous class, and last number is an
+        // If block is anonymous class, and cname starts with an
         // anonymous class index, see if they match.
-        int lastIndex = remainingClassNamesToMatch.size() - 1;
-        String lastClassNameToMatch =
-          remainingClassNamesToMatch.get(lastIndex);
-        //        remainingClassNamesToMatch.add(lastIndex, "");
-        remainingClassNamesToMatch.remove(lastIndex);
 
-        int lastIndexToMatch;
-        try {
-          lastIndexToMatch = Integer.parseInt(lastClassNameToMatch);
-        } catch (NumberFormatException e) {
+        Matcher anonclassMatcher = anonclassPattern.matcher(cname);
+        if (! anonclassMatcher.matches()) {
+          debug("false InClassCriterion.isSatisfiedBy:%n  cname=%s%n  tree=%s%n", cname, tree);
           return false;
+        }
+        String anonclassNumString = anonclassMatcher.group("num");
+        cname = anonclassMatcher.group("remaining");
+        if (cname == null) {
+          cname = "";
+        }
+        int anonclassNum;
+        try {
+          anonclassNum = Integer.parseInt(anonclassNumString);
+        } catch (NumberFormatException e) {
+          throw new Error("This can't happen: " + cname + "$" + anonclassNumString, e);
         }
 
         int actualIndexInSource = AnonymousClassScanner.indexOfClassTree(path, tree);
 
-        if (lastIndexToMatch != actualIndexInSource) {
+        if (anonclassNum != actualIndexInSource) {
+          debug("false InClassCriterion.isSatisfiedBy:%n  cname=%s%n  tree=%s%n", cname, tree);
           return false;
         }
       }
-      path = path.getParentPath();
-    } while (path != null && path.getLeaf() != null);
+    }
 
-    return false;
+    debug("%s InClassCriterion.isSatisfiedBy:%n  cname=%s%n  tree=%s%n", cname.equals(""), cname, path.getLeaf());
+    return cname.equals("");
   }
 
   /**
    * {@inheritDoc}
    */
   public String toString() {
-    return "In package: " + packageName + " in class '" + className + "'";
-  }
-
-  private Integer parseInt(String s) {
-    Integer i = null;
-    try {
-    i = Integer.parseInt(s);
-    } catch(Exception e) {
-
-    }
-    return i;
+    return "In class '" + className + "'" + (exactMatch ? " (exactly)" : "");
   }
 
   /**
@@ -180,6 +190,12 @@ final class InClassCriterion implements Criterion {
     }
     result.add(s);
     return result;
+  }
+
+  private static void debug(String message, Object... args) {
+    if (debug) {
+      System.out.printf(message, args);
+    }
   }
 
 }

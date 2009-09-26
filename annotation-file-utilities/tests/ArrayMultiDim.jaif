@@ -9,7 +9,7 @@ annotation @G: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYP
 annotation @H: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
 
 package annotator.tests:
-class MultiDimArray:
+class ArrayMultiDim:
 
     field field: @D
         inner-type 0: @E

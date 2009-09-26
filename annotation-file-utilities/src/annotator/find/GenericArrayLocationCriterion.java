@@ -15,16 +15,19 @@ import com.sun.source.util.TreePath;
  */
 public class GenericArrayLocationCriterion implements Criterion {
 
-  private Criterion parentCriterion;
+  // the full location list
   private List<Integer> location;
+  // the last element of the location list
   private Integer locationInParent;
+  // represents all but the last element of the location list
+  private Criterion parentCriterion;
 
   /**
    * Creates a new GenericArrayLocationCriterion specifying that the element
    * is an outer type, such as:
    *  <code>@A List<Integer></code>
    * or
-   *  <code>@A Integer []</code>
+   *  <code>Integer @A []</code>
    */
   public GenericArrayLocationCriterion() {
     this(new ArrayList<Integer>());
@@ -46,10 +49,9 @@ public class GenericArrayLocationCriterion implements Criterion {
       this.parentCriterion = null;
       this.locationInParent = null;
     } else {
-      this.locationInParent = location.get(location.size() -1);
-      List<Integer> newLocation = new ArrayList<Integer>(location);
-      newLocation.remove(newLocation.size() -1);
+      List<Integer> newLocation = location.subList(0, location.size() - 1);
       this.parentCriterion = new GenericArrayLocationCriterion(newLocation);
+      this.locationInParent = location.get(location.size() - 1);
     }
   }
 
@@ -69,7 +71,7 @@ public class GenericArrayLocationCriterion implements Criterion {
     Tree leaf = path.getLeaf();
     if (locationInParent == null) {
       // no inner type location, want to annotate outermost type
-      // i.e.   @Readonly List list;
+      // e.g.,  @Readonly List list;
       //        @Readonly List<String> list;
       if (leaf instanceof ParameterizedTypeTree
           || leaf instanceof IdentifierTree
@@ -96,13 +98,28 @@ public class GenericArrayLocationCriterion implements Criterion {
             return b;
           }
         } else if (parent instanceof ArrayTypeTree) {
-          // annotating @A Integer []
-          ArrayTypeTree att = (ArrayTypeTree) parent;
-          Tree typeOfVtt = att.getType();
-          boolean b =  typeOfVtt.equals(leaf);
-          if (parentCriterion != null) {
-            b = b &&
-              parentCriterion.isSatisfiedBy(parentPath);
+          // annotating Integer @A []
+          parentPath = TreeFinder.largestContainingArray(path.getParentPath());
+          parent = parentPath.getLeaf();
+          System.out.printf("parent instanceof ArrayTypeTree: %s locationInParent=%d%n",
+                            parent, locationInParent);
+          Tree elt = ((ArrayTypeTree) parent).getType();
+          for (int i=0; i<locationInParent; i++) {
+            if (! (elt instanceof ArrayTypeTree)) {
+              return false;
+            }
+            elt = ((ArrayTypeTree) elt).getType();
+          }
+          System.out.printf("parent instanceof ArrayTypeTree: %s %s %d%n",
+                            elt, parent, locationInParent);
+          boolean b = elt.equals(leaf);
+          System.out.printf("b=%s elt=%s leaf=%s%n",
+                            b, elt, leaf);
+          if (b && parentCriterion != null) {
+            b = b && parentCriterion.isSatisfiedBy(parentPath);
+            if (!b) {
+              System.out.printf("Parent criterion failed: %s%n", parentCriterion);
+            }
           }
           return b;
         }
