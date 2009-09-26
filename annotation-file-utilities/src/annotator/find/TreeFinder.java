@@ -31,14 +31,29 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
   }
 
   private static void debug(String message, Object... args) {
-    if (debug)
+    if (debug) {
       System.out.printf(message, args);
+      if (! message.endsWith("%n")) {
+        System.out.println();
+      }
+    }
+  }
+
+  public static TreePath largestContainingArray(TreePath p) {
+    if (p.getLeaf().getKind() != Tree.Kind.ARRAY_TYPE) {
+      return null;
+    }
+    while (p.getParentPath().getLeaf().getKind() == Tree.Kind.ARRAY_TYPE) {
+      p = p.getParentPath();
+    }
+    assert p.getLeaf().getKind() == Tree.Kind.ARRAY_TYPE;
+    return p;
   }
 
   /**
-   * Determines the insertion position for tye annotations on various
-   * elements.  For instance, variable annotations should be placed before
-   * the variable's <i>type</i> rather than its name.
+   * Determines the insertion position for type annotations on various
+   * elements.  For instance, type annotations for a declaration should be
+   * placed before the type rather than the variable name.
    */
   private static class TypePositionFinder extends TreeScanner<Integer, Void> {
 
@@ -153,10 +168,12 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       return receiverLoc;
     }
 
+    /** Returns the position of the first bracket at or after the given position. */
+    // To do:  skip over comments
     private int getFirstBracketAfter(int i) {
       try {
         CharSequence s = tree.getSourceFile().getCharContent(true);
-        // return first [, plus 1
+        // return index of first '['
         for (int j=i; j < s.length(); j++) {
           if (s.charAt(j) == '[') {
             return j;
@@ -169,11 +186,14 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       return i;
     }
 
+    private Tree parent(Tree node) {
+      return TreePath.getPath(tree, node).getParentPath().getLeaf();
+    }
+
     @Override
       public Integer visitIdentifier(IdentifierTree node, Void p) {
       // for arrays, need to indent inside array, not right before type
-      TreePath path = TreePath.getPath(tree, node);
-      Tree parent = path.getParentPath().getLeaf();
+      Tree parent = parent(node);
       Integer i = null;
       if (parent instanceof ArrayTypeTree) {
         debug("TypePositionFinder.visitIdentifier: recognized array");
@@ -191,8 +211,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     @Override
       public Integer visitPrimitiveType(PrimitiveTypeTree node, Void p) {
       // want exact same logistics as with visitIdentifier
-      TreePath path = TreePath.getPath(tree, node);
-      Tree parent = path.getParentPath().getLeaf();
+      Tree parent = parent(node);
       Integer i = null;
       if (parent instanceof ArrayTypeTree) {
         ArrayTypeTree att = (ArrayTypeTree) parent;
@@ -208,8 +227,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
 
     @Override
       public Integer visitParameterizedType(ParameterizedTypeTree node, Void p) {
-      TreePath path = TreePath.getPath(tree, node);
-      Tree parent = path.getParentPath().getLeaf();
+      Tree parent = parent(node);
       Integer i = null;
       if (parent instanceof ArrayTypeTree) {
         // want to annotate the first level of this array
@@ -229,8 +247,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
 //       int rightBeforeBlock = ((JCBlock) node).pos;
 //       // Will be adjusted if a throws statement exists.
 //       int afterParamList = -1;
-//       TreePath path = TreePath.getPath(tree, node);
-//       Tree methodTree = path.getParentPath().getLeaf();
+//       Tree parent = parent(node);
 //       if (!(methodTree.getKind() == Tree.Kind.METHOD)) {
 //         throw new RuntimeException("BlockTree has non-method parent");
 //       }
@@ -279,11 +296,51 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
 //       return afterParamList;
 //     }
 
+    /**
+     * Returns the number of array levels that are in the given array type tree,
+     * or 0 if the given node is not an array type tree.
+     */
+    private int arrayLevels(Tree node) {
+      int result = 0;
+      while (node.getKind() == Tree.Kind.ARRAY_TYPE) {
+        result++;
+        node = ((ArrayTypeTree) node).getType();
+      }
+      return result;
+    }
+
+    public ArrayTypeTree largestContainingArray(Tree node) {
+      TreePath p = TreePath.getPath(tree, node);
+      Tree result = TreeFinder.largestContainingArray(p).getLeaf();
+      assert result.getKind() == Tree.Kind.ARRAY_TYPE;
+      return (ArrayTypeTree) result;
+    }
+
+    private int arrayStartPos(Tree node) {
+      assert node.getKind() == Tree.Kind.ARRAY_TYPE;
+      while (node.getKind() == Tree.Kind.ARRAY_TYPE) {
+        node = ((ArrayTypeTree) node).getType();
+      }
+      return ((JCTree) node).getPreferredPosition();
+    }
 
     @Override
-      public Integer visitArrayType(ArrayTypeTree node, Void p) {
+    public Integer visitArrayType(ArrayTypeTree node, Void p) {
+      debug("TypePositionFinder.visitArrayType");
       JCArrayTypeTree att = (JCArrayTypeTree) node;
-      return att.getPreferredPosition();
+      debug("TypePositionFinder.visitArrayType(%s) preferred = %s%n", node, att.getPreferredPosition());
+      int pos = arrayStartPos(node);
+      ArrayTypeTree largest = largestContainingArray(node);
+      assert arrayStartPos(node) == pos;
+      int largestLevels = arrayLevels(largest);
+      int levels = arrayLevels(node);
+      pos = getFirstBracketAfter(pos+1);
+      debug("  levels=%d largestLevels=%d%n", levels, largestLevels);
+      for (int i=levels; i<largestLevels; i++) {
+        pos = getFirstBracketAfter(pos+1);
+        debug("  pos %d at i=%d%n", pos, i);
+      }
+      return pos;
     }
 
     @Override
@@ -553,7 +610,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       // to look for a particular different node.  I will do the latter.
       Integer pos;
 
-      // System.out.printf("node: %s%ncritera: %s%n", node, i.getCriteria());
+      debug("node: %s%ncritera: %s%n", node, i.getCriteria());
 
       if ((node instanceof MethodTree) && (i.getCriteria().isOnReturnType())) {
           // looking for the return type
@@ -572,7 +629,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
           // looking for the type
           pos = tpf.scan(node, null);
           assert handled(node);
-          debug("pos = %d at type: %s%n", pos, node.getClass());
+          debug("pos = %d at type: %s (%s)%n", pos, node.toString(), node.getClass());
         } else {
           // looking for the declaration
           pos = dpf.scan(node, null);

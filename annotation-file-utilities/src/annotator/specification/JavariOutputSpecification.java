@@ -175,7 +175,7 @@ public class JavariOutputSpecification implements Specification {
         if (modifier != null && !name.startsWith("$e")) {
             Criteria c = new Criteria();
             c.add(Criteria.is(Tree.Kind.VARIABLE, name));
-            c.add(Criteria.inClass(clazz));
+            c.add(Criteria.inClass(clazz, /*exactMatch=*/ true));
             if (method != null)
                 c.add(Criteria.inMethod(method));
             else c.add(Criteria.notInMethod());
@@ -201,7 +201,7 @@ public class JavariOutputSpecification implements Specification {
         if (modifier != null) {
             Criteria c = new Criteria();
             c.add(Criteria.is(Tree.Kind.METHOD, method));
-            c.add(Criteria.inClass(clazz));
+            c.add(Criteria.inClass(clazz, /*exactMatch=*/ true));
             insertion.add(new Insertion(modifier, c, false));
         }
 
@@ -238,7 +238,7 @@ public class JavariOutputSpecification implements Specification {
                 Criteria c = new Criteria();
                 c.add(Criteria.is(Tree.Kind.VARIABLE, name));
                 c.add(Criteria.inMethod(method));
-                c.add(Criteria.inClass(clazz));
+                c.add(Criteria.inClass(clazz, /*exactMatch=*/ true));
                 insertion.add(new Insertion(modifier, c, false));
                 System.out.println("added var");
             }

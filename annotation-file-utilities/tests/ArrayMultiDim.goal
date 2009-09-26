@@ -2,6 +2,6 @@ package annotator.tests;
 
 import java.util.*;
 
-public class MultiDimArray {
+public class ArrayMultiDim {
   @java.lang.C Object @java.lang.D [] @java.lang.E [] @java.lang.F [] field;
 }
