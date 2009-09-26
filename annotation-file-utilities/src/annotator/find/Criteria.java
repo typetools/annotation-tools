@@ -162,10 +162,11 @@ public final class Criteria {
    * by the specified class.
    *
    * @param name the name of the enclosing class
+   * @param exact whether to match only in the class itself, not in its inner classes
    * @return an "in class" criterion
    */
-  public final static Criterion inClass(String name) {
-    return new InClassCriterion(name);
+  public final static Criterion inClass(String name, boolean exact) {
+    return new InClassCriterion(name, /*exactmatch=*/ true);
   }
 
   /**

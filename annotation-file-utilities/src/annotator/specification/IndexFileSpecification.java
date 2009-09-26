@@ -30,7 +30,7 @@ public class IndexFileSpecification implements Specification {
 
   // If set, do not attempt to read class files with Asm.
   // Mostly for debugging and workarounds.
-  public static boolean noAsm = false;
+  public static boolean noAsm = true;
 
   private static boolean debug = false;
 
@@ -121,25 +121,11 @@ public class IndexFileSpecification implements Specification {
         throw e;
       }
     }
-    String packageName;
-    String classNameUnqualified;
-    int lastdot = className.lastIndexOf('.');
-    if (lastdot == -1) {
-      packageName = "";
-      classNameUnqualified = className;
-    } else {
-      packageName = className.substring(0, lastdot);
-      classNameUnqualified = className.substring(lastdot+1);
-    }
 
-    CriterionList classClist = clist;
-    clist = clist.add(Criteria.inPackage(packageName));
-    int dollarpos;
-    while ((dollarpos = classNameUnqualified.lastIndexOf('$')) != -1) {
-      classClist = classClist.add(Criteria.inClass(classNameUnqualified.substring(0, dollarpos)));
-      classNameUnqualified = classNameUnqualified.substring(dollarpos+1);
-    }
-    classClist = clist.add(Criteria.is(Tree.Kind.CLASS, classNameUnqualified));
+    CriterionList clistSansClass = clist;
+
+    clist = clist.add(Criteria.inClass(className, true));
+    CriterionList classClist = clistSansClass.add(Criteria.is(Tree.Kind.CLASS, className));
     parseElement(classClist, clazz);
 
     VivifyingMap<BoundLocation, ATypeElement> bounds = clazz.bounds;
@@ -157,12 +143,7 @@ public class IndexFileSpecification implements Specification {
       parseElement(outerClist, bound);
     }
 
-
-    // TODO: fix in class criterion to accept fully qualified names?
-//    if (className.contains(".")) {
-//      className = className.substring(className.lastIndexOf(".") + 1);
-//    }
-    clist = clist.add(Criteria.inClass(className));
+    clist = clist.add(Criteria.inClass(className, /*exactMatch=*/ false));
 
     for (Map.Entry<String, ATypeElement> entry : clazz.fields.entrySet()) {
 //      clist = clist.add(Criteria.notInMethod()); // TODO: necessary? what is in class but not in method?
