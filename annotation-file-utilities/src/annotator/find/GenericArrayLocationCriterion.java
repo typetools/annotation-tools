@@ -101,8 +101,8 @@ public class GenericArrayLocationCriterion implements Criterion {
           // annotating Integer @A []
           parentPath = TreeFinder.largestContainingArray(path.getParentPath());
           parent = parentPath.getLeaf();
-          System.out.printf("parent instanceof ArrayTypeTree: %s locationInParent=%d%n",
-                            parent, locationInParent);
+          // System.out.printf("parent instanceof ArrayTypeTree: %s locationInParent=%d%n",
+          //                   parent, locationInParent);
           Tree elt = ((ArrayTypeTree) parent).getType();
           for (int i=0; i<locationInParent; i++) {
             if (! (elt instanceof ArrayTypeTree)) {
@@ -110,11 +110,10 @@ public class GenericArrayLocationCriterion implements Criterion {
             }
             elt = ((ArrayTypeTree) elt).getType();
           }
-          System.out.printf("parent instanceof ArrayTypeTree: %s %s %d%n",
-                            elt, parent, locationInParent);
+          // System.out.printf("parent instanceof ArrayTypeTree: %s %s %d%n",
+          //                   elt, parent, locationInParent);
           boolean b = elt.equals(leaf);
-          System.out.printf("b=%s elt=%s leaf=%s%n",
-                            b, elt, leaf);
+          // System.out.printf("b=%s elt=%s leaf=%s%n", b, elt, leaf);
           if (b && parentCriterion != null) {
             b = b && parentCriterion.isSatisfiedBy(parentPath);
             if (!b) {
