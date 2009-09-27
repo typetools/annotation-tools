@@ -246,15 +246,11 @@ public class Main {
               throw new Error("Insertion doesn't start with '@': " + toInsert);
             }
             if (abbreviate) {
-              int nameEnd = toInsert.indexOf("(");
-              if (nameEnd == -1) {
-                nameEnd = toInsert.length();
+              Pair<String,String> ps = removePackage(toInsert);
+              if (ps.a != null) {
+                imports.add(ps.a);
               }
-              int dotIndex = toInsert.lastIndexOf(".", nameEnd);
-              if (dotIndex != -1) {
-                imports.add(toInsert.substring(1, nameEnd));
-                toInsert = "@" + toInsert.substring(dotIndex + 1);
-              }
+              toInsert = ps.b;
             }
             if (comments) {
               toInsert = "/*" + toInsert + "*/";
@@ -409,6 +405,27 @@ public class Main {
       return s;
     } else {
       return s.substring(0, newlineIndex) + "...";
+    }
+  }
+
+  /** Remove the leading package. */
+  public static Pair<String,String> removePackage(String s) {
+    int nameEnd = s.indexOf("(");
+    if (nameEnd == -1) {
+      nameEnd = s.length();
+    }
+    int dotIndex = s.lastIndexOf(".", nameEnd);
+    if (dotIndex != -1) {
+      String packageName = s.substring(0, nameEnd);
+      if (packageName.startsWith("@")) {
+        return Pair.of(packageName.substring(1),
+                       "@" + s.substring(dotIndex + 1));
+      } else {
+        return Pair.of(packageName,
+                       s.substring(dotIndex + 1));
+      }
+    } else {
+      return Pair.of((String)null, s);
     }
   }
 
