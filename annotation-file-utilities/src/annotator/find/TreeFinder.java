@@ -16,6 +16,8 @@ import javax.lang.model.element.Modifier;
 
 import com.google.common.collect.*;
 
+import utilMDE.Pair;
+
 /**
  * A {@code TreeScanner} that is able to locate program elements in an
  * AST based on {@code Criteria}. It is used to scan a tree and return a
@@ -595,8 +597,12 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       if (mt != null) {
         for (AnnotationTree at : mt.getAnnotations()) {
           String ann = at.toString();
-          if (ann.equals(i.getText())
-              || ann.equals(i.getText() + "()")) {
+          String iann = i.getText();
+          String iannNoPackage = Main.removePackage(iann).b;
+          // System.out.printf("Comparing: %s %s %s%n", ann, iann, iannNoPackage);
+          if (ann.equals(iann)
+              || ann.equals(iann + "()")
+              || ann.equals(iannNoPackage)) {
             satisfied.add(i);
             return super.scan(node, p);
           }
