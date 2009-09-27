@@ -9,7 +9,7 @@ annotation @G: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYP
 annotation @H: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
 
 package annotator.tests:
-class MultiLevelGeneric:
+class GenericMultiLevel:
 
     field field: @java.lang.A
         inner-type 0: @B
