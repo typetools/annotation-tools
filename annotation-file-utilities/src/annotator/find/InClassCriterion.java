@@ -62,7 +62,8 @@ final class InClassCriterion implements Criterion {
 
   static Pattern anonclassPattern;
   static {
-    anonclassPattern = Pattern.compile("^(?<num>[0-9]+)(\\$(?<remaining>.*))?$");
+    //for JDK 7: anonclassPattern = Pattern.compile("^(?<num>[0-9]+)(\\$(?<remaining>.*))?$");
+    anonclassPattern = Pattern.compile("^([0-9]+)(\\$(.*))?$");
   }
 
   public static boolean isSatisfiedBy(TreePath path, String className, boolean exactMatch) {
@@ -143,8 +144,10 @@ final class InClassCriterion implements Criterion {
           debug("false InClassCriterion.isSatisfiedBy:%n  cname=%s%n  tree=%s%n", cname, tree);
           return false;
         }
-        String anonclassNumString = anonclassMatcher.group("num");
-        cname = anonclassMatcher.group("remaining");
+        //for JDK 7: String anonclassNumString = anonclassMatcher.group("num");
+        //for JDK 7: cname = anonclassMatcher.group("remaining");
+        String anonclassNumString = anonclassMatcher.group(1);
+        cname = anonclassMatcher.group(3);
         if (cname == null) {
           cname = "";
         }
