@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path=""/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/asmx"/>
+	<classpathentry kind="lib" path="/scene-lib/junit.jar"/>
+	<classpathentry kind="lib" path="/afs/csail.mit.edu/u/j/jaimeq/research/annotations/asmx/bcel.jar"/>
+	<classpathentry kind="lib" path="/afs/csail.mit.edu/u/j/jaimeq/research/annotations/asmx/janino.jar"/>
+	<classpathentry kind="lib" path="/afs/csail.mit.edu/u/j/jaimeq/research/annotations/asmx/javassist.jar"/>
+	<classpathentry kind="lib" path="/afs/csail.mit.edu/u/j/jaimeq/research/annotations/asmx/ow_util_ant_tasks.jar"/>
+	<classpathentry kind="lib" path="/afs/csail.mit.edu/u/j/jaimeq/research/annotations/asmx/serp.jar"/>
+	<classpathentry kind="output" path=""/>
+</classpath>
