@@ -46,12 +46,6 @@ import java.util.Set;
  */
 public enum TargetType {
 
-    //
-    // Some target types are commented out, because Java doesn't permit such
-    // targets.  They are included here to confirm that their omission is
-    // intentional omission not an accidental omission.
-    //
-
     /** For annotations on typecasts. */
     TYPECAST(0x00, IsLocal),
 
@@ -86,8 +80,8 @@ public enum TargetType {
     /** For annotations on a type argument or nested array of a local. */
     LOCAL_VARIABLE_GENERIC_OR_ARRAY(0x09, HasLocation, IsLocal),
 
-    // handled by regular annotations
-    //@Deprecated METHOD_RETURN(0x0A),
+    /** For type annotations on a method return type */
+    METHOD_RETURN(0x0A),
 
     /**
      * For annotations on a type argument or nested array of a method return
@@ -95,14 +89,16 @@ public enum TargetType {
      */
     METHOD_RETURN_GENERIC_OR_ARRAY(0x0B, HasLocation),
 
-    // handled by regular annotations
-    //@Deprecated METHOD_PARAMETER(0x0C),
+    /**
+     * For type annotations on a method parameter
+     */
+    METHOD_PARAMETER(0x0C),
 
     /** For annotations on a type argument or nested array of a method parameter. */
     METHOD_PARAMETER_GENERIC_OR_ARRAY(0x0D, HasLocation),
 
-    // handled by regular annotations
-    //@Deprecated FIELD(0x0E),
+    /** For type annotations on a method parameter */
+    FIELD(0x0E),
 
     /** For annotations on a type argument or nested array of a field. */
     FIELD_GENERIC_OR_ARRAY(0x0F, HasLocation),
