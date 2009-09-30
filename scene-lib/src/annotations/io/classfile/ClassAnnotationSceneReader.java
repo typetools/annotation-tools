@@ -215,6 +215,7 @@ extends EmptyVisitor {
       }
     }
 
+    @SuppressWarnings("unchecked")
     private AnnotationDef getAnnotationDef(String jvmlClassName) {
       String annoTypeName = classDescToName(jvmlClassName);
       // It would be better to not require the .class file to be on the
@@ -222,7 +223,7 @@ extends EmptyVisitor {
       // program.  Worry about that later.
       Class<? extends java.lang.annotation.Annotation> annoClass;
       try {
-        annoClass = (Class<? extends java.lang.annotation.Annotation>) Class.forName(annoTypeName);
+    	  annoClass = (Class<? extends java.lang.annotation.Annotation>) Class.forName(annoTypeName);
       } catch (ClassNotFoundException e) {
         System.out.printf("Could not find class: %s%n", e.getMessage());
         printClasspath();
@@ -277,7 +278,7 @@ extends EmptyVisitor {
       // BasicAFT.forType(Class) expects int.class instead of Integer.class,
       // and so on for all primitives.  String.class is ok, since it has no
       // primitive type.
-      Class c = value.getClass();
+      Class<?> c = value.getClass();
       if (c.equals(Boolean.class)) {
         c = boolean.class;
       } else if (c.equals(Byte.class)) {
@@ -322,7 +323,7 @@ extends EmptyVisitor {
      */
     private List<Object> asList(Object hiddenArray) {
       List<Object> objects = new ArrayList<Object>();
-      Class c = hiddenArray.getClass().getComponentType();
+      Class<?> c = hiddenArray.getClass().getComponentType();
       if (c.equals(boolean.class)) {
         for (boolean o : (boolean[]) hiddenArray) {
           objects.add(o);
