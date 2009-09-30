@@ -30,7 +30,7 @@ public class IndexFileSpecification implements Specification {
 
   // If set, do not attempt to read class files with Asm.
   // Mostly for debugging and workarounds.
-  public static boolean noAsm = true;
+  public static boolean noAsm = false;
 
   private static boolean debug = false;
 
