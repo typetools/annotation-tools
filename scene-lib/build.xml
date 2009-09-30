@@ -127,6 +127,7 @@
     <target name="test-scene-lib" depends="init, bin">
         <mkdir dir="reports"/>
         <junit showoutput="true" fork="yes" dir="." haltonfailure="yes">
+            <bootclasspath refid="libpath"/>
             <classpath refid="libpath"/>
             <formatter type="plain"/>
             <test name="annotations.tests.TestSceneLib" todir="reports"/>
@@ -139,6 +140,7 @@
     <target name="test-classfile" depends="init, bin">
         <mkdir dir="reports"/>
         <junit showoutput="true" fork="yes" dir="." haltonfailure="yes">
+            <bootclasspath refid="libpath"/>
             <classpath refid="libpath"/>
             <formatter type="plain"/>
             <test name="annotations.tests.classfile.AnnotationsTest" todir="reports"/>
