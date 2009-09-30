@@ -2,8 +2,7 @@ package annotator.tests;
 
 import java.io.Serializable;
 import java.util.Date;
-
-import com.sun.tools.javac.util.List;
+import java.util.List;
 
 public class BoundClassMultiple<
   T extends Date,
