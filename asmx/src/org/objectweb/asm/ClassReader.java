@@ -1405,7 +1405,7 @@ public class ClassReader {
         // 0x0A*/0x0B: method return type
         // {
         // } reference_info;
-        //case METHOD_RETURN:
+        case METHOD_RETURN:
         case METHOD_RETURN_GENERIC_OR_ARRAY:
           break;
 
@@ -1414,7 +1414,7 @@ public class ClassReader {
         //   TEMP this should contain the index but doesn't, so for the moment
         //        we assume the index is zero
         // } reference_info;
-        //case METHOD_PARAMETER:
+        case METHOD_PARAMETER:
         case METHOD_PARAMETER_GENERIC_OR_ARRAY:
           int param = readByte(v);
           v++;
@@ -1424,6 +1424,7 @@ public class ClassReader {
         // 0x0E*/0x0F: field
         // {
         // } reference_info;
+        case FIELD:
         case FIELD_GENERIC_OR_ARRAY:
           break;
 
