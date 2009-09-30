@@ -473,6 +473,16 @@ extends EmptyVisitor {
         // those annotations on the field.  If we get such an annotation and
         // aElement is a field, skip the annotation for now to avoid crashing.
         switch(target) {
+        case FIELD:
+            // TODO: resolve issue once classfile format is finalized
+            if (aElement instanceof AClass) {
+              //handleFieldOnClass((AClass) aElement);
+            } else if (aElement instanceof ATypeElement) {
+              handleField((ATypeElement) aElement);
+            } else {
+              throw new RuntimeException("Unknown FIELD_GENERIC_ARRAY");
+            }
+            break;
         case FIELD_GENERIC_OR_ARRAY:
           // TODO: resolve issue once classfile format is finalized
           if (aElement instanceof AClass) {
@@ -497,6 +507,9 @@ extends EmptyVisitor {
           if (aElement instanceof AMethod)
             handleMethodObjectCreationGenericArray((AMethod) aElement);
           break;
+        case METHOD_PARAMETER:
+          handleMethodParameterType((AMethod) aElement);
+          break;
         case METHOD_PARAMETER_GENERIC_OR_ARRAY:
           handleMethodParameterTypeGenericArray((AMethod) aElement);
           break;
@@ -511,6 +524,9 @@ extends EmptyVisitor {
           if (aElement instanceof AMethod)
             handleMethodTypecastGenericArray((AMethod) aElement);
           break;
+        case METHOD_RETURN:
+        	handleMethodReturnType((AMethod) aElement);
+        	break;
         case METHOD_RETURN_GENERIC_OR_ARRAY:
           handleMethodReturnTypeGenericArray((AMethod) aElement);
           break;
@@ -656,6 +672,13 @@ extends EmptyVisitor {
     /*
      * Creates the inner annotation on aElement.innerTypes.
      */
+    private void handleField(ATypeElement aElement) {
+    	aElement.tlAnnotationsHere.add(makeAnnotation());
+    }
+
+    /*
+     * Creates the inner annotation on aElement.innerTypes.
+     */
     private void handleFieldGenericArray(ATypeElement aElement) {
       InnerTypeLocation innerTypeLocation = makeInnerTypeLocation();
       AElement aInnerType = aElement.innerTypes.vivify(innerTypeLocation);
@@ -703,6 +726,13 @@ extends EmptyVisitor {
     /*
      * Creates the method parameter type generic/array annotation on aMethod.
      */
+    private void handleMethodParameterType(AMethod aMethod) {
+      aMethod.parameters.vivify(makeIndex()).tlAnnotationsHere.add(makeAnnotation());
+    }
+
+    /*
+     * Creates the method parameter type generic/array annotation on aMethod.
+     */
     private void handleMethodParameterTypeGenericArray(AMethod aMethod) {
       aMethod.parameters.vivify(makeIndex()).innerTypes.vivify(
           makeInnerTypeLocation()).tlAnnotationsHere.add(makeAnnotation());
@@ -722,6 +752,14 @@ extends EmptyVisitor {
     private void handleMethodTypecastGenericArray(AMethod aMethod) {
       aMethod.typecasts.vivify(makeOffset()).innerTypes.vivify(
           makeInnerTypeLocation()).tlAnnotationsHere.add(makeAnnotation());
+    }
+
+    /*
+     * Creates the method return type generic/array annotation on aMethod.
+     */
+    private void handleMethodReturnType(AMethod aMethod) {
+      if (trace) { System.out.printf("handleMethodReturnTypeGenericArray(%s)%n", aMethod); }
+      aMethod.returnType.tlAnnotationsHere.add(makeAnnotation());
     }
 
     /*
