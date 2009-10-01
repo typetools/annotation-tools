@@ -6,9 +6,22 @@ import java.util.Set;
 import annotator.find.Criteria;
 import annotator.find.Criterion;
 
+// The notion of a CriterionList as a list of independent elements (with the
+// list being satisfied if each of its elements is) is broken.  For example, a
+// class may have an inner class of the same name, and the list would be
+// satisfied for either one.  The same goes for method names, and (most
+// problematically, because it comes up most often) for relative location in
+// GenericArrayLocationCriterion, where the criterion [1] would also match [2
+// 1] because it is a suffix of it, or [2 1] would also match [3 2 1].  A
+// related problem is the idea of checking from the bottom to the top of a
+// TreePath whether it satisfies a criterion.  I have put into place piecemeal
+// fixes for some of these, but really the CriterionList needs to be turned
+// into a path that is followed, and checking needs to start at the top of the
+// tree (at the CompilationUnit). -MDE 9/2009
+
 /**
  * A CriterionList is a singly-linked list of Criterion meant to be treated
- * as a stack.  It is very useful for creating base criteria and passing
+ * as a stack.  It is useful for creating base criteria and passing
  * independent copies to different parts of a specification that creates
  * all the criterion.  A CriterionList is immutable, and so copies
  * created by the add() function can safely be passed anywhere.
@@ -44,9 +57,9 @@ public class CriterionList {
   }
 
   /**
-   * Adds the given criterion to the present list and returns a newly
-   * allocated list containing the result.  Note that this will not lead to
-   * a modification of the list this is called on.
+   * Adds the given criterion to the present list and returns a
+   * newly-allocated list containing the result.  Does not modify its
+   * argument.
    *
    * @param c the criterion to add
    * @return a new list containing the given criterion and the rest of the
