@@ -1,7 +1,7 @@
 # System test of annotation tools
 
-ANNCAT = ../../../scene-lib/anncat
-XJAVAC = ../../../../jsr308-langtools/dist/bin/javac -g
+ANNCAT ?= ../../../scene-lib/anncat
+XJAVAC ?= ../../../../jsr308-langtools/dist/bin/javac -g
 
 all: clean results
 
