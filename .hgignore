@@ -36,3 +36,7 @@ scene-lib/reports
 *.class-correct-scene.txt
 *.class-from-indexfile.txt
 *.class-generated-scene.txt
+
+.metadata
+.project
+.classpath
