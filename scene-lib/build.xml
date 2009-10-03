@@ -77,9 +77,8 @@
             <!-- remainder only for repository version -->
             <pathelement location="${annotations-compiler}/dist/lib/javac.jar"/>
             <pathelement location="${annotations-compiler}/dist/lib/javap.jar"/>
-            <pathelement location="${checkers}/build"/>
+            <pathelement location="${checkers}/checkers.jar"/>
             <pathelement location="bin"/>
-            <pathelement location="${jre1.6.0}"/>
         </path>
     </target>
         
@@ -100,11 +99,10 @@
                destdir="bin" 
                debug="true" 
                classpathref="libpath"
-               bootclasspath="${libpath}"
                classpath="${libpath}">
             <src refid="sourcepath"/>
+            <compilerarg value="-Xbootclasspath/p:${toString:libpath}"/>
             <classpath refid="libpath"/>
-            <bootclasspath refid="libpath"/>
         </javac> 
 
         <!-- TODO: This relies on jsr308 compiler being first in your PATH. 
@@ -127,7 +125,7 @@
     <target name="test-scene-lib" depends="init, bin">
         <mkdir dir="reports"/>
         <junit showoutput="true" fork="yes" dir="." haltonfailure="yes">
-            <bootclasspath refid="libpath"/>
+            <jvmarg value="-Xbootclasspath/p:${toString:libpath}"/>
             <classpath refid="libpath"/>
             <formatter type="plain"/>
             <test name="annotations.tests.TestSceneLib" todir="reports"/>
@@ -140,7 +138,7 @@
     <target name="test-classfile" depends="init, bin">
         <mkdir dir="reports"/>
         <junit showoutput="true" fork="yes" dir="." haltonfailure="yes">
-            <bootclasspath refid="libpath"/>
+            <jvmarg value="-Xbootclasspath/p:${toString:libpath}"/>
             <classpath refid="libpath"/>
             <formatter type="plain"/>
             <test name="annotations.tests.classfile.AnnotationsTest" todir="reports"/>

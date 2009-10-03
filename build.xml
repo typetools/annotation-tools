@@ -1,0 +1,57 @@
+<project name="annotation-tools" default="all">
+
+    <property file="${user.home}/.annotations-tools.properties" />
+    <property file="build.properties" />
+
+    <!-- location of projects -->
+    <property name="asmx" value="asmx"/>
+    <property name="scene-lib" value="scene-lib"/>
+    <property name="afu" value="annotation-file-utilities"/>
+
+    <target name="all" depends="compile,test"/>
+
+    <target name="compile" description="Compiler all annotation tools"
+        depends="compile-all"/>
+
+    <target name="test" description="Test all the tools"
+        depends="test-all"/>
+
+    <target name="clean" depends="clean-all"/>
+
+    <target name="compile-asmx">
+        <ant dir="${asmx}" target="compile"/>
+    </target>
+
+    <!-- TODO: Get this working -->
+    <!-- Known to fail -->
+    <target name="test-asmx">
+        <ant dir="${asmx}" target="test"/>
+    </target>
+
+    <target name="compile-scene-lib">
+        <ant dir="${scene-lib}" target="bin"/>
+    </target>
+
+    <target name="test-scene-lib">
+        <ant dir="${scene-lib}" target="test"/>
+    </target>
+
+    <target name="compile-afu">
+        <ant dir="${afu}" target="jarfile"/>
+    </target>
+
+    <target name="test-afu">
+        <ant dir="${afu}" target="run-tests"/>
+    </target>
+
+    <target name="compile-all"
+           depends="compile-asmx,compile-scene-lib,compile-afu"/>
+    <target name="test-all"
+           depends="test-scene-lib,test-afu"/>
+    <target name="clean-all">
+      <ant dir="${asmx}" target="clean"/>
+      <ant dir="${scene-lib}" target="clean"/>
+      <ant dir="${afu}" target="clean"/>
+    </target>
+
+</project>

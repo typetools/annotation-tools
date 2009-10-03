@@ -320,6 +320,8 @@
 
   <target name="run-tests" description="run tests for the annotator">
     <exec dir="tests/" executable="make" failonerror="true">
+        <env key="XJAVAC" value="${annotations-compiler}/dist/bin/javac"/>
+        <env key="JAVAC_JAR" value="${annotations-compiler}/dist/lib/javac.jar"/>
     </exec>
   </target>
 
