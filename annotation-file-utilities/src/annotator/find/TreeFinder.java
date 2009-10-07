@@ -230,6 +230,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     @Override
       public Integer visitParameterizedType(ParameterizedTypeTree node, Void p) {
       Tree parent = parent(node);
+      debug("TypePositionFinder.visitParameterizedType %s parent=%s%n", node, parent);
       Integer i = null;
       if (parent instanceof ArrayTypeTree) {
         // want to annotate the first level of this array
