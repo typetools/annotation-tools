@@ -1,5 +1,7 @@
 package annotator.find;
 
+import annotator.Main;
+
 import java.util.*;
 
 import annotations.el.BoundLocation;
@@ -55,7 +57,7 @@ public final class Criteria {
     for (Criterion c : criteria)
       if (! c.isSatisfiedBy(path, leaf)) {
         if (debug) {
-          System.out.println("unsatisfied criterion: " + c);
+          System.out.printf("unsatisfied criterion:%n  %s%n  %s%n", c, Main.pathToString(path));
         }
         return false;
       }
