@@ -7,7 +7,7 @@
 ANNOTATION_FILE_UTILS1=$(dirname $0)/annotation-file-utilities.jar
 ANNOTATION_FILE_UTILS2=$(dirname $0)/../annotation-file-utilities.jar
 # Contains Java 7 version of java.lang.annotation.ElementType.
-JAVAC_JAR?=$(dirname $0)/../../../jsr308-langtools/dist/lib/javac.jar
+JAVAC_JAR=${JAVAC_JAR:-$(dirname $0)/../../../jsr308-langtools/dist/lib/javac.jar}
 
 # Augment, don't replace, CLASSPATH, so as to find user files.
 # Can we can do without annotation-file-utilities.jar on bootclasspath?
