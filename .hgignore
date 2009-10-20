@@ -31,6 +31,8 @@ annotation-file-utilities/tests/system-test/out5.jann
 
 scene-lib/javadoc
 scene-lib/reports
+scene-lib/src/annotations/tests/example-stdout.jann
+scene-lib/src/annotations/tests/example-output.jann
 
 *.class-via-classfile-scene.txt
 *.class-correct-scene.txt
