@@ -153,7 +153,8 @@
               dir="src/annotations/tests"
         -->
         <java classname="annotations.tests.Example"
-              output="src/annotations/tests/example-stdout.jann">
+              output="src/annotations/tests/example-stdout.jann"
+              classpathref="libpath">
             <arg value="src/annotations/tests/example-input.jann" />
             <arg value="foo.Bar" />
             <arg value="src/annotations/tests/example-output.jann" />
