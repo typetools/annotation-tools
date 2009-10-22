@@ -3,7 +3,7 @@
     <property file="${user.home}/.annotations-tools.properties" />
     <property file="build.properties" />
 
-    <!-- location of projects -->
+    <!-- default location of projects, has effect only if not previously set -->
     <property name="asmx" value="asmx"/>
     <property name="scene-lib" value="scene-lib"/>
     <property name="afu" value="annotation-file-utilities"/>
