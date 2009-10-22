@@ -23,7 +23,7 @@ public class Example {
   public static void main(String /*@ReadOnly*/ [] args) {
     AScene scene;
 
-    System.out.println("Reading in " + args[0]);
+    // System.out.println("Reading in " + args[0]);
     try {
       scene = new AScene();
       IndexFileParser.parseFile(args[0], scene);
@@ -62,7 +62,7 @@ public class Example {
       }
     }
 
-    System.out.println("Writing out " + args[2]);
+    // System.out.println("Writing out " + args[2]);
     try {
       IndexFileWriter.write(scene, new FileWriter(args[2]));
     } catch (IOException e) {
