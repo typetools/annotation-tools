@@ -3,6 +3,12 @@
 
     <property environment="env"/>
 
+    <taskdef resource="net/sf/antcontrib/antcontrib.properties">
+      <classpath>
+	<pathelement location="ant-contrib.jar" />
+      </classpath>
+    </taskdef>
+
     <target name="init-properties">
         <condition property="exists.build.properties">
             <available file="build.properties"/>
@@ -163,6 +169,15 @@
             <filesmatch file1="src/annotations/tests/example-output.jann.goal"
                         file2="src/annotations/tests/example-output.jann"/>
         </condition>
+	<if>
+	    <isfalse value="${example.output.matches}"/>
+	    <then>
+		<exec executable="cat">
+		  <arg value="src/annotations/tests/example-output.jann.goal"/>
+		  <arg value="src/annotations/tests/example-output.jann"/>
+		</exec>
+            </then>
+        </if>
         <fail unless="example.output.matches" 
             message="In src/annotations/tests/, file example-output.jann does not match goal."/>
         <condition property="example.stdout.matches">
