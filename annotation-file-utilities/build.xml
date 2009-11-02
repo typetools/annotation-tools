@@ -57,6 +57,12 @@
       unless="exists.user.build.properties"
       message="File ${user.build.properties} file not found."/>
     <property file="${user.build.properties}"/>
+
+    <echo message="annotations-compiler: ${annotations-compiler}"/>
+
+    <!-- convert relative to absolute pathname -->
+    <property name="annotations-compiler-absolute" location="${annotations-compiler}" />
+
   </target>
 
   <!-- Compiles all the subparts of the Annotation File Utilities. -->
@@ -318,10 +324,11 @@
     <delete file="annotation-tools.zip"/>
   </target>
 
-  <target name="run-tests" description="run tests for the annotator">
+  <target name="run-tests" depends="init-properties"
+          description="run tests for the annotator">
     <exec dir="tests/" executable="make" failonerror="true">
-        <env key="XJAVAC" value="${annotations-compiler}/dist/bin/javac"/>
-        <env key="JAVAC_JAR" value="${annotations-compiler}/dist/lib/javac.jar"/>
+        <env key="XJAVAC" value="${annotations-compiler-absolute}/dist/bin/javac"/>
+        <env key="JAVAC_JAR" value="${annotations-compiler-absolute}/dist/lib/javac.jar"/>
     </exec>
   </target>
 
