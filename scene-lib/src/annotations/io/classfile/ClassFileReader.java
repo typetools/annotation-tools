@@ -27,9 +27,11 @@ public class ClassFileReader {
     + "         -h, --help       print usage information and exit\n"
     + "         --version        print version information and exit\n"
     + "\n"
-    + "For each class a.b.C given, extracts the annotations from that\n"
-    + " class and prints them in index-file format to a.b.C.jaif .\n"
-    + "Note that the class a.b.C must be located in your classpath.\n";
+    + "For each class a.b.C (or class file a/b/C.class) given, extracts\n"
+    + "the annotations from that class and prints them in index-file format\n"
+    + "to a.b.C.jaif .\n"
+    + "Note that, if using the qualified class name, the class a.b.C must be\n"
+    + "located in your classpath.\n";
 
 
   /**
@@ -74,12 +76,13 @@ public class ClassFileReader {
     // check args for well-formed names
     for (String arg : args) {
       arg = arg.trim();
-      if (arg.contains("/") || arg.endsWith(".class")) {
-        System.out.print("Error: " + arg +
-            " does not appear to be a fully qualified class name");
+      // check for invalid class file paths with '.'
+      if (!arg.contains(".class") && arg.contains("/")) {
+        System.out.println("Error: " + arg +
+            " does not appear to be a fully qualified class name or path");
         System.out.print(" please use names such as java.lang.Object");
-        System.out.print(" instead of Ljava/lang/Object or");
-        System.out.println(" java.lang.Object.class");
+        System.out.print(" instead of Ljava/lang/Object,");
+        System.out.println(" or use class file paths as /.../path/to/MyClass.class");
         return;
       }
     }
@@ -91,14 +94,17 @@ public class ClassFileReader {
       origName = origName.trim();
       System.out.println("reading: " + origName);
       String className = origName;
-//      if (!className.endsWith(".class")) {
-//        className = className + ".class";
-//      }
+      if (origName.endsWith(".class")) {
+          origName = origName.replace(".class", "");
+      }
 
-      AScene scene =
-        new AScene();
+      AScene scene = new AScene();
       try {
-        readFromClass(scene, className);
+        if (className.endsWith(".class")) {
+          read(scene, className);
+        } else {
+          readFromClass(scene, className);
+        }
         String outputFile = origName + ".jaif";
         System.out.println("printing results to : " + outputFile);
         IndexFileWriter.write(scene, outputFile);
