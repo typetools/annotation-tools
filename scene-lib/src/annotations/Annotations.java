@@ -39,6 +39,12 @@ public abstract class Annotations {
     public static AnnotationDef adTypeQualifier;
     public static Annotation aTypeQualifier;
 
+    /**
+     * Annotations that are meta-annotated with themselves.  Due to a flaw
+     * in the the Scene Library, it is unable to read them from classfiles.
+     * An expedient workaround is to pre-define them, so they never need be
+     * read from a classfile.
+     */
     public static Set<AnnotationDef> standardDefs;
 
     // the field types for an annotation with only one field, named "value".
