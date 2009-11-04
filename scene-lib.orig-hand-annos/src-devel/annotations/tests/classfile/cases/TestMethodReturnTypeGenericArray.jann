@@ -1,0 +1,38 @@
+package annotations.tests.classfile.foo:
+annotation visible @A
+
+annotation visible @B:
+	String value
+
+annotation visible @C:
+	int fieldA
+	String fieldB
+	
+package annotations.tests.classfile.cases:
+class TestMethodReturnTypeGenericArray:
+	method test()Ljava/util/List; : @annotations.tests.classfile.foo.A
+	
+	method test2()Ljava/util/List; : @annotations.tests.classfile.foo.B(value="single-depth")
+		inner-type 0 : @annotations.tests.classfile.foo.A	
+
+	method test3()[Ljava/lang/String; : @annotations.tests.classfile.foo.A
+		inner-type 0 : @annotations.tests.classfile.foo.B(value="on array element")
+		
+	method test4()[[Ljava/lang/String; : @annotations.tests.classfile.foo.A
+		inner-type 0 : @annotations.tests.classfile.foo.B(value="on")
+		inner-type 1 : @annotations.tests.classfile.foo.B(value="in")
+		
+	method test5()Ljava/util/Set; :
+		inner-type 0 : @annotations.tests.classfile.foo.A
+		inner-type 0, 0 : @annotations.tests.classfile.foo.B(value="two-deep")
+		
+  method test6()Ljava/util/Map; :
+  	inner-type 0 : @annotations.tests.classfile.foo.B(value="map as key")
+  	inner-type 1, 0 : @annotations.tests.classfile.foo.B(value="array of value")
+  	inner-type 1, 0, 0 : @annotations.tests.classfile.foo.B(value="inner-most value")
+  	inner-type 1 : @annotations.tests.classfile.foo.B(value="set as value")
+  	inner-type 0, 0, 0 : @annotations.tests.classfile.foo.B(value="innermost key or key")
+  	inner-type 0, 0 : @annotations.tests.classfile.foo.A
+  	inner-type 0, 1 : @annotations.tests.classfile.foo.C(fieldA=01, fieldB="value of key")
+  	inner-type 0, 1, 0: @annotations.tests.classfile.foo.A
+  
