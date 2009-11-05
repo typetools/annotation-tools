@@ -538,7 +538,7 @@ public final class IndexFileParser {
 
         if (defs.containsKey(ad.name)) {
             // TODO:  permit identical re-definition
-            throw new ParseException("Duplicate definition of annotation type " + ad.name);
+            System.err.println("Duplicate definition of annotation type " + ad.name);
         }
         defs.put(ad.name, ad);
         // Add short name; but if it's already there, remove it to avoid ambiguity.
