@@ -4,6 +4,8 @@ import checkers.nullness.quals.*;
 import checkers.javari.quals.*;
 
 import java.io.*;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 import java.util.*;
 
 import annotations.*;
@@ -41,9 +43,23 @@ public final class IndexFileWriter {
         protected void visitAnnotationDef(AnnotationDef d) {
             pw.println("package " + packagePart(d.name) + ":");
             pw.print("annotation @" + basenamePart(d.name) + ":");
-            printAnnotations(d);
+            // TODO: We would only print Retention and Target annotations
+            printAnnotations(requiredMetaannotations(d.tlAnnotationsHere));
             pw.println();
             printAnnotationDefBody(d);
+        }
+
+        private Collection<Annotation> requiredMetaannotations(
+                Collection<Annotation> annos) {
+            Set<Annotation> results = new HashSet<Annotation>();
+            for (Annotation a : annos) {
+                String aName = a.def.name;
+                if (aName.equals(Retention.class.getCanonicalName())
+                    || aName.equals(Target.class.getCanonicalName())) {
+                    results.add(a);
+                }
+            }
+            return results;
         }
     }
 
@@ -101,11 +117,15 @@ public final class IndexFileWriter {
         }
     }
 
-    private void printAnnotations(/*@ReadOnly*/ AElement e) {
-        for (Annotation tla : e.tlAnnotationsHere) {
+    private void printAnnotations(Collection<? extends Annotation> annos) {
+        for (Annotation tla : annos) {
             pw.print(' ');
             printAnnotation(tla);
         }
+    }
+
+    private void printAnnotations(/*@ReadOnly*/ AElement e) {
+        printAnnotations(e.tlAnnotationsHere);
     }
 
     private void printElement(String indentation,
