@@ -71,17 +71,19 @@ public class ClassFileWriter {
       System.out.println(" merged class file to: a.b.C.class");
       System.out.println(" Note that the class a.b.C, given as a fully-qualified name,");
       System.out.println(" must be located somewhere on your classpath.");
+      System.out.println(" You can also the path for the class, e.g. /.../path/to/a/b/C.class");
     }
 
     // check args for well-formed names
-    for (String arg : args) {
-      arg = arg.trim();
-      if (arg.contains("/") || arg.endsWith(".class")) {
+    for (int i = 0; i < args.length; i += 2) {
+      String arg = args[i].trim();
+      if (!arg.endsWith(".class") && arg.contains("/")) {
         System.out.print("Error: " + arg +
             " does not appear to be a fully qualified class name");
         System.out.print(" please use names such as java.lang.Object");
         System.out.print(" instead of Ljava/lang/Object or");
-        System.out.println(" java.lang.Object.class");
+        System.out.println(" java.lang.Object.class,");
+        System.out.println(" or use class file path as /.../path/to/MyClass.class");
         return;
       }
     }
@@ -100,17 +102,9 @@ public class ClassFileWriter {
      }
      String indexFileName = args[i];
 
-     AScene scene =
-       new AScene();
+     AScene scene = new AScene();
 
-//      try {
-        IndexFileParser.parseFile(indexFileName, scene);
-//      } catch(FileIOException e) {
-//        throw e;
-//      } catch(IOException e) {
-//        System.out.println("Unable to open index file: " + indexFileName);
-//        System.out.println("Please try providing an absolute path to this file");
-//      }
+     IndexFileParser.parseFile(indexFileName, scene);
 
      // annotations loaded from index file into scene, now insert them
      // into class file
