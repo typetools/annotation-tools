@@ -108,11 +108,15 @@ public class ClassFileWriter {
 
      // annotations loaded from index file into scene, now insert them
      // into class file
-     String outputFileName = className + ".class";
+     String outputFileName = className + (className.endsWith(".class") ? "" : ".class");
      try {
        System.out.println("Writing class file with annotations to: "
            + outputFileName);
-       insert(scene, className, outputFileName, true);
+       if (className.endsWith(".class")) {
+           insert(scene, outputFileName, true);
+       } else
+           insert(scene, className, outputFileName, true);
+
      } catch(IOException e) {
        System.out.println("Problem reading to/from class/file: " +
            className + "/" + outputFileName);
