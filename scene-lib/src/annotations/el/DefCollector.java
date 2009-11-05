@@ -58,16 +58,11 @@ public abstract class DefCollector {
             collect(c);
     }
 
-    private void collect(AnnotationDef d) throws DefException {
-        if (defs.contains(d)) {
+    private void addToDefs(AnnotationDef d) throws DefException {
+        // TODO: this mimics the condition we have in collect, but
+        // i don't know if we need it
+        if (defs.contains(d))
             return;
-        }
-
-        // define the fields first
-        for (AnnotationFieldType aft : d.fieldTypes.values())
-            if (aft instanceof AnnotationAFT)
-                collect(((AnnotationAFT) aft).annotationDef);
-
         AnnotationDef oldD = getDef(d.name);
         if (oldD == null) {
             defs.add(d);
@@ -81,28 +76,40 @@ public abstract class DefCollector {
         }
     }
 
+    private void collect(AnnotationDef d) throws DefException {
+        if (defs.contains(d)) {
+            return;
+        }
+
+        // define the fields first
+        for (AnnotationFieldType aft : d.fieldTypes.values())
+            if (aft instanceof AnnotationAFT)
+                collect(((AnnotationAFT) aft).annotationDef);
+
+        addToDefs(d);
+
+        // TODO: In the future we want to add the defs of meta-annotations
+        // as well.  Enable this option by uncommenting the following line.
+        //
+        // For the time-being, the parser would fail, because of possible
+        // circular references (e.g. Documented and Retention).  When it is
+        // fixed, uncomment it
+        //
+        //collect((/*@ReadOnly*/ AElement)d);
+    }
+
     private void collect(/*@ReadOnly*/ AElement e)
             throws DefException {
         for (Annotation tla : e.tlAnnotationsHere) {
             AnnotationDef tld = tla.def;
             if (defs.contains(tld)) {
-                return;
+                continue;
             }
 
             AnnotationDef d = tld;
             collect(d);
 
-            AnnotationDef oldTld = getDef(d.name);
-            if (oldTld == null)
-                defs.add(tld);
-            else {
-                AnnotationDef utld = AnnotationDef.unify(oldTld, tld);
-                if (utld == null) {
-                    throw new DefException(d.name);
-                }
-                defs.remove(oldTld);
-                defs.add(utld);
-            }
+            addToDefs(d);
         }
     }
 
