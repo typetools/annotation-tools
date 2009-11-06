@@ -25,6 +25,7 @@ public final /*@ReadOnly*/ class ArrayAFT extends AnnotationFieldType {
      * (see {@link AnnotationBuilder#addEmptyArrayField}).
      */
     public ArrayAFT(ScalarAFT elementType) {
+        assert elementType != null;
         this.elementType = elementType;
     }
 

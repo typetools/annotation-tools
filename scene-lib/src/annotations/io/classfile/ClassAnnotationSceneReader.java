@@ -972,6 +972,7 @@ extends EmptyVisitor {
     }
 
     private void prepareForElement(ScalarAFT elementType) {
+      assert elementType != null; // but, does this happen when reading from classfile?
       if (arrayBuilder == null) {
         this.elementType = elementType;
         arrayBuilder = parent.annotationBuilder.beginArrayField(arrayName,
