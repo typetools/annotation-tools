@@ -33,8 +33,8 @@ public final /*@ReadOnly*/ class AnnotationFactory {
     }
 
     /**
-     * Returns an {@link AnnotationBuilder} appropriate for building a
-     * {@link Annotation} of the given type name.
+     * Returns an {@link AnnotationBuilder}.
+     * Tries to look up the AnnotationDef in adefs; if not found, inserts in adefs.
      */
     public AnnotationBuilder beginAnnotation(java.lang.annotation.Annotation a, Map<String, AnnotationDef> adefs) {
         AnnotationDef def = AnnotationDef.fromClass(a.getClass(), adefs);
