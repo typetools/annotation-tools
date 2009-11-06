@@ -342,6 +342,10 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
   private void visitFields(AnnotationVisitor av, Annotation a) {
     for (String fieldName : a.def().fieldTypes.keySet()) {
       Object value = a.getFieldValue(fieldName);
+      if (value == null) {
+          // hopefully a field with a default value
+          continue;
+      }
       if (value instanceof Annotation) {
         AnnotationVisitor nav = av.visitAnnotation(fieldName, a.def().name);
         visitFields(nav, (Annotation) a);
