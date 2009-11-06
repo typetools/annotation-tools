@@ -35,6 +35,11 @@ public final /*@ReadOnly*/ class Annotation {
 
     /** Check the representation, throw assertion failure if it is violated. */
     public void checkRep() {
+        assert fieldValues != null;
+        assert fieldValues.keySet() != null;
+        assert def != null;
+        assert def.fieldTypes != null;
+        assert def.fieldTypes.keySet() != null;
         if (! fieldValues.keySet().equals(def.fieldTypes.keySet())) {
             for (String s : fieldValues.keySet()) {
                 assert def.fieldTypes.containsKey(s)
@@ -51,13 +56,30 @@ public final /*@ReadOnly*/ class Annotation {
             AnnotationFieldType aft = def.fieldTypes.get(fieldname);
             Object value = fieldValues.get(fieldname);
             String valueString;
+            String classString = value.getClass().toString();
             if (value instanceof Object[]) {
-                valueString = Arrays.toString((Object[]) value);
+                Object[] arr = (Object[]) value;
+                valueString = Arrays.toString(arr);
+                classString += " {";
+                for (Object elt : arr) {
+                    classString += " " + elt.getClass();
+                }
+                classString += "}";
+            } else if (value instanceof Collection) {
+                Collection coll = (Collection) value;
+                valueString = Arrays.toString(coll.toArray());
+                classString += " {";
+                for (Object elt : coll) {
+                    classString += " " + elt.getClass();
+                }
+                classString += " }";
             } else {
                 valueString = value.toString();
+                // No need to modify valueString.
             }
             assert aft.isValidValue(value)
-                : String.format("Bad value%n %s (%s)%nfor%n %s (%s)", valueString, value.getClass(), aft, aft.getClass());
+                : String.format("Bad field value%n  %s (%s)%nfor field%n  %s (%s)%nin annotation%n  %s",
+                                valueString, classString, aft, aft.getClass(), def);
         }
     }
 
