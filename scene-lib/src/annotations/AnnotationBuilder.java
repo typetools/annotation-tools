@@ -37,6 +37,7 @@ public class AnnotationBuilder {
 
     boolean active = true;
 
+    // Generally, don't use this.  Use method fieldTypes() instead.
     private Map<String, AnnotationFieldType> fieldTypes =
         new LinkedHashMap<String, AnnotationFieldType>();
 
@@ -63,17 +64,25 @@ public class AnnotationBuilder {
         boolean abActive = true;
 
         String fieldName;
+        AnnotationFieldType aft; // the type for the elements
 
         List</*@ReadOnly*/ Object> arrayElements =
             new ArrayList</*@ReadOnly*/ Object>();
 
-        SimpleArrayBuilder(String fieldName) {
+        SimpleArrayBuilder(String fieldName, AnnotationFieldType aft) {
+            assert aft != null;
+            assert fieldName != null;
             this.fieldName = fieldName;
+            this.aft = aft;
         }
 
         public void appendElement(/*@ReadOnly*/ Object x) {
             if (!abActive)
                 throw new IllegalStateException("Array is finished");
+            if (!aft.isValidValue(x)) {
+                throw new IllegalArgumentException(String.format("Bad array element value%n  %s (%s)%nfor field %s%n  %s (%s)",
+                                                                 x, x.getClass(), fieldName, aft, aft.getClass()));
+            }
             arrayElements.add(x);
         }
 
@@ -111,8 +120,7 @@ public class AnnotationBuilder {
     public void addScalarField(String fieldName, ScalarAFT aft, /*@ReadOnly*/ Object x) {
         checkAddField(fieldName);
         if (x instanceof Annotation && !(x instanceof Annotation))
-            throw new IllegalArgumentException(
-                                               "All subannotations must be Annotations");
+            throw new IllegalArgumentException("All subannotations must be Annotations");
         if (def == null) {
             fieldTypes.put(fieldName, aft);
         }
@@ -137,9 +145,17 @@ public class AnnotationBuilder {
         checkAddField(fieldName);
         if (def == null) {
             fieldTypes.put(fieldName, aft);
+        } else {
+            aft = (ArrayAFT) fieldTypes().get(fieldName);
+            if (aft == null) {
+                throw new Error(String.format("Definition for %s lacks field %s:%n  %s",
+                                              def.name, fieldName, def));
+            }
+            assert aft != null;
         }
         arrayInProgress = true;
-        return new SimpleArrayBuilder(fieldName);
+        assert aft.elementType != null;
+        return new SimpleArrayBuilder(fieldName, aft.elementType);
     }
 
     /**
@@ -175,6 +191,7 @@ public class AnnotationBuilder {
             throw new IllegalStateException("Array in progress");
         active = false;
         if (def == null) {
+            assert fieldTypes != null;
             def = new AnnotationDef(typeName, tlAnnotationsHere, fieldTypes);
         } else {
             assert typeName == null;
