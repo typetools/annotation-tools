@@ -48,7 +48,10 @@ public final /*@ReadOnly*/ class AnnotationDef extends AElement {
     }
 
     // Problem:  I am not sure how to handle circularities (annotations meta-annotated with themselves
-    /** Use scene to look up (or insert into it) missing AnnotationDefs. */
+    /**
+     * Look up an AnnotationDefs in adefs.
+     * If not found, read from a class and insert in adefs.
+     */
     public static AnnotationDef fromClass(Class<? extends java.lang.annotation.Annotation> annoType, Map<String,AnnotationDef> adefs) {
         String name = annoType.getCanonicalName();
         assert name != null;
