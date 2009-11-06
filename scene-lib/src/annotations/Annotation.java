@@ -40,11 +40,12 @@ public final /*@ReadOnly*/ class Annotation {
                 assert def.fieldTypes.containsKey(s)
                     : String.format("Annotation contains field %s but AnnotationDef does not%n  annotation: %s%n  def: %s%n", s, this, this.def);
             }
-            for (String s : def.fieldTypes.keySet()) {
-                assert fieldValues.containsKey(s)
-                    : String.format("Annotation contains field %s but AnnotationDef does not", s);
-            }
-            assert false : "This can't happen.";
+            // TODO: Faulty assertions, fails when default value is used
+//            for (String s : def.fieldTypes.keySet()) {
+//                assert fieldValues.containsKey(s)
+//                    : String.format("AnnotationDef contains field %s but Annotation does not", s);
+//            }
+//            assert false : "This can't happen.";
         }
 
         for (String fieldname : fieldValues.keySet()) {
