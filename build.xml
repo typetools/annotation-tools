@@ -4,9 +4,9 @@
     <property file="build.properties" />
 
     <!-- default location of projects, has effect only if not previously set -->
-    <property name="asmx" value="asmx"/>
-    <property name="scene-lib" value="scene-lib"/>
-    <property name="afu" value="annotation-file-utilities"/>
+    <property name="asmx" location="asmx"/>
+    <property name="scene-lib" location="scene-lib"/>
+    <property name="afu" location="annotation-file-utilities"/>
 
     <target name="all" depends="compile,test"/>
 
