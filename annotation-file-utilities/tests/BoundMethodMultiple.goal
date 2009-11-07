@@ -1,0 +1,24 @@
+package annotator.tests;
+
+import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
+import java.util.Date;
+
+public class BoundMethodMultiple {
+  public <T> void foo( @java.lang.A Object o) {
+
+  }
+
+  public <T extends  @java.lang.B Date> void foo(T o) {
+
+  }
+
+  public <T extends  @java.lang.C List &  @java.lang.D Serializable> void foo(T t) {
+
+  }
+
+  public <T extends  @java.lang.E Date, U extends @java.lang.F Map> void foo(T t, U u) {
+
+  }
+}
