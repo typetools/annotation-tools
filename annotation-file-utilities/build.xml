@@ -11,20 +11,18 @@
   <property name="java-version" value="7"/>
 
   <!-- The distribution is the result of zipping this directory. -->
-  <property name="temp-annotation-tools" value="${java.io.tmpdir}/annotation-tools" />
+  <property name="temp-annotation-tools" location="${java.io.tmpdir}/annotation-tools" />
 
   <!-- Can't I just reuse temp-annotation-file-utilities, rather than
        having this separate directory? -->
-  <property name="temp-jarfile" value="${java.io.tmpdir}/annotation-file-utilities-jarfile" />
+  <property name="temp-jarfile" location="${java.io.tmpdir}/annotation-file-utilities-jarfile" />
 
 <!--
-  <property name="jsr308-www"
-    value="/afs/csail/group/pag/www/jsr308"/>
+  <property name="jsr308-www" location="/afs/csail/group/pag/www/jsr308"/>
 -->
-  <property name="jsr308-www"
-    value="/cse/www2/types"/>
+  <property name="jsr308-www" location="/cse/www2/types"/>
   <property name="jsr308-www-annotation-file-utilities"
-    value="${jsr308-www}/annotation-file-utilities"/>
+    location="${jsr308-www}/annotation-file-utilities"/>
 
   <target name="init-properties">
     <condition property="exists.build.properties">
