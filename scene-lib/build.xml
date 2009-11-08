@@ -3,6 +3,20 @@
 
     <property environment="env"/>
 
+	<macrodef name="echo-fileset">
+		<attribute name="filesetref" />
+	   	<sequential>
+	        <pathconvert pathsep="
+" property="@{filesetref}.echopath">
+		   		<path>
+		   			<fileset refid="@{filesetref}" />
+		   		</path>
+		   	</pathconvert>
+    		<echo>   ------- echoing fileset @{filesetref} -------</echo>
+	        <echo>${@{filesetref}.echopath}</echo>
+	   	</sequential>
+	</macrodef>
+
     <taskdef resource="net/sf/antcontrib/antcontrib.properties">
       <classpath>
 	<pathelement location="ant-contrib.jar" />
@@ -61,17 +75,33 @@
         -->
     </target>
     
-    <target name="init" depends="init-properties, init-dependencies">
+    <target name="init-paths">
         <path id="sourcepath">
             <pathelement location="src"/>
         </path>
 
-        <!-- Only for repository version. -->
-        <fileset dir="." id="source-files">
-           <include name="src/**/*.java"/>
+        <fileset dir="." id="source.files.java">
+            <include name="src/**/*.java"/>
             <exclude name="**/.svn"/>
+            <exclude name="**/package-info.java"/>
         </fileset>
     
+        <fileset dir="." id="source.files.java.nopackageinfo">
+            <include name="src/**/*.java"/>
+            <exclude name="**/.svn"/>
+            <exclude name="**/package-info.java"/>
+        </fileset>
+
+        <fileset dir="." id="source.files.java.packageinfo">
+            <include name="**/package-info.java"/>
+        </fileset>
+
+        <fileset dir="." id="source.files.non-java">
+            <include name="src/**/*"/>
+            <exclude name="**/.svn"/>
+	    <exclude name="**/*.java"/>
+        </fileset>
+
         <path id="javadoc-sourcepath">
             <pathelement location="src"/>
         </path>
@@ -88,12 +118,50 @@
         </path>
     </target>
         
+    <target name="init" depends="init-properties, init-dependencies, init-paths"/>
+
     <target name="bin-clean">
         <delete dir="bin"/>
     </target>
     
-    <target name="bin" depends="init, bin-clean">
+    <target name="bin-check-uptodate" depends="init">
+
+	<uptodate property="source.files.non-java.uptodate">
+	  <srcfiles refid="source.files.non-java"/>
+          <mapper type="glob" from="src/*" to="bin/*"/>
+	</uptodate>
+
+	<uptodate property="source.files.java.nopackageinfo.uptodate">
+	  <srcfiles refid="source.files.java.nopackageinfo"/>
+          <mapper type="glob" from="src/*.java" to="bin/*.class"/>
+        </uptodate>
+
+	<!-- I want to say that package-info.java does not force
+	recompilation if it is older than all source files in its own
+	package. -->
+	<uptodate property="source.files.java.packageinfo.uptodate" targetfile="bin">
+	  <srcfiles refid="source.files.java.packageinfo"/>
+        </uptodate>
+
+	<condition property="bin.uptodate">
+	  <and>
+	    <isset property="source.files.non-java.uptodate"/>
+	    <isset property="source.files.java.nopackageinfo.uptodate"/>
+	    <isset property="source.files.java.packageinfo.uptodate"/>
+	  </and>
+	</condition>
+
+	<echo message="source.files.non-java.uptodate: ${source.files.non-java.uptodate}"/>
+	<echo message="source.files.java.nopackageinfo.uptodate: ${source.files.java.nopackageinfo.uptodate}"/>
+	<echo message="source.files.java.packageinfo.uptodate: ${source.files.java.packageinfo.uptodate}"/>
+	<echo message="bin.uptodate: ${bin.uptodate}"/>
+	
+    </target>
+
+    <target name="bin" depends="init, bin-check-uptodate" unless="bin.uptodate">
+	<echo message="Running bin"/>
         <mkdir dir="bin"/>
+	<!-- Copy non-java files to bin.  These are mostly .jann files. -->
         <copy todir="bin">
             <fileset dir="src" excludes="**/*.java"/>
         </copy>
@@ -115,7 +183,7 @@
              We should figure out how to call jsr 308 properly from Ant. -->
 <!--
        <pathconvert property="libpath" refid="libpath"/>
-       <pathconvert property="source-files" refid="source-files" pathsep=" "/>
+       <pathconvert property="source.files.java.spaceseparated" refid="source.files.java" pathsep=" "/>
         <exec executable="javac" failonerror="true">
           <arg value="-version"/>
           <arg value="-d"/>
@@ -123,7 +191,7 @@
           <arg value="-g"/>
           <arg value="-cp"/>
           <arg value="${libpath}"/>
-          <arg line="${source-files}"/>
+          <arg line="source.files.java.spaceseparated"/>
         </exec>
 -->
     </target>

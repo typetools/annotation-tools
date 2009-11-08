@@ -117,9 +117,51 @@
 -->
   </target>
 
+  <target name="jarfile.check.uptodate">
+      <uptodate property="bin.uptodate" targetfile="annotation-file-utilities.jar">
+	<srcfiles dir="bin" />
+      </uptodate>
+      <uptodate property="asmx.bin.uptodate" targetfile="annotation-file-utilities.jar">
+	<srcfiles dir="${asmx}/bin" excludes="tmp/**"/>
+      </uptodate>
+      <uptodate property="scene-lib.bin.uptodate" targetfile="annotation-file-utilities.jar">
+	<srcfiles dir="${scene-lib}/bin" />
+      </uptodate>
+      <uptodate property="build.classes.uptodate" targetfile="annotation-file-utilities.jar">
+	<srcfiles dir="${annotations-compiler}/build/classes" />
+      </uptodate>
+      <uptodate property="build.bootstrap.classes.uptodate" targetfile="annotation-file-utilities.jar">
+	<srcfiles dir="${annotations-compiler}/build/bootstrap/classes" />
+      </uptodate>
+      <uptodate property="utilmde.uptodate" targetfile="annotation-file-utilities.jar" srcfile="lib/utilMDE.jar"/>
+      <uptodate property="google-collect.uptodate" targetfile="annotation-file-utilities.jar" srcfile="lib/google-collect-1.0-rc3.jar"/>
+
+      <condition property="jarfile.uptodate">
+	<and>
+	  <isset property="bin.uptodate"/>
+	  <isset property="asmx.bin.uptodate"/>
+	  <isset property="scene-lib.bin.uptodate"/>
+	  <isset property="build.classes.uptodate"/>
+	  <isset property="build.bootstrap.classes.uptodate"/>
+	  <isset property="utilmde.uptodate"/>
+	  <isset property="google-collect.uptodate"/>
+	</and>
+      </condition>
+
+      <echo message="bin.uptodate: ${bin.uptodate}"/>
+      <echo message="asmx.bin.uptodate: ${asmx.bin.uptodate}"/>
+      <echo message="scene-lib.bin.uptodate: ${scene-lib.bin.uptodate}"/>
+      <echo message="build.classes.uptodate: ${build.classes.uptodate}"/>
+      <echo message="build.bootstrap.classes.uptodate: ${build.bootstrap.classes.uptodate}"/>
+      <echo message="utilmde.uptodate: ${utilmde.uptodate}"/>
+      <echo message="google-collect.uptodate: ${google-collect.uptodate}"/>
+      <echo message="jarfile.uptodate: ${jarfile.uptodate}"/>
+
+  </target>
 
   <target name="jarfile"
-          depends="init,build"
+          depends="init,build,jarfile.check.uptodate"
+	  unless="jarfile.uptodate"
           description="create the class library annotation-file-utilities.jar">
 
     <echo message="Using temporary directory: ${temp-jarfile}"/>
@@ -141,7 +183,7 @@
         <exclude name="META-INF/" />
       </patternset>
     </unjar>
-    <unjar src="lib/google-collect-1.0-rc2.jar" dest="${temp-jarfile}">
+    <unjar src="lib/google-collect-1.0-rc3.jar" dest="${temp-jarfile}">
       <patternset>
         <include name="**/*.class"/>
         <exclude name="META-INF/" />
