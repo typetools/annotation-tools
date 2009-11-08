@@ -87,7 +87,7 @@
       -->
       <pathelement location="${annotations-compiler}/dist/lib/javac.jar"/>
       <pathelement location="${annotation-tools}/annotation-file-utilities/lib/utilMDE.jar"/>
-      <pathelement location="${annotation-tools}/annotation-file-utilities/lib/google-collect-1.0-rc2.jar"/>
+      <pathelement location="${annotation-tools}/annotation-file-utilities/lib/google-collect-1.0-rc3.jar"/>
       <pathelement location="${scene-lib}/bin"/>
       <pathelement location="${asmx}/bin"/>
       <!-- additional for distribution:
