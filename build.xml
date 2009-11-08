@@ -46,6 +46,7 @@
 
     <target name="compile-all"
            depends="compile-asmx,compile-scene-lib,compile-afu"/>
+    <!-- TODO: Add asmx tests when they work -->
     <target name="test-all"
            depends="test-scene-lib,test-afu"/>
     <target name="clean-all">
