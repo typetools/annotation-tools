@@ -972,6 +972,7 @@ extends EmptyVisitor {
     }
 
     private void prepareForElement(ScalarAFT elementType) {
+      if (trace) { System.out.printf("prepareForElement(%s) in %s (%s)%n", elementType, this, this.getClass()); }
       assert elementType != null; // but, does this happen when reading from classfile?
       if (arrayBuilder == null) {
         this.elementType = elementType;
@@ -980,10 +981,23 @@ extends EmptyVisitor {
       }
     }
 
+    // There are only so many different array types that are permitted in
+    // an annotation.  (I'm not sure how relevant that is here.)
     @Override
     public void visit(String name, Object value) {
-      if (trace) { System.out.printf("visit(%s, %s) in %s (%s)%n", name, value, this, this.getClass()); }
-      prepareForElement(BasicAFT.forType(value.getClass()));
+      if (trace) { System.out.printf("visit(%s, %s) (%s) in %s (%s)%n", name, value, value.getClass(), this, this.getClass()); }
+      ScalarAFT aft;
+      if (value.getClass().equals(org.objectweb.asm.Type.class)) {
+        // What if it's an annotation?
+        aft = ClassTokenAFT.ctaft;
+        value = ((org.objectweb.asm.Type) value).getClassName();
+      } else {
+        Class<?> vc = value.getClass();
+        aft = BasicAFT.forType(vc);
+        //or: aft = (ScalarAFT) AnnotationFieldType.fromClass(vc, null);
+      }
+      assert aft != null;
+      prepareForElement(aft);
       assert arrayBuilder != null;
       arrayBuilder.appendElement(value);
     }
