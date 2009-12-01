@@ -151,7 +151,7 @@ public class ClassFileWriter {
    *
    * @param scene the scene containing the annotations to insert into a class
    * @param fileName the file name of the class the annotations should be
-   * inserted
+   * inserted into
    * @param overwrite whether to overwrite existing annotations
    * @throws IOException if there is a problem reading from or writing to
    * <code> fileName </code>
