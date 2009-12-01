@@ -35,7 +35,8 @@ out3:
 	${XJAVAC} -d out3 source-plain/AnnotationTest.java || (\rm -rf out3 && false)
 
 # Step 4: Insert annotations into the class file.
-out4.class:
+# Can debug with:  javap -v out4.class 
+out4.class: out3
 	CLASSPATH=`pwd`/out1 ${ANNCAT} --index expected-annos.jann --out --class out3/annotations/tests/AnnotationTest.class --to out4.class
 
 # Step 5: Convert the annotation-inserted class file to an annotation file.
@@ -43,7 +44,7 @@ out4.class:
 # (The annotation-compiled and annotation-inserted class files tend to differ
 # for stupid reasons (e.g., order of items in the constant pool), so we don't
 # compare them.)
-out5.jann:
+out5.jann: out4.class
 	CLASSPATH=`pwd`/out1 ${ANNCAT} --class out4.class --out --index out5.jann
 
 out5.diff: out5.jann
