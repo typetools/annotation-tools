@@ -169,7 +169,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
   public FieldVisitor visitField(int access, String name, String desc,
       String signature, Object value) {
     ensureVisitSceneClassAnnotations();
-    // FieldAnnotationSceneWriter ensures that the field visit's all
+    // FieldAnnotationSceneWriter ensures that the field visits all
     //  its annotations in the scene.
     return new FieldAnnotationSceneWriter(name,
         super.visitField(access, name, desc, signature, value));
@@ -183,7 +183,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
   public MethodVisitor visitMethod(int access, String name, String desc,
       String signature, String[] exceptions) {
     ensureVisitSceneClassAnnotations();
-    // MethodAnnotationSceneWriter ensures that the method visit's all
+    // MethodAnnotationSceneWriter ensures that the method visits all
     //  its annotations in the scene.
     return new MethodAnnotationSceneWriter(name, desc,
         super.visitMethod(access, name, desc, signature, exceptions));
@@ -644,7 +644,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
 
     /**
      * Returns true iff the annotation with the given name should not be written
-     * because it already exits in this method's annotations.\
+     * because it already exists in this method's annotations.
      */
     private boolean shouldSkipExisting(String name) {
       return ((!overwrite)
