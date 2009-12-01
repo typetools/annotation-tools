@@ -223,7 +223,7 @@ extends EmptyVisitor {
       // program.  Worry about that later.
       Class<? extends java.lang.annotation.Annotation> annoClass;
       try {
-    	  annoClass = (Class<? extends java.lang.annotation.Annotation>) Class.forName(annoTypeName);
+        annoClass = (Class<? extends java.lang.annotation.Annotation>) Class.forName(annoTypeName);
       } catch (ClassNotFoundException e) {
         System.out.printf("Could not find class: %s%n", e.getMessage());
         printClasspath();
@@ -526,8 +526,8 @@ extends EmptyVisitor {
             handleMethodTypecastGenericArray((AMethod) aElement);
           break;
         case METHOD_RETURN:
-        	handleMethodReturnType((AMethod) aElement);
-        	break;
+          handleMethodReturnType((AMethod) aElement);
+          break;
         case METHOD_RETURN_GENERIC_OR_ARRAY:
           handleMethodReturnTypeGenericArray((AMethod) aElement);
           break;
@@ -674,7 +674,7 @@ extends EmptyVisitor {
      * Creates the inner annotation on aElement.innerTypes.
      */
     private void handleField(ATypeElement aElement) {
-    	aElement.tlAnnotationsHere.add(makeAnnotation());
+      aElement.tlAnnotationsHere.add(makeAnnotation());
     }
 
     /*
