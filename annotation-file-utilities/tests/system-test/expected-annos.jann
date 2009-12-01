@@ -104,7 +104,7 @@ class AnnotationTest: @annotations.tests.AClass @annotations.tests.CClass
         return:
 
     method doSomething(Ljava/util/Set;)Ljava/util/HashSet;: @annotations.tests.A0A @annotations.tests.C0A
-        return: @annotations.tests.A0AT @annotations.tests.C0AT
+        return: @annotations.tests.A0A @annotations.tests.C0A @annotations.tests.A0AT @annotations.tests.C0AT
             inner-type 0: @annotations.tests.A0B @annotations.tests.C0B
         receiver: @annotations.tests.A06 @annotations.tests.C06
         parameter #0: @annotations.tests.A0C @annotations.tests.C0C
