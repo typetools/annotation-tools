@@ -698,6 +698,12 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
       for (Annotation tla : aMethod.returnType.tlAnnotationsHere) {
         if (shouldSkip(tla)) continue;
 
+        // If this is "visitAnnotation(tla)", then the annotation
+        // incorrectly appears on the method rather than the return type.
+        // If this is "visitExtendedAnnotation(tla)", then the annotation
+        // incorrectly appears on a typecast.  (That's weird.  Maybe it's
+        // because it's still on the wrong location and the bits are
+        // interpreted as typecast bits.)
         AnnotationVisitor av = visitAnnotation(tla);
         visitFields(av, tla);
         av.visitEnd();
