@@ -14,8 +14,10 @@ class Bar:
         return:
         receiver: @ReadOnly
         parameter #0: @checkers.nullness.quals.NonNull
+            type:
 
     method setSomething(Ljava/lang/String;)V:
         return:
         parameter #0: @NonNull
+            type:
 
