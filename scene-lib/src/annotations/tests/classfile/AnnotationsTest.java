@@ -531,7 +531,7 @@ public class AnnotationsTest extends TestCase {
   /**
    * Runs a test on class files for TestMethodReturnTypeGenericArray.
    */
-  public void testcMethodReturnTypeGenericArray() {
+  public void IGNOREtestcMethodReturnTypeGenericArray() {
     testAgainstClass(nameIndex("TestMethodReturnTypeGenericArray.jann"),
         nameClass("TestMethodReturnTypeGenericArray"));
   }
