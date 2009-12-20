@@ -98,6 +98,7 @@ package annotations.tests:
 class AnnotationTest: @annotations.tests.AClass @annotations.tests.CClass
 
     field field: @annotations.tests.A0E @annotations.tests.C0E
+        type: @annotations.tests.A0E @annotations.tests.C0E
         inner-type 0: @annotations.tests.A0F @annotations.tests.C0F
 
     method <init>()V:
@@ -108,6 +109,7 @@ class AnnotationTest: @annotations.tests.AClass @annotations.tests.CClass
             inner-type 0: @annotations.tests.A0B @annotations.tests.C0B
         receiver: @annotations.tests.A06 @annotations.tests.C06
         parameter #0: @annotations.tests.A0C @annotations.tests.C0C
+            type: @annotations.tests.A0E @annotations.tests.C0E
             inner-type 0: @annotations.tests.A0D @annotations.tests.C0D
         local 2 #23+2: @annotations.tests.A08 @annotations.tests.C08
             inner-type 0: @annotations.tests.A09 @annotations.tests.C09
