@@ -512,8 +512,9 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
         if ((!overwrite) && existingFieldAnnotations.contains(name(tla))) {
           continue;
         }
-        AnnotationVisitor av = fv.visitAnnotation(classNameToDesc(name(tla)), isRuntimeRetention(tla));
+        ExtendedAnnotationVisitor av = fv.visitExtendedAnnotation(classNameToDesc(name(tla)), isRuntimeRetention(tla));
         visitFields(av, tla);
+        visitTargetType(av, TargetType.FIELD);
         av.visitEnd();
       }
 
@@ -698,14 +699,9 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
       for (Annotation tla : aMethod.returnType.tlAnnotationsHere) {
         if (shouldSkip(tla)) continue;
 
-        // If this is "visitAnnotation(tla)", then the annotation
-        // incorrectly appears on the method rather than the return type.
-        // If this is "visitExtendedAnnotation(tla)", then the annotation
-        // incorrectly appears on a typecast.  (That's weird.  Maybe it's
-        // because it's still on the wrong location and the bits are
-        // interpreted as typecast bits.)
-        AnnotationVisitor av = visitAnnotation(tla);
+        ExtendedAnnotationVisitor av = visitExtendedAnnotation(tla);
         visitFields(av, tla);
+        visitTargetType(av, TargetType.METHOD_RETURN);
         av.visitEnd();
       }
 
@@ -858,8 +854,10 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
         for (Annotation tla : aParameter.tlAnnotationsHere) {
           if (shouldSkip(tla)) continue;
 
-          AnnotationVisitor av = visitParameterAnnotation(index, tla);
+          ExtendedAnnotationVisitor av = visitExtendedAnnotation(tla);
           visitFields(av, tla);
+          visitTargetType(av, TargetType.METHOD_PARAMETER);
+          visitParameterIndex(av, index);
           av.visitEnd();
         }
 
