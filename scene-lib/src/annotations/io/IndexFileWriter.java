@@ -160,6 +160,42 @@ public final class IndexFileWriter {
         }
     }
 
+    private void printNumberedAmbigiousElements(String indentation,
+            String desc,
+            /*@ReadOnly*/ Map<Integer, /*@ReadOnly*/ ATypeElement> nels) {
+        for (/*@ReadOnly*/ Map.Entry<Integer, /*@ReadOnly*/ ATypeElement> te
+                : nels.entrySet()) {
+            /*@ReadOnly*/ ATypeElement t = te.getValue();
+            printAmbElementAndInnerTypes(indentation,
+                    desc + " #" + te.getKey(), t);
+        }
+    }
+
+    private void printAmbElementAndInnerTypes(String indentation,
+            String desc,
+            /*@ReadOnly*/ ATypeElement e) {
+        printElement(indentation, desc, e);
+        printElement(indentation + INDENT, "type", e.type);
+        for (/*@ReadOnly*/ Map.Entry<InnerTypeLocation, /*@ReadOnly*/ AElement> ite
+                : e.type.innerTypes.entrySet()) {
+            InnerTypeLocation loc = ite.getKey();
+            /*@ReadOnly*/ AElement it = ite.getValue();
+            pw.print(indentation + INDENT + "inner-type");
+            boolean first = true;
+            for (int l : loc.location) {
+                if (first)
+                    pw.print(' ');
+                else
+                    pw.print(',');
+                pw.print(l);
+                first = false;
+            }
+            pw.print(':');
+            printAnnotations(it);
+            pw.println();
+        }
+    }
+
     private void printNumberedElements(String indentation,
             String desc,
             /*@ReadOnly*/ Map<Integer, /*@ReadOnly*/ ATypeElement> nels) {
@@ -204,7 +240,8 @@ public final class IndexFileWriter {
                 String fname = fe.getKey();
                 /*@ReadOnly*/ ATypeElement f = fe.getValue();
                 pw.println();
-                printElementAndInnerTypes(INDENT, "field " + fname, f);
+                printElement(INDENT, "field " + fname, f);
+                printElementAndInnerTypes(INDENT, "type", f.type);
             }
             for (/*@ReadOnly*/ Map.Entry<String, /*@ReadOnly*/ AMethod> me
                     : c.methods.entrySet()) {
@@ -216,7 +253,7 @@ public final class IndexFileWriter {
                 printElementAndInnerTypes(INDENT + INDENT, "return", m.returnType);
                 if (!m.receiver.tlAnnotationsHere.isEmpty())
                     printElement(INDENT + INDENT, "receiver", m.receiver);
-                printNumberedElements(INDENT + INDENT, "parameter", m.parameters);
+                printNumberedAmbigiousElements(INDENT + INDENT, "parameter", m.parameters);
                 for (/*@ReadOnly*/ Map.Entry<LocalLocation, /*@ReadOnly*/ ATypeElement> le
                         : m.locals.entrySet()) {
                     LocalLocation loc = le.getKey();

@@ -116,8 +116,11 @@ public abstract class DefCollector {
     private void collect(/*@ReadOnly*/ ATypeElement e)
             throws DefException {
         collect((/*@ReadOnly*/ AElement) e);
-        for (AElement it : e.innerTypes.values())
-            collect(it);
+        if (e.type != null) {
+            collect((/*@ReadOnly*/ AElement) e.type);
+            for (AElement it : e.type.innerTypes.values())
+                collect(it);
+        }
     }
 
     private void collect(/*@ReadOnly*/ AMethod m)

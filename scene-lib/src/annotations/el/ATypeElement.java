@@ -31,6 +31,9 @@ public class ATypeElement extends AElement {
         };
     }
 
+    /** The type of a field or a method parameter */
+    public final ATypeElement type; // initialized in constructor
+
     /** The annotated inner types; map key is the inner type location */
     public final VivifyingMap<InnerTypeLocation, AElement> innerTypes =
         AElement.<InnerTypeLocation>newVivifyingLHMap_AE();
@@ -39,8 +42,13 @@ public class ATypeElement extends AElement {
     public Object description;
 
     ATypeElement(Object description) {
+        this(description, true);
+    }
+
+    ATypeElement(Object description, boolean isType) {
       super(description);
       this.description = description;
+      type = isType ? new ATypeElement("type of " + description, false) : null;
     }
 
     /**
@@ -56,7 +64,8 @@ public class ATypeElement extends AElement {
 
     // note:  does not call super.equals, so does not check name
     final boolean equalsTypeElement(/*@ReadOnly*/ ATypeElement o) /*@ReadOnly*/ {
-        return equalsElement(o) && innerTypes.equals(o.innerTypes);
+        return equalsElement(o) && innerTypes.equals(o.innerTypes)
+            && (type == null ? o.type == null : type.equals(o.type));
     }
 
     /**
@@ -64,7 +73,8 @@ public class ATypeElement extends AElement {
      */
     @Override
     public int hashCode() /*@ReadOnly*/ {
-        return tlAnnotationsHere.hashCode() + innerTypes.hashCode();
+        return tlAnnotationsHere.hashCode() + innerTypes.hashCode()
+                + (type == null ? 0 : type.hashCode());
     }
 
     /**
@@ -72,7 +82,8 @@ public class ATypeElement extends AElement {
      */
     @Override
     public boolean prune() {
-        return super.prune() & innerTypes.prune();
+        return super.prune() & innerTypes.prune()
+            & (type != null ? type.prune() : true);
     }
 
     private static final String lineSep = System.getProperty("line.separator");
@@ -86,6 +97,9 @@ public class ATypeElement extends AElement {
         for (Annotation a : tlAnnotationsHere) {
           sb.append(a.toString());
           sb.append(" ");
+        }
+        if (type != null) {
+            
         }
         sb.append("{");
         String linePrefix = "  ";
