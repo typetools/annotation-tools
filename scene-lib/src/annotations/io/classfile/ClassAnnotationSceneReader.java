@@ -728,14 +728,14 @@ extends EmptyVisitor {
      * Creates the method parameter type generic/array annotation on aMethod.
      */
     private void handleMethodParameterType(AMethod aMethod) {
-      aMethod.parameters.vivify(makeIndex()).tlAnnotationsHere.add(makeAnnotation());
+      aMethod.parameters.vivify(makeIndex()).type.tlAnnotationsHere.add(makeAnnotation());
     }
 
     /*
      * Creates the method parameter type generic/array annotation on aMethod.
      */
     private void handleMethodParameterTypeGenericArray(AMethod aMethod) {
-      aMethod.parameters.vivify(makeIndex()).innerTypes.vivify(
+      aMethod.parameters.vivify(makeIndex()).type.innerTypes.vivify(
           makeInnerTypeLocation()).tlAnnotationsHere.add(makeAnnotation());
     }
 
