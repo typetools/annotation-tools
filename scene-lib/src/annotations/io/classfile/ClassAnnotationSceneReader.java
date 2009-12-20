@@ -1075,13 +1075,13 @@ extends EmptyVisitor {
     @Override
     public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
       if (trace) { System.out.printf("visitAnnotation(%s, %s) in %s (%s)%n", desc, visible, this, this.getClass()); }
-      return visitExtendedAnnotation(desc, visible);
+      return new AnnotationSceneReader(desc, visible, aField);
     }
 
     @Override
     public ExtendedAnnotationVisitor visitExtendedAnnotation(String desc, boolean visible) {
       if (trace) { System.out.printf("visitExtendedAnnotation(%s, %s) in %s (%s)%n", desc, visible, this, this.getClass()); }
-      return new AnnotationSceneReader(desc, visible, aField);
+      return new AnnotationSceneReader(desc, visible, aField.type);
     }
   }
 
