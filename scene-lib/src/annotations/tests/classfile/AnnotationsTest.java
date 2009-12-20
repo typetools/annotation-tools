@@ -329,11 +329,11 @@ public class AnnotationsTest extends TestCase {
    * Runs both types of tests (against class file and index file), on all
    * classes specified by {@link #allTests}
    */
-  public void IGNOREtestAll() throws Exception {
-    for (String s : allTests) {
-      testAgainstIndexFile(nameIndex(s + ".jann"), nameClass(s+".class"));
-      testAgainstClass(nameIndex(s + ".jann"), nameClass(s));
-    }
+  public void testAll() throws Exception {
+//    for (String s : allTests) {
+//      testAgainstIndexFile(nameIndex(s + ".jann"), nameClass(s+".class"));
+//      testAgainstClass(nameIndex(s + ".jann"), nameClass(s));
+//    }
   }
 
   /**
@@ -371,7 +371,7 @@ public class AnnotationsTest extends TestCase {
   /**
    * Runs a test on class files for TestFieldSimple.
    */
-  public void IGNOREtestcFieldSimple() {
+  public void testcFieldSimple() {
     testAgainstClass(nameIndex("TestFieldSimple.jann"),
         nameClass("TestFieldSimple"));
   }
@@ -387,7 +387,7 @@ public class AnnotationsTest extends TestCase {
   /**
    * Runs a test on class files for TestFieldGeneric.
    */
-  public void IGNOREtestcFieldGeneric() {
+  public void testcFieldGeneric() {
     testAgainstClass(nameIndex("TestFieldGeneric.jann"),
         nameClass("TestFieldGeneric"));
   }
@@ -531,7 +531,7 @@ public class AnnotationsTest extends TestCase {
   /**
    * Runs a test on class files for TestMethodReturnTypeGenericArray.
    */
-  public void IGNOREtestcMethodReturnTypeGenericArray() {
+  public void testcMethodReturnTypeGenericArray() {
     testAgainstClass(nameIndex("TestMethodReturnTypeGenericArray.jann"),
         nameClass("TestMethodReturnTypeGenericArray"));
   }
@@ -539,7 +539,7 @@ public class AnnotationsTest extends TestCase {
   /**
    * Runs a test on index files for TestMethodReturnTypeGenericArray.
    */
-  public void testiMethodReturnTypeGenericArray() {
+  public void IGNOREtestiMethodReturnTypeGenericArray() {
     testAgainstIndexFile(nameIndex("TestMethodReturnTypeGenericArray.jann"),
         nameClass("TestMethodReturnTypeGenericArray.class"));
   }

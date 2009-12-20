@@ -512,6 +512,16 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
         if ((!overwrite) && existingFieldAnnotations.contains(name(tla))) {
           continue;
         }
+        AnnotationVisitor av = fv.visitAnnotation(classNameToDesc(name(tla)), isRuntimeRetention(tla));
+        visitFields(av, tla);
+        av.visitEnd();
+      }
+
+      // Then do the type annotations on the field
+      for (Annotation tla : aField.type.tlAnnotationsHere) {
+        if ((!overwrite) && existingFieldAnnotations.contains(name(tla))) {
+          continue;
+        }
         ExtendedAnnotationVisitor av = fv.visitExtendedAnnotation(classNameToDesc(name(tla)), isRuntimeRetention(tla));
         visitFields(av, tla);
         visitTargetType(av, TargetType.FIELD);
@@ -520,7 +530,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
 
       // Now do field generics/arrays.
       for (Map.Entry<InnerTypeLocation, AElement> fieldInnerEntry :
-        aField.innerTypes.entrySet()) {
+        aField.type.innerTypes.entrySet()) {
 
         for (Annotation tla : fieldInnerEntry.getValue().tlAnnotationsHere) {
           if ((!overwrite) && existingFieldAnnotations.contains(name(tla))) {
@@ -672,7 +682,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
      * Has this visit the parameter annotation in tla and returns the
      * resulting visitor.
      */
-    private AnnotationVisitor visitParameterAnnotation(int index, Annotation tla) {
+    private AnnotationVisitor visitParameterAnnotation(Annotation tla, int index) {
       return super.visitParameterAnnotation(index, classNameToDesc(name(tla)), isRuntimeRetention(tla));
     }
 
@@ -851,19 +861,29 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
         aMethod.parameters.entrySet()) {
         ATypeElement aParameter = entry.getValue();
         int index = entry.getKey();
+        // First visit declaration annotations on the parameter
         for (Annotation tla : aParameter.tlAnnotationsHere) {
           if (shouldSkip(tla)) continue;
 
-          ExtendedAnnotationVisitor av = visitExtendedAnnotation(tla);
+          AnnotationVisitor av = visitParameterAnnotation(tla, index);
           visitFields(av, tla);
-          visitTargetType(av, TargetType.METHOD_PARAMETER);
-          visitParameterIndex(av, index);
           av.visitEnd();
+        }
+
+        // Then handle type annotations targeting the parameter
+        for (Annotation tla : aParameter.type.tlAnnotationsHere) {
+            if (shouldSkip(tla)) continue;
+
+            ExtendedAnnotationVisitor av = visitExtendedAnnotation(tla);
+            visitFields(av, tla);
+            visitTargetType(av, TargetType.METHOD_PARAMETER);
+            visitParameterIndex(av, index);
+            av.visitEnd();
         }
 
         // now handle inner annotations on aParameter (parameter)
         for (Map.Entry<InnerTypeLocation, AElement> e :
-          aParameter.innerTypes.entrySet()) {
+          aParameter.type.innerTypes.entrySet()) {
           InnerTypeLocation aParameterLocation = e.getKey();
           AElement aInnerType = e.getValue();
           for (Annotation tla : aInnerType.tlAnnotationsHere) {
