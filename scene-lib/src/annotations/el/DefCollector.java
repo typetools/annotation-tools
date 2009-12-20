@@ -118,9 +118,9 @@ public abstract class DefCollector {
         collect((/*@ReadOnly*/ AElement) e);
         if (e.type != null) {
             collect((/*@ReadOnly*/ AElement) e.type);
-            for (AElement it : e.type.innerTypes.values())
-                collect(it);
         }
+        for (AElement it : e.innerTypes.values())
+            collect(it);
     }
 
     private void collect(/*@ReadOnly*/ AMethod m)
