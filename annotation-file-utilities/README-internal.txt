@@ -21,7 +21,7 @@ Manually update the version number and date in the following places:
     annotations/scene-lib/src/annotations/io/classfile/ClassFileWriter.java
 
 Run 
-  ant web
+  ant -e web
 create and post to the web the entire distribution.
 
 Run
