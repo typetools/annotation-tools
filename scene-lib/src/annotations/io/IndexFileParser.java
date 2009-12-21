@@ -593,7 +593,12 @@ public final class IndexFileParser {
 
         expectChar(':');
         parseAnnotations(f);
-        parseInnerTypes(f);
+        if (checkKeyword("type") && matchKeyword("type")) {
+            expectChar(':');
+            parseAnnotations(f.type);
+            // no need for parseInner call here
+        }
+        parseInnerTypes(f.type);
     }
 
     private void parseMethod(AClass c) throws IOException,
@@ -646,7 +651,12 @@ public final class IndexFileParser {
                 ATypeElement p = m.parameters.vivify(idx);
                 expectChar(':');
                 parseAnnotations(p);
-                parseInnerTypes(p);
+                if (checkKeyword("type") && matchKeyword("type")) {
+                    expectChar(':');
+                    parseAnnotations(p.type);
+                    // no need to parse inner types here
+                }
+                parseInnerTypes(p.type);
             } else if (matchKeyword("receiver")) {
                 expectChar(':');
                 parseAnnotations(m.receiver);

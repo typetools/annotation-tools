@@ -10,7 +10,8 @@ annotation @GenericType: @Retention(value=RUNTIME) @java.lang.annotation.Target(
 package annotator.tests:
 class FieldGenericArray:
 
-    field field: @OuterMostType
+    field field:
+        type: @OuterMostType
         inner-type 0: @InsideArray
         inner-type 0,0: @GenericType
 

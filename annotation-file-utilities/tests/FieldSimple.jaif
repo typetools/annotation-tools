@@ -4,7 +4,8 @@ annotation @Mutable: @Retention(value=RUNTIME) @java.lang.annotation.Target(valu
 package annotator.tests:
 class FieldSimple:
 
-    field field: @java.lang.Mutable
+    field field:
+      type: @java.lang.Mutable
 
     method <init>()V:
 
