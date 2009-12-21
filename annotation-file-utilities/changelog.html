@@ -15,7 +15,7 @@ This is the changelog for the
 <ul>
 
   <li>
-  Version 3.0.0: (Released December ??, 2009)
+  Version 3.0 (released December 21, 2009):
     <ul>
       <li>
       Handle meta-annotations.
@@ -28,7 +28,8 @@ This is the changelog for the
       <li>
       Distinguish type annotations from declaration annotations.
       Previously, AFU assumed that all annotations were type annotations.  Now,
-      this information is looked up from the meta-annotations.
+      this information is looked up from the meta-annotations and is
+      distinguished in the file format (see below).
       </li>
 
       <li>
@@ -98,14 +99,14 @@ This is the changelog for the
   </li>
 
   <li>
-  Version 2.3.3: (Released August 18, 2009)
+  Version 2.3.3 (released August 18, 2009):
     <ul>
       <li>Fix a few bugs.</li>
     </ul>
   </li>
 
   <li>
-  Version 2.3.2: (Released August 14, 2009)
+  Version 2.3.2 (released August 14, 2009):
     <ul>
       <li>Relax file format:  receiver may precede parameters (in spec &
           implementation), parameters may omit "#" (in implementation only)</li>
@@ -113,14 +114,14 @@ This is the changelog for the
   </li>
 
   <li>
-  Version 2.3.1: (Released August 12, 2009)
+  Version 2.3.1 (released August 12, 2009):
     <ul>
       <li>Fix many bugs.</li>
     </ul>
   </li>
 
   <li>
-  Version 2.3: (Released July 29, 2009)
+  Version 2.3 (released July 29, 2009):
     <ul>
       <li>Support -i --in-place argument.</li>
       <li>Fix incorrect array brackets in tests.</li>
@@ -131,7 +132,7 @@ This is the changelog for the
   </li>
 
   <li>
-  Version 2.2: (Released December 7, 2008)
+  Version 2.2 (released December 7, 2008):
     <ul>
       <li>Permit Main to process multiple files at a time.</li>
       <li>Don't re-insert annotations that are already present.</li>
@@ -145,14 +146,14 @@ This is the changelog for the
   </li>
 
   <li>
-  Version 2.1.2: (Released April 28, 2008)
-  Minor updates to the &ldquo;Annotation File Specification&rdquo; (<a
+  Version 2.1.2 (released April 28, 2008):
+  Minor updates to the &ldquo;Annotation File Format Specification&rdquo; (<a
     href="http://types.cs.washington.edu/annotation-file-utilities/annotation-file-format.pdf">PDF</a>, <a
     href="http://types.cs.washington.edu/annotation-file-utilities/annotation-file-format.html">HTML</a>).
   </li>
 
   <li>
-  Version 2.1.1: (Released May 31, 2007)
+  Version 2.1.1 (released May 31, 2007):
   Added support for two new annotation target_types; consult the
   classfile specification (<a
   href="http://types.cs.washington.edu/jsr308/specification/java-annotation-design.pdf">PDF</a>,
@@ -160,16 +161,18 @@ This is the changelog for the
   </li>
 
   <li>
-  Version 2.1: (Released May 4, 2007)
+  Version 2.1 (released May 4, 2007):
   Modified overall setup of distribution to be easier to understand.
   </li>
 
   <li>
-  Version 2.0: (Released May 1, 2007) Initial public release.
+  Version 2.0 (released May 1, 2007):
+  Initial public release.
   </li>
 
   <li>
-  Version 1.0: (Released March 19, 2007) Preliminary release.
+  Version 1.0 (released March 19, 2007):
+  Preliminary release.
   The <code>insert-to-annotations-source</code> tool only
   operates on class, field and method signatures.
   </li>
