@@ -291,13 +291,16 @@ inner class or the outer class.)
 \qquad        \bnfnt{method-definition}* \\
 \\
 \bnfnt{field-definition} ::= \\
+\qquad    \bnfcmt The annotation on the \bnlit{field} line is that of the field declaration,
+\qquad    \bnfcmt while the annotation on the \bnlit{type} line is that of outermost type.
 \qquad    \bnflit{field} \bnfnt{name} \bnflit{:} \bnfnt{annotation}* \lineend  \\
+\qquad        \bnflit{type:} \bnfnt{annotation}* \lineend \\
 \qquad        \bnfnt{type-argument-or-array-definition}* \\
 \\
 \bnfnt{method-definition} ::= \\
 \qquad    \bnfcmt The method-key consists of the name followed by the signature \\
 \qquad    \bnfcmt in JVML format, for example: ``\code{foo([ILjava/lang/String;)V}''. \\
-\qquad    \bnfcmt The annotation on the \bnflit{method} line is that on the method or the return value. \\
+\qquad    \bnfcmt The annotation on the \bnflit{method} line is that on the method not the return value. \\
 \qquad    \bnflit{method} \bnfnt{method-key} \bnflit{:} \bnfnt{annotation}* \lineend \\
 \qquad        \bnfnt{bound-definition}* \\
 \qquad        \bnfnt{return-definition}? \\
@@ -328,7 +331,10 @@ inner class or the outer class.)
 \bnfnt{parameter-definition} ::= \\
 \qquad    \bnfcmt the integer is the index of the parameter in the method \\
 \qquad    \bnfcmt (i.e., 0 is the first method parameter) \\
+\qquad    \bnfcmt The annotation on the \bnlit{parameter} line is that of the parameter declaration,
+\qquad    \bnfcmt while the annotation on the \bnlit{type} line is that of outermost type of the parameter.
 \qquad    \bnflit{parameter} \bnfnt{integer} \bnflit{:} \bnfnt{annotation}* \lineend \\
+\qquad        \bnflit{type:} \bnfnt{annotation}* \lineend \\
 \qquad    \bnfnt{type-argument-or-array-definition}* \\
 \\
 \bnfnt{variable-definition} ::= \\

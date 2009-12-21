@@ -42,6 +42,9 @@ This is the changelog for the
       declaration in the class file.
       </li>
 
+      <li>
+    </li>
+
       <li>Changes to annotation file format.
 
 	<ul>
@@ -69,7 +72,14 @@ This is the changelog for the
 	    <pre>  method foo(Ljava/util/Set;)V:
     return: @p2.B</pre>
 
-	Fields should perhaps be treated similarly, but are not (yet).
+    Fields and method parameters are treated similarly, but with `type`
+    marker instead of `return`.  So if p2.A is a declaration annotation
+    targeting the field, while p2.B is a type annotation on the field,
+    the field would be declared as:
+    
+    <pre> field s: @p2.A
+    type: @p2.B</pre>
+
 	  </li>
 	  <li>Permit qualified names in several places that only identifiers were
 	permitted before.  This enables use of names that contain periods, such
