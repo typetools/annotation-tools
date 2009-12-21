@@ -8,13 +8,16 @@ annotation @InnerlyAnnotated: @java.lang.annotation.Target(value={TYPE_USE})
 package annotator.tests:
 class InnerClassAnonymous$1:
 
-    field serialVersionUID: @java.lang.ReadOnly
+    field serialVersionUID:
+        type: @java.lang.ReadOnly
 
 class InnerClassAnonymous$2:
 
-    field serialVersionUID: @NonNegative
+    field serialVersionUID:
+        type: @NonNegative
 
 class InnerClassAnonymous$3:
 
-    field serialVersionUID: @InnerlyAnnotated
+    field serialVersionUID:
+        type: @InnerlyAnnotated
 

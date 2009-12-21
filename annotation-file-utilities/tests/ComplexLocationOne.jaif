@@ -16,7 +16,8 @@ annotation @E: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYP
 package annotator.tests:
 class ComplexLocationOne:
 
-    field field: @java.lang.A
+    field field:
+        type: @java.lang.A
         inner-type 0,0: @java.lang.C
         inner-type 0,1,0: @java.lang.D
         inner-type 0,1: @java.lang.E

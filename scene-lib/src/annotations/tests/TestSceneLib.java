@@ -24,11 +24,16 @@ public /*@ReadOnly*/ class TestSceneLib extends TestCase {
     }
 
     static final String fooIndexContents =
-            "package:\n" + "annotation @Ready: @Retention(RUNTIME)\n"
-                    + "annotation @Author: @Retention(CLASS)\n" + "String value\n"
-                    + "class Foo:\n" + "field x: @Ready\n" + "method y()Z:\n"
-                    + "parameter #5:\n" + "inner-type 1, 2:\n"
-                    + "@Author(value=\"Matt M.\")\n";
+            "package:\n" +
+            "annotation @Ready: @Retention(RUNTIME)\n" +
+            "annotation @Author: @Retention(CLASS)\n" +
+            "String value\n" +
+            "class Foo:\n" +
+            "field x: @Ready\n" +
+            "method y()Z:\n" +
+            "parameter #5:\n" +
+            "inner-type 1, 2:\n" +
+            "@Author(value=\"Matt M.\")\n";
 
     public static AnnotationDef adAuthor
       = Annotations.createValueAnnotationDef("Author",
@@ -112,7 +117,7 @@ public /*@ReadOnly*/ class TestSceneLib extends TestCase {
         s1.classes.vivify("Foo").fields.vivify("x").tlAnnotationsHere
                 .add(createEmptyAnnotation(ready));
         Annotation myAuthor = Annotations.createValueAnnotation(adAuthor, "Matt M.");
-        s1.classes.vivify("Foo").methods.vivify("y()Z").parameters.vivify(5).innerTypes
+        s1.classes.vivify("Foo").methods.vivify("y()Z").parameters.vivify(5).type.innerTypes
                 .vivify(new InnerTypeLocation(Arrays
                                 .asList(new Integer[] { 1, 2 }))).tlAnnotationsHere
                 .add(myAuthor);
