@@ -8,8 +8,11 @@ package annotator.tests:
 class ConstructorParamMultiple:
 
     method <init>(Ljava/lang/Object;Ljava/util/List;I)V:
-        parameter #0: @java.lang.ReadOnly
-        parameter #1: @java.lang.ReadOnly
+        parameter #0:
+            type: @java.lang.ReadOnly
+        parameter #1:
+            type: @java.lang.ReadOnly
             inner-type 0: @java.lang.Mutable
-        parameter #2: @java.lang.ReadOnly
+        parameter #2:
+            type: @java.lang.ReadOnly
 

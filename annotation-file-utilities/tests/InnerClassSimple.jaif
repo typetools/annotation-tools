@@ -5,7 +5,8 @@ annotation @DoesNotExist: @Retention(value=RUNTIME) @java.lang.annotation.Target
 package annotator.tests:
 class InnerClassSimple$ActualInnerClass: @java.lang.ReadOnly
 
-    field d: @java.lang.ReadOnly
+    field d:
+        type: @java.lang.ReadOnly
 
 package annotator.tests.InnerClassSimple:
 class ActualInnerClass: @java.lang.DoesNotExist

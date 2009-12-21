@@ -22,7 +22,8 @@ class BoundMethodMultiple:
     method <init>()V:
 
     method foo(Ljava/lang/Object;)V:
-        parameter #0: @java.lang.A
+        parameter #0: 
+          type: @java.lang.A
 
     method foo(Lannotator/tests/Date;)V:
         bound ,0 &0: @java.lang.B
