@@ -296,8 +296,10 @@
     <copy file="annotation-tools.zip"
       todir="${jsr308-www-annotation-file-utilities}"/>
 
-    <echo message="Copying annotation-file-utilities.html as index.html"/>
+    <echo message="Copying annotation-file-utilities.html"/>
     <copy file="annotation-file-utilities.html"
+      todir="${jsr308-www-annotation-file-utilities}"/>
+    <copy file="changelog.html"
       todir="${jsr308-www-annotation-file-utilities}"/>
 
     <echo message="Copying annotation-file-format.{html,pdf"/>
