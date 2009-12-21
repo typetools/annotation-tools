@@ -10,7 +10,7 @@
 
     <target name="all" depends="compile,test"/>
 
-    <target name="compile" description="Compiler all annotation tools"
+    <target name="compile" description="Compile all annotation tools"
         depends="compile-all"/>
 
     <target name="test" description="Test all the tools"

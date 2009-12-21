@@ -27,9 +27,11 @@
 \makeatother
 
 
-\title{Annotation File Specification}
+\title{Annotation File Format Specification}
+% Hevea ignores \date, so move the date into \author
 \author{\url{http://types.cs.washington.edu/annotation-file-utilities/} \\
 \today}
+\date{}
 
 \begin{document}
 
@@ -141,7 +143,9 @@ annotation index file''), but this is not required.
 \newcommand{\bnfor}{\ensuremath{|}}
 
 
-\section{Grammar conventions}
+\section{Grammar}
+
+\subsection{Grammar conventions}
 
 % TODO: How is "[...]" different from "(...)?" ?  Why are two versions
 % necessary? -MDE
@@ -291,8 +295,8 @@ inner class or the outer class.)
 \qquad        \bnfnt{method-definition}* \\
 \\
 \bnfnt{field-definition} ::= \\
-\qquad    \bnfcmt The annotation on the \bnlit{field} line is that of the field declaration, \\
-\qquad    \bnfcmt while the annotation on the \bnlit{type} line is that of outermost type. \\
+\qquad    \bnfcmt The annotation on the \bnflit{field} line is that of the field declaration, \\
+\qquad    \bnfcmt while the annotation on the \bnflit{type} line is that of outermost type. \\
 \qquad    \bnflit{field} \bnfnt{name} \bnflit{:} \bnfnt{annotation}* \lineend  \\
 \qquad        \bnflit{type:} \bnfnt{annotation}* \lineend \\
 \qquad        \bnfnt{type-argument-or-array-definition}* \\
@@ -331,8 +335,8 @@ inner class or the outer class.)
 \bnfnt{parameter-definition} ::= \\
 \qquad    \bnfcmt the integer is the index of the parameter in the method \\
 \qquad    \bnfcmt (i.e., 0 is the first method parameter) \\
-\qquad    \bnfcmt The annotation on the \bnlit{parameter} line is that of the parameter declaration, \\
-\qquad    \bnfcmt while the annotation on the \bnlit{type} line is that of outermost type of the parameter. \\
+\qquad    \bnfcmt The annotation on the \bnflit{parameter} line is that of the parameter declaration, \\
+\qquad    \bnfcmt while the annotation on the \bnflit{type} line is that of outermost type of the parameter. \\
 \qquad    \bnflit{parameter} \bnfnt{integer} \bnflit{:} \bnfnt{annotation}* \lineend \\
 \qquad        \bnflit{type:} \bnfnt{annotation}* \lineend \\
 \qquad    \bnfnt{type-argument-or-array-definition}* \\
