@@ -159,7 +159,11 @@ public class IndexFileSpecification implements Specification {
   /** Fill in this.insertions with insertion pairs. */
   private void parseField(CriterionList clist, String fieldName, ATypeElement field) {
     clist = clist.add(Criteria.field(fieldName));
-    parseInnerAndOuterElements(clist, field);
+
+    // parse declaration annotations
+    parseElement(clist, field);
+
+    parseInnerAndOuterElements(clist, field.type);
   }
 
   /** Fill in this.insertions with insertion pairs. */
@@ -251,7 +255,9 @@ public class IndexFileSpecification implements Specification {
       Integer index = entry.getKey();
       ATypeElement param = entry.getValue();
       CriterionList paramClist = clist.add(Criteria.param(methodName, index));
-      parseInnerAndOuterElements(paramClist, param);
+      // parse declaration annotations
+      parseElement(clist, param);
+      parseInnerAndOuterElements(paramClist, param.type);
     }
 
     // parse locals of method
