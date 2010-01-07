@@ -10,11 +10,13 @@ annotation @ThisMutable: @Retention(value=RUNTIME) @java.lang.annotation.Target(
 package annotator.tests:
 class GenericCell:
 
-    field internalList: @java.lang.ThisMutable
+    field internalList:
+        type: @java.lang.ThisMutable
         inner-type 0: @java.lang.ThisMutable
 
     method <init>(Ljava/util/List;)V:
-        parameter #0: @java.lang.Mutable
+        parameter #0:
+            type: @java.lang.Mutable
             inner-type 0: @java.lang.Mutable
 
     method getList()Ljava/util/List;:

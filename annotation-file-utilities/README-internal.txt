@@ -1,22 +1,31 @@
-This is the internal README for creating a distribution of the annotation
-file utilities.
+This is the internal README for creating a distribution of the Annotation
+File Utilities.
 
 The distributed documentation file is annotation-file-utilities.html.
 
-The annotator is the insert-annnotations-to-source tool of the annotation
-file utilities.
+The annotator is the insert-annnotations-to-source tool of the Annotation
+File Utilities.
 
-The relevant ant build commands are:
+For a list of all Ant targets, run:  
+  ant -projecthelp
 
-  ant export            create and post to the web the entire distribution
-  ant -projecthelp      list all other ant targets
+===========================================================================
 
-Before you make a new release, you must manually update the version number
-and date in the following places:
-  In the manual:
-    annotation-file-utilities.html (twice, including in the changelog)
-  In the actual tools:
+To make a release:
+
+Manually update the version number and date in the following places:
+    annotation-file-utilities.html
+    changelog.html
     src/annotator/Main.java
     annotations/scene-lib/src/annotations/io/classfile/ClassFileReader.java
     annotations/scene-lib/src/annotations/io/classfile/ClassFileWriter.java
 
+Run 
+  ant -e web
+create and post to the web the entire distribution.
+
+Run
+  checklink -q -r http://types.cs.washington.edu/annotation-file-utilities/
+and if there are any problems, re-make the distribution.
+
+Send email to: jsr308-discuss@googlegroups.com

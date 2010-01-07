@@ -7,7 +7,8 @@ annotation @Mutable: @Retention(value=RUNTIME) @java.lang.annotation.Target(valu
 package annotator.tests:
 class FieldSimpleArray:
 
-    field field: @java.lang.ReadOnly
+    field field:
+        type: @java.lang.ReadOnly
         inner-type 0: @java.lang.Mutable
 
     method <init>()V:

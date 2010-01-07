@@ -11,7 +11,8 @@ annotation @H: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYP
 package annotator.tests:
 class ArrayMultiDim:
 
-    field field: @D
+    field field:
+        type: @D
         inner-type 0: @E
         inner-type 1: @F
         inner-type 2: @C
