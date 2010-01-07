@@ -1,0 +1,20 @@
+package java.lang:
+annotation @ReadOnly: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+
+package:
+annotation @NonNegative: @java.lang.annotation.Target(value={TYPE_USE})
+annotation @InnerlyAnnotated: @java.lang.annotation.Target(value={TYPE_USE})
+
+package annotator.tests:
+class InnerClassAnonymous$1:
+
+    field serialVersionUID: @java.lang.ReadOnly
+
+class InnerClassAnonymous$2:
+
+    field serialVersionUID: @NonNegative
+
+class InnerClassAnonymous$3:
+
+    field serialVersionUID: @InnerlyAnnotated
+
