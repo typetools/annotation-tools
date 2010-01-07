@@ -663,7 +663,12 @@ extends EmptyVisitor {
      * Returns the bound location for this annotation.
      */
     private BoundLocation makeBoundLocation() {
-      return new BoundLocation(xParamIndexArgs.get(0), xBoundIndexArgs.get(0));
+      // TODO: Give up on unbounded wildcards for now!
+      if (!xParamIndexArgs.isEmpty()) {
+        return new BoundLocation(xParamIndexArgs.get(0), xBoundIndexArgs.get(0));
+      } else {
+        return new BoundLocation(Integer.MAX_VALUE, Integer.MAX_VALUE);
+      }
     }
 
     private TypeIndexLocation makeTypeIndexLocation() {

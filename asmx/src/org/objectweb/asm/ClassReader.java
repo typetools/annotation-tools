@@ -1453,9 +1453,14 @@ public class ClassReader {
         // } reference_info;
         case CLASS_EXTENDS:
         case CLASS_EXTENDS_GENERIC_OR_ARRAY:
+            type_index = readUnsignedShort(v);
+            if (type_index == 0xFF) type_index = -1;
+            v += 2;
+            xav.visitXTypeIndex(type_index);
+            break;
         case THROWS:
-          type_index = readByte(v);
-          v++;
+          type_index = readUnsignedShort(v);
+          v += 2;
           xav.visitXTypeIndex(type_index);
           break;
 
