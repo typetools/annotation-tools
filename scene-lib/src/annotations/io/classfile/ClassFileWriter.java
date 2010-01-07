@@ -22,7 +22,7 @@ import annotations.io.IndexFileParser;
 public class ClassFileWriter {
 
   public static final String INDEX_UTILS_VERSION =
-    "Annotation file utilities: insert-annotations v2.3.3";
+    "Annotation file utilities: insert-annotations v3.0";
   /**
    * Main method meant to a a convenient way to write annotations from an index
    * file to a class file.  For programmatic access to this
