@@ -23,6 +23,15 @@ public class Example {
   public static void main(String /*@ReadOnly*/ [] args) {
     AScene scene;
 
+    if (! new File(args[0]).exists()) {
+      try {
+        throw new Error(String.format("Cannot find file %s in %s",
+                                    args[0], new File(".").getCanonicalPath()));
+      } catch (IOException e) {
+        throw new Error("This can't happen: ", e);
+      }
+    }
+
     // System.out.println("Reading in " + args[0]);
     try {
       scene = new AScene();

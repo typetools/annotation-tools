@@ -119,6 +119,9 @@ public class IndexFileSpecification implements Specification {
       } catch (RuntimeException e) {
         System.err.println("IndexFileSpecification had a problem reading class: " + className);
         throw e;
+      } catch (Error e) {
+        System.err.println("IndexFileSpecification had a problem reading class: " + className);
+        throw e;
       }
     }
 
