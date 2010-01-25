@@ -241,7 +241,7 @@ public final class IndexFileWriter {
                 /*@ReadOnly*/ ATypeElement f = fe.getValue();
                 pw.println();
                 printElement(INDENT, "field " + fname, f);
-                printElementAndInnerTypes(INDENT, "type", f.type);
+                printElementAndInnerTypes(INDENT + INDENT, "type", f.type);
             }
             for (/*@ReadOnly*/ Map.Entry<String, /*@ReadOnly*/ AMethod> me
                     : c.methods.entrySet()) {
