@@ -6,6 +6,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/asmx"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/checkers"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jsr308-langtools"/>
-	<classpathentry kind="lib" path="/annotation-file-utilities/lib/utilMDE.jar"/>
+	<classpathentry kind="lib" path="/annotation-file-utilities/lib/plume.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

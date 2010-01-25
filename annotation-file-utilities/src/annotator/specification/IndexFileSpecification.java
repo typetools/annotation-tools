@@ -19,8 +19,8 @@ import annotator.scanner.MethodOffsetClassVisitor;
 
 import com.sun.source.tree.Tree;
 
-import utilMDE.FileIOException;
-import utilMDE.Pair;
+import plume.FileIOException;
+import plume.Pair;
 
 public class IndexFileSpecification implements Specification {
 

@@ -16,7 +16,7 @@ import javax.lang.model.element.Modifier;
 
 import com.google.common.collect.*;
 
-import utilMDE.Pair;
+import plume.Pair;
 
 /**
  * A {@code TreeScanner} that is able to locate program elements in an

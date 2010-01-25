@@ -5,7 +5,7 @@ import java.util.List;
 // import annotations.io.FileIOException;
 import annotator.find.Insertion;
 
-import utilMDE.FileIOException;
+import plume.FileIOException;
 
 /**
  * Represents a file containing a "specification" for placing annotations on
