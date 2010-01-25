@@ -98,8 +98,8 @@ package annotations.tests:
 class AnnotationTest: @annotations.tests.AClass @annotations.tests.CClass
 
     field field: @annotations.tests.A0E @annotations.tests.C0E
-    type: @annotations.tests.A0E @annotations.tests.C0E
-        inner-type 0: @annotations.tests.A0F @annotations.tests.C0F
+        type: @annotations.tests.A0E @annotations.tests.C0E
+            inner-type 0: @annotations.tests.A0F @annotations.tests.C0F
 
     method <init>()V:
         return:
