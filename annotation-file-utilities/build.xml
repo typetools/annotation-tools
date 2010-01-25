@@ -133,7 +133,7 @@
       <uptodate property="build.bootstrap.classes.uptodate" targetfile="annotation-file-utilities.jar">
 	<srcfiles dir="${annotations-compiler}/build/bootstrap/classes" />
       </uptodate>
-      <uptodate property="utilmde.uptodate" targetfile="annotation-file-utilities.jar" srcfile="lib/plume.jar"/>
+      <uptodate property="plume.uptodate" targetfile="annotation-file-utilities.jar" srcfile="lib/plume.jar"/>
       <uptodate property="google-collect.uptodate" targetfile="annotation-file-utilities.jar" srcfile="lib/google-collect-1.0-rc3.jar"/>
 
       <condition property="jarfile.uptodate">
@@ -143,7 +143,7 @@
 	  <isset property="scene-lib.bin.uptodate"/>
 	  <isset property="build.classes.uptodate"/>
 	  <isset property="build.bootstrap.classes.uptodate"/>
-	  <isset property="utilmde.uptodate"/>
+	  <isset property="plume.uptodate"/>
 	  <isset property="google-collect.uptodate"/>
 	</and>
       </condition>
@@ -153,7 +153,7 @@
       <echo message="scene-lib.bin.uptodate: ${scene-lib.bin.uptodate}"/>
       <echo message="build.classes.uptodate: ${build.classes.uptodate}"/>
       <echo message="build.bootstrap.classes.uptodate: ${build.bootstrap.classes.uptodate}"/>
-      <echo message="utilmde.uptodate: ${utilmde.uptodate}"/>
+      <echo message="plume.uptodate: ${plume.uptodate}"/>
       <echo message="google-collect.uptodate: ${google-collect.uptodate}"/>
       <echo message="jarfile.uptodate: ${jarfile.uptodate}"/>
 
@@ -417,8 +417,7 @@
       <compilerarg line="-processor checkers.nullness.NullnessChecker"/>
       <compilerarg line="-Xbootclasspath/p:${env.CHECKERS}/jdk/nullness/jdk.jar"/>
       <compilerarg value="-implicit:class"/>
-      <compilerarg value="-Awarns"/>
-      <compilerarg line="-Xmaxwarns 10000"/>
+      <compilerarg line="-Awarns -Xmaxwarns 10000"/>
       <classpath>
         <path refid="libpath"/>
         <pathelement location="${env.annotations}/checkers/checkers.jar"/>
