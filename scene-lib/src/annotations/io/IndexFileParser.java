@@ -10,7 +10,7 @@ import static java.io.StreamTokenizer.TT_WORD;
 import java.io.*;
 import java.util.*;
 
-import utilMDE.FileIOException;
+import plume.FileIOException;
 
 import annotations.*;
 import annotations.el.*;

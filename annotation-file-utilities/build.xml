@@ -86,7 +86,7 @@
       <pathelement location="${annotations-compiler}/bin"/>
       -->
       <pathelement location="${annotations-compiler}/dist/lib/javac.jar"/>
-      <pathelement location="${annotation-tools}/annotation-file-utilities/lib/utilMDE.jar"/>
+      <pathelement location="${annotation-tools}/annotation-file-utilities/lib/plume.jar"/>
       <pathelement location="${annotation-tools}/annotation-file-utilities/lib/google-collect-1.0-rc3.jar"/>
       <pathelement location="${scene-lib}/bin"/>
       <pathelement location="${asmx}/bin"/>
@@ -133,7 +133,7 @@
       <uptodate property="build.bootstrap.classes.uptodate" targetfile="annotation-file-utilities.jar">
 	<srcfiles dir="${annotations-compiler}/build/bootstrap/classes" />
       </uptodate>
-      <uptodate property="utilmde.uptodate" targetfile="annotation-file-utilities.jar" srcfile="lib/utilMDE.jar"/>
+      <uptodate property="utilmde.uptodate" targetfile="annotation-file-utilities.jar" srcfile="lib/plume.jar"/>
       <uptodate property="google-collect.uptodate" targetfile="annotation-file-utilities.jar" srcfile="lib/google-collect-1.0-rc3.jar"/>
 
       <condition property="jarfile.uptodate">
@@ -177,7 +177,7 @@
       <fileset dir="${annotations-compiler}/build/bootstrap/classes" />
     </copy>
     <!-- Also need to get class files in libraries -->
-    <unjar src="lib/utilMDE.jar" dest="${temp-jarfile}">
+    <unjar src="lib/plume.jar" dest="${temp-jarfile}">
       <patternset>
         <include name="**/*.class"/>
         <exclude name="META-INF/" />
@@ -389,6 +389,43 @@
     </javac>
 
   </target>
+
+  <!-- Boilerplate to set jsr308javac property. Is there a better way? -->
+  <property environment="env"/>
+  <condition property="isUnix">
+    <os family="unix" />
+  </condition>
+  <condition property="isWindows">
+    <os family="windows" />
+  </condition>
+  <target name="init-jsr308javac-unix" if="isUnix">
+    <property name="jsr308javac" value="${env.CHECKERS}/binary/javac" />
+  </target>
+  <target name="init-jsr308javac-windows" if="isWindows">
+    <property name="jsr308javac" value="${env.CHECKERS}/binary/javac.bat" />
+  </target>
+
+  <target name="check-nullness"
+          description="Check for nullness errors."
+          depends="init,clean,init-jsr308javac-unix,init-jsr308javac-windows">
+    <mkdir dir="bin"/>
+    <javac srcdir="src" destdir="bin" debug="true" encoding="8859_1"
+           fork="yes"
+           executable="${jsr308javac}">
+      <compilerarg value="-version"/>
+      <compilerarg line="-target 5"/>
+      <compilerarg line="-processor checkers.nullness.NullnessChecker"/>
+      <compilerarg line="-Xbootclasspath/p:${env.CHECKERS}/jdk/nullness/jdk.jar"/>
+      <compilerarg value="-implicit:class"/>
+      <compilerarg value="-Awarns"/>
+      <compilerarg line="-Xmaxwarns 10000"/>
+      <classpath>
+        <path refid="libpath"/>
+        <pathelement location="${env.annotations}/checkers/checkers.jar"/>
+      </classpath>
+    </javac>
+  </target>
+
 
   <!-- This tags table includes the scene library. -->
   <target name="etags" depends="tags">

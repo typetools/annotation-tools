@@ -15,7 +15,7 @@ import annotations.field.*;
 import annotations.io.*;
 import annotations.util.coll.*;
 
-import utilMDE.FileIOException;
+import plume.FileIOException;
 
 public /*@ReadOnly*/ class TestSceneLib extends TestCase {
     LineNumberReader openPackagedIndexFile(String name) {
