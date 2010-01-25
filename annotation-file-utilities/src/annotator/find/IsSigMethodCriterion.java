@@ -16,7 +16,7 @@ import com.sun.source.tree.TypeParameterTree;
 import com.sun.source.tree.VariableTree;
 import com.sun.source.util.TreePath;
 
-import utilMDE.UtilMDE;
+import plume.UtilMDE;
 
 public class IsSigMethodCriterion implements Criterion {
 

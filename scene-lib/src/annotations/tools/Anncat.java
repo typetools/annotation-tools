@@ -4,7 +4,7 @@ import checkers.nullness.quals.*;
 
 import java.io.*;
 
-import utilMDE.FileIOException;
+import plume.FileIOException;
 
 import annotations.*;
 import annotations.el.*;
