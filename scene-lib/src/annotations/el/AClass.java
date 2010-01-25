@@ -4,7 +4,7 @@ import checkers.nullness.quals.*;
 import checkers.javari.quals.*;
 
 import java.util.*;
-import static utilMDE.UtilMDE.mapToString;
+import static plume.UtilMDE.mapToString;
 
 import annotations.*;
 import annotations.util.coll.*;
