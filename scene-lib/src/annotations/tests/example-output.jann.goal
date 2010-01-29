@@ -13,11 +13,11 @@ class Bar:
     method getSomething(Ljava/lang/StringBuffer;)V:
         return:
         receiver: @ReadOnly
-        parameter #0: @checkers.nullness.quals.NonNull
-            type:
+        parameter #0:
+            type: @checkers.nullness.quals.NonNull
 
     method setSomething(Ljava/lang/String;)V:
         return:
         parameter #0: @NonNull
-            type:
+            type: @checkers.nullness.quals.NonNull
 

@@ -110,9 +110,10 @@ class AnnotationTest: @annotations.tests.AClass @annotations.tests.CClass
         receiver: @annotations.tests.A06 @annotations.tests.C06
         parameter #0: @annotations.tests.A0C @annotations.tests.C0C
             type: @annotations.tests.A0C @annotations.tests.C0C
-            inner-type 0: @annotations.tests.A0D @annotations.tests.C0D
+                inner-type 0: @annotations.tests.A0D @annotations.tests.C0D
         local 2 #23+2: @annotations.tests.A08 @annotations.tests.C08
-            inner-type 0: @annotations.tests.A09 @annotations.tests.C09
+            type:
+                inner-type 0: @annotations.tests.A09 @annotations.tests.C09
         typecast #7: @annotations.tests.A00 @annotations.tests.C00
             inner-type 0: @annotations.tests.A01 @annotations.tests.C01
         instanceof #0: @annotations.tests.A02 @annotations.tests.C02

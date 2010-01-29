@@ -200,7 +200,7 @@ public final class JavapParser {
                         line.substring(
                         line.indexOf(paramIdxHead) + paramIdxHead.length()));
                 nextLine();
-                subOuterType = ((AMethod) member).parameters.vivify(paramIdx);
+                subOuterType = ((AMethod) member).parameters.vivify(paramIdx).type;
                 break;
             case LOCAL_VARIABLE:
             case LOCAL_VARIABLE_GENERIC_OR_ARRAY:
@@ -213,7 +213,7 @@ public final class JavapParser {
                 LocalLocation ll =
                     new LocalLocation(index, scopeStart, scopeLength);
                 nextLine();
-                subOuterType = ((AMethod) member).locals.vivify(ll);
+                subOuterType = ((AMethod) member).locals.vivify(ll).type;
                 break;
             case TYPECAST:
             case TYPECAST_GENERIC_OR_ARRAY:

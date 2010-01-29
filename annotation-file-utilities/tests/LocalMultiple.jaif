@@ -10,6 +10,8 @@ class LocalMultiple:
     method <init>()V:
 
     method foo(Ljava/lang/Object;)V:
-        local 3 #13+8: @java.lang.Mutable
-        local 3 #26+8: @java.lang.ReadOnly
+        local 3 #13+8:
+            type: @java.lang.Mutable
+        local 3 #26+8:
+            type: @java.lang.ReadOnly
 

@@ -265,10 +265,10 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
           xav.visitEnd();
         }
 
-        for (Map.Entry<InnerTypeLocation, AElement> e2 :
+        for (Map.Entry<InnerTypeLocation, ATypeElement> e2 :
           bound.innerTypes.entrySet()) {
           InnerTypeLocation itloc = e2.getKey();
-          AElement innerType = e2.getValue();
+          ATypeElement innerType = e2.getValue();
 
           for (Annotation tla : innerType.tlAnnotationsHere) {
             ExtendedAnnotationVisitor xav = visitExtendedAnnotation(tla);
@@ -437,10 +437,10 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
     private List<String> existingFieldAnnotations;
 
     /**
-     * The ATypeElement that represents this field in the AScene the
+     * The AElement that represents this field in the AScene the
      *   class is visiting.
      */
-    private ATypeElement aField;
+    private AElement aField;
 
     /**
      * Constructs a new FieldAnnotationSceneWriter with the given name that
@@ -529,7 +529,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
       }
 
       // Now do field generics/arrays.
-      for (Map.Entry<InnerTypeLocation, AElement> fieldInnerEntry :
+      for (Map.Entry<InnerTypeLocation, ATypeElement> fieldInnerEntry :
         aField.type.innerTypes.entrySet()) {
 
         for (Annotation tla : fieldInnerEntry.getValue().tlAnnotationsHere) {
@@ -716,10 +716,10 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
       }
 
       // Now do generic/array information on return type
-      for (Map.Entry<InnerTypeLocation, AElement> e :
+      for (Map.Entry<InnerTypeLocation, ATypeElement> e :
         aMethod.returnType.innerTypes.entrySet()) {
         InnerTypeLocation loc = e.getKey();
-        AElement innerType = e.getValue();
+        ATypeElement innerType = e.getValue();
 
         for (Annotation tla : innerType.tlAnnotationsHere) {
           ExtendedAnnotationVisitor xav = visitExtendedAnnotation(tla);
@@ -754,10 +754,10 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
           xav.visitEnd();
         }
 
-        for (Map.Entry<InnerTypeLocation, AElement> e2 :
+        for (Map.Entry<InnerTypeLocation, ATypeElement> e2 :
           bound.innerTypes.entrySet()) {
           InnerTypeLocation itloc = e2.getKey();
-          AElement innerType = e2.getValue();
+          ATypeElement innerType = e2.getValue();
 
           for (Annotation tla : innerType.tlAnnotationsHere) {
             ExtendedAnnotationVisitor xav = visitExtendedAnnotation(tla);
@@ -776,10 +776,10 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
      * Has this visit the annotations on local variables in this method.
      */
     private void ensureVisitLocalVariablesAnnotations() {
-      for (Map.Entry<LocalLocation, ATypeElement> entry :
+      for (Map.Entry<LocalLocation, AElement> entry :
         aMethod.locals.entrySet()) {
         LocalLocation localLocation = entry.getKey();
-        ATypeElement aLocation = entry.getValue();
+        AElement aLocation = entry.getValue();
 
         for (Annotation tla : aLocation.tlAnnotationsHere) {
           if (shouldSkip(tla)) continue;
@@ -792,10 +792,10 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
         }
 
         // now do annotations on inner type of aLocation (local variable)
-        for (Map.Entry<InnerTypeLocation, AElement> e :
-          aLocation.innerTypes.entrySet()) {
+        for (Map.Entry<InnerTypeLocation, ATypeElement> e :
+          aLocation.type.innerTypes.entrySet()) {
           InnerTypeLocation localVariableLocation = e.getKey();
-          AElement aInnerType = e.getValue();
+          ATypeElement aInnerType = e.getValue();
           for (Annotation tla : aInnerType.tlAnnotationsHere) {
             if (shouldSkip(tla)) continue;
 
@@ -833,10 +833,10 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
         }
 
         // now do inner annotations on aNew (object creation)
-        for (Map.Entry<InnerTypeLocation, AElement> e :
+        for (Map.Entry<InnerTypeLocation, ATypeElement> e :
           aNew.innerTypes.entrySet()) {
           InnerTypeLocation aNewLocation = e.getKey();
-          AElement aInnerType = e.getValue();
+          ATypeElement aInnerType = e.getValue();
           for (Annotation tla : aInnerType.tlAnnotationsHere) {
             if (shouldSkip(tla)) continue;
 
@@ -857,9 +857,9 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
      * Has this visit the parameter annotations on this method.
      */
     private void ensureVisitParameterAnnotations() {
-      for (Map.Entry<Integer, ATypeElement> entry :
+      for (Map.Entry<Integer, AElement> entry :
         aMethod.parameters.entrySet()) {
-        ATypeElement aParameter = entry.getValue();
+        AElement aParameter = entry.getValue();
         int index = entry.getKey();
         // First visit declaration annotations on the parameter
         for (Annotation tla : aParameter.tlAnnotationsHere) {
@@ -882,10 +882,10 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
         }
 
         // now handle inner annotations on aParameter (parameter)
-        for (Map.Entry<InnerTypeLocation, AElement> e :
+        for (Map.Entry<InnerTypeLocation, ATypeElement> e :
           aParameter.type.innerTypes.entrySet()) {
           InnerTypeLocation aParameterLocation = e.getKey();
-          AElement aInnerType = e.getValue();
+          ATypeElement aInnerType = e.getValue();
           for (Annotation tla : aInnerType.tlAnnotationsHere) {
             if (shouldSkip(tla)) continue;
 
@@ -938,10 +938,10 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
         }
 
         // now do inner annotations of aTypecast (typecast)
-        for (Map.Entry<InnerTypeLocation, AElement> e :
+        for (Map.Entry<InnerTypeLocation, ATypeElement> e :
           aTypecast.innerTypes.entrySet()) {
           InnerTypeLocation aTypecastLocation = e.getKey();
-          AElement aInnerType = e.getValue();
+          ATypeElement aInnerType = e.getValue();
           for (Annotation tla : aInnerType.tlAnnotationsHere) {
             if (shouldSkip(tla)) continue;
 
@@ -977,7 +977,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
         }
 
         // now do inner annotations of aTypeTest (typetest)
-        for (Map.Entry<InnerTypeLocation, AElement> e :
+        for (Map.Entry<InnerTypeLocation, ATypeElement> e :
           aTypeTest.innerTypes.entrySet()) {
           InnerTypeLocation aTypeTestLocation = e.getKey();
           AElement aInnerType = e.getValue();

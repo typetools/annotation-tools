@@ -9,5 +9,6 @@ class LocalGenericShadow:
     method <init>()V:
 
     method method()V:
-        local 1 #2+8: @java.lang.Mutable
+        local 1 #2+8:
+            type: @java.lang.Mutable
 

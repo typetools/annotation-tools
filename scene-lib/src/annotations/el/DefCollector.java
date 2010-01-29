@@ -111,16 +111,15 @@ public abstract class DefCollector {
 
             addToDefs(d);
         }
+        if (e.type != null) {
+            collect(e.type);
+        }
+
     }
 
     private void collect(/*@ReadOnly*/ ATypeElement e)
             throws DefException {
         collect((/*@ReadOnly*/ AElement) e);
-        if (e.type != null) {
-            collect((/*@ReadOnly*/ AElement) e.type);
-            for (AElement it : e.type.innerTypes.values())
-                collect(it);
-        }
         for (AElement it : e.innerTypes.values())
             collect(it);
     }
@@ -132,9 +131,9 @@ public abstract class DefCollector {
         collect((/*@ReadOnly*/ AElement) m);
         collect((/*@ReadOnly*/ ATypeElement) m.returnType);
         collect(m.receiver);
-        for (ATypeElement p : m.parameters.values())
+        for (AElement p : m.parameters.values())
             collect(p);
-        for (ATypeElement l : m.locals.values())
+        for (AElement l : m.locals.values())
             collect(l);
         for (ATypeElement tc : m.typecasts.values())
             collect(tc);
@@ -151,7 +150,7 @@ public abstract class DefCollector {
             collect(b);
         for (AMethod m : c.methods.values())
             collect(m);
-        for (ATypeElement f : c.fields.values())
+        for (AElement f : c.fields.values())
             collect(f);
     }
 

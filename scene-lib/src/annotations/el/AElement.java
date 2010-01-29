@@ -21,8 +21,26 @@ public class AElement {
         return new VivifyingMap<K, AElement>(
                 new LinkedHashMap<K, AElement>()) {
             @Override
-            public  AElement createValueFor(K k) /*@ReadOnly*/ {
+            public AElement createValueFor(K k) /*@ReadOnly*/ {
                 return new AElement(k);
+            }
+
+            @Override
+            public boolean subPrune(AElement v) /*@ReadOnly*/ {
+                return v.prune();
+            }
+        };
+    }
+
+    
+    // Different than the above in that the elements are guaranteed to
+    // contain a non-null "type" field.
+    static <K extends /*@ReadOnly*/ Object> VivifyingMap<K, AElement> newVivifyingLHMap_AET() {
+        return new VivifyingMap<K, AElement>(
+                new LinkedHashMap<K, AElement>()) {
+            @Override
+            public AElement createValueFor(K k) /*@ReadOnly*/ {
+                return new AElement(k, true);
             }
 
             @Override
@@ -39,6 +57,9 @@ public class AElement {
      */
     public final Set<Annotation> tlAnnotationsHere;
 
+    /** The type of a field or a method parameter */
+    public final ATypeElement type; // initialized in constructor
+
     public Annotation lookup(String name) {
         for (Annotation anno : tlAnnotationsHere) {
             if (anno.def.name.equals(name)) {
@@ -52,8 +73,13 @@ public class AElement {
     private Object description;
 
     AElement(Object description) {
+        this(description, false);
+    }
+
+    AElement(Object description, boolean hasType) {
         tlAnnotationsHere = new LinkedHashSet<Annotation>();
         this.description = description;
+        type = hasType ? new ATypeElement("type of " + description) : null;
     }
 
     /**
@@ -105,7 +131,8 @@ public class AElement {
      */
     @Override
     public int hashCode() /*@ReadOnly*/ {
-        return getClass().getName().hashCode() + tlAnnotationsHere.hashCode();
+        return getClass().getName().hashCode() + tlAnnotationsHere.hashCode()
+            + (type == null ? 0 : type.hashCode());
     }
 
     /**
@@ -115,7 +142,8 @@ public class AElement {
     // In subclasses, we use & (not &&) because we want complete evaluation:
     // we should prune everything even if the first subelement is nonempty.
     public boolean prune() {
-        return tlAnnotationsHere.isEmpty();
+        return tlAnnotationsHere.isEmpty()
+            & (type != null ? type.prune() : true);
     }
 
     @Override
@@ -124,15 +152,19 @@ public class AElement {
       sb.append("AElement: ");
       sb.append(description);
       sb.append(" : ");
-      boolean first = true;
-      for (Annotation aElement : tlAnnotationsHere) {
-        if (!first) {
-          sb.append(", ");
-        }
-        first = false;
-        sb.append(aElement.toString());
-      }
-
+      tlAnnotationsHereFormatted(sb);
       return sb.toString();
     }
+
+    public void tlAnnotationsHereFormatted(StringBuilder sb) {
+        boolean first = true;
+        for (Annotation aElement : tlAnnotationsHere) {
+            if (!first) {
+                sb.append(", ");
+            }
+            first = false;
+            sb.append(aElement.toString());
+        }
+    }
+
 }
