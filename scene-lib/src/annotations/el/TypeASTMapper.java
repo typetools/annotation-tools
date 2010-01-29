@@ -32,13 +32,13 @@ import annotations.*;
  */
 public abstract class TypeASTMapper<N> {
     /**
-     * Constructs a {@link TypeASTMapper}.  {@link TypeASTMapper}s store no
+     * Constructs a {@link TypeASTMapper}.  A {@link TypeASTMapper} stores no
      * state.
      */
     protected TypeASTMapper() {
     }
 
-    private static AElement
+    private static ATypeElement
         getInnerType(ATypeElement te,
                 /*@ReadOnly*/  List< Integer> ls) {
         if (ls.isEmpty())
@@ -64,14 +64,12 @@ public abstract class TypeASTMapper<N> {
              ATypeElement aslRoot) {
         // Elements are added and removed from the end of this sole mutable
         // list during the traversal.
-         List< Integer> ls =
-            new ArrayList< Integer>();
+         List<Integer> ls = new ArrayList<Integer>();
         traverse1(tastRoot, aslRoot, ls);
     }
 
     // "Sane": top-level or type argument
-    private void traverse1(N n, ATypeElement te,
-             List< Integer> ls) {
+    private void traverse1(N n, ATypeElement te, List<Integer> ls) {
         N elType = getElementType(n);
         if (elType == null) {
             // no array, so the prefix corresponds to the type right here
@@ -138,5 +136,5 @@ public abstract class TypeASTMapper<N> {
      * calls {@link #map} on sub-nodes of <code>n</code> but not necessarily
      * before it explores the structure of <code>n</code>'s subtree.
      */
-    protected abstract void map(N n, AElement e);
+    protected abstract void map(N n, ATypeElement e);
 }

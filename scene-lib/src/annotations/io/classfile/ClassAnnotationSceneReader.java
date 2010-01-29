@@ -124,7 +124,7 @@ extends EmptyVisitor {
       String signature,
       Object value  ) {
     if (trace) { System.out.printf("visitField(%s, %s, %s, %s, %s) in %s (%s)%n", access, name, desc, signature, value, this, this.getClass()); }
-    ATypeElement aField = aClass.fields.vivify(name);
+    AElement aField = aClass.fields.vivify(name);
     return new FieldAnnotationSceneReader(name, desc, signature, value, aField);
   }
 
@@ -710,7 +710,7 @@ extends EmptyVisitor {
      * Creates the local variable generic/array annotation on aMethod.
      */
     private void handleMethodLocalVariableGenericArray(AMethod aMethod) {
-      aMethod.locals.vivify(makeLocalLocation()).innerTypes.
+      aMethod.locals.vivify(makeLocalLocation()).type.innerTypes.
         vivify(makeInnerTypeLocation()).tlAnnotationsHere.add(makeAnnotation());
     }
 
@@ -1062,14 +1062,14 @@ extends EmptyVisitor {
     private String desc;
     private String signature;
     private Object value;
-    private ATypeElement aField;
+    private AElement aField;
 
     public FieldAnnotationSceneReader(
         String name,
         String desc,
         String signature,
         Object value,
-        ATypeElement aField) {
+        AElement aField) {
       this.name = name;
       this.desc = desc;
       this.signature = signature;

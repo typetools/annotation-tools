@@ -31,24 +31,22 @@ public class ATypeElement extends AElement {
         };
     }
 
-    /** The type of a field or a method parameter */
-    public final ATypeElement type; // initialized in constructor
-
-    /** The annotated inner types; map key is the inner type location */
-    public final VivifyingMap<InnerTypeLocation, AElement> innerTypes =
-        AElement.<InnerTypeLocation>newVivifyingLHMap_AE();
+    /**
+     * The annotated inner types; map key is the inner type location.
+     */
+    public final VivifyingMap<InnerTypeLocation, ATypeElement> innerTypes =
+        ATypeElement.<InnerTypeLocation>newVivifyingLHMap_ATE();
 
     // general information about the element being annotated
     public Object description;
 
     ATypeElement(Object description) {
-        this(description, true);
-    }
-
-    ATypeElement(Object description, boolean isType) {
       super(description);
       this.description = description;
-      type = isType ? new ATypeElement("type of " + description, false) : null;
+    }
+
+    void checkRep() {
+        assert type == null;
     }
 
     /**
@@ -73,8 +71,8 @@ public class ATypeElement extends AElement {
      */
     @Override
     public int hashCode() /*@ReadOnly*/ {
-        return tlAnnotationsHere.hashCode() + innerTypes.hashCode()
-                + (type == null ? 0 : type.hashCode());
+        checkRep();
+        return tlAnnotationsHere.hashCode() + innerTypes.hashCode();
     }
 
     /**
@@ -82,8 +80,8 @@ public class ATypeElement extends AElement {
      */
     @Override
     public boolean prune() {
-        return super.prune() & innerTypes.prune()
-            & (type != null ? type.prune() : true);
+        checkRep();
+        return super.prune() & innerTypes.prune();
     }
 
     private static final String lineSep = System.getProperty("line.separator");
@@ -98,12 +96,9 @@ public class ATypeElement extends AElement {
           sb.append(a.toString());
           sb.append(" ");
         }
-        if (type != null) {
-            
-        }
         sb.append("{");
         String linePrefix = "  ";
-        for (Map.Entry<InnerTypeLocation, AElement> entry : innerTypes.entrySet()) {
+        for (Map.Entry<InnerTypeLocation, ATypeElement> entry : innerTypes.entrySet()) {
             sb.append(linePrefix);
             sb.append(entry.getKey().toString());
             sb.append(" => ");

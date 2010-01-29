@@ -32,6 +32,7 @@ public /*@ReadOnly*/ class TestSceneLib extends TestCase {
             "field x: @Ready\n" +
             "method y()Z:\n" +
             "parameter #5:\n" +
+            "type:\n" +
             "inner-type 1, 2:\n" +
             "@Author(value=\"Matt M.\")\n";
 
@@ -82,8 +83,8 @@ public /*@ReadOnly*/ class TestSceneLib extends TestCase {
         return new AScene();
     }
 
-    void doParseTest(String index, /*@NonNull*/
-    /*@ReadOnly*/ AScene expectScene) {
+    void doParseTest(String index,
+                     /*@NonNull*/ /*@ReadOnly*/ AScene expectScene) {
         AScene s = newScene();
         doParseTest(index, s, expectScene);
     }
@@ -95,6 +96,8 @@ public /*@ReadOnly*/ class TestSceneLib extends TestCase {
     public void testEquals() {
         AScene s1 = newScene(), s2 = newScene();
 
+        s1.classes.vivify("Foo");
+        s1.classes.vivify("Foo").fields.vivify("x");
         s1.classes.vivify("Foo").fields.vivify("x").tlAnnotationsHere
                 .add(createEmptyAnnotation(ready));
 
@@ -117,6 +120,13 @@ public /*@ReadOnly*/ class TestSceneLib extends TestCase {
         s1.classes.vivify("Foo").fields.vivify("x").tlAnnotationsHere
                 .add(createEmptyAnnotation(ready));
         Annotation myAuthor = Annotations.createValueAnnotation(adAuthor, "Matt M.");
+        s1.classes.vivify("Foo");
+        s1.classes.vivify("Foo").methods.vivify("y()Z");
+        s1.classes.vivify("Foo").methods.vivify("y()Z").parameters.vivify(5);
+        Object dummy = 
+          s1.classes.vivify("Foo").methods.vivify("y()Z").parameters.vivify(5).type;
+        Object dummy2 = 
+          s1.classes.vivify("Foo").methods.vivify("y()Z").parameters.vivify(5).type.innerTypes;
         s1.classes.vivify("Foo").methods.vivify("y()Z").parameters.vivify(5).type.innerTypes
                 .vivify(new InnerTypeLocation(Arrays
                                 .asList(new Integer[] { 1, 2 }))).tlAnnotationsHere
@@ -129,12 +139,12 @@ public /*@ReadOnly*/ class TestSceneLib extends TestCase {
         Annotation ann = ((Annotation) constructor.receiver.lookup("p2.D"));
         assertEquals(Collections.singletonMap("value", "spam"), ann.fieldValues);
         ATypeElement l = (ATypeElement) constructor.locals
-                        .get(new LocalLocation(1, 3, 5));
+                        .get(new LocalLocation(1, 3, 5)).type;
         AElement i = (AElement) l.innerTypes
                         .get(new InnerTypeLocation(
                                 Collections.singletonList(0)));
         assertNotNull(i.lookup("p2.C"));
-        ATypeElement l2 =
+        AElement l2 =
                 constructor.locals.get(new LocalLocation(1, 3, 6));
         assertNull(l2);
     }
@@ -572,7 +582,7 @@ public /*@ReadOnly*/ class TestSceneLib extends TestCase {
         }
 
         @Override
-        protected void map(MyTAST n, AElement e) {
+        protected void map(MyTAST n, ATypeElement e) {
             int nodeID = n.id;
             if (nodeID == 10) {
                 assertTrue(e.lookup("IdAnno") == null);
@@ -613,33 +623,33 @@ public /*@ReadOnly*/ class TestSceneLib extends TestCase {
                 )
         );
 
-        // Pretend myField represents a field of the type represented by tast
+        // Pretend myField represents a field of the type represented by tast.
         // We have to do this because clients are no longer allowed to create
         // AElements directly; instead, they must vivify.
-        ATypeElement myAField =
-            new AScene()
-                .classes.vivify("someclass").fields.vivify("somefield");
+        AElement myAField =
+            new AScene().classes.vivify("someclass").fields.vivify("somefield");
+        ATypeElement myAFieldType = myAField.type;
         // load it with annotations we can check against IDs
-        myAField.tlAnnotationsHere.add(makeTLIdAnno(0));
-        assignId(myAField, 1, 0, 0);
-        assignId(myAField, 2, 0, 1);
-        assignId(myAField, 3, 0);
-        assignId(myAField, 4, 0, 0, 0);
-        assignId(myAField, 5, 1);
-        assignId(myAField, 6, 1, 0);
-        assignId(myAField, 7, 1, 1, 0);
-        assignId(myAField, 8, 1, 1);
-        assignId(myAField, 9, 1, 2);
+        myAFieldType.tlAnnotationsHere.add(makeTLIdAnno(0));
+        assignId(myAFieldType, 1, 0, 0);
+        assignId(myAFieldType, 2, 0, 1);
+        assignId(myAFieldType, 3, 0);
+        assignId(myAFieldType, 4, 0, 0, 0);
+        assignId(myAFieldType, 5, 1);
+        assignId(myAFieldType, 6, 1, 0);
+        assignId(myAFieldType, 7, 1, 1, 0);
+        assignId(myAFieldType, 8, 1, 1);
+        assignId(myAFieldType, 9, 1, 2);
         // to test vivification, we don't assign 10
 
         // now visit and make sure the ID numbers match up
         MyTASTMapper mapper = new MyTASTMapper();
-        mapper.traverse(tast, myAField);
+        mapper.traverse(tast, myAFieldType);
 
         for (int i = 0; i < 11; i++)
             assertTrue(mapper.saw[i]);
         // make sure it vivified #10 and our annotation stuck
-        AElement e10 = myAField.innerTypes.get(
+        AElement e10 = myAFieldType.innerTypes.get(
                 new InnerTypeLocation(Arrays.asList(1, 3)));
         assertNotNull(e10);
         int e10aid = (Integer) e10.lookup("IdAnno").getFieldValue("id");

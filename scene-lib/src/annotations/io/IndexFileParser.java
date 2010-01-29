@@ -589,7 +589,7 @@ public final class IndexFileParser {
             ParseException {
         expectKeyword("field");
         String name = expectIdentifier();
-        ATypeElement f = c.fields.vivify(name);
+        AElement f = c.fields.vivify(name);
 
         expectChar(':');
         parseAnnotations(f);
@@ -648,7 +648,7 @@ public final class IndexFileParser {
                     matchChar('#');
                 }
                 int idx = expectNonNegative(matchNNInteger());
-                ATypeElement p = m.parameters.vivify(idx);
+                AElement p = m.parameters.vivify(idx);
                 expectChar(':');
                 parseAnnotations(p);
                 if (checkKeyword("type") && matchKeyword("type")) {
@@ -672,10 +672,14 @@ public final class IndexFileParser {
             int scopeLength = expectNonNegative(matchNNInteger());
             LocalLocation loc =
                     new LocalLocation(index, scopeStart, scopeLength);
-            ATypeElement l = m.locals.vivify(loc);
+            AElement l = m.locals.vivify(loc);
             expectChar(':');
             parseAnnotations(l);
-            parseInnerTypes(l);
+            if (checkKeyword("type") && matchKeyword("type")) {
+                expectChar(':');
+                parseAnnotations(l.type);
+            }
+            parseInnerTypes(l.type);
         }
         while (matchKeyword("typecast")) {
             expectChar('#');

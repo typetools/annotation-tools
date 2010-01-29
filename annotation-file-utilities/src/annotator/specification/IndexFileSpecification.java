@@ -136,7 +136,7 @@ public class IndexFileSpecification implements Specification {
       BoundLocation boundLoc = entry.getKey();
       ATypeElement bound = entry.getValue();
       CriterionList boundList = clist.add(Criteria.classBound(className, boundLoc));
-      for (Entry<InnerTypeLocation, AElement> innerEntry : bound.innerTypes.entrySet()) {
+      for (Entry<InnerTypeLocation, ATypeElement> innerEntry : bound.innerTypes.entrySet()) {
         InnerTypeLocation innerLoc = innerEntry.getKey();
         AElement ae = innerEntry.getValue();
         CriterionList innerBoundList = boundList.add(Criteria.atLocation(innerLoc));
@@ -148,7 +148,7 @@ public class IndexFileSpecification implements Specification {
 
     clist = clist.add(Criteria.inClass(className, /*exactMatch=*/ false));
 
-    for (Map.Entry<String, ATypeElement> entry : clazz.fields.entrySet()) {
+    for (Map.Entry<String, AElement> entry : clazz.fields.entrySet()) {
 //      clist = clist.add(Criteria.notInMethod()); // TODO: necessary? what is in class but not in method?
       parseField(clist, entry.getKey(), entry.getValue());
     }
@@ -160,7 +160,7 @@ public class IndexFileSpecification implements Specification {
   }
 
   /** Fill in this.insertions with insertion pairs. */
-  private void parseField(CriterionList clist, String fieldName, ATypeElement field) {
+  private void parseField(CriterionList clist, String fieldName, AElement field) {
     clist = clist.add(Criteria.field(fieldName));
 
     // parse declaration annotations
@@ -183,7 +183,7 @@ public class IndexFileSpecification implements Specification {
 
   /** Fill in this.insertions with insertion pairs. */
   private void parseInnerAndOuterElements(CriterionList clist, ATypeElement typeElement) {
-    for (Entry<InnerTypeLocation, AElement> innerEntry: typeElement.innerTypes.entrySet()) {
+    for (Entry<InnerTypeLocation, ATypeElement> innerEntry: typeElement.innerTypes.entrySet()) {
       InnerTypeLocation innerLoc = innerEntry.getKey();
       AElement innerElement = innerEntry.getValue();
       CriterionList innerClist = clist.add(Criteria.atLocation(innerLoc));
@@ -254,9 +254,9 @@ public class IndexFileSpecification implements Specification {
     }
 
     // parse parameters of method
-    for (Entry<Integer, ATypeElement> entry : method.parameters.entrySet()) {
+    for (Entry<Integer, AElement> entry : method.parameters.entrySet()) {
       Integer index = entry.getKey();
-      ATypeElement param = entry.getValue();
+      AElement param = entry.getValue();
       CriterionList paramClist = clist.add(Criteria.param(methodName, index));
       // parse declaration annotations
       parseElement(clist, param);
@@ -264,11 +264,11 @@ public class IndexFileSpecification implements Specification {
     }
 
     // parse locals of method
-    for (Entry<LocalLocation, ATypeElement> entry : method.locals.entrySet()) {
+    for (Entry<LocalLocation, AElement> entry : method.locals.entrySet()) {
       LocalLocation loc = entry.getKey();
-      ATypeElement var = entry.getValue();
+      AElement var = entry.getValue();
       CriterionList varClist = clist.add(Criteria.local(methodName, loc));
-      parseInnerAndOuterElements(varClist, var);
+      parseInnerAndOuterElements(varClist, var.type);
     }
 
     // parse typecasts of method

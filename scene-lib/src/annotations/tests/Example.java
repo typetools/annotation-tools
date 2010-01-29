@@ -61,13 +61,13 @@ public class Example {
         System.out.println("Method " + me.getKey()
             + " must not modify the receiver");
 
-      ATypeElement param1 = method.parameters.vivify(0);
-      Annotation p1nn = param1.lookup("NonNull");
+      ATypeElement paramType1 = method.parameters.vivify(0).type;
+      Annotation p1nn = paramType1.lookup("NonNull");
       if (p1nn == null) {
-        System.out.println("Annotating first parameter of "
+        System.out.println("Annotating type of first parameter of "
             + me.getKey() + " nonnull");
 
-        param1.tlAnnotationsHere.add(Annotations.aNonNull);
+        paramType1.tlAnnotationsHere.add(Annotations.aNonNull);
       }
     }
 

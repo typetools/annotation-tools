@@ -22,8 +22,7 @@ public final class AClass extends AElement {
         return new VivifyingMap<String, AMethod>(
                 new LinkedHashMap<String, AMethod>()) {
             @Override
-            public  AMethod createValueFor(
-             String k) /*@ReadOnly*/ {
+            public  AMethod createValueFor(String k) /*@ReadOnly*/ {
                 return new AMethod(k);
             }
 
@@ -46,8 +45,8 @@ public final class AClass extends AElement {
             createMethodMap();
 
     /** The class's annotated fields; map key is field name */
-    public final VivifyingMap<String, ATypeElement> fields =
-            ATypeElement.<String>newVivifyingLHMap_ATE();
+    public final VivifyingMap<String, AElement> fields =
+            AElement.<String>newVivifyingLHMap_AET();
 
     private String className;
 
