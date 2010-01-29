@@ -223,9 +223,9 @@ public class IndexFileSpecification implements Specification {
   }
 
   private String formatFieldValue(Annotation a, String field) {
-    AnnotationFieldType fieldType = a.def.fieldTypes.get("value");
+    AnnotationFieldType fieldType = a.def.fieldTypes.get(field);
     assert fieldType != null;
-    return fieldType.format(a.fieldValues.get("value"));
+    return fieldType.format(a.fieldValues.get(field));
   }
 
   private void parseMethod(CriterionList clist, String methodName, AMethod method) {
