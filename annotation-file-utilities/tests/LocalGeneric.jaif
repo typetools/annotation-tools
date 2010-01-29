@@ -10,6 +10,7 @@ class LocalGeneric:
     method <init>()V:
 
     method foo()V:
-        local 1 #2+8: @java.lang.Mutable
-            inner-type 0: @java.lang.ReadOnly
+        local 1 #2+8:
+            type: @java.lang.Mutable
+                inner-type 0: @java.lang.ReadOnly
 

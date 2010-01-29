@@ -10,6 +10,7 @@ class LocalArray:
     method <init>()V:
 
     method foo()V:
-        local 1 #2+8: @java.lang.ReadOnly
-            inner-type 0: @java.lang.Mutable
+        local 1 #2+8:
+            type: @java.lang.ReadOnly
+                inner-type 0: @java.lang.Mutable
 

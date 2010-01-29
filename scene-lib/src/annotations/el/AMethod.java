@@ -7,6 +7,7 @@ import annotations.*;
 import annotations.util.coll.*;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * An annotated method; contains parameters, receiver, locals, typecasts, and
@@ -21,17 +22,17 @@ public final class AMethod extends AElement {
     public final ATypeElement returnType; // initialized in constructor
 
     /** The method's annotated receiver */
-    public final AElement receiver; // initialized in constructor
+    public final ATypeElement receiver; // initialized in constructor
 
     /** The method's annotated parameters; map key is parameter index */
-    public final VivifyingMap<Integer, ATypeElement> parameters =
-            ATypeElement.<Integer>newVivifyingLHMap_ATE();
+    public final VivifyingMap<Integer, AElement> parameters =
+            AElement.<Integer>newVivifyingLHMap_AET();
 
     // Currently we don't validate the local locations (e.g., that no two
     // distinct ranges for the same index overlap).
     /** The method's annotated local variables; map key contains local variable location numbers */
-    public final VivifyingMap<LocalLocation, ATypeElement> locals =
-            ATypeElement.<LocalLocation>newVivifyingLHMap_ATE();
+    public final VivifyingMap<LocalLocation, AElement> locals =
+            AElement.<LocalLocation>newVivifyingLHMap_AET();
 
     /** The method's annotated typecasts; map key is the offset of the checkcast bytecode */
     public final VivifyingMap<Integer, ATypeElement> typecasts =
@@ -54,7 +55,7 @@ public final class AMethod extends AElement {
       super("method: " + methodName);
       this.methodName = methodName;
       returnType = new ATypeElement("return type of " + methodName);
-      receiver = new AElement("receiver of " + methodName);
+      receiver = new ATypeElement("receiver of " + methodName);
     }
 
     /**
@@ -109,11 +110,30 @@ public final class AMethod extends AElement {
 
     @Override
     public String toString() {
-        String result = methodName;
-        result += ":  " + super.toString();
-        return result;
+        StringBuilder sb = new StringBuilder();
+        sb.append("AMethod ");
+        sb.append(methodName);
+        sb.append(": (");
+        sb.append(" -1:");
+        sb.append(receiver.toString());
+        int size = parameters.size();
+        for (Map.Entry<Integer, AElement> em : parameters.entrySet()) {
+            Integer i = em.getKey();
+            sb.append(" ");
+            sb.append(i);
+            sb.append(":");
+            AElement ae = em.getValue();
+            sb.append(ae.toString());
+            sb.append(" ");
+            ATypeElement ate = ae.type;
+            sb.append(ate.toString());
+        }
+        sb.append(" ");
+        sb.append("ret:");
+        sb.append(returnType.toString());
+        sb.append(")");
+        return sb.toString();
     }
-
 
 
 }

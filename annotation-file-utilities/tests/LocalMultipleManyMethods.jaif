@@ -16,10 +16,14 @@ class LocalMultipleManyMethods:
     method <init>()V:
 
     method foo(Ljava/lang/Object;)V:
-        local 3 #13+8: @java.lang.C
-        local 3 #26+8: @java.lang.B
+        local 3 #13+8:
+            type: @java.lang.C
+        local 3 #26+8:
+            type: @java.lang.B
 
     method foo([Ljava/lang/Object;)V:
-        local 3 #13+8: @java.lang.A
-        local 3 #26+8: @java.lang.D
+        local 3 #13+8:
+            type: @java.lang.A
+        local 3 #26+8:
+            type: @java.lang.D
 
