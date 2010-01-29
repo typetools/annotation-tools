@@ -413,15 +413,20 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       List<? extends AnnotationTree> annos = mt.getAnnotations();
       Set<Modifier> flags = mt.getFlags();
 
-      int declPos;
+      JCTree before;
       if (annos.size() > 1) {
-        declPos = ((JCAnnotation) annos.get(0)).pos;
+        before = (JCAnnotation) annos.get(0);
+      } else if (node.getReturnType() != null) {
+        before = (JCTree) node.getReturnType();
       } else {
-        declPos = ((JCTree) node.getReturnType()).pos;
+        // if we're a constructor, we have null return type, so we use the constructor's position
+        // rather than the return type's position
+        before = (JCTree) node;
       }
+      int declPos = TreeInfo.getStartPos(before);
+
       // There is no source code location information for Modifiers, so
       // cannot iterate through the modifiers.  But we don't have to.
-
       int modsPos = ((JCModifiers)mt).pos().getStartPosition();
       if (modsPos != -1) {
         declPos = Math.min(declPos, modsPos);
