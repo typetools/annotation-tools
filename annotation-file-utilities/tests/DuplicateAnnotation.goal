@@ -1,5 +1,7 @@
 package annotator.tests;
 
+// This test ensures that no annotation is re-inserted, if it already
+// existed in the original source code.
 public class DuplicateAnnotation {
 
   @SuppressWarnings("A")
