@@ -22,17 +22,20 @@ class Foo: @p2.A(value=12)
 
     field bar:
 
-    field baz: @p2.B
-        inner-type 0: @p2.C
+    field baz:
+        type: @p2.B
+            inner-type 0: @p2.C
 
     method <init>(Ljava/util/Set;)V: @p2.B
         bound ,2 &0: @p2.C
             inner-type 0: @p2.B
         parameter #0: @p2.B
-            inner-type 0: @p2.C
+            type:
+                inner-type 0: @p2.C
         receiver: @p2.D(value="spam")
         local 1 #3+5: @p2.B
-            inner-type 0: @p2.C
+            type:
+                inner-type 0: @p2.C
         typecast #7: @p2.B
             inner-type 0: @p2.C
         instanceof #199: @p2.C
