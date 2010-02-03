@@ -31,10 +31,12 @@ public class IsSigMethodCriterion implements Criterion {
   }
   private static Map<CompilationUnitTree, Context> contextCache = new HashMap<CompilationUnitTree, Context>();
 
-  private String fullMethodName;
+  private String fullMethodName; // really the full JVML signature, sans return type
   private String simpleMethodName;
-  // ?? // list of parameters in JVML format
+  // list of parameters in Java, not JVML format
   private List<String> fullyQualifiedParams;
+  // in Java, not JVML, format.  may be "void"
+  private String returnType;
 
   public IsSigMethodCriterion(String methodName) {
     this.fullMethodName = methodName.substring(0, methodName.indexOf(")") + 1);
@@ -55,6 +57,10 @@ public class IsSigMethodCriterion implements Criterion {
       throw new RuntimeException("Caught exception while parsing method: " +
           methodName, e);
     }
+    String returnTypeJvml = methodName.substring(methodName.indexOf(")") + 1);
+    this.returnType = (returnTypeJvml.equals("V")
+                       ? "void"
+                       : UtilMDE.classnameFromJvm(returnTypeJvml));
   }
 
   // params is in JVML format
@@ -108,6 +114,25 @@ public class IsSigMethodCriterion implements Criterion {
     return result;
   }
 
+  // Abstracts out the inner loop of matchTypeParams.
+  private boolean matchTypeParam(String goalType, Tree type,
+                                 Map<String, String> typeToClassMap,
+                                 Context context) {
+    String simpleType = type.toString();
+
+    boolean haveMatch = matchSimpleType(goalType, simpleType, context);
+    if (!haveMatch) {
+      if (typeToClassMap.containsKey(simpleType)) {
+        simpleType = typeToClassMap.get(simpleType);
+        haveMatch = matchSimpleType(goalType, simpleType, context);
+        if (!haveMatch) {
+          if (Criteria.debug) debug(String.format("matchTypeParams() => false:%n  type = %s%n  simpleType = %s%n  goalType = %s%n", type, simpleType, goalType));
+        }
+      }
+    }
+    return haveMatch;
+  }
+    
 
   private boolean matchTypeParams(List<? extends VariableTree> sourceParams,
                                   Map<String, String> typeToClassMap,
@@ -116,17 +141,9 @@ public class IsSigMethodCriterion implements Criterion {
     for (int i = 0; i < sourceParams.size(); i++) {
       String fullType = fullyQualifiedParams.get(i);
       VariableTree vt = sourceParams.get(i);
-      String simpleType = vt.getType().toString();
-
-      boolean haveMatch = matchSimpleType(fullType, simpleType, context);
-      if (!haveMatch) {
-        if (typeToClassMap.containsKey(simpleType)) {
-          simpleType = typeToClassMap.get(simpleType);
-          haveMatch = matchSimpleType(fullType, simpleType, context);
-        }
-      }
-      if (!haveMatch) {
-        if (Criteria.debug) debug(String.format("matchTypeParams() => false:%n  vt = %s%n  simpleType = %s%n  fullType = %s%n", vt, simpleType, fullType));
+      Tree vtType = vt.getType();
+      if (! matchTypeParam(fullType, vtType, typeToClassMap, context)) {
+        if (Criteria.debug) debug(String.format("matchTypeParam() => false:%n  i=%d vt = %s%n  fullType = %s%n", i, vt, fullType));
         return false;
       }
     }
@@ -255,44 +272,56 @@ public class IsSigMethodCriterion implements Criterion {
 
     MethodTree mt = (MethodTree) leaf;
 
-    if (simpleMethodName.equals(mt.getName().toString())) {
-
-      List<? extends VariableTree> sourceParams = mt.getParameters();
-      if (fullyQualifiedParams.size() == sourceParams.size()) {
-
-        // now go through all type parameters declared by method
-        // and for each one, create a mapping from the type to the
-        // first declared extended class, defaulting to Object
-        // for example,
-        // <T extends Date> void foo(T t)
-        //  creates mapping: T -> Date
-        // <T extends Date & List> void foo(Object o)
-        //  creates mapping: T -> Date
-        // <T extends Date, U extends List> foo(Object o)
-        //  creates mappings: T -> Date, U -> List
-        // <T> void foo(T t)
-        //  creates mapping: T -> Object
-
-        Map<String, String> typeToClassMap = new HashMap<String, String>();
-        for (TypeParameterTree param : mt.getTypeParameters()) {
-          String paramName = param.getName().toString();
-          String paramClass = "Object";
-          List<? extends Tree> paramBounds = param.getBounds();
-          if (paramBounds != null && paramBounds.size() >= 1) {
-            paramClass = paramBounds.get(0).toString();
-          }
-          typeToClassMap.put(paramName, paramClass);
-        }
-
-        if (matchTypeParams(sourceParams, typeToClassMap, context)) {
-          debug("IsSigMethodCriterion => true");
-          return true;
-        }
-      }
+    if (! simpleMethodName.equals(mt.getName().toString())) {
+      debug("IsSigMethodCriterion.isSatisfiedBy => false");
+      return false;
     }
 
-    debug("IsSigMethodCriterion.isSatisfiedBy => false");
-    return false;
+    List<? extends VariableTree> sourceParams = mt.getParameters();
+    if (fullyQualifiedParams.size() != sourceParams.size()) {
+      debug("IsSigMethodCriterion.isSatisfiedBy => false");
+      return false;
+    }
+
+    // now go through all type parameters declared by method
+    // and for each one, create a mapping from the type to the
+    // first declared extended class, defaulting to Object
+    // for example,
+    // <T extends Date> void foo(T t)
+    //  creates mapping: T -> Date
+    // <T extends Date & List> void foo(Object o)
+    //  creates mapping: T -> Date
+    // <T extends Date, U extends List> foo(Object o)
+    //  creates mappings: T -> Date, U -> List
+    // <T> void foo(T t)
+    //  creates mapping: T -> Object
+
+    Map<String, String> typeToClassMap = new HashMap<String, String>();
+    for (TypeParameterTree param : mt.getTypeParameters()) {
+      String paramName = param.getName().toString();
+      String paramClass = "Object";
+      List<? extends Tree> paramBounds = param.getBounds();
+      if (paramBounds != null && paramBounds.size() >= 1) {
+        paramClass = paramBounds.get(0).toString();
+      }
+      typeToClassMap.put(paramName, paramClass);
+    }
+
+    if (! matchTypeParams(sourceParams, typeToClassMap, context)) {
+      debug("IsSigMethodCriterion => false");
+      return false;
+    }
+
+
+
+    if ((mt.getReturnType() != null) // must be a constructor
+        && (! matchTypeParam(returnType, mt.getReturnType(), typeToClassMap, context))) {
+      debug("IsSigMethodCriterion => false");
+      return false;
+    }
+
+    debug("IsSigMethodCriterion.isSatisfiedBy => true");
+    return true;
   }
 
   public Kind getKind() {
