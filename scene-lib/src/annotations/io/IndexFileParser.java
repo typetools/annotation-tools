@@ -596,9 +596,8 @@ public final class IndexFileParser {
         if (checkKeyword("type") && matchKeyword("type")) {
             expectChar(':');
             parseAnnotations(f.type);
-            // no need for parseInner call here
+            parseInnerTypes(f.type);
         }
-        parseInnerTypes(f.type);
     }
 
     private void parseMethod(AClass c) throws IOException,
@@ -654,9 +653,8 @@ public final class IndexFileParser {
                 if (checkKeyword("type") && matchKeyword("type")) {
                     expectChar(':');
                     parseAnnotations(p.type);
-                    // no need to parse inner types here
+                    parseInnerTypes(p.type);
                 }
-                parseInnerTypes(p.type);
             } else if (matchKeyword("receiver")) {
                 expectChar(':');
                 parseAnnotations(m.receiver);
@@ -678,8 +676,8 @@ public final class IndexFileParser {
             if (checkKeyword("type") && matchKeyword("type")) {
                 expectChar(':');
                 parseAnnotations(l.type);
+                parseInnerTypes(l.type);
             }
-            parseInnerTypes(l.type);
         }
         while (matchKeyword("typecast")) {
             expectChar('#');
