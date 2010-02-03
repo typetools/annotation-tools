@@ -298,8 +298,7 @@ inner class or the outer class.)
 \qquad    \bnfcmt The annotation on the \bnflit{field} line is that of the field declaration, \\
 \qquad    \bnfcmt while the annotation on the \bnflit{type} line is that of outermost type. \\
 \qquad    \bnflit{field} \bnfnt{name} \bnflit{:} \bnfnt{annotation}* \lineend  \\
-\qquad        \bnflit{type:} \bnfnt{annotation}* \lineend \\
-\qquad        \bnfnt{type-argument-or-array-definition}* \\
+\qquad        \bnfnt{type-annotations}* \\
 \\
 \bnfnt{method-definition} ::= \\
 \qquad    \bnfcmt The method-key consists of the name followed by the signature \\
@@ -314,6 +313,11 @@ inner class or the outer class.)
 \qquad        \bnfnt{typecast-definition}* \\
 \qquad        \bnfnt{instanceof-definition}* \\
 \qquad        \bnfnt{new-definition}* \\
+\\
+\bnfnt{type-annotations} ::= \\
+\qquad    \bnfcmt holds the type annotations, as opposed to the declaration annotations \\
+\qquad        \bnflit{type:} \bnfnt{annotation}* \lineend \\
+\qquad        \bnfnt{type-argument-or-array-definition}* \\
 \\
 \bnfnt{type-argument-or-array-definition} ::= \\
 \qquad    \bnfcmt The integer list here contains the values of the ``\ahref{http://types.cs.washington.edu/jsr308/specification/java-annotation-design.html#class-file:ext:ri:typearg}{location}'' array~\cite{JSR308}. \\ % Section 4.3.12
@@ -338,8 +342,7 @@ inner class or the outer class.)
 \qquad    \bnfcmt The annotation on the \bnflit{parameter} line is that of the parameter declaration, \\
 \qquad    \bnfcmt while the annotation on the \bnflit{type} line is that of outermost type of the parameter. \\
 \qquad    \bnflit{parameter} \bnfnt{integer} \bnflit{:} \bnfnt{annotation}* \lineend \\
-\qquad        \bnflit{type:} \bnfnt{annotation}* \lineend \\
-\qquad    \bnfnt{type-argument-or-array-definition}* \\
+\qquad    \bnfnt{type-annotations}* \\
 \\
 \bnfnt{variable-definition} ::= \\
 \qquad    \bnfcmt The integers are respectively the index, start, and length \\
