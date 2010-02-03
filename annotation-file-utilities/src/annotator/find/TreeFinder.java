@@ -79,6 +79,18 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
         case ARRAY_TYPE:
           t = ((JCArrayTypeTree) t).elemtype;
           break;
+        case PARAMETERIZED_TYPE:
+          t = ((JCTypeApply) t).getTypeArguments().get(0);
+          break;
+        case EXTENDS_WILDCARD:
+        case SUPER_WILDCARD:
+          t = ((JCWildcard) t).inner;
+          break;
+        case UNBOUNDED_WILDCARD:
+          // This is "?" as in "List<?>".  ((JCWildcard) t).inner is null.
+          // There is nowhere to attach the annotation, so for now return
+          // the "?" tree itself.
+          return t;
         default:
           throw new RuntimeException(String.format("Unrecognized type (kind=%s, class=%s): %s", t.getKind(), t.getClass(), t));
         }
