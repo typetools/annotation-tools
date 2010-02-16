@@ -160,8 +160,10 @@ The Kleene qualifiers ``*'' (zero or more), ``?'' (zero or one), and ``+''
 A vertical bar (``\bnfor'') separates alternatives.
 Parentheses (``()'') denote grouping, and square brackets (``[]'')
 denote optional syntax, which is equivalent to ``( ... ) ?''.
+We use the hash key (``\#'') for comments within the grammar. 
 
-In the annotation file, 
+In the annotation file,
+besides its use as token separator, 
 whitespace (excluding
 newlines) is optional with one exception: no space is permitted
 between an ``@'' character and a subsequent name. Indentation is
@@ -175,6 +177,8 @@ two adjacent slashes (``//'') until the first newline is a comment.
 This is omitted from the grammar for simplicity.
 Block comments (``/* ... */'') are not allowed.
 
+The line end symbol \lineend{} is used for all the different line end
+conventions, that is, Windows- and Unix-style new lines are supported.
 
 
 
@@ -238,9 +242,9 @@ elements of any package.
 \begin{tabbing}
 \qquad \= \kill
 \bnfnt{annotation-definition} ::= \\
-\qquad    \bnflit{annotation} \bnflit{@}\bnfnt{name} \\
-\qquad    [ \bnflit{:} \bnfnt{annotation-field-definition}+ ] \\
-\qquad    \lineend \\
+\qquad    \bnflit{annotation} \bnflit{@}\bnfnt{name}
+    \bnflit{:} \bnfnt{annotation}* \lineend  \\ 
+\qquad    \bnfnt{annotation-field-definition}* \\
 \\
 \bnfnt{annotation-field-definition} ::= \\
 \qquad    \bnfnt{type} \bnfnt{name} \lineend
@@ -281,16 +285,17 @@ inner class or the outer class.)
 \\
 \bnfnt{annotation-field} ::= \\
 \qquad    \bnfcmt In Java, if a single-field annotation has a field named \\
-\qquad    \bnfcmt ``\texttt{value}'', and that field name may be elided in uses of the \\
-\qquad    \bnfcmt annotation:   ``\texttt{@A(12)}'' rather than ``\texttt{@A(value=12)}''. \\
+\qquad    \bnfcmt ``\texttt{value}'', then that field name may be elided in uses
+of the \\ \qquad    \bnfcmt annotation:   ``\texttt{@A(12)}'' rather than ``\texttt{@A(value=12)}''. \\
 \qquad    \bnfcmt Furthermore
-
-\qquad    \bnfcmt The same convention holdss in an annotation file. \\
+% TODO: something seems to be missing.
+\qquad    \bnfcmt The same convention holds in an annotation file. \\
 \qquad    \bnfnt{name} \bnflit{=} \bnfnt{value} \\
 \\
 \bnfnt{class-definition} ::= \\
 \qquad    \bnflit{class} \bnfnt{name} \bnflit{:} \bnfnt{annotation}* \lineend  \\
 \qquad        \bnfnt{bound-definition}* \\
+% TODO: annotations on superclass and interfaces?
 \qquad        \bnfnt{field-definition}*  \\
 \qquad        \bnfnt{method-definition}* \\
 \\
@@ -304,15 +309,20 @@ inner class or the outer class.)
 \qquad    \bnfcmt The method-key consists of the name followed by the signature \\
 \qquad    \bnfcmt in JVML format, for example: ``\code{foo([ILjava/lang/String;)V}''. \\
 \qquad    \bnfcmt The annotation on the \bnflit{method} line is that on the method not the return value. \\
+% TODO: is this also for constructors?
 \qquad    \bnflit{method} \bnfnt{method-key} \bnflit{:} \bnfnt{annotation}* \lineend \\
 \qquad        \bnfnt{bound-definition}* \\
 \qquad        \bnfnt{return-definition}? \\
 \qquad        \bnfnt{receiver-definition}? \\
 \qquad        \bnfnt{parameter-definition}* \\
+% TODO: method throws
 \qquad        \bnfnt{variable-definition}* \\
 \qquad        \bnfnt{typecast-definition}* \\
 \qquad        \bnfnt{instanceof-definition}* \\
 \qquad        \bnfnt{new-definition}* \\
+% TODO: exception types in catch clause
+% TODO: .class literals
+% TODO: type arguments in constructor and method calls
 \\
 \bnfnt{type-annotations} ::= \\
 \qquad    \bnfcmt holds the type annotations, as opposed to the declaration annotations \\
@@ -326,7 +336,8 @@ inner class or the outer class.)
 \bnfnt{bound-definition} ::= \\
 \qquad    \bnfcmt The integers are respectively the parameter and bound indices of \\
 \qquad    \bnfcmt the type parameter bound~\cite{JSR308}. \\
-\qquad    \bnflit{bound} \bnflit{,}\bnfnt{integer} \bnflit{\&}\bnfnt{integer} \bnflit{:} \bnfnt{annotation}* \lineend \\
+\qquad    \bnflit{bound} \bnfnt{integer} \bnflit{\&} \bnfnt{integer} \bnflit{:}
+\bnfnt{annotation}* \lineend \\
 \qquad    \bnfnt{type-argument-or-array-definition}* \\
 \\
 \bnfnt{return-definition} ::=  \\
@@ -337,8 +348,8 @@ inner class or the outer class.)
 \qquad    \bnflit{receiver:} \bnfnt{annotation}* \lineend \\
 \\
 \bnfnt{parameter-definition} ::= \\
-\qquad    \bnfcmt the integer is the index of the parameter in the method \\
-\qquad    \bnfcmt (i.e., 0 is the first method parameter) \\
+\qquad    \bnfcmt The integer is the index of the parameter in the method \\
+\qquad    \bnfcmt (i.e., 0 is the first method parameter). \\
 \qquad    \bnfcmt The annotation on the \bnflit{parameter} line is that of the parameter declaration, \\
 \qquad    \bnfcmt while the annotation on the \bnflit{type} line is that of outermost type of the parameter. \\
 \qquad    \bnflit{parameter} \bnfnt{integer} \bnflit{:} \bnfnt{annotation}* \lineend \\
@@ -348,6 +359,8 @@ inner class or the outer class.)
 \qquad    \bnfcmt The integers are respectively the index, start, and length \\
 \qquad    \bnfcmt fields of the annotations on this variable~\cite{JSR308}. \\
 \qquad    \bnflit{local} \bnfnt{integer} \bnflit{\#} \bnfnt{integer} \bnflit{+} \bnfnt{integer} \bnflit{:} \bnfnt{annotation}* \lineend \\
+% TODO: add a type here to distinguish declaration and type annotations, i.e.
+% change next line to type-annotations
 \qquad    \bnfnt{type-argument-or-array-definition}* \\
 \\
 \bnfnt{typecast-definition} ::= \\
@@ -376,6 +389,10 @@ tool that maps such annotations from an annotation file into source code must
 have access to the specific \code{.class} file that was used to generate
 the annotation file.  For non-expression annotations such as those on methods,
 fields, classes, etc., the \code{.class} file is not necessary.
+
+% TODO: What about interface and enum declarations?
+
+% TODO: annotations on wildcard bounds? 
 
 
 \section{Example}
@@ -430,7 +447,7 @@ class Foo: @A(value=12)
         inner-type 0: @C
 
     method <init>():
-        parameter #0: @B
+        parameter 0: @B
             inner-type 0: @C
         receiver: @D(value="spam")
         local 1 #3+5: @B
@@ -489,7 +506,7 @@ class Foo:
 
 The Java language permits several types for annotation fields: primitives,
 \code{String}s, \code{java.lang.Class} tokens (possibly parameterized),
-enumeration constants, subannotations, and one-dimensional arrays of these.
+enumeration constants, annotations, and one-dimensional arrays of these.
 
 These \textbf{types} are represented in an annotation file as follows:
 \begin{itemize}
@@ -499,6 +516,7 @@ These \textbf{types} are represented in an annotation file as follows:
 represented in annotation files.
 \item Enumeration constant: \code{enum} followed by the fully qualified name of
 the enumeration class, such as \code{enum java.lang.Thread\$State}.
+% TODO: \item Annotations: \bnflit{@} followed by the annotation name.
 \item Array: The representation of the element type followed by \code{[]}, such
 as \code{String[]}, with one exception: an annotation definition may specify
 a field type as \code{unknown[]} if, in all occurrences of that annotation in
