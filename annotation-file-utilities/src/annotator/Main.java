@@ -408,7 +408,12 @@ public class Main {
     }
   }
 
-  /** Remove the leading package. */
+  /**
+   * Removes the leading package.
+   *
+   * @return given <code>@com.foo.bar(baz)</code> it returns the pair
+   * <code>{ com.foo, @bar(baz) }</code>.
+   */
   public static Pair<String,String> removePackage(String s) {
     int nameEnd = s.indexOf("(");
     if (nameEnd == -1) {
@@ -427,6 +432,18 @@ public class Main {
     } else {
       return Pair.of((String)null, s);
     }
+  }
+
+  /**
+   * Separates the annotation class from its arguments.
+   *
+   * @return given <code>@foo(bar)</code> it returns the pair <code>{ @foo, (bar) }</code>.
+   */
+  public static Pair<String,String> removeArgs(String s) {
+    int pidx = s.indexOf("(");
+    return (pidx == -1) ?
+        Pair.of((String)null, s) :
+        Pair.of(s.substring(0, pidx), s.substring(pidx));
   }
 
 }
