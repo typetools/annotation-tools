@@ -555,7 +555,6 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       return super.scan(node, p);
     }
 
-
     TreePath path;
     if (paths.containsKey(tree))
       path = paths.get(tree);
@@ -614,13 +613,18 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       // printPath(path);
       if (mt != null) {
         for (AnnotationTree at : mt.getAnnotations()) {
-          String ann = at.toString();
-          String iann = i.getText();
+          // we compare our to be inserted annotation to the existing annotation, ignoring its
+          // arguments (duplicate annotations are never allowed even if they differ in arguments);
+          // this allows us to skirt around the additional complication that if we did have to
+          // compare our arguments, we'd have to deal with enum arguments potentially being fully
+          // qualified or not:
+          // @Retention(java.lang.annotation.RetentionPolicy.CLASS) vs
+          // @Retention(RetentionPolicy.CLASS)
+          String ann = at.getAnnotationType().toString();
+          String iann = Main.removeArgs(i.getText()).a.substring(1); // strip off the leading @
           String iannNoPackage = Main.removePackage(iann).b;
           // System.out.printf("Comparing: %s %s %s%n", ann, iann, iannNoPackage);
-          if (ann.equals(iann)
-              || ann.equals(iann + "()")
-              || ann.equals(iannNoPackage)) {
+          if (ann.equals(iann) || ann.equals(iannNoPackage)) {
             satisfied.add(i);
             return super.scan(node, p);
           }
