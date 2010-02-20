@@ -63,14 +63,14 @@ public final /*@ReadOnly*/ class ArrayAFT extends AnnotationFieldType {
      */
     @Override
     public String format(Object o) {
-        Object[] asArray = (Object[]) o;
+        Collection<?> asCollection = (Collection<?>)o;
         StringBuilder result = new StringBuilder();
         result.append("{");
-        for (int i = 0; i<asArray.length; i++) {
-            if (i != 0) {
+        for (Object elt : asCollection) {
+            if (result.length() > 1) {
                 result.append(",");
             }
-            result.append(elementType.format(asArray[i]));
+            result.append(elementType.format(elt));
         }
         result.append("}");
         return result.toString();
