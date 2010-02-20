@@ -45,7 +45,7 @@ public final /*@ReadOnly*/ class EnumAFT extends ScalarAFT {
      */
     @Override
     public String format(Object o) {
-        return o.toString();
+        return typeName + "." + o.toString();
     }
 
 }
