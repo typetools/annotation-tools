@@ -1,0 +1,30 @@
+package annotations.tests.classfile.foo:
+annotation visible @A
+
+annotation visible @B:
+	String value
+
+annotation visible @C:
+	int fieldA
+	String fieldB
+	
+package annotations.tests.classfile.cases:
+class TestObjectCreation:
+	
+  method test()V : 
+  	new # 1 : @annotations.tests.classfile.foo.B(value="first new")
+  	new # 12 : @annotations.tests.classfile.foo.B(value="a string")
+  	new # 23 : @annotations.tests.classfile.foo.A
+  	  	
+  method test2()V :
+  	new # 7 : @annotations.tests.classfile.foo.A
+  	new # 14 : @annotations.tests.classfile.foo.A
+  	
+  method test3()V :
+  	new # 1 : @annotations.tests.classfile.foo.B(value="new")
+		new # 12 : @annotations.tests.classfile.foo.A
+  	
+  method test4()V :
+  	new # 1 : @annotations.tests.classfile.foo.A
+  	new # 13 : @annotations.tests.classfile.foo.B(value="self test")
+  	  	
