@@ -147,9 +147,6 @@ annotation index file''), but this is not required.
 
 \subsection{Grammar conventions}
 
-% TODO: How is "[...]" different from "(...)?" ?  Why are two versions
-% necessary? -MDE
-
 Throughout this document, ``name'' is any valid Java simple name or 
 fully qualified name, ``type'' is any valid type, and ``value'' is any
 valid Java constant, and quoted strings are literal values.
@@ -159,8 +156,8 @@ The Kleene qualifiers ``*'' (zero or more), ``?'' (zero or one), and ``+''
 %
 A vertical bar (``\bnfor'') separates alternatives.
 Parentheses (``()'') denote grouping, and square brackets (``[]'')
-denote optional syntax, which is equivalent to ``( ... ) ?''.
-We use the hash key (``\#'') for comments within the grammar. 
+denote optional syntax, which is equivalent to ``( ... ) ?'' but more concise.
+We use the hash/pound/octothorpe symbol (``\#'') for comments within the grammar. 
 
 In the annotation file,
 besides its use as token separator, 
@@ -287,8 +284,6 @@ inner class or the outer class.)
 \qquad    \bnfcmt In Java, if a single-field annotation has a field named \\
 \qquad    \bnfcmt ``\texttt{value}'', then that field name may be elided in uses
 of the \\ \qquad    \bnfcmt annotation:   ``\texttt{@A(12)}'' rather than ``\texttt{@A(value=12)}''. \\
-\qquad    \bnfcmt Furthermore
-% TODO: something seems to be missing.
 \qquad    \bnfcmt The same convention holds in an annotation file. \\
 \qquad    \bnfnt{name} \bnflit{=} \bnfnt{value} \\
 \\
