@@ -68,6 +68,9 @@ public class Main {
   @Option("-c Insert annotations in comments")
   public static boolean comments = false;
 
+  @Option("-o Omit given annotation")
+  public static String omit_annotation;
+
   @Option("-v Verbose (print progress information)")
   public static boolean verbose;
 
@@ -129,11 +132,24 @@ public class Main {
         try {
           Specification spec = new IndexFileSpecification(arg);
           List<Insertion> parsedSpec = spec.parse();
-          insertions.addAll(parsedSpec);
           if (verbose || debug) {
             System.out.printf("Read %d annotations from %s%n",
                               parsedSpec.size(), arg);
           }
+          if (omit_annotation != null) {
+            List<Insertion> filtered = new ArrayList<Insertion>(parsedSpec.size());
+            for (Insertion insertion : parsedSpec) {
+              if (! omit_annotation.equals(insertion.getText())) {
+                filtered.add(insertion);
+              }
+            }
+            parsedSpec = filtered;
+            if (verbose || debug) {
+              System.out.printf("After filtering: %d annotations from %s%n",
+                                parsedSpec.size(), arg);
+            }
+          }
+          insertions.addAll(parsedSpec);
         } catch (RuntimeException e) {
           if (e.getCause() != null
               && e.getCause() instanceof FileNotFoundException) {
