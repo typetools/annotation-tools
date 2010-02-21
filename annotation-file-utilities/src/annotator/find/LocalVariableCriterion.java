@@ -8,6 +8,7 @@ import java.util.Map;
 import annotations.el.LocalLocation;
 import annotator.scanner.LocalVariableScanner;
 
+import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.tree.VariableTree;
 import com.sun.source.util.TreePath;
@@ -43,7 +44,9 @@ public class LocalVariableCriterion implements Criterion {
     if (parentPath != null) {
       Tree parent = parentPath.getLeaf();
       if (parent != null) {
-        if (parent instanceof VariableTree) {
+        if ((parent instanceof VariableTree)
+            // Avoid matching formal parameters
+            && (! (parentPath.getParentPath().getLeaf() instanceof MethodTree))) {
           VariableTree vtt = (VariableTree) parent;
           String varName = vtt.getName().toString();
           Pair<String, Pair<Integer, Integer>> key =
