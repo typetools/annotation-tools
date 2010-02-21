@@ -1,0 +1,16 @@
+package java.lang:
+annotation @ReadOnly: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+
+package java.lang:
+annotation @Mutable: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+
+package annotator.tests:
+class InstanceOfMultiple:
+
+    method <init>()V:
+
+    method foo(Ljava/lang/Object;)V:
+        instanceof #1: @java.lang.ReadOnly
+        instanceof #15: @java.lang.Mutable
+        instanceof #29: @java.lang.Mutable
+
