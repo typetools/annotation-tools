@@ -10,4 +10,4 @@ JAVAC_JAR=${JAVAC_JAR:-$(dirname $0)/../../../jsr308-langtools/dist/lib/javac.ja
 
 # Augment, don't replace, CLASSPATH, so as to find user files.
 # Can we can do without annotation-file-utilities.jar on bootclasspath?
-java -ea -Xbootclasspath/p:${JAVAC_JAR} -cp ${ANNOTATION_FILE_UTILS}:${CLASSPATH} annotator.Main "$@"
+java -ea -Xbootclasspath/p:${JAVAC_JAR} -classpath ${ANNOTATION_FILE_UTILS}:${CLASSPATH} annotator.Main "$@"
