@@ -442,7 +442,7 @@ public class Main {
   public static Pair<String,String> removeArgs(String s) {
     int pidx = s.indexOf("(");
     return (pidx == -1) ?
-        Pair.of((String)null, s) :
+        Pair.of(s, (String)null) :
         Pair.of(s.substring(0, pidx), s.substring(pidx));
   }
 
