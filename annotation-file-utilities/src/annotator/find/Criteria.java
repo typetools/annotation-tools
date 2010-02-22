@@ -21,7 +21,8 @@ import com.sun.source.util.TreePath;
  */
 public final class Criteria {
 
-  public final static boolean debug = false;
+  // Not final, to avoid tests against it being optimized away.
+  public static boolean debug = false;
 
   /** The set of criterion objects. */
   private final Set<Criterion> criteria;
