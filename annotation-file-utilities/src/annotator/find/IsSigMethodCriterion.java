@@ -115,6 +115,7 @@ public class IsSigMethodCriterion implements Criterion {
   }
 
   // Abstracts out the inner loop of matchTypeParams.
+  // goalType is fully-qualified.
   private boolean matchTypeParam(String goalType, Tree type,
                                  Map<String, String> typeToClassMap,
                                  Context context) {
@@ -151,7 +152,9 @@ public class IsSigMethodCriterion implements Criterion {
   }
 
 
-  // It looks like both fullType and simpleType are expected to be in Java, not JVML, format
+  // simpleType is the name as it appeared in the source code.
+  // fullType is fully-qualified.
+  // Both are in Java, not JVML, format.
   private boolean matchSimpleType(String fullType, String simpleType, Context context) {
     if (Criteria.debug) debug(String.format("matchSimpleType(%s, %s, %s)%n", fullType, simpleType, context));
 
@@ -167,7 +170,7 @@ public class IsSigMethodCriterion implements Criterion {
 
     // TODO: arrays?
 
-    // first try quantifying simpleType with this package name,
+    // first try qualifying simpleType with this package name,
     // then with java.lang
     // then with default package
     // then with all of the imports
@@ -231,18 +234,20 @@ public class IsSigMethodCriterion implements Criterion {
     return matchable;
   }
 
-  // simpleType is in JVML format ??
+  // simpleType can be in JVML format ??  Is that really possible?
   private boolean matchWithPrefix(String fullType, String simpleType, String prefix) {
 
-    // quick return if simpleType is in Java format
-    if (fullType.equals(prefix + simpleType)) {
-      return true;
-    }
-
     // maybe simpleType is in JVML format
-    String possibleFullType = prefix + UtilMDE.classnameToJvm(simpleType);
-    possibleFullType = possibleFullType.replace(".", "/");
-    boolean b = fullType.equals(possibleFullType);
+    String simpleType2 = simpleType.replace(".", "/");
+    String prefix2 = (prefix.endsWith(".")
+                      ? prefix.substring(0, prefix.length() - 1)
+                      : prefix);
+
+    boolean b = (fullType.equals(prefix + simpleType2)
+                 // Hacky way to handle the possibility that fulltype is an
+                 // inner type but simple type is unqualified.
+                 || (fullType.startsWith(prefix)
+                     && fullType.endsWith("$" + simpleType2)));
     if (Criteria.debug) debug(String.format("matchWithPrefix(%s, %s, %s) => %s)%n", fullType, simpleType, prefix, b));
     return b;
   }
