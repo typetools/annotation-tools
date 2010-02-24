@@ -1,0 +1,14 @@
+\begin{thebibliography}{LBR06}
+
+\bibitem[Ern08]{JSR308}
+Michael~D. Ernst.
+\newblock {Type Annotations} specification ({JSR} 308).
+\newblock \url{http://types.cs.washington.edu/jsr308/}, September~12, 2008.
+
+\bibitem[LBR06]{LeavensBR2006:JML}
+Gary~T. Leavens, Albert~L. Baker, and Clyde Ruby.
+\newblock Preliminary design of {JML}: A behavioral interface specification
+  language for {Java}.
+\newblock {\em ACM SIGSOFT Software Engineering Notes}, 31(3), March 2006.
+
+\end{thebibliography}
