@@ -38,9 +38,8 @@ public abstract class TypeASTMapper<N> {
     protected TypeASTMapper() {
     }
 
-    private static ATypeElement
-        getInnerType(ATypeElement te,
-                /*@ReadOnly*/  List< Integer> ls) {
+    private static ATypeElement getInnerType(ATypeElement te,
+                                             /*@ReadOnly*/ List<Integer> ls) {
         if (ls.isEmpty())
             return te;
         else
@@ -60,11 +59,10 @@ public abstract class TypeASTMapper<N> {
      * may wish to {@linkplain AElement#prune prune} <code>aslRoot</code> after
      * traversal.
      */
-    public void traverse(N tastRoot,
-             ATypeElement aslRoot) {
+    public void traverse(N tastRoot, ATypeElement aslRoot) {
         // Elements are added and removed from the end of this sole mutable
         // list during the traversal.
-         List<Integer> ls = new ArrayList<Integer>();
+        List<Integer> ls = new ArrayList<Integer>();
         traverse1(tastRoot, aslRoot, ls);
     }
 
