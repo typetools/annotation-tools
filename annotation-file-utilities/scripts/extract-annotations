@@ -7,7 +7,6 @@
 ANNOTATION_FILE_UTILS=$(dirname $0)/../annotation-file-utilities.jar
 # Contains Java 7 version of java.lang.annotation.ElementType.
 JAVAC_JAR=${JAVAC_JAR:-$(dirname $0)/../../../jsr308-langtools/dist/lib/javac.jar}
-i
 
 # AFU seems to bundle checkers.qualifiers in the
 # annotation-file-utilities.jar.  extract-annotations uses NonNull in
