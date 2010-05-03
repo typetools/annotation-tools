@@ -173,7 +173,8 @@
                destdir="bin" 
                debug="true" 
                classpathref="libpath"
-               classpath="${libpath}">
+               classpath="${libpath}"
+               includeantruntime="false">
             <src refid="sourcepath"/>
             <compilerarg value="-Xbootclasspath/p:${toString:libpath}"/>
             <classpath refid="libpath"/>
