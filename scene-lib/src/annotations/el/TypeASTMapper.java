@@ -79,20 +79,23 @@ public abstract class TypeASTMapper<N> {
                 ls.remove(ls.size() - 1);
             }
         } else {
+            map(n, getInnerType(te, ls));
+
             // at least one array layer to confuse us
             int layers = 0;
             while ((elType = getElementType(n)) != null) {
                 ls.add(layers);
-                map(n, getInnerType(te, ls));
+                map(elType, getInnerType(te, ls));
                 ls.remove(ls.size() - 1);
-                n = (N) elType;
+                n = elType;
                 layers++;
             }
-            // n is now the innermost element type
-            // map it to the prefix
-            map(n, getInnerType(te, ls));
+            // // n is now the innermost element type
+            // // map it to the prefix
+            // map(n, getInnerType(te, ls));
+
             // hack for type arguments of the innermost element type
-            ls.add(0);
+            ls.add(layers);
             int nta = numTypeArguments(n);
             for (int tai = 0; tai < nta; tai++) {
                 ls.add(tai);
