@@ -384,7 +384,7 @@
     <mkdir dir="bin"/>
 
     <javac srcdir="src" destdir="bin" debug="true" encoding="8859_1"
-      classpathref="libpath">
+      classpathref="libpath" includeantruntime="false">
       <compilerarg value="-version"/>
     </javac>
 
