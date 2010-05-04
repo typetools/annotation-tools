@@ -631,14 +631,14 @@ public /*@ReadOnly*/ class TestSceneLib extends TestCase {
         ATypeElement myAFieldType = myAField.type;
         // load it with annotations we can check against IDs
         myAFieldType.tlAnnotationsHere.add(makeTLIdAnno(0));
-        assignId(myAFieldType, 1, 0, 0);
-        assignId(myAFieldType, 2, 0, 1);
-        assignId(myAFieldType, 3, 0);
-        assignId(myAFieldType, 4, 0, 0, 0);
+        assignId(myAFieldType, 1, 0);
+        assignId(myAFieldType, 2, 0, 0);
+        assignId(myAFieldType, 3, 0, 1);
+        assignId(myAFieldType, 4, 0, 1, 0);
         assignId(myAFieldType, 5, 1);
         assignId(myAFieldType, 6, 1, 0);
-        assignId(myAFieldType, 7, 1, 1, 0);
-        assignId(myAFieldType, 8, 1, 1);
+        assignId(myAFieldType, 7, 1, 1);
+        assignId(myAFieldType, 8, 1, 1, 0);
         assignId(myAFieldType, 9, 1, 2);
         // to test vivification, we don't assign 10
 
