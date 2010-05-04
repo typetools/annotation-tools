@@ -71,6 +71,8 @@ public abstract class TypeASTMapper<N> {
         N elType = getElementType(n);
         if (elType == null) {
             // no array, so the prefix corresponds to the type right here
+            // System.out.printf("non-array: map(%s, getInnerType(%s, %s)=%s)%n",
+            //                   n, te, ls, getInnerType(te, ls));
             map(n, getInnerType(te, ls));
             int nta = numTypeArguments(n);
             for (int tai = 0; tai < nta; tai++) {
@@ -79,12 +81,16 @@ public abstract class TypeASTMapper<N> {
                 ls.remove(ls.size() - 1);
             }
         } else {
+            // System.out.printf("array top-level: map(%s, getInnerType(%s, %s)=%s)%n",
+            //                   n, te, ls, getInnerType(te, ls));
             map(n, getInnerType(te, ls));
 
             // at least one array layer to confuse us
             int layers = 0;
             while ((elType = getElementType(n)) != null) {
                 ls.add(layers);
+                // System.out.printf("layers=%d, map(%s, getInnerType(%s, %s)=%s)%n",
+                //                   layers, elType, te, ls, getInnerType(te, ls));
                 map(elType, getInnerType(te, ls));
                 ls.remove(ls.size() - 1);
                 n = elType;
@@ -95,7 +101,7 @@ public abstract class TypeASTMapper<N> {
             // map(n, getInnerType(te, ls));
 
             // hack for type arguments of the innermost element type
-            ls.add(layers);
+            ls.add(layers-1);
             int nta = numTypeArguments(n);
             for (int tai = 0; tai < nta; tai++) {
                 ls.add(tai);
