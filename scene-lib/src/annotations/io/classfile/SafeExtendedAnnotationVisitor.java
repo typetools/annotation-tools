@@ -284,13 +284,25 @@ implements ExtendedAnnotationVisitor {
       checkListSize(1, 1, c, 1, 0, 1, 0, 0, 0,
       "Invalid local variable generic/array annotation:");
       break;
+    case METHOD_RETURN:
+      checkListSize(0, 0, 0, 0, 0, 0, 0, 0, 0,
+      "Invalid method return type annotation:");
+      break;
     case METHOD_RETURN_GENERIC_OR_ARRAY:
       checkListSize(0, 0, c, 1, 0, 0, 0, 0, 0,
       "Invalid method return type generic/array annotation:");
       break;
+    case METHOD_PARAMETER:
+      checkListSize(1, 0, 0, 0, 0, 0, 0, 0, 0,
+      "Invalid method parameter annotation:");
+      break;
     case METHOD_PARAMETER_GENERIC_OR_ARRAY:
-      checkListSize(0, 0, c, 1, 0, 0, 0, 0, 0,
+      checkListSize(1, 0, c, 1, 0, 0, 0, 0, 0,
       "Invalid method parameter generic/array annotation:");
+      break;
+    case FIELD:
+      checkListSize(0, 0, c, 0, 0, 0, 0, 0, 0,
+      "Invalid field annotation:");
       break;
     case FIELD_GENERIC_OR_ARRAY:
       checkListSize(0, 0, c, 1, 0, 0, 0, 0, 0,
