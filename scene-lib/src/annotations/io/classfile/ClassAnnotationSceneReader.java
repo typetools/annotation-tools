@@ -729,18 +729,22 @@ extends EmptyVisitor {
           makeInnerTypeLocation()).tlAnnotationsHere.add(makeAnnotation());
     }
 
+    private int makeParamIndex() {
+    	return xParamIndexArgs.get(0);
+    }
+
     /*
      * Creates the method parameter type generic/array annotation on aMethod.
      */
     private void handleMethodParameterType(AMethod aMethod) {
-      aMethod.parameters.vivify(makeIndex()).type.tlAnnotationsHere.add(makeAnnotation());
+      aMethod.parameters.vivify(makeParamIndex()).type.tlAnnotationsHere.add(makeAnnotation());
     }
 
     /*
      * Creates the method parameter type generic/array annotation on aMethod.
      */
     private void handleMethodParameterTypeGenericArray(AMethod aMethod) {
-      aMethod.parameters.vivify(makeIndex()).type.innerTypes.vivify(
+      aMethod.parameters.vivify(makeParamIndex()).type.innerTypes.vivify(
           makeInnerTypeLocation()).tlAnnotationsHere.add(makeAnnotation());
     }
 
