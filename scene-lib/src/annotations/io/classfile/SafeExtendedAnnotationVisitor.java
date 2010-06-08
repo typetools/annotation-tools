@@ -293,11 +293,11 @@ implements ExtendedAnnotationVisitor {
       "Invalid method return type generic/array annotation:");
       break;
     case METHOD_PARAMETER:
-      checkListSize(1, 0, 0, 0, 0, 0, 0, 0, 0,
+      checkListSize(0, 0, 0, 0, 0, 0, 1, 0, 0,
       "Invalid method parameter annotation:");
       break;
     case METHOD_PARAMETER_GENERIC_OR_ARRAY:
-      checkListSize(1, 0, c, 1, 0, 0, 0, 0, 0,
+      checkListSize(0, 0, c, 1, 0, 0, 1, 0, 0,
       "Invalid method parameter generic/array annotation:");
       break;
     case FIELD:
