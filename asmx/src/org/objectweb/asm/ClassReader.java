@@ -1418,7 +1418,7 @@ public class ClassReader {
         case METHOD_PARAMETER_GENERIC_OR_ARRAY:
           int param = readByte(v);
           v++;
-          xav.visitXIndex(param);
+          xav.visitXParamIndex(param);
           break;
 
         // 0x0E*/0x0F: field
