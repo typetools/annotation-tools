@@ -108,19 +108,18 @@ public class ClassFileWriter {
 
      // annotations loaded from index file into scene, now insert them
      // into class file
-     String outputFileName = className + (className.endsWith(".class") ? "" : ".class");
      try {
-       System.out.println("Writing class file with annotations to: "
-           + outputFileName);
        if (className.endsWith(".class")) {
-           insert(scene, outputFileName, true);
-       } else
-           insert(scene, className, outputFileName, true);
-
+         System.out.printf("Adding annotations to class file %s%n", className);
+         insert(scene, className, true);
+       } else {
+         String outputFileName = className + ".class";
+         System.out.printf("Reading class file %s; writing with annotations to %s%n",
+                           className, outputFileName);
+         insert(scene, className, outputFileName, true);
+       }
      } catch(IOException e) {
-       System.out.println("Problem reading to/from class/file: " +
-           className + "/" + outputFileName);
-       System.out.println(e.getMessage());
+       System.out.printf("IOException: %s%n", e.getMessage());
        return;
      } catch(Exception e) {
        System.out.println("Uknown error trying to insert annotations from: " +
@@ -139,26 +138,26 @@ public class ClassFileWriter {
 
   /**
    * Inserts the annotations contained in <code> scene </code> into
-   * the class file contained in <code> fileName </code>.
-   * <code> fileName </code> should be a file name that can be resolved from
-   * the current working directory, which means it should end in ".class"
-   * for standard Java class files.  The new class containing the annotations
-   * specified by <code> scene </code> will be written out back to
-   * <code> fileName </code>.  If overwrite is true, then whenever an
-   * annotations exists on a particular element in both the scene and the
-   * class file, the one from the scene will be used.  Else, if overwrite is
-   * false, the existing annotation in the class file will be used.
+   * the class file contained in <code> fileName </code>, and write
+   * the result back into <code> fileName </code>.
    *
    * @param scene the scene containing the annotations to insert into a class
    * @param fileName the file name of the class the annotations should be
-   * inserted into
-   * @param overwrite whether to overwrite existing annotations
+   * inserted into.  Should be a file name that can be resolved from
+   * the current working directory, which means it should end in ".class"
+   * for standard Java class files.
+   * @param overwrite controls behavior when an annotation exists on a
+   * particular element in both the scene and the class file.  If true,
+   * then the one from the scene is used; else the the existing annotation
+   * in the class file is retained.
    * @throws IOException if there is a problem reading from or writing to
    * <code> fileName </code>
    */
   public static void insert(
       AScene scene, String fileName, boolean overwrite)
   throws IOException {
+    assert fileName.endsWith(".class");
+
     // can't just call other insert, because this closes the input stream
     InputStream in = new FileInputStream(fileName);
     ClassReader cr = new ClassReader(in);
@@ -179,15 +178,15 @@ public class ClassFileWriter {
    * class file into <code> out </code>.  <code> in </code> should be a stream
    * of bytes that specify a valid Java class file, and <code> out </code> will
    * contain a stream of bytes in the same format, and will also contain the
-   * annotations from <code> scene </code>.  If overwrite is true, then whenever
-   * an annotations exists on a particular element in both the scene and the
-   * class file, the one from the scene will be used.  Else, if overwrite is
-   * false, the existing annotation in the class file will be used.
+   * annotations from <code> scene </code>.
    *
    * @param scene the scene containing the annotations to insert into a class
    * @param in the input stream from which to read a class
    * @param out the output stream the merged class should be written to
-   * @param overwrite whether to overwrite existing annotations
+   * @param overwrite controls behavior when an annotation exists on a
+   * particular element in both the scene and the class file.  If true,
+   * then the one from the scene is used; else the the existing annotation
+   * in the class file is retained.
    * @throws IOException if there is a problem reading from <code> in </code> or
    * writing to <code> out </code>
    */
@@ -209,15 +208,14 @@ public class ClassFileWriter {
    * class file into <code> out </code>.  <code> in </code> should be the
    * name of a fully-qualified class, and <code> out </code> should be the
    * name of a file to output the resulting class file to.
-   * If overwrite is true, then whenever
-   * an annotations exists on a particular element in both the scene and the
-   * class file, the one from the scene will be used.  Else, if overwrite is
-   * false, the existing annotation in the class file will be used.
    *
    * @param scene the scene containing the annotations to insert into a class
    * @param className the fully qualified class to read
    * @param outputFileName the name of the output file the class should be written to
-   * @param overwrite whether to overwrite existing annotations
+   * @param overwrite controls behavior when an annotation exists on a
+   * particular element in both the scene and the class file.  If true,
+   * then the one from the scene is used; else the the existing annotation
+   * in the class file is retained.
    * @throws IOException if there is a problem reading from <code> in </code> or
    * writing to <code> out </code>
    */
