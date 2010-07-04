@@ -6,7 +6,20 @@
 #
 # To test just one file, use (for example) 'make myClass.diff'.
 
+# Put user-specific changes in your own Makefile.user.
+# Make will silently continue if that file does not exist.
+-include Makefile.user
+
+# Override these in Makefile.user if the java and javac commands are not on
+# your classpath.  Example from Makefile.user:
+#   JAVA=${JAVA_HOME}/bin/java
+#   JAVAC=${JAVA_HOME}/bin/javac
+JAVA?=java
+JAVAC?=javac
+TOOLS?=${JAVA_HOME}/lib/tools.jar
+
 export SHELL=/bin/bash -o pipefail
+
 
 DIFFS := $(wildcard *.goal)
 DIFFS := $(patsubst %.goal, %.diff, $(DIFFS))
@@ -30,26 +43,26 @@ results: bin/VerifyDiffs.class
 	@echo ""
 	@echo "=== RESULTS ==="
 	@echo ""
-	@java -cp bin VerifyDiffs --show_all
+	@$(JAVA) -cp bin VerifyDiffs --show_all
 
 # Remakes the little java program that checks and compares diffs
 bin/VerifyDiffs.class : VerifyDiffs.java
-	@javac -g -cp ../bincompile -d bin VerifyDiffs.java
+	@$(JAVAC) -g -cp ../bincompile -d bin VerifyDiffs.java
 
 # Compiles all the test cases (be verbose about this).
 compile :
 	mkdir -p bin
-	javac -g -cp ../bin -d bin *.java
+	$(JAVAC) -g -cp ../bin -d bin *.java
 
 .PRECIOUS : bin/annotator/tests/%.class
 bin/annotator/tests/%.class: %.java
 	mkdir -p bin
-	javac -g -cp bin:../bin -d bin -sourcepath . $*.java
+	$(JAVAC) -g -cp bin:../bin -d bin -sourcepath . $*.java
 
 # Actually runs the annotator to create the annotated java file.
 .PRECIOUS: %.output
 %.output: %.jaif %.java bin/annotator/tests/%.class ../lib/plume.jar ../bin ../annotation-file-utilities.jar
-	java \
+	$(JAVA) \
 	-cp bin:../annotation-file-utilities.jar \
 	annotator.Main \
 	${DEBUG} \
