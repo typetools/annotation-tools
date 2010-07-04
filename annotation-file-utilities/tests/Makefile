@@ -63,7 +63,7 @@ bin/annotator/tests/%.class: %.java
 .PRECIOUS: %.output
 %.output: %.jaif %.java bin/annotator/tests/%.class ../lib/plume.jar ../bin ../annotation-file-utilities.jar
 	$(JAVA) \
-	-cp $(TOOLS):bin:../annotation-file-utilities.jar \
+	-cp bin:../annotation-file-utilities.jar:$(TOOLS) \
 	annotator.Main \
 	${DEBUG} \
 	--abbreviate=false \
