@@ -11,7 +11,7 @@
 -include Makefile.user
 
 # Override these in Makefile.user if the java and javac commands are not on
-# your classpath.  Example from Makefile.user:
+# your execution path.  Example from Makefile.user:
 #   JAVA=${JAVA_HOME}/bin/java
 #   JAVAC=${JAVA_HOME}/bin/javac
 JAVA?=java
@@ -63,7 +63,7 @@ bin/annotator/tests/%.class: %.java
 .PRECIOUS: %.output
 %.output: %.jaif %.java bin/annotator/tests/%.class ../lib/plume.jar ../bin ../annotation-file-utilities.jar
 	$(JAVA) \
-	-cp bin:../annotation-file-utilities.jar \
+	-cp $(TOOLS):bin:../annotation-file-utilities.jar \
 	annotator.Main \
 	${DEBUG} \
 	--abbreviate=false \
