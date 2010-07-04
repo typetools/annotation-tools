@@ -16,7 +16,6 @@
 #   JAVAC=${JAVA_HOME}/bin/javac
 JAVA?=java
 JAVAC?=javac
-TOOLS?=${JAVA_HOME}/lib/tools.jar
 
 export SHELL=/bin/bash -o pipefail
 
@@ -63,7 +62,7 @@ bin/annotator/tests/%.class: %.java
 .PRECIOUS: %.output
 %.output: %.jaif %.java bin/annotator/tests/%.class ../lib/plume.jar ../bin ../annotation-file-utilities.jar
 	$(JAVA) \
-	-cp bin:../annotation-file-utilities.jar:$(TOOLS) \
+	-cp bin:../annotation-file-utilities.jar \
 	annotator.Main \
 	${DEBUG} \
 	--abbreviate=false \
