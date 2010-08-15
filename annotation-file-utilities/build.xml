@@ -433,7 +433,7 @@
           description="create Emacs TAGS table, including scene library files">
     <exec executable="/bin/sh">
       <arg value="-c"/>
-      <arg value="etags `find src -name '*.java' | sort-directory-order.pl` `find ../scene-lib -name '*.java' | sort-directory-order.pl`"/>
+      <arg value="etags `find src -name '*.java' | sort-directory-order` `find ../scene-lib -name '*.java' | sort-directory-order`"/>
     </exec>
   </target>
 
