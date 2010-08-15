@@ -322,7 +322,7 @@
   <target name="tags" description="Create Emacs TAGS table">
     <exec executable="/bin/sh">
       <arg value="-c"/>
-      <arg value="etags `find -name '*.java' | sort-directory-order.pl`"/>
+      <arg value="etags `find -name '*.java' | sort-directory-order`"/>
     </exec>
   </target>
 
