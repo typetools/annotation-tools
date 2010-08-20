@@ -21,7 +21,7 @@ import com.google.common.collect.*;
  * This is the main class for the annotator, which inserts annotations in
  * Java source code.  It takes as input
  * <ul>
- *   <li>annotation (index) files, which indcate the annotations to insert</li>
+ *   <li>annotation (index) files, which indicate the annotations to insert</li>
  *   <li>Java source files, into which the annotator inserts annotations</li>
  * </ul>
  * Use the --help option for full usage details.
@@ -99,7 +99,7 @@ public class Main {
     }
 
     Options options = new Options("Main [options] ann-file... java-file...", Main.class);
-    String[] file_args = options.parse_and_usage (args);
+    String[] file_args = options.parse_or_usage (args);
 
     if (debug) {
       TreeFinder.debug = true;
@@ -305,7 +305,7 @@ public class Main {
 
             // If it's already there, don't re-insert.  This is a hack!
             // Also, I think this is already checked when constructing the
-            // innertions.
+            // insertions.
             int precedingTextPos = pos-toInsert.length()-1;
             if (precedingTextPos >= 0) {
               String precedingTextPlusChar
@@ -356,7 +356,6 @@ public class Main {
             importIndex = m.end();
           }
         }
-        String lineSep = System.getProperty("line.separator");
         for (String classname : imports) {
           String toInsert = "import " + classname + ";" + fileLineSep;
           src.insert(importIndex, toInsert);
