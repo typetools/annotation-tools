@@ -10,12 +10,14 @@
 
   <property name="java-version" value="7"/>
 
+  <!-- Avoid conflicts between multiple users on the same computer. -->
+  <property name="tmpdir" location="${java.io.tmpdir}/${user.name}" />
   <!-- The distribution is the result of zipping this directory. -->
-  <property name="temp-annotation-tools" location="${java.io.tmpdir}/annotation-tools" />
+  <property name="temp-annotation-tools" location="${tmpdir}/annotation-tools" />
 
   <!-- Can't I just reuse temp-annotation-file-utilities, rather than
        having this separate directory? -->
-  <property name="temp-jarfile" location="${java.io.tmpdir}/annotation-file-utilities-jarfile" />
+  <property name="temp-jarfile" location="${tmpdir}/annotation-file-utilities-jarfile" />
 
 <!--
   <property name="jsr308-www" location="/afs/csail/group/pag/www/jsr308"/>
@@ -165,6 +167,7 @@
           description="create the class library annotation-file-utilities.jar">
 
     <echo message="Using temporary directory: ${temp-jarfile}"/>
+    <delete dir="${temp-jarfile}"/>
     <mkdir dir="${temp-jarfile}"/>
 
     <echo message="Copying .class files to ${temp-jarfile}"/>
@@ -199,9 +202,7 @@
 
     <!-- Delete class files copied over -->
     <echo message="Deleting temporary directory: ${temp-jarfile}"/>
-    <delete>
-      <fileset dir="${temp-jarfile}"/>
-    </delete>
+    <delete dir="${temp-jarfile}"/>
   </target>
 
   <target name="check-hg-status" depends="init-properties">
@@ -270,13 +271,13 @@
          include them specifically with the right permissions.  Ant presently
          does not use the file's permissions themselves to do this. -->
     <zip destfile="annotation-tools.zip" compress="true">
-      <fileset dir="${java.io.tmpdir}">
+      <fileset dir="${tmpdir}">
         <include name="annotation-tools/"/>
         <exclude name="annotation-tools/annotation-file-utilities/scripts/extract-annotations"/>
         <exclude name="annotation-tools/annotation-file-utilities/scripts/insert-annotations"/>
         <exclude name="annotation-tools/annotation-file-utilities/scripts/insert-annotations-to-source"/>
       </fileset>
-      <zipfileset dir="${java.io.tmpdir}" filemode="755">
+      <zipfileset dir="${tmpdir}" filemode="755">
         <include name="annotation-tools/annotation-file-utilities/scripts/extract-annotations"/>
         <include name="annotation-tools/annotation-file-utilities/scripts/insert-annotations"/>
         <include name="annotation-tools/annotation-file-utilities/scripts/insert-annotations-to-source"/>
