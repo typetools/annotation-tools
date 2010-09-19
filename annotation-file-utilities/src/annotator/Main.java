@@ -31,9 +31,6 @@ import com.google.common.collect.*;
  */
 public class Main {
 
-  public static final String INDEX_UTILS_VERSION =
-    "Annotation file utilities: insert-annotations-to-source v3.0";
-
   /** Directory in which output files are written. */
   @Option("-d <directory> Directory in which output files are written")
   public static String outdir = "annotated/";
@@ -95,7 +92,8 @@ public class Main {
   public static void main(String[] args) {
 
     if (verbose) {
-      System.out.println(INDEX_UTILS_VERSION);
+      System.out.printf("insert-annotations-to-source (%s)",
+                        annotations.io.classfile.ClassFileReader.INDEX_UTILS_VERSION);
     }
 
     Options options = new Options("Main [options] ann-file... java-file...", Main.class);
