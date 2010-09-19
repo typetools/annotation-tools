@@ -9,14 +9,15 @@ import org.objectweb.asm.ClassReader;
 import annotations.*;
 import annotations.el.AScene;
 import annotations.io.IndexFileWriter;
+
 /**
  * A <code> ClassFileReader </code> provides methods for reading in annotations
  *  from a class file into an {@link annotations.el.AScene}.
  */
 public class ClassFileReader {
 
-  public static final String INDEX_UTILS_VERSION =
-    "Annotation file utilities: extract-annotations v3.0";
+  public static final String INDEX_UTILS_VERSION
+    = "Annotation File Utilities v3.1";
 
   static String usage
     = "usage: extract-annotations\n"
@@ -61,7 +62,8 @@ public class ClassFileReader {
     for (String arg: args) {
       arg = arg.trim();
       if (arg.equals("-version") || arg.equals("--version")) {
-        System.out.println(INDEX_UTILS_VERSION);
+        System.out.printf("extract-annotations (%s)",
+                          INDEX_UTILS_VERSION);
         if (!printUsage) {
           return;
         }
