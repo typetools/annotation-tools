@@ -10,17 +10,20 @@
 <p>Contents:</p>
 <!-- start toc.  do not edit; run html-update-toc instead -->
     <ul>
-      <li><a href="#motivation">Motivation: External storage of annotations</a></li>
-      <li><a href="#annotation-file-utilities-description">Annotation File Utilities</a></li>
+      <li><a href="#motivation">Motivation</a>
+        <ul>
+          <li><a href="#jaif-file">External storage of annotations</a></li>
+          <li><a href="#annotation-file-utilities-description">Annotation File Utilities</a></li>
+        </ul></li>
       <li><a href="#installation">Installation</a>
         <ul>
           <li><a href="#viewing-source">Building from source</a></li>
         </ul></li>
       <li><a href="#using">Using the Annotation File Utilities</a>
         <ul>
-          <li><a href="#using-insert">Insert-annotations</a></li>
-          <li><a href="#using-extract">Extract-annotations</a></li>
-          <li><a href="#using-insert-source">Insert-annotations-to-source</a></li>
+          <li><a href="#insert-annotations">Insert-annotations</a></li>
+          <li><a href="#extract-annotations">Extract-annotations</a></li>
+          <li><a href="#insert-annotations-to-source">Insert-annotations-to-source</a></li>
         </ul></li>
       <li><a href="#feedback">Feedback</a>
         <ul>
@@ -32,13 +35,12 @@
 
 
 <hr />
-<h2 id="motivation">Motivation: External storage of annotations</h2>
+<h2 id="motivation">Motivation</h2>
 
 <p>
 Java annotations are meta-data about Java program elements, as in
 &ldquo;<code><font color="red">@Deprecated</font> class Date
-{&nbsp;...&nbsp;}</code>&rdquo; or &ldquo<code>List
-    &lt;<font color="red">@NonNull</font> String&gt;</code>&rdquo;.
+{&nbsp;...&nbsp;}</code>&rdquo; or &ldquo<code>List&lt;<font color="red">@NonNull</font> String&gt;</code>&rdquo;.
 Ordinarily, Java annotations are
 written in the 
 source code of a <code>.java</code> Java source file.  When
@@ -52,6 +54,8 @@ the resulting <code>.class</code> file (as
   free to improve that document.
 -->
 
+<h3 id="jaif-file">External storage of annotations</h3>
+
 <p>
 Sometimes, it is convenient to specify
 the annotations outside the source code or the <code>.class</code> file.
@@ -62,8 +66,9 @@ The document
 defines a textual format for annotations,
 and it also motivates reasons why such a file format is necessary in
 addition to the <code>.java</code> and <code>.class</code> formats.  The
-file format supports both standard Java SE 6 annotations and also the
-<a href="http://types.cs.washington.edu/jsr308/">type annotations</a> of Java 7.
+file format supports both the declaration annotations introduced in Java 5, and also the
+<a href="http://types.cs.washington.edu/jsr308/">type annotations</a> that
+will appear in a forthcoming version of Java.
 </p>
 
 <p>
@@ -73,25 +78,24 @@ File).
 </p>
 
 
-<hr />
-<h2 id="annotation-file-utilities-description">Annotation File Utilities</h2>
+<h3 id="annotation-file-utilities-description">Annotation File Utilities</h3>
 
 <p>
-With three possible locations for annotations &mdash; source code, class files,
-and annotation files &mdash; one needs to be able to easily transfer annotations
-between these three file formats.  Programmers will want to extract
+Programmers need to be able to transfer annotations
+between the three possible locations for annotations &mdash; source code, class files,
+and annotation files.   Programmers will want to extract
 annotations from source and class files to an annotation file in order to easily
 read annotations, while various tools will only read annotations from
-source and class files.  We provide three tools to read and write annotation
-files.
+source and class files.  The Annotation File Utilities provide three tools
+to read and write annotation files.
 </p>
 
 <ul>
-  <li> <code>insert-annotations</code> reads annotations from an annotation file
+  <li> <a href="#insert-annotations"><code>insert-annotations</code></a> reads annotations from an annotation file
        and inserts them into a class file</li> 
-  <li> <code>extract-annotations</code> reads annotations from a class file
+  <li> <a href="#extract-annotations"><code>extract-annotations</code></a> reads annotations from a class file
        and writes them out to an annotation file</li>
-  <li> <code>insert-annotations-to-source</code> reads annotations from an
+  <li> <a href="#insert-annotations-to-source"><code>insert-annotations-to-source</code></a> reads annotations from an
        annotation file and inserts them into a Java source file</li>
 </ul>
 
@@ -123,29 +127,11 @@ The current distribution is <code>Annotation File Utilities version
 </li>
 
 <li>
-  Unpack the distribution zipfile by running:
+  Creade a directory named
+  <code>annotation-tools</code> by 
+  unpacking the distribution zipfile:
 
   <pre><code>unzip annotation-tools.zip</code></pre>
-
-  <p>
-  This command creates a directory named
-  <code>annotation-tools</code>.  See its
-  <code>annotation-file-utilities</code> subdirectory, which contains:
-  </p>
-  <ul>
-    <li>These instructions (annotation-file-utilities.html)
-    </li>
-    <li>A document describing the annotation file format
-	(annotation-file-format.{html,pdf})
-    </li>
-    <li>A <tt>scripts/</tt> directory containing programs for transferring annotations
-       among Java, class, and annotation files (<tt>extract-*</tt> and <tt>insert-*</tt>)
-    </li>
-    <li>A Java library used by the programs (<tt>annotation-file-utilities.jar</tt>)
-    </li>
-    <li>Source code (in various <code>src/</code> directories)
-    </li>
-  </ul>
 </li>
 
 <li>
@@ -153,18 +139,14 @@ Add the annotation-file-utilities directory to your path.
 
 <ul>
 <li>
-For <b>Unix</b> (including Linux), add the directory to your PATH environment
-variable.
-<ul>
-<li>
-  For sh/bash, add to ~/.bashrc or ~/.bash_profile:
-<pre><code>export PATH=${PATH}:/path/to/annotation-file-utilities/</code></pre>
-</li>
-<li>
+For <b>Unix</b> (including Linux and MacOS), add the directory to your PATH
+environment variable.  If your shell is sh or bash, add to your
+<tt>~/.bashrc</tt> or <tt>~/.bash_profile</tt> file:
+<pre><code>export PATH=${PATH}:<em>/path/to/annotation-file-utilities/</em></code></pre>
+<!-- Omitted to save space and simplify instructions
 For csh/tcsh, add to ~/.tcshrc or ~/.cshrc or ~/.login:
 <pre><code>setenv PATH=${PATH}:/path/to/annotation-file-utilities/</code></pre>
-</li>
-</ul>
+-->
 </li>
 <li>
 For <b>Windows</b>, add the directory to your 
@@ -204,8 +186,8 @@ not on your execution path, see the notes near the top of
 </p>
 
 <p>
-For access to the source code repository, see
-<a href="http://code.google.com/p/annotation-tools/source/checkout">http://code.google.com/p/annotation-tools/source/checkout</a>.
+The source code repository is available at
+<a href="http://code.google.com/p/annotation-tools">http://code.google.com/p/annotation-tools</a>.
 </p>
 
 
@@ -215,13 +197,14 @@ For access to the source code repository, see
 <p>
 To use the tools, simply run them from the command-line with the
 appropriate arguments.  The following instructions are for running the
-tools on a Linux machine.  The tools work identically on Windows, except
+tools on a Linux/Unix/MacOS machine.
+The tools work identically on Windows, except
 the extension <code>.bat</code> needs to be appended to the tool name (for
-example, windows users would execute <code>insert-annotations.bat</code>
+example, Windows users would execute <code>insert-annotations.bat</code>
 instead of <code>insert-annotations</code>).
 </p>
 
-<h3 id="using-insert"> Insert-annotations </h3>
+<h3 id="insert-annotations"> Insert-annotations </h3>
 
 <p>
 To insert annotations specified by an annotation file into a class file, use the
@@ -247,7 +230,7 @@ for full usage information.
 </p>
 
 
-<h3 id="using-extract"> Extract-annotations </h3>
+<h3 id="extract-annotations"> Extract-annotations </h3>
 
 <p>
 To extract annotations from a class file and write them to an annotation file,
@@ -271,7 +254,7 @@ for full usage information.
 </p>
 
 
-<h3 id="using-insert-source">Insert-annotations-to-source </h3>
+<h3 id="insert-annotations-to-source">Insert-annotations-to-source </h3>
 
 <p>
 To insert annotations specified by an annotation file into a Java source file,
@@ -321,14 +304,14 @@ But please use the
 <h3 id="change-log"> Change Log </h3>
 
 <p>
-See the <a href="changelog.html">changelog</a>.
+The <a href="changelog.html">changelog</a> describes what is new in each release.
 </p>
 
 
 <hr/>
 
 <p>
-Last revised: September 2, 2010
+Last revised: September 18, 2010
 </p>
 
 </body>

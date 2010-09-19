@@ -15,6 +15,29 @@ This is the changelog for the
 <ul>
 
   <li>
+  Version 3.1 (released September 18, 2010):
+    <ul>
+      <li>
+        Don't duplicate annotations that are in the source already.
+      </li>
+      <li>
+        Add <tt>--omit-annotation</tt> option to omit a given annotation
+        (example: <tt>@ThisMutable</tt>, which is the default and need not be
+        inserted in source files).
+      </li>
+      <li>
+        Bug fixes related to inner classes, array levels, multiple methods
+        with same signature but different return type (impossible in Java
+        code, but can occur in class files), parameter indices.
+      </li>
+      <li>
+        Switch from utilMDE library to
+        <a href="http://code.google.com/p/plume-lib/">plume-lib</a>.
+      </li>
+    </ul>
+  </li>
+
+  <li>
   Version 3.0 (released December 21, 2009):
     <ul>
       <li>
@@ -42,9 +65,6 @@ This is the changelog for the
       declared in the annotation file, it should be consistent with its
       declaration in the class file.
       </li>
-
-      <li>
-    </li>
 
       <li>Changes to annotation file format.
 
