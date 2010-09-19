@@ -219,8 +219,7 @@
 
     <fail unless="status.output.empty"
           message="`hg status' did not return empty output.
-  Commit/add/remove files as appropriate, then re-try.
-  "/>
+  Commit/add/remove files as appropriate, then re-try."/>
   </target>
 
   <!-- Copy files from repository to temporary directory from which they
