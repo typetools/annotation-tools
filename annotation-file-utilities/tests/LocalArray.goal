@@ -1,0 +1,9 @@
+package annotator.tests;
+
+public class LocalArray {
+  
+  public void foo() {
+    @java.lang.Mutable Object @java.lang.ReadOnly [] o = null;
+    System.out.println(o);
+  }
+}

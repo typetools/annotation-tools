@@ -1,0 +1,26 @@
+package java.lang:
+annotation @Mutable: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+
+package java.lang:
+annotation @PolyRead: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+
+package java.lang:
+annotation @ThisMutable: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+
+package annotator.tests:
+class GenericCell:
+
+    field internalList:
+        type: @java.lang.ThisMutable
+        inner-type 0: @java.lang.ThisMutable
+
+    method <init>(Ljava/util/List;)V:
+        parameter #0:
+            type: @java.lang.Mutable
+            inner-type 0: @java.lang.Mutable
+
+    method getList()Ljava/util/List;:
+        return: @java.lang.PolyRead
+            inner-type 0: @java.lang.PolyRead
+        receiver: @java.lang.PolyRead
+

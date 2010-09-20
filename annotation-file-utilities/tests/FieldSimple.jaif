@@ -1,0 +1,11 @@
+package java.lang:
+annotation @Mutable: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+
+package annotator.tests:
+class FieldSimple:
+
+    field field:
+      type: @java.lang.Mutable
+
+    method <init>()V:
+
