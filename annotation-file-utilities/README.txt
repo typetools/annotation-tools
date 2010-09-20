@@ -39,6 +39,9 @@ Run
   checklink -q -r http://types.cs.washington.edu/annotation-file-utilities/
 and if there are any problems, re-make the distribution.
 
+Tag the release, for example:
+  hg tag 3.1
+
 Send email to: jsr308-discuss@googlegroups.com
 
 ===========================================================================
