@@ -1,6 +1,6 @@
 This file contains some notes about the process of building the full
-OpenJDK distribution in RedHat Enterprise Linux 4 (Sun's recommended
-environment) in VMWare. It also contains some of Matt's recommendations as
+OpenJDK distribution in RedHat Enterprise Linux 4 (Oracle's recommended
+environment) in VMWare.  It also contains some of Matt's recommendations as
 to when and how OpenJDK builds should be made.
 
 ===========================================================================
@@ -65,7 +65,7 @@ took about 40 minutes.
 
 The /control/build/linux-i586 folder contains j2sdk-image, which seems
 suitable as a binary distribution. I don't think there's a way to create
-the Sun version, however (the .bin file that, when executed, prompts you to
+the Oracle version, however (the .bin file that, when executed, prompts you to
 accept their license and then extracts files).
 
 There also doesn't seem to be a way to extract out just the compiler
@@ -80,18 +80,18 @@ Matt's Recommendations:
 
 The build procedure (in Linux, at least) should not prevent us from
 releasing a binary JSR 308 OpenJDK package. We may have to figure out how
-to produce the Sun package (with the license prompt and executable format)
+to produce the Oracle package (with the license prompt and executable format)
 if a .zip is not a sufficient means of distribution. We may need some
 additional tools and setup for building in Windows.
 
 However, the build procedure takes too long (at least 17 minutes per build,
 vs around 5 seconds for the current compiler-only setup) for doing
 day-to-day development in this environment. I propose continuing to work
-with the compiler the way we have it in SVN (which mirrors Sun's
+with the compiler the way we have it in SVN (which mirrors Oracle's
 compiler-only distribution) and creating two scripts: one for updating the
 OpenJDK checkout with our compiler modifications and one for updating our
 compiler repository with vendor OpenJDK changes. We'd only use the former
-when doing a JSR 308 release, and only use the latter when Sun does a
+when doing a JSR 308 release, and only use the latter when Oracle does a
 release. In this way, we don't have to make any serious modifications (only
 a couple of additions) to our repositories or build scripts and can keep
 small build times for daily development.

@@ -5,7 +5,7 @@
 SCENE_LIB=$(dirname $0)
 WORKSPACE=$SCENE_LIB/..
 ASMX=$WORKSPACE/asmx
-# Contains Java 7 version of java.lang.annotation.ElementType.
+# Contains new version of java.lang.annotation.ElementType.
 JAVAC_JAR=${JAVAC_JAR:-${SCENE_LIB}/../../jsr308-langtools/dist/lib/javac.jar}
 
 export CLASSPATH=$SCENE_LIB/bin:$ASMX/bin:$WORKSPACE/annotation-file-utilities/lib/plume.jar:$CLASSPATH
