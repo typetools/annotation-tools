@@ -27,8 +27,10 @@ Making a release
 
 To make a release (a distribution):
 
+Be sure to run these instructions in an account that uses JDK 6, not JDK 7.
+
 Manually update the version number and date in the following places:
-    annotation-file-utilities.html
+    annotation-file-utilities.html  (in "Installation" section)
     changelog.html
     annotations/scene-lib/src/annotations/io/classfile/ClassFileReader.java
 
@@ -42,6 +44,6 @@ and if there are any problems, re-make the distribution.
 Tag the release, for example:
   hg tag 3.1
 
-Send email to: jsr308-discuss@googlegroups.com
+Send email to: checker-framework-discuss@googlegroups.com
 
 ===========================================================================
