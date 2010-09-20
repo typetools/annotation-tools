@@ -5,7 +5,7 @@
 # See the annotation file utilities documentation for more information.
 
 ANNOTATION_FILE_UTILS=$(dirname $0)/../annotation-file-utilities.jar
-# Contains Java 7 version of java.lang.annotation.ElementType.
+# Contains new version of java.lang.annotation.ElementType.
 JAVAC_JAR=${JAVAC_JAR:-$(dirname $0)/../../../jsr308-langtools/dist/lib/javac.jar}
 CHECKERS=${CHECKERS:-$(dirname $0)/../../../checker-framework/checkers}
 CHECKERS_JAR=${CHECKERS_JAR:-${CHECKERS}/checkers.jar}
