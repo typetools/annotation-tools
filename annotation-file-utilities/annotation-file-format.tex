@@ -272,6 +272,9 @@ inner class or the outer class.)
 % wants the specification to always require fully qualified names.  Matt P. says
 % we'll make a final decision and reconcile the examples later. -- Matt M. 7/5
 
+% TODO: some descriptions talk about single annotatitions, whereas the grammar allows multiple.
+% TODO: the reference to the "type" line is also confusing, as it's in a separate production.
+
 \begin{tabbing}
 \qquad \= \kill
 \bnfnt{annotation} ::= \\
@@ -348,17 +351,17 @@ of the \\ \qquad    \bnfcmt annotation:   ``\texttt{@A(12)}'' rather than ``\tex
 \qquad    \bnfcmt The integer is the index of the parameter in the method \\
 \qquad    \bnfcmt (i.e., 0 is the first method parameter). \\
 \qquad    \bnfcmt The annotation on the \bnflit{parameter} line is that of the parameter declaration, \\
-\qquad    \bnfcmt while the annotation on the \bnflit{type} line is that of outermost type of the parameter. \\
+\qquad    \bnfcmt while the annotation on the \bnflit{type} line is that of the outermost type of the parameter. \\
 \qquad    \bnflit{parameter} \bnfnt{integer} \bnflit{:} \bnfnt{annotation}* \lineend \\
 \qquad    \bnfnt{type-annotations}* \\
 \\
 \bnfnt{variable-definition} ::= \\
 \qquad    \bnfcmt The integers are respectively the index, start, and length \\
 \qquad    \bnfcmt fields of the annotations on this variable~\cite{JSR308}. \\
+\qquad    \bnfcmt The annotation on the \bnflit{local} line is that of the variable declaration, \\
+\qquad    \bnfcmt while the annotation on the \bnflit{type} line is that of the outermost type of the variable. \\
 \qquad    \bnflit{local} \bnfnt{integer} \bnflit{\#} \bnfnt{integer} \bnflit{+} \bnfnt{integer} \bnflit{:} \bnfnt{annotation}* \lineend \\
-% TODO: add a type here to distinguish declaration and type annotations, i.e.
-% change next line to type-annotations
-\qquad    \bnfnt{type-argument-or-array-definition}* \\
+\qquad    \bnfnt{type-annotations}* \\
 \\
 \bnfnt{typecast-definition} ::= \\
 \qquad    \bnfcmt The integer is the offset field of the annotation~\cite{JSR308}. \\
