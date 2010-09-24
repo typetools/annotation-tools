@@ -274,6 +274,7 @@ inner class or the outer class.)
 
 % TODO: some descriptions talk about single annotatitions, whereas the grammar allows multiple.
 % TODO: the reference to the "type" line is also confusing, as it's in a separate production.
+% TODO: the method signatures are erased, which is unique, but maybe confusing?
 
 \begin{tabbing}
 \qquad \= \kill
@@ -306,7 +307,7 @@ of the \\ \qquad    \bnfcmt annotation:   ``\texttt{@A(12)}'' rather than ``\tex
 \bnfnt{method-definition} ::= \\
 \qquad    \bnfcmt The method-key consists of the name followed by the signature \\
 \qquad    \bnfcmt in JVML format, for example: ``\code{foo([ILjava/lang/String;)V}''. \\
-\qquad    \bnfcmt Note that the signature contains the generic type information and is not erased.\\
+\qquad    \bnfcmt Note that the signature is the erased signature of the method and does not contain generic type information.\\
 \qquad    \bnfcmt ``\code{<init>}'' and ``\code{<clinit>}'' are used for instance and class initialization methods.\\
 \qquad    \bnfcmt The annotation on the \bnflit{method} line is that on the method not the return value. \\
 % TODO: Ensure the tool uses generic signatures and init/clinit.
@@ -448,7 +449,7 @@ class Foo: @A(value=12)
         inner-type 0: @C
 
     method <init>(
-      Ljava/util/List<Ljava/lang/String;>;)V:
+      Ljava/util/List;)V:
         parameter 0: @B
             inner-type 0: @C
         receiver: @D(value="spam")
