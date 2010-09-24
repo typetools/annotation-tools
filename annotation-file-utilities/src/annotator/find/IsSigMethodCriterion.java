@@ -278,13 +278,13 @@ public class IsSigMethodCriterion implements Criterion {
     MethodTree mt = (MethodTree) leaf;
 
     if (! simpleMethodName.equals(mt.getName().toString())) {
-      debug("IsSigMethodCriterion.isSatisfiedBy => false");
+      debug("IsSigMethodCriterion.isSatisfiedBy => false: Names don't match");
       return false;
     }
 
     List<? extends VariableTree> sourceParams = mt.getParameters();
     if (fullyQualifiedParams.size() != sourceParams.size()) {
-      debug("IsSigMethodCriterion.isSatisfiedBy => false");
+      debug("IsSigMethodCriterion.isSatisfiedBy => false: Number of parameters don't match");
       return false;
     }
 
@@ -313,7 +313,7 @@ public class IsSigMethodCriterion implements Criterion {
     }
 
     if (! matchTypeParams(sourceParams, typeToClassMap, context)) {
-      debug("IsSigMethodCriterion => false");
+      debug("IsSigMethodCriterion => false: Parameter types don't match");
       return false;
     }
 
@@ -321,7 +321,7 @@ public class IsSigMethodCriterion implements Criterion {
 
     if ((mt.getReturnType() != null) // must be a constructor
         && (! matchTypeParam(returnType, mt.getReturnType(), typeToClassMap, context))) {
-      debug("IsSigMethodCriterion => false");
+      debug("IsSigMethodCriterion => false: Return types don't match");
       return false;
     }
 
