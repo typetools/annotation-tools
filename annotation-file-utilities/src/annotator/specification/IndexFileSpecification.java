@@ -268,6 +268,8 @@ public class IndexFileSpecification implements Specification {
       LocalLocation loc = entry.getKey();
       AElement var = entry.getValue();
       CriterionList varClist = clist.add(Criteria.local(methodName, loc));
+      // parse declaration annotations
+      parseElement(varClist, var);
       parseInnerAndOuterElements(varClist, var.type);
     }
 
