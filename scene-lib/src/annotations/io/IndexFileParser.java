@@ -673,9 +673,17 @@ public final class IndexFileParser {
         		int scopeLength = expectNonNegative(matchNNInteger());
         		loc = new LocalLocation(index, scopeStart, scopeLength);
         	} else {
-        		// hope that we get a valid identifier for the local variable
+        		// look for a valid identifier for the local variable
                 String lvar = expectIdentifier();
-        		loc = new LocalLocation(lvar);
+                int varIndex;
+        		if (checkChar('#')) {
+        			expectChar('#');
+        			varIndex = expectNonNegative(matchNNInteger());
+        		} else {
+                    // default the variable index to 0, the most common case
+        			varIndex = 0;
+        		}
+        		loc = new LocalLocation(lvar, varIndex);
         	}
             AElement l = m.locals.vivify(loc);
             expectChar(':');
