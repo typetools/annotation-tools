@@ -50,10 +50,15 @@ public class LocalVariableCriterion implements Criterion {
           VariableTree vtt = (VariableTree) parent;
           String varName = vtt.getName().toString();
           
-          if (loc.varname!=null && loc.varname.equals(varName)) {
-        	  // the location specifies a variable name and it matches the current variable
-        	  // -> hurray
-        	  return true;
+          if (loc.varName!=null && loc.varName.equals(varName)) {
+        	  int varIndex = LocalVariableScanner.indexOfVarTree(path, vtt, varName);
+        		  
+        	  if (loc.varIndex==varIndex) {
+        		  // the location specifies a variable name and index and it matches the current variable
+        		  // -> hurray
+        		  return true;
+        	  }
+        	  return false;
           }
           
           Pair<String, Pair<Integer, Integer>> key =
