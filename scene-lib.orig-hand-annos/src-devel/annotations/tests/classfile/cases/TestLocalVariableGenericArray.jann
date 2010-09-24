@@ -1,0 +1,54 @@
+package annotations.tests.classfile.foo:
+annotation visible @A
+
+annotation visible @B:
+	String value
+
+annotation visible @C:
+	int fieldA
+	String fieldB
+	
+package annotations.tests.classfile.cases:
+class TestLocalVariableGenericArray:
+	
+	method <init>()V:
+		local 2 # 37 + 55 : @annotations.tests.classfile.foo.B(value="good")
+			inner-type 0 : @annotations.tests.classfile.foo.B(value="first param")
+			inner-type 1 : @annotations.tests.classfile.foo.B(value="second param")
+		
+	method someMethod()V:
+		local 1 # 8 + 26 : @annotations.tests.classfile.foo.B(value="bad")
+			inner-type 0 : @annotations.tests.classfile.foo.C(fieldA=0,fieldB="String")
+	
+	method someMethod2(I)I:
+		local 2 # 8 + 66 : @annotations.tests.classfile.foo.C(fieldA=0, fieldB="Boolean")
+			inner-type 0 : @annotations.tests.classfile.foo.A
+		local 3 # 16 + 58 : @annotations.tests.classfile.foo.A
+			inner-type 0 : @annotations.tests.classfile.foo.B(value="inner-type")
+		
+	method someMethod3()Z:
+		local 1 # 8 + 70 : @annotations.tests.classfile.foo.B(value="t")
+			inner-type 0 : @annotations.tests.classfile.foo.B(value="map key string")
+			inner-type 1 : @annotations.tests.classfile.foo.B(value="map value set")
+			inner-type 1 , 0 : @annotations.tests.classfile.foo.A
+		local 2 # 10 + 68 : 
+			inner-type 0 : @annotations.tests.classfile.foo.A
+			inner-type 1 : @annotations.tests.classfile.foo.C(fieldA=1, fieldB="set of maps")
+			inner-type 1, 0 : @annotations.tests.classfile.foo.B(value="maps")
+			inner-type 1, 0, 0 : @annotations.tests.classfile.foo.B(value="map key is integer")
+			inner-type 1, 0, 1 : @annotations.tests.classfile.foo.B(value="map value is 2-d array")
+			inner-type 1, 0, 1, 0 : @annotations.tests.classfile.foo.B(value="first dimension")
+			inner-type 1, 0, 1, 1 : @annotations.tests.classfile.foo.B(value ="second dimension")
+			
+	method someMethod4()V:
+		local 1 # 8 + 10 :
+			inner-type 0 : @annotations.tests.classfile.foo.A
+    
+    
+    
+    
+    
+    
+    
+    
+    
