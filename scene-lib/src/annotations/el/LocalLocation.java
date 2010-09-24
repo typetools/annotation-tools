@@ -34,16 +34,19 @@ public final /*@ReadOnly*/ class LocalLocation {
     	this.index = index;
         this.scopeStart = scopeStart;
         this.scopeLength = scopeLength;
-        this.varname = null;
+        this.varName = null;
+        this.varIndex = -1;
     }
 
-    public final String varname;
+    public final String varName;
+    public final int varIndex;
     
-    public LocalLocation(String varname) {
+    public LocalLocation(String varName, int varIndex) {
     	this.index = -1;
         this.scopeStart = -1;
         this.scopeLength = -1;
-    	this.varname = varname;
+    	this.varName = varName;
+    	this.varIndex = varIndex;
     }
     
     
@@ -55,7 +58,7 @@ public final /*@ReadOnly*/ class LocalLocation {
     public boolean equals(LocalLocation l) {
         return (index == l.index && scopeStart == l.scopeStart
                 && scopeLength == l.scopeLength) ||
-                (varname!=null && varname.equals(l.varname));
+                (varName!=null && varName.equals(l.varName) && varIndex==l.varIndex);
     }
 
     /**
@@ -75,23 +78,24 @@ public final /*@ReadOnly*/ class LocalLocation {
      */
     @Override
     public int hashCode() /*@ReadOnly*/ {
-    	if (varname==null) {
-			Hasher h = new Hasher();
+		Hasher h = new Hasher();
+    	if (varName==null) {
 			h.mash(index);
 			h.mash(scopeStart);
 			h.mash(scopeLength);
-			return h.hash;
 		} else {
-    		return varname.hashCode();
+			h.mash(varName.hashCode());
+			h.mash(varIndex);
 		}
+		return h.hash;
     }
 
     @Override
     public String toString() {
-    	if (varname==null) {
+    	if (varName==null) {
     		return "LocalLocation(" + index + ", " + scopeStart + ", " + scopeLength + ")";
     	} else {
-    		return "LocalLocation(\"" + varname + "\")";
+    		return "LocalLocation(\"" + varName + "\" #" + varIndex + ")";
     	}
     }
 }
