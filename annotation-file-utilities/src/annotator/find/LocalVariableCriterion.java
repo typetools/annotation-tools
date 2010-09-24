@@ -49,6 +49,13 @@ public class LocalVariableCriterion implements Criterion {
             && (! (parentPath.getParentPath().getLeaf() instanceof MethodTree))) {
           VariableTree vtt = (VariableTree) parent;
           String varName = vtt.getName().toString();
+          
+          if (loc.varname!=null && loc.varname.equals(varName)) {
+        	  // the location specifies a variable name and it matches the current variable
+        	  // -> hurray
+        	  return true;
+          }
+          
           Pair<String, Pair<Integer, Integer>> key =
             Pair.of(fullMethodName, Pair.of(loc.index, loc.scopeStart));
           String potentialVarName =
