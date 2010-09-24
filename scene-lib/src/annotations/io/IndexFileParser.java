@@ -663,13 +663,20 @@ public final class IndexFileParser {
             }
         }
         while (matchKeyword("local")) {
-            int index = expectNonNegative(matchNNInteger());
-            expectChar('#');
-            int scopeStart = expectNonNegative(matchNNInteger());
-            expectChar('+');
-            int scopeLength = expectNonNegative(matchNNInteger());
-            LocalLocation loc =
-                    new LocalLocation(index, scopeStart, scopeLength);
+            LocalLocation loc;
+        	if (checkNNInteger()!=-1) {
+        		// the local variable is specified by bytecode index/range
+        		int index = expectNonNegative(matchNNInteger());
+        		expectChar('#');
+        		int scopeStart = expectNonNegative(matchNNInteger());
+        		expectChar('+');
+        		int scopeLength = expectNonNegative(matchNNInteger());
+        		loc = new LocalLocation(index, scopeStart, scopeLength);
+        	} else {
+        		// hope that we get a valid identifier for the local variable
+                String lvar = expectIdentifier();
+        		loc = new LocalLocation(lvar);
+        	}
             AElement l = m.locals.vivify(loc);
             expectChar(':');
             parseAnnotations(l);
