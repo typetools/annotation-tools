@@ -31,19 +31,31 @@ public final /*@ReadOnly*/ class LocalLocation {
      * the fields of the same names.
      */
     public LocalLocation(int index, int scopeStart, int scopeLength) {
-        this.index = index;
+    	this.index = index;
         this.scopeStart = scopeStart;
         this.scopeLength = scopeLength;
+        this.varname = null;
     }
 
+    public final String varname;
+    
+    public LocalLocation(String varname) {
+    	this.index = -1;
+        this.scopeStart = -1;
+        this.scopeLength = -1;
+    	this.varname = varname;
+    }
+    
+    
     /**
      * Returns whether this {@link LocalLocation} equals <code>o</code>; a
      * slightly faster variant of {@link #equals(Object)} for when the argument
      * is statically known to be another nonnull {@link LocalLocation}.
      */
     public boolean equals(LocalLocation l) {
-        return index == l.index && scopeStart == l.scopeStart
-                && scopeLength == l.scopeLength;
+        return (index == l.index && scopeStart == l.scopeStart
+                && scopeLength == l.scopeLength) ||
+                (varname!=null && varname.equals(l.varname));
     }
 
     /**
@@ -63,15 +75,23 @@ public final /*@ReadOnly*/ class LocalLocation {
      */
     @Override
     public int hashCode() /*@ReadOnly*/ {
-         Hasher h = new Hasher();
-        h.mash(index);
-        h.mash(scopeStart);
-        h.mash(scopeLength);
-        return h.hash;
+    	if (varname==null) {
+			Hasher h = new Hasher();
+			h.mash(index);
+			h.mash(scopeStart);
+			h.mash(scopeLength);
+			return h.hash;
+		} else {
+    		return varname.hashCode();
+		}
     }
 
     @Override
     public String toString() {
-     return "LocalLocation(" + index + ", " + scopeStart + ", " + scopeLength + ")";
+    	if (varname==null) {
+    		return "LocalLocation(" + index + ", " + scopeStart + ", " + scopeLength + ")";
+    	} else {
+    		return "LocalLocation(\"" + varname + "\")";
+    	}
     }
 }
