@@ -372,9 +372,10 @@ of the \\ \qquad    \bnfcmt annotation:   ``\texttt{@A(12)}'' rather than ``\tex
 \bnfnt{instanceof-definition} ::= \\
 \qquad    \bnfcmt The integer is the offset field of the annotation~\cite{JSR308}. \\
 \qquad    \bnflit{instanceof} \bnflit{\#} \bnfnt{integer} \bnflit{:} \bnfnt{annotation}* \lineend \\
+\qquad    \bnfnt{type-argument-or-array-definition}* \\
 \\
 \bnfnt{new-definition} ::= \\
-\qquad    \bnfcmt the integer is the offset field of the annotation~\cite{JSR308}. \\
+\qquad    \bnfcmt The integer is the offset field of the annotation~\cite{JSR308}. \\
 \qquad    \bnflit{new} \bnflit{\#} \bnfnt{integer} \bnflit{:} \bnfnt{annotation}* \lineend  \\
 \qquad    \bnfnt{type-argument-or-array-definition}*
 \end{tabbing}
@@ -394,6 +395,55 @@ fields, classes, etc., the \code{.class} file is not necessary.
 % TODO: What about interface and enum declarations?
 
 % TODO: annotations on wildcard bounds? 
+
+
+\subsection{Support for source code indexes}
+
+For some tools it is easier to generate the index into the source code
+instead of the bytecode offset.
+As an experimental feature we support the following additional
+elements:
+
+
+\begin{tabbing}
+\qquad \= \kill
+\bnfnt{source-variable-definition} ::= \\
+\qquad    \bnfcmt The \bnfnt{name} is the identifier of the local variable.\\
+\qquad    \bnfcmt The \bnfnt{integer} is the optional zero-based index of the\\
+\qquad    \bnfcmt intended local variable within all local variables with the given
+\bnfnt{name}.\\
+\qquad    \bnfcmt The default value for the index is zero.\\
+\qquad    \bnfcmt The annotation on the \bnflit{local} line is that of the variable declaration, \\
+\qquad    \bnfcmt while the annotation on the \bnflit{type} line is that of the outermost type of the variable. \\
+\qquad    \bnflit{local} \bnfnt{name} [\bnflit{*} \bnfnt{integer}] \bnflit{:} \bnfnt{annotation}* \lineend \\
+\qquad    \bnfnt{type-annotations}* \\
+\\
+\bnfnt{source-typecast-definition} ::= \\
+\qquad    \bnfcmt The integer is the zero-based index of the
+typecast within the method. \\
+\qquad    \bnflit{typecast} \bnflit{*} \bnfnt{integer} \bnflit{:} \bnfnt{annotation}* \lineend \\
+\qquad    \bnfnt{type-argument-or-array-definition}* \\
+\\
+\bnfnt{source-instanceof-definition} ::= \\
+\qquad    \bnfcmt The integer is the zero-based index of the
+instanceof within the method. \\
+\qquad    \bnflit{instanceof} \bnflit{*} \bnfnt{integer} \bnflit{:} \bnfnt{annotation}* \lineend \\
+\qquad    \bnfnt{type-argument-or-array-definition}* \\
+\\
+\bnfnt{source-new-definition} ::= \\
+\qquad    \bnfcmt The integer is the zero-based index of the
+object or array creation within the method. \\
+\qquad    \bnflit{new} \bnflit{*} \bnfnt{integer} \bnflit{:} \bnfnt{annotation}* \lineend  \\
+\qquad    \bnfnt{type-argument-or-array-definition}*
+\end{tabbing}
+
+
+We use the star literal \bnflit{*} to distinguish source indexes from
+the bytecode offsets that are introduced using \bnflit{\#}.
+
+% TODO: explain more about the pros/cons.
+% Maybe an example?
+
 
 
 \section{Example}
