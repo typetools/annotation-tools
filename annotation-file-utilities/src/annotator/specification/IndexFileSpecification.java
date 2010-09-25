@@ -274,26 +274,26 @@ public class IndexFileSpecification implements Specification {
     }
 
     // parse typecasts of method
-    for (Entry<Integer, ATypeElement> entry : method.typecasts.entrySet()) {
-      Integer offset = entry.getKey();
+    for (Entry<RelativeLocation, ATypeElement> entry : method.typecasts.entrySet()) {
+      RelativeLocation loc = entry.getKey();
       ATypeElement cast = entry.getValue();
-      CriterionList castClist = clist.add(Criteria.cast(methodName, offset));
+      CriterionList castClist = clist.add(Criteria.cast(methodName, loc));
       parseInnerAndOuterElements(castClist, cast);
     }
 
     // parse news (object creation) of method
-    for (Entry<Integer, ATypeElement> entry : method.news.entrySet()) {
-      Integer offset = entry.getKey();
+    for (Entry<RelativeLocation, ATypeElement> entry : method.news.entrySet()) {
+      RelativeLocation loc = entry.getKey();
       ATypeElement newObject = entry.getValue();
-      CriterionList newClist = clist.add(Criteria.newObject(methodName, offset));
+      CriterionList newClist = clist.add(Criteria.newObject(methodName, loc));
       parseInnerAndOuterElements(newClist, newObject);
     }
 
     // parse instanceofs of method
-    for (Entry<Integer, ATypeElement> entry : method.instanceofs.entrySet()) {
-      Integer offset = entry.getKey();
+    for (Entry<RelativeLocation, ATypeElement> entry : method.instanceofs.entrySet()) {
+      RelativeLocation loc = entry.getKey();
       ATypeElement instanceOf = entry.getValue();
-      CriterionList instanceOfClist = clist.add(Criteria.instanceOf(methodName, offset));
+      CriterionList instanceOfClist = clist.add(Criteria.instanceOf(methodName, loc));
       parseInnerAndOuterElements(instanceOfClist, instanceOf);
     }
   }
