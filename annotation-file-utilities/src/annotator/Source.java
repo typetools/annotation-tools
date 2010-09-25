@@ -65,7 +65,7 @@ public final class Source {
         CompilationTask cTask =
             compiler.getTask(null, fileManager, null, optsList, null, fileObjs);
         if (!(cTask instanceof JavacTask))
-            throw new CompilerException("could not get a valid JavacTask");
+            throw new CompilerException("could not get a valid JavacTask: " + cTask.getClass());
         this.task = (JavacTask)cTask;
 
         // Read the source file into a buffer.
