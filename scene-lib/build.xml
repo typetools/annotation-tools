@@ -199,7 +199,7 @@
     
     <target name="test-scene-lib" depends="init, bin">
         <mkdir dir="reports"/>
-        <junit showoutput="true" fork="yes" dir="." haltonfailure="yes">
+        <junit printsummary="withOutAndErr" showoutput="true" fork="yes" dir="." haltonfailure="yes">
             <jvmarg value="-Xbootclasspath/p:${toString:libpath}"/>
             <classpath refid="libpath"/>
             <formatter type="plain"/>
@@ -212,7 +212,7 @@
     
     <target name="test-classfile" depends="init, bin">
         <mkdir dir="reports"/>
-        <junit showoutput="true" fork="yes" dir="." haltonfailure="yes">
+        <junit printsummary="withOutAndErr" showoutput="true" fork="yes" dir="." haltonfailure="yes">
             <jvmarg value="-Xbootclasspath/p:${toString:libpath}"/>
             <classpath refid="libpath"/>
             <formatter type="plain"/>
