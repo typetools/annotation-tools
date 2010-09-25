@@ -676,8 +676,8 @@ public final class IndexFileParser {
         		// look for a valid identifier for the local variable
                 String lvar = expectIdentifier();
                 int varIndex;
-        		if (checkChar('#')) {
-        			expectChar('#');
+        		if (checkChar('*')) {
+        			expectChar('*');
         			varIndex = expectNonNegative(matchNNInteger());
         		} else {
                     // default the variable index to 0, the most common case
@@ -695,25 +695,49 @@ public final class IndexFileParser {
             }
         }
         while (matchKeyword("typecast")) {
-            expectChar('#');
-            int offset = expectNonNegative(matchNNInteger());
-            ATypeElement t = m.typecasts.vivify(offset);
+        	RelativeLocation loc;
+        	if (checkChar('#')) {
+        		expectChar('#');
+        		int offset = expectNonNegative(matchNNInteger());
+        		loc = RelativeLocation.createOffset(offset);
+        	} else {
+        		expectChar('*');
+        		int index = expectNonNegative(matchNNInteger());
+        		loc = RelativeLocation.createIndex(index);
+        	}
+            ATypeElement t = m.typecasts.vivify(loc);
             expectChar(':');
             parseAnnotations(t);
             parseInnerTypes(t);
         }
         while (matchKeyword("instanceof")) {
-            expectChar('#');
-            int offset = expectNonNegative(matchNNInteger());
-            ATypeElement i = m.instanceofs.vivify(offset);
+        	RelativeLocation loc;
+        	if (checkChar('#')) {
+        		expectChar('#');
+        		int offset = expectNonNegative(matchNNInteger());
+        		loc = RelativeLocation.createOffset(offset);
+        	} else {
+        		expectChar('*');
+        		int index = expectNonNegative(matchNNInteger());
+        		loc = RelativeLocation.createIndex(index);
+        	}
+            ATypeElement i = m.instanceofs.vivify(loc);
             expectChar(':');
             parseAnnotations(i);
             parseInnerTypes(i);
         }
         while (matchKeyword("new")) {
-            expectChar('#');
-            int offset = expectNonNegative(matchNNInteger());
-            ATypeElement n = m.news.vivify(offset);
+        	RelativeLocation loc;
+        	if (checkChar('#')) {
+        		expectChar('#');
+        		int offset = expectNonNegative(matchNNInteger());
+        		loc = RelativeLocation.createOffset(offset);
+        	} else {
+        		expectChar('*');
+        		int index = expectNonNegative(matchNNInteger());
+        		loc = RelativeLocation.createIndex(index);
+        	}
+            ATypeElement n = m.news.vivify(loc);
             expectChar(':');
             parseAnnotations(n);
             parseInnerTypes(n);
