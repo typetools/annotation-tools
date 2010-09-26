@@ -1,16 +1,19 @@
 package annotator.find;
 
+import annotations.el.RelativeLocation;
+import annotator.scanner.NewScanner;
+
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
 
 public class NewCriterion implements Criterion {
 
   private String methodName;
-  private Integer offset;
+  private RelativeLocation loc;
 
-  public NewCriterion(String methodName, Integer offset) {
+  public NewCriterion(String methodName, RelativeLocation loc) {
     this.methodName = methodName.substring(0, methodName.lastIndexOf(")") + 1);
-    this.offset = offset;
+    this.loc = loc;
   }
 
   /** {@inheritDoc} */
@@ -31,8 +34,14 @@ public class NewCriterion implements Criterion {
 
     if (leaf.getKind() == Tree.Kind.NEW_CLASS) {
       int indexInSource = NewScanner.indexOfNewTree(path, leaf);
-      int indexInClass = NewScanner.getMethodNewIndex(methodName, offset);
-      return (indexInSource == indexInClass);
+      boolean b;
+      if (loc.isBytecodeOffset()) {
+    	  int indexInClass = NewScanner.getMethodNewIndex(methodName, loc.offset);
+    	  b = (indexInSource == indexInClass);
+      } else {
+    	  b = (indexInSource == loc.index);
+      }
+      return b;
     } else {
       return this.isSatisfiedBy(path.getParentPath());
     }
@@ -43,7 +52,7 @@ public class NewCriterion implements Criterion {
   }
 
   public String toString() {
-    return "NewCriterion: in method: " + methodName + " offset: " + offset;
+    return "NewCriterion: in method: " + methodName + " location: " + loc;
   }
 
 }

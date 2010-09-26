@@ -219,21 +219,21 @@ public final class JavapParser {
             case TYPECAST_GENERIC_OR_ARRAY:
             {
                 int offset = parseOffset();
-                subOuterType = ((AMethod) member).typecasts.vivify(offset);
+                subOuterType = ((AMethod) member).typecasts.vivify(RelativeLocation.createOffset(offset));
                 break;
             }
             case INSTANCEOF:
             case INSTANCEOF_GENERIC_OR_ARRAY:
             {
                 int offset = parseOffset();
-                subOuterType = ((AMethod) member).instanceofs.vivify(offset);
+                subOuterType = ((AMethod) member).instanceofs.vivify(RelativeLocation.createOffset(offset));
                 break;
             }
             case NEW:
             case NEW_GENERIC_OR_ARRAY:
             {
                 int offset = parseOffset();
-                subOuterType = ((AMethod) member).news.vivify(offset);
+                subOuterType = ((AMethod) member).news.vivify(RelativeLocation.createOffset(offset));
                 break;
             }
             // TEMP

@@ -35,16 +35,16 @@ public final class AMethod extends AElement {
             AElement.<LocalLocation>newVivifyingLHMap_AET();
 
     /** The method's annotated typecasts; map key is the offset of the checkcast bytecode */
-    public final VivifyingMap<Integer, ATypeElement> typecasts =
-            ATypeElement.<Integer>newVivifyingLHMap_ATE();
+    public final VivifyingMap<RelativeLocation, ATypeElement> typecasts =
+            ATypeElement.<RelativeLocation>newVivifyingLHMap_ATE();
 
     /** The method's annotated "instanceof" tests; map key is the offset of the instanceof bytecode */
-    public final VivifyingMap<Integer, ATypeElement> instanceofs =
-            ATypeElement.<Integer>newVivifyingLHMap_ATE();
+    public final VivifyingMap<RelativeLocation, ATypeElement> instanceofs =
+            ATypeElement.<RelativeLocation>newVivifyingLHMap_ATE();
 
     /** The method's annotated "new" invocations; map key is the offset of the new bytecode */
-    public final VivifyingMap<Integer, ATypeElement> news =
-            ATypeElement.<Integer>newVivifyingLHMap_ATE();
+    public final VivifyingMap<RelativeLocation, ATypeElement> news =
+            ATypeElement.<RelativeLocation>newVivifyingLHMap_ATE();
 
     public final VivifyingMap<TypeIndexLocation, ATypeElement> throwsException =
         ATypeElement.<TypeIndexLocation>newVivifyingLHMap_ATE();

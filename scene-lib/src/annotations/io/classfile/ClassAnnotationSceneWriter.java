@@ -817,11 +817,15 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
      * Has this visit the object creation (new) annotations on this method.
      */
     private void ensureVisitObjectCreationAnnotations() {
-      for (Map.Entry<Integer, ATypeElement> entry :
+      for (Map.Entry<RelativeLocation, ATypeElement> entry :
         aMethod.news.entrySet()) {
+        if(!entry.getKey().isBytecodeOffset()) {
+        	// if the RelativeLocation is a source index, we cannot insert it
+        	// into bytecode
+        	// TODO: output a warning or translate
+        }
+        int offset = entry.getKey().offset;
         ATypeElement aNew = entry.getValue();
-        int offset = entry.getKey();
-
         for (Annotation tla : aNew.tlAnnotationsHere) {
           if (shouldSkip(tla)) continue;
 
@@ -923,9 +927,14 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
      * Has this visit the typecast annotations on this method.
      */
     private void ensureVisitTypecastAnnotations() {
-      for (Map.Entry<Integer, ATypeElement> entry :
+      for (Map.Entry<RelativeLocation, ATypeElement> entry :
         aMethod.typecasts.entrySet()) {
-        int offset = entry.getKey();
+        if(!entry.getKey().isBytecodeOffset()) {
+          // if the RelativeLocation is a source index, we cannot insert it
+          // into bytecode
+          // TODO: output a warning or translate
+        }
+        int offset = entry.getKey().offset;
         ATypeElement aTypecast = entry.getValue();
         for (Annotation tla : aTypecast.tlAnnotationsHere) {
           if (shouldSkip(tla)) continue;
@@ -962,9 +971,14 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
      * Has this visit the typetest annotations on this method.
      */
     private void ensureVisitTypeTestAnnotations() {
-      for (Map.Entry<Integer, ATypeElement> entry :
+      for (Map.Entry<RelativeLocation, ATypeElement> entry :
         aMethod.instanceofs.entrySet()) {
-        int offset = entry.getKey();
+        if(!entry.getKey().isBytecodeOffset()) {
+          // if the RelativeLocation is a source index, we cannot insert it
+          // into bytecode
+          // TODO: output a warning or translate
+        }
+        int offset = entry.getKey().offset;
         ATypeElement aTypeTest = entry.getValue();
         for (Annotation tla : aTypeTest.tlAnnotationsHere) {
           if (shouldSkip(tla)) continue;

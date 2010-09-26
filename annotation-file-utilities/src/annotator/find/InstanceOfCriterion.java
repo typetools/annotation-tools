@@ -1,5 +1,6 @@
 package annotator.find;
 
+import annotations.el.RelativeLocation;
 import annotator.scanner.InstanceOfScanner;
 
 import com.sun.source.tree.InstanceOfTree;
@@ -9,11 +10,11 @@ import com.sun.source.util.TreePath;
 public class InstanceOfCriterion implements Criterion {
 
   private String methodName;
-  private Integer offset;
+  private RelativeLocation loc;
 
-  public InstanceOfCriterion(String methodName, Integer offset) {
+  public InstanceOfCriterion(String methodName, RelativeLocation loc) {
     this.methodName = methodName.substring(0, methodName.lastIndexOf(")") + 1);
-    this.offset = offset;
+    this.loc = loc;
   }
 
   /** {@inheritDoc} */
@@ -60,10 +61,16 @@ public class InstanceOfCriterion implements Criterion {
       }
 
       int indexInSource = InstanceOfScanner.indexOfInstanceOfTree(path, parent);
-      int indexInClass = InstanceOfScanner.getMethodInstanceOfIndex(methodName, offset);
-      boolean b = (indexInSource == indexInClass);
       debug("return source: "+ indexInSource);
-      debug("return class: " + indexInClass);
+      boolean b;
+      if (loc.isBytecodeOffset()) {
+    	  int indexInClass = InstanceOfScanner.getMethodInstanceOfIndex(methodName, loc.offset);
+          debug("return class: " + indexInClass);
+    	  b = (indexInSource == indexInClass);
+      } else {
+    	  b = (indexInSource == loc.index);
+          debug("return loc.index: " + loc.index);
+      }
       debug("return new: " + b);
       return b;
     } else {
@@ -84,7 +91,7 @@ public class InstanceOfCriterion implements Criterion {
   }
 
   public String toString() {
-    return "InstanceOfCriterion: in method: " + methodName + " offset: " + offset;
+    return "InstanceOfCriterion: in method: " + methodName + " location: " + loc;
   }
 
 }

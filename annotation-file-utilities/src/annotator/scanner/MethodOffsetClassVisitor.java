@@ -8,7 +8,6 @@ import org.objectweb.asm.Opcodes;
 
 import com.sun.tools.javac.util.Pair;
 
-import annotator.find.NewScanner;
 
 /**
  * MethodOffsetClassVisitor is a class visitor that can should be passed to
