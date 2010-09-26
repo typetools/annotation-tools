@@ -2,6 +2,7 @@ package annotator.find;
 
 import java.util.List;
 
+import annotations.el.RelativeLocation;
 import annotator.scanner.CastScanner;
 
 import com.sun.source.tree.Tree;
@@ -12,11 +13,11 @@ import com.sun.tools.javac.util.Pair;
 public class CastCriterion implements Criterion {
 
   private String methodName;
-  private Integer offset;
+  private RelativeLocation loc;
 
-  public CastCriterion(String methodName, Integer offset) {
+  public CastCriterion(String methodName, RelativeLocation loc) {
     this.methodName = methodName.substring(0, methodName.lastIndexOf(")") + 1);
-    this.offset = offset;
+    this.loc = loc;
   }
 
   /** {@inheritDoc} */
@@ -37,9 +38,15 @@ public class CastCriterion implements Criterion {
 
     if (leaf.getKind() == Tree.Kind.TYPE_CAST) {
       int indexInSource = CastScanner.indexOfCastTree(path, leaf);
-      int indexInClass = CastScanner.getMethodCastIndex(methodName, offset);
-      boolean b = (indexInSource == indexInClass);
-      return b;
+      boolean b;
+      if (loc.isBytecodeOffset()) {
+    	  int indexInClass = CastScanner.getMethodCastIndex(methodName, loc.offset);
+    	  b = (indexInSource == indexInClass);
+      } else {
+    	  b = (indexInSource == loc.index);
+      }
+	  return b;
+
     } else {
       boolean b = this.isSatisfiedBy(path.getParentPath());
       return b;
@@ -51,6 +58,6 @@ public class CastCriterion implements Criterion {
   }
 
   public String toString() {
-    return "CastCriterion: in method: " + methodName + " offset: " + offset;
+    return "CastCriterion: in method: " + methodName + " location: " + loc;
   }
 }

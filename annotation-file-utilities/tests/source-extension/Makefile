@@ -8,7 +8,7 @@
 
 # Put user-specific changes in your own Makefile.user.
 # Make will silently continue if that file does not exist.
--include Makefile.user
+-include ../Makefile.user
 
 # Override these in Makefile.user if the java and javac commands are not on
 # your execution path.  Example from Makefile.user:
@@ -30,43 +30,35 @@ DEBUG :=
 default : all
 
 .PHONY: all
-all : $(DIFFS) system-test source-extension results
-
-.PHONY: system-test
-system-test:
-	${MAKE} -C system-test
-
-.PHONY: source-extension
-source-extension:
-	${MAKE} -C source-extension
+all : $(DIFFS) results
 
 # Display results of all .diff files.
 .PHONY: results
-results: bin/VerifyDiffs.class
+results: ../bin/VerifyDiffs.class
 	@echo ""
 	@echo "=== RESULTS ==="
 	@echo ""
-	@$(JAVA) -cp bin VerifyDiffs --show_all
+	@$(JAVA) -cp bin:../bin VerifyDiffs --show_all
 
 # Remakes the little java program that checks and compares diffs
-bin/VerifyDiffs.class : VerifyDiffs.java
-	@$(JAVAC) -g -cp ../bincompile -d bin VerifyDiffs.java
+../bin/VerifyDiffs.class : ../VerifyDiffs.java
+	@$(JAVAC) -g -cp ../../bincompile -d ../bin ../VerifyDiffs.java
 
 # Compiles all the test cases (be verbose about this).
 compile :
 	mkdir -p bin
-	$(JAVAC) -g -cp ../bin -d bin *.java
+	$(JAVAC) -g -cp ../../bin -d bin *.java
 
 .PRECIOUS : bin/annotator/tests/%.class
 bin/annotator/tests/%.class: %.java
 	mkdir -p bin
-	$(JAVAC) -g -cp bin:../bin -d bin -sourcepath . $*.java
+	$(JAVAC) -g -cp bin:../../bin -d bin -sourcepath . $*.java
 
 # Actually runs the annotator to create the annotated java file.
 .PRECIOUS: %.output
-%.output: %.jaif %.java bin/annotator/tests/%.class ../lib/plume.jar ../bin ../annotation-file-utilities.jar
+%.output: %.jaif %.java bin/annotator/tests/%.class ../../lib/plume.jar ../../bin ../../annotation-file-utilities.jar
 	$(JAVA) \
-	-cp bin:../annotation-file-utilities.jar \
+	-cp bin:../../annotation-file-utilities.jar \
 	annotator.Main \
 	${DEBUG} \
 	--abbreviate=false \

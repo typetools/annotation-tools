@@ -31,19 +31,34 @@ public final /*@ReadOnly*/ class LocalLocation {
      * the fields of the same names.
      */
     public LocalLocation(int index, int scopeStart, int scopeLength) {
-        this.index = index;
+    	this.index = index;
         this.scopeStart = scopeStart;
         this.scopeLength = scopeLength;
+        this.varName = null;
+        this.varIndex = -1;
     }
 
+    public final String varName;
+    public final int varIndex;
+    
+    public LocalLocation(String varName, int varIndex) {
+    	this.index = -1;
+        this.scopeStart = -1;
+        this.scopeLength = -1;
+    	this.varName = varName;
+    	this.varIndex = varIndex;
+    }
+    
+    
     /**
      * Returns whether this {@link LocalLocation} equals <code>o</code>; a
      * slightly faster variant of {@link #equals(Object)} for when the argument
      * is statically known to be another nonnull {@link LocalLocation}.
      */
     public boolean equals(LocalLocation l) {
-        return index == l.index && scopeStart == l.scopeStart
-                && scopeLength == l.scopeLength;
+        return (index == l.index && scopeStart == l.scopeStart
+                && scopeLength == l.scopeLength) ||
+                (varName!=null && varName.equals(l.varName) && varIndex==l.varIndex);
     }
 
     /**
@@ -63,15 +78,24 @@ public final /*@ReadOnly*/ class LocalLocation {
      */
     @Override
     public int hashCode() /*@ReadOnly*/ {
-         Hasher h = new Hasher();
-        h.mash(index);
-        h.mash(scopeStart);
-        h.mash(scopeLength);
-        return h.hash;
+		Hasher h = new Hasher();
+    	if (varName==null) {
+			h.mash(index);
+			h.mash(scopeStart);
+			h.mash(scopeLength);
+		} else {
+			h.mash(varName.hashCode());
+			h.mash(varIndex);
+		}
+		return h.hash;
     }
 
     @Override
     public String toString() {
-     return "LocalLocation(" + index + ", " + scopeStart + ", " + scopeLength + ")";
+    	if (varName==null) {
+    		return "LocalLocation(" + index + ", " + scopeStart + ", " + scopeLength + ")";
+    	} else {
+    		return "LocalLocation(\"" + varName + "\" #" + varIndex + ")";
+    	}
     }
 }

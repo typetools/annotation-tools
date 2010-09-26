@@ -7,6 +7,7 @@ import java.util.*;
 import annotations.el.BoundLocation;
 import annotations.el.InnerTypeLocation;
 import annotations.el.LocalLocation;
+import annotations.el.RelativeLocation;
 
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
@@ -234,16 +235,16 @@ public final class Criteria {
     return new LocalVariableCriterion(methodName, loc);
   }
 
-  public final static Criterion cast(String methodName, Integer offset) {
-    return new CastCriterion(methodName, offset);
+  public final static Criterion cast(String methodName, RelativeLocation loc) {
+    return new CastCriterion(methodName, loc);
   }
 
-  public final static Criterion newObject(String methodName, Integer offset) {
-    return new NewCriterion(methodName, offset);
+  public final static Criterion newObject(String methodName, RelativeLocation loc) {
+    return new NewCriterion(methodName, loc);
   }
 
-  public final static Criterion instanceOf(String methodName, Integer offset) {
-    return new InstanceOfCriterion(methodName, offset);
+  public final static Criterion instanceOf(String methodName, RelativeLocation loc) {
+    return new InstanceOfCriterion(methodName, loc);
   }
 
   public final static Criterion atBoundLocation(BoundLocation loc) {

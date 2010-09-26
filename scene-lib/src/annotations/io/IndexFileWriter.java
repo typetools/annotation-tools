@@ -209,14 +209,14 @@ public final class IndexFileWriter {
         }
     }
 
-    private void printNumberedElements(String indentation,
+    private void printRelativeElements(String indentation,
             String desc,
-            /*@ReadOnly*/ Map<Integer, /*@ReadOnly*/ ATypeElement> nels) {
-        for (/*@ReadOnly*/ Map.Entry<Integer, /*@ReadOnly*/ ATypeElement> te
+            /*@ReadOnly*/ Map<RelativeLocation, /*@ReadOnly*/ ATypeElement> nels) {
+        for (/*@ReadOnly*/ Map.Entry<RelativeLocation, /*@ReadOnly*/ ATypeElement> te
                 : nels.entrySet()) {
             /*@ReadOnly*/ ATypeElement t = te.getValue();
             printTypeElementAndInnerTypes(indentation,
-                    desc + " #" + te.getKey(), t);
+                    desc + " " + te.getKey().getLocationString(), t);
         }
     }
 
@@ -277,9 +277,9 @@ public final class IndexFileWriter {
                     printTypeElementAndInnerTypes(INDENT + INDENT + INDENT,
                             "type", l.type);
                 }
-                printNumberedElements(INDENT + INDENT, "typecast", m.typecasts);
-                printNumberedElements(INDENT + INDENT, "instanceof", m.instanceofs);
-                printNumberedElements(INDENT + INDENT, "new", m.news);
+                printRelativeElements(INDENT + INDENT, "typecast", m.typecasts);
+                printRelativeElements(INDENT + INDENT, "instanceof", m.instanceofs);
+                printRelativeElements(INDENT + INDENT, "new", m.news);
                 // throwsException field is not processed.  Why?
             }
             pw.println();

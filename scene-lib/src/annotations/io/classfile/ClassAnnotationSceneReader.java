@@ -648,8 +648,8 @@ extends EmptyVisitor {
     /*
      * Returns the offset for this annotation.
      */
-    private int makeOffset() {
-      return xOffsetArgs.get(0);
+    private RelativeLocation makeOffset() {
+      return RelativeLocation.createOffset(xOffsetArgs.get(0));
     }
 
     /*
