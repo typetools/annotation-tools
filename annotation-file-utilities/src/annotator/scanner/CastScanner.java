@@ -8,14 +8,13 @@ import java.util.Map;
 import com.sun.source.tree.Tree;
 import com.sun.source.tree.TypeCastTree;
 import com.sun.source.util.TreePath;
-import com.sun.source.util.TreePathScanner;
 
 /** CastScanner stores information about the names and offsets of
  * casts inside a method, and can also be used to scan the source
  * tree and determine the index of a given cast, where the i^th
  * index corresponds to the i^th cast, using 0-based indexing.
  */
-public class CastScanner extends TreePathScanner<Void,Void> {
+public class CastScanner extends CommonScanner {
 
   /**
    * Computes the index of the given cast tree amongst all cast trees inside
@@ -25,22 +24,42 @@ public class CastScanner extends TreePathScanner<Void,Void> {
    * @param tree the cast tree to search for
    * @return the index of the given cast tree
    */
-  public static int indexOfCastTree(
-        TreePath path,
-        Tree tree) {
+  public static int indexOfCastTree(TreePath path, Tree tree) {
     // only start searching from within this method
-    while (path.getLeaf().getKind() != Tree.Kind.METHOD) {
-      path = path.getParentPath();
-      if (path == null) {
-        // Was called on something other than a local variable, so return
-        // -1 to ensure that it doesn't match anything.
-        return -1;
-      }
+    path = findEnclosingMethod(path);
+    if (path == null) {
+      // Was called on something other than a local variable, so return
+      // -1 to ensure that it doesn't match anything.
+      return -1;
     }
-     CastScanner lvts = new CastScanner(tree);
+    CastScanner lvts = new CastScanner(tree);
     lvts.scan(path, null);
     return lvts.index;
   }
+
+	public static int indexOfCastTreeInFieldInit(TreePath path, Tree tree) {
+		// only start searching from within this field initializer
+	    path = findEnclosingFieldInit(path);
+	    if (path == null) {
+	      return -1;
+	    }
+
+		CastScanner lvts = new CastScanner(tree);
+		lvts.scan(path, null);
+		return lvts.index;
+	}
+
+	public static int indexOfCastTreeInStaticInit(TreePath path, Tree tree) {
+		// only start searching from within this method
+	    path = findEnclosingStaticInit(path);
+	    if (path == null) {
+	      return -1;
+	    }
+
+	    CastScanner lvts = new CastScanner(tree);
+		lvts.scan(path, null);
+		return lvts.index;
+	}
 
   private int index = -1;
   private boolean done = false;
