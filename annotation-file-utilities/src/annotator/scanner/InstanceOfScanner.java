@@ -6,17 +6,15 @@ import java.util.List;
 import java.util.Map;
 
 import com.sun.source.tree.InstanceOfTree;
-import com.sun.source.tree.NewClassTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
-import com.sun.source.util.TreePathScanner;
 
 /** InstanceOfScanner stores information about the names and offsets of
  * instanceof checks inside a method, and can also be used to scan the source
  * tree and determine the index of a given instanceof check, where the i^th
  * index corresponds to the i^th instanceof check, using 0-based indexing.
  */
-public class InstanceOfScanner extends TreePathScanner<Void, Void> {
+public class InstanceOfScanner extends CommonScanner {
 
   /**
    * Computes the index of the given instanceof tree amongst all instanceof
@@ -26,23 +24,44 @@ public class InstanceOfScanner extends TreePathScanner<Void, Void> {
    * @param tree the instanceof tree to search for
    * @return the index of the given instanceof tree
    */
-  public static int indexOfInstanceOfTree(
-        TreePath path,
-        Tree tree) {
+  public static int indexOfInstanceOfTree(TreePath path, Tree tree) {
     // only start searching from within this method
-    while (path.getLeaf().getKind() != Tree.Kind.METHOD) {
-      path = path.getParentPath();
-      if (path == null) {
-        // Was called on something other than a local variable, so return
-        // -1 to ensure that it doesn't match anything.
-        return -1;
-      }
+    path = findEnclosingMethod(path);
+    if (path == null) {
+      // Was called on something other than a local variable, so return
+      // -1 to ensure that it doesn't match anything.
+      return -1;
     }
-     InstanceOfScanner ios = new InstanceOfScanner(tree);
+    InstanceOfScanner ios = new InstanceOfScanner(tree);
     ios.scan(path, null);
     return ios.index;
   }
 
+	public static int indexOfInstanceOfTreeInFieldInit(TreePath path, Tree tree) {
+		// only start searching from within this field initializer
+	    path = findEnclosingFieldInit(path);
+	    if (path == null) {
+	      return -1;
+	    }
+
+		InstanceOfScanner lvts = new InstanceOfScanner(tree);
+		lvts.scan(path, null);
+		return lvts.index;
+	}
+
+	public static int indexOfInstanceOfTreeInStaticInit(TreePath path, Tree tree) {
+		// only start searching from within this method
+	    path = findEnclosingStaticInit(path);
+	    if (path == null) {
+	      return -1;
+	    }
+
+	    InstanceOfScanner lvts = new InstanceOfScanner(tree);
+		lvts.scan(path, null);
+		return lvts.index;
+	}
+
+  
   private int index = -1;
   private boolean done = false;
   private Tree tree;

@@ -9,13 +9,12 @@ import com.sun.source.tree.NewArrayTree;
 import com.sun.source.tree.NewClassTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
-import com.sun.source.util.TreePathScanner;
 
 /**
  * NewScanner scans the source tree and determines the index of a given new,
  * where the i^th index corresponds to the i^th new, using 0-based indexing.
  */
-public class NewScanner extends TreePathScanner<Void, Void> {
+public class NewScanner extends CommonScanner {
 	private static boolean debug = false;
 
 	/**
@@ -32,20 +31,45 @@ public class NewScanner extends TreePathScanner<Void, Void> {
 	public static int indexOfNewTree(TreePath path, Tree tree) {
 		debug("indexOfNewTree: " + path.getLeaf());
 		// only start searching from within this method
-		while (path.getLeaf().getKind() != Tree.Kind.METHOD) {
-			path = path.getParentPath();
-			if (path == null) {
-				// Was called on something other than a local variable, so
-				// return
-				// -1 to ensure that it doesn't match anything.
-				return -1;
-			}
-		}
+	    path = findEnclosingMethod(path);
+	    if (path == null) {
+	      // Was called on something other than a local variable, so return
+	      // -1 to ensure that it doesn't match anything.
+	      return -1;
+	    }
+
+	    NewScanner lvts = new NewScanner(tree);
+		lvts.scan(path, null);
+		return lvts.index;
+	}
+	
+	public static int indexOfNewTreeInFieldInit(TreePath path, Tree tree) {
+		debug("indexOfNewTreeInFieldInit: " + path.getLeaf());
+		// only start searching from within this field initializer
+	    path = findEnclosingFieldInit(path);
+	    if (path == null) {
+	      return -1;
+	    }
+
 		NewScanner lvts = new NewScanner(tree);
 		lvts.scan(path, null);
 		return lvts.index;
 	}
 
+	public static int indexOfNewTreeInStaticInit(TreePath path, Tree tree) {
+		debug("indexOfNewTreeInStaticInit: " + path.getLeaf());
+		// only start searching from within this method
+	    path = findEnclosingStaticInit(path);
+	    if (path == null) {
+	      return -1;
+	    }
+
+	    NewScanner lvts = new NewScanner(tree);
+		lvts.scan(path, null);
+		return lvts.index;
+	}
+
+	
 	private int index = -1;
 	private boolean done = false;
 	private Tree tree;

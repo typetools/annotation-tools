@@ -5,12 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import annotator.find.LocalVariableCriterion;
-
 import com.sun.source.tree.Tree;
 import com.sun.source.tree.VariableTree;
 import com.sun.source.util.TreePath;
-import com.sun.source.util.TreePathScanner;
 import com.sun.tools.javac.util.Pair;
 
 /** LocalVariableScanner stores information about the names and offsets of
@@ -19,7 +16,7 @@ import com.sun.tools.javac.util.Pair;
  * the i^th index corresponds to the i^th declaration of a local variable with
  * that name, using 0-based indexing.
  */
-public class LocalVariableScanner extends TreePathScanner<Void, Void> {
+public class LocalVariableScanner extends CommonScanner {
   /**
    * Computes the index i of the given tree along the given tree path
    * such that it is the i^th declaration of the local variable with the given
@@ -31,32 +28,39 @@ public class LocalVariableScanner extends TreePathScanner<Void, Void> {
    * @return the index of the variable tree with respect to the given
    *  local variable name
    */
-  public static int indexOfVarTree(
-        TreePath path,
-        Tree varTree,
-        String varName) {
-    // Move all the way up the source tree to the overall method tree
-    // containing varTree
-    while (path.getLeaf().getKind() != Tree.Kind.METHOD) {
-      path = path.getParentPath();
-      if (path == null) {
-        // Was called on something other than a local variable, so return
-        // -1 to ensure that it doesn't match anything.
-        return -1;
-      }
+  public static int indexOfVarTree(TreePath path, Tree varTree, String varName) {
+    // only start searching from within this method
+    path = findEnclosingMethod(path);
+    if (path == null) {
+      // Was called on something other than a local variable, so return
+      // -1 to ensure that it doesn't match anything.
+      return -1;
     }
-     LocalVariableScanner lvts =
-      new LocalVariableScanner(varTree, varName);
 
-     try {
-       lvts.scan(path, null);
-     } catch(Throwable e) {
-       System.out.println("LocalVariableScanner: can't locate: " + varTree);
-       return -2; // Don't return -1, which is above return code
-     }
+    LocalVariableScanner lvts = new LocalVariableScanner(varTree, varName);
+
+    try {
+      lvts.scan(path, null);
+    } catch(Throwable e) {
+      System.out.println("LocalVariableScanner: can't locate: " + varTree);
+      return -2; // Don't return -1, which is above return code
+    }
     return lvts.index;
   }
 
+	public static int indexOfVarTreeInStaticInit(TreePath path, Tree tree, String varName) {
+		// only start searching from within this method
+	    path = findEnclosingStaticInit(path);
+	    if (path == null) {
+	      return -1;
+	    }
+
+	    LocalVariableScanner lvts = new LocalVariableScanner(tree, varName);
+		lvts.scan(path, null);
+		return lvts.index;
+	}
+  
+  
   private int index = -1;
   private boolean done = false;
   private Tree varTree;
