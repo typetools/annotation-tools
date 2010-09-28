@@ -21,8 +21,6 @@ import com.sun.tools.javac.util.Pair;
 // There is no good reason why this is the case with ASM.
 public class MethodOffsetClassVisitor extends ClassWriter {
 
-  private static boolean debug = false;
-
   // This field should be set by entry on a method through visitMethod,
   // and so all the visit* methods in LocalVariableMethodVisitor
   private String methodName;
