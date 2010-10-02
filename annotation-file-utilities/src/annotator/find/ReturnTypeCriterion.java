@@ -1,14 +1,5 @@
 package annotator.find;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import annotations.el.InnerTypeLocation;
-
-import com.sun.source.tree.ArrayTypeTree;
-import com.sun.source.tree.IdentifierTree;
-import com.sun.source.tree.MethodTree;
-import com.sun.source.tree.ParameterizedTypeTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
 
