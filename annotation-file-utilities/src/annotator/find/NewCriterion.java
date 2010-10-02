@@ -6,6 +6,9 @@ import annotator.scanner.NewScanner;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
 
+/**
+ * Criterion for being a specific object creation expression.
+ */
 public class NewCriterion implements Criterion {
 
   private String methodName;
