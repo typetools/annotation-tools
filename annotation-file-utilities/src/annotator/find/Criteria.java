@@ -56,13 +56,16 @@ public final class Criteria {
    */
   public boolean isSatisfiedBy(TreePath path, Tree leaf) {
     assert path == null || path.getLeaf() == leaf;
-    for (Criterion c : criteria)
+    for (Criterion c : criteria) {
       if (! c.isSatisfiedBy(path, leaf)) {
-        if (debug) {
-          System.out.printf("unsatisfied criterion:%n  %s%n  %s%n", c, Main.pathToString(path));
-        }
+    	if (debug) {
+          System.out.printf("UNsatisfied criterion:%n  %s%n  %s%n", c, Main.pathToString(path));
+    	}
         return false;
+      } else if (debug) {
+    	System.out.printf("satisfied criterion:%n  %s%n  %s%n", c, Main.pathToString(path));
       }
+    }
     return true;
   }
 
@@ -75,13 +78,16 @@ public final class Criteria {
    * false otherwise
    */
   public boolean isSatisfiedBy(TreePath path) {
-    for (Criterion c : criteria)
+    for (Criterion c : criteria) {
       if (! c.isSatisfiedBy(path)) {
         if (debug) {
-          System.out.println("unsatisfied criterion: " + c);
+          System.out.println("UNsatisfied criterion: " + c);
         }
         return false;
+      } else if (debug) {
+    	System.out.println("satisfied criterion: " + c);
       }
+    }
     return true;
   }
 
@@ -207,8 +213,17 @@ public final class Criteria {
   }
 
   public final static Criterion field(String varName) {
-    return new FieldCriterion(varName);
+	return new FieldCriterion(varName);
   }
+
+  public final static Criterion inStaticInit(int blockID) {
+    return new InStaticInitCriterion(blockID);
+  }
+
+  public final static Criterion inFieldInit(String varName) {
+    return new InFieldInitCriterion(varName);
+  }
+
   public final static Criterion receiver(String methodName) {
     return new ReceiverCriterion(methodName);
   }
