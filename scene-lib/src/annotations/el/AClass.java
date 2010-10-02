@@ -33,6 +33,37 @@ public final class AClass extends AElement {
         };
     }
 
+    private static VivifyingMap<Integer, ABlock> createStaticInitMap() {
+        return new VivifyingMap<Integer, ABlock>(
+                new LinkedHashMap<Integer, ABlock>()) {
+            @Override
+            public  ABlock createValueFor(Integer k) /*@ReadOnly*/ {
+                return new ABlock(k);
+            }
+
+            @Override
+            public boolean subPrune(ABlock v) /*@ReadOnly*/ {
+                return v.prune();
+            }
+        };
+    }
+    
+    private static VivifyingMap<String, AExpression> createFieldInitMap() {
+        return new VivifyingMap<String, AExpression>(
+                new LinkedHashMap<String, AExpression>()) {
+            @Override
+            public  AExpression createValueFor(String k) /*@ReadOnly*/ {
+                return new AExpression(k);
+            }
+
+            @Override
+            public boolean subPrune(AExpression v) /*@ReadOnly*/ {
+                return v.prune();
+            }
+        };
+    }
+
+    
     /**
      * The class's annotated methods; a method's key consists of its name
      * followed by its erased signature in JVML format.
@@ -42,11 +73,17 @@ public final class AClass extends AElement {
      * of the {@link AMethod}s exist in the signature.
      */
     public final VivifyingMap<String, AMethod> methods =
-            createMethodMap();
+        createMethodMap();
+
+    public final VivifyingMap<Integer, ABlock> staticInits =
+        createStaticInitMap();
 
     /** The class's annotated fields; map key is field name */
     public final VivifyingMap<String, AElement> fields =
-            AElement.<String>newVivifyingLHMap_AET();
+        AElement.<String>newVivifyingLHMap_AET();
+
+    public final VivifyingMap<String, AExpression> fieldInits =
+        createFieldInitMap();
 
     private String className;
 
@@ -125,6 +162,12 @@ public final class AClass extends AElement {
         sb.append(linePrefix);
         sb.append("Fields:\n");
         mapToString(sb, fields, linePrefix + "  ");
+        sb.append(linePrefix);
+        sb.append("Field Initializers:\n");
+        mapToString(sb, fieldInits, linePrefix + "  ");
+        sb.append(linePrefix);
+        sb.append("Static Initializers:\n");
+        mapToString(sb, staticInits, linePrefix + "  ");
         sb.append(linePrefix);
         sb.append("Methods:\n");
         mapToString(sb, methods, linePrefix + "  ");
