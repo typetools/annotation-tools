@@ -239,9 +239,9 @@ public class IsSigMethodCriterion implements Criterion {
 
     // maybe simpleType is in JVML format
     String simpleType2 = simpleType.replace(".", "/");
-    String prefix2 = (prefix.endsWith(".")
+    /* unused String prefix2 = (prefix.endsWith(".")
                       ? prefix.substring(0, prefix.length() - 1)
-                      : prefix);
+                      : prefix); */
 
     boolean b = (fullType.equals(prefix + simpleType2)
                  // Hacky way to handle the possibility that fulltype is an
