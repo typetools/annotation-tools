@@ -22,6 +22,7 @@ public class GenericArrayLocationCriterion implements Criterion {
   // the last element of the location list
   private Integer locationInParent;
   // represents all but the last element of the location list
+  // TODO: this field is initialized, but never read!
   private Criterion parentCriterion;
 
   /**
@@ -156,7 +157,7 @@ public class GenericArrayLocationCriterion implements Criterion {
     // no (remaining) inner type location, want to annotate outermost type
     // e.g.,  @Readonly List list;
     //        @Readonly List<String> list;
-    Tree leaf = pathRemaining.getLeaf();
+    // Tree leaf = pathRemaining.getLeaf();
     Tree parent = pathRemaining.getParentPath().getLeaf();
     // System.out.printf("No (remaining) inner type location: %s %b %b%n", Main.treeToString(leaf), is_generic_or_array(leaf), is_generic_or_array(parent));
     return ! is_generic_or_array(parent);
