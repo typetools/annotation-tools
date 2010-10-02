@@ -24,42 +24,16 @@ public class CastScanner extends CommonScanner {
    * @param tree the cast tree to search for
    * @return the index of the given cast tree
    */
-  public static int indexOfCastTree(TreePath path, Tree tree) {
-    // only start searching from within this method
-    path = findEnclosingMethod(path);
+  public static int indexOfCastTree(TreePath origpath, Tree tree) {
+    TreePath path = findCountingContext(origpath);
     if (path == null) {
-      // Was called on something other than a local variable, so return
-      // -1 to ensure that it doesn't match anything.
-      return -1;
+	  return -1;
     }
+
     CastScanner lvts = new CastScanner(tree);
     lvts.scan(path, null);
     return lvts.index;
   }
-
-	public static int indexOfCastTreeInFieldInit(TreePath path, Tree tree) {
-		// only start searching from within this field initializer
-	    path = findEnclosingFieldInit(path);
-	    if (path == null) {
-	      return -1;
-	    }
-
-		CastScanner lvts = new CastScanner(tree);
-		lvts.scan(path, null);
-		return lvts.index;
-	}
-
-	public static int indexOfCastTreeInStaticInit(TreePath path, Tree tree) {
-		// only start searching from within this method
-	    path = findEnclosingStaticInit(path);
-	    if (path == null) {
-	      return -1;
-	    }
-
-	    CastScanner lvts = new CastScanner(tree);
-		lvts.scan(path, null);
-		return lvts.index;
-	}
 
   private int index = -1;
   private boolean done = false;
@@ -72,9 +46,7 @@ public class CastScanner extends CommonScanner {
   }
 
   @Override
-  public   Void visitTypeCast(
-        TypeCastTree node,
-        Void p) {
+  public Void visitTypeCast(TypeCastTree node, Void p) {
     if (!done) {
       index++;
     }
@@ -98,11 +70,8 @@ public class CastScanner extends CommonScanner {
    * @param methodName the name of the method
    * @param offset the offset to add
    */
-  public static void addCastToMethod(
-        String methodName,
-        Integer offset) {
-     List<  Integer> offsetList =
-      methodNameToCastOffsets.get(methodName);
+  public static void addCastToMethod(String methodName, Integer offset) {
+    List<  Integer> offsetList = methodNameToCastOffsets.get(methodName);
     if (offsetList == null) {
       offsetList = new ArrayList<  Integer>();
       methodNameToCastOffsets.put(methodName, offsetList);
@@ -121,15 +90,10 @@ public class CastScanner extends CommonScanner {
    * @return the index of the given offset, or a negative number if the
    *  given offset does not exists inside the method
    */
-  public static  Integer getMethodCastIndex(
-        String methodName,
-        Integer offset) {
-      List<Integer> offsetList =
-      methodNameToCastOffsets.get(methodName);
+  public static Integer getMethodCastIndex(String methodName, Integer offset) {
+    List<Integer> offsetList = methodNameToCastOffsets.get(methodName);
     if (offsetList == null) {
       return -1;
-//      throw new RuntimeException("CastScanner.getMethodCastIndex() : " +
-//          "did not find offsets for method: " + methodName);
     }
 
     return offsetList.indexOf(offset);

@@ -10,6 +10,19 @@ import com.sun.source.util.TreePathScanner;
  */
 public class CommonScanner extends TreePathScanner<Void, Void> {
 
+	// the counting context for new, typecast, instanceof, and locals
+	public static TreePath findCountingContext(TreePath path) {
+		while (path != null ) {
+			if (path.getLeaf().getKind() == Tree.Kind.METHOD ||
+					isFieldInit(path) ||
+					isStaticInit(path)) {
+				return path;
+			}
+			path = path.getParentPath();
+		}
+		return path;
+	}
+	
 	// classes
 	
 	public static TreePath findEnclosingClass(TreePath path) {
@@ -69,5 +82,4 @@ public class CommonScanner extends TreePathScanner<Void, Void> {
 		}
 		return path;
 	}
-
 }

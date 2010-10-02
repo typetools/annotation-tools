@@ -24,43 +24,16 @@ public class InstanceOfScanner extends CommonScanner {
    * @param tree the instanceof tree to search for
    * @return the index of the given instanceof tree
    */
-  public static int indexOfInstanceOfTree(TreePath path, Tree tree) {
-    // only start searching from within this method
-    path = findEnclosingMethod(path);
+  public static int indexOfInstanceOfTree(TreePath origpath, Tree tree) {
+    TreePath path = findCountingContext(origpath);
     if (path == null) {
-      // Was called on something other than a local variable, so return
-      // -1 to ensure that it doesn't match anything.
       return -1;
     }
+
     InstanceOfScanner ios = new InstanceOfScanner(tree);
     ios.scan(path, null);
     return ios.index;
   }
-
-	public static int indexOfInstanceOfTreeInFieldInit(TreePath path, Tree tree) {
-		// only start searching from within this field initializer
-	    path = findEnclosingFieldInit(path);
-	    if (path == null) {
-	      return -1;
-	    }
-
-		InstanceOfScanner lvts = new InstanceOfScanner(tree);
-		lvts.scan(path, null);
-		return lvts.index;
-	}
-
-	public static int indexOfInstanceOfTreeInStaticInit(TreePath path, Tree tree) {
-		// only start searching from within this method
-	    path = findEnclosingStaticInit(path);
-	    if (path == null) {
-	      return -1;
-	    }
-
-	    InstanceOfScanner lvts = new InstanceOfScanner(tree);
-		lvts.scan(path, null);
-		return lvts.index;
-	}
-
   
   private int index = -1;
   private boolean done = false;
@@ -101,11 +74,8 @@ public class InstanceOfScanner extends CommonScanner {
    * @param methodName the name of the method
    * @param offset the offset to add
    */
-  public static void addInstanceOfToMethod(
-        String methodName,
-        Integer offset) {
-     List<  Integer> offsetList =
-      methodNameToInstanceOfOffsets.get(methodName);
+  public static void addInstanceOfToMethod(String methodName, Integer offset) {
+    List<  Integer> offsetList = methodNameToInstanceOfOffsets.get(methodName);
     if (offsetList == null) {
       offsetList = new ArrayList<  Integer>();
       methodNameToInstanceOfOffsets.put(methodName, offsetList);
@@ -124,15 +94,10 @@ public class InstanceOfScanner extends CommonScanner {
    * @return the index of the given offset, or a negative number
    *  if the offset does not exist inside the method
    */
-  public static Integer getMethodInstanceOfIndex(
-        String methodName,
-        Integer offset)  {
-     List<  Integer> offsetList =
-      methodNameToInstanceOfOffsets.get(methodName);
+  public static Integer getMethodInstanceOfIndex(String methodName, Integer offset)  {
+    List<  Integer> offsetList = methodNameToInstanceOfOffsets.get(methodName);
     if (offsetList == null) {
       return -1;
-//      throw new RuntimeException("InstanceOfScanner.getMethodCastIndex() : " +
-//          "did not find offsets for method: " + methodName);
     }
 
     return offsetList.indexOf(offset);
