@@ -1,15 +1,14 @@
 package annotator.find;
 
-import java.util.List;
-
 import annotations.el.RelativeLocation;
 import annotator.scanner.CastScanner;
 
 import com.sun.source.tree.Tree;
-import com.sun.source.tree.VariableTree;
 import com.sun.source.util.TreePath;
-import com.sun.tools.javac.util.Pair;
 
+/**
+ * Criterion for being a specific type cast expression.
+ */
 public class CastCriterion implements Criterion {
 
   private String methodName;
