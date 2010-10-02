@@ -7,8 +7,6 @@ import java.util.Map.Entry;
 import org.objectweb.asm.ClassReader;
 
 import annotations.Annotation;
-import annotations.AnnotationFactory;
-import annotations.Annotation;
 import annotations.el.*;
 import annotations.field.AnnotationFieldType;
 import annotations.io.IndexFileParser;
@@ -155,6 +153,12 @@ public class IndexFileSpecification implements Specification {
     for (Map.Entry<String, AMethod> entry : clazz.methods.entrySet()) {
       parseMethod(clist, entry.getKey(), entry.getValue());
     }
+    for (Map.Entry<Integer, ABlock> entry : clazz.staticInits.entrySet()) {
+      parseStaticInit(clist, entry.getKey(), entry.getValue());
+    }
+    for (Map.Entry<String, AExpression> entry : clazz.fieldInits.entrySet()) {
+      parseFieldInit(clist, entry.getKey(), entry.getValue());
+    }
 
     debug("parseClass(" + className + "):  done");
   }
@@ -169,6 +173,19 @@ public class IndexFileSpecification implements Specification {
     parseInnerAndOuterElements(clist, field.type);
   }
 
+  private void parseStaticInit(CriterionList clist, int blockID, ABlock block) {
+    clist = clist.add(Criteria.inStaticInit(blockID));
+    // the method name argument is not used for static initializers, which are only used
+    // in source specifications. Same for field initializers.
+    // the empty () are there to prevent the whole string to be removed in later parsing.
+  	parseBlock(clist, "static init number " + blockID + "()", block);
+  }
+
+  private void parseFieldInit(CriterionList clist, String fieldName, AExpression exp) {
+    clist = clist.add(Criteria.inFieldInit(fieldName));
+    parseExpression(clist, "init for field " + fieldName + "()", exp);
+  }
+  
   /** Fill in this.insertions with insertion pairs. */
   private void parseElement(CriterionList clist, AElement element) {
     for (Pair<String,Boolean> p : getElementAnnotation(element)) {
@@ -262,9 +279,14 @@ public class IndexFileSpecification implements Specification {
       parseElement(paramClist, param);
       parseInnerAndOuterElements(paramClist, param.type);
     }
+    
+    parseBlock(clist, methodName, method);
+  }
+  
+  private void parseBlock(CriterionList clist, String methodName, ABlock block) {
 
     // parse locals of method
-    for (Entry<LocalLocation, AElement> entry : method.locals.entrySet()) {
+    for (Entry<LocalLocation, AElement> entry : block.locals.entrySet()) {
       LocalLocation loc = entry.getKey();
       AElement var = entry.getValue();
       CriterionList varClist = clist.add(Criteria.local(methodName, loc));
@@ -273,8 +295,12 @@ public class IndexFileSpecification implements Specification {
       parseInnerAndOuterElements(varClist, var.type);
     }
 
+    parseExpression(clist, methodName, block);
+  }
+  
+  private void parseExpression(CriterionList clist, String methodName, AExpression exp) {
     // parse typecasts of method
-    for (Entry<RelativeLocation, ATypeElement> entry : method.typecasts.entrySet()) {
+    for (Entry<RelativeLocation, ATypeElement> entry : exp.typecasts.entrySet()) {
       RelativeLocation loc = entry.getKey();
       ATypeElement cast = entry.getValue();
       CriterionList castClist = clist.add(Criteria.cast(methodName, loc));
@@ -282,7 +308,7 @@ public class IndexFileSpecification implements Specification {
     }
 
     // parse news (object creation) of method
-    for (Entry<RelativeLocation, ATypeElement> entry : method.news.entrySet()) {
+    for (Entry<RelativeLocation, ATypeElement> entry : exp.news.entrySet()) {
       RelativeLocation loc = entry.getKey();
       ATypeElement newObject = entry.getValue();
       CriterionList newClist = clist.add(Criteria.newObject(methodName, loc));
@@ -290,7 +316,7 @@ public class IndexFileSpecification implements Specification {
     }
 
     // parse instanceofs of method
-    for (Entry<RelativeLocation, ATypeElement> entry : method.instanceofs.entrySet()) {
+    for (Entry<RelativeLocation, ATypeElement> entry : exp.instanceofs.entrySet()) {
       RelativeLocation loc = entry.getKey();
       ATypeElement instanceOf = entry.getValue();
       CriterionList instanceOfClist = clist.add(Criteria.instanceOf(methodName, loc));
