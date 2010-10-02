@@ -153,6 +153,10 @@ public class AElement {
       sb.append(description);
       sb.append(" : ");
       tlAnnotationsHereFormatted(sb);
+      if (type!=null) {
+    	  sb.append(' ');
+    	  sb.append(type.toString());
+      }
       return sb.toString();
     }
 
