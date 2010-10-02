@@ -1,8 +1,5 @@
 package annotator.specification;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import annotator.find.Criteria;
 import annotator.find.Criterion;
 
@@ -78,7 +75,6 @@ public class CriterionList {
     Criteria criteria = new Criteria();
 
     CriterionList c = this;
-    Set<Criterion> criterion = new HashSet<Criterion>();
     while (c != null && c.current != null) {
       criteria.add(c.current);
       c = c.next;
