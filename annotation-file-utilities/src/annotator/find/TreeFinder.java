@@ -16,8 +16,6 @@ import javax.lang.model.element.Modifier;
 
 import com.google.common.collect.*;
 
-import plume.Pair;
-
 /**
  * A {@code TreeScanner} that is able to locate program elements in an
  * AST based on {@code Criteria}. It is used to scan a tree and return a
@@ -211,7 +209,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       Integer i = null;
       if (parent instanceof ArrayTypeTree) {
         debug("TypePositionFinder.visitIdentifier: recognized array");
-        ArrayTypeTree att = (ArrayTypeTree) parent;
+        // ArrayTypeTree att = (ArrayTypeTree) parent;
         JCIdent jcid = (JCIdent) node;
         i = jcid.pos;
       } else {
@@ -228,14 +226,14 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       Tree parent = parent(node);
       Integer i = null;
       if (parent instanceof ArrayTypeTree) {
-        ArrayTypeTree att = (ArrayTypeTree) parent;
+        // ArrayTypeTree att = (ArrayTypeTree) parent;
         JCTree jcid = (JCTree) node;
         i = jcid.pos;
       } else {
         i = ((JCTree) node).pos;
       }
       //          JCPrimitiveTypeTree pt = (JCPrimitiveTypeTree) node;
-      JCTree jt = (JCTree) node;
+      // JCTree jt = (JCTree) node;
       return i;
     }
 
@@ -423,7 +421,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
 
       // actually List<JCAnnotation>.
       List<? extends AnnotationTree> annos = mt.getAnnotations();
-      Set<Modifier> flags = mt.getFlags();
+      // Set<Modifier> flags = mt.getFlags();
 
       JCTree before;
       if (annos.size() > 1) {
