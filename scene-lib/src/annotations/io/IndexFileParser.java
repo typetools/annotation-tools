@@ -598,7 +598,23 @@ public final class IndexFileParser {
             parseAnnotations(f.type);
             parseInnerTypes(f.type);
         }
+        
+        AExpression fieldinit = c.fieldInits.vivify(name);
+        parseExpression(fieldinit);
     }
+
+	private void parseStaticInit(AClass c) throws IOException,
+			ParseException {
+		expectKeyword("staticinit");
+		expectChar('*');
+		int blockIndex = expectNonNegative(matchNNInteger());
+		// AElement block = c.staticinits.vivify(blockIndex);
+
+		expectChar(':');
+
+        AExpression staticinit = c.staticInits.vivify(blockIndex);
+        parseExpression(staticinit);
+	}
 
     private void parseMethod(AClass c) throws IOException,
             ParseException {
@@ -662,86 +678,122 @@ public final class IndexFileParser {
                 throw new Error("This can't happen");
             }
         }
-        while (matchKeyword("local")) {
-            LocalLocation loc;
-        	if (checkNNInteger()!=-1) {
-        		// the local variable is specified by bytecode index/range
-        		int index = expectNonNegative(matchNNInteger());
-        		expectChar('#');
-        		int scopeStart = expectNonNegative(matchNNInteger());
-        		expectChar('+');
-        		int scopeLength = expectNonNegative(matchNNInteger());
-        		loc = new LocalLocation(index, scopeStart, scopeLength);
-        	} else {
-        		// look for a valid identifier for the local variable
-                String lvar = expectIdentifier();
-                int varIndex;
-        		if (checkChar('*')) {
-        			expectChar('*');
-        			varIndex = expectNonNegative(matchNNInteger());
-        		} else {
-                    // default the variable index to 0, the most common case
-        			varIndex = 0;
-        		}
-        		loc = new LocalLocation(lvar, varIndex);
-        	}
-            AElement l = m.locals.vivify(loc);
-            expectChar(':');
-            parseAnnotations(l);
-            if (checkKeyword("type") && matchKeyword("type")) {
-                expectChar(':');
-                parseAnnotations(l.type);
-                parseInnerTypes(l.type);
-            }
-        }
-        while (matchKeyword("typecast")) {
-        	RelativeLocation loc;
-        	if (checkChar('#')) {
-        		expectChar('#');
-        		int offset = expectNonNegative(matchNNInteger());
-        		loc = RelativeLocation.createOffset(offset);
-        	} else {
-        		expectChar('*');
-        		int index = expectNonNegative(matchNNInteger());
-        		loc = RelativeLocation.createIndex(index);
-        	}
-            ATypeElement t = m.typecasts.vivify(loc);
-            expectChar(':');
-            parseAnnotations(t);
-            parseInnerTypes(t);
-        }
-        while (matchKeyword("instanceof")) {
-        	RelativeLocation loc;
-        	if (checkChar('#')) {
-        		expectChar('#');
-        		int offset = expectNonNegative(matchNNInteger());
-        		loc = RelativeLocation.createOffset(offset);
-        	} else {
-        		expectChar('*');
-        		int index = expectNonNegative(matchNNInteger());
-        		loc = RelativeLocation.createIndex(index);
-        	}
-            ATypeElement i = m.instanceofs.vivify(loc);
-            expectChar(':');
-            parseAnnotations(i);
-            parseInnerTypes(i);
-        }
-        while (matchKeyword("new")) {
-        	RelativeLocation loc;
-        	if (checkChar('#')) {
-        		expectChar('#');
-        		int offset = expectNonNegative(matchNNInteger());
-        		loc = RelativeLocation.createOffset(offset);
-        	} else {
-        		expectChar('*');
-        		int index = expectNonNegative(matchNNInteger());
-        		loc = RelativeLocation.createIndex(index);
-        	}
-            ATypeElement n = m.news.vivify(loc);
-            expectChar(':');
-            parseAnnotations(n);
-            parseInnerTypes(n);
-        }
+        
+        parseBlock(m);
+    }
+    
+	private void parseBlock(ABlock bl) throws IOException,
+			ParseException {
+		boolean matched = true;
+
+		while (matched) {
+			matched = false;
+
+			while (checkKeyword("local")) {
+				matchKeyword("local");
+				matched = true;
+				LocalLocation loc;
+				if (checkNNInteger() != -1) {
+					// the local variable is specified by bytecode index/range
+					int index = expectNonNegative(matchNNInteger());
+					expectChar('#');
+					int scopeStart = expectNonNegative(matchNNInteger());
+					expectChar('+');
+					int scopeLength = expectNonNegative(matchNNInteger());
+					loc = new LocalLocation(index, scopeStart, scopeLength);
+				} else {
+					// look for a valid identifier for the local variable
+					String lvar = expectIdentifier();
+					int varIndex;
+					if (checkChar('*')) {
+						expectChar('*');
+						varIndex = expectNonNegative(matchNNInteger());
+					} else {
+						// default the variable index to 0, the most common case
+						varIndex = 0;
+					}
+					loc = new LocalLocation(lvar, varIndex);
+				}
+				AElement l = bl.locals.vivify(loc);
+				expectChar(':');
+				parseAnnotations(l);
+				if (checkKeyword("type") && matchKeyword("type")) {
+					expectChar(':');
+					parseAnnotations(l.type);
+					parseInnerTypes(l.type);
+				}
+			}
+			matched = parseExpression(bl) || matched;
+		}
+	}
+	
+	private boolean parseExpression(AExpression exp) throws IOException,
+			ParseException {
+		boolean matched = true;
+		boolean evermatched = false;
+		
+		while (matched) {
+			matched = false;
+
+			while (checkKeyword("typecast")) {
+				matchKeyword("typecast");
+				matched = true;
+				evermatched = true;
+				RelativeLocation loc;
+				if (checkChar('#')) {
+					expectChar('#');
+					int offset = expectNonNegative(matchNNInteger());
+					loc = RelativeLocation.createOffset(offset);
+				} else {
+					expectChar('*');
+					int index = expectNonNegative(matchNNInteger());
+					loc = RelativeLocation.createIndex(index);
+				}
+				ATypeElement t = exp.typecasts.vivify(loc);
+				expectChar(':');
+				parseAnnotations(t);
+				parseInnerTypes(t);
+			}
+			while (checkKeyword("instanceof")) {
+				matchKeyword("instanceof");
+				matched = true;
+				evermatched = true;
+				RelativeLocation loc;
+				if (checkChar('#')) {
+					expectChar('#');
+					int offset = expectNonNegative(matchNNInteger());
+					loc = RelativeLocation.createOffset(offset);
+				} else {
+					expectChar('*');
+					int index = expectNonNegative(matchNNInteger());
+					loc = RelativeLocation.createIndex(index);
+				}
+				ATypeElement i = exp.instanceofs.vivify(loc);
+				expectChar(':');
+				parseAnnotations(i);
+				parseInnerTypes(i);
+			}
+			while (checkKeyword("new")) {
+				matchKeyword("new");
+				matched = true;
+				evermatched = true;
+				RelativeLocation loc;
+				if (checkChar('#')) {
+					expectChar('#');
+					int offset = expectNonNegative(matchNNInteger());
+					loc = RelativeLocation.createOffset(offset);
+				} else {
+					expectChar('*');
+					int index = expectNonNegative(matchNNInteger());
+					loc = RelativeLocation.createIndex(index);
+				}
+				ATypeElement n = exp.news.vivify(loc);
+				expectChar(':');
+				parseAnnotations(n);
+				parseInnerTypes(n);
+			}
+		}
+		return evermatched;
     }
 
     private void parseClass() throws IOException, ParseException {
@@ -757,6 +809,8 @@ public final class IndexFileParser {
 
         while (checkKeyword("field"))
             parseField(c);
+        while (checkKeyword("staticinit"))
+        	parseStaticInit(c);
         while (checkKeyword("method"))
             parseMethod(c);
         c.methods.prune();
