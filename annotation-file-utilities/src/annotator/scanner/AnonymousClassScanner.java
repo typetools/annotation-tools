@@ -22,7 +22,6 @@ public class AnonymousClassScanner extends TreePathScanner<Void, Void> {
    * @return the index of the anonymous class in the source code
    */
   public static int indexOfClassTree(TreePath path, Tree anonclass) {
-
     // This seems like too much:  only want to move up to wherever
     // numbering starts. -MDE
     // Move all the way to the top of the source tree in order
@@ -60,9 +59,7 @@ public class AnonymousClassScanner extends TreePathScanner<Void, Void> {
   // CLASSes.  If it is a NEW_CLASS, only count NEW_CLASSes
 
   @Override
-  public   Void visitClass(
-        ClassTree node,
-        Void p) {
+  public Void visitClass(ClassTree node, Void p) {
     if (!found && anonclass.getKind() == Tree.Kind.CLASS) {
       if (anonclass == node) {
         found = true;
@@ -75,9 +72,7 @@ public class AnonymousClassScanner extends TreePathScanner<Void, Void> {
   }
 
   @Override
-  public   Void visitNewClass(
-        NewClassTree node,
-        Void p) {
+  public Void visitNewClass(NewClassTree node, Void p) {
     if (!found && anonclass.getKind() == Tree.Kind.NEW_CLASS) {
       if (anonclass == node) {
         found = true;
@@ -89,5 +84,4 @@ public class AnonymousClassScanner extends TreePathScanner<Void, Void> {
     }
     return super.visitNewClass(node, p);
   }
-
 }

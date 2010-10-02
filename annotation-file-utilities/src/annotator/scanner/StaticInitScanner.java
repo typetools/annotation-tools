@@ -6,17 +6,17 @@ import com.sun.source.util.TreePath;
 
 /**
  * StaticInitScanner scans the source tree and determines the index of a given static
- * initializer block, where the i^th index corresponds to the i^th new, using 0-based
- * indexing.
+ * initializer block, where the i^th index corresponds to the i^th static initializer,
+ * using 0-based indexing.
  */
 public class StaticInitScanner extends CommonScanner {
-	public static int indexOfStaticInitTree(TreePath path, Tree tree) {
+	public static int indexOfStaticInitTree(TreePath path) {
 		// we allow to start with any path/tree within a static initializer.
 		// first go to the enclosing static initializer
-	    tree = findEnclosingStaticInit(path).getLeaf();
+	    Tree tree = findEnclosingStaticInit(path).getLeaf();
 	    // find the enclosing class
 		path = findEnclosingClass(path);
-	    if (path == null) {
+	    if (tree==null || path == null) {
 	      return -1;
 	    }
 	    // find the index of the current static initializer within the enclosing class
