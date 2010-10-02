@@ -1,9 +1,6 @@
 package annotator.find;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import annotations.el.LocalLocation;
 import annotator.scanner.LocalVariableScanner;
@@ -14,6 +11,9 @@ import com.sun.source.tree.VariableTree;
 import com.sun.source.util.TreePath;
 import com.sun.tools.javac.util.Pair;
 
+/**
+ * Criterion for being a specific local variable.
+ */
 public class LocalVariableCriterion implements Criterion {
 
   private String fullMethodName;
@@ -37,8 +37,6 @@ public class LocalVariableCriterion implements Criterion {
     if (path == null) {
       return false;
     }
-
-    Tree leaf = path.getLeaf();
 
     TreePath parentPath = path.getParentPath();
     if (parentPath != null) {
@@ -78,7 +76,6 @@ public class LocalVariableCriterion implements Criterion {
 
               // now you need to make sure that this is the
               // thisVariablesOffset'th variable tree in the entire source
-
               int i =
                 LocalVariableScanner.indexOfVarTree(path, parent, potentialVarName);
 
