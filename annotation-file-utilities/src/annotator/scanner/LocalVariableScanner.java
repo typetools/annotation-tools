@@ -28,12 +28,9 @@ public class LocalVariableScanner extends CommonScanner {
    * @return the index of the variable tree with respect to the given
    *  local variable name
    */
-  public static int indexOfVarTree(TreePath path, Tree varTree, String varName) {
-    // only start searching from within this method
-    path = findEnclosingMethod(path);
+  public static int indexOfVarTree(TreePath origpath, Tree varTree, String varName) {
+    TreePath path = findCountingContext(origpath);
     if (path == null) {
-      // Was called on something other than a local variable, so return
-      // -1 to ensure that it doesn't match anything.
       return -1;
     }
 
@@ -48,6 +45,11 @@ public class LocalVariableScanner extends CommonScanner {
     return lvts.index;
   }
 
+  /*
+   * For efficiency, we might want to have methods like the following, specialized for the
+   * three different cases.
+   */
+  /*
 	public static int indexOfVarTreeInStaticInit(TreePath path, Tree tree, String varName) {
 		// only start searching from within this method
 	    path = findEnclosingStaticInit(path);
@@ -59,16 +61,14 @@ public class LocalVariableScanner extends CommonScanner {
 		lvts.scan(path, null);
 		return lvts.index;
 	}
-  
+  */
   
   private int index = -1;
   private boolean done = false;
   private Tree varTree;
   private String varName;
 
-  private LocalVariableScanner(
-        Tree varTree,
-        String varName) {
+  private LocalVariableScanner(Tree varTree, String varName) {
     this.index = -1;
     this.done = false;
     this.varTree = varTree;
@@ -76,7 +76,7 @@ public class LocalVariableScanner extends CommonScanner {
   }
 
   @Override
-  public   Void visitVariable(VariableTree node, Void p) {
+  public Void visitVariable(VariableTree node, Void p) {
     // increment index only if you have not already reached the right node, and
     // if this node declares the same local variable you are searching for
     if (varName.equals(node.getName().toString())) {
@@ -90,21 +90,17 @@ public class LocalVariableScanner extends CommonScanner {
     return p;
   }
 
-
-
   // TODO: refactor class keys to avoid so many uses of generics
 
   // mapping from (method-name, variable-index, start-offset)
   // to variable name
   private static Map<Pair<String, Pair<Integer,Integer>>, String>
-    methodNameIndexMap =
-    new HashMap<Pair<String, Pair<Integer,Integer>>, String>();
+    methodNameIndexMap = new HashMap<Pair<String, Pair<Integer,Integer>>, String>();
 
   // map from method to map from variable name to
   // a list of start offsets
   private static Map<String, Map<String, List<Integer>>>
-    methodNameCounter =
-      new HashMap<String, Map<String,List<Integer>>>();
+    methodNameCounter = new HashMap<String, Map<String,List<Integer>>>();
 
   /**
    * Adds the given variable specified as a pair of method name and
@@ -127,7 +123,7 @@ public class LocalVariableScanner extends CommonScanner {
    *  index and start offset
    * @return the name of the local variable at the specified location
    */
-  public static  String getFromMethodNameIndexMap(Pair<String, Pair<Integer, Integer>> varInfo) {
+  public static String getFromMethodNameIndexMap(Pair<String, Pair<Integer, Integer>> varInfo) {
     return methodNameIndexMap.get(varInfo);
   }
 
@@ -139,19 +135,15 @@ public class LocalVariableScanner extends CommonScanner {
    * @param varName the name of the local variable
    * @param offset the start offset of the local variable
    */
-  public static void addToMethodNameCounter(
-        String methodName,
-        String varName,
+  public static void addToMethodNameCounter(String methodName, String varName,
         Integer offset) {
-     Map<String, List<Integer>> nameOffsetCounter =
-      methodNameCounter.get(methodName);
+    Map<String, List<Integer>> nameOffsetCounter = methodNameCounter.get(methodName);
     if (nameOffsetCounter == null) {
       nameOffsetCounter = new HashMap<String, List<Integer>>();
       methodNameCounter.put(methodName, nameOffsetCounter);
     }
 
-     List<  Integer> listOfOffsets =
-      nameOffsetCounter.get(varName);
+    List<  Integer> listOfOffsets = nameOffsetCounter.get(varName);
     if (listOfOffsets == null) {
       listOfOffsets = new ArrayList<  Integer>();
       nameOffsetCounter.put(varName, listOfOffsets);

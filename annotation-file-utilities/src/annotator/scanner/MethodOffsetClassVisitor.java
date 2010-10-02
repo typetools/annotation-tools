@@ -31,13 +31,8 @@ public class MethodOffsetClassVisitor extends ClassWriter {
   }
 
   @Override
-  public MethodVisitor visitMethod(
-      int access,
-        String name,
-        String desc,
-        String signature,
-        String[  ] exceptions)
-  {
+  public MethodVisitor visitMethod(int access, String name,
+        String desc, String signature, String[  ] exceptions) {
     methodName = name + desc.substring(0, desc.indexOf(")") + 1);
     return new MethodOffsetMethodVisitor(
         super.visitMethod(access, name, desc, signature, exceptions));
@@ -58,13 +53,8 @@ public class MethodOffsetClassVisitor extends ClassWriter {
     }
 
     @Override
-    public void visitLocalVariable(
-          String name,
-          String desc,
-          String signature,
-          Label start,
-          Label end,
-        int index)  {
+    public void visitLocalVariable(String name, String desc,
+          String signature, Label start, Label end, int index)  {
       super.visitLocalVariable(name, desc, signature, start, end, index);
       LocalVariableScanner.addToMethodNameIndexMap(
           Pair.of(methodName, Pair.of(index, start.getOffset())),
@@ -80,8 +70,7 @@ public class MethodOffsetClassVisitor extends ClassWriter {
     }
 
     @Override
-    public void visitTypeInsn(
-        int opcode,  String desc)   {
+    public void visitTypeInsn(int opcode,  String desc)   {
       super.visitTypeInsn(opcode, desc);
       if (opcode == Opcodes.CHECKCAST) {
         CastScanner.addCastToMethod(methodName, lastLabel.getOffset() + 1);
@@ -98,8 +87,7 @@ public class MethodOffsetClassVisitor extends ClassWriter {
     }
 
     @Override
-    public void visitMultiANewArrayInsn(
-          String desc, int dims)  {
+    public void visitMultiANewArrayInsn(String desc, int dims)  {
       super.visitMultiANewArrayInsn(desc, dims);
       NewScanner.addNewToMethod(methodName, lastLabel.getOffset());
     }

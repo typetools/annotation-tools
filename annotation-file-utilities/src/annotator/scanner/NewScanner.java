@@ -28,47 +28,18 @@ public class NewScanner extends CommonScanner {
 	 *            the cast tree to search for
 	 * @return the index of the given cast tree
 	 */
-	public static int indexOfNewTree(TreePath path, Tree tree) {
-		debug("indexOfNewTree: " + path.getLeaf());
-		// only start searching from within this method
-	    path = findEnclosingMethod(path);
-	    if (path == null) {
-	      // Was called on something other than a local variable, so return
-	      // -1 to ensure that it doesn't match anything.
-	      return -1;
-	    }
+	public static int indexOfNewTree(TreePath origpath, Tree tree) {
+		debug("indexOfNewTree: " + origpath.getLeaf());
 
-	    NewScanner lvts = new NewScanner(tree);
-		lvts.scan(path, null);
-		return lvts.index;
-	}
-	
-	public static int indexOfNewTreeInFieldInit(TreePath path, Tree tree) {
-		debug("indexOfNewTreeInFieldInit: " + path.getLeaf());
-		// only start searching from within this field initializer
-	    path = findEnclosingFieldInit(path);
-	    if (path == null) {
-	      return -1;
-	    }
-
+		TreePath path = findCountingContext(origpath);
+		if (path == null) {
+			return -1;
+		}
+		
 		NewScanner lvts = new NewScanner(tree);
 		lvts.scan(path, null);
 		return lvts.index;
 	}
-
-	public static int indexOfNewTreeInStaticInit(TreePath path, Tree tree) {
-		debug("indexOfNewTreeInStaticInit: " + path.getLeaf());
-		// only start searching from within this method
-	    path = findEnclosingStaticInit(path);
-	    if (path == null) {
-	      return -1;
-	    }
-
-	    NewScanner lvts = new NewScanner(tree);
-		lvts.scan(path, null);
-		return lvts.index;
-	}
-
 	
 	private int index = -1;
 	private boolean done = false;
@@ -108,7 +79,8 @@ public class NewScanner extends CommonScanner {
 		}
 	}
 
-	private static Map<String, List<Integer>> methodNameToNewOffsets = new HashMap<String, List<Integer>>();
+	private static Map<String, List<Integer>> methodNameToNewOffsets =
+		new HashMap<String, List<Integer>>();
 
 	public static void addNewToMethod(String methodName, Integer offset) {
 		debug("adding new to method: " + methodName + " offset: " + offset);
