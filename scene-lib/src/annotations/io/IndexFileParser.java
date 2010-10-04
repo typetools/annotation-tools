@@ -608,12 +608,10 @@ public final class IndexFileParser {
 		expectKeyword("staticinit");
 		expectChar('*');
 		int blockIndex = expectNonNegative(matchNNInteger());
-		// AElement block = c.staticinits.vivify(blockIndex);
-
 		expectChar(':');
 
-        AExpression staticinit = c.staticInits.vivify(blockIndex);
-        parseExpression(staticinit);
+        ABlock staticinit = c.staticInits.vivify(blockIndex);
+        parseBlock(staticinit);
 	}
 
     private void parseMethod(AClass c) throws IOException,
