@@ -1,5 +1,7 @@
 package annotations.el;
 
+import checkers.javari.quals.ReadOnly;
+
 import java.util.Map;
 
 import annotations.util.coll.VivifyingMap;
@@ -39,7 +41,7 @@ public class AExpression extends AElement {
             ((/*@ReadOnly*/ AExpression) o).equalsExpression(this);
     }
     
-	protected boolean equalsExpression(/*@ReadOnly */ AExpression o) /*@ReadOnly */{
+	protected boolean equalsExpression(/*@ReadOnly*/ AExpression o) /*@ReadOnly */{
 		return typecasts.equals(o.typecasts)
 				&& instanceofs.equals(o.instanceofs)
 				&& news.equals(o.news);
