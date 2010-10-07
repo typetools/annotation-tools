@@ -26,7 +26,7 @@ public final /*@ReadOnly*/ class AnnotationDef extends AElement {
 
     /**
      * The fully qualified name of the annotation type, such as
-     * "foo.Bar$Baz".
+     * "foo.Bar.Baz" for inner class Baz in class Bar in package foo.
      */
     public final String name;
 
