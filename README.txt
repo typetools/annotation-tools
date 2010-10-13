@@ -27,8 +27,9 @@ Most of the changes are delimited by
 //jaime
 // end jaime
 
-asmx was branched off of asm 2.2.2, available here:
+asmx was branched off of asm 2.2.2, available at either of these locations:
   http://forge.objectweb.org/project/download.php?group_id=23&file_id=5769
+  http://download.forge.objectweb.org/asm/asm-2.2.2.tar.gz
 To see the changes, diff the current source files against the 2.2.2
 files.
 
