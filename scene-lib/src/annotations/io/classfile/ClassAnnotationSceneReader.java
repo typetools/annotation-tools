@@ -932,7 +932,7 @@ extends EmptyVisitor {
 
     public NestedAnnotationSceneReader(AnnotationSceneReader parent,
         String name, String desc) {
-      super(name, parent.visible, parent.aElement);
+      super(desc, parent.visible, parent.aElement);
       if (trace) { System.out.printf("NestedAnnotationSceneReader(%s, %s, %s)%n", parent, name, desc); }
       this.parent = parent;
       this.name = name;
