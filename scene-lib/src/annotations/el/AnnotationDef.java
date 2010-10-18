@@ -25,8 +25,8 @@ import annotations.Annotations;
 public final /*@ReadOnly*/ class AnnotationDef extends AElement {
 
     /**
-     * The fully qualified name of the annotation type, such as
-     * "foo.Bar$Baz".
+     * The binary name of the annotation type, such as
+     * "foo.Bar$Baz" for inner class Baz in class Bar in package foo.
      */
     public final String name;
 
@@ -53,7 +53,7 @@ public final /*@ReadOnly*/ class AnnotationDef extends AElement {
      * If not found, read from a class and insert in adefs.
      */
     public static AnnotationDef fromClass(Class<? extends java.lang.annotation.Annotation> annoType, Map<String,AnnotationDef> adefs) {
-        String name = annoType.getCanonicalName();
+        String name = annoType.getName();
         assert name != null;
 
         if (adefs.containsKey(name)) {
