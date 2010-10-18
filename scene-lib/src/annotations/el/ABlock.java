@@ -1,5 +1,7 @@
 package annotations.el;
 
+import checkers.javari.quals.ReadOnly;
+
 import java.util.Map;
 
 import annotations.util.coll.VivifyingMap;

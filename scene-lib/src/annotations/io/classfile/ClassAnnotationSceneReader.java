@@ -153,6 +153,10 @@ extends EmptyVisitor {
   /// Inner classes
   ///
 
+  // Hackish workaround for odd subclassing.
+  @SuppressWarnings("signature")
+  String dummyDesc = "dummy";
+
   /*
    * Most of the complexity behind reading annotations from a class file into
    * a scene is in AnnotationSceneReader, which fully implements the
@@ -205,15 +209,15 @@ extends EmptyVisitor {
     private List<Integer> xBoundIndexArgs;
     private List<Integer> xTypeIndexArgs;
 
-    private AnnotationDef getAnnotationDef(Object o) {
-      if (o instanceof AnnotationDef) {
-        return (AnnotationDef) o;
-      } else if (o instanceof String) {
-        return getAnnotationDef((String) o);
-      } else {
-        throw new Error(String.format("bad type %s : %s", o.getClass(), o));
-      }
-    }
+    // private AnnotationDef getAnnotationDef(Object o) {
+    //   if (o instanceof AnnotationDef) {
+    //     return (AnnotationDef) o;
+    //   } else if (o instanceof String) {
+    //     return getAnnotationDef((String) o);
+    //   } else {
+    //     throw new Error(String.format("bad type %s : %s", o.getClass(), o));
+    //   }
+    // }
 
     @SuppressWarnings("unchecked")
     private AnnotationDef getAnnotationDef(String jvmlClassName) {
@@ -240,13 +244,13 @@ extends EmptyVisitor {
      * Constructs a new AnnotationScene reader with the given description and
      * visibility.  Calling visitEnd() will ensure that this writes out the
      * annotation it visits into aElement.
-     * @param desc JVML format for the field being read
+     * @param desc JVML format for the field being read, or ClassAnnotationSceneReader.dummyDesc
      */
-    public AnnotationSceneReader(Object desc, boolean visible, AElement aElement) {
+    public AnnotationSceneReader(String desc, boolean visible, AElement aElement) {
       if (trace) { System.out.printf("AnnotationSceneReader(%s, %s, %s)%n", desc, visible, aElement); }
       this.visible = visible;
       this.aElement = aElement;
-      if (desc != "dummy") {    // interned
+      if (desc != dummyDesc) {    // interned
         AnnotationDef ad = getAnnotationDef(desc);
 
         AnnotationBuilder ab = AnnotationFactory.saf.beginAnnotation(ad);
@@ -928,7 +932,7 @@ extends EmptyVisitor {
 
     public NestedAnnotationSceneReader(AnnotationSceneReader parent,
         String name, String desc) {
-      super(name, parent.visible, parent.aElement);
+      super(desc, parent.visible, parent.aElement);
       if (trace) { System.out.printf("NestedAnnotationSceneReader(%s, %s, %s)%n", parent, name, desc); }
       this.parent = parent;
       this.name = name;
@@ -959,7 +963,8 @@ extends EmptyVisitor {
   // An AnnotationSceneReader reads an annotation.  An
   // ArrayAnnotationSceneReader reads an arbitrary array field, but not an
   // entire annotation.  So why is ArrayAnnotationSceneReader a subclass of
-  // AnnotationSceneReader?  Pass "dummy" in the superclass constructor to
+  // AnnotationSceneReader?  Pass ClassAnnotationSceneReader.dummyDesc
+  // in the superclass constructor to
   // disable superclass behaviors that would otherwise cause trouble.
   private class ArrayAnnotationSceneReader extends AnnotationSceneReader {
     private AnnotationSceneReader parent;
@@ -973,7 +978,7 @@ extends EmptyVisitor {
         AnnotationSceneReader parent,
         String fieldName,
         AnnotationFieldType eltType) {
-      super("dummy", parent.visible, parent.aElement);
+      super(dummyDesc, parent.visible, parent.aElement);
       if (trace) { System.out.printf("ArrayAnnotationSceneReader(%s, %s)%n", parent, fieldName); }
       this.parent = parent;
       this.arrayName = fieldName;

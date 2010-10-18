@@ -148,7 +148,7 @@ annotation index file''), but this is not required.
 \subsection{Grammar conventions}
 
 Throughout this document, ``name'' is any valid Java simple name or 
-fully qualified name, ``type'' is any valid type, and ``value'' is any
+binary name, ``type'' is any valid type, and ``value'' is any
 valid Java constant, and quoted strings are literal values.
 %
 The Kleene qualifiers ``*'' (zero or more), ``?'' (zero or one), and ``+''
@@ -267,11 +267,6 @@ inner class or the outer class.)
 % as an annotation it may always use the simple name (even if there's another
 % annotation with the same simple name in another package)? - MP 06/28
 
-% Currently the original examples do not have fully qualified names, Matt M.'s
-% example does, and Matt M.'s parser requires fully qualified names.  Matt M.
-% wants the specification to always require fully qualified names.  Matt P. says
-% we'll make a final decision and reconcile the examples later. -- Matt M. 7/5
-
 % TODO: some descriptions talk about single annotatitions, whereas the grammar allows multiple.
 % TODO: the reference to the "type" line is also confusing, as it's in a separate production.
 % TODO: the method signatures are erased, which is unique, but maybe confusing?
@@ -281,7 +276,8 @@ inner class or the outer class.)
 \bnfnt{annotation} ::= \\
 \qquad    \bnfcmt The name may be the annotation's simple name, unless the file \\
 \qquad    \bnfcmt contains definitions for two annotations with the same simple name. \\
-\qquad    \bnfcmt In this case, the fully-qualified annotation name is required. \\
+\qquad    \bnfcmt In this case, the binary name of the annotation name is required \\
+\qquad    \bnfcmt (like the fully-qualified name, but with \$ for inner classes)s. \\
 \qquad    \bnflit{@}\bnfnt{name} [ \bnflit{(} \bnfnt{annotation-field} [ \bnflit{,} \bnfnt{annotation-field} ]+ \bnflit{)} ] \\
 \\
 \bnfnt{annotation-field} ::= \\
@@ -567,9 +563,9 @@ These \textbf{types} are represented in an annotation file as follows:
 \item String: \code{String}.
 \item Class token: \code{Class}; the parameterization, if any, is not
 represented in annotation files.
-\item Enumeration constant: \code{enum} followed by the fully qualified name of
+\item Enumeration constant: \code{enum} followed by the binary name of
 the enumeration class, such as \code{enum java.lang.Thread\$State}.
-% TODO: \item Annotations: \bnflit{@} followed by the annotation name.
+\item Annotation: \code{@} followed by the binary name of the annotation type.
 \item Array: The representation of the element type followed by \code{[]}, such
 as \code{String[]}, with one exception: an annotation definition may specify
 a field type as \code{unknown[]} if, in all occurrences of that annotation in
@@ -592,7 +588,7 @@ code.
 as \code{'A'} or \code{'\char`\\''}.
 \item String: A string literal as it would appear in source code, such as
 \code{"\char`\\"Yields falsehood when quined\char`\\" yields falsehood when quined."}.
-\item Class token: The fully qualified name of the class (using \code{\$} for
+\item Class token: The binary name of the class (using \code{\$} for
 inner classes) or the name of the primitive type or \code{void}, possibly
 followed by \code{[]}s representing array layers, followed by \code{.class}.
 Examples: \code{java.lang.Integer[].class}, \code{java.util.Map\$Entry.class},
