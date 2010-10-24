@@ -76,7 +76,7 @@ public final /*@ReadOnly*/ class AnnotationDef extends AElement {
             jannos = annoType.getDeclaredAnnotations();
         } catch (Exception e) {
             printClasspath();
-            throw new Error("Exception in getDeclaredAnnotations for " + annoType, e);
+            throw new Error("Exception in anno.getDeclaredAnnotations() for anno = " + annoType, e);
         }
         for (java.lang.annotation.Annotation ja : jannos) {
             result.tlAnnotationsHere.add(new Annotation(ja, adefs));
@@ -265,7 +265,12 @@ public final /*@ReadOnly*/ class AnnotationDef extends AElement {
         StringTokenizer tokenizer =
             new StringTokenizer(System.getProperty("java.class.path"), File.pathSeparator);
         while (tokenizer.hasMoreTokens()) {
-            System.out.println("  " + tokenizer.nextToken());
+            String cpelt = tokenizer.nextToken();
+            boolean exists = new File(cpelt).exists();
+            if (! exists) {
+                System.out.print(" non-existent:");
+            }
+            System.out.println("  " + cpelt);
         }
     }
 
