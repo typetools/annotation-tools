@@ -8,6 +8,6 @@ class InnerClassSimple$ActualInnerClass: @java.lang.ReadOnly
     field d:
         type: @java.lang.ReadOnly
 
-package annotator.tests.InnerClassSimple:
-class ActualInnerClass: @java.lang.DoesNotExist
+package annotator.tests:
+class InnerClassSimple$ActualInnerClass: @java.lang.DoesNotExist
 
