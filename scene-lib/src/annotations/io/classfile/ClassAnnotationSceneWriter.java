@@ -347,7 +347,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
           continue;
       }
       if (value instanceof Annotation) {
-        AnnotationVisitor nav = av.visitAnnotation(fieldName, a.def().name);
+        AnnotationVisitor nav = av.visitAnnotation(fieldName, classDescToName(a.def().name));
         visitFields(nav, (Annotation) a);
         nav.visitEnd();
       } else if (value instanceof List) {
