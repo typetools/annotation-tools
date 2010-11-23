@@ -16,6 +16,8 @@ import javax.lang.model.element.Modifier;
 
 import com.google.common.collect.*;
 
+import plume.Pair;
+
 /**
  * A {@code TreeScanner} that is able to locate program elements in an
  * AST based on {@code Criteria}. {@link #getPositions(Tree,List)}
@@ -200,8 +202,40 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       return i;
     }
 
+    static Map<Pair<CompilationUnitTree,Tree>,TreePath> getPathCache1 = new HashMap<Pair<CompilationUnitTree,Tree>,TreePath>();
+    
+    /**
+     * An alternative to TreePath.getPath(CompilationUnitTree,Tree) that
+     * caches its results.
+     */
+    public static TreePath getPath(CompilationUnitTree unit, Tree target) {
+      Pair<CompilationUnitTree,Tree> args = Pair.of(unit, target);
+      if (getPathCache1.containsKey(args)) {
+        return getPathCache1.get(args);
+      }
+      TreePath result = TreePath.getPath(unit, target);
+      getPathCache1.put(args, result);
+      return result;
+    }
+
+    static Map<Pair<TreePath,Tree>,TreePath> getPathCache2 = new HashMap<Pair<TreePath,Tree>,TreePath>();
+    
+    /**
+     * An alternative to TreePath.getPath(TreePath,Tree) that
+     * caches its results.
+     */
+    public static TreePath getPath(TreePath path, Tree target) {
+      Pair<TreePath,Tree> args = Pair.of(path, target);
+      if (getPathCache2.containsKey(args)) {
+        return getPathCache2.get(args);
+      }
+      TreePath result = TreePath.getPath(path, target);
+      getPathCache2.put(args, result);
+      return result;
+    }
+
     private Tree parent(Tree node) {
-      return TreePath.getPath(tree, node).getParentPath().getLeaf();
+      return getPath(tree, node).getParentPath().getLeaf();
     }
 
     @Override
@@ -325,7 +359,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     }
 
     public ArrayTypeTree largestContainingArray(Tree node) {
-      TreePath p = TreePath.getPath(tree, node);
+      TreePath p = getPath(tree, node);
       Tree result = TreeFinder.largestContainingArray(p).getLeaf();
       assert result.getKind() == Tree.Kind.ARRAY_TYPE;
       return (ArrayTypeTree) result;
