@@ -18,7 +18,8 @@ import com.google.common.collect.*;
 
 /**
  * A {@code TreeScanner} that is able to locate program elements in an
- * AST based on {@code Criteria}. It is used to scan a tree and return a
+ * AST based on {@code Criteria}. {@link #getPositions(Tree,List)}
+ * scans a tree and returns a
  * mapping of source positions (as character offsets) to insertion text.
  */
 public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
@@ -106,7 +107,8 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       return leftmostIdentifier(type).pos;
     }
 
-    // When a method is visited, it is visited for the receiver, not the return value and not the declaration itself.
+    // When a method is visited, it is visited for the receiver, not the
+    // return value and not the declaration itself.
     @Override
     public Integer visitMethod(MethodTree node, Void p) {
       super.visitMethod(node, p);
@@ -508,9 +510,6 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
   private DeclarationPositionFinder dpf;
   private CompilationUnitTree tree;
   private SetMultimap<Integer, Insertion> positions;
-  // Set of insertions that got added; any insertion not in this set could
-  // not be added.
-  private Set<Insertion> satisfied;
 
   /**
    * Creates a {@code TreeFinder} from a source tree.
@@ -523,7 +522,6 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     this.tpf = new TypePositionFinder(tree);
     this.dpf = new DeclarationPositionFinder(tree);
     this.paths = new HashMap<Tree, TreePath>();
-    this.satisfied = new HashSet<Insertion>();
   }
 
   boolean handled(Tree node) {
@@ -572,9 +570,8 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       }
     }
 
-    for (Insertion i : p) {
-      if (satisfied.contains(i))
-        continue;
+    for (Iterator<Insertion> it = p.iterator(); it.hasNext(); ) {
+      Insertion i = it.next();
 
       if (debug) {
         debug("Considering insertion at tree:");
@@ -591,7 +588,6 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
 
       // Question:  is this particular annotation already present at this location?
       // If so, we don't want to insert a duplicate.
-      if (path != null) {
       ModifiersTree mt = null;
       if (path != null) {
         for (Tree n : path) {
@@ -611,11 +607,11 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       // printPath(path);
       if (mt != null) {
         for (AnnotationTree at : mt.getAnnotations()) {
-          // we compare our to be inserted annotation to the existing annotation, ignoring its
-          // arguments (duplicate annotations are never allowed even if they differ in arguments);
-          // this allows us to skirt around the additional complication that if we did have to
-          // compare our arguments, we'd have to deal with enum arguments potentially being fully
-          // qualified or not:
+          // Compare the to-be-inserted annotation to the existing
+          // annotation, ignoring its arguments (duplicate annotations are
+          // never allowed even if they differ in arguments).  If we did
+          // have to compare our arguments, we'd have to deal with enum
+          // arguments potentially being fully qualified or not:
           // @Retention(java.lang.annotation.RetentionPolicy.CLASS) vs
           // @Retention(RetentionPolicy.CLASS)
           String ann = at.getAnnotationType().toString();
@@ -623,11 +619,10 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
           String iannNoPackage = Main.removePackage(iann).b;
           // System.out.printf("Comparing: %s %s %s%n", ann, iann, iannNoPackage);
           if (ann.equals(iann) || ann.equals(iannNoPackage)) {
-            satisfied.add(i);
+            it.remove();
             return super.scan(node, p);
           }
         }
-      }
       }
 
       // If this is a method, then it might have been selected because of
@@ -671,7 +666,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
         positions.put(pos, i);
       }
 
-      satisfied.add(i);
+      it.remove();
     }
 
     return super.scan(node, p);
@@ -679,7 +674,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
 
   /**
    * Scans the given tree with the given insertion list and returns the
-   * source position to insertion text mapping.  The positions are sorted
+   * mapping from source position to insertion text.  The positions are sorted
    * in decreasing order of index, so that inserting one doesn't throw
    * off the index for a subsequent one.
    *
@@ -692,15 +687,14 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
    * @return the source position to insertion text mapping
    */
   public SetMultimap<Integer, Insertion> getPositions(Tree node, List<Insertion> p) {
-    this.scan(node, p);
+    List<Insertion> uninserted = new LinkedList<Insertion>(p);
+    this.scan(node, uninserted);
     // This needs to be optional, because there may be many extra
     // annotations in a .jaif file.
     if (debug) {
       // Output every insertion that was not given a position:
-      for (Insertion i : p) {
-        if (!satisfied.contains(i) ) { // TODO: && options.hasOption("x")) {
-          System.err.println("Unable to insert: " + i);
-        }
+      for (Insertion i : uninserted) {
+        System.err.println("Unable to insert: " + i);
       }
     }
     return Multimaps.unmodifiableSetMultimap(positions);
