@@ -19,7 +19,11 @@ import com.google.common.collect.*;
 
 /**
  * This is the main class for the annotator, which inserts annotations in
- * Java source code.  It takes as input
+ * Java source code.  You can call it as <tt>java annotator.Main</tt> or by
+ * using the shell script <tt>insert-annotations-to-source</tt>.
+ * <p>
+ *
+ * It takes as input
  * <ul>
  *   <li>annotation (index) files, which indicate the annotations to insert</li>
  *   <li>Java source files, into which the annotator inserts annotations</li>
@@ -224,6 +228,9 @@ public class Main {
         // fileLineSep is set here so that exceptions can be caught
         fileLineSep = UtilMDE.inferLineSeparator(javafilename);
         src = new Source(javafilename);
+        if (verbose) {
+          System.out.printf("Parsed %s%n", javafilename);
+        }
       } catch (CompilerException e) {
         e.printStackTrace();
         return;
@@ -231,6 +238,8 @@ public class Main {
         e.printStackTrace();
         return;
       }
+
+      int num_insertions = 0;
 
       for (CompilationUnitTree tree : src.parse()) {
 
@@ -242,8 +251,8 @@ public class Main {
         SetMultimap<Integer, Insertion> positions = finder.getPositions(tree, insertions);
 
         // Apply the positions to the source file.
-        if (debug) {
-          System.err.printf("%d positions in tree for %s%n", positions.size(), javafilename);
+        if (debug || verbose) {
+          System.err.printf("getPositions returned %d positions in tree for %s%n", positions.size(), javafilename);
         }
 
         Set<Integer> positionKeysUnsorted = positions.keySet();
@@ -322,10 +331,22 @@ public class Main {
               toInsert = toInsert + " ";
             }
             src.insert(pos, toInsert);
+            if (verbose) {
+              System.out.print(".");
+              num_insertions++;
+              if ((num_insertions % 50) == 0) {
+                System.out.println();   // terminate the line that contains dots
+              }
+            }
             if (debug) {
               System.out.println("Post-insertion source: " + src.getString());
             }
           }
+        }
+      }
+      if (verbose) {
+        if ((num_insertions % 50) != 0) {
+          System.out.println();   // terminate the line that contains dots
         }
       }
 
