@@ -10,12 +10,16 @@ import com.sun.source.tree.NewClassTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
 
+import plume.Pair;
+
 /**
  * NewScanner scans the source tree and determines the index of a given new,
  * where the i^th index corresponds to the i^th new, using 0-based indexing.
  */
 public class NewScanner extends CommonScanner {
 	private static boolean debug = false;
+
+	static Map<Pair<TreePath,Tree>, Integer> cache = new HashMap<Pair<TreePath,Tree>, Integer>();
 
 	/**
 	 * Computes the index of the given new tree amongst all new trees inside its
@@ -31,6 +35,11 @@ public class NewScanner extends CommonScanner {
 	public static int indexOfNewTree(TreePath origpath, Tree tree) {
 		debug("indexOfNewTree: " + origpath.getLeaf());
 
+		Pair<TreePath,Tree> args = Pair.of(origpath, tree);
+		if (cache.containsKey(args)) {
+			return cache.get(args);
+		}
+
 		TreePath path = findCountingContext(origpath);
 		if (path == null) {
 			return -1;
@@ -38,6 +47,7 @@ public class NewScanner extends CommonScanner {
 		
 		NewScanner lvts = new NewScanner(tree);
 		lvts.scan(path, null);
+		cache.put(args, lvts.index);
 		return lvts.index;
 	}
 	
