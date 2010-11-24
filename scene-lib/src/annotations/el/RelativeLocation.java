@@ -8,7 +8,7 @@ import annotations.util.*;
 /**
  * A {@link RelativeLocation} holds location information for a
  * instanceof, cast, or new: either the bytecode offset or the source code index.
- * I call instanceof, cast, or new the construct.
+ * I call instanceof, cast, or new "the construct".
  */
 public final /*@ReadOnly*/ class RelativeLocation {
     /**
