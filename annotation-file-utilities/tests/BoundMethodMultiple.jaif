@@ -26,13 +26,13 @@ class BoundMethodMultiple:
           type: @java.lang.A
 
     method foo(Lannotator/tests/Date;)V:
-        bound ,0 &0: @java.lang.B
+        bound 0 &0: @java.lang.B
 
     method foo(Ljava/util/List;)V:
-        bound ,0 &0: @java.lang.C
-        bound ,0 &1: @java.lang.D
+        bound 0 &0: @java.lang.C
+        bound 0 &1: @java.lang.D
 
     method foo(Lannotator/tests/Date;Ljava/util/Map;)V:
-        bound ,0 &0: @java.lang.E
-        bound ,1 &0: @java.lang.F
+        bound 0 &0: @java.lang.E
+        bound 1 &0: @java.lang.F
 

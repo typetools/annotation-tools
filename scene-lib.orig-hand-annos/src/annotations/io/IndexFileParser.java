@@ -478,7 +478,7 @@ public final class IndexFileParser<A extends Annotation> {
             BoundLocation, /*@NonNull*/ ATypeElement<A>> bounds)
         throws IOException, ParseException {
         while (matchKeyword("bound")) {
-            expectChar(',');
+            // expectChar(',');
             int paramIndex = expectNN(matchNNInteger());
             expectChar('&');
             int boundIndex = expectNN(matchNNInteger());

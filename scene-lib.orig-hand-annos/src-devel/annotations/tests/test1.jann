@@ -16,8 +16,8 @@ annotation invisible @E:
 
 package p1:
 class Foo: @p2.A(value=12)
-    bound ,0 &1: @p2.B
-    bound ,1 &0: @p2.C
+    bound 0 &1: @p2.B
+    bound 1 &0: @p2.C
         inner-type 1, 2, 3: @p2.B
 
     field bar:
@@ -26,7 +26,7 @@ class Foo: @p2.A(value=12)
         inner-type 0: @p2.C
 
     method <init>(Ljava/util/Set;)V: @p2.B
-        bound ,2 &0: @p2.C
+        bound 2 &0: @p2.C
             inner-type 0: @p2.B
         parameter #0: @p2.B
             inner-type 0: @p2.C
