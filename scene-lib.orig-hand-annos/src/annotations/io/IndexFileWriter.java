@@ -167,7 +167,7 @@ public final class IndexFileWriter<A extends Annotation> {
             /*@NonNull*/ BoundLocation bl = be.getKey();
             /*@NonNull*/ /*@ReadOnly*/ ATypeElement<A> b = be.getValue();
             printElementAndInnerTypes(indentation,
-                    "bound ," + bl.paramIndex + " &" + bl.boundIndex, b);
+                    "bound " + bl.paramIndex + " &" + bl.boundIndex, b);
         }
     }
 
