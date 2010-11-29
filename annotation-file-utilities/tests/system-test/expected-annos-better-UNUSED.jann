@@ -90,7 +90,7 @@ annotation invisible @C0F:
 
 package annotations.tests:
 class AnnotationTest: @annotations.tests.AClass @annotations.tests.CClass
-    bound ,0 &0: @annotations.tests.A10 @annotations.tests.C10
+    bound 0 &0: @annotations.tests.A10 @annotations.tests.C10
         inner-type 0: @annotations.tests.A11 @annotations.tests.C11
 
     field field: @annotations.tests.A0E @annotations.tests.C0E
@@ -101,7 +101,7 @@ class AnnotationTest: @annotations.tests.AClass @annotations.tests.CClass
     method doSomething(Ljava/util/Set;)Ljava/util/HashSet;:
         return: @annotations.tests.A0A @annotations.tests.C0A
             inner-type 0: @annotations.tests.A0B @annotations.tests.C0B
-        bound ,0 &0: @annotations.tests.A12 @annotations.tests.C12
+        bound 0 &0: @annotations.tests.A12 @annotations.tests.C12
             inner-type 0: @annotations.tests.A13 @annotations.tests.C13
         parameter #0: @annotations.tests.A0C @annotations.tests.C0C
             inner-type 0: @annotations.tests.A0D @annotations.tests.C0D

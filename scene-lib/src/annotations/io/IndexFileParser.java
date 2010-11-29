@@ -572,7 +572,7 @@ public final class IndexFileParser {
     private void parseBounds(VivifyingMap<BoundLocation, ATypeElement> bounds)
         throws IOException, ParseException {
         while (matchKeyword("bound")) {
-            expectChar(',');
+            // expectChar(',');
             int paramIndex = expectNonNegative(matchNNInteger());
             expectChar('&');
             int boundIndex = expectNonNegative(matchNNInteger());
