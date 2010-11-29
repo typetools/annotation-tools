@@ -3,7 +3,7 @@ annotation @ReadOnly: @Retention(value=RUNTIME) @java.lang.annotation.Target(val
 
 package annotator.tests:
 class BoundClassSimple:
-    bound ,0 & 0: @java.lang.ReadOnly
+    bound 0 & 0: @java.lang.ReadOnly
 
     field field:
     field misleadingField: 
