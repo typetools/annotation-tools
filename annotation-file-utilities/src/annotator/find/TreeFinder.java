@@ -620,27 +620,45 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
         debug("  ... satisfied!");
       }
 
-      // Question:  is this particular annotation already present at this location?
-      // If so, we don't want to insert a duplicate.
-      ModifiersTree mt = null;
+      // Don't insert a duplicate if this particular annotation is already
+      // present at this location.
+      List<? extends AnnotationTree> alreadyPresent = null;
       if (path != null) {
         for (Tree n : path) {
           if (n instanceof ClassTree) {
-            mt = ((ClassTree) n).getModifiers();
+            alreadyPresent = ((ClassTree) n).getModifiers().getAnnotations();
             break;
           } else if (n instanceof MethodTree) {
-            mt = ((MethodTree) n).getModifiers();
+            alreadyPresent = ((MethodTree) n).getModifiers().getAnnotations();
             break;
           } else if (n instanceof VariableTree) {
-            mt = ((VariableTree) n).getModifiers();
+            alreadyPresent = ((VariableTree) n).getModifiers().getAnnotations();
+            break;
+          } else if (n instanceof TypeCastTree) {
+            Tree type = ((TypeCastTree) n).getType();
+            if (type instanceof AnnotatedTypeTree) {
+              alreadyPresent = ((AnnotatedTypeTree) type).getAnnotations();
+            }
+            break;
+          } else if (n instanceof InstanceOfTree) {
+            Tree type = ((InstanceOfTree) n).getType();
+            if (type instanceof AnnotatedTypeTree) {
+              alreadyPresent = ((AnnotatedTypeTree) type).getAnnotations();
+            }
+            break;
+          } else if (n instanceof NewClassTree) {
+            JCNewClass nc = (JCNewClass) n;
+            if (nc.clazz instanceof AnnotatedTypeTree) {
+              alreadyPresent = ((AnnotatedTypeTree) nc.clazz).getAnnotations();
+            }
             break;
           }
         }
       }
-      // System.out.printf("mt = %s for %s%n", mt, node.getKind());
+      // System.out.printf("alreadyPresent = %s for %s%n", alreadyPresent, node.getKind());
       // printPath(path);
-      if (mt != null) {
-        for (AnnotationTree at : mt.getAnnotations()) {
+      if (alreadyPresent != null) {
+        for (AnnotationTree at : alreadyPresent) {
           // Compare the to-be-inserted annotation to the existing
           // annotation, ignoring its arguments (duplicate annotations are
           // never allowed even if they differ in arguments).  If we did
@@ -653,6 +671,9 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
           String iannNoPackage = Main.removePackage(iann).b;
           // System.out.printf("Comparing: %s %s %s%n", ann, iann, iannNoPackage);
           if (ann.equals(iann) || ann.equals(iannNoPackage)) {
+            if (debug) {
+              System.out.printf("Already present, not reinserting: %s%n", ann);
+            }
             it.remove();
             return super.scan(node, p);
           }
@@ -730,6 +751,9 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       for (Insertion i : uninserted) {
         System.err.println("Unable to insert: " + i);
       }
+    }
+    if (debug) {
+      System.out.printf("getPositions => %d positions%n", positions.size());
     }
     return Multimaps.unmodifiableSetMultimap(positions);
   }
