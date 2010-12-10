@@ -362,18 +362,21 @@ of the \\ \qquad    \bnfcmt annotation:   ``\texttt{@A(12)}'' rather than ``\tex
 \\
 \bnfnt{typecast-definition} ::= \\
 \qquad    \bnfcmt The integer is the offset field of the annotation~\cite{JSR308}. \\
-\qquad    \bnflit{typecast} \bnflit{\#} \bnfnt{integer} \bnflit{:} \bnfnt{annotation}* \lineend \\
+\qquad    \bnflit{typecast} \bnfnt{loc}\bnflit{:} \bnfnt{annotation}* \lineend \\
 \qquad    \bnfnt{type-argument-or-array-definition}* \\
 \\
 \bnfnt{instanceof-definition} ::= \\
 \qquad    \bnfcmt The integer is the offset field of the annotation~\cite{JSR308}. \\
-\qquad    \bnflit{instanceof} \bnflit{\#} \bnfnt{integer} \bnflit{:} \bnfnt{annotation}* \lineend \\
+\qquad    \bnflit{instanceof} \bnfnt{loc}\bnflit{:} \bnfnt{annotation}* \lineend \\
 \qquad    \bnfnt{type-argument-or-array-definition}* \\
 \\
 \bnfnt{new-definition} ::= \\
 \qquad    \bnfcmt The integer is the offset field of the annotation~\cite{JSR308}. \\
-\qquad    \bnflit{new} \bnflit{\#} \bnfnt{integer} \bnflit{:} \bnfnt{annotation}* \lineend  \\
-\qquad    \bnfnt{type-argument-or-array-definition}*
+\qquad    \bnflit{new} \bnfnt{loc}\bnflit{:} \bnfnt{annotation}* \lineend  \\
+\qquad    \bnfnt{type-argument-or-array-definition}* \\
+\bnfnt{loc} ::= \\
+\qquad    \bnfcmt ``\# integer'' is a bytecode offset, and ``* integer'' indicates which occurrence in the source. \\
+\qquad    \bnflit{\#} \bnfnt{integer} $|$ \bnflit{*} \bnfnt{integer}
 \end{tabbing}
 
 
