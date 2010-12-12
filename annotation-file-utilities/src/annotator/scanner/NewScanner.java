@@ -22,9 +22,10 @@ public class NewScanner extends CommonScanner {
 	static Map<Pair<TreePath,Tree>, Integer> cache = new HashMap<Pair<TreePath,Tree>, Integer>();
 
 	/**
-	 * Computes the index of the given new tree amongst all new trees inside its
-	 * method, using 0-based indexing. The tree has to be either a NewClassTree
-	 * or a NewArrayTree.
+	 * Computes the index of the given new tree amongst all new trees
+	 * inside its method, using 0-based indexing. The tree has to be
+	 * either a NewClassTree or a NewArrayTree.  If the tree is not in
+	 * a method, then the index is computed 
 	 * 
 	 * @param path
 	 *            the path ending in the given cast tree
