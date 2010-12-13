@@ -749,10 +749,10 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
             GenericArrayLocationCriterion galc = i.getCriteria().getGenericArrayLocation();
             if (galc != null) {
               arrayLocationInParent = galc.locationInParent;
-              System.out.printf("Set arrayLocationInParent to %s%n", arrayLocationInParent);
+              // System.out.printf("Set arrayLocationInParent to %s%n", arrayLocationInParent);
             } else {
               arrayLocationInParent = null;
-              System.out.printf("No arrayLocationInParent%n");
+              // System.out.printf("No arrayLocationInParent%n");
             }
           }
           // System.out.printf("Calling tpf.scan(%s: %s)%n", node.getClass(), node);
