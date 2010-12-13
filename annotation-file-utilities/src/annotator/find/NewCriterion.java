@@ -35,7 +35,8 @@ public class NewCriterion implements Criterion {
 
     Tree leaf = path.getLeaf();
 
-    if (leaf.getKind() == Tree.Kind.NEW_CLASS) {
+    if (leaf.getKind() == Tree.Kind.NEW_CLASS
+        || leaf.getKind() == Tree.Kind.NEW_ARRAY) {
       int indexInSource = NewScanner.indexOfNewTree(path, leaf);
       boolean b;
       if (loc.isBytecodeOffset()) {
