@@ -60,6 +60,10 @@ compile :
 .PRECIOUS : bin/annotator/tests/%.class
 bin/annotator/tests/%.class: %.java
 	mkdir -p bin
+# For debugging Hudson job
+	which javac
+	$(JAVAC) -version
+# end of Hudson job debugging
 	$(JAVAC) -g -cp bin:../bin -d bin -sourcepath . $*.java
 
 # Actually runs the annotator to create the annotated java file.
