@@ -458,7 +458,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       int dim = ((arrayLocationInParent == null)
                  ? 0
                  : arrayLocationInParent.intValue() + 1);
-      System.out.printf("visitNewArray: dim=%d (arrayLocationInParent=%s)%n", dim, arrayLocationInParent);
+      // System.out.printf("visitNewArray: dim=%d (arrayLocationInParent=%s)%n", dim, arrayLocationInParent);
       if (dim == na.dims.size()) {
         return na.elemtype.getPreferredPosition();
       }
