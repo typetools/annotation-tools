@@ -755,7 +755,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
               System.out.printf("No arrayLocationInParent%n");
             }
           }
-          System.out.printf("Calling tpf.scan(%s: %s)%n", node.getClass(), node);
+          // System.out.printf("Calling tpf.scan(%s: %s)%n", node.getClass(), node);
           pos = tpf.scan(node, null);
           assert handled(node);
           debug("pos = %d at type: %s (%s)%n", pos, node.toString(), node.getClass());
