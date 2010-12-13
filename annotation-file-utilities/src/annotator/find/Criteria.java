@@ -122,6 +122,18 @@ public final class Criteria {
   }
 
   /**
+   * @return a GenericArrayLocationCriterion if this has one, else null
+   */
+  public GenericArrayLocationCriterion getGenericArrayLocation() {
+    for (Criterion c : criteria) {
+      if (c.getKind() == Criterion.Kind.GENERIC_ARRAY_LOCATION) {
+        return (GenericArrayLocationCriterion) c;
+      }
+    }
+    return null;
+  }
+
+  /**
    * {@inheritDoc}
    */
   public String toString() {

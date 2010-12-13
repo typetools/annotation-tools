@@ -20,7 +20,7 @@ public class GenericArrayLocationCriterion implements Criterion {
   // the full location list
   private List<Integer> location;
   // the last element of the location list
-  private Integer locationInParent;
+  public Integer locationInParent;
   // represents all but the last element of the location list
   // TODO: this field is initialized, but never read!
   private Criterion parentCriterion;
@@ -79,17 +79,19 @@ public class GenericArrayLocationCriterion implements Criterion {
       // no inner type location, want to annotate outermost type
       // e.g.,  @Readonly List list;
       //        @Readonly List<String> list;
+      //        String @Readonly [] array;
       Tree leaf = path.getLeaf();
       Tree parent = path.getParentPath().getLeaf();
-      boolean result = ((is_generic_or_array(leaf)
-                         // or, it might be a raw type
-                         || leaf instanceof IdentifierTree
-                         || leaf instanceof MethodTree
-                         // I don't know why a GenericArrayLocationCriterion
-                         // is being created in this case, but it is.
-                         || leaf instanceof PrimitiveTypeTree)
-                        && ! is_generic_or_array(parent));
-      // System.out.printf("locationInParent==null; %s => %s (%s %s)%n", leaf, result, is_generic_or_array(leaf), ! is_generic_or_array(parent));
+      boolean result = ((leaf.getKind() == Tree.Kind.NEW_ARRAY)
+                        || ((is_generic_or_array(leaf)
+                             // or, it might be a raw type
+                             || leaf instanceof IdentifierTree
+                             || leaf instanceof MethodTree
+                             // I don't know why a GenericArrayLocationCriterion
+                             // is being created in this case, but it is.
+                             || leaf instanceof PrimitiveTypeTree)
+                            && ! is_generic_or_array(parent)));
+      // System.out.printf("locationInParent==null; %s (%s); %s (%s) => %s (%s %s)%n", leaf, leaf.getClass(), parent, parent.getClass(), result, is_generic_or_array(leaf), ! is_generic_or_array(parent));
       return result;
     }
 
@@ -99,6 +101,10 @@ public class GenericArrayLocationCriterion implements Criterion {
     while (locationRemaining.size() != 0) {
       // annotating an inner type
       Tree leaf = pathRemaining.getLeaf();
+      if ((leaf.getKind() == Tree.Kind.NEW_ARRAY)
+          && (locationRemaining.size() == 1)) {
+        return true;
+      }
       TreePath parentPath = pathRemaining.getParentPath();
       if (parentPath == null) {
         return false;
@@ -149,7 +155,10 @@ public class GenericArrayLocationCriterion implements Criterion {
         } else {
           return false;
         }
+      } else if (parent.getKind() == Tree.Kind.NEW_ARRAY) {
+        return true;
       } else {
+        // System.out.printf("unrecognized parent kind = %s%n", parent.getKind());
         return false;
       }
     }
@@ -165,7 +174,10 @@ public class GenericArrayLocationCriterion implements Criterion {
 
   private boolean is_generic_or_array(Tree t) {
     return ((t.getKind() == Tree.Kind.PARAMETERIZED_TYPE)
-            || (t.getKind() == Tree.Kind.ARRAY_TYPE));
+            || (t.getKind() == Tree.Kind.ARRAY_TYPE)
+            // Monolithic:  one node for entire "new".  So, handle specially.
+            // || (t.getKind() == Tree.Kind.NEW_ARRAY)
+            );
   }
 
   public Kind getKind() {
