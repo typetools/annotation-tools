@@ -56,9 +56,10 @@ public final /*@ReadOnly*/ class LocalLocation {
      * is statically known to be another nonnull {@link LocalLocation}.
      */
     public boolean equals(LocalLocation l) {
-        return (index == l.index && scopeStart == l.scopeStart
-                && scopeLength == l.scopeLength) ||
-                (varName!=null && varName.equals(l.varName) && varIndex==l.varIndex);
+        return index == l.index && scopeStart == l.scopeStart
+                && scopeLength == l.scopeLength &&
+                (varName==null || varName.equals(l.varName)) &&
+                varIndex==l.varIndex;
     }
 
     /**
