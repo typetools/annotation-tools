@@ -1,0 +1,43 @@
+package GUT.quals:
+annotation @A:
+package GUT.quals:
+annotation @B:
+package GUT.quals:
+annotation @C:
+package GUT.quals:
+annotation @D:
+package GUT.quals:
+annotation @E:
+package GUT.quals:
+annotation @F:
+
+
+package:
+class AnonInner$InnerOne:
+method m1(Ljava/lang/String;)LObject;:
+new *0: @GUT.quals.A
+
+package:
+class AnonInner$InnerOne$1:
+method e1(Ljava/lang/Object;)LObject;:
+return: @GUT.quals.B
+
+package:
+class AnonInner$InnerOne$1:
+method e1(Ljava/lang/Object;)LObject;:
+new *0: @GUT.quals.C
+
+package:
+class AnonInner$InnerOne:
+method m2(Ljava/lang/String;)LObject;:
+new *0: @GUT.quals.D
+
+package:
+class AnonInner$InnerOne$2:
+method e2(Ljava/lang/Object;)LObject;:
+return: @GUT.quals.E
+
+package:
+class AnonInner$InnerOne$2:
+method e2(Ljava/lang/Object;)LObject;:
+new *0: @GUT.quals.F
