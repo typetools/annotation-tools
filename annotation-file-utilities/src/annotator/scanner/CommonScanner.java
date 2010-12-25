@@ -10,9 +10,12 @@ import com.sun.source.util.TreePathScanner;
  */
 public class CommonScanner extends TreePathScanner<Void, Void> {
 
-	// the counting context for new, typecast, instanceof, and locals
+	/**
+	 * The counting context for new, typecast, instanceof, and locals.
+	 * This is a path to a method or a field/static initializer.
+	 */
 	public static TreePath findCountingContext(TreePath path) {
-		while (path != null ) {
+		while (path != null) {
 			if (path.getLeaf().getKind() == Tree.Kind.METHOD ||
 					isFieldInit(path) ||
 					isStaticInit(path)) {
