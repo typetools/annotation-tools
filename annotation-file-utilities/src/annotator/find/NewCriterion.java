@@ -37,7 +37,8 @@ public class NewCriterion implements Criterion {
 
     if (leaf.getKind() == Tree.Kind.NEW_CLASS
         || leaf.getKind() == Tree.Kind.NEW_ARRAY) {
-      int indexInSource = NewScanner.indexOfNewTree(path, leaf);
+      int indexInSource = NewScanner.indexOfNewTree(path, leaf, methodName);
+      // System.out.printf("indexInSource=%d%n", indexInSource);
       boolean b;
       if (loc.isBytecodeOffset()) {
     	  int indexInClass = NewScanner.getMethodNewIndex(methodName, loc.offset);
@@ -56,7 +57,7 @@ public class NewCriterion implements Criterion {
   }
 
   public String toString() {
-    return "NewCriterion: in method: " + methodName + " location: " + loc;
+    return "NewCriterion in method: " + methodName + " at location " + loc;
   }
 
 }

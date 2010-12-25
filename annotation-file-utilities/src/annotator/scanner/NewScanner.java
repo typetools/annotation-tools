@@ -10,6 +10,8 @@ import com.sun.source.tree.NewClassTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
 
+import com.sun.tools.javac.tree.JCTree;
+
 import plume.Pair;
 
 /**
@@ -33,7 +35,7 @@ public class NewScanner extends CommonScanner {
 	 *            the cast tree to search for
 	 * @return the index of the given cast tree
 	 */
-	public static int indexOfNewTree(TreePath origpath, Tree tree) {
+	public static int indexOfNewTree(TreePath origpath, Tree tree, String methodname) {
 		debug("indexOfNewTree: " + origpath.getLeaf());
 
 		Pair<TreePath,Tree> args = Pair.of(origpath, tree);
@@ -45,7 +47,18 @@ public class NewScanner extends CommonScanner {
 		if (path == null) {
 			return -1;
 		}
-		
+		Tree leaf = path.getLeaf();
+		// Need better check for method decls, and also a check for
+		// initializers.
+		if (leaf instanceof JCTree.JCMethodDecl) {
+			JCTree.JCMethodDecl md = (JCTree.JCMethodDecl) leaf;
+			// Lazy (and wrong): just check the name, not the signature.
+			String shortMethodname = methodname.substring(0, methodname.indexOf("("));
+			if (! (md.name.toString().equals(shortMethodname))) {
+				return -1;
+			}
+		}
+
 		NewScanner lvts = new NewScanner(tree);
 		lvts.scan(path, null);
 		cache.put(args, lvts.index);
