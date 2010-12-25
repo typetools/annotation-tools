@@ -83,6 +83,7 @@ public class GenericArrayLocationCriterion implements Criterion {
       Tree leaf = path.getLeaf();
       Tree parent = path.getParentPath().getLeaf();
       boolean result = ((leaf.getKind() == Tree.Kind.NEW_ARRAY)
+                        || (leaf.getKind() == Tree.Kind.NEW_CLASS)
                         || ((is_generic_or_array(leaf)
                              // or, it might be a raw type
                              || leaf instanceof IdentifierTree

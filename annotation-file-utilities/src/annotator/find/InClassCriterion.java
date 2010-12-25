@@ -95,7 +95,7 @@ final class InClassCriterion implements Criterion {
           if (cname.startsWith(declaredPackage + ".")) {
             cname = cname.substring(declaredPackage.length()+1);
           } else {
-            debug("false InClassCriterion.isSatisfiedBy:%n  cname=%s%n  tree=%s%n", cname, tree);
+            debug("false[COMPILATION_UNIT; bad declaredPackage = %s] InClassCriterion.isSatisfiedBy:%n  cname=%s%n  tree=%s%n", declaredPackage, cname, tree);
             return false;
           }
         }
@@ -126,9 +126,14 @@ final class InClassCriterion implements Criterion {
         }
         break;
       case NEW_CLASS:
+        // When matching the "new Class() { ... }" expression itself, we
+        // should not use the anonymous class name.  But when matching
+        // within the braces, we should.
         debug("InClassCriterion.isSatisfiedBy:%n  cname=%s%n  tree=%s%n", cname, tree);
-        NewClassTree nc = (NewClassTree) tree;
-        checkAnon = nc.getClassBody() != null;
+        if (! cname.equals("")) {
+          NewClassTree nc = (NewClassTree) tree;
+          checkAnon = nc.getClassBody() != null;
+        }
         break;
       default:
         // nothing to do
@@ -141,7 +146,7 @@ final class InClassCriterion implements Criterion {
 
         Matcher anonclassMatcher = anonclassPattern.matcher(cname);
         if (! anonclassMatcher.matches()) {
-          debug("false InClassCriterion.isSatisfiedBy:%n  cname=%s%n  tree=%s%n", cname, tree);
+          debug("false[anonclassMatcher] InClassCriterion.isSatisfiedBy:%n  cname=%s%n  tree=%s%n", cname, tree);
           return false;
         }
         //for JDK 7: String anonclassNumString = anonclassMatcher.group("num");
@@ -161,7 +166,7 @@ final class InClassCriterion implements Criterion {
         int actualIndexInSource = AnonymousClassScanner.indexOfClassTree(path, tree);
 
         if (anonclassNum != actualIndexInSource) {
-          debug("false InClassCriterion.isSatisfiedBy:%n  cname=%s%n  tree=%s%n", cname, tree);
+          debug("false[anonclassNum %d %d] InClassCriterion.isSatisfiedBy:%n  cname=%s%n  tree=%s%n", anonclassNum, actualIndexInSource, cname, tree);
           return false;
         }
       }

@@ -1,9 +1,3 @@
-import GUT.quals.F;
-import GUT.quals.E;
-import GUT.quals.D;
-import GUT.quals.C;
-import GUT.quals.B;
-import GUT.quals.A;
 public class AnonInner {
   class InnerOne {
     Object m1(String p) {
