@@ -487,13 +487,14 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       // System.out.printf("classname %s (%s)%n", className, className.getClass());
       while (! (className instanceof IdentifierTree)) {
         if (className instanceof JCAnnotatedType) {
-          className = ((JCAnnotatedType)className).underlyingType;
-          // System.out.printf("classname %s (%s)%n", className, className.getClass());
+          className = ((JCAnnotatedType) className).underlyingType;
+        } else if (className instanceof JCTypeApply) {
+          className = ((JCTypeApply) className).clazz;
         } else {
           throw new Error(String.format("unrecognized JCNewClass.clazz (%s): %s%n", className.getClass(), className));
         }
+        // System.out.printf("classname %s (%s)%n", className, className.getClass());
       }
-      // System.out.printf("final classname %s (%s)%n", className, className.getClass());
 
       return visitIdentifier((IdentifierTree) className, p);
     }
