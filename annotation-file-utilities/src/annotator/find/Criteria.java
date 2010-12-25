@@ -59,11 +59,11 @@ public final class Criteria {
     for (Criterion c : criteria) {
       if (! c.isSatisfiedBy(path, leaf)) {
     	if (debug) {
-          System.out.printf("UNsatisfied criterion:%n  %s%n  %s%n", c, Main.pathToString(path));
+          System.out.printf("UNsatisfied criterion:%n    %s%n    %s%n", c, Main.pathToString(path));
     	}
         return false;
       } else if (debug) {
-    	System.out.printf("satisfied criterion:%n  %s%n  %s%n", c, Main.pathToString(path));
+    	System.out.printf("satisfied criterion:%n    %s%n    %s%n", c, Main.pathToString(path));
       }
     }
     return true;
