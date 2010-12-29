@@ -415,7 +415,7 @@
       <compilerarg value="-version"/>
       <compilerarg line="-target 5"/>
       <compilerarg line="-processor checkers.nullness.NullnessChecker"/>
-      <compilerarg line="-Xbootclasspath/p:${env.CHECKERS}/jdk/nullness/jdk.jar"/>
+      <compilerarg line="-Xbootclasspath/p:${env.CHECKERS}/jdk/jdk.jar"/>
       <compilerarg value="-implicit:class"/>
       <compilerarg line="-Awarns -Xmaxwarns 10000"/>
       <classpath>
