@@ -1,0 +1,13 @@
+package annotator.tests;
+
+import java.util.List;
+
+public class NewGeneric {
+  public void foo(Object o) {
+    List<NewGeneric> varOne = (@java.lang.ReadOnly List<@java.lang.Mutable NewGeneric>) o;
+    
+    NewGeneric varTwo = (@java.lang.Mutable NewGeneric) varOne;
+    
+    varTwo.foo(varOne);
+  }
+}

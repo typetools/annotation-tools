@@ -1,0 +1,18 @@
+package annotator.tests;
+
+import java.util.List;
+
+public class LocalSimpleMultiple {
+  public void foo() {
+    @java.lang.Mutable Object o = null;
+    System.out.println(o);
+    @java.lang.ReadOnly List list = null;
+    bar(list);
+    bar(o);
+  }
+  
+  public void bar(Object o) {
+    @java.lang.ReadOnly LocalSimpleMultiple second = null;
+    bar(second);
+  }
+}

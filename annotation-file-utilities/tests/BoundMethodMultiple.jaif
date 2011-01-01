@@ -1,0 +1,38 @@
+package java.lang:
+annotation @A: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+
+package java.lang:
+annotation @B: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+
+package java.lang:
+annotation @C: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+
+package java.lang:
+annotation @D: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+
+package java.lang:
+annotation @E: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+
+package java.lang:
+annotation @F: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+
+package annotator.tests:
+class BoundMethodMultiple:
+
+    method <init>()V:
+
+    method foo(Ljava/lang/Object;)V:
+        parameter #0: 
+          type: @java.lang.A
+
+    method foo(Lannotator/tests/Date;)V:
+        bound 0 &0: @java.lang.B
+
+    method foo(Ljava/util/List;)V:
+        bound 0 &0: @java.lang.C
+        bound 0 &1: @java.lang.D
+
+    method foo(Lannotator/tests/Date;Ljava/util/Map;)V:
+        bound 0 &0: @java.lang.E
+        bound 1 &0: @java.lang.F
+
