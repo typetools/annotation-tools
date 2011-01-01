@@ -279,7 +279,7 @@ public class Main {
             if (comments) {
               if (toInsert.startsWith("extends ")) {
                 toInsert = "extends /*"
-                  + toInsert.substring(8, toInsert.length()- 15)
+                  + toInsert.substring(8, toInsert.length()-7)
                   + "*/ Object";
               } else {
                 toInsert = "/*" + toInsert + "*/";
@@ -455,7 +455,7 @@ public class Main {
    * @return given <code>@com.foo.bar(baz)</code> it returns the pair
    * <code>{ com.foo, @bar(baz) }</code>.
    */
-  public static Pair<String,String> removePackage(String s) {
+  private static Pair<String,String> removePackageInternal(String s) {
     int nameEnd = s.indexOf("(");
     if (nameEnd == -1) {
       nameEnd = s.length();
@@ -474,6 +474,29 @@ public class Main {
       return Pair.of((String)null, s);
     }
   }
+
+  /**
+   * Removes the leading package.
+   * Handles "extends @B Object" strings.
+   *
+   * @return given <code>@com.foo.bar(baz)</code> it returns the pair
+   * <code>{ com.foo, @bar(baz) }</code>.
+   */
+  public static Pair<String,String> removePackage(String s) {
+    boolean extendsWrapped = false;
+    if (s.startsWith("extends ") && s.endsWith(" Object")) {
+      s = s.substring(8, s.length()-7);
+      extendsWrapped = true;
+    }
+    Pair<String,String> result = removePackageInternal(s);
+    // System.out.printf("removePackageInternal(%s) => %s%n", s, result);
+    if (extendsWrapped) {
+      return Pair.of(result.a, "extends " + result.b + " Object");
+    } else {
+      return result;
+    }
+  }
+
 
   /**
    * Separates the annotation class from its arguments.
