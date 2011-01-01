@@ -11,7 +11,7 @@ import com.sun.source.util.TreePath;
  */
 final class InMethodCriterion implements Criterion {
 
-  private final String name;
+  public final String name;
   private final IsSigMethodCriterion sigMethodCriterion;
 
   InMethodCriterion(String name) {
