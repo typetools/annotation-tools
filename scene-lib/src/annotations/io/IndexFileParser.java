@@ -49,7 +49,7 @@ public final class IndexFileParser {
         if (i >= 0)
             return i;
         else
-            throw new ParseException("Expected a nonnegative integer, got " + i);
+            throw new ParseException("Expected a nonnegative integer, got " + st);
     }
 
     /** True if the next thing from st is the given character. */
