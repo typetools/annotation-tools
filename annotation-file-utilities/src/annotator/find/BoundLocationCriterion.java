@@ -48,6 +48,8 @@ public class BoundLocationCriterion implements Criterion {
 
     Tree leaf = path.getLeaf();
 
+    // System.out.printf("BoundLocationCriterion.isSatisfiedBy(%s):%n  leaf=%s (%s)%n", path, leaf, leaf.getClass());
+
     TreePath parentPath = path.getParentPath();
     if (parentPath == null) {
       return false;
@@ -60,6 +62,8 @@ public class BoundLocationCriterion implements Criterion {
 
     boolean returnValue = false;
 
+    // System.out.printf("BoundLocationCriterion.isSatisfiedBy(%s):%n  leaf=%s (%s)%n  parent=%s (%s)%n", path, leaf, leaf.getClass(), parent, parent.getClass());
+
     // if boundIndex is not null, need to check that this is right bound
     // in parent
     if (boundIndex != null) {
@@ -71,6 +75,12 @@ public class BoundLocationCriterion implements Criterion {
             returnValue = parentCriterion.isSatisfiedBy(parentPath);
           }
         }
+      } else if ((boundIndex == 0)
+                 && (leaf instanceof TypeParameterTree)
+                 && ((TypeParameterTree) leaf).getBounds().size() == 0) {
+          // If the bound is implicit (i.e., a missing "extends Object"),
+          // then permit the match here.
+          returnValue = parentCriterion.isSatisfiedBy(path);
       }
     } else if (paramIndex != null) {
       // if paramIndex is not null, need to ensure this present

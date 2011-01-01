@@ -8,15 +8,15 @@ import com.sun.source.tree.Tree;
 public class MethodBoundCriterion implements Criterion {
 
   private String methodName;
-  private BoundLocation loc;
+  public BoundLocation boundLoc;
   private Criterion sigMethodCriterion;
   private Criterion boundLocationCriterion;
 
-  public MethodBoundCriterion(String methodName, BoundLocation loc) {
+  public MethodBoundCriterion(String methodName, BoundLocation boundLoc) {
     this.methodName = methodName;
-    this.loc = loc;
+    this.boundLoc = boundLoc;
     this.sigMethodCriterion = Criteria.inMethod(methodName);
-    this.boundLocationCriterion = Criteria.atBoundLocation(loc);
+    this.boundLocationCriterion = Criteria.atBoundLocation(boundLoc);
   }
 
   /** {@inheritDoc} */
@@ -38,6 +38,6 @@ public class MethodBoundCriterion implements Criterion {
   }
 
   public String toString() {
-    return "MethodBoundCriterion: method: " + methodName + " bound loc: " + loc;
+    return "MethodBoundCriterion: method: " + methodName + " bound boundLoc: " + boundLoc;
   }
 }
