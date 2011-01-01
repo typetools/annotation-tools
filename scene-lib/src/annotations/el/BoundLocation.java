@@ -56,7 +56,7 @@ public final /*@ReadOnly*/ class BoundLocation {
      */
     @Override
     public int hashCode() /*@ReadOnly*/ {
-         Hasher h = new Hasher();
+        Hasher h = new Hasher();
         h.mash(paramIndex);
         h.mash(boundIndex);
         return h.hash;
