@@ -88,11 +88,13 @@ public class GenericArrayLocationCriterion implements Criterion {
                              // or, it might be a raw type
                              || leaf instanceof IdentifierTree
                              || leaf instanceof MethodTree
+                             || leaf instanceof TypeParameterTree
                              // I don't know why a GenericArrayLocationCriterion
                              // is being created in this case, but it is.
-                             || leaf instanceof PrimitiveTypeTree)
+                             || leaf instanceof PrimitiveTypeTree
+                             )
                             && ! is_generic_or_array(parent)));
-      // System.out.printf("locationInParent==null; %s (%s); %s (%s) => %s (%s %s)%n", leaf, leaf.getClass(), parent, parent.getClass(), result, is_generic_or_array(leaf), ! is_generic_or_array(parent));
+      // System.out.printf("GenericArrayLocationCriterion.isSatisfiedBy: locationInParent==null%n  leaf=%s (%s)%n  parent=%s (%s)%n  => %s (%s %s)%n", leaf, leaf.getClass(), parent, parent.getClass(), result, is_generic_or_array(leaf), ! is_generic_or_array(parent));
       return result;
     }
 

@@ -31,7 +31,7 @@ final class InClassCriterion implements Criterion {
 
   static boolean debug = false;
 
-  private String className;
+  final public String className;
   boolean exactMatch;
 
   /** The argument is a fully-qualified class name. */

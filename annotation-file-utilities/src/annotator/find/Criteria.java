@@ -133,6 +133,38 @@ public final class Criteria {
     return null;
   }
 
+  // Returns the last one.  Should really return the outermost one, but I
+  // think that works for now.
+  /**
+   * @return an InClassCriterion if this has one, else null
+   */
+  public InClassCriterion getInClass() {
+    InClassCriterion result = null;
+    for (Criterion c : criteria) {
+      if (c.getKind() == Criterion.Kind.IN_CLASS) {
+        result = (InClassCriterion) c;
+      }
+    }
+    return result;
+  }
+
+  /**
+   * @return true if this is on the zeroth bound of a type
+   */
+  public boolean onBoundZero() {
+    for (Criterion c : criteria) {
+      if ((c.getKind() == Criterion.Kind.CLASS_BOUND)
+          && ((ClassBoundCriterion) c).boundLoc.boundIndex == 0) {
+        return true;
+      }
+      if ((c.getKind() == Criterion.Kind.METHOD_BOUND)
+          && ((MethodBoundCriterion) c).boundLoc.boundIndex == 0) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   /**
    * {@inheritDoc}
    */
