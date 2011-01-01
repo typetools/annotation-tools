@@ -8,7 +8,7 @@ import com.sun.source.tree.Tree;
 public class ClassBoundCriterion implements Criterion {
 
   private String className;
-  private BoundLocation boundLoc;
+  public BoundLocation boundLoc;
   private Criterion notInMethodCriterion;
   private Criterion boundLocCriterion;
 

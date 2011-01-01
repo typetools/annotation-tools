@@ -265,7 +265,8 @@ public class Main {
             : "pos is negative: " + pos + " " + toInsertList.get(0) + " " + javafilename;
           for (Insertion iToInsert : toInsertList) {
             String toInsert = iToInsert.getText();
-            if (! toInsert.startsWith("@")) {
+            if (! (toInsert.startsWith("@")
+                   || toInsert.startsWith("extends @"))) {
               throw new Error("Insertion doesn't start with '@': " + toInsert);
             }
             if (abbreviate) {
@@ -276,7 +277,13 @@ public class Main {
               toInsert = ps.b;
             }
             if (comments) {
-              toInsert = "/*" + toInsert + "*/";
+              if (toInsert.startsWith("extends ")) {
+                toInsert = "extends /*"
+                  + toInsert.substring(8, toInsert.length()- 15)
+                  + "*/ Object";
+              } else {
+                toInsert = "/*" + toInsert + "*/";
+              }
             }
 
             // Possibly add whitespace after the insertion
@@ -327,7 +334,7 @@ public class Main {
               }
             }
             // add trailing whitespace
-            if (! gotSeparateLine) {
+            if ((! gotSeparateLine) && (! toInsert.startsWith(" extends "))) {
               toInsert = toInsert + " ";
             }
             src.insert(pos, toInsert);

@@ -55,6 +55,43 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     return p;
   }
 
+    /** Returns the position of the first instance of a character at or after the given position. */
+    // To do:  skip over comments
+  private static int getFirstInstanceAfter(char c, int i, CompilationUnitTree tree) {
+      try {
+        CharSequence s = tree.getSourceFile().getCharContent(true);
+        // return index of first instance of character c
+        for (int j=i; j < s.length(); j++) {
+          if (s.charAt(j) == c) {
+            return j;
+          }
+        }
+      } catch(Exception e) {
+        throw new RuntimeException(e);
+      }
+
+      return -1;
+    }
+
+    /** Returns the position of the first bracket at or before the given position. */
+    // To do:  skip over comments
+  private static int getLastBracketBefore(int i, CompilationUnitTree tree) {
+      try {
+        CharSequence s = tree.getSourceFile().getCharContent(true);
+        // return index of first '['
+        for (int j=i; j >= 0; j--) {
+          if (s.charAt(j) == '[') {
+            return j;
+          }
+        }
+      } catch(Exception e) {
+        throw new RuntimeException(e);
+      }
+
+      return -1;
+    }
+
+
   /**
    * Determines the insertion position for type annotations on various
    * elements.  For instance, type annotations for a declaration should be
@@ -188,42 +225,6 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       return receiverLoc;
     }
 
-    /** Returns the position of the first bracket at or after the given position. */
-    // To do:  skip over comments
-    private int getFirstBracketAfter(int i) {
-      try {
-        CharSequence s = tree.getSourceFile().getCharContent(true);
-        // return index of first '['
-        for (int j=i; j < s.length(); j++) {
-          if (s.charAt(j) == '[') {
-            return j;
-          }
-        }
-      } catch(Exception e) {
-        throw new RuntimeException(e);
-      }
-
-      return -1;
-    }
-
-    /** Returns the position of the first bracket at or before the given position. */
-    // To do:  skip over comments
-    private int getLastBracketBefore(int i) {
-      try {
-        CharSequence s = tree.getSourceFile().getCharContent(true);
-        // return index of first '['
-        for (int j=i; j >= 0; j--) {
-          if (s.charAt(j) == '[') {
-            return j;
-          }
-        }
-      } catch(Exception e) {
-        throw new RuntimeException(e);
-      }
-
-      return -1;
-    }
-
     static Map<Pair<CompilationUnitTree,Tree>,TreePath> getPathCache1 = new HashMap<Pair<CompilationUnitTree,Tree>,TreePath>();
     
     /**
@@ -270,7 +271,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
         debug("TypePositionFinder.visitIdentifier: recognized array");
         JCNewArray na = (JCNewArray) parent;
         int dimLoc = na.dims.get(0).getPreferredPosition();
-        i = getLastBracketBefore(dimLoc);
+        i = getLastBracketBefore(dimLoc, tree);
       } else if (parent instanceof NewClassTree) {
         debug("TypePositionFinder.visitIdentifier: recognized class");
         JCNewClass nc = (JCNewClass) parent;
@@ -285,6 +286,12 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
 
       debug("visitIdentifier(%s) => %d where parent (%s) = %s%n", node, i, parent.getClass(), parent);
       return i;
+    }
+
+    @Override
+    public Integer visitTypeParameter(TypeParameterTree node, Void p) {
+      JCTypeParameter tp = (JCTypeParameter) node;
+      return tp.getStartPosition();
     }
 
     @Override
@@ -415,10 +422,10 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       assert arrayStartPos(node) == pos;
       int largestLevels = arrayLevels(largest);
       int levels = arrayLevels(node);
-      pos = getFirstBracketAfter(pos+1);
+      pos = getFirstInstanceAfter('[', pos+1, tree);
       debug("  levels=%d largestLevels=%d%n", levels, largestLevels);
       for (int i=levels; i<largestLevels; i++) {
-        pos = getFirstBracketAfter(pos+1);
+        pos = getFirstInstanceAfter('[', pos+1, tree);
         debug("  pos %d at i=%d%n", pos, i);
       }
       return pos;
@@ -477,7 +484,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
         return na.elemtype.getPreferredPosition();
       }
       int argPos = na.dims.get(dim).getPreferredPosition();
-      return getLastBracketBefore(argPos);
+      return getLastBracketBefore(argPos, tree);
     }
 
     @Override
@@ -638,7 +645,10 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
             || node instanceof ParameterizedTypeTree
             || node instanceof BlockTree
             || node instanceof ArrayTypeTree
-            || node instanceof PrimitiveTypeTree);
+            || node instanceof PrimitiveTypeTree
+            // For the case with implicit upper bound
+            || node instanceof TypeParameterTree
+            );
   }
 
   /**
@@ -652,7 +662,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     }
 
     if (! handled(node)) {
-      // System.out.printf("Not handled, skipping (%s): %s%n", node.getClass(), node);
+      debug("Not handled, skipping (%s): %s%n", node.getClass(), node);
       // nothing to do
       return super.scan(node, p);
     }
@@ -766,6 +776,12 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
         pos = tpf.scan(((MethodTree)node).getReturnType(), null);
         assert handled(node);
         debug("pos = %d at return type node: %s%n", pos, ((JCMethodDecl)node).getReturnType().getClass());
+      } else if ((node instanceof TypeParameterTree)
+                 && (i.getCriteria().onBoundZero())) {
+          pos = tpf.scan(node, null);
+          pos = getFirstInstanceAfter('>', pos+1, tree);
+          // need to add "extends ... Object" around the type annotation
+          i = new Insertion("extends " + i.getText() + " Object", i.getCriteria(), i.getSeparateLine());
       } else {
         boolean typeScan = true;
         if (node instanceof MethodTree) {
@@ -829,8 +845,23 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
   public SetMultimap<Integer, Insertion> getPositions(Tree node, List<Insertion> p) {
     List<Insertion> uninserted = new LinkedList<Insertion>(p);
     this.scan(node, uninserted);
-    // This needs to be optional, because there may be many extra
-    // annotations in a .jaif file.
+    // There may be many extra annotations in a .jaif file.  For instance,
+    // the .jaif file may be for an entire library, but its compilation
+    // units are processed one by one.
+    // However, we should warn about any insertions that were within the
+    // given compilation unit but still didn't get inserted.
+    CompilationUnitTree cut = (CompilationUnitTree) node;
+    List<? extends Tree> typeDecls = cut.getTypeDecls();
+    for (Insertion i : uninserted) {
+      InClassCriterion c = i.getCriteria().getInClass();
+      if (c == null) continue;
+      for (Tree t : typeDecls) {
+        if (c.isSatisfiedBy(TreePath.getPath(cut, t))) {
+          // Should be made more user-friendly
+          System.err.printf("Found class %s, but unable to insert %s:%n  %s%n", c.className, i.getText(), i);
+        }
+      }
+    }
     if (debug) {
       // Output every insertion that was not given a position:
       for (Insertion i : uninserted) {
