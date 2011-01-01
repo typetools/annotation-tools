@@ -122,6 +122,36 @@ public final class Criteria {
   }
 
   /**
+   * Determines whether this is the criteria on a local variable.
+   *
+   * @return true iff this is the criteria on a local variable
+   */
+  public boolean isOnLocalVariable() {
+    for (Criterion c : criteria) {
+      if (c.getKind() == Criterion.Kind.LOCAL_VARIABLE) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Returns true if this Criteria is on the given method.
+   */
+  public boolean isOnMethod(String methodname) {
+    for (Criterion c : criteria) {
+      if (c.getKind() == Criterion.Kind.IN_METHOD) {
+        if (((InMethodCriterion) c).name.equals(methodname)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+    
+
+  /**
    * @return a GenericArrayLocationCriterion if this has one, else null
    */
   public GenericArrayLocationCriterion getGenericArrayLocation() {

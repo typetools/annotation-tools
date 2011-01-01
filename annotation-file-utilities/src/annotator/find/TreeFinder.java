@@ -857,8 +857,15 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       if (c == null) continue;
       for (Tree t : typeDecls) {
         if (c.isSatisfiedBy(TreePath.getPath(cut, t))) {
-          // Should be made more user-friendly
-          System.err.printf("Found class %s, but unable to insert %s:%n  %s%n", c.className, i.getText(), i);
+          // Avoid warnings about synthetic generated methods.
+          // This test is too coarse, but is good enough for now.
+          // There are also synthetic local variables; maybe suppress
+          // warnings about them, too.
+          if (! (i.getCriteria().isOnMethod("<init>()V")
+                 || i.getCriteria().isOnLocalVariable())) {
+            // Should be made more user-friendly
+            System.err.printf("Found class %s, but unable to insert %s:%n  %s%n", c.className, i.getText(), i);
+          }
         }
       }
     }
