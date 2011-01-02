@@ -109,7 +109,7 @@ public class IndexFileSpecification implements Specification {
         MethodOffsetClassVisitor cv = new MethodOffsetClassVisitor();
         classReader.accept(cv, false);
         debug("Done reading " + className + ".class");
-      } catch(IOException e) {
+      } catch (IOException e) {
         // If .class file not found, still proceed, in case
         // user only wants method signature annotations.
         System.out.println("Warning: IndexFileSpecification did not find classfile for: " + className);
