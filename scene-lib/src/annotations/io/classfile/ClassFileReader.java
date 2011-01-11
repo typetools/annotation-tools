@@ -3,6 +3,7 @@ package annotations.io.classfile;
 import checkers.nullness.quals.*;
 
 import java.io.*;
+import plume.*;
 
 import org.objectweb.asm.ClassReader;
 
@@ -19,21 +20,22 @@ public class ClassFileReader {
   public static final String INDEX_UTILS_VERSION
     = "Annotation File Utilities v3.1";
 
-  static String usage
-    = "usage: extract-annotations\n"
-    + "            <options> \n"
-    + "            <space-separated list of classes to analyze>\n"
-    + "\n"
-    + "       <options> include: \n"
-    + "         -h, --help       print usage information and exit\n"
-    + "         --version        print version information and exit\n"
-    + "\n"
-    + "For each class a.b.C (or class file a/b/C.class) given, extracts\n"
-    + "the annotations from that class and prints them in index-file format\n"
-    + "to a.b.C.jaif .\n"
-    + "Note that, if using the qualified class name, the class a.b.C must be\n"
-    + "located in your classpath.\n";
+  @Option("-h print usage information and exit")
+  public static boolean help = false;
+ 
+  @Option("print version information and exit")
+  public static boolean version = false;
+ 
+  private static String linesep = System.getProperty("line.separator");
 
+  static String usage
+    = "extract-annotations [options] class1 class2 ..."
+    + linesep
+    + "Each argument is a class a.b.C (that is on your classpath) or a class file"
+    + linesep
+    + "a/b/C.class.  Extracts the annotations from each such argument and prints"
+    + linesep
+    + "them in index-file format to a.b.C.jaif .  Options:";
 
   /**
    * From the command line, read annotations from a class file and write
@@ -51,49 +53,31 @@ public class ClassFileReader {
    * @throws IOException if a class file cannot be found
    */
   public static void main(String[] args) throws IOException {
-    boolean printUsage = false;
-    for (String arg : args) {
-      arg = arg.trim();
-      if (arg.equals("-h") || arg.equals("-help") || arg.equals("--help")) {
-        printUsage = true;
-      }
+    Options options = new Options(usage, ClassFileReader.class);
+    args = options.parse_or_usage(args);
+    if (version) {
+      System.out.printf("extract-annotations (%s)", INDEX_UTILS_VERSION);
+    }
+    if (help) {
+      options.print_usage();
+    }
+    if (version || help) {
+      System.exit(-1);
     }
 
-    for (String arg: args) {
-      arg = arg.trim();
-      if (arg.equals("-version") || arg.equals("--version")) {
-        System.out.printf("extract-annotations (%s)",
-                          INDEX_UTILS_VERSION);
-        if (!printUsage) {
-          return;
-        }
-      }
-    }
-
-    if (args.length == 0 || printUsage) {
-      System.out.println(usage);
-      return;
+    if (args.length == 0) {
+      options.print_usage("No arguments given.");
+      System.exit(-1);
     }
 
     // check args for well-formed names
     for (String arg : args) {
-      arg = arg.trim();
-      // check for invalid class file paths with '.'
-      if (!arg.contains(".class") && arg.contains("/")) {
-        System.out.println("Error: " + arg +
-            " does not appear to be a fully qualified class name or path");
-        System.out.print(" please use names such as java.lang.Object");
-        System.out.print(" instead of Ljava/lang/Object,");
-        System.out.println(" or use class file paths as /.../path/to/MyClass.class");
-        return;
+      if (!checkClass(arg)) {
+        System.exit(-1);
       }
     }
 
     for (String origName : args) {
-      if (origName.startsWith("-")) {
-        continue; // ignore options
-      }
-      origName = origName.trim();
       System.out.println("reading: " + origName);
       String className = origName;
       if (origName.endsWith(".class")) {
@@ -127,6 +111,21 @@ public class ClassFileReader {
         return;
       }
     }
+  }
+
+  /**
+   * If s is not a valid representation of a class, print a warning message
+   * and return false.
+   */
+  public static boolean checkClass(String arg) {
+    // check for invalid class file paths with '.'
+    if (!arg.contains(".class") && arg.contains("/")) {
+      System.out.println("Error: bad class " + arg);
+      System.out.println("Use a fully qualified class name such as java.lang.Object");
+      System.out.println("or a filename such as .../path/to/MyClass.class");
+      return false;
+    }
+    return true;
   }
 
   /**
