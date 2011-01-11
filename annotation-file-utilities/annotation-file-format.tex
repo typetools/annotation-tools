@@ -289,6 +289,7 @@ of the \\ \qquad    \bnfcmt annotation:   ``\texttt{@A(12)}'' rather than ``\tex
 \\
 \bnfnt{class-definition} ::= \\
 \qquad    \bnflit{class} \bnfnt{name} \bnflit{:} \bnfnt{annotation}* \lineend  \\
+\qquad        \bnfnt{typeparam-definition}* \\
 \qquad        \bnfnt{bound-definition}* \\
 % TODO: annotations on superclass and interfaces?
 \qquad        \bnfnt{field-definition}*  \\
@@ -308,6 +309,7 @@ of the \\ \qquad    \bnfcmt annotation:   ``\texttt{@A(12)}'' rather than ``\tex
 \qquad    \bnfcmt The annotation on the \bnflit{method} line is that on the method not the return value. \\
 % TODO: Ensure the tool uses generic signatures and init/clinit.
 \qquad    \bnflit{method} \bnfnt{method-key} \bnflit{:} \bnfnt{annotation}* \lineend \\
+\qquad        \bnfnt{typeparam-definition}* \\
 \qquad        \bnfnt{bound-definition}* \\
 \qquad        \bnfnt{return-definition}? \\
 \qquad        \bnfnt{receiver-definition}? \\
@@ -330,6 +332,10 @@ of the \\ \qquad    \bnfcmt annotation:   ``\texttt{@A(12)}'' rather than ``\tex
 \qquad    \bnfcmt The integer list here contains the values of the ``\ahref{http://types.cs.washington.edu/jsr308/specification/java-annotation-design.html#class-file:ext:ri:typearg}{location}'' array~\cite{JSR308}. \\ % Section 4.3.12
 \qquad    \bnflit{inner-type} \bnfnt{integer} [ \bnflit{,} \bnfnt{integer} ]+ \bnflit{:} \bnfnt{annotation}* \lineend \\
 \\
+\bnfnt{typeparam-definition} ::= \\
+\qquad    \bnfcmt The integer is the zero-based type parameter index. \\
+\qquad    \bnflit{typeparam} \bnfnt{integer} \bnflit{:}
+% The bound should really be a sub-element of the typeparam!
 \bnfnt{bound-definition} ::= \\
 \qquad    \bnfcmt The integers are respectively the parameter and bound indices of \\
 \qquad    \bnfcmt the type parameter bound~\cite{JSR308}. \\
@@ -345,9 +351,9 @@ of the \\ \qquad    \bnfcmt annotation:   ``\texttt{@A(12)}'' rather than ``\tex
 \qquad    \bnflit{receiver:} \bnfnt{annotation}* \lineend \\
 \\
 \bnfnt{parameter-definition} ::= \\
-\qquad    \bnfcmt The integer is the index of the parameter in the method \\
-\qquad    \bnfcmt (i.e., 0 is the first method parameter). \\
-\qquad    \bnfcmt The annotation on the \bnflit{parameter} line is that of the parameter declaration, \\
+\qquad    \bnfcmt The integer is the index of the formal parameter in the method \\
+\qquad    \bnfcmt (i.e., 0 is the first formal parameter). \\
+\qquad    \bnfcmt The annotation on the \bnflit{parameter} line is that of the formal parameter declaration, \\
 \qquad    \bnfcmt while the annotation on the \bnflit{type} line is that of the outermost type of the parameter. \\
 \qquad    \bnflit{parameter} \bnfnt{integer} \bnflit{:} \bnfnt{annotation}* \lineend \\
 \qquad    \bnfnt{type-annotations}* \\
