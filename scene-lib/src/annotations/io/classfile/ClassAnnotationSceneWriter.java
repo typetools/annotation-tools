@@ -260,8 +260,13 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
           ExtendedAnnotationVisitor xav = visitExtendedAnnotation(tla);
 
           visitFields(xav, tla);
-          visitTargetType(xav, TargetType.CLASS_TYPE_PARAMETER_BOUND);
-          visitBound(xav, bloc);
+          if (bloc.boundIndex == -1) {
+            visitTargetType(xav, TargetType.CLASS_TYPE_PARAMETER);
+            visitBound(xav, bloc);
+          } else {
+            visitTargetType(xav, TargetType.CLASS_TYPE_PARAMETER_BOUND);
+            visitBound(xav, bloc);
+          }
           xav.visitEnd();
         }
 
@@ -414,7 +419,8 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
    */
   private void visitBound(ExtendedAnnotationVisitor xav, BoundLocation loc) {
     xav.visitXParamIndex(loc.paramIndex);
-    xav.visitXBoundIndex(loc.boundIndex);
+    if (loc.boundIndex != -1)
+      xav.visitXBoundIndex(loc.boundIndex);
   }
 
   /**
@@ -749,8 +755,13 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
           ExtendedAnnotationVisitor xav = visitExtendedAnnotation(tla);
 
           visitFields(xav, tla);
-          visitTargetType(xav, TargetType.METHOD_TYPE_PARAMETER_BOUND);
-          visitBound(xav, bloc);
+          if (bloc.boundIndex == -1) {
+            visitTargetType(xav, TargetType.METHOD_TYPE_PARAMETER);
+            visitBound(xav, bloc);
+          } else {
+            visitTargetType(xav, TargetType.METHOD_TYPE_PARAMETER_BOUND);
+            visitBound(xav, bloc);
+          }
           xav.visitEnd();
         }
 
