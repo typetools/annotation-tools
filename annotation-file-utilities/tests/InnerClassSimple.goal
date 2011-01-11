@@ -1,0 +1,11 @@
+package annotator.tests;
+
+import java.util.Date;
+
+public class InnerClassSimple {
+  public Integer field;
+
+  @java.lang.ReadOnly @java.lang.DoesNotExist public class ActualInnerClass {
+    @java.lang.ReadOnly Date d;
+  }
+}

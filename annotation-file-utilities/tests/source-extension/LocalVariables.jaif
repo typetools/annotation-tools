@@ -1,0 +1,11 @@
+package java.lang:
+annotation @Mutable: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+
+package annotator.tests:
+class LocalVariables:
+
+    method <init>()V:
+
+    method foo()V:
+        local a: @java.lang.Mutable
+
