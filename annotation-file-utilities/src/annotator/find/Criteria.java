@@ -181,6 +181,8 @@ public final class Criteria {
   /**
    * @return true if this is on the zeroth bound of a type
    */
+  // Used when determining whether an annotation is on an implicit upper
+  // bound (the "extends Object" that is customarily omitted).
   public boolean onBoundZero() {
     for (Criterion c : criteria) {
       if ((c.getKind() == Criterion.Kind.CLASS_BOUND)
