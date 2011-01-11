@@ -226,8 +226,13 @@ public final class IndexFileWriter {
                 : bounds.entrySet()) {
             BoundLocation bl = be.getKey();
             /*@ReadOnly*/ ATypeElement b = be.getValue();
-            printTypeElementAndInnerTypes(indentation,
-                    "bound " + bl.paramIndex + " &" + bl.boundIndex, b);
+            if (bl.boundIndex == -1) {
+                printTypeElementAndInnerTypes(indentation,
+                                              "typeparam " + bl.paramIndex, b);
+            } else {
+                printTypeElementAndInnerTypes(indentation,
+                           "bound " + bl.paramIndex + " &" + bl.boundIndex, b);
+            }
         }
     }
 

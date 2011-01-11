@@ -187,8 +187,10 @@ implements ExtendedAnnotationVisitor {
    * @see org.objectweb.asm.ExtendedAnnotationVisitor#visitXBoundIndex(int)
    */
   public void visitXBoundIndex(int bound_index) {
-    xBoundIndexArgs.add(bound_index);
-    xav.visitXBoundIndex(bound_index);
+    if (bound_index != -1) {
+      xBoundIndexArgs.add(bound_index);
+      xav.visitXBoundIndex(bound_index);
+    }
   }
 
   public void visitXTypeIndex(int type_index) {
@@ -308,6 +310,10 @@ implements ExtendedAnnotationVisitor {
       checkListSize(0, 0, c, 1, 0, 0, 0, 0, 0,
       "Invalid field generic/array annotation:");
       break;
+    case CLASS_TYPE_PARAMETER:
+      checkListSize(0, 0, 0, 0, 0, 0, 1, 0, 0,
+      "Invalid class type parameter annotation:");
+      break;
     case CLASS_TYPE_PARAMETER_BOUND:
       checkListSize(0, 0, 0, 0, 0, 0, 1, 1, 0,
       "Invalid class type parameter bound annotation:");
@@ -315,6 +321,10 @@ implements ExtendedAnnotationVisitor {
     case CLASS_TYPE_PARAMETER_BOUND_GENERIC_OR_ARRAY:
       checkListSize(0, 0, c, 1, 0, 0, 1, 1, 0,
       "Invalid class type parameter bound generic/array annotation:");
+      break;
+    case METHOD_TYPE_PARAMETER:
+      checkListSize(0, 0, 0, 0, 0, 0, 1, 0, 0,
+      "Invalid method type parameter annotation:");
       break;
     case METHOD_TYPE_PARAMETER_BOUND:
       checkListSize(0, 0, 0, 0, 0, 0, 1, 1, 0,

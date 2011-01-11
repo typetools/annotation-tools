@@ -41,14 +41,14 @@ import annotations.field.*;
  * All other methods are intended to be called only by
  * {@link org.objectweb.asm.ClassReader#accept},
  * and should not be called anywhere else, due to the order in which
- *  {@link org.objectweb.asm.ClassVisitor} methods should be called.
+ * {@link org.objectweb.asm.ClassVisitor} methods should be called.
  */
 public class ClassAnnotationSceneReader
 extends EmptyVisitor {
   // general strategy:
   // -only "Runtime[In]visible[Type]Annotations" are supported
   // -use an empty visitor for everything besides annotations, fields and
-  //  methods for those three, use a special visitor that does all the work
+  //  methods; for those three, use a special visitor that does all the work
   //  and inserts the annotations correctly into the specified AElement
 
   private boolean trace = false;
@@ -109,7 +109,7 @@ extends EmptyVisitor {
    */
   @Override
   public ExtendedAnnotationVisitor visitExtendedAnnotation(String desc, boolean visible) {
-    if (trace) { System.out.printf("visitExtendedAnnotation(%s, %s) in %s (%s)%n", desc, visible, this, this.getClass()); }
+    if (trace) { System.out.printf("visitExtendedAnnotation(%s, %s); aClass=%s in %s (%s)%n", desc, visible, aClass, this, this.getClass()); }
     return new AnnotationSceneReader(desc, visible, aClass);
   }
 
@@ -570,10 +570,14 @@ extends EmptyVisitor {
         case NEW_TYPE_ARGUMENT_GENERIC_OR_ARRAY:
           handleNewTypeArgumentGenericArray((AMethod) aElement);
           break;
-//
-//      TODO:
-//        METHOD_TYPE_ARGUMENT,
-//        METHOD_TYPE_ARGUMENT_GENERIC_OR_ARRAY,
+
+        case METHOD_TYPE_ARGUMENT:
+          throw new Error("METHOD_TYPE_ARGUMENT: to do");
+          // break;
+
+        case METHOD_TYPE_ARGUMENT_GENERIC_OR_ARRAY:
+          throw new Error("METHOD_TYPE_ARGUMENT_GENERIC_OR_ARRAY: to do");
+          // break;
 
         case WILDCARD_BOUND:
           handleWildcardBound(aElement);
@@ -582,12 +586,16 @@ extends EmptyVisitor {
           handleWildcardBoundGenericArray(aElement);
           break;
 
-//      TODO:
-//        CLASS_LITERAL,
-//        @Deprecated CLASS_LITERAL_GENERIC_OR_ARRAY,
-//
-//        METHOD_TYPE_PARAMETER,
-//        @Deprecated METHOD_TYPE_PARAMETER_GENERIC_OR_ARRAY,
+        case CLASS_LITERAL:
+          throw new Error("CLASS_LITERAL: to do");
+          // break;
+
+        case METHOD_TYPE_PARAMETER:
+          throw new Error("METHOD_TYPE_PARAMETER: to do");
+
+        case CLASS_TYPE_PARAMETER:
+          handleClassTypeParameter((AClass) aElement);
+          break;
 
         default:
           // Rather than throw an error here, since a declaration annotation
@@ -665,6 +673,18 @@ extends EmptyVisitor {
 
     /*
      * Returns the bound location for this annotation.
+     */
+    private BoundLocation makeTypeParameterLocation() {
+      if (!xParamIndexArgs.isEmpty()) {
+        return new BoundLocation(xParamIndexArgs.get(0), -1);
+      } else {
+        return new BoundLocation(Integer.MAX_VALUE, -1);
+      }
+    }
+
+    /*
+     * Returns the bound location for this annotation.
+     * @see #makeTypeParameterLocation()
      */
     private BoundLocation makeBoundLocation() {
       // TODO: Give up on unbounded wildcards for now!
@@ -799,6 +819,14 @@ extends EmptyVisitor {
     private void handleMethodInstanceOfGenericArray(AMethod aMethod) {
       aMethod.typecasts.vivify(makeOffset()).innerTypes.vivify(
           makeInnerTypeLocation()).tlAnnotationsHere.add(makeAnnotation());
+    }
+
+    /*
+     * Creates the class type parameter bound annotation on aClass.
+     */
+    private void handleClassTypeParameter(AClass aClass) {
+      aClass.bounds.vivify(makeTypeParameterLocation())
+          .tlAnnotationsHere.add(makeAnnotation());
     }
 
     /*
@@ -1094,7 +1122,7 @@ extends EmptyVisitor {
 
     @Override
     public ExtendedAnnotationVisitor visitExtendedAnnotation(String desc, boolean visible) {
-      if (trace) { System.out.printf("visitExtendedAnnotation(%s, %s) in %s (%s)%n", desc, visible, this, this.getClass()); }
+      if (trace) { System.out.printf("visitExtendedAnnotation(%s, %s); aField=%s, aField.type=%s in %s (%s)%n", desc, visible, aField, aField.type, this, this.getClass()); }
       return new AnnotationSceneReader(desc, visible, aField.type);
     }
   }
@@ -1130,7 +1158,7 @@ extends EmptyVisitor {
 
     @Override
     public ExtendedAnnotationVisitor visitExtendedAnnotation(String desc, boolean visible) {
-      if (trace) { System.out.printf("visitExtendedAnnotation(%s, %s) in %s (%s)%n", desc, visible, this, this.getClass()); }
+      if (trace) { System.out.printf("visitExtendedAnnotation(%s, %s) method=%s in %s (%s)%n", desc, visible, aMethod, this, this.getClass()); }
       return new AnnotationSceneReader(desc, visible, aMethod);
     }
 

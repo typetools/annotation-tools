@@ -403,7 +403,8 @@ public class AnnotationVerifier {
     }
 
     public void visitXBoundIndex(int bound_index) {
-      xBoundIndexArgs.add(bound_index);
+      if (bound_index != -1)
+        xBoundIndexArgs.add(bound_index);
     }
 
     public void visitXTypeIndex(int type_index) {

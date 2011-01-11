@@ -571,17 +571,29 @@ public final class IndexFileParser {
 
     private void parseBounds(VivifyingMap<BoundLocation, ATypeElement> bounds)
         throws IOException, ParseException {
-        while (matchKeyword("bound")) {
-            // expectChar(',');
-            int paramIndex = expectNonNegative(matchNNInteger());
-            expectChar('&');
-            int boundIndex = expectNonNegative(matchNNInteger());
-            BoundLocation bl = new BoundLocation(paramIndex, boundIndex);
-            ATypeElement b = bounds.vivify(bl);
-
-            expectChar(':');
-            parseAnnotations(b);
-            parseInnerTypes(b);
+        while (checkKeyword("typeparam") || checkKeyword("bound")) {
+            if (matchKeyword("typeparam")) {
+                int paramIndex = expectNonNegative(matchNNInteger());
+                BoundLocation bl = new BoundLocation(paramIndex, -1);
+                ATypeElement b = bounds.vivify(bl);
+                expectChar(':');
+                parseAnnotations(b);
+                // does this make sense?
+                parseInnerTypes(b);
+            } else if (matchKeyword("bound")) {
+                // expectChar(',');
+                int paramIndex = expectNonNegative(matchNNInteger());
+                expectChar('&');
+                int boundIndex = expectNonNegative(matchNNInteger());
+                BoundLocation bl = new BoundLocation(paramIndex, boundIndex);
+                ATypeElement b = bounds.vivify(bl);
+                expectChar(':');
+                parseAnnotations(b);
+                // does this make sense?
+                parseInnerTypes(b);
+            } else {
+                throw new Error("impossible");
+            }
         }
     }
 
