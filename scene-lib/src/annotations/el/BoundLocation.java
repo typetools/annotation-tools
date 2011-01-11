@@ -8,6 +8,9 @@ import annotations.util.*;
 /**
  * A {@link BoundLocation} holds location information for a bound of a type
  * parameter of a class or method: parameter index and bound index.
+ * It also handles type parameters themselves (not just the bound part).
+ * It would be better named "TypeParameterLocation", or the two uses could
+ * be separated out.
  */
 public final /*@ReadOnly*/ class BoundLocation {
     /**
@@ -18,6 +21,7 @@ public final /*@ReadOnly*/ class BoundLocation {
 
     /**
      * The index of the bound among all bounds on the type parameter.
+     * -1 if for the type parameter itself.
      */
     public final int boundIndex;
 
