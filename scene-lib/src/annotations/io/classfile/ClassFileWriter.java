@@ -2,11 +2,8 @@ package annotations.io.classfile;
 
 import checkers.nullness.quals.*;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
+import plume.*;
 
 import org.objectweb.asm.ClassReader;
 
@@ -20,6 +17,30 @@ import annotations.io.IndexFileParser;
  *  from an {@link annotations.el.AScene} into a class file.
  */
 public class ClassFileWriter {
+
+  @Option("-h print usage information and exit")
+  public static boolean help = false;
+ 
+  @Option("print version information and exit")
+  public static boolean version = false;
+ 
+  private static String linesep = System.getProperty("line.separator");
+
+  static String usage
+    = "usage: insert-annotations [options] class1 indexfile1 class2 indexfile2 ..."
+    + ""
+    + linesep
+    + "For each class/index file pair (a.b.C a.b.C.jaif), read annotations from"
+    + linesep
+    + "the index file a.b.C.jaif and insert them into the class a.b.C, then"
+    + linesep
+    + "output the merged class file to a.b.C.class"
+    + linesep
+    + "Each class is either a fully-qualified name of a class on your classpath,"
+    + linesep
+    + "or a path to a .class file, such as e.g. /.../path/to/a/b/C.class ."
+    + linesep
+    + "Options:";
 
   /**
    * Main method meant to a a convenient way to write annotations from an index
@@ -37,60 +58,37 @@ public class ClassFileWriter {
    */
   public static void main(String[] args) throws IOException {
     boolean printUsage = false;
-    for (String arg : args) {
-      arg = arg.trim();
-      if (arg.equals("-h") || arg.equals("-help") || arg.equals("--help")) {
-        printUsage = true;
-      }
+    Options options = new Options(usage, ClassFileWriter.class);
+
+    args = options.parse_or_usage(args);
+    if (version) {
+      System.out.printf("insert-annotations (%s)",
+                        ClassFileReader.INDEX_UTILS_VERSION);
+    }
+    if (help) {
+      options.print_usage();
+    }
+    if (version || help) {
+      System.exit(-1);
     }
 
-    for (String arg: args) {
-      arg = arg.trim();
-      if (arg.equals("-version") || arg.equals("--version")) {
-        System.out.printf("insert-annotations (%s)",
-                          ClassFileReader.INDEX_UTILS_VERSION);
-        if (!printUsage) {
-          return;
-        }
-      }
+    if (args.length == 0) {
+      options.print_usage("No arguments given.");
+      System.exit(-1);
     }
-
-    if (args.length == 0 || printUsage) {
-      System.out.println("usage: insert-annotations");
-      System.out.println("            <options> ");
-      System.out.println("            <space-separated list of pairs of classes and index files>");
-      System.out.println("");
-      System.out.println("       <options> include: ");
-      System.out.println("         -h, --help       print usage information and exit");
-      System.out.println("         --version        print version information and exit");
-      System.out.println("");
-      System.out.println("For each class/index file pair: a.b.C a.b.C.jaif");
-      System.out.println(" this will read in annotations from the index file a.b.C.jaif");
-      System.out.println(" and insert them into the class a.b.C and will output the");
-      System.out.println(" merged class file to: a.b.C.class");
-      System.out.println(" Note that the class a.b.C, given as a fully-qualified name,");
-      System.out.println(" must be located somewhere on your classpath.");
-      System.out.println(" You can also the path for the class, e.g. /.../path/to/a/b/C.class");
+    if (args.length % 2 == 1) {
+      options.print_usage("Must supply an even number of arguments.");
+      System.exit(-1);
     }
 
     // check args for well-formed names
     for (int i = 0; i < args.length; i += 2) {
-      String arg = args[i].trim();
-      if (!arg.endsWith(".class") && arg.contains("/")) {
-        System.out.print("Error: " + arg +
-            " does not appear to be a fully qualified class name");
-        System.out.print(" please use names such as java.lang.Object");
-        System.out.print(" instead of Ljava/lang/Object or");
-        System.out.println(" java.lang.Object.class,");
-        System.out.println(" or use class file path as /.../path/to/MyClass.class");
-        return;
+      if (!ClassFileReader.checkClass(args[i])) {
+        System.exit(-1);
       }
     }
 
     for (int i = 0; i < args.length; i++) {
-     if (args[i].startsWith("-")) {
-       continue; // ignore options
-     }
 
      String className = args[i];
      i++;
