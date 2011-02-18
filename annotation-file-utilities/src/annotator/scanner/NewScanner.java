@@ -9,7 +9,6 @@ import com.sun.source.tree.NewArrayTree;
 import com.sun.source.tree.NewClassTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
-
 import com.sun.tools.javac.tree.JCTree;
 
 import plume.Pair;
@@ -27,16 +26,16 @@ public class NewScanner extends CommonScanner {
 	 * Computes the index of the given new tree amongst all new trees
 	 * inside its method, using 0-based indexing. The tree has to be
 	 * either a NewClassTree or a NewArrayTree.  If the tree is not in
-	 * a method, then the index is computed 
-	 * 
+	 * a method, then the index is computed
+	 *
 	 * @param path
 	 *            the path ending in the given cast tree
 	 * @param tree
 	 *            the cast tree to search for
 	 * @return the index of the given cast tree
 	 */
-	public static int indexOfNewTree(TreePath origpath, Tree tree, String methodname) {
-		debug("indexOfNewTree: " + origpath.getLeaf());
+	public static int indexOfNewTree(TreePath origpath, Tree tree) {
+        debug("indexOfNewTree: " + origpath.getLeaf());
 
 		Pair<TreePath,Tree> args = Pair.of(origpath, tree);
 		if (cache.containsKey(args)) {
@@ -47,24 +46,14 @@ public class NewScanner extends CommonScanner {
 		if (path == null) {
 			return -1;
 		}
-		Tree leaf = path.getLeaf();
-		// Need better check for method decls, and also a check for
-		// initializers.
-		if (leaf instanceof JCTree.JCMethodDecl) {
-			JCTree.JCMethodDecl md = (JCTree.JCMethodDecl) leaf;
-			// Lazy (and wrong): just check the name, not the signature.
-			String shortMethodname = methodname.substring(0, methodname.indexOf("("));
-			if (! (md.name.toString().equals(shortMethodname))) {
-				return -1;
-			}
-		}
 
 		NewScanner lvts = new NewScanner(tree);
 		lvts.scan(path, null);
 		cache.put(args, lvts.index);
+
 		return lvts.index;
 	}
-	
+
 	private int index = -1;
 	private boolean done = false;
 	private Tree tree;
