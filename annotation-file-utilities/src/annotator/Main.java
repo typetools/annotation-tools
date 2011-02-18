@@ -246,7 +246,7 @@ public class Main {
         // Create a finder, and use it to get positions.
         TreeFinder finder = new TreeFinder(tree);
         if (debug) {
-          finder.debug = true;
+          TreeFinder.debug = true;
         }
         SetMultimap<Integer, Insertion> positions = finder.getPositions(tree, insertions);
 
