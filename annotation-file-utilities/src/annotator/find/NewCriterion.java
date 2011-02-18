@@ -18,7 +18,13 @@ public class NewCriterion implements Criterion {
 
   public NewCriterion(String methodName, RelativeLocation loc) {
     this.methodName = methodName.substring(0, methodName.lastIndexOf(")") + 1);
-    this.inMethodCriterion = Criteria.inMethod(methodName);
+
+    if (!(methodName.startsWith("init for field") ||
+        methodName.startsWith("static init number"))) {
+        // keep strings consistent with text used in IndexFileSpecification
+        this.inMethodCriterion = Criteria.inMethod(methodName);
+    }
+
     this.loc = loc;
   }
 
@@ -38,9 +44,11 @@ public class NewCriterion implements Criterion {
 
     Tree leaf = path.getLeaf();
 
-    if (inMethodCriterion.isSatisfiedBy(path) &&
-            (leaf.getKind() == Tree.Kind.NEW_CLASS
-                    || leaf.getKind() == Tree.Kind.NEW_ARRAY)) {
+    if (inMethodCriterion!=null && !inMethodCriterion.isSatisfiedBy(path)) {
+      return this.isSatisfiedBy(path.getParentPath());
+    }
+    if (leaf.getKind() == Tree.Kind.NEW_CLASS
+            || leaf.getKind() == Tree.Kind.NEW_ARRAY) {
       int indexInSource = NewScanner.indexOfNewTree(path, leaf);
       // System.out.printf("indexInSource=%d%n", indexInSource);
       boolean b;
