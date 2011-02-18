@@ -37,6 +37,7 @@ public class IndexFileSpecification implements Specification {
     scene = new AScene();
   }
 
+  @Override
   public List<Insertion> parse() throws FileIOException {
     try {
       IndexFileParser.parseFile(indexFileName, scene);
@@ -181,11 +182,14 @@ public class IndexFileSpecification implements Specification {
   	parseBlock(clist, "static init number " + blockID + "()", block);
   }
 
+  // keep the descriptive strings for field initializers and static inits consistent
+  // with text used in NewCriterion.
+
   private void parseFieldInit(CriterionList clist, String fieldName, AExpression exp) {
     clist = clist.add(Criteria.inFieldInit(fieldName));
     parseExpression(clist, "init for field " + fieldName + "()", exp);
   }
-  
+
   /** Fill in this.insertions with insertion pairs. */
   private void parseElement(CriterionList clist, AElement element) {
     for (Pair<String,Boolean> p : getElementAnnotation(element)) {
@@ -279,10 +283,10 @@ public class IndexFileSpecification implements Specification {
       parseElement(paramClist, param);
       parseInnerAndOuterElements(paramClist, param.type);
     }
-    
+
     parseBlock(clist, methodName, method);
   }
-  
+
   private void parseBlock(CriterionList clist, String methodName, ABlock block) {
 
     // parse locals of method
@@ -297,7 +301,7 @@ public class IndexFileSpecification implements Specification {
 
     parseExpression(clist, methodName, block);
   }
-  
+
   private void parseExpression(CriterionList clist, String methodName, AExpression exp) {
     // parse typecasts of method
     for (Entry<RelativeLocation, ATypeElement> entry : exp.typecasts.entrySet()) {
