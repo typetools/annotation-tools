@@ -1,6 +1,7 @@
 package annotator.find;
 
-import annotator.Main;
+// only used for debugging
+// import annotator.Main;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -183,10 +184,12 @@ public class GenericArrayLocationCriterion implements Criterion {
             );
   }
 
+  @Override
   public Kind getKind() {
     return Criterion.Kind.GENERIC_ARRAY_LOCATION;
   }
 
+  @Override
   public String toString() {
     return "GenericArrayLocationCriterion at " +
     ((locationInParent == null)
