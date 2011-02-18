@@ -22,6 +22,7 @@ final class InMethodCriterion implements Criterion {
   /**
    * {@inheritDoc}
    */
+  @Override
   public Kind getKind() {
     return Kind.IN_METHOD;
   }
@@ -64,6 +65,7 @@ final class InMethodCriterion implements Criterion {
   /**
    * {@inheritDoc}
    */
+  @Override
   public String toString() {
     return "in method '" + name + "'";
   }
