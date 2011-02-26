@@ -22,7 +22,7 @@ public class LocalVariableScanner extends CommonScanner {
    * such that it is the i^th declaration of the local variable with the given
    * var name, using 0-based indexing.
    *
-   * @param path the source path that ends in varTree
+   * @param origpath the source path that ends in varTree
    * @param varTree the variable tree that declares the local variable
    * @param varName the name of the local variable
    * @return the index of the variable tree with respect to the given
