@@ -143,8 +143,12 @@ public class GenericArrayLocationCriterion implements Criterion {
         Tree boundTree = wct.getBound();
         return boundTree.equals(leaf);
       } else if (parent.getKind() == Tree.Kind.SUPER_WILDCARD) {
-        System.out.println("GenericArrayLocationCriterion::isSatisfiedBy: TODO: How should SUPER_WILDCARD be handled?");
-        return false;
+        // annotating List<? super @A Integer>
+        // System.out.printf("parent instanceof super WildcardTree: %s loc=%d%n",
+        //                   Main.treeToString(parent), loc);
+        WildcardTree wct = (WildcardTree) parent;
+        Tree boundTree = wct.getBound();
+        return boundTree.equals(leaf);
       // } else if (parent.getKind() == Tree.Kind.UNBOUNDED_WILDCARD) {
         // The parent can never be the unbounded wildcard, as it doesn't have any members.
       } else if (parent.getKind() == Tree.Kind.ARRAY_TYPE) {
