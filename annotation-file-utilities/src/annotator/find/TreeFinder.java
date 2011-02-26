@@ -802,7 +802,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
           pos = (nextpos1!=-1 && nextpos1 < nextpos2) ? nextpos1 : nextpos2;
 
           // need to add "extends ... Object" around the type annotation
-          i = new Insertion("extends " + i.getText() + " Object", i.getCriteria(), i.getSeparateLine());
+          i = new Insertion("extends " + i.getText() + " java.lang.Object", i.getCriteria(), i.getSeparateLine());
       } else if ((node instanceof WildcardTree)
                && ((WildcardTree)node).getBound()==null) {
           pos = tpf.scan(node, null);
@@ -812,7 +812,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
           pos = (nextpos1!=-1 && nextpos1 < nextpos2) ? nextpos1 : nextpos2;
 
           // need to add "extends ... Object" around the type annotation
-          i = new Insertion("extends " + i.getText() + " Object", i.getCriteria(), i.getSeparateLine());
+          i = new Insertion("extends " + i.getText() + " java.lang.Object", i.getCriteria(), i.getSeparateLine());
       } else {
         boolean typeScan = true;
         if (node instanceof MethodTree) {
