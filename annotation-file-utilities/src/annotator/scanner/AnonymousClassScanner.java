@@ -18,7 +18,7 @@ public class AnonymousClassScanner extends TreePathScanner<Void, Void> {
    * an anonymous class.
    *
    * @param path the source path ending in the anonymous class
-   * @param tree the anonymous class to search for
+   * @param anonclass the anonymous class to search for
    * @return the index of the anonymous class in the source code
    */
   public static int indexOfClassTree(TreePath path, Tree anonclass) {
