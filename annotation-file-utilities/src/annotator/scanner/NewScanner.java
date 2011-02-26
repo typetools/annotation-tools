@@ -25,9 +25,9 @@ public class NewScanner extends CommonScanner {
 	 * Computes the index of the given new tree amongst all new trees
 	 * inside its method, using 0-based indexing. The tree has to be
 	 * either a NewClassTree or a NewArrayTree.  If the tree is not in
-	 * a method, then the index is computed
-	 *
-	 * @param path
+	 * a method, then the index is computed 
+	 * 
+	 * @param origpath
 	 *            the path ending in the given cast tree
 	 * @param tree
 	 *            the cast tree to search for
