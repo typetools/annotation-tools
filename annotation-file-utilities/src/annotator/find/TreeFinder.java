@@ -226,7 +226,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     }
 
     static Map<Pair<CompilationUnitTree,Tree>,TreePath> getPathCache1 = new HashMap<Pair<CompilationUnitTree,Tree>,TreePath>();
-    
+
     /**
      * An alternative to TreePath.getPath(CompilationUnitTree,Tree) that
      * caches its results.
@@ -242,7 +242,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     }
 
     static Map<Pair<TreePath,Tree>,TreePath> getPathCache2 = new HashMap<Pair<TreePath,Tree>,TreePath>();
-    
+
     /**
      * An alternative to TreePath.getPath(TreePath,Tree) that
      * caches its results.
@@ -295,7 +295,13 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     }
 
     @Override
-      public Integer visitPrimitiveType(PrimitiveTypeTree node, Void p) {
+    public Integer visitWildcard(WildcardTree node, Void p) {
+      JCWildcard wc = (JCWildcard) node;
+      return wc.getStartPosition();
+    }
+
+    @Override
+    public Integer visitPrimitiveType(PrimitiveTypeTree node, Void p) {
       debug("TypePositionFinder.visitPrimitiveType(%s)", node);
       // want exact same logistics as with visitIdentifier
       Tree parent = parent(node);
@@ -610,6 +616,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
    * A comparator for sorting integers in reverse
    */
   public static class ReverseIntegerComparator implements Comparator<Integer> {
+    @Override
     public int compare(Integer o1, Integer o2) {
       return o1.compareTo(o2) * -1;
     }
@@ -635,7 +642,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
   }
 
   boolean handled(Tree node) {
-    return (node instanceof CompilationUnitTree
+    boolean res = (node instanceof CompilationUnitTree
             || node instanceof ClassTree
             || node instanceof MethodTree
             || node instanceof VariableTree
@@ -649,6 +656,16 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
             // For the case with implicit upper bound
             || node instanceof TypeParameterTree
             );
+    if (res) return true;
+
+    // We also need to handle un-bounded wildcards,
+    // because there is no bound that would be visited later.
+    if (node instanceof WildcardTree
+            && (((WildcardTree)node).getBound() == null)) {
+        return true;
+    }
+
+    return false;
   }
 
   /**
@@ -779,7 +796,21 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       } else if ((node instanceof TypeParameterTree)
                  && (i.getCriteria().onBoundZero())) {
           pos = tpf.scan(node, null);
-          pos = getFirstInstanceAfter('>', pos+1, tree);
+
+          Integer nextpos1 = getFirstInstanceAfter(',', pos+1, tree);
+          Integer nextpos2 = getFirstInstanceAfter('>', pos+1, tree);
+          pos = (nextpos1!=-1 && nextpos1 < nextpos2) ? nextpos1 : nextpos2;
+
+          // need to add "extends ... Object" around the type annotation
+          i = new Insertion("extends " + i.getText() + " Object", i.getCriteria(), i.getSeparateLine());
+      } else if ((node instanceof WildcardTree)
+               && ((WildcardTree)node).getBound()==null) {
+          pos = tpf.scan(node, null);
+
+          Integer nextpos1 = getFirstInstanceAfter(',', pos+1, tree);
+          Integer nextpos2 = getFirstInstanceAfter('>', pos+1, tree);
+          pos = (nextpos1!=-1 && nextpos1 < nextpos2) ? nextpos1 : nextpos2;
+
           // need to add "extends ... Object" around the type annotation
           i = new Insertion("extends " + i.getText() + " Object", i.getCriteria(), i.getSeparateLine());
       } else {
