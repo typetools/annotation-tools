@@ -17,7 +17,7 @@ public class Insertion {
      *
      * @param text the text to insert
      * @param criteria where to insert the text
-     * @param whether to insert the text on its own
+     * @param separateLine whether to insert the text on its own
      */
     public Insertion(String text, Criteria criteria, boolean separateLine) {
         this.text = text;

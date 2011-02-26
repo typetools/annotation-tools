@@ -20,7 +20,7 @@ public class CastScanner extends CommonScanner {
    * Computes the index of the given cast tree amongst all cast trees inside
    * its method, using 0-based indexing.
    *
-   * @param path the path ending in the given cast tree
+   * @param origpath the path ending in the given cast tree
    * @param tree the cast tree to search for
    * @return the index of the given cast tree
    */
