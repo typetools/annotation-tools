@@ -30,7 +30,11 @@ DEBUG :=
 default : all
 
 .PHONY: all
-all : $(DIFFS) system-test results
+all : $(DIFFS) system-test source-extension results
+
+.PHONY: source-extension
+source-extension:
+	${MAKE} -C source-extension
 
 .PHONY: system-test
 system-test:
