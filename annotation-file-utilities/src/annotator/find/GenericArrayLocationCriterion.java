@@ -1,5 +1,6 @@
 package annotator.find;
 
+// only used for debugging
 import annotator.Main;
 
 import java.util.ArrayList;
@@ -92,6 +93,8 @@ public class GenericArrayLocationCriterion implements Criterion {
                              // I don't know why a GenericArrayLocationCriterion
                              // is being created in this case, but it is.
                              || leaf instanceof PrimitiveTypeTree
+                             // TODO: do we need wildcards here?
+                             // || leaf instanceof WildcardTree
                              )
                             && ! is_generic_or_array(parent)));
       // System.out.printf("GenericArrayLocationCriterion.isSatisfiedBy: locationInParent==null%n  leaf=%s (%s)%n  parent=%s (%s)%n  => %s (%s %s)%n", leaf, leaf.getClass(), parent, parent.getClass(), result, is_generic_or_array(leaf), ! is_generic_or_array(parent));
@@ -132,6 +135,22 @@ public class GenericArrayLocationCriterion implements Criterion {
           //                   ((childTrees.size() > loc) ? childTrees.get(loc) : null));
           return false;
         }
+      } else if (parent.getKind() == Tree.Kind.EXTENDS_WILDCARD) {
+        // annotating List<? extends @A Integer>
+        // System.out.printf("parent instanceof extends WildcardTree: %s loc=%d%n",
+        //                   Main.treeToString(parent), loc);
+        WildcardTree wct = (WildcardTree) parent;
+        Tree boundTree = wct.getBound();
+        return boundTree.equals(leaf);
+      } else if (parent.getKind() == Tree.Kind.SUPER_WILDCARD) {
+        // annotating List<? super @A Integer>
+        // System.out.printf("parent instanceof super WildcardTree: %s loc=%d%n",
+        //                   Main.treeToString(parent), loc);
+        WildcardTree wct = (WildcardTree) parent;
+        Tree boundTree = wct.getBound();
+        return boundTree.equals(leaf);
+      // } else if (parent.getKind() == Tree.Kind.UNBOUNDED_WILDCARD) {
+        // The parent can never be the unbounded wildcard, as it doesn't have any members.
       } else if (parent.getKind() == Tree.Kind.ARRAY_TYPE) {
         // annotating Integer @A []
         parentPath = TreeFinder.largestContainingArray(parentPath);
@@ -183,10 +202,12 @@ public class GenericArrayLocationCriterion implements Criterion {
             );
   }
 
+  @Override
   public Kind getKind() {
     return Criterion.Kind.GENERIC_ARRAY_LOCATION;
   }
 
+  @Override
   public String toString() {
     return "GenericArrayLocationCriterion at " +
     ((locationInParent == null)
