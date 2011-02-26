@@ -39,11 +39,13 @@ public class InStaticInitCriterion implements Criterion {
 		return false;
 	}
 
-	public Kind getKind() {
-		return Kind.IN_CLASS;
+	@Override
+    public Kind getKind() {
+		return Kind.IN_METHOD;
 	}
 
-	public String toString() {
+	@Override
+    public String toString() {
 		return "In static initializer with index " + blockID;
 	}
 }
