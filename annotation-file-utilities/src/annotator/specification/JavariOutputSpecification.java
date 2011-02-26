@@ -21,10 +21,8 @@ public class JavariOutputSpecification implements Specification {
     private List<Insertion> insertion;
 
     /**
-     * Creates a new {@code JavariOutputSpecification} from the given set of
-     * command line options.
+     * Creates a new {@code JavariOutputSpecification}.
      *
-     * @param options param the command-line options to use
      * @throws FileNotFoundException if an input file couldn't be found
      * @throws IOException if an input file couldn't be read
      */

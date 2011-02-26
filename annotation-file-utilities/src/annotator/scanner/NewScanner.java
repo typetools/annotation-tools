@@ -29,7 +29,7 @@ public class NewScanner extends CommonScanner {
 	 * either a NewClassTree or a NewArrayTree.  If the tree is not in
 	 * a method, then the index is computed 
 	 * 
-	 * @param path
+	 * @param origpath
 	 *            the path ending in the given cast tree
 	 * @param tree
 	 *            the cast tree to search for
