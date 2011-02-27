@@ -272,7 +272,7 @@ public class Main {
             if (abbreviate) {
               Pair<String,String> ps = removePackage(toInsert);
               if (ps.a != null) {
-                if (debug && !imports.containsKey(ps.a)) {
+                if (debug && !imports.contains(ps.a)) {
                   System.out.printf("Need import %s%n  due to insertion %s%n",
                                     ps.a, toInsert);
                 }
