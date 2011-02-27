@@ -480,23 +480,27 @@ public class Main {
     }
   }
 
+  private static Pattern extendsObjectPattern
+    = Pattern.compile("^extends (.*) ((java\\.lang\\.)?Object)$");
+
   /**
    * Removes the leading package.
-   * Handles "extends @B Object" strings.
+   * Handles "extends @B Object" and "extends @B java.lang.Object" strings.
    *
    * @return given <code>@com.foo.bar(baz)</code> it returns the pair
    * <code>{ com.foo, @bar(baz) }</code>.
    */
   public static Pair<String,String> removePackage(String s) {
-    boolean extendsWrapped = false;
-    if (s.startsWith("extends ") && s.endsWith(" Object")) {
-      s = s.substring(8, s.length()-7);
-      extendsWrapped = true;
+    String extendsWrapped = null;
+    Matcher m = extendsObjectPattern.matcher(s);
+    if (m.matches()) {
+      s = m.group(1);
+      extendsWrapped = m.group(2);
     }
     Pair<String,String> result = removePackageInternal(s);
     // System.out.printf("removePackageInternal(%s) => %s%n", s, result);
-    if (extendsWrapped) {
-      return Pair.of(result.a, "extends " + result.b + " Object");
+    if (extendsWrapped != null) {
+      return Pair.of(result.a, "extends " + result.b + " " + extendsWrapped);
     } else {
       return result;
     }
