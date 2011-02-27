@@ -272,6 +272,10 @@ public class Main {
             if (abbreviate) {
               Pair<String,String> ps = removePackage(toInsert);
               if (ps.a != null) {
+                if (debug && !imports.containsKey(ps.a)) {
+                  System.out.printf("Need import %s%n  due to insertion %s%n",
+                                    ps.a, toInsert);
+                }
                 imports.add(ps.a);
               }
               toInsert = ps.b;
@@ -334,6 +338,7 @@ public class Main {
               }
             }
             // add trailing whitespace
+            // (test is not for "extends " because we just added a leading space, above)
             if ((! gotSeparateLine) && (! toInsert.startsWith(" extends "))) {
               toInsert = toInsert + " ";
             }
