@@ -24,6 +24,7 @@ import org.objectweb.asm.commons.EmptyVisitor;
 
 import annotations.*;
 import annotations.el.*;
+import annotations.field.*;
 
 /**
  * A ClassAnnotationSceneWriter is a {@link org.objectweb.asm.ClassVisitor}
@@ -351,6 +352,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
           // hopefully a field with a default value
           continue;
       }
+      AnnotationFieldType aft = a.def().fieldTypes.get(fieldName);
       if (value instanceof Annotation) {
         AnnotationVisitor nav = av.visitAnnotation(fieldName, classDescToName(a.def().name));
         visitFields(nav, (Annotation) a);
@@ -364,6 +366,8 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
           aav.visit(null, o);
         }
         aav.visitEnd();
+      } else if (aft instanceof EnumAFT) {
+        av.visitEnum(fieldName, ((EnumAFT) aft).typeName, value.toString());
       } else {
         // everything else is a string
         av.visit(fieldName, value);
