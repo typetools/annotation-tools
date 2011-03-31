@@ -1,0 +1,6 @@
+import java.util.*;
+
+public class WildcardsSuper {
+  @GUT.quals.Rep
+  Enumeration<? super @GUT.quals.Peer WildcardsSuper> f;
+}

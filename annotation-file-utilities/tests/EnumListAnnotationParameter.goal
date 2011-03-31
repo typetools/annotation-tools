@@ -1,0 +1,7 @@
+package annotator.tests;
+
+public class EnumListAnnotationParameter {
+  @java.lang.TestAnnotation({java.lang.TestEnum.A,java.lang.TestEnum.B})
+  public void foo() {
+  }
+}

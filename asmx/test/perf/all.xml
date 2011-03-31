@@ -1,0 +1,21 @@
+<project name="perf" default="test">
+  <target name="test">
+    <java classname="org.objectweb.asm.ALLPerfTest" fork="yes">
+      <classpath>
+        <pathelement location="${out.build}"/>
+        <pathelement location="${out.test}"/>
+        <fileset dir="${test}">
+          <include name="lib/bcel.jar"/>
+          <include name="lib/serp.jar"/>
+          <include name="lib/javassist.jar"/>
+          <!-- xslt engines -->
+          <include name="lib/jd.xslt-1.5.5.jar"/>
+          <include name="lib/saxon7.jar"/>
+          <include name="lib/xalan-2.6.0.jar"/>
+        </fileset>
+      </classpath>
+      <arg value="${out.test}/"/>
+      <arg value="${java.home}/../lib/tools.jar"/>
+    </java>
+  </target>
+</project>
