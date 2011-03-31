@@ -385,7 +385,11 @@
 
     <javac srcdir="src" destdir="bin" debug="true" encoding="8859_1"
       classpathref="libpath" includeantruntime="false">
-      <compilerarg value="-version"/>
+      <!-- We are required to put jsr308's javac.jar on the bootclasspath so
+           that those javac classes are found before the stock javac classes
+           that the Mac OS includes on the bootclasspath (other platforms do
+           not make such inclusions) -->
+      <compilerarg value="-Xbootclasspath/p:${annotations-compiler-absolute}/dist/lib/javac.jar"/>
     </javac>
 
   </target>

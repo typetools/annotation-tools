@@ -63,10 +63,15 @@ bin/annotator/tests/%.class: %.java
 	$(JAVAC) -g -cp bin:../bin -d bin -sourcepath . $*.java
 
 # Actually runs the annotator to create the annotated java file.
+# We are required to put annotation-file-utilities.jar (and ../bin) on the
+# bootclasspath so that the jsr308 javac classes bundled therein are found
+# before the stock javac classes that the Mac OS includes on the bootclasspath
+# (other platforms do not make such inclusions)
 .PRECIOUS: %.output
 %.output: %.jaif %.java bin/annotator/tests/%.class ../lib/plume.jar ../bin ../annotation-file-utilities.jar
 	$(JAVA) \
-	-cp bin:../bin:../annotation-file-utilities.jar \
+        -Xbootclasspath/p:../bin:../annotation-file-utilities.jar \
+        -cp bin \
 	annotator.Main \
 	${DEBUG} \
 	--abbreviate=false \
