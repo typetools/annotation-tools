@@ -362,8 +362,13 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
         // visitArray needs to visit each element, and by specification
         // the name should be null for each element.
         AnnotationVisitor aav = av.visitArray(fieldName);
+        aft = ((ArrayAFT) aft).elementType;
         for (Object o : (List)value) {
-          aav.visit(null, o);
+          if (aft instanceof EnumAFT) {
+            aav.visitEnum(null, ((EnumAFT) aft).typeName, o.toString());
+          } else {
+            aav.visit(null, o);
+          }
         }
         aav.visitEnd();
       } else if (aft instanceof EnumAFT) {
