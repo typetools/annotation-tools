@@ -3,6 +3,7 @@ package annotations.tests.classfile;
 import checkers.nullness.quals.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -15,6 +16,8 @@ import org.objectweb.asm.ExtendedAnnotationVisitor;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.commons.EmptyVisitor;
+
+import plume.UtilMDE;
 
 /**
  * An <code>AnnotationVerifier</code> provides a way to check to see if two
@@ -471,7 +474,7 @@ public class AnnotationVerifier {
       verifyList(sb, "visitArray()", 1, this.arrayArgs, ar.arrayArgs);
 
       verifyList(sb, "visitXIndexArgs()", 1, this.xIndexArgs, ar.xIndexArgs);
-      verifyList(sb, "visitXLength()", 1, this.xLengthArgs, ar.xIndexArgs);
+      verifyList(sb, "visitXLength()", 1, this.xLengthArgs, ar.xLengthArgs);
       verifyList(sb, "visitXLocation()", 1, this.xLocationArgs, ar.xLocationArgs);
       verifyList(sb, "visitXLocationLength()", 1, this.xLocationLengthArgs, ar.xLocationLengthArgs);
       verifyList(sb, "visitXOffset()", 1, this.xOffsetArgs, ar.xOffsetArgs);
@@ -495,12 +498,26 @@ public class AnnotationVerifier {
         int parameter,
         List questionable,
         List correct) {
-      if (!questionable.equals(correct)) {
-        String s = "\n" + description +
-        " was called with unexpected information in parameter: " + parameter +
-        "\nReceived: " + questionable  +
-        "\nExpected: " + correct;
+      if (questionable.equals(correct)) {
+        return;
       }
+      if (UtilMDE.deepEquals(questionable, correct)) {
+        return;
+      }
+
+      sb.append(lineSep);
+      sb.append(methodName);
+      sb.append(" was called with unexpected information in parameter: ");
+      sb.append(parameter);
+      sb.append(lineSep);
+      sb.append("Description: ");
+      sb.append(description);
+      sb.append(lineSep);
+      sb.append(String.format("Received (%s): %s%n",
+                              questionable.getClass(), questionable));
+      sb.append(String.format("Expected (%s): %s%n",
+                              correct.getClass(), correct));
+      // new Error("The backtrace:").printStackTrace();
     }
 
     private void verifyInnerAnnotationRecorder(
