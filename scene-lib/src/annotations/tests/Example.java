@@ -25,7 +25,7 @@ public class Example {
 
     if (! new File(args[0]).exists()) {
       try {
-        throw new Error(String.format("Cannot find file %s in %s",
+        throw new Error(String.format("Cannot find file %s in directory %s",
                                     args[0], new File(".").getCanonicalPath()));
       } catch (IOException e) {
         throw new Error("This can't happen: ", e);
