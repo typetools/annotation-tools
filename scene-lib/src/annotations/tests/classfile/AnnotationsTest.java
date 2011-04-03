@@ -252,8 +252,13 @@ public class AnnotationsTest extends TestCase {
       try {
         av.verify();
       } catch(AnnotationVerifier.AnnotationMismatchException e) {
+        String message = String.format("assertClassAnnotations (consider running javap on the two .class files):%n  correctClass %s%n  generatedClass %s%n%s", correctClass, generatedClass, e.toString());
+        System.out.println();
+        System.out.println(message);
         av.verifyPrettyPrint();
-        fail(String.format("assertClassAnnotations (consider running javap on the two .class files):%n  correctClass %s%n  generatedClass %s%n%s", correctClass, generatedClass, e.toString()));
+        System.out.println(message);
+        System.out.println();
+        fail(message);
       }
 
     } catch(IOException e) {
