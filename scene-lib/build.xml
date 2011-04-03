@@ -224,8 +224,13 @@
     </target>
     
     <target name="test-example" depends="init, bin">
-	<!-- Working directory is ignored when same JVM is used. 
+	<!-- Working directory is ignored when same JVM is used.  That means
+             that the relative path for ${scene-lib} works only if this target
+             is invoked from the same directory as the build.xml file appears
+             in.  We can fix the java task by adding this:
+              fork="true"
               dir="${scene-lib}/src/annotations/tests"
+             but there are other uses of ${scene-lib} in this target.
         -->
         <java classname="annotations.tests.Example"
               output="${scene-lib}/src/annotations/tests/example-stdout.jann"
