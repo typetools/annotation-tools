@@ -83,7 +83,7 @@ public class IsSigMethodCriterion implements Criterion {
     } else if (firstChar.equals("L")) {
       return "L" + restOfParams.substring(1, restOfParams.indexOf(";") + 1);
     } else {
-      throw new RuntimeException("Unknown method params: " + fullMethodName);
+      throw new RuntimeException("Unknown method params: " + fullMethodName + " with remainder: " + restOfParams);
     }
   }
 
@@ -133,7 +133,7 @@ public class IsSigMethodCriterion implements Criterion {
     }
     return haveMatch;
   }
-    
+
 
   private boolean matchTypeParams(List<? extends VariableTree> sourceParams,
                                   Map<String, String> typeToClassMap,
@@ -329,6 +329,7 @@ public class IsSigMethodCriterion implements Criterion {
     return true;
   }
 
+  @Override
   public Kind getKind() {
     return Kind.SIG_METHOD;
   }
@@ -432,6 +433,7 @@ public class IsSigMethodCriterion implements Criterion {
     }
   }
 
+  @Override
   public String toString() {
     return "IsSigMethodCriterion: " + fullMethodName;
   }
