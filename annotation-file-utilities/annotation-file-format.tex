@@ -334,7 +334,8 @@ of the \\ \qquad    \bnfcmt annotation:   ``\texttt{@A(12)}'' rather than ``\tex
 \\
 \bnfnt{typeparam-definition} ::= \\
 \qquad    \bnfcmt The integer is the zero-based type parameter index. \\
-\qquad    \bnflit{typeparam} \bnfnt{integer} \bnflit{:}
+\qquad    \bnflit{typeparam} \bnfnt{integer} \bnflit{:} \bnfnt{annotation}* \lineend\\
+\\
 % The bound should really be a sub-element of the typeparam!
 \bnfnt{bound-definition} ::= \\
 \qquad    \bnfcmt The integers are respectively the parameter and bound indices of \\
