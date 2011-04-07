@@ -332,7 +332,8 @@ public class Main {
               if (toInsert.equals(precedingTextPlusChar.substring(0, toInsert.length()))
                   || toInsert.equals(precedingTextPlusChar.substring(1))) {
                 if (debug) {
-                  System.out.println("Already present, skipping");
+                    System.out.println("Already present, skipping");
+                    System.out.println("Inserting " + toInsert + " at " + pos + " in code of length " + src.getString().length() + " with preceding text '" + precedingTextPlusChar + "'");
                 }
                 continue;
               }
