@@ -19,7 +19,9 @@
     <target name="clean" depends="clean-all"/>
 
     <target name="compile-asmx">
-        <ant dir="${asmx}" target="compile"/>
+        <ant dir="${asmx}" target="compile">
+	     <property name="product.noshrink" value="true"/>
+        </ant>
     </target>
 
     <!-- TODO: Get this working -->
