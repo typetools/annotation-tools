@@ -597,6 +597,25 @@ public final class IndexFileParser {
         }
     }
 
+    private void parseExtends(AClass cls) throws IOException, ParseException {
+        expectKeyword("extends");
+        TypeIndexLocation idx = new TypeIndexLocation(-1);
+        ATypeElement ext = cls.extendsImplements.vivify(idx);
+        expectChar(':');
+        parseAnnotations(ext);
+        parseInnerTypes(ext);
+    }
+
+    private void parseImplements(AClass cls) throws IOException, ParseException {
+        expectKeyword("implements");
+        int implIndex = expectNonNegative(matchNNInteger());
+        TypeIndexLocation idx = new TypeIndexLocation(implIndex);
+        ATypeElement impl = cls.extendsImplements.vivify(idx);
+        expectChar(':');
+        parseAnnotations(impl);
+        parseInnerTypes(impl);
+    }
+
     private void parseField(AClass c) throws IOException,
             ParseException {
         expectKeyword("field");
@@ -610,7 +629,7 @@ public final class IndexFileParser {
             parseAnnotations(f.type);
             parseInnerTypes(f.type);
         }
-        
+
         AExpression fieldinit = c.fieldInits.vivify(name);
         parseExpression(fieldinit);
     }
@@ -688,10 +707,10 @@ public final class IndexFileParser {
                 throw new Error("This can't happen");
             }
         }
-        
+
         parseBlock(m);
     }
-    
+
 	private void parseBlock(ABlock bl) throws IOException,
 			ParseException {
 		boolean matched = true;
@@ -736,12 +755,12 @@ public final class IndexFileParser {
 			matched = parseExpression(bl) || matched;
 		}
 	}
-	
+
 	private boolean parseExpression(AExpression exp) throws IOException,
 			ParseException {
 		boolean matched = true;
 		boolean evermatched = false;
-		
+
 		while (matched) {
 			matched = false;
 
@@ -812,15 +831,20 @@ public final class IndexFileParser {
         String fullName = curPkgPrefix + basename;
 
         AClass c = scene.classes.vivify(fullName);
-
         expectChar(':');
+
         parseAnnotations(c);
         parseBounds(c.bounds);
+
+        while (checkKeyword("extends"))
+            parseExtends(c);
+        while (checkKeyword("implements"))
+            parseImplements(c);
 
         while (checkKeyword("field"))
             parseField(c);
         while (checkKeyword("staticinit"))
-        	parseStaticInit(c);
+            parseStaticInit(c);
         while (checkKeyword("method"))
             parseMethod(c);
         c.methods.prune();
