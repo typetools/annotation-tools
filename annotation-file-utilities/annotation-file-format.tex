@@ -295,24 +295,23 @@ of the \\ \qquad    \bnfcmt annotation:   ``\texttt{@A(12)}'' rather than ``\tex
 \qquad    \bnflit{class} \bnfnt{name} \bnflit{:} \bnfnt{annotation}* \lineend  \\
 % TODO: is the order really important? eg. can fields and methods not
 % be mixed?
-\qquad        \bnfnt{extends-definition}* \\
-\qquad        \bnfnt{implements-definition}* \\
 \qquad        \bnfnt{typeparam-definition}* \\
 \qquad        \bnfnt{bound-definition}* \\
+\qquad        \bnfnt{extends-definition}* \\
+\qquad        \bnfnt{implements-definition}* \\
 \qquad        \bnfnt{field-definition}*  \\
 \qquad        \bnfnt{method-definition}* \\
 \\
 \bnfnt{extends-definition} ::= \\
 \qquad    \bnfcmt Only type annotations are allowed.\\
-\qquad    \bnflit{extends} \bnflit{:} \lineend  \\
-\qquad        \bnfnt{type-annotations}* \\
+\qquad    \bnflit{extends} \bnflit{:} \bnfnt{annotation}* \lineend  \\
+\qquad        \bnfnt{type-argument-or-array-definition}* \\
 \\
 \bnfnt{implements-definition} ::= \\
 \qquad    \bnfcmt Only type annotations are allowed.\\
-\qquad    \bnfcmt The integer is the zero-based index of the
-implemented interface. \\
-\qquad    \bnflit{implements} \bnfnt{integer} \bnflit{:} \lineend  \\
-\qquad        \bnfnt{type-annotations}* \\
+\qquad    \bnfcmt The integer is the zero-based index of the implemented interface. \\
+\qquad    \bnflit{implements} \bnfnt{integer} \bnflit{:} \bnfnt{annotation}* \lineend  \\
+\qquad        \bnfnt{type-argument-or-array-definition}* \\
 \\
 \bnfnt{field-definition} ::= \\
 \qquad    \bnfcmt The annotation on the \bnflit{field} line is that of the field declaration, \\
