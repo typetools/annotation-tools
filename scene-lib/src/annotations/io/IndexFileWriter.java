@@ -236,6 +236,21 @@ public final class IndexFileWriter {
         }
     }
 
+    private void printExtImpls(String indentation,
+            /*@ReadOnly*/ Map<TypeIndexLocation, /*@ReadOnly*/ ATypeElement> extImpls) {
+
+        for (/*@ReadOnly*/ Map.Entry<TypeIndexLocation, /*@ReadOnly*/ ATypeElement> ei
+                : extImpls.entrySet()) {
+            TypeIndexLocation idx = ei.getKey();
+            /*@ReadOnly*/ ATypeElement ty = ei.getValue();
+            if (idx.typeIndex == -1) {
+                printTypeElementAndInnerTypes(indentation, "extends", ty);
+            } else {
+                printTypeElementAndInnerTypes(indentation, "implements " + idx.typeIndex, ty);
+            }
+        }
+    }
+
     private void write() throws DefException {
         // First the annotation definitions...
         OurDefCollector odc = new OurDefCollector();
@@ -252,7 +267,10 @@ public final class IndexFileWriter {
             pw.print("class " + basename + ":");
             printAnnotations(c);
             pw.println();
+
             printBounds(INDENT, c.bounds);
+            printExtImpls(INDENT, c.extendsImplements);
+
             for (/*@ReadOnly*/ Map.Entry<String, /*@ReadOnly*/ AElement> fe
                     : c.fields.entrySet()) {
                 String fname = fe.getKey();
