@@ -148,6 +148,8 @@ public abstract class DefCollector {
         collect((/*@ReadOnly*/ AElement) c);
         for (ATypeElement b : c.bounds.values())
             collect(b);
+        for (ATypeElement ei : c.extendsImplements.values())
+            collect(ei);
         for (AMethod m : c.methods.values())
             collect(m);
         for (AElement f : c.fields.values())
