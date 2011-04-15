@@ -147,6 +147,22 @@ public class IndexFileSpecification implements Specification {
 
     clist = clist.add(Criteria.inClass(className, /*exactMatch=*/ false));
 
+    VivifyingMap<TypeIndexLocation, ATypeElement> extimpl = clazz.extendsImplements;
+    for (Entry<TypeIndexLocation, ATypeElement> entry : extimpl.entrySet()) {
+      TypeIndexLocation eiLoc = entry.getKey();
+      ATypeElement ei = entry.getValue();
+      CriterionList eiList = clist.add(Criteria.atExtImplsLocation(className, eiLoc));
+
+      for (Entry<InnerTypeLocation, ATypeElement> innerEntry : ei.innerTypes.entrySet()) {
+        InnerTypeLocation innerLoc = innerEntry.getKey();
+        AElement ae = innerEntry.getValue();
+        CriterionList innerBoundList = eiList.add(Criteria.atLocation(innerLoc));
+        parseElement(innerBoundList, ae);
+      }
+      CriterionList outerClist = eiList.add(Criteria.atLocation());
+      parseElement(outerClist, ei);
+    }
+
     for (Map.Entry<String, AElement> entry : clazz.fields.entrySet()) {
 //      clist = clist.add(Criteria.notInMethod()); // TODO: necessary? what is in class but not in method?
       parseField(clist, entry.getKey(), entry.getValue());
