@@ -288,7 +288,15 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
         }
       }
 
+      for (Map.Entry<TypeIndexLocation, ATypeElement> e : aClass.extendsImplements.entrySet()) {
+        TypeIndexLocation idx = e.getKey();
+        ATypeElement aty = e.getValue();
+
+        // TODO: How is this annotation written back out?
+        System.err.println("ClassAnnotationSceneWriter: ignoring Extends/Implements annotation " + idx + " with type: " + aty);
       }
+      
+    }
   }
 
   /**
@@ -471,6 +479,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
      * @inheritDoc
      * @see org.objectweb.asm.FieldVisitor#visitAnnotation(java.lang.String, boolean)
      */
+    @Override
     public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
       existingFieldAnnotations.add(desc);
 
@@ -487,6 +496,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
      * @inheritDoc
      * @see org.objectweb.asm.FieldVisitor#visitExtendedAnnotation(java.lang.String, boolean)
      */
+    @Override
     public ExtendedAnnotationVisitor visitExtendedAnnotation(String desc, boolean visible) {
       existingFieldAnnotations.add(desc);
 
@@ -503,6 +513,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
     /** @inheritDoc
      * @see org.objectweb.asm.FieldVisitor#visitAttribute(org.objectweb.asm.Attribute)
      */
+    @Override
     public void visitAttribute(Attribute attr) {
       fv.visitAttribute(attr);
     }
@@ -513,6 +524,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
      *
      * @see org.objectweb.asm.FieldVisitor#visitEnd()
      */
+    @Override
     public void visitEnd() {
       ensureVisitSceneFieldAnnotations();
       fv.visitEnd();
