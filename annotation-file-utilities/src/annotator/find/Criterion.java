@@ -31,6 +31,7 @@ public interface Criterion {
         NEW,
         INSTANCE_OF,
         BOUND_LOCATION,
+        EXTIMPLS_LOCATION,
         METHOD_BOUND,
         CLASS_BOUND,
         IN_PACKAGE,
