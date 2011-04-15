@@ -8,6 +8,7 @@ import annotations.el.BoundLocation;
 import annotations.el.InnerTypeLocation;
 import annotations.el.LocalLocation;
 import annotations.el.RelativeLocation;
+import annotations.el.TypeIndexLocation;
 
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
@@ -149,7 +150,7 @@ public final class Criteria {
     }
     return false;
   }
-    
+
 
   /**
    * @return a GenericArrayLocationCriterion if this has one, else null
@@ -200,6 +201,7 @@ public final class Criteria {
   /**
    * {@inheritDoc}
    */
+  @Override
   public String toString() {
     return criteria.toString();
   }
@@ -340,6 +342,10 @@ public final class Criteria {
 
   public final static Criterion atBoundLocation(BoundLocation loc) {
     return new BoundLocationCriterion(loc);
+  }
+
+  public final static Criterion atExtImplsLocation(String className, TypeIndexLocation loc) {
+    return new ExtImplsLocationCriterion(className, loc);
   }
 
   public final static Criterion methodBound(String methodName, BoundLocation boundLoc) {
