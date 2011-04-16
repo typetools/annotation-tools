@@ -257,6 +257,11 @@ public final class Criteria {
     return new InClassCriterion(name, /*exactmatch=*/ true);
   }
 
+  public final static boolean isClassEquiv(Tree tree) {
+    return tree.getKind() == Tree.Kind.CLASS || tree.getKind() == Tree.Kind.NEW_CLASS ||
+      tree.getKind() == Tree.Kind.INTERFACE || tree.getKind() == Tree.Kind.ENUM;
+  }
+
   /**
    * Creates an "in method" criterion: that a program element is enclosed
    * by the specified method.
