@@ -15,6 +15,11 @@ public interface Criterion {
      */
     public static enum Kind {
         IN_METHOD,
+        /*
+         * Used for classes, interfaces, enums, annotation types.
+         * What would be a better name?
+         * Also see Criteria.isClassEquiv
+         */
         IN_CLASS,
         ENCLOSED_BY,
         HAS_KIND,
@@ -35,6 +40,11 @@ public interface Criterion {
         METHOD_BOUND,
         CLASS_BOUND,
         IN_PACKAGE,
+        /*
+         * This constant is never used. What is the difference to IN_CLASS?
+         * Is one for anywhere within a class and this one only for the
+         * class declaration itself?
+         */
         CLASS,
         PACKAGE;
     }
