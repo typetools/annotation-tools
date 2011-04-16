@@ -12,6 +12,7 @@ final class NotInMethodCriterion implements Criterion {
   /**
    * {@inheritDoc}
    */
+  @Override
   public Kind getKind() {
     return Kind.NOT_IN_METHOD;
   }
@@ -30,7 +31,7 @@ final class NotInMethodCriterion implements Criterion {
       Tree tree = path.getLeaf();
       if (tree.getKind() == Tree.Kind.METHOD)
         return false;
-      if (tree.getKind() == Tree.Kind.CLASS || tree.getKind() == Tree.Kind.NEW_CLASS) {
+      if (Criteria.isClassEquiv(tree)) {
         return true;
       }
       path = path.getParentPath();
@@ -42,6 +43,7 @@ final class NotInMethodCriterion implements Criterion {
   /**
    * {@inheritDoc}
    */
+  @Override
   public String toString() {
     return "not in method";
   }
