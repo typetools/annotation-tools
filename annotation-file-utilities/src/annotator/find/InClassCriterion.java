@@ -3,6 +3,8 @@ package annotator.find;
 import java.util.*;
 import java.util.regex.*;
 
+import javax.lang.model.element.Name;
+
 import annotator.scanner.AnonymousClassScanner;
 
 import com.sun.source.tree.ClassTree;
@@ -84,7 +86,7 @@ final class InClassCriterion implements Criterion {
     for (Tree tree : trees) {
       boolean checkAnon = false;
 
-      switch (tree.getKind()) {
+	  switch (tree.getKind()) {
       case COMPILATION_UNIT:
         debug("InClassCriterion.isSatisfiedBy:%n  cname=%s%n  tree=%s%n", cname, tree);
         ExpressionTree packageTree = ((CompilationUnitTree) tree).getPackageName();
@@ -101,14 +103,21 @@ final class InClassCriterion implements Criterion {
         }
         break;
       case CLASS:
+      case INTERFACE:
+      case ENUM:
+      case ANNOTATION_TYPE:
         debug("InClassCriterion.isSatisfiedBy:%n  cname=%s%n  tree=%s%n", cname, tree);
+
+        // all four Kinds are represented by ClassTree
         ClassTree c = (ClassTree)tree;
-        if (c.getSimpleName() == null) {
+        Name csn = c.getSimpleName();
+        
+        if (csn == null) {
           debug("empty getSimpleName: InClassCriterion.isSatisfiedBy:%n  cname=%s%n  tree=%s%n", cname, tree);
           checkAnon = true;
           break;
         }
-        String treeClassName = c.getSimpleName().toString();
+        String treeClassName = csn.toString();
         if (cname.equals(treeClassName)) {
           if (exactMatch) {
             cname = "";
