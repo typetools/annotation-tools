@@ -258,8 +258,16 @@ public final class Criteria {
   }
 
   public final static boolean isClassEquiv(Tree tree) {
-    return tree.getKind() == Tree.Kind.CLASS || tree.getKind() == Tree.Kind.NEW_CLASS ||
-      tree.getKind() == Tree.Kind.INTERFACE || tree.getKind() == Tree.Kind.ENUM;
+    switch (tree.getKind()) {
+      case CLASS:
+      case NEW_CLASS:
+      case INTERFACE:
+      case ENUM:
+      case ANNOTATION_TYPE:
+        return true;
+      default:
+        return false;
+    }
   }
 
   /**
