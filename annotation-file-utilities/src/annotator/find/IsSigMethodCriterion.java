@@ -3,10 +3,13 @@ package annotator.find;
 import annotator.Main;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.ImportTree;
@@ -312,6 +315,28 @@ public class IsSigMethodCriterion implements Criterion {
       typeToClassMap.put(paramName, paramClass);
     }
 
+    // Do the same for the enclosing class.
+    // The type variable might not be from the directly enclosing
+    // class, but from a further up class.
+    // Go through all enclosing classes and add the type parameters.
+    {
+      TreePath classpath = path;
+      ClassTree ct = enclosingClass(classpath);
+      while (ct!=null) {
+        for (TypeParameterTree param : ct.getTypeParameters()) {
+          String paramName = param.getName().toString();
+          String paramClass = "Object";
+          List<? extends Tree> paramBounds = param.getBounds();
+          if (paramBounds != null && paramBounds.size() >= 1) {
+            paramClass = paramBounds.get(0).toString();
+          }
+          typeToClassMap.put(paramName, paramClass);
+        }
+        classpath = classpath.getParentPath();
+        ct = enclosingClass(classpath);
+      }
+    }
+
     if (! matchTypeParams(sourceParams, typeToClassMap, context)) {
       debug("IsSigMethodCriterion => false: Parameter types don't match");
       return false;
@@ -327,6 +352,31 @@ public class IsSigMethodCriterion implements Criterion {
 
     debug("IsSigMethodCriterion.isSatisfiedBy => true");
     return true;
+  }
+
+  /* This is a copy of the method from the Checker Framework
+   * TreeUtils.enclosingClass.
+   * We cannot have a dependency on the Checker Framework.
+   * TODO: as is the case there, anonymous classes are not handled correctly.
+   */
+  private static ClassTree enclosingClass(final TreePath path) {
+    final Set<Tree.Kind> kinds = EnumSet.of(
+            Tree.Kind.CLASS,
+            Tree.Kind.ENUM,
+            Tree.Kind.INTERFACE,
+            Tree.Kind.ANNOTATION_TYPE
+    );
+    TreePath p = path;
+
+    while (p != null) {
+      Tree leaf = p.getLeaf();
+      assert leaf != null; /*nninvariant*/
+      if (kinds.contains(leaf.getKind()))
+        return (ClassTree) leaf;
+      p = p.getParentPath();
+    }
+
+    return null;
   }
 
   @Override
