@@ -503,8 +503,14 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
           className = ((JCAnnotatedType) className).underlyingType;
         } else if (className instanceof JCTypeApply) {
           className = ((JCTypeApply) className).clazz;
+        } else if (className instanceof JCFieldAccess) {
+          // This occurs for fully qualified names, e.g. "new java.lang.Object()".
+          // I'm not quite sure why the field "selected" is taken, but "name" would
+          // be a type mismatch. It seems to work, see NewPackage test case.
+          className = ((JCFieldAccess) className).selected;
         } else {
-          throw new Error(String.format("unrecognized JCNewClass.clazz (%s): %s%n", className.getClass(), className));
+          throw new Error(String.format("unrecognized JCNewClass.clazz (%s): %s%n" +
+                  "   sourrounding new class tree: %s%n", className.getClass(), className, node));
         }
         // System.out.printf("classname %s (%s)%n", className, className.getClass());
       }
