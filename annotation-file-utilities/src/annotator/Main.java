@@ -261,6 +261,9 @@ public class Main {
         for (Integer pos : positionKeysSorted) {
           List<Insertion> toInsertList = new ArrayList<Insertion>(positions.get(pos));
           Collections.reverse(toInsertList);
+          if (debug) {
+            System.out.printf("insertion pos: %d%n", pos);
+          }
           assert pos >= 0
             : "pos is negative: " + pos + " " + toInsertList.get(0) + " " + javafilename;
           for (Insertion iToInsert : toInsertList) {
@@ -293,11 +296,14 @@ public class Main {
             // Possibly add whitespace after the insertion
             boolean gotSeparateLine = false;
             if (iToInsert.getSeparateLine()) {
+              // System.out.printf("getSeparateLine=true for insertion at pos %d: %s%n", pos, iToInsert);
               int indentation = 0;
               while ((pos - indentation != 0)
                      // horizontal whitespace
                      && (src.charAt(pos-indentation-1) == ' '
                          || src.charAt(pos-indentation-1) == '\t')) {
+                // System.out.printf("src.charAt(pos-indentation-1 == %d-%d-1)='%s'%n",
+                //                   pos, indentation, src.charAt(pos-indentation-1));
                 indentation++;
               }
               if ((pos - indentation == 0)
