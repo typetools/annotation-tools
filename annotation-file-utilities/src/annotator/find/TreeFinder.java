@@ -44,6 +44,10 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     }
   }
 
+  // If this code location is not an array type, return null.  Otherwise,
+  // starting at an array type, walk up the AST as long as still an array,
+  // and stop at the largest containing array (with nothing but arrays in
+  // between).
   public static TreePath largestContainingArray(TreePath p) {
     if (p.getLeaf().getKind() != Tree.Kind.ARRAY_TYPE) {
       return null;
@@ -424,6 +428,9 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       JCArrayTypeTree att = (JCArrayTypeTree) node;
       debug("TypePositionFinder.visitArrayType(%s) preferred = %s%n", node, att.getPreferredPosition());
       int pos = arrayStartPos(node);
+      // If the code has a type like "String[][][]", then this gets called
+      // three times:  for String[][][], String[][], and String[]
+      // respectively.  For each of the three, call String[][][] "largest".
       ArrayTypeTree largest = largestContainingArray(node);
       assert arrayStartPos(node) == pos;
       int largestLevels = arrayLevels(largest);
