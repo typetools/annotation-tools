@@ -1,0 +1,10 @@
+package java.lang:
+annotation @A:
+
+annotation @ShouldNotAppearInOutput:
+
+package annotator.tests:
+class MatchReturnValue:
+
+    method clone()Lannotator.tests.MatchReturnValue;: @A
+    method clone()Ljava.lang.Object;: @ShouldNotAppearInOutput
