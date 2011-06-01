@@ -1,0 +1,5 @@
+public class NonClass {
+  interface A { void m(@X Object p); }
+  enum B { ONE; void m() { @X Object l; } }
+  @interface C { @X String value() default "Ha!"; }
+}

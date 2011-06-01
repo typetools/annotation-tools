@@ -1,0 +1,5 @@
+class ExplicitUpper<X extends @A Object> {
+}
+
+public class ImplicitUpper<Y extends @B java.lang.Object> {
+}

@@ -1,0 +1,18 @@
+package java.lang:
+annotation @ReadOnly: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+
+package java.lang:
+annotation @Mutable: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+
+package annotator.tests:
+class ConstructorParamMultiple:
+
+    method <init>(Ljava/lang/Object;Ljava/util/List;I)V:
+        parameter #0:
+            type: @java.lang.ReadOnly
+        parameter #1:
+            type: @java.lang.ReadOnly
+            inner-type 0: @java.lang.Mutable
+        parameter #2:
+            type: @java.lang.ReadOnly
+
