@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.sun.source.tree.AnnotatedTypeTree;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.tree.ExpressionTree;
@@ -328,7 +329,11 @@ public class IsSigMethodCriterion implements Criterion {
           String paramClass = "Object";
           List<? extends Tree> paramBounds = param.getBounds();
           if (paramBounds != null && paramBounds.size() >= 1) {
-            paramClass = paramBounds.get(0).toString();
+            Tree pb = paramBounds.get(0);
+            if (pb.getKind() == Tree.Kind.ANNOTATED_TYPE) {
+                pb = ((AnnotatedTypeTree)pb).getUnderlyingType();
+            }
+            paramClass = pb.toString();
           }
           typeToClassMap.put(paramName, paramClass);
         }
@@ -341,8 +346,6 @@ public class IsSigMethodCriterion implements Criterion {
       debug("IsSigMethodCriterion => false: Parameter types don't match");
       return false;
     }
-
-
 
     if ((mt.getReturnType() != null) // must be a constructor
         && (! matchTypeParam(returnType, mt.getReturnType(), typeToClassMap, context))) {
