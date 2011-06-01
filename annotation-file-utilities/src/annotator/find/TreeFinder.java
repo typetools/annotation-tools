@@ -267,12 +267,12 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       // for arrays, need to indent inside array, not right before type
       Tree parent = parent(node);
       Integer i = null;
-      if (parent instanceof NewArrayTree) {
+      if (parent.getKind() == Tree.Kind.NEW_ARRAY) { // NewArrayTree)
         debug("TypePositionFinder.visitIdentifier: recognized array");
         JCNewArray na = (JCNewArray) parent;
         int dimLoc = na.dims.get(0).getPreferredPosition();
         i = getLastBracketBefore(dimLoc, tree);
-      } else if (parent instanceof NewClassTree) {
+      } else if (parent.getKind() == Tree.Kind.NEW_CLASS) { // NewClassTree)
         debug("TypePositionFinder.visitIdentifier: recognized class");
         JCNewClass nc = (JCNewClass) parent;
         debug("TypePositionFinder.visitIdentifier: clazz %s (%d) constructor %s",
@@ -306,7 +306,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       // want exact same logistics as with visitIdentifier
       Tree parent = parent(node);
       Integer i = null;
-      if (parent instanceof ArrayTypeTree) {
+      if (parent.getKind() == Tree.Kind.ARRAY_TYPE) { // ArrayTypeTree
         // ArrayTypeTree att = (ArrayTypeTree) parent;
         JCTree jcid = (JCTree) node;
         i = jcid.pos;
@@ -323,7 +323,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       Tree parent = parent(node);
       debug("TypePositionFinder.visitParameterizedType %s parent=%s%n", node, parent);
       Integer i = null;
-      if (parent instanceof ArrayTypeTree) {
+      if (parent.getKind() == Tree.Kind.ARRAY_TYPE) { // ArrayTypeTree
         // want to annotate the first level of this array
         ArrayTypeTree att = (ArrayTypeTree) parent;
         Tree baseType = att.getType();
@@ -498,7 +498,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       JCNewClass na = (JCNewClass) node;
       JCExpression className = na.clazz;
       // System.out.printf("classname %s (%s)%n", className, className.getClass());
-      while (! (className instanceof IdentifierTree)) {
+      while (! (className.getKind() == Tree.Kind.IDENTIFIER)) { // IdentifierTree
         if (className instanceof JCAnnotatedType) {
           className = ((JCAnnotatedType) className).underlyingType;
         } else if (className instanceof JCTypeApply) {
@@ -703,6 +703,12 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     // an annotation.
     if (path != null) {
       for (Tree t : path) {
+        if (t.getKind() == Tree.Kind.PARAMETERIZED_TYPE) {
+            // We started with something within a parameterized type and
+            // should not look for any further annotations.
+            // TODO: does this work on multiple nested levels?
+            break;
+        }
         if (t.getKind() == Tree.Kind.ANNOTATION) {
           return super.scan(node, p);
         }
@@ -733,37 +739,42 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       List<? extends AnnotationTree> alreadyPresent = null;
       if (path != null) {
         for (Tree n : path) {
-          if (n instanceof ClassTree) {
+          if (n.getKind() == Tree.Kind.CLASS) { // ClassTree
             alreadyPresent = ((ClassTree) n).getModifiers().getAnnotations();
             break;
-          } else if (n instanceof MethodTree) {
+          } else if (n.getKind() == Tree.Kind.METHOD) { // MethodTree
             alreadyPresent = ((MethodTree) n).getModifiers().getAnnotations();
             break;
-          } else if (n instanceof VariableTree) {
+          } else if (n.getKind() == Tree.Kind.VARIABLE) { // VariableTree
             alreadyPresent = ((VariableTree) n).getModifiers().getAnnotations();
             break;
-          } else if (n instanceof TypeCastTree) {
+          } else if (n.getKind() == Tree.Kind.TYPE_CAST) { // TypeCastTree
             Tree type = ((TypeCastTree) n).getType();
-            if (type instanceof AnnotatedTypeTree) {
+            if (type.getKind() == Tree.Kind.ANNOTATED_TYPE) { // AnnotatedTypeTree
               alreadyPresent = ((AnnotatedTypeTree) type).getAnnotations();
             }
             break;
-          } else if (n instanceof InstanceOfTree) {
+          } else if (n.getKind() == Tree.Kind.INSTANCE_OF) { // InstanceOfTree
             Tree type = ((InstanceOfTree) n).getType();
-            if (type instanceof AnnotatedTypeTree) {
+            if (type.getKind() == Tree.Kind.ANNOTATED_TYPE) { // AnnotatedTypeTree
               alreadyPresent = ((AnnotatedTypeTree) type).getAnnotations();
             }
             break;
-          } else if (n instanceof NewClassTree) {
+          } else if (n.getKind() == Tree.Kind.NEW_CLASS) { // NewClassTree
             JCNewClass nc = (JCNewClass) n;
-            if (nc.clazz instanceof AnnotatedTypeTree) {
+            if (nc.clazz.getKind() == Tree.Kind.ANNOTATED_TYPE) { // AnnotatedTypeTree
               alreadyPresent = ((AnnotatedTypeTree) nc.clazz).getAnnotations();
             }
             break;
+          } else if (n.getKind() == Tree.Kind.PARAMETERIZED_TYPE) { // ParameterizedTypeTree
+              // If we pass through a parameterized type, stop, otherwise we
+              // mix up annotations on the outer type.
+              // TODO: is something similar needed for Arrays?
+              break;
           }
         }
       }
-      // System.out.printf("alreadyPresent = %s for %s%n", alreadyPresent, node.getKind());
+      // System.out.printf("alreadyPresent = %s for %s of kind %s%n", alreadyPresent, node, node.getKind());
       // printPath(path);
       if (alreadyPresent != null) {
         for (AnnotationTree at : alreadyPresent) {
@@ -794,12 +805,12 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
 
       debug("TreeFinder.scan: node=%s%n  critera=%s%n", node, i.getCriteria());
 
-      if ((node instanceof MethodTree) && (i.getCriteria().isOnReturnType())) {
+      if ((node.getKind() == Tree.Kind.METHOD) && (i.getCriteria().isOnReturnType())) {
         // looking for the return type
         pos = tpf.scan(((MethodTree)node).getReturnType(), null);
         assert handled(node);
         debug("pos = %d at return type node: %s%n", pos, ((JCMethodDecl)node).getReturnType().getClass());
-      } else if ((node instanceof TypeParameterTree)
+      } else if ((node.getKind() == Tree.Kind.TYPE_PARAMETER) // TypeParameterTree
                  && (i.getCriteria().onBoundZero())) {
           pos = tpf.scan(node, null);
 
@@ -809,7 +820,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
 
           // need to add "extends ... Object" around the type annotation
           i = new Insertion("extends " + i.getText() + " java.lang.Object", i.getCriteria(), i.getSeparateLine());
-      } else if ((node instanceof WildcardTree)
+      } else if ((node instanceof WildcardTree) // Easier than listing three tree kinds. Correct?              
                && ((WildcardTree)node).getBound()==null) {
           pos = tpf.scan(node, null);
 
@@ -821,10 +832,10 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
           i = new Insertion("extends " + i.getText() + " java.lang.Object", i.getCriteria(), i.getSeparateLine());
       } else {
         boolean typeScan = true;
-        if (node instanceof MethodTree) {
+        if (node.getKind() == Tree.Kind.METHOD) { // MethodTree
           // looking for the receiver or the declaration
           typeScan = i.getCriteria().isOnReceiver();
-        } else if (node instanceof ClassTree) {
+        } else if (node.getKind() == Tree.Kind.CLASS) { // ClassTree
           typeScan = ! i.getSeparateLine(); // hacky check
         }
         if (typeScan) {
