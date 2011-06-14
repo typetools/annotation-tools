@@ -15,7 +15,7 @@
 #   JAVA=${JAVA_HOME}/bin/java
 #   JAVAC=${JAVA_HOME}/bin/javac
 JAVA?=java -ea
-JAVAC?=javac
+XJAVAC?=javac
 
 export SHELL=/bin/bash -o pipefail
 
@@ -50,17 +50,17 @@ results: bin/VerifyDiffs.class
 
 # Remakes the little java program that checks and compares diffs
 bin/VerifyDiffs.class : VerifyDiffs.java
-	@$(JAVAC) -g -cp ../bincompile -d bin VerifyDiffs.java
+	@$(XJAVAC) -g -cp ../bincompile -d bin VerifyDiffs.java
 
 # Compiles all the test cases (be verbose about this).
 compile :
 	mkdir -p bin
-	$(JAVAC) -g -cp ../bin -d bin *.java
+	$(XJAVAC) -g -cp ../bin -d bin *.java
 
 .PRECIOUS : bin/annotator/tests/%.class
 bin/annotator/tests/%.class: %.java
 	mkdir -p bin
-	$(JAVAC) -g -cp bin:../bin -d bin -sourcepath . $*.java
+	$(XJAVAC) -g -cp bin:../bin -d bin -sourcepath . $*.java
 
 # Actually runs the annotator to create the annotated java file.
 # We are required to put annotation-file-utilities.jar (and ../bin) on the
