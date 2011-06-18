@@ -15,6 +15,44 @@ This is the changelog for the
 <ul>
 
   <li>
+  Version 3.2 (released June 18, 2011):
+    <ul>
+      <li>
+	Support source code indexes, in contrast to the bytecode
+	centric indexes supported so far, which makes it easier for
+	source code centric tools to emit AFU files.
+	See Section "Support for source code indexes" in the
+	<a href="annotation-file-format.html">manual</a>.
+      </li>
+      <li>
+	Support annotating the bounds of class and method type
+	parameters and of wildcards, in particular also support
+	implicit bounds and make them explicit.
+	Also support adding declaration annotations on type parameters.
+      </li>
+      <li>
+	Better support for anonymous inner classes.
+      </li>
+      <li>
+	Improve handling of already existing annotations, in
+	particular for generic types.
+      </li>
+      <li>
+	Consistently do matching on methods using the erased signature.
+      </li>
+      <li>
+	Specify annotations on extends and implements clauses.
+      </li>
+      <li>
+	Handle interfaces, enums, etc. like classes.
+      </li>
+      <li>
+	Numerous small bug fixes and improvements.
+      </li>
+    </ul>
+  </li>
+
+  <li>
   Version 3.1 (released September 18, 2010):
     <ul>
       <li>
