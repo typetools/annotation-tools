@@ -18,7 +18,7 @@ import annotations.io.IndexFileWriter;
 public class ClassFileReader {
 
   public static final String INDEX_UTILS_VERSION
-    = "Annotation File Utilities v3.1";
+    = "Annotation File Utilities v3.2";
 
   @Option("-h print usage information and exit")
   public static boolean help = false;
