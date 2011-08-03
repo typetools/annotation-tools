@@ -1,0 +1,27 @@
+package java.lang:
+annotation @A: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+
+package java.lang:
+annotation @B: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+
+package java.lang:
+annotation @C: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+
+package java.lang:
+annotation @D: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+
+package java.lang:
+annotation @E: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+
+package annotator.tests:
+class ComplexLocationOne:
+
+    field field:
+        type: @java.lang.A
+        inner-type 0,0: @java.lang.C
+        inner-type 0,1,0: @java.lang.D
+        inner-type 0,1: @java.lang.E
+        inner-type 0: @java.lang.B
+
+    method <init>()V:
+
