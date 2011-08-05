@@ -484,6 +484,8 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       }
     }
 
+    // Visit "new int[5][10]" or "new int[][] {...}" or even something like
+    // "String[] names2 = { "Alice", "Bob" };"
     @Override
     public Integer visitNewArray(NewArrayTree node, Void p) {
       debug("TypePositionFinder.visitNewArray");
