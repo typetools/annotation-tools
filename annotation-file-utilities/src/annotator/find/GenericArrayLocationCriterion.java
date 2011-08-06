@@ -22,7 +22,9 @@ public class GenericArrayLocationCriterion implements Criterion {
   // the full location list
   private List<Integer> location;
   
-  // the last element of the location list
+  // The last element of the location list -- that is,
+  // location.get(location.size() - 1), or null if (location.size() == 0).
+  // 
   // Needs to be visible for TreeFinder, for a hacky access from there. 
   // TODO: make private
   // Also TODO: locationInParent is not used for any logic in this class,
