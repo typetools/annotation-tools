@@ -59,8 +59,8 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     return p;
   }
 
-    /** Returns the position of the first instance of a character at or after the given position. */
-    // To do:  skip over comments
+  /** Returns the position of the first instance of a character at or after the given position. */
+  // To do:  skip over comments
   private static int getFirstInstanceAfter(char c, int i, CompilationUnitTree tree) {
       try {
         CharSequence s = tree.getSourceFile().getCharContent(true);
@@ -77,8 +77,8 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       return -1;
     }
 
-    /** Returns the position of the first bracket at or before the given position. */
-    // To do:  skip over comments
+  /** Returns the position of the first bracket at or before the given position. */
+  // To do:  skip over comments
   private static int getLastBracketBefore(int i, CompilationUnitTree tree) {
       try {
         CharSequence s = tree.getSourceFile().getCharContent(true);
@@ -142,7 +142,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     }
 
     @Override
-      public Integer visitVariable(VariableTree node, Void p) {
+    public Integer visitVariable(VariableTree node, Void p) {
       JCTree jt = ((JCVariableDecl) node).getType();
       debug("visitVariable: %s %s%n", jt, jt.getClass());
       if (jt instanceof JCTypeApply) {
@@ -266,7 +266,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     }
 
     @Override
-      public Integer visitIdentifier(IdentifierTree node, Void p) {
+    public Integer visitIdentifier(IdentifierTree node, Void p) {
       debug("TypePositionFinder.visitIdentifier(%s)", node);
       // for arrays, need to indent inside array, not right before type
       Tree parent = parent(node);
@@ -484,22 +484,88 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       }
     }
 
-    // Visit "new int[5][10]" or "new int[][] {...}" or even something like
-    // "String[] names2 = { "Alice", "Bob" };"
+    // structure stolen from javac's Pretty.java
+    private int getDimsSize(JCExpression tree) {
+      if (tree instanceof JCNewArray) {
+        JCNewArray na = (JCNewArray) tree;
+        if (na.dims.size() != 0) {
+          return na.dims.size();
+        }
+        if (na.elemtype != null) {
+          return getDimsSize(na.elemtype) + 1;
+        }
+        assert na.elems != null;
+        int maxDimsSize = 0;
+        for (JCExpression elem : na.elems) {
+          if (elem instanceof JCNewArray) {
+            int elemDimsSize = getDimsSize((JCNewArray)elem);
+            maxDimsSize = Math.max(maxDimsSize, elemDimsSize);
+          } else if (elem instanceof JCArrayTypeTree) {
+            // Does this ever happen?  javac's Pretty.java handles it.
+            System.out.printf("JCArrayTypeTree: %s%n", elem);
+          }
+        }
+        return maxDimsSize + 1;
+      } else if (tree instanceof JCAnnotatedType) {
+        return getDimsSize(((JCAnnotatedType) tree).underlyingType);
+      } else if (tree instanceof JCArrayTypeTree) {
+        return 1 + getDimsSize(((JCArrayTypeTree) tree).elemtype);
+      } else {
+        return 0;
+      }
+    }
+
+
+    // Visit an expression of one of these forms:
+    //   new int[5][10]
+    //   new int[][] {...}
+    //   { ... }            -- as in: String[] names2 = { "Alice", "Bob" };
     @Override
     public Integer visitNewArray(NewArrayTree node, Void p) {
       debug("TypePositionFinder.visitNewArray");
       JCNewArray na = (JCNewArray) node;
       // We need to know what array dimension to return.  This is gross.
       int dim = ((arrayLocationInParent == null)
-                 ? 0
+                 ? 0  // outermost type
                  : arrayLocationInParent.intValue() + 1);
-      // System.out.printf("visitNewArray: dim=%d (arrayLocationInParent=%s)%n", dim, arrayLocationInParent);
-      if (dim == na.dims.size()) {
-        return na.elemtype.getPreferredPosition();
+      // Invariant:  na.dims.size() == 0  or  na.elems == null  (but not both)
+      // If na.dims.size() != 0, na.elemtype is non-null.
+      // If na.dims.size() == 0, na.elemtype may be null or non-null.
+      int dimsSize = getDimsSize(na);
+
+      // System.out.printf("visitNewArray: dim=%d (arrayLocationInParent=%s), node=%s, elemtype=%s%s, dimsSize=%d, dims=%s (size=%d), elems=%s, annotations=%s (size=%d), dimAnnotations=%s (size=%d)%n", dim, arrayLocationInParent, na, na.elemtype, (na.elemtype == null ? "" : String.format(" (class: %s)", na.elemtype.getClass())), dimsSize, na.dims, na.dims.size(), na.elems, na.annotations, na.annotations.size(), na.dimAnnotations, na.dimAnnotations.size());
+      if (dim == dimsSize) {
+        if (na.elemtype == null) {
+          throw new Error("Bad .jaif file: specifies non-existent location because array initializer has no explicit type: " + node);
+        }
+        // return na.elemtype.getPreferredPosition();
+        return na.elemtype.getStartPosition();
       }
-      int argPos = na.dims.get(dim).getPreferredPosition();
-      return getLastBracketBefore(argPos, tree);
+      if (na.dims.size() != 0) {
+        int argPos = na.dims.get(dim).getPreferredPosition();
+        return getLastBracketBefore(argPos, tree);
+      }
+      // In a situation like
+      //   node=new String[][][][][]{{{}}}
+      // Also see Pretty.printBrackets.
+      if (dim == 0) {
+        // na.elemtype.getPreferredPosition(); seems to be at the end, after the brackets.
+        // na.elemtype.getStartPosition(); is before the type name itself
+        int startPos = na.elemtype.getStartPosition();
+        return getFirstInstanceAfter('[', startPos+1, tree);
+      }
+      JCArrayTypeTree jcatt = (JCArrayTypeTree) na.elemtype;
+      for (int i=1; i<dim; i++) {
+        JCTree elem = jcatt.elemtype;
+        if (elem.getTag() == JCTree.ANNOTATED_TYPE) {
+          elem = ((JCAnnotatedType) elem).underlyingType;
+        }
+        if (elem.getTag() != JCTree.TYPEARRAY) {
+          throw new Error();
+        }
+        jcatt = (JCArrayTypeTree) elem;
+      }
+      return jcatt.pos().getPreferredPosition();
     }
 
     @Override
@@ -854,10 +920,10 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
             GenericArrayLocationCriterion galc = i.getCriteria().getGenericArrayLocation();
             if (galc != null) {
               arrayLocationInParent = galc.locationInParent;
-              // System.out.printf("Set arrayLocationInParent to %s%n", arrayLocationInParent);
+              // System.out.printf("Set arrayLocationInParent to %s for %s%n", arrayLocationInParent, node);
             } else {
               arrayLocationInParent = null;
-              // System.out.printf("No arrayLocationInParent%n");
+              // System.out.printf("No arrayLocationInParent for %s%n", node);
             }
           }
           debug("Calling tpf.scan(%s: %s)%n", node.getClass(), node);
