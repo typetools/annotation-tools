@@ -484,6 +484,28 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       }
     }
 
+
+    // There are three types of array initializers:
+    //   /*style 1*/ String[] names1 = new String[12];
+    //   /*style 2*/ String[] names2 = { "Alice", "Bob" };
+    //   /*style 3*/ String[] names3 = new String[] { "Alice", "Bob" };
+    // (Can the styles be combined?)
+    //
+    // For style 1, we can just find the location of the
+    // dimensionality expression, and then locate the bracket before it.
+    // For style 2, annotations are impossible.
+    // For style 3, we need to count the brackets and get to the right one.
+    //
+    // The AST depth of the initializer is correct unless all arrays are
+    // empty, in which case it is arbitary.  This is legal:
+    // String[][][][][] names4 = new String[][][][][] { { { } } };
+    //
+    // Array initializers can also be multi-dimensional, but this is not
+    // relevant to us:
+    //   int[][] pascalsTriangle = { { 1 }, { 1,1 }, { 1,2,1 } };
+    //   int[][] pascalsTriangle = new int[][] { { 1 }, { 1,1 }, { 1,2,1 } };
+
+
     // structure stolen from javac's Pretty.java
     private int getDimsSize(JCExpression tree) {
       if (tree instanceof JCNewArray) {
