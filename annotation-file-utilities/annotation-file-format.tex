@@ -40,7 +40,7 @@
 %HEVEA \setcounter{tocdepth}{2}
 \tableofcontents
 
-\section{Purpose:  External storage of annotations}
+\section{Purpose:  External storage of annotations\label{purpose}}
 
 Java annotations are meta-data about Java program elements, as in
 ``\code{@Deprecated class Date \{ ... \}}''.
@@ -143,9 +143,9 @@ annotation index file''), but this is not required.
 \newcommand{\bnfor}{\ensuremath{|}}
 
 
-\section{Grammar}
+\section{Grammar\label{grammar}}
 
-\subsection{Grammar conventions}
+\subsection{Grammar conventions\label{grammar-conventions}}
 
 Throughout this document, ``name'' is any valid Java simple name or 
 binary name, ``type'' is any valid type, and ``value'' is any
@@ -165,8 +165,7 @@ whitespace (excluding
 newlines) is optional with one exception: no space is permitted
 between an ``@'' character and a subsequent name. Indentation is
 ignored, but is encouraged to maintain readability of the hierarchy of
-program elements in the class (see the example in section
-\ref{sec:example}).
+program elements in the class (see the example in Section~\ref{example}).
 
 Comments can be written throughout the annotation file using the double-slash
 syntax employed by Java for single-line comments: anything following
@@ -179,7 +178,7 @@ conventions, that is, Windows- and Unix-style new lines are supported.
 
 
 
-\subsection{Annotation file}
+\subsection{Annotation file\label{annotation-file}}
 
 The annotation file itself contains one or more
 package definitions; each package definition describes one or more
@@ -198,8 +197,7 @@ Program elements that do not appear in the annotation file are treated as
 unannotated.
 
 
-\subsection{Package definitions}
-\label{sec:package-definition}
+\subsection{Package definitions\label{package-definitions}}
 
 Package definitions describe a package containing a list of annotation
 definitions and classes.  A package definition also contains any
@@ -216,8 +214,7 @@ annotations on the package itself (such as those from a
 \end{tabbing}
 
 
-\subsection{Annotation definitions}
-\label{sec:annotation-definition}
+\subsection{Annotation definitions\label{annotation-definitions}}
 
 An annotation definition describes the annotation's fields and their
 types, so that they may be referenced in a compact way throughout the
@@ -247,7 +244,7 @@ elements of any package.
 \qquad    \bnfnt{type} \bnfnt{name} \lineend
 \end{tabbing}
 
-\subsection{Class definitions}
+\subsection{Class definitions\label{class-definitions}}
 
 Class definitions describe the annotations present on the various
 program elements.  It is organized according to the hierarchy of fields
@@ -408,7 +405,7 @@ of the \\ \qquad    \bnfcmt annotation:   ``\texttt{@A(12)}'' rather than ``\tex
 \end{tabbing}
 
 
-\subsection{Dependence on bytecode offsets}
+\subsection{Dependence on bytecode offsets\label{bytecode-offsets}}
 
 For annotations on expressions (typecasts, instanceof, new, etc.), the
 annotation file uses offsets into the bytecode array of the class file to
@@ -424,7 +421,7 @@ fields, classes, etc., the \code{.class} file is not necessary.
 % TODO: annotations on wildcard bounds? 
 
 
-\subsection{Support for source code indexes}
+\subsection{Support for source code indexes\label{source-code-index}}
 
 For some tools it is easier to generate the index into the source code
 instead of the bytecode offset.
@@ -473,8 +470,7 @@ the bytecode offsets that are introduced using \bnflit{\#}.
 
 
 
-\section{Example}
-\label{sec:example}
+\section{Example\label{example}}
 
 Consider the code of Figure~\ref{fig:java-example}.
 Figure~\ref{fig:annotation-file-examples} shows two legal annotation files
@@ -581,8 +577,7 @@ class Foo:
 \end{figure}
 
 
-\section{Types and values}
-\label{sec:typesvalues}
+\section{Types and values\label{types-and-values}}
 
 The Java language permits several types for annotation fields: primitives,
 \code{String}s, \code{java.lang.Class} tokens (possibly parameterized),
@@ -672,7 +667,7 @@ class Foo: @p1.ClassInfo(
 \end{verbatim}
 
 
-\section{Alternative formats}
+\section{Alternative formats\label{alternative-formats}}
 
 We mention two alternatives to the format described in this document.
 Each of them has its own merits.
