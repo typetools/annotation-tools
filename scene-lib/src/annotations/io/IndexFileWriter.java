@@ -243,7 +243,8 @@ public final class IndexFileWriter {
                 : extImpls.entrySet()) {
             TypeIndexLocation idx = ei.getKey();
             /*@ReadOnly*/ ATypeElement ty = ei.getValue();
-            if (idx.typeIndex == -1) {
+            // reading from a short into an integer does not preserve sign?
+            if (idx.typeIndex == -1 || idx.typeIndex == 65535) {
                 printTypeElementAndInnerTypes(indentation, "extends", ty);
             } else {
                 printTypeElementAndInnerTypes(indentation, "implements " + idx.typeIndex, ty);
