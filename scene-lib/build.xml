@@ -270,7 +270,8 @@
     
     <target name="test" depends="test-scene-lib, test-classfile, test-example"
        description="Run tests"/>
-    <target name="clean" depends="bin-clean, javadoc-clean, test-clean"/>
+    <target name="clean" depends="bin-clean, javadoc-clean, test-clean"
+       description="Remove generated files"/>
     
     <target name="javadoc-clean">
         <delete dir="javadoc"/>
