@@ -1,0 +1,19 @@
+package annotator.tests;
+
+import java.util.List;
+
+public class InstanceOfMultiple {
+  public void foo(Object o) {
+    if(o instanceof @java.lang.ReadOnly List) {
+      if(o instanceof InstanceOfMultiple) {
+        if(o instanceof @java.lang.Mutable Object) {
+          System.out.println(o);
+        }
+      }
+    }
+    
+    if(o instanceof @java.lang.Mutable List) {
+      System.out.println(o);
+    }
+  }
+}
