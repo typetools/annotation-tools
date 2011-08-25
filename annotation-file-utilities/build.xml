@@ -364,6 +364,9 @@
     <!-- <echo message="Deleting previous distribution:  annotation-file-utilities.{jar,zip}"/> -->
     <delete file="annotation-file-utilities.jar"/>
     <delete file="annotation-tools.zip"/>
+    <exec dir="tests/" executable="make" failonerror="true">
+      <arg value="clean"/>
+    </exec>
   </target>
 
   <target name="run-tests" depends="init-properties"
