@@ -45,5 +45,3 @@ scene-lib/src/annotations/tests/example-output.jann
 *.class-generated-scene.txt
 
 .metadata
-.project
-.classpath
