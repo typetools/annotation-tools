@@ -1,0 +1,25 @@
+package:
+
+annotation @A:
+annotation @B:
+annotation @C:
+annotation @D:
+annotation @E:
+annotation @F:
+
+class ExtImpl$C1:
+extends: @A
+inner-type 0: @B
+inner-type 1: @C
+implements 0: @D
+inner-type 0: @E
+inner-type 1: @F
+
+class ExtImpl$C2:
+implements 0: @A
+inner-type 0: @B
+inner-type 1: @C
+implements 1: @D
+inner-type 0: @E
+inner-type 1: @F
+
