@@ -51,7 +51,7 @@ public @AClass /*@CClass*/ class AnnotationTest<Foo extends /*A10*/ /*C10*/ Comp
     @A0E /*@C0E*/ Iterable<@A0F /*@C0F*/ String> field;
 
     <Bar extends /*A12*/ /*C12*/ Comparable</*A13*/ /*C13*/ Integer>> @A0A /*@C0A*/ @A0AT /*@C0AT*/ HashSet<@A0B /*@C0B*/ Integer>
-        doSomething(@A0C /*@C0C*/ Set<@A0D /*@C0D*/ Integer> param) @A06 /*@C06*/ {
+        doSomething(@A06 AnnotationTest this, @A0C /*@C0C*/ Set<@A0D /*@C0D*/ Integer> param) /*@C06*/ {
         @A08 /*@C08*/ HashSet<@A09 /*@C09*/ Integer> local;
         if (param instanceof @A02 /*@C02*/ HashSet)
             local = (@A00 /*@C00*/ HashSet<@A01 /*@C01*/ Integer>) param;
