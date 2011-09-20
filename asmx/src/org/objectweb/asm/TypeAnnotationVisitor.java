@@ -21,7 +21,7 @@ package org.objectweb.asm;
  * @author jaimeq
  */
 
-public interface ExtendedAnnotationVisitor extends AnnotationVisitor {
+public interface TypeAnnotationVisitor extends AnnotationVisitor {
   /**
    * Visits the target type of the extended annotation, which defines the
    * type and structure of the reference info of the extended annotation.

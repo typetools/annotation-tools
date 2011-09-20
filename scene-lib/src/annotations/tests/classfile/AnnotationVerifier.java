@@ -12,7 +12,7 @@ import java.util.Set;
 
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.ExtendedAnnotationVisitor;
+import org.objectweb.asm.TypeAnnotationVisitor;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.commons.EmptyVisitor;
@@ -150,7 +150,7 @@ public class AnnotationVerifier {
       return av;
     }
 
-    public ExtendedAnnotationVisitor visitExtendedAnnotation(String desc, boolean visible) {
+    public TypeAnnotationVisitor visitTypeAnnotation(String desc, boolean visible) {
       AnnotationRecorder av = new AnnotationRecorder(
           description + " annotation: " + desc);
       xanns.put(desc,av);
@@ -311,10 +311,10 @@ public class AnnotationVerifier {
 
 
   /**
-   * An AnnotationRecorder is an ExtendedAnnotationVisitor that records all the
+   * An AnnotationRecorder is an TypeAnnotationVisitor that records all the
    * information it visits.
    */
-  private class AnnotationRecorder implements ExtendedAnnotationVisitor {
+  private class AnnotationRecorder implements TypeAnnotationVisitor {
     private String description;
 
     private List<String> fieldArgsName;
