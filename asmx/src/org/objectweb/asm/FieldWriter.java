@@ -86,8 +86,8 @@ final class FieldWriter implements FieldVisitor {
     private AnnotationWriter ianns;
 
     //jaime
-    private ExtendedAnnotationWriter xanns;
-    private ExtendedAnnotationWriter ixanns;
+    private TypeAnnotationWriter xanns;
+    private TypeAnnotationWriter ixanns;
     //end jaime
     
     /**
@@ -159,14 +159,14 @@ final class FieldWriter implements FieldVisitor {
 
     
     //jaime
-    public ExtendedAnnotationVisitor visitExtendedAnnotation(
+    public TypeAnnotationVisitor visitTypeAnnotation(
         final String desc,
         final boolean visible) {
       ByteVector bv = new ByteVector();
       // write type, and reserve space for values count
       bv.putShort(cw.newUTF8(desc)).putShort(0);
-      ExtendedAnnotationWriter xaw = 
-        new ExtendedAnnotationWriter(cw, true, bv, bv, 2);
+      TypeAnnotationWriter xaw = 
+        new TypeAnnotationWriter(cw, true, bv, bv, 2);
       if(visible) {
         xaw.next = xanns;
         xanns = xaw;

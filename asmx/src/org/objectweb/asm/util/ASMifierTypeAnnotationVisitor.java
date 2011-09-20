@@ -1,16 +1,16 @@
 package org.objectweb.asm.util;
 
 import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.ExtendedAnnotationVisitor;
+import org.objectweb.asm.TypeAnnotationVisitor;
 
 /**
- * An {@link ExtendedAnnotationVisitor} that prints the ASM code that generates 
+ * An {@link TypeAnnotationVisitor} that prints the ASM code that generates 
  *  the extended annotations it visits.
  * 
  * @author jaimeq
  */
-public class ASMifierExtendedAnnotationVisitor extends AbstractVisitor 
-  implements ExtendedAnnotationVisitor
+public class ASMifierTypeAnnotationVisitor extends AbstractVisitor 
+  implements TypeAnnotationVisitor
 {
 
     /**
@@ -20,17 +20,17 @@ public class ASMifierExtendedAnnotationVisitor extends AbstractVisitor
     protected final int id;
 
     /**
-     * Constructs a new {@link ASMifierExtendedAnnotationVisitor}.
+     * Constructs a new {@link ASMifierTypeAnnotationVisitor}.
      * 
      * @param id identifier of the extended annotation visitor variable in the
      *  produced code.
      */
-    public ASMifierExtendedAnnotationVisitor(final int id) {
+    public ASMifierTypeAnnotationVisitor(final int id) {
         this.id = id;
     }
 
     // ------------------------------------------------------------------------
-    // Implementation of the ExtendedAnnotationVisitor interface
+    // Implementation of the TypeAnnotationVisitor interface
     // ------------------------------------------------------------------------
 
     public void visit(final String name, final Object value) {

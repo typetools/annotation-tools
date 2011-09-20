@@ -29,7 +29,7 @@
  */
 package org.objectweb.asm.util;
 
-import org.objectweb.asm.ExtendedAnnotationVisitor;
+import org.objectweb.asm.TypeAnnotationVisitor;
 import org.objectweb.asm.FieldVisitor;
 
 /**
