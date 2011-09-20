@@ -32,7 +32,7 @@ package org.objectweb.asm.xml;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Attribute;
 import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.ExtendedAnnotationVisitor;
+import org.objectweb.asm.TypeAnnotationVisitor;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
@@ -106,7 +106,7 @@ public final class SAXClassAdapter extends SAXAdapter implements ClassVisitor {
                 desc);
     }
 
-    public ExtendedAnnotationVisitor visitExtendedAnnotation(
+    public TypeAnnotationVisitor visitTypeAnnotation(
         String desc, boolean visible) {
       throw new RuntimeException("Jaime did not implement yet");
     }

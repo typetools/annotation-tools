@@ -33,7 +33,7 @@ import java.util.HashMap;
 
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Attribute;
-import org.objectweb.asm.ExtendedAnnotationVisitor;
+import org.objectweb.asm.TypeAnnotationVisitor;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
@@ -110,14 +110,14 @@ public class TraceMethodVisitor extends TraceAbstractVisitor implements
     }
 
     // jaime
-    public ExtendedAnnotationVisitor visitExtendedAnnotation(
+    public TypeAnnotationVisitor visitTypeAnnotation(
         final String desc, 
         final boolean visible)
     {
-        ExtendedAnnotationVisitor xav = super.visitExtendedAnnotation(desc, visible);
+        TypeAnnotationVisitor xav = super.visitTypeAnnotation(desc, visible);
         if (mv != null) {
-            ((TraceExtendedAnnotationVisitor) xav).xav =
-                mv.visitExtendedAnnotation(desc, visible);
+            ((TraceTypeAnnotationVisitor) xav).xav =
+                mv.visitTypeAnnotation(desc, visible);
         }
         return xav;
     }

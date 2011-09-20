@@ -46,11 +46,11 @@ import annotations.Values;
 import annotations.ValuesAnnotation;
 import annotations.ValuesEnum;
 
-public class ExtendedAnnotationTest extends TestCase {
+public class TypeAnnotationTest extends TestCase {
 
     private ValuesAnnotation a;
 
-    public ExtendedAnnotationTest(String name) {
+    public TypeAnnotationTest(String name) {
         super(name);
     }
 

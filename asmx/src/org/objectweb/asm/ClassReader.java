@@ -481,9 +481,9 @@ public class ClassReader {
               for (; j > 0; --j) {
                   desc = readUTF8(v, c);
                   v += 2;
-                  v = readExtendedAnnotationValues(v,
+                  v = readTypeAnnotationValues(v,
                           c,
-                          classVisitor.visitExtendedAnnotation(desc, i != 0));
+                          classVisitor.visitTypeAnnotation(desc, i != 0));
               }
           }
       }
@@ -602,8 +602,8 @@ public class ClassReader {
                   for(; k > 0; --k) {
                     desc = readUTF8(v, c);
                     v += 2;
-                    v = readExtendedAnnotationValues(v,
-                        c, fv.visitExtendedAnnotation(desc, true));
+                    v = readTypeAnnotationValues(v,
+                        c, fv.visitTypeAnnotation(desc, true));
                   }
                 }
 
@@ -614,8 +614,8 @@ public class ClassReader {
                   for(; k > 0; --k) {
                     desc = readUTF8(v, c);
                     v += 2;
-                    v = readExtendedAnnotationValues(v,
-                        c, fv.visitExtendedAnnotation(desc, false));
+                    v = readTypeAnnotationValues(v,
+                        c, fv.visitTypeAnnotation(desc, false));
                   }
                 }
 
@@ -803,9 +803,9 @@ public class ClassReader {
                             desc = readUTF8(w, c);
                             w += 2;
 
-                            w = readExtendedAnnotationValues(w,
+                            w = readTypeAnnotationValues(w,
                                   c,
-                                  mv.visitExtendedAnnotation(desc, j != 0));
+                                  mv.visitTypeAnnotation(desc, j != 0));
                       }
                   }
               }
@@ -1316,10 +1316,10 @@ public class ClassReader {
     * @return the end offset of the annotations values.
     * @author jaimeq
     */
-    private int readExtendedAnnotationValues(
+    private int readTypeAnnotationValues(
         int v,
         final char[] buf,
-        final ExtendedAnnotationVisitor xav)
+        final TypeAnnotationVisitor xav)
     {
         int i = readUnsignedShort(v);
         v += 2;
