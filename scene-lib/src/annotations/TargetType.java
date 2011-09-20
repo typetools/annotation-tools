@@ -1,12 +1,12 @@
 /*
- * Copyright 2008-2009 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 2008, 2009, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 only, as
- * published by the Free Software Foundation.  Sun designates this
+ * published by the Free Software Foundation.  Oracle designates this
  * particular file as subject to the "Classpath" exception as provided
- * by Sun in the LICENSE file that accompanied this code.
+ * by Oracle in the LICENSE file that accompanied this code.
  *
  * This code is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
@@ -18,9 +18,9 @@
  * 2 along with this work; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
  *
- * Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa Clara,
- * CA 95054 USA or visit www.sun.com if you need additional information or
- * have any questions.
+ * Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
+ * or visit www.oracle.com if you need additional information or have any
+ * questions.
  */
 
 package annotations;
@@ -39,11 +39,13 @@ import java.util.Set;
  * annotation targets a type argument in a local variable, method return type,
  * or a typecast).
  *
- *  <p><b>This is NOT part of any API supported by Sun Microsystems.  If
- *  you write code that depends on this, you do so at your own risk.
+ *  <p><b>This is NOT part of any supported API.
+ *  If you write code that depends on this, you do so at your own risk.
  *  This code and its internal interfaces are subject to change or
  *  deletion without notice.</b>
  */
+// Keep synchronized with com.sun.tools.javac.code.TargetType.
+// This is an exact copy, modulo package names.
 public enum TargetType {
 
     /** For annotations on typecasts. */
@@ -80,7 +82,7 @@ public enum TargetType {
     /** For annotations on a type argument or nested array of a local. */
     LOCAL_VARIABLE_GENERIC_OR_ARRAY(0x09, HasLocation, IsLocal),
 
-    /** For type annotations on a method return type */
+    /** For type annotations on a method return type. */
     METHOD_RETURN(0x0A),
 
     /**
@@ -89,15 +91,13 @@ public enum TargetType {
      */
     METHOD_RETURN_GENERIC_OR_ARRAY(0x0B, HasLocation),
 
-    /**
-     * For type annotations on a method parameter
-     */
+    /** For type annotations on a method parameter. */
     METHOD_PARAMETER(0x0C),
 
     /** For annotations on a type argument or nested array of a method parameter. */
     METHOD_PARAMETER_GENERIC_OR_ARRAY(0x0D, HasLocation),
 
-    /** For type annotations on a method parameter */
+    /** For type annotations on a field. */
     FIELD(0x0E),
 
     /** For annotations on a type argument or nested array of a field. */
@@ -132,6 +132,13 @@ public enum TargetType {
 
     // invalid location
     //@Deprecated THROWS_GENERIC_OR_ARRAY(0x17, HasLocation),
+
+    /** For type annotations on an exception parameter. */
+    EXCEPTION_PARAMETER(0x1A),
+
+    /** For annotations on a type argument or nested array of an exception parameter. */
+    // TODO: are these allowed? Not for THROWS, so why here?
+    EXCEPTION_PARAMETER_GENERIC_OR_ARRAY(0x1B, HasLocation),
 
     /** For annotations in type arguments of object creation expressions. */
     NEW_TYPE_ARGUMENT(0x18, IsLocal),
