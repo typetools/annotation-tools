@@ -29,7 +29,8 @@
  */
 package org.objectweb.asm;
 
-import static org.objectweb.asm.TargetType.*;
+import com.sun.tools.javac.code.TargetType;
+import static com.sun.tools.javac.code.TargetType.*;
 
 import java.io.IOException;
 import java.io.InputStream;

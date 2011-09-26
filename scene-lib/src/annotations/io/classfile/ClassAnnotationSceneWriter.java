@@ -22,6 +22,8 @@ import org.objectweb.asm.MethodAdapter;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.commons.EmptyVisitor;
 
+import com.sun.tools.javac.code.TargetType;
+
 import annotations.*;
 import annotations.el.*;
 import annotations.field.*;
@@ -371,7 +373,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
         // the name should be null for each element.
         AnnotationVisitor aav = av.visitArray(fieldName);
         aft = ((ArrayAFT) aft).elementType;
-        for (Object o : (List)value) {
+        for (Object o : (List<?>)value) {
           if (aft instanceof EnumAFT) {
             aav.visitEnum(null, ((EnumAFT) aft).typeName, o.toString());
           } else {

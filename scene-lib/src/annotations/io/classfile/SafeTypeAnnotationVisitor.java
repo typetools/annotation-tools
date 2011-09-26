@@ -11,7 +11,7 @@ import java.util.List;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.TypeAnnotationVisitor;
 
-import annotations.TargetType;
+import com.sun.tools.javac.code.TargetType;
 
 /**
  * A <code>SafeTypeAnnotationVisitor</code> wraps around an
