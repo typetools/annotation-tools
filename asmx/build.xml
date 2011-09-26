@@ -125,6 +125,11 @@
     <javac destdir="${out.tmp}" debug="on" source="5" includeantruntime="false">
       <classpath>
         <pathelement location="${out.tmp}"/>
+        <!-- TODO: Using
+          <pathelement location="${annotations-compiler}/dist/lib/javac.jar"/>
+          doesn't work for me. What is a nicer way to reference this jar?
+        -->
+	<pathelement location="../../jsr308-langtools/dist/lib/javac.jar"/>
       </classpath>
       <src path="${src}"/>
       <include name="**/*.java"/>

@@ -16,6 +16,8 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.commons.EmptyVisitor;
 
+import com.sun.tools.javac.code.TargetType;
+
 import annotations.*;
 import annotations.el.*;
 import annotations.field.*;
