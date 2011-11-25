@@ -579,10 +579,10 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       JCArrayTypeTree jcatt = (JCArrayTypeTree) na.elemtype;
       for (int i=1; i<dim; i++) {
         JCTree elem = jcatt.elemtype;
-        if (elem.getTag() == JCTree.ANNOTATED_TYPE) {
+        if (elem.hasTag(JCTree.Tag.ANNOTATED_TYPE)) {
           elem = ((JCAnnotatedType) elem).underlyingType;
         }
-        if (elem.getTag() != JCTree.TYPEARRAY) {
+        if (!elem.hasTag(JCTree.Tag.TYPEARRAY)) {
           throw new Error();
         }
         jcatt = (JCArrayTypeTree) elem;
