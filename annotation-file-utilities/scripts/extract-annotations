@@ -19,5 +19,5 @@ CHECKERS_JAR=${CHECKERS_JAR:-${CHECKERS}/checkers.jar}
 # AnnotatedPrimitiveType causing the following bit of exception:
 
 # Needs CLASSPATH to find user files
-java  -ea -cp ${CHECKERS_JAR}:${ANNOTATION_FILE_UTILS}:${JAVAC_JAR}:${CLASSPATH} annotations.io.classfile.ClassFileReader $@
+java -Xbootclasspath/p:${JAVAC_JAR} -ea -cp ${CHECKERS_JAR}:${ANNOTATION_FILE_UTILS}:${CLASSPATH} annotations.io.classfile.ClassFileReader $@
 
