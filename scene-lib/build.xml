@@ -1,0 +1,335 @@
+<?xml version="1.0"?>
+<project name="scene-lib" default="bin">
+
+    <property environment="env"/>
+
+	<macrodef name="echo-fileset">
+		<attribute name="filesetref" />
+	   	<sequential>
+	        <pathconvert pathsep="
+" property="@{filesetref}.echopath">
+		   		<path>
+		   			<fileset refid="@{filesetref}" />
+		   		</path>
+		   	</pathconvert>
+    		<echo>   ------- echoing fileset @{filesetref} -------</echo>
+	        <echo>${@{filesetref}.echopath}</echo>
+	   	</sequential>
+	</macrodef>
+
+    <taskdef resource="net/sf/antcontrib/antcontrib.properties">
+      <classpath>
+	<pathelement location="ant-contrib.jar" />
+      </classpath>
+    </taskdef>
+
+    <target name="init-properties">
+        <condition property="exists.build.properties">
+            <available file="build.properties"/>
+        </condition>
+        <fail
+            unless="exists.build.properties" 
+            message="Local build.properites file is missing."/>
+        
+        <property file="build.properties"/>
+        
+        <fail 
+            unless="global.build.properties" 
+            message="Local build.properties file did not define global buildfile in property global.build.properties"/>
+        <condition property="exists.global.build.properties">
+            <available file="${global.build.properties}"/>
+        </condition>
+        <fail 
+            unless="exists.global.build.properties"
+        message="File ${global.build.properties} file not found."/>
+        <property file="${global.build.properties}"/>
+
+        <fail 
+           unless="user.build.properties" 
+            message="Local build.properties file did not define global buildfile in property user.build.properties"/>
+        <condition property="exists.user.build.properties">
+            <available file="${user.build.properties}"/>
+        </condition>
+        <fail 
+            unless="exists.user.build.properties"
+            message="File ${user.build.properties} file not found."/>            
+        <property file="${user.build.properties}"/>
+
+    </target>
+    
+    <target name="init-dependencies"
+            depends="init-properties">
+        <!-- I should reinstate this after figuring out how to make
+        it remake only when necessary, not always.  (I should
+        probably do that outside ASM rather than modifying ASM itself?)
+        And, supply -Dproduct.noshrink to asmx ant command, at least when
+        testing.
+        -->
+        <!--
+        <ant dir="${asmx}" inheritAll="false" target="bin"/>
+        -->
+        <!-- Next 2 lines only for repository version. -->
+        <!--
+        <ant dir="${annotations-compiler}" antfile="make/build.xml" inheritAll="false" target="build"/>
+        <ant dir="${checkers}" inheritAll="false" target="build"/>
+        -->
+    </target>
+    
+    <target name="init-paths">
+        <path id="sourcepath">
+            <pathelement location="src"/>
+        </path>
+
+        <fileset dir="." id="source.files.java">
+            <include name="src/**/*.java"/>
+            <exclude name="**/.svn"/>
+            <exclude name="**/package-info.java"/>
+        </fileset>
+    
+        <fileset dir="." id="source.files.java.nopackageinfo">
+            <include name="src/**/*.java"/>
+            <exclude name="**/.svn"/>
+            <exclude name="**/package-info.java"/>
+        </fileset>
+
+        <fileset dir="." id="source.files.java.packageinfo">
+            <include name="**/package-info.java"/>
+        </fileset>
+
+        <fileset dir="." id="source.files.non-java">
+            <include name="src/**/*"/>
+            <exclude name="**/.svn"/>
+	    <exclude name="**/*.java"/>
+        </fileset>
+
+        <path id="javadoc-sourcepath">
+            <pathelement location="src"/>
+        </path>
+                        
+        <path id="libpath">
+            <pathelement location="${asmx}/bin"/>
+            <pathelement location="${junit}"/>
+            <pathelement location="${annotation-tools}/annotation-file-utilities/lib/plume.jar"/>
+            <!-- remainder only for repository version -->
+            <pathelement location="${annotations-compiler}/dist/lib/javac.jar"/>
+            <pathelement location="${annotations-compiler}/dist/lib/javap.jar"/>
+            <pathelement location="${checkers}/checkers.jar"/>
+            <pathelement location="bin"/>
+        </path>
+    </target>
+        
+    <target name="init" depends="init-properties, init-dependencies, init-paths"/>
+
+    <target name="bin-clean">
+        <delete dir="bin"/>
+    </target>
+    
+    <target name="bin-check-uptodate" depends="init">
+
+	<uptodate property="source.files.non-java.uptodate">
+	  <srcfiles refid="source.files.non-java"/>
+          <mapper type="glob" from="src/*" to="bin/*"/>
+	</uptodate>
+
+	<uptodate property="source.files.java.nopackageinfo.uptodate">
+	  <srcfiles refid="source.files.java.nopackageinfo"/>
+          <mapper type="glob" from="src/*.java" to="bin/*.class"/>
+        </uptodate>
+
+	<!-- I want to say that package-info.java does not force
+	recompilation if it is older than all source files in its own
+	package. -->
+	<uptodate property="source.files.java.packageinfo.uptodate" targetfile="bin">
+	  <srcfiles refid="source.files.java.packageinfo"/>
+        </uptodate>
+
+	<condition property="bin.uptodate">
+	  <and>
+	    <isset property="source.files.non-java.uptodate"/>
+	    <isset property="source.files.java.nopackageinfo.uptodate"/>
+	    <isset property="source.files.java.packageinfo.uptodate"/>
+	  </and>
+	</condition>
+
+	<echo message="source.files.non-java.uptodate: ${source.files.non-java.uptodate}"/>
+	<echo message="source.files.java.nopackageinfo.uptodate: ${source.files.java.nopackageinfo.uptodate}"/>
+	<echo message="source.files.java.packageinfo.uptodate: ${source.files.java.packageinfo.uptodate}"/>
+	<echo message="bin.uptodate: ${bin.uptodate}"/>
+	
+    </target>
+
+    <target name="bin" depends="init, bin-check-uptodate" unless="bin.uptodate">
+	<echo message="Running bin"/>
+        <mkdir dir="bin"/>
+	<!-- Copy non-java files to bin.  These are mostly .jann files. -->
+        <copy todir="bin">
+            <fileset dir="src" excludes="**/*.java"/>
+        </copy>
+
+<!-- Optional lines for "javac":
+  executable=".../research/types/jsr308-langtools/dist/bin/javac"
+-->
+        <javac 
+               destdir="bin" 
+               debug="true" 
+               classpathref="libpath"
+               classpath="${libpath}"
+               includeantruntime="false">
+            <src refid="sourcepath"/>
+            <compilerarg value="-Xbootclasspath/p:${toString:libpath}"/>
+            <classpath refid="libpath"/>
+        </javac> 
+
+        <!-- TODO: This relies on jsr308 compiler being first in your PATH. 
+             We should figure out how to call jsr 308 properly from Ant. -->
+<!--
+       <pathconvert property="libpath" refid="libpath"/>
+       <pathconvert property="source.files.java.spaceseparated" refid="source.files.java" pathsep=" "/>
+        <exec executable="javac" failonerror="true">
+          <arg value="-version"/>
+          <arg value="-d"/>
+          <arg value="bin"/>
+          <arg value="-g"/>
+          <arg value="-cp"/>
+          <arg value="${libpath}"/>
+          <arg line="source.files.java.spaceseparated"/>
+        </exec>
+-->
+    </target>
+    
+    <target name="test-scene-lib" depends="init, bin">
+        <mkdir dir="reports"/>
+        <junit printsummary="withOutAndErr" showoutput="true" fork="yes" dir="." haltonfailure="yes">
+            <jvmarg value="-Xbootclasspath/p:${toString:libpath}"/>
+            <classpath refid="libpath"/>
+            <formatter type="plain"/>
+            <test name="annotations.tests.TestSceneLib" todir="reports"/>
+	    <assertions>
+	      <enable/>
+	    </assertions>
+        </junit>
+    </target>
+    
+    <target name="test-classfile" depends="init, bin">
+        <mkdir dir="reports"/>
+        <junit printsummary="withOutAndErr" showoutput="true" fork="yes" dir="." haltonfailure="yes">
+            <jvmarg value="-Xbootclasspath/p:${toString:libpath}"/>
+            <classpath refid="libpath"/>
+            <formatter type="plain"/>
+            <test name="annotations.tests.classfile.AnnotationsTest" todir="reports"/>
+	    <assertions>
+	      <enable/>
+	    </assertions>
+        </junit>
+    </target>
+    
+    <target name="test-example" depends="init, bin">
+	<!-- Working directory is ignored when same JVM is used.  That means
+             that the relative path for ${scene-lib} works only if this target
+             is invoked from the same directory as the build.xml file appears
+             in.  We can fix the java task by adding this:
+              fork="true"
+              dir="${scene-lib}/src/annotations/tests"
+             but there are other uses of ${scene-lib} in this target.
+        -->
+        <java classname="annotations.tests.Example"
+              output="${scene-lib}/src/annotations/tests/example-stdout.jann"
+              classpathref="libpath">
+            <arg value="${scene-lib}/src/annotations/tests/example-input.jann" />
+            <arg value="foo.Bar" />
+            <arg value="${scene-lib}/src/annotations/tests/example-output.jann" />
+        </java>
+        <condition property="example.output.matches">
+            <filesmatch file1="${scene-lib}/src/annotations/tests/example-output.jann.goal"
+                        file2="${scene-lib}/src/annotations/tests/example-output.jann"/>
+        </condition>
+	<!-- Debugging output in case I don't have access to the filesystem. -->
+	<if>
+	    <isfalse value="${example.output.matches}"/>
+	    <then>
+		<exec executable="cat">
+		  <arg value="${scene-lib}/src/annotations/tests/example-output.jann.goal"/>
+		  <arg value="${scene-lib}/src/annotations/tests/example-output.jann"/>
+		</exec>
+            </then>
+        </if>
+        <fail unless="example.output.matches" 
+            message="In ${scene-lib}/src/annotations/tests/, file example-output.jann does not match goal."/>
+        <condition property="example.stdout.matches">
+            <filesmatch file1="${scene-lib}/src/annotations/tests/example-stdout.jann.goal"
+                        file2="${scene-lib}/src/annotations/tests/example-stdout.jann"/>
+        </condition>
+        <fail unless="example.stdout.matches" 
+            message="In ${scene-lib}/src/annotations/tests/, file example-stdout.jann does not match goal."/>
+
+    </target>
+    
+    <target name="test-clean">
+        <delete dir="reports"/>
+    </target>
+    
+    <target name="test" depends="test-scene-lib, test-classfile, test-example"
+       description="Run tests"/>
+    <target name="clean" depends="bin-clean, javadoc-clean, test-clean"
+       description="Remove generated files"/>
+    
+    <target name="javadoc-clean">
+        <delete dir="javadoc"/>
+    </target>
+    
+    <target name="javadoc" depends="javadoc-clean, init"
+       description="Generate Javadoc API documentation">
+        <javadoc sourcepathref="javadoc-sourcepath" 
+		classpathref="libpath"
+		packagenames="*"
+		Overview="overview.html"
+		destdir="javadoc" 
+		access="public"
+		noqualifier="annotations:annotations.el:annotations.field:annotations.io:annotations.io.classfile:annotations.util:annotations.util.coll:java.lang"
+		/>
+    </target>
+
+    <target name="test-package" depends="bin">
+        <property name="test-package" value="scene-lib-test"/>
+        <mkdir dir="${test-package}"/>
+        <mkdir dir="${test-package}/src"/>
+        <copy todir="${test-package}/src">
+            <fileset dir="src" excludes="**/.svn"/>
+        </copy>
+        <jar destfile="${test-package}/deps.jar">
+            <fileset dir="${asmx}/bin" includes="org/**"/>
+        </jar>
+        <zip destfile="${test-package}.zip">
+            <zipfileset dir="${test-package}" prefix="${test-package}"/>
+        </zip>
+        <delete dir="${test-package}"/>
+    </target>
+
+    <!-- = = = = = = = = = = = = = = = = =
+         macrodef: echopath
+         Use as:    <echopath pathid="mypath"/>
+         = = = = = = = = = = = = = = = = = -->
+    <macrodef name="echopath">
+      <attribute name="pathid"/>
+      <sequential>
+        <property name="line.pathprefix" value="| |-- "/>
+        <!-- get given path in a printable form -->
+        <pathconvert pathsep="${line.separator}${line.pathprefix}"
+             property="echo.@{pathid}"
+             refid="@{pathid}">
+        </pathconvert>
+        <echo>Path @{pathid}</echo>
+        <echo>${line.pathprefix}${echo.@{pathid}}</echo>
+      </sequential>
+    </macrodef>
+
+  <target name="etags" depends="tags">
+  </target>
+  <target name="tags" description="Create Emacs TAGS table">
+    <exec executable="/bin/sh">
+      <arg value="-c"/>
+      <arg value="etags `find -name '*.java' | sort-directory-order`"/>
+    </exec>
+  </target>
+
+</project>

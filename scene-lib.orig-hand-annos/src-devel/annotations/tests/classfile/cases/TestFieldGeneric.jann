@@ -1,0 +1,60 @@
+package annotations.tests.classfile.foo:
+annotation visible @A
+
+annotation visible @B:
+	String value
+
+annotation visible @C:
+	int fieldA
+	String fieldB
+
+annotation visible @D:
+	int fieldA
+	String fieldB
+	int[] fieldC
+
+annotation visible @E:
+	int fieldA
+	String fieldB
+
+annotation visible @F:
+	int fieldA
+	String fieldB
+
+annotation visible @G:
+	int fieldA
+	String fieldB
+	boolean[] fieldC
+	int fieldD
+	int fieldE
+	
+package annotations.tests.classfile.cases:
+class TestFieldGeneric: @annotations.tests.classfile.foo.A
+	field s: @annotations.tests.classfile.foo.F(fieldA=1, fieldB="fi")
+	field list: @annotations.tests.classfile.foo.G(fieldA=3, fieldB="three", fieldC={true, false}, fieldD=2, fieldE=4)
+	field set: @annotations.tests.classfile.foo.E(fieldA=2, fieldB = "rh")
+						 @annotations.tests.classfile.foo.F(fieldA = 1, fieldB = "if")
+  field testFieldGeneric: 
+  				inner-type 0 : @annotations.tests.classfile.foo.A
+  				
+  				
+  // Set<TestFieldGeneric<Set<TestFieldGeneric>>> nestedSet;
+    
+    field nestedSet: @annotations.tests.classfile.foo.B(value="nested")
+  				inner-type 0 : @annotations.tests.classfile.foo.F(fieldA=1, fieldB="n")
+  				inner-type 0 : @annotations.tests.classfile.foo.A
+  				inner-type 0, 0 : @annotations.tests.classfile.foo.B(value="nil")
+  				inner-type 0 : @annotations.tests.classfile.foo.C(fieldA=-2, fieldB="nl")
+  				inner-type 0, 0, 0 : @annotations.tests.classfile.foo.D(fieldA=-1, fieldB="hello", fieldC={3,2,4})
+  				
+  // Map<Set<TestFieldGeneric>, TestFieldGeneric<T>> nestedMap;
+  
+  	field nestedMap: @annotations.tests.classfile.foo.C(fieldA=1, fieldB="nested")
+  				inner-type 1 : @annotations.tests.classfile.foo.A
+  				inner-type 1, 0 : @annotations.tests.classfile.foo.B(value="inner most T")
+  				inner-type 0, 0 : @annotations.tests.classfile.foo.C(fieldA=256, fieldB="hello")
+  				inner-type 0 : @annotations.tests.classfile.foo.B(value="inner most F")
+  
+
+  				
+	
