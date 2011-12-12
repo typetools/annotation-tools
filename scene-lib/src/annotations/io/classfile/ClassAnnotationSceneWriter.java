@@ -37,7 +37,7 @@ import annotations.field.*;
  * <p>
  *
  * The proper usage of this class is to construct a
- * <code>ClassAnnotationSceneWriter}</code> with a {@link AScene} that
+ * <code>ClassAnnotationSceneWriter</code> with a {@link AScene} that
  * already contains all its annotations, pass this as a {@link
  * org.objectweb.asm.ClassVisitor} to {@link
  * org.objectweb.asm.ClassReader#accept}, and then obtain the resulting
