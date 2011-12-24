@@ -173,7 +173,15 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       // I'm not quite sure where this list is now.
       // jcnode.recvparam.mods.annotations might still contain declaration annotations.
       // By the point they are disambiguated, they've become TypeCompounds.
-      List<JCTypeAnnotation> receiverAnnotations = Collections.emptyList();
+      List<JCTypeAnnotation> receiverAnnotations;
+
+      if (jcnode.recvparam!=null) {
+    	  receiverAnnotations = com.sun.tools.javac.util.List.convert(JCTypeAnnotation.class, jcnode.recvparam.mods.annotations);
+      } else {
+    	  receiverAnnotations = Collections.emptyList();
+      }
+
+      // TODO WMD: the above needs to be updated.
 
       if (! throwsExpressions.isEmpty()) {
         // has a throws expression
@@ -583,10 +591,10 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       JCArrayTypeTree jcatt = (JCArrayTypeTree) na.elemtype;
       for (int i=1; i<dim; i++) {
         JCTree elem = jcatt.elemtype;
-        if (elem.getTag() == JCTree.ANNOTATED_TYPE) {
+        if (elem.getTag() == JCTree.Tag.ANNOTATED_TYPE) {
           elem = ((JCAnnotatedType) elem).underlyingType;
         }
-        if (elem.getTag() != JCTree.TYPEARRAY) {
+        if (elem.getTag() != JCTree.Tag.TYPEARRAY) {
           throw new Error();
         }
         jcatt = (JCArrayTypeTree) elem;
