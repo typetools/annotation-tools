@@ -9,7 +9,7 @@ public class GenericCell {
     internalList = list;
   }
 
-  public @java.lang.PolyRead List<@java.lang.PolyRead IntCell> getList() @java.lang.PolyRead {
+  public @java.lang.PolyRead List<@java.lang.PolyRead IntCell> getList(@java.lang.PolyRead GenericCell this) {
     return internalList;
   }
 
