@@ -588,10 +588,6 @@ extends EmptyVisitor {
           handleWildcardBoundGenericArray(aElement);
           break;
 
-        case CLASS_LITERAL:
-          throw new Error("CLASS_LITERAL: to do");
-          // break;
-
         case METHOD_TYPE_PARAMETER:
           throw new Error("METHOD_TYPE_PARAMETER: to do");
 
