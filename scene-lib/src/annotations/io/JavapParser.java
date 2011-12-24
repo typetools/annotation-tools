@@ -7,6 +7,8 @@ import java.util.*;
 import java.util.regex.*;
 import java.lang.annotation.RetentionPolicy;
 
+import com.sun.tools.javac.code.TargetType;
+
 import annotations.*;
 import annotations.el.*;
 

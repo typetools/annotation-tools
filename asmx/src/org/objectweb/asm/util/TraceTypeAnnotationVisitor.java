@@ -1,22 +1,22 @@
 package org.objectweb.asm.util;
 
-import org.objectweb.asm.ExtendedAnnotationVisitor;
+import org.objectweb.asm.TypeAnnotationVisitor;
 /**
- * An {@link ExtendedAnnotationVisitor} that prints a disassembled view of the
+ * An {@link TypeAnnotationVisitor} that prints a disassembled view of the
  * extended annotations it visits.
  * 
  * @author jaimeq
  */
 
-public class TraceExtendedAnnotationVisitor extends TraceAnnotationVisitor 
-  implements ExtendedAnnotationVisitor
+public class TraceTypeAnnotationVisitor extends TraceAnnotationVisitor 
+  implements TypeAnnotationVisitor
 {
 
     /**
-     * The {@link ExtendedAnnotationVisitor} to which this visitor 
+     * The {@link TypeAnnotationVisitor} to which this visitor 
      * delegates calls. May be <tt>null</tt>.
      */
-    protected ExtendedAnnotationVisitor xav;
+    protected TypeAnnotationVisitor xav;
 
     /**
      * A string representing two consecutive tabs, as defined in
@@ -43,9 +43,9 @@ public class TraceExtendedAnnotationVisitor extends TraceAnnotationVisitor
     
     
     /**
-     * Constructs a new {@link TraceExtendedAnnotationVisitor}.
+     * Constructs a new {@link TraceTypeAnnotationVisitor}.
      */
-    public TraceExtendedAnnotationVisitor() {
+    public TraceTypeAnnotationVisitor() {
         // ignore
     }
 
@@ -58,8 +58,8 @@ public class TraceExtendedAnnotationVisitor extends TraceAnnotationVisitor
     // Utility methods
     // ------------------------------------------------------------------------
 
-    protected TraceExtendedAnnotationVisitor createTraceExtendedAnnotationVisitor() {
-        return new TraceExtendedAnnotationVisitor();
+    protected TraceTypeAnnotationVisitor createTraceTypeAnnotationVisitor() {
+        return new TraceTypeAnnotationVisitor();
     }
 
     /**

@@ -77,7 +77,7 @@ public interface MethodVisitor {
      * @param visible <tt>true</tt> if the annotation is visible at runtime.
      * @return a non null visitor to visit the annotation values.
      */
-    ExtendedAnnotationVisitor visitExtendedAnnotation(String desc, 
+    TypeAnnotationVisitor visitTypeAnnotation(String desc, 
                                                       boolean visible);
 
     /**

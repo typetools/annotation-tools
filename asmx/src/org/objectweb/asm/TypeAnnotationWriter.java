@@ -34,12 +34,12 @@
 package org.objectweb.asm;
 
 /**
- * An {@link ExtendedAnnotationVisitor} that generates 
+ * An {@link TypeAnnotationVisitor} that generates 
  * extended annotations in bytecode form.
  * 
  * @author jaimeq
  */
-final class ExtendedAnnotationWriter implements ExtendedAnnotationVisitor {
+final class TypeAnnotationWriter implements TypeAnnotationVisitor {
 
     /**
      * The class writer to which this annotation must be added.
@@ -80,12 +80,12 @@ final class ExtendedAnnotationWriter implements ExtendedAnnotationVisitor {
     /**
      * Next annotation writer. This field is used to store annotation lists.
      */
-    ExtendedAnnotationWriter next;
+    TypeAnnotationWriter next;
 
     /**
      * Previous annotation writer. This field is used to store annotation lists.
      */
-    ExtendedAnnotationWriter prev;
+    TypeAnnotationWriter prev;
 
     
     // information for extended annotation type
@@ -131,7 +131,7 @@ final class ExtendedAnnotationWriter implements ExtendedAnnotationVisitor {
     // ------------------------------------------------------------------------
 
     /**
-     * Constructs a new {@link ExtendedAnnotationWriter}.
+     * Constructs a new {@link TypeAnnotationWriter}.
      * 
      * @param cw the class writer to which this annotation must be added.
      * @param named <tt>true<tt> if values are named, <tt>false</tt> otherwise.
@@ -140,7 +140,7 @@ final class ExtendedAnnotationWriter implements ExtendedAnnotationVisitor {
      * @param offset where in <tt>parent</tt> the number of annotation values must 
      *      be stored.
      */
-    ExtendedAnnotationWriter(
+    TypeAnnotationWriter(
         final ClassWriter cw,
         final boolean named,
         final ByteVector bv,
@@ -291,7 +291,7 @@ final class ExtendedAnnotationWriter implements ExtendedAnnotationVisitor {
      */
     int getSize() {
         int size = 0;
-        ExtendedAnnotationWriter aw = this;
+        TypeAnnotationWriter aw = this;
         while (aw != null) {
             size += aw.bv.length;
             aw = aw.next;
@@ -308,8 +308,8 @@ final class ExtendedAnnotationWriter implements ExtendedAnnotationVisitor {
     void put(final ByteVector out) {
         int n = 0;
         int size = 2;
-        ExtendedAnnotationWriter aw = this;
-        ExtendedAnnotationWriter last = null;
+        TypeAnnotationWriter aw = this;
+        TypeAnnotationWriter last = null;
         while (aw != null) {
             ++n;
             size += aw.bv.length;
@@ -333,15 +333,15 @@ final class ExtendedAnnotationWriter implements ExtendedAnnotationVisitor {
      * @param panns an array of annotation writer lists.
      * @param out where the annotations must be put.
      */
-    static void put(final ExtendedAnnotationWriter[] panns, final ByteVector out) {
+    static void put(final TypeAnnotationWriter[] panns, final ByteVector out) {
         int size = 1 + 2 * panns.length;
         for (int i = 0; i < panns.length; ++i) {
             size += panns[i] == null ? 0 : panns[i].getSize();
         }
         out.putInt(size).putByte(panns.length);
         for (int i = 0; i < panns.length; ++i) {
-            ExtendedAnnotationWriter aw = panns[i];
-            ExtendedAnnotationWriter last = null;
+            TypeAnnotationWriter aw = panns[i];
+            TypeAnnotationWriter last = null;
             int n = 0;
             while (aw != null) {
                 ++n;
@@ -360,7 +360,7 @@ final class ExtendedAnnotationWriter implements ExtendedAnnotationVisitor {
     }
 
     // ------------------------------------------------------------------------
-    // Implementation of the ExtendedAnnotationVisitor interface
+    // Implementation of the TypeAnnotationVisitor interface
     // ------------------------------------------------------------------------
     
     // below are all the methods for implementing extended annotations

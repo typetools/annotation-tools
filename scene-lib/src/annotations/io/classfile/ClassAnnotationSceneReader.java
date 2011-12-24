@@ -10,11 +10,13 @@ import java.io.*;
 import java.lang.annotation.RetentionPolicy;
 
 import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.ExtendedAnnotationVisitor;
+import org.objectweb.asm.TypeAnnotationVisitor;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.commons.EmptyVisitor;
+
+import com.sun.tools.javac.code.TargetType;
 
 import annotations.*;
 import annotations.el.*;
@@ -101,15 +103,15 @@ extends EmptyVisitor {
   @Override
   public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
     if (trace) { System.out.printf("visitAnnotation(%s, %s) in %s (%s)%n", desc, visible, this, this.getClass()); }
-    return visitExtendedAnnotation(desc, visible);
+    return visitTypeAnnotation(desc, visible);
   }
 
   /**
-   * @see org.objectweb.asm.commons.EmptyVisitor#visitExtendedAnnotation(java.lang.String, boolean)
+   * @see org.objectweb.asm.commons.EmptyVisitor#visitTypeAnnotation(java.lang.String, boolean)
    */
   @Override
-  public ExtendedAnnotationVisitor visitExtendedAnnotation(String desc, boolean visible) {
-    if (trace) { System.out.printf("visitExtendedAnnotation(%s, %s); aClass=%s in %s (%s)%n", desc, visible, aClass, this, this.getClass()); }
+  public TypeAnnotationVisitor visitTypeAnnotation(String desc, boolean visible) {
+    if (trace) { System.out.printf("visitTypeAnnotation(%s, %s); aClass=%s in %s (%s)%n", desc, visible, aClass, this, this.getClass()); }
     return new AnnotationSceneReader(desc, visible, aClass);
   }
 
@@ -160,7 +162,7 @@ extends EmptyVisitor {
   /*
    * Most of the complexity behind reading annotations from a class file into
    * a scene is in AnnotationSceneReader, which fully implements the
-   * ExtendedAnnotationVisitor interface (and therefore also implements the
+   * TypeAnnotationVisitor interface (and therefore also implements the
    * AnnotationVisitor interface).  It keeps an AElement of the
    * element into which this should insert the annotations it visits in
    * a class file.  Thus, constructing an AnnotationSceneReader with an
@@ -170,7 +172,7 @@ extends EmptyVisitor {
    * of the correct form (ATypeElement, or AMethod depending on the
    * target type of the extended annotation).
    */
-  private class AnnotationSceneReader implements ExtendedAnnotationVisitor {
+  private class AnnotationSceneReader implements TypeAnnotationVisitor {
     // Implementation strategy:
     // For field values and enums, simply pass the information
     //  onto annotationBuilder.
@@ -393,42 +395,42 @@ extends EmptyVisitor {
     }
 
     /*
-     * @see org.objectweb.asm.ExtendedAnnotationVisitor#visitXTargetType(int)
+     * @see org.objectweb.asm.TypeAnnotationVisitor#visitXTargetType(int)
      */
     public void visitXTargetType(int target_type) {
       xTargetTypeArgs.add(target_type);
     }
 
     /*
-     * @see org.objectweb.asm.ExtendedAnnotationVisitor#visitXIndex(int)
+     * @see org.objectweb.asm.TypeAnnotationVisitor#visitXIndex(int)
      */
     public void visitXIndex(int index) {
       xIndexArgs.add(index);
     }
 
     /*
-     * @see org.objectweb.asm.ExtendedAnnotationVisitor#visitXLength(int)
+     * @see org.objectweb.asm.TypeAnnotationVisitor#visitXLength(int)
      */
     public void visitXLength(int length) {
       xLengthArgs.add(length);
     }
 
     /*
-     * @see org.objectweb.asm.ExtendedAnnotationVisitor#visitXLocation(int)
+     * @see org.objectweb.asm.TypeAnnotationVisitor#visitXLocation(int)
      */
     public void visitXLocation(int location) {
       xLocationsArgs.add(location);
     }
 
     /*
-     * @see org.objectweb.asm.ExtendedAnnotationVisitor#visitXLocationLength(int)
+     * @see org.objectweb.asm.TypeAnnotationVisitor#visitXLocationLength(int)
      */
     public void visitXLocationLength(int location_length) {
       xLocationLengthArgs.add(location_length);
     }
 
     /*
-     * @see org.objectweb.asm.ExtendedAnnotationVisitor#visitXOffset(int)
+     * @see org.objectweb.asm.TypeAnnotationVisitor#visitXOffset(int)
      */
     public void visitXOffset(int offset) {
       xOffsetArgs.add(offset);
@@ -438,21 +440,21 @@ extends EmptyVisitor {
     }
 
     /*
-     * @see org.objectweb.asm.ExtendedAnnotationVisitor#visitXStartPc(int)
+     * @see org.objectweb.asm.TypeAnnotationVisitor#visitXStartPc(int)
      */
     public void visitXStartPc(int start_pc) {
       xStartPcArgs.add(start_pc);
     }
 
     /*
-     * @see org.objectweb.asm.ExtendedAnnotationVisitor#visitXBoundIndex(int)
+     * @see org.objectweb.asm.TypeAnnotationVisitor#visitXBoundIndex(int)
      */
     public void visitXParamIndex(int param_index) {
       xParamIndexArgs.add(param_index);
     }
 
     /*
-     * @see org.objectweb.asm.ExtendedAnnotationVisitor#visitXBoundIndex(int)
+     * @see org.objectweb.asm.TypeAnnotationVisitor#visitXBoundIndex(int)
      */
     public void visitXBoundIndex(int bound_index) {
       xBoundIndexArgs.add(bound_index);
@@ -466,7 +468,7 @@ extends EmptyVisitor {
      * Visits the end of the annotation, and actually writes out the
      *  annotation into aElement.
      *
-     * @see org.objectweb.asm.ExtendedAnnotationVisitor#visitEnd()
+     * @see org.objectweb.asm.TypeAnnotationVisitor#visitEnd()
      */
     public void visitEnd() {
       if (trace) { System.out.printf("visitEnd on %s (%s)%n", this, this.getClass()); }
@@ -585,10 +587,6 @@ extends EmptyVisitor {
         case WILDCARD_BOUND_GENERIC_OR_ARRAY:
           handleWildcardBoundGenericArray(aElement);
           break;
-
-        case CLASS_LITERAL:
-          throw new Error("CLASS_LITERAL: to do");
-          // break;
 
         case METHOD_TYPE_PARAMETER:
           throw new Error("METHOD_TYPE_PARAMETER: to do");
@@ -1121,8 +1119,8 @@ extends EmptyVisitor {
     }
 
     @Override
-    public ExtendedAnnotationVisitor visitExtendedAnnotation(String desc, boolean visible) {
-      if (trace) { System.out.printf("visitExtendedAnnotation(%s, %s); aField=%s, aField.type=%s in %s (%s)%n", desc, visible, aField, aField.type, this, this.getClass()); }
+    public TypeAnnotationVisitor visitTypeAnnotation(String desc, boolean visible) {
+      if (trace) { System.out.printf("visitTypeAnnotation(%s, %s); aField=%s, aField.type=%s in %s (%s)%n", desc, visible, aField, aField.type, this, this.getClass()); }
       return new AnnotationSceneReader(desc, visible, aField.type);
     }
   }
@@ -1153,12 +1151,12 @@ extends EmptyVisitor {
     @Override
     public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
       if (trace) { System.out.printf("visitAnnotation(%s, %s) in %s (%s)%n", desc, visible, this, this.getClass()); }
-      return visitExtendedAnnotation(desc, visible);
+      return visitTypeAnnotation(desc, visible);
     }
 
     @Override
-    public ExtendedAnnotationVisitor visitExtendedAnnotation(String desc, boolean visible) {
-      if (trace) { System.out.printf("visitExtendedAnnotation(%s, %s) method=%s in %s (%s)%n", desc, visible, aMethod, this, this.getClass()); }
+    public TypeAnnotationVisitor visitTypeAnnotation(String desc, boolean visible) {
+      if (trace) { System.out.printf("visitTypeAnnotation(%s, %s) method=%s in %s (%s)%n", desc, visible, aMethod, this, this.getClass()); }
       return new AnnotationSceneReader(desc, visible, aMethod);
     }
 

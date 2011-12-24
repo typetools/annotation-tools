@@ -205,11 +205,11 @@ public abstract class AbstractTest extends TestCase {
             return fv.visitAnnotation(desc, visible);
         }
 
-        public ExtendedAnnotationVisitor visitExtendedAnnotation(
+        public TypeAnnotationVisitor visitTypeAnnotation(
             final String desc,
             final boolean visible)
         {
-            return fv.visitExtendedAnnotation(desc, visible);
+            return fv.visitTypeAnnotation(desc, visible);
         }
 
         public void visitAttribute(final Attribute attr) {
