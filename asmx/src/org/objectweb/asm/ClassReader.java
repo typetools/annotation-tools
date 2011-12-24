@@ -1492,17 +1492,6 @@ public class ClassReader {
             // XXX: Parse here
           break;
 
-        // 0x1E/0x1F*: class literal
-        // {
-        //    u1 type_index;
-        // } reference_info;
-        case CLASS_LITERAL:
-        case CLASS_LITERAL_GENERIC_OR_ARRAY:
-            offset = this.readUnsignedShort(v);
-            v += 2;
-            xav.visitXOffset(offset);
-          break;
-
         // 0x20/0x21*: method type parameter
         // {
         //    u1 param_index;
