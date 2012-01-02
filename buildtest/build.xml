@@ -26,7 +26,7 @@
     <target name="checkout-jsr308-langtools" depends="init">
         <exec dir="${builddir}" executable="hg">
             <arg value="clone"/>
-            <arg value="https://jsr308-langtools.googlecode.com/hg/"/>
+            <arg value="https://code.google.com/p/jsr308-langtools/"/>
             <arg value="jsr308-langtools"/>
         </exec>
     </target>
@@ -34,7 +34,7 @@
     <target name="checkout-annotation-tools" depends="init">
         <exec dir="${builddir}" executable="hg">
             <arg value="clone"/>
-            <arg value="https://annotation-tools.googlecode.com/hg/"/>
+            <arg value="https://code.google.com/p/annotation-tools/"/>
             <arg value="annotation-tools"/>
         </exec>
     </target>
@@ -42,7 +42,7 @@
     <target name="checkout-checker-framework" depends="init">
         <exec dir="${builddir}" executable="hg">
             <arg value="clone"/>
-            <arg value="https://checker-framework.googlecode.com/hg/"/>
+            <arg value="https://code.google.com/p/checker-framework/"/>
             <arg value="checker-framework"/>
         </exec>
     </target>
@@ -50,7 +50,7 @@
     <target name="checkout-javarifier" depends="init">
         <exec dir="${builddir}" executable="hg">
             <arg value="clone"/>
-            <arg value="https://javarifier.googlecode.com/hg/"/>
+            <arg value="https://code.google.com/p/javarifier/"/>
             <arg value="javarifier"/>
         </exec>
     </target>
