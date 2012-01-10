@@ -1,4 +1,4 @@
-//This is a wrapper class around an ExtendedAnnotationVisitor that can be used
+//This is a wrapper class around an TypeAnnotationVisitor that can be used
 //to verify the information it visits specifies a valid [extended] annotation.
 
 package annotations.io.classfile;
@@ -9,18 +9,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.ExtendedAnnotationVisitor;
+import org.objectweb.asm.TypeAnnotationVisitor;
 
-import annotations.TargetType;
+import com.sun.tools.javac.code.TargetType;
 
 /**
- * A <code>SafeExtendedAnnotationVisitor</code> wraps around an
- * ExtendedAnnotationVisitor and delegates all calls to it.  However, it
+ * A <code>SafeTypeAnnotationVisitor</code> wraps around an
+ * TypeAnnotationVisitor and delegates all calls to it.  However, it
  * maintains a record of all methods that have been called and on
- * calling {@link SafeExtendedAnnotationVisitor#visitEnd},
+ * calling {@link SafeTypeAnnotationVisitor#visitEnd},
  * performs a check to verify that all the data passed
  * to this visitor specifies a legal annotation or extended annotation.  Its
- * intended use is to wrap around an <code>ExtendedAnnotationWriter</code> and
+ * intended use is to wrap around an <code>TypeAnnotationWriter</code> and
  * thus ensure that no illegal class files are written, although it will work
  * more generally on any visitor.
  *
@@ -34,11 +34,11 @@ import annotations.TargetType;
  * methods have been called, the check will ensure that the data passed to this
  * specifies a legal extended annotation, as defined by its target type.
  */
-public class SafeExtendedAnnotationVisitor
-implements ExtendedAnnotationVisitor {
+public class SafeTypeAnnotationVisitor
+implements TypeAnnotationVisitor {
 
   // The visitor this delegates all calls to.
-  private final ExtendedAnnotationVisitor xav;
+  private final TypeAnnotationVisitor xav;
 
   // Each list keeps a record of what was passed in to the similarly-named
   // method, and except for xLocationArgs, should all contain at most 1 element.
@@ -54,12 +54,12 @@ implements ExtendedAnnotationVisitor {
   private List<Integer> xTypeIndexArgs;
 
   /**
-   * Constructs a new <code> SafeExtendedAnnotationVisitor </code> that
+   * Constructs a new <code> SafeTypeAnnotationVisitor </code> that
    *  delegates all calls to the given visitor.
    *
    * @param xav the visitor to delegate all method calls to
    */
-  public SafeExtendedAnnotationVisitor(ExtendedAnnotationVisitor xav) {
+  public SafeTypeAnnotationVisitor(TypeAnnotationVisitor xav) {
     this.xav = xav;
     // Start most of these with a capacity of one, since for legal annotations
     // they should not contain more than one element.
@@ -109,7 +109,7 @@ implements ExtendedAnnotationVisitor {
 
   /**
    * @inheritDoc
-   * @see org.objectweb.asm.ExtendedAnnotationVisitor#visitXIndex(int)
+   * @see org.objectweb.asm.TypeAnnotationVisitor#visitXIndex(int)
    */
   public void visitXIndex(int index) {
     xIndexArgs.add(index);
@@ -118,7 +118,7 @@ implements ExtendedAnnotationVisitor {
 
   /**
    * @inheritDoc
-   * @see org.objectweb.asm.ExtendedAnnotationVisitor#visitXLength(int)
+   * @see org.objectweb.asm.TypeAnnotationVisitor#visitXLength(int)
    */
   public void visitXLength(int length) {
     xLengthArgs.add(length);
@@ -127,7 +127,7 @@ implements ExtendedAnnotationVisitor {
 
   /**
    * @inheritDoc
-   * @see org.objectweb.asm.ExtendedAnnotationVisitor#visitXLocation(int)
+   * @see org.objectweb.asm.TypeAnnotationVisitor#visitXLocation(int)
    */
   public void visitXLocation(int location) {
     xLocationArgs.add(location);
@@ -136,7 +136,7 @@ implements ExtendedAnnotationVisitor {
 
   /**
    * @inheritDoc
-   * @see org.objectweb.asm.ExtendedAnnotationVisitor#visitXLocationLength(int)
+   * @see org.objectweb.asm.TypeAnnotationVisitor#visitXLocationLength(int)
    */
   public void visitXLocationLength(int location_length) {
     xLocationLengthArgs.add(location_length);
@@ -145,7 +145,7 @@ implements ExtendedAnnotationVisitor {
 
   /**
    * @inheritDoc
-   * @see org.objectweb.asm.ExtendedAnnotationVisitor#visitXOffset(int)
+   * @see org.objectweb.asm.TypeAnnotationVisitor#visitXOffset(int)
    */
   public void visitXOffset(int offset) {
     xOffsetArgs.add(offset);
@@ -157,7 +157,7 @@ implements ExtendedAnnotationVisitor {
 
   /**
    * @inheritDoc
-   * @see org.objectweb.asm.ExtendedAnnotationVisitor#visitXStartPc(int)
+   * @see org.objectweb.asm.TypeAnnotationVisitor#visitXStartPc(int)
    */
   public void visitXStartPc(int start_pc) {
     xStartPcArgs.add(start_pc);
@@ -166,7 +166,7 @@ implements ExtendedAnnotationVisitor {
 
   /**
    * @inheritDoc
-   * @see org.objectweb.asm.ExtendedAnnotationVisitor#visitXTargetType(int)
+   * @see org.objectweb.asm.TypeAnnotationVisitor#visitXTargetType(int)
    */
   public void visitXTargetType(int target_type) {
     xTargetTypeArgs.add(target_type);
@@ -175,7 +175,7 @@ implements ExtendedAnnotationVisitor {
 
   /**
    * @inheritDoc
-   * @see org.objectweb.asm.ExtendedAnnotationVisitor#visitXParamIndex(int)
+   * @see org.objectweb.asm.TypeAnnotationVisitor#visitXParamIndex(int)
    */
   public void visitXParamIndex(int param_index) {
     xParamIndexArgs.add(param_index);
@@ -184,7 +184,7 @@ implements ExtendedAnnotationVisitor {
 
   /**
    * @inheritDoc
-   * @see org.objectweb.asm.ExtendedAnnotationVisitor#visitXBoundIndex(int)
+   * @see org.objectweb.asm.TypeAnnotationVisitor#visitXBoundIndex(int)
    */
   public void visitXBoundIndex(int bound_index) {
     if (bound_index != -1) {
@@ -205,7 +205,7 @@ implements ExtendedAnnotationVisitor {
    *  throws an exception.
    *
    * @inheritDoc
-   * @throws InvalidExtendedAnnotationException if the information this
+   * @throws InvalidTypeAnnotationException if the information this
    *  has visited does not specify a legal extended annotation
    * @see org.objectweb.asm.AnnotationVisitor#visitEnd()
    */
@@ -221,7 +221,7 @@ implements ExtendedAnnotationVisitor {
           xLocationLengthArgs.size() != 0 ||
           xOffsetArgs.size() != 0 ||
           xStartPcArgs.size() != 0) {
-        throw new InvalidExtendedAnnotationException(
+        throw new InvalidTypeAnnotationException(
         "No target type was specified, yet other visitX* methods were still called.");
       }
     }
@@ -231,7 +231,7 @@ implements ExtendedAnnotationVisitor {
   /**
    * Checks that the extended information this has visited is valid.
    *
-   * @throws InvalidExtendedAnnotationException if extended information is
+   * @throws InvalidTypeAnnotationException if extended information is
    *  not valid
    */
   private void checkX() {
@@ -239,7 +239,7 @@ implements ExtendedAnnotationVisitor {
     // then dispatch to checkListSize() based on that target type.
     if (xTargetTypeArgs.size() != 1) {
       throw new
-      InvalidExtendedAnnotationException("More than one target type visited.");
+      InvalidTypeAnnotationException("More than one target type visited.");
     }
 
     // Since the correct size of xLocationArgs is specified by
@@ -347,7 +347,7 @@ implements ExtendedAnnotationVisitor {
       "Invalid exception type in throws annotation:");
       break;
     default:
-      throw new InvalidExtendedAnnotationException(
+      throw new InvalidTypeAnnotationException(
           "Unknown target type given: " + xTargetTypeArgs.get(0));
     }
   }
@@ -382,7 +382,7 @@ implements ExtendedAnnotationVisitor {
    *  correct length, this throws an exception with a message equal to msg, plus
    *  information describing which lists were incorrect.
    *
-   * @throws InvalidExtendedAnnotationException if the extended information
+   * @throws InvalidTypeAnnotationException if the extended information
    *  lists are not of the correct length
    */
   private void checkListSize(
@@ -412,7 +412,7 @@ implements ExtendedAnnotationVisitor {
     //  in the extended annotation information.
     String s = sb.toString();
     if (s.length() > 0) {
-      throw new InvalidExtendedAnnotationException(msg + s);
+      throw new InvalidTypeAnnotationException(msg + s);
     }
   }
 }

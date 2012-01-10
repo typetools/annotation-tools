@@ -489,7 +489,7 @@ public @A(12) class Foo {
     public int bar;             // no annotation
     private @B List<@C String> baz;
 
-    public Foo(@B List<@C String> a) @D("spam") {
+    public Foo(@D("spam") Foo this, @B List<@C String> a) {
         @B List<@C String> l = new LinkedList<@C String>();
         l = (@B List<@C String>)l;
     }
