@@ -61,6 +61,6 @@ public interface FieldVisitor {
     void visitEnd();
     
     // jaime
-    ExtendedAnnotationVisitor visitExtendedAnnotation(String desc, 
+    TypeAnnotationVisitor visitTypeAnnotation(String desc, 
                                                       boolean visible);
 }

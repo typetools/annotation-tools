@@ -169,7 +169,19 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       JCMethodDecl jcnode = (JCMethodDecl) node;
       List<JCExpression> throwsExpressions = jcnode.thrown;
       JCBlock body = jcnode.getBody();
-      List<JCTypeAnnotation> receiverAnnotations = jcnode.receiverAnnotations;
+      // TODO: this used to be jcnode.receiverAnnotations, which doesn't exist any more
+      // I'm not quite sure where this list is now.
+      // jcnode.recvparam.mods.annotations might still contain declaration annotations.
+      // By the point they are disambiguated, they've become TypeCompounds.
+      List<JCTypeAnnotation> receiverAnnotations;
+
+      if (jcnode.recvparam!=null) {
+    	  receiverAnnotations = com.sun.tools.javac.util.List.convert(JCTypeAnnotation.class, jcnode.recvparam.mods.annotations);
+      } else {
+    	  receiverAnnotations = Collections.emptyList();
+      }
+
+      // TODO WMD: the above needs to be updated.
 
       if (! throwsExpressions.isEmpty()) {
         // has a throws expression

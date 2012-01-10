@@ -29,22 +29,22 @@
  */
 package org.objectweb.asm.optimizer;
 
-import org.objectweb.asm.ExtendedAnnotationVisitor;
+import org.objectweb.asm.TypeAnnotationVisitor;
 
 /**
- * An {@link ExtendedAnnotationVisitor} that collects the 
+ * An {@link TypeAnnotationVisitor} that collects the 
  * {@link Constant}s of the extended annotations it visits.
  * 
  * @author jaimeq
  */
-public class ExtendedAnnotationConstantsCollector 
+public class TypeAnnotationConstantsCollector 
   extends AnnotationConstantsCollector 
-  implements ExtendedAnnotationVisitor {
+  implements TypeAnnotationVisitor {
 
-    private ExtendedAnnotationVisitor xav;
+    private TypeAnnotationVisitor xav;
 
-    public ExtendedAnnotationConstantsCollector(
-        final ExtendedAnnotationVisitor xav,
+    public TypeAnnotationConstantsCollector(
+        final TypeAnnotationVisitor xav,
         final ConstantPool cp)
     {
       super(xav, cp);
