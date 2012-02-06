@@ -80,6 +80,9 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
   //     annotations in the scene at the first call of visit{Code, End}.
   //
 
+  // Whether to output error messages for unsupported cases
+  private static final boolean strict = false;
+
   // None of these classes fields should be null, except for aClass, which
   //  can't be vivified until the first visit() is called.
 
@@ -295,7 +298,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
         ATypeElement aty = e.getValue();
 
         // TODO: How is this annotation written back out?
-        System.err.println("ClassAnnotationSceneWriter: ignoring Extends/Implements annotation " + idx + " with type: " + aty);
+        if (strict) { System.err.println("ClassAnnotationSceneWriter: ignoring Extends/Implements annotation " + idx + " with type: " + aty); }
       }
       
     }
@@ -854,9 +857,10 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
       for (Map.Entry<RelativeLocation, ATypeElement> entry :
         aMethod.news.entrySet()) {
         if(!entry.getKey().isBytecodeOffset()) {
-        	// if the RelativeLocation is a source index, we cannot insert it
-        	// into bytecode
-        	// TODO: output a warning or translate
+          // if the RelativeLocation is a source index, we cannot insert it
+          // into bytecode
+          // TODO: output a warning or translate
+          if (strict) { System.err.println("ClassAnnotationSceneWriter.ensureVisitObjectCreationAnnotation: no bytecode offset found!"); }
         }
         int offset = entry.getKey().offset;
         ATypeElement aNew = entry.getValue();
@@ -946,7 +950,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
      * Has this visit the receiver annotations on this method.
      */
     private void ensureVisitReceiverAnnotations() {
-      AElement aReceiver = aMethod.receiver;
+      ATypeElement aReceiver = aMethod.receiver;
       for (Annotation tla : aReceiver.tlAnnotationsHere) {
         if (shouldSkip(tla)) continue;
 
@@ -955,6 +959,24 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
         visitTargetType(xav, TargetType.METHOD_RECEIVER);
         xav.visitEnd();
       }
+
+      // now do inner annotations of aReceiver
+      for (Map.Entry<InnerTypeLocation, ATypeElement> e :
+        aReceiver.innerTypes.entrySet()) {
+        InnerTypeLocation aReceiverLocation = e.getKey();
+        ATypeElement aInnerType = e.getValue();
+        for (Annotation tla : aInnerType.tlAnnotationsHere) {
+          if (shouldSkip(tla)) continue;
+
+          TypeAnnotationVisitor xav = visitTypeAnnotation(tla);
+          visitFields(xav, tla);
+          visitTargetType(xav, TargetType.METHOD_RECEIVER_GENERIC_OR_ARRAY);
+          // information for generic/array (on receiver)
+          visitLocations(xav, aReceiverLocation);
+          xav.visitEnd();
+        }
+      }
+
     }
 
     /**
@@ -967,6 +989,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
           // if the RelativeLocation is a source index, we cannot insert it
           // into bytecode
           // TODO: output a warning or translate
+          if (strict) { System.err.println("ClassAnnotationSceneWriter.ensureVisitTypecastAnnotation: no bytecode offset found!"); }
         }
         int offset = entry.getKey().offset;
         ATypeElement aTypecast = entry.getValue();
@@ -1011,6 +1034,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
           // if the RelativeLocation is a source index, we cannot insert it
           // into bytecode
           // TODO: output a warning or translate
+          if (strict) { System.err.println("ClassAnnotationSceneWriter.ensureVisitTypeTestAnnotation: no bytecode offset found!"); }
         }
         int offset = entry.getKey().offset;
         ATypeElement aTypeTest = entry.getValue();
@@ -1065,6 +1089,8 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
         ensureVisitReceiverAnnotations();
         ensureVisitTypecastAnnotations();
         ensureVisitTypeTestAnnotations();
+        // TODO: throw clauses?!
+        // TODO: catch clauses!?
       }
     }
   }

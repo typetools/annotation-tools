@@ -1378,6 +1378,7 @@ public class ClassReader {
         // {
         // } reference_info;
         case METHOD_RECEIVER:
+        case METHOD_RECEIVER_GENERIC_OR_ARRAY:
           break;
 
         // 0x08/0x09: local variable
@@ -1503,7 +1504,7 @@ public class ClassReader {
           xav.visitXParamIndex(param_index);
           break;
 
-          default: throw new RuntimeException(
+        default: throw new RuntimeException(
               "Unrecognized target type: " + target_type);
         }
 

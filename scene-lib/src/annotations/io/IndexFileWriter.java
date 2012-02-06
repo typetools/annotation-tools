@@ -288,8 +288,7 @@ public final class IndexFileWriter {
                 printElement(INDENT, "method " + mkey, m);
                 printBounds(INDENT + INDENT, m.bounds);
                 printTypeElementAndInnerTypes(INDENT + INDENT, "return", m.returnType);
-                if (!m.receiver.tlAnnotationsHere.isEmpty())
-                    printElement(INDENT + INDENT, "receiver", m.receiver);
+                printTypeElementAndInnerTypes(INDENT + INDENT, "receiver", m.receiver);
                 printNumberedAmbigiousElements(INDENT + INDENT, "parameter", m.parameters);
                 for (/*@ReadOnly*/ Map.Entry<LocalLocation, /*@ReadOnly*/ AElement> le
                         : m.locals.entrySet()) {
