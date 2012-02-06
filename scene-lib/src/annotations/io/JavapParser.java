@@ -194,9 +194,9 @@ public final class JavapParser {
                 subOuterType = (ATypeElement) member;
                 break;
             case METHOD_RECEIVER:
-                // A method receiver doesn't have inner types, so return the
-                // receiver and bypass the targetType.isGeneric() part below.
-                return ((AMethod) member).receiver;
+            case METHOD_RECEIVER_GENERIC_OR_ARRAY:
+                subOuterType = ((AMethod) member).receiver;
+                break;
             case METHOD_PARAMETER_GENERIC_OR_ARRAY:
                 int paramIdx = Integer.parseInt(
                         line.substring(

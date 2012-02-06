@@ -278,6 +278,11 @@ implements TypeAnnotationVisitor {
       checkListSize(0, 0, 0, 0, 0, 0, 0, 0, 0,
       "Invalid method receiver annotation:");
       break;
+    case METHOD_RECEIVER_GENERIC_OR_ARRAY:
+      // TODO
+      checkListSize(0, 0, 0, 0, 0, 0, 0, 0, 0,
+      "Invalid method receiver generic/array annotation:");
+      break;
     case LOCAL_VARIABLE:
       checkListSize(1, 1, 0, 0, 0, 1, 0, 0, 0,
       "Invalid local variable annotation:");

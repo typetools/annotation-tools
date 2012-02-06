@@ -53,7 +53,11 @@ extends EmptyVisitor {
   //  methods; for those three, use a special visitor that does all the work
   //  and inserts the annotations correctly into the specified AElement
 
-  private boolean trace = false;
+  // Whether to output tracing information
+  private static final boolean trace = false;
+
+  // Whether to output error messages for unsupported cases
+  private static final boolean strict = false;
 
   // The scene into which this class will insert annotations.
   private AScene scene;
@@ -484,20 +488,22 @@ extends EmptyVisitor {
             // TODO: resolve issue once classfile format is finalized
             if (aElement instanceof AClass) {
               //handleFieldOnClass((AClass) aElement);
+              if (strict) { System.err.println("Unhandled FIELD annotation for " + aElement); }
             } else if (aElement instanceof ATypeElement) {
               handleField((ATypeElement) aElement);
             } else {
-              throw new RuntimeException("Unknown FIELD_GENERIC_ARRAY");
+              throw new RuntimeException("Unknown FIELD aElement: " + aElement);
             }
             break;
         case FIELD_GENERIC_OR_ARRAY:
           // TODO: resolve issue once classfile format is finalized
           if (aElement instanceof AClass) {
             //handleFieldGenericArrayOnClass((AClass) aElement);
+            if (strict) { System.err.println("Unhandled FIELD_GENERIC_OR_ARRAY annotation for " + aElement); }
           } else if (aElement instanceof ATypeElement) {
             handleFieldGenericArray((ATypeElement) aElement);
           } else {
-            throw new RuntimeException("Unknown FIELD_GENERIC_ARRAY");
+            throw new RuntimeException("Unknown FIELD_GENERIC_OR_ARRAY: " + aElement);
           }
           break;
         case LOCAL_VARIABLE:
@@ -507,12 +513,20 @@ extends EmptyVisitor {
           handleMethodLocalVariableGenericArray((AMethod) aElement);
           break;
         case NEW:
-          if (aElement instanceof AMethod)
+          if (aElement instanceof AMethod) {
             handleMethodObjectCreation((AMethod) aElement);
+          } else {
+            // TODO: in field initializers
+            if (strict) { System.err.println("Unhandled NEW annotation for " + aElement); }
+          }
           break;
         case NEW_GENERIC_OR_ARRAY:
-          if (aElement instanceof AMethod)
+          if (aElement instanceof AMethod) {
             handleMethodObjectCreationGenericArray((AMethod) aElement);
+          } else {
+              // TODO: in field initializers
+              if (strict) { System.err.println("Unhandled NEW_GENERIC_OR_ARRAY annotation for " + aElement); }
+          }
           break;
         case METHOD_PARAMETER:
           handleMethodParameterType((AMethod) aElement);
@@ -521,15 +535,26 @@ extends EmptyVisitor {
           handleMethodParameterTypeGenericArray((AMethod) aElement);
           break;
         case METHOD_RECEIVER:
-          handleMethodReceiver((AMethod) aElement);
-          break;
+            handleMethodReceiver((AMethod) aElement);
+            break;
+        case METHOD_RECEIVER_GENERIC_OR_ARRAY:
+            handleMethodReceiverGenericArray((AMethod) aElement);
+            break;
         case TYPECAST:
-          if (aElement instanceof AMethod)
+          if (aElement instanceof AMethod) {
             handleMethodTypecast((AMethod) aElement);
+          } else {
+              // TODO: in field initializers
+              if (strict) { System.err.println("Unhandled TYPECAST annotation for " + aElement); }
+          }
           break;
         case TYPECAST_GENERIC_OR_ARRAY:
-          if (aElement instanceof AMethod)
+          if (aElement instanceof AMethod) {
             handleMethodTypecastGenericArray((AMethod) aElement);
+          } else {
+              // TODO: in field initializers
+              if (strict) { System.err.println("Unhandled TYPECAST_GENERIC_OR_ARRAY annotation for " + aElement); }
+          }
           break;
         case METHOD_RETURN:
           handleMethodReturnType((AMethod) aElement);
@@ -538,12 +563,20 @@ extends EmptyVisitor {
           handleMethodReturnTypeGenericArray((AMethod) aElement);
           break;
         case INSTANCEOF:
-          if (aElement instanceof AMethod)
+          if (aElement instanceof AMethod) {
             handleMethodInstanceOf((AMethod) aElement);
+          } else {
+              // TODO: in field initializers
+              if (strict) { System.err.println("Unhandled INSTANCEOF annotation for " + aElement); }
+          }
           break;
         case INSTANCEOF_GENERIC_OR_ARRAY:
-          if (aElement instanceof AMethod)
+          if (aElement instanceof AMethod) {
             handleMethodInstanceOfGenericArray((AMethod) aElement);
+          } else {
+              // TODO: in field initializers
+              if (strict) { System.err.println("Unhandled INSTANCEOF_GENERIC_OR_ARRAY annotation for " + aElement); }
+          }
           break;
         case CLASS_TYPE_PARAMETER_BOUND:
           handleClassTypeParameterBound((AClass) aElement);
@@ -595,6 +628,7 @@ extends EmptyVisitor {
           handleClassTypeParameter((AClass) aElement);
           break;
 
+          // TODO: ensure all cases covered.
         default:
           // Rather than throw an error here, since a declaration annotation
           // is being used as an extended annotation, just make the
@@ -676,6 +710,7 @@ extends EmptyVisitor {
       if (!xParamIndexArgs.isEmpty()) {
         return new BoundLocation(xParamIndexArgs.get(0), -1);
       } else {
+        if (strict) { System.err.println("makeTypeParameterLocation with empty xParamIndexArgs!"); }
         return new BoundLocation(Integer.MAX_VALUE, -1);
       }
     }
@@ -689,6 +724,7 @@ extends EmptyVisitor {
       if (!xParamIndexArgs.isEmpty()) {
         return new BoundLocation(xParamIndexArgs.get(0), xBoundIndexArgs.get(0));
       } else {
+        if (strict) { System.err.println("makeBoundLocation with empty xParamIndexArgs!"); }
         return new BoundLocation(Integer.MAX_VALUE, Integer.MAX_VALUE);
       }
     }
@@ -718,6 +754,15 @@ extends EmptyVisitor {
      */
     private void handleMethodReceiver(AMethod aMethod) {
       aMethod.receiver.tlAnnotationsHere.add(makeAnnotation());
+    }
+
+    /*
+     * Creates the inner method receiver annotation on aMethod.innerTypes.
+     */
+    private void handleMethodReceiverGenericArray(AMethod aMethod) {
+      InnerTypeLocation innerTypeLocation = makeInnerTypeLocation();
+      AElement aInnerType = aMethod.receiver.innerTypes.vivify(innerTypeLocation);
+      aInnerType.tlAnnotationsHere.add(makeAnnotation());
     }
 
     /*
@@ -790,7 +835,7 @@ extends EmptyVisitor {
      * Creates the method return type generic/array annotation on aMethod.
      */
     private void handleMethodReturnType(AMethod aMethod) {
-      if (trace) { System.out.printf("handleMethodReturnTypeGenericArray(%s)%n", aMethod); }
+      if (trace) { System.out.printf("handleMethodReturnType(%s)%n", aMethod); }
       aMethod.returnType.tlAnnotationsHere.add(makeAnnotation());
     }
 
@@ -875,29 +920,14 @@ extends EmptyVisitor {
         .tlAnnotationsHere.add(makeAnnotation());
     }
 
-//    /*
-//     * Creates the typecast annotation on aMethod.
-//     */
-//    private void handleMethodTypecast(AMethod aMethod) {
-//     aMethod.typecasts.vivify(makeOffset()).tlAnnotationsHere.add(
-//         makeAnnotation());
-//    }
-//
-//    /*
-//     * Creates the typecast generic/array annotation on aMethod.
-//     */
-//    private void handleMethodTypecastGenericArray(AMethod aMethod) {
-//      aMethod.typecasts.vivify(makeOffset()).innerTypes.vivify(
-//          makeInnerTypeLocation()).tlAnnotationsHere.add(makeAnnotation());
-//    }
-
     private void handleNewTypeArgument(AMethod aMethod) {
       //aMethod.news.vivify(makeOffset()).innerTypes.vivify();
           //makeInnerTypeLocation()).tlAnnotationsHere.add(makeAnnotation());
+      if (strict) { System.err.println("Unhandled handleNewTypeArgument on aMethod: " + aMethod); }
     }
 
     private void handleNewTypeArgumentGenericArray(AMethod aMethod) {
-
+      if (strict) { System.err.println("Unhandled handleNewTypeArgumentGenericArray on aMethod: " + aMethod); }
     }
 
     private void handleWildcardBound(AElement aElement) {
@@ -949,7 +979,7 @@ extends EmptyVisitor {
    * of its parent, and once it has fully visited that annotation, it will
    * call its parent annotation builder to include that field, so after
    * its parent constructs and returns this as an AnnotationVisitor
-   * (visitAnnotation()), it no longer needs to wory about that field.
+   * (visitAnnotation()), it no longer needs to worry about that field.
    */
   private class NestedAnnotationSceneReader extends AnnotationSceneReader {
     private AnnotationSceneReader parent;
