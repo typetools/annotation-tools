@@ -1364,11 +1364,11 @@ public class ClassReader {
         //   u2 offset;
         // } reference_info;
         case TYPECAST:
-        case TYPECAST_GENERIC_OR_ARRAY:
+        case TYPECAST_COMPONENT:
         case INSTANCEOF:
-        case INSTANCEOF_GENERIC_OR_ARRAY:
+        case INSTANCEOF_COMPONENT:
         case NEW:
-        case NEW_GENERIC_OR_ARRAY:
+        case NEW_COMPONENT:
           offset = readUnsignedShort(v);
           v += 2;
           xav.visitXOffset(offset);
@@ -1378,7 +1378,7 @@ public class ClassReader {
         // {
         // } reference_info;
         case METHOD_RECEIVER:
-        case METHOD_RECEIVER_GENERIC_OR_ARRAY:
+        case METHOD_RECEIVER_COMPONENT:
           break;
 
         // 0x08/0x09: local variable
@@ -1389,7 +1389,7 @@ public class ClassReader {
         //   u2 index;
         // } reference_info;
         case LOCAL_VARIABLE:
-        case LOCAL_VARIABLE_GENERIC_OR_ARRAY:
+        case LOCAL_VARIABLE_COMPONENT:
           table_length = readUnsignedShort(v);
           v += 2;
           assert table_length == 1; // FIXME
@@ -1408,7 +1408,7 @@ public class ClassReader {
         // {
         // } reference_info;
         case METHOD_RETURN:
-        case METHOD_RETURN_GENERIC_OR_ARRAY:
+        case METHOD_RETURN_COMPONENT:
           break;
 
         // 0x0C*/0x0D: method parameter
@@ -1417,7 +1417,7 @@ public class ClassReader {
         //        we assume the index is zero
         // } reference_info;
         case METHOD_PARAMETER:
-        case METHOD_PARAMETER_GENERIC_OR_ARRAY:
+        case METHOD_PARAMETER_COMPONENT:
           int param = readByte(v);
           v++;
           xav.visitXParamIndex(param);
@@ -1427,7 +1427,7 @@ public class ClassReader {
         // {
         // } reference_info;
         case FIELD:
-        case FIELD_GENERIC_OR_ARRAY:
+        case FIELD_COMPONENT:
           break;
 
         // 0x10/0x11: class type parameter bound
@@ -1437,9 +1437,9 @@ public class ClassReader {
         //   u1 bound_index;
         // } reference_info;
         case CLASS_TYPE_PARAMETER_BOUND:
-        case CLASS_TYPE_PARAMETER_BOUND_GENERIC_OR_ARRAY:
+        case CLASS_TYPE_PARAMETER_BOUND_COMPONENT:
         case METHOD_TYPE_PARAMETER_BOUND:
-        case METHOD_TYPE_PARAMETER_BOUND_GENERIC_OR_ARRAY:
+        case METHOD_TYPE_PARAMETER_BOUND_COMPONENT:
           param_index = readByte(v);
           v++;
           xav.visitXParamIndex(param_index);
@@ -1454,7 +1454,7 @@ public class ClassReader {
         //    u1 type_index;
         // } reference_info;
         case CLASS_EXTENDS:
-        case CLASS_EXTENDS_GENERIC_OR_ARRAY:
+        case CLASS_EXTENDS_COMPONENT:
             type_index = readUnsignedShort(v);
             if (type_index == 0xFF) type_index = -1;
             v += 2;
@@ -1471,9 +1471,9 @@ public class ClassReader {
         // {
         // } reference_info;
         case NEW_TYPE_ARGUMENT:
-        case NEW_TYPE_ARGUMENT_GENERIC_OR_ARRAY:
+        case NEW_TYPE_ARGUMENT_COMPONENT:
         case METHOD_TYPE_ARGUMENT:
-        case METHOD_TYPE_ARGUMENT_GENERIC_OR_ARRAY:
+        case METHOD_TYPE_ARGUMENT_COMPONENT:
             offset = readUnsignedShort(v);
             v += 2;
             xav.visitXOffset(offset);
@@ -1489,7 +1489,7 @@ public class ClassReader {
         //    reference_info wildcard_target_type
         // } reference_info;
         case WILDCARD_BOUND:
-        case WILDCARD_BOUND_GENERIC_OR_ARRAY:
+        case WILDCARD_BOUND_COMPONENT:
             // XXX: Parse here
           break;
 
