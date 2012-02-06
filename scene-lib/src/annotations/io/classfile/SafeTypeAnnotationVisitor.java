@@ -254,7 +254,7 @@ implements TypeAnnotationVisitor {
       checkListSize(0, 0, 0, 0, 1, 0, 0, 0, 0,
           "Invalid typecast annotation:");
       break;
-    case TYPECAST_GENERIC_OR_ARRAY:
+    case TYPECAST_COMPONENT:
       checkListSize(0, 0, c, 1, 1, 0, 0, 0, 0,
       "Invalid typecast generic/array annotation:");
       break;
@@ -262,7 +262,7 @@ implements TypeAnnotationVisitor {
       checkListSize(0, 0, 0, 0, 1, 0, 0, 0, 0,
       "Invalid type test annotation:");
       break;
-    case INSTANCEOF_GENERIC_OR_ARRAY:
+    case INSTANCEOF_COMPONENT:
       checkListSize(0, 0, c, 1, 1, 0, 0, 0, 0,
       "Invalid type test generic/array annotation:");
       break;
@@ -270,7 +270,7 @@ implements TypeAnnotationVisitor {
       checkListSize(0, 0, 0, 0, 1, 0, 0, 0, 0,
       "Invalid object creation annotation:");
       break;
-    case NEW_GENERIC_OR_ARRAY:
+    case NEW_COMPONENT:
       checkListSize(0, 0, c, 1, 1, 0, 0, 0, 0,
       "Invalid object creation generic/array annotation:");
       break;
@@ -278,7 +278,7 @@ implements TypeAnnotationVisitor {
       checkListSize(0, 0, 0, 0, 0, 0, 0, 0, 0,
       "Invalid method receiver annotation:");
       break;
-    case METHOD_RECEIVER_GENERIC_OR_ARRAY:
+    case METHOD_RECEIVER_COMPONENT:
       // TODO
       checkListSize(0, 0, 0, 0, 0, 0, 0, 0, 0,
       "Invalid method receiver generic/array annotation:");
@@ -287,7 +287,7 @@ implements TypeAnnotationVisitor {
       checkListSize(1, 1, 0, 0, 0, 1, 0, 0, 0,
       "Invalid local variable annotation:");
       break;
-    case LOCAL_VARIABLE_GENERIC_OR_ARRAY:
+    case LOCAL_VARIABLE_COMPONENT:
       checkListSize(1, 1, c, 1, 0, 1, 0, 0, 0,
       "Invalid local variable generic/array annotation:");
       break;
@@ -295,7 +295,7 @@ implements TypeAnnotationVisitor {
       checkListSize(0, 0, 0, 0, 0, 0, 0, 0, 0,
       "Invalid method return type annotation:");
       break;
-    case METHOD_RETURN_GENERIC_OR_ARRAY:
+    case METHOD_RETURN_COMPONENT:
       checkListSize(0, 0, c, 1, 0, 0, 0, 0, 0,
       "Invalid method return type generic/array annotation:");
       break;
@@ -303,7 +303,7 @@ implements TypeAnnotationVisitor {
       checkListSize(0, 0, 0, 0, 0, 0, 1, 0, 0,
       "Invalid method parameter annotation:");
       break;
-    case METHOD_PARAMETER_GENERIC_OR_ARRAY:
+    case METHOD_PARAMETER_COMPONENT:
       checkListSize(0, 0, c, 1, 0, 0, 1, 0, 0,
       "Invalid method parameter generic/array annotation:");
       break;
@@ -311,7 +311,7 @@ implements TypeAnnotationVisitor {
       checkListSize(0, 0, c, 0, 0, 0, 0, 0, 0,
       "Invalid field annotation:");
       break;
-    case FIELD_GENERIC_OR_ARRAY:
+    case FIELD_COMPONENT:
       checkListSize(0, 0, c, 1, 0, 0, 0, 0, 0,
       "Invalid field generic/array annotation:");
       break;
@@ -323,7 +323,7 @@ implements TypeAnnotationVisitor {
       checkListSize(0, 0, 0, 0, 0, 0, 1, 1, 0,
       "Invalid class type parameter bound annotation:");
       break;
-    case CLASS_TYPE_PARAMETER_BOUND_GENERIC_OR_ARRAY:
+    case CLASS_TYPE_PARAMETER_BOUND_COMPONENT:
       checkListSize(0, 0, c, 1, 0, 0, 1, 1, 0,
       "Invalid class type parameter bound generic/array annotation:");
       break;
@@ -335,7 +335,7 @@ implements TypeAnnotationVisitor {
       checkListSize(0, 0, 0, 0, 0, 0, 1, 1, 0,
       "Invalid method type parameter bound annotation:");
       break;
-    case METHOD_TYPE_PARAMETER_BOUND_GENERIC_OR_ARRAY:
+    case METHOD_TYPE_PARAMETER_BOUND_COMPONENT:
       checkListSize(0, 0, c, 1, 0, 0, 1, 1, 0,
       "Invalid method type parameter bound generic/array annotation:");
       break;
@@ -343,7 +343,7 @@ implements TypeAnnotationVisitor {
       checkListSize(0, 0, 0, 0, 0, 0, 0, 0, 1,
       "Invalid class extends/implements annotation:");
       break;
-    case CLASS_EXTENDS_GENERIC_OR_ARRAY:
+    case CLASS_EXTENDS_COMPONENT:
       checkListSize(0, 0, 0, 0, 0, 0, 0, 0, 1,
       "Invalid class extends/implements generic/array annotation:");
       break;
