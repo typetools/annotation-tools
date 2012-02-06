@@ -495,21 +495,21 @@ extends EmptyVisitor {
               throw new RuntimeException("Unknown FIELD aElement: " + aElement);
             }
             break;
-        case FIELD_GENERIC_OR_ARRAY:
+        case FIELD_COMPONENT:
           // TODO: resolve issue once classfile format is finalized
           if (aElement instanceof AClass) {
             //handleFieldGenericArrayOnClass((AClass) aElement);
-            if (strict) { System.err.println("Unhandled FIELD_GENERIC_OR_ARRAY annotation for " + aElement); }
+            if (strict) { System.err.println("Unhandled FIELD_COMPONENT annotation for " + aElement); }
           } else if (aElement instanceof ATypeElement) {
             handleFieldGenericArray((ATypeElement) aElement);
           } else {
-            throw new RuntimeException("Unknown FIELD_GENERIC_OR_ARRAY: " + aElement);
+            throw new RuntimeException("Unknown FIELD_COMPONENT: " + aElement);
           }
           break;
         case LOCAL_VARIABLE:
           handleMethodLocalVariable((AMethod) aElement);
           break;
-        case LOCAL_VARIABLE_GENERIC_OR_ARRAY:
+        case LOCAL_VARIABLE_COMPONENT:
           handleMethodLocalVariableGenericArray((AMethod) aElement);
           break;
         case NEW:
@@ -520,24 +520,24 @@ extends EmptyVisitor {
             if (strict) { System.err.println("Unhandled NEW annotation for " + aElement); }
           }
           break;
-        case NEW_GENERIC_OR_ARRAY:
+        case NEW_COMPONENT:
           if (aElement instanceof AMethod) {
             handleMethodObjectCreationGenericArray((AMethod) aElement);
           } else {
               // TODO: in field initializers
-              if (strict) { System.err.println("Unhandled NEW_GENERIC_OR_ARRAY annotation for " + aElement); }
+              if (strict) { System.err.println("Unhandled NEW_COMPONENT annotation for " + aElement); }
           }
           break;
         case METHOD_PARAMETER:
           handleMethodParameterType((AMethod) aElement);
           break;
-        case METHOD_PARAMETER_GENERIC_OR_ARRAY:
+        case METHOD_PARAMETER_COMPONENT:
           handleMethodParameterTypeGenericArray((AMethod) aElement);
           break;
         case METHOD_RECEIVER:
             handleMethodReceiver((AMethod) aElement);
             break;
-        case METHOD_RECEIVER_GENERIC_OR_ARRAY:
+        case METHOD_RECEIVER_COMPONENT:
             handleMethodReceiverGenericArray((AMethod) aElement);
             break;
         case TYPECAST:
@@ -548,18 +548,18 @@ extends EmptyVisitor {
               if (strict) { System.err.println("Unhandled TYPECAST annotation for " + aElement); }
           }
           break;
-        case TYPECAST_GENERIC_OR_ARRAY:
+        case TYPECAST_COMPONENT:
           if (aElement instanceof AMethod) {
             handleMethodTypecastGenericArray((AMethod) aElement);
           } else {
               // TODO: in field initializers
-              if (strict) { System.err.println("Unhandled TYPECAST_GENERIC_OR_ARRAY annotation for " + aElement); }
+              if (strict) { System.err.println("Unhandled TYPECAST_COMPONENT annotation for " + aElement); }
           }
           break;
         case METHOD_RETURN:
           handleMethodReturnType((AMethod) aElement);
           break;
-        case METHOD_RETURN_GENERIC_OR_ARRAY:
+        case METHOD_RETURN_COMPONENT:
           handleMethodReturnTypeGenericArray((AMethod) aElement);
           break;
         case INSTANCEOF:
@@ -570,29 +570,29 @@ extends EmptyVisitor {
               if (strict) { System.err.println("Unhandled INSTANCEOF annotation for " + aElement); }
           }
           break;
-        case INSTANCEOF_GENERIC_OR_ARRAY:
+        case INSTANCEOF_COMPONENT:
           if (aElement instanceof AMethod) {
             handleMethodInstanceOfGenericArray((AMethod) aElement);
           } else {
               // TODO: in field initializers
-              if (strict) { System.err.println("Unhandled INSTANCEOF_GENERIC_OR_ARRAY annotation for " + aElement); }
+              if (strict) { System.err.println("Unhandled INSTANCEOF_COMPONENT annotation for " + aElement); }
           }
           break;
         case CLASS_TYPE_PARAMETER_BOUND:
           handleClassTypeParameterBound((AClass) aElement);
           break;
-        case CLASS_TYPE_PARAMETER_BOUND_GENERIC_OR_ARRAY:
+        case CLASS_TYPE_PARAMETER_BOUND_COMPONENT:
           handleClassTypeParameterBoundGenericArray((AClass) aElement);
           break;
         case METHOD_TYPE_PARAMETER_BOUND:
           handleMethodTypeParameterBound((AMethod) aElement);
           break;
-        case METHOD_TYPE_PARAMETER_BOUND_GENERIC_OR_ARRAY:
+        case METHOD_TYPE_PARAMETER_BOUND_COMPONENT:
           handleMethodTypeParameterBoundGenericArray((AMethod) aElement);
         case CLASS_EXTENDS:
           handleClassExtends((AClass) aElement);
           break;
-        case CLASS_EXTENDS_GENERIC_OR_ARRAY:
+        case CLASS_EXTENDS_COMPONENT:
           handleClassExtendsGenericArray((AClass) aElement);
           break;
         case THROWS:
@@ -602,7 +602,7 @@ extends EmptyVisitor {
         case NEW_TYPE_ARGUMENT:
           handleNewTypeArgument((AMethod) aElement);
           break;
-        case NEW_TYPE_ARGUMENT_GENERIC_OR_ARRAY:
+        case NEW_TYPE_ARGUMENT_COMPONENT:
           handleNewTypeArgumentGenericArray((AMethod) aElement);
           break;
 
@@ -610,14 +610,14 @@ extends EmptyVisitor {
           throw new Error("METHOD_TYPE_ARGUMENT: to do");
           // break;
 
-        case METHOD_TYPE_ARGUMENT_GENERIC_OR_ARRAY:
-          throw new Error("METHOD_TYPE_ARGUMENT_GENERIC_OR_ARRAY: to do");
+        case METHOD_TYPE_ARGUMENT_COMPONENT:
+          throw new Error("METHOD_TYPE_ARGUMENT_COMPONENT: to do");
           // break;
 
         case WILDCARD_BOUND:
           handleWildcardBound(aElement);
           break;
-        case WILDCARD_BOUND_GENERIC_OR_ARRAY:
+        case WILDCARD_BOUND_COMPONENT:
           handleWildcardBoundGenericArray(aElement);
           break;
 
