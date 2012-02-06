@@ -29,7 +29,7 @@ public interface TypeAnnotationVisitor extends AnnotationVisitor {
    * @param target_type the target type of the extended annotation
    */
   void visitXTargetType(int target_type);
-  
+
   /**
    * Visits the offset specified by the extended annotation, whose meaning
    * depends on the extended annotation's target type.
@@ -37,7 +37,7 @@ public interface TypeAnnotationVisitor extends AnnotationVisitor {
    * @param offset the offset specified by the extended annotation
    */
   void visitXOffset(int offset);
-  
+
   /**
    * Visits the location_length specified by the extended annotation, whose 
    * meaning depends on the extended annotation's target type.
@@ -46,7 +46,7 @@ public interface TypeAnnotationVisitor extends AnnotationVisitor {
    *  annotation
    */
   void visitXLocationLength(int location_length);
-  
+
   /**
    * Visits the location specified by the extended annotation, whose meaning 
    * depends on the extended annotation's target type.
@@ -54,9 +54,9 @@ public interface TypeAnnotationVisitor extends AnnotationVisitor {
    * @param location the location specified by the extended annotation
    */
   void visitXLocation(int location);
-  
+
   void visitXNumEntries(int num_entries);
-  
+
   /**
    * Visits the start_pc specified by the extended annotation, whose meaning
    * depends on the extended annotation's target type.
@@ -64,7 +64,7 @@ public interface TypeAnnotationVisitor extends AnnotationVisitor {
    * @param start_pc the start_pc specified by the extended annotation
    */
   void visitXStartPc(int start_pc);
-  
+
   /**
    * Visits the length specified by the extended annotation, whose meaning
    * depends on the extended annotation's target type.
@@ -72,9 +72,9 @@ public interface TypeAnnotationVisitor extends AnnotationVisitor {
    * @param length the length specified by the extended annotation
    */
   void visitXLength(int length);
-  
+
   /**
-   * Visists the index specified by the extended annotation, whose meaning 
+   * Visits the index specified by the extended annotation, whose meaning 
    * depends on the extended annotation's target type.
    * 
    * @param index the index specified by the extended annotation
@@ -96,9 +96,9 @@ public interface TypeAnnotationVisitor extends AnnotationVisitor {
    * @param bound_index the bound_index specified by the extended annotation
    */
   public void visitXBoundIndex(int bound_index);
-  
+
   /**
-   * Visits the type_index specified ty the extended annotation, whose meaning
+   * Visits the type_index specified by the extended annotation, whose meaning
    * depends on the extended annotation's target type.
    * @param type_index
    */
