@@ -126,4 +126,8 @@ public final class AScene {
         return sb.toString();
     }
 
+    @Override
+    public String toString() {
+        return unparse();
+    }
 }
