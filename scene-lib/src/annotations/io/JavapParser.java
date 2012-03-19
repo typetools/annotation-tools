@@ -7,6 +7,8 @@ import java.util.*;
 import java.util.regex.*;
 import java.lang.annotation.RetentionPolicy;
 
+import com.sun.tools.javac.code.TargetType;
+
 import annotations.*;
 import annotations.el.*;
 
@@ -187,15 +189,15 @@ public final class JavapParser {
             ATypeElement subOuterType;
             AElement subElement;
             switch (targetType) {
-            case FIELD_GENERIC_OR_ARRAY:
-            case METHOD_RETURN_GENERIC_OR_ARRAY:
+            case FIELD_COMPONENT:
+            case METHOD_RETURN_COMPONENT:
                 subOuterType = (ATypeElement) member;
                 break;
             case METHOD_RECEIVER:
-                // A method receiver doesn't have inner types, so return the
-                // receiver and bypass the targetType.isGeneric() part below.
-                return ((AMethod) member).receiver;
-            case METHOD_PARAMETER_GENERIC_OR_ARRAY:
+            case METHOD_RECEIVER_COMPONENT:
+                subOuterType = ((AMethod) member).receiver;
+                break;
+            case METHOD_PARAMETER_COMPONENT:
                 int paramIdx = Integer.parseInt(
                         line.substring(
                         line.indexOf(paramIdxHead) + paramIdxHead.length()));
@@ -203,7 +205,7 @@ public final class JavapParser {
                 subOuterType = ((AMethod) member).parameters.vivify(paramIdx).type;
                 break;
             case LOCAL_VARIABLE:
-            case LOCAL_VARIABLE_GENERIC_OR_ARRAY:
+            case LOCAL_VARIABLE_COMPONENT:
                 int index, scopeStart, scopeLength;
                 Matcher m = localLocRegex.matcher(line);
                 m.matches();
@@ -216,21 +218,21 @@ public final class JavapParser {
                 subOuterType = ((AMethod) member).locals.vivify(ll).type;
                 break;
             case TYPECAST:
-            case TYPECAST_GENERIC_OR_ARRAY:
+            case TYPECAST_COMPONENT:
             {
                 int offset = parseOffset();
                 subOuterType = ((AMethod) member).typecasts.vivify(RelativeLocation.createOffset(offset));
                 break;
             }
             case INSTANCEOF:
-            case INSTANCEOF_GENERIC_OR_ARRAY:
+            case INSTANCEOF_COMPONENT:
             {
                 int offset = parseOffset();
                 subOuterType = ((AMethod) member).instanceofs.vivify(RelativeLocation.createOffset(offset));
                 break;
             }
             case NEW:
-            case NEW_GENERIC_OR_ARRAY:
+            case NEW_COMPONENT:
             {
                 int offset = parseOffset();
                 subOuterType = ((AMethod) member).news.vivify(RelativeLocation.createOffset(offset));

@@ -29,7 +29,8 @@
  */
 package org.objectweb.asm;
 
-import static org.objectweb.asm.TargetType.*;
+import com.sun.tools.javac.code.TargetType;
+import static com.sun.tools.javac.code.TargetType.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -481,9 +482,9 @@ public class ClassReader {
               for (; j > 0; --j) {
                   desc = readUTF8(v, c);
                   v += 2;
-                  v = readExtendedAnnotationValues(v,
+                  v = readTypeAnnotationValues(v,
                           c,
-                          classVisitor.visitExtendedAnnotation(desc, i != 0));
+                          classVisitor.visitTypeAnnotation(desc, i != 0));
               }
           }
       }
@@ -602,8 +603,8 @@ public class ClassReader {
                   for(; k > 0; --k) {
                     desc = readUTF8(v, c);
                     v += 2;
-                    v = readExtendedAnnotationValues(v,
-                        c, fv.visitExtendedAnnotation(desc, true));
+                    v = readTypeAnnotationValues(v,
+                        c, fv.visitTypeAnnotation(desc, true));
                   }
                 }
 
@@ -614,8 +615,8 @@ public class ClassReader {
                   for(; k > 0; --k) {
                     desc = readUTF8(v, c);
                     v += 2;
-                    v = readExtendedAnnotationValues(v,
-                        c, fv.visitExtendedAnnotation(desc, false));
+                    v = readTypeAnnotationValues(v,
+                        c, fv.visitTypeAnnotation(desc, false));
                   }
                 }
 
@@ -803,9 +804,9 @@ public class ClassReader {
                             desc = readUTF8(w, c);
                             w += 2;
 
-                            w = readExtendedAnnotationValues(w,
+                            w = readTypeAnnotationValues(w,
                                   c,
-                                  mv.visitExtendedAnnotation(desc, j != 0));
+                                  mv.visitTypeAnnotation(desc, j != 0));
                       }
                   }
               }
@@ -1316,10 +1317,10 @@ public class ClassReader {
     * @return the end offset of the annotations values.
     * @author jaimeq
     */
-    private int readExtendedAnnotationValues(
+    private int readTypeAnnotationValues(
         int v,
         final char[] buf,
-        final ExtendedAnnotationVisitor xav)
+        final TypeAnnotationVisitor xav)
     {
         int i = readUnsignedShort(v);
         v += 2;
@@ -1363,11 +1364,11 @@ public class ClassReader {
         //   u2 offset;
         // } reference_info;
         case TYPECAST:
-        case TYPECAST_GENERIC_OR_ARRAY:
+        case TYPECAST_COMPONENT:
         case INSTANCEOF:
-        case INSTANCEOF_GENERIC_OR_ARRAY:
+        case INSTANCEOF_COMPONENT:
         case NEW:
-        case NEW_GENERIC_OR_ARRAY:
+        case NEW_COMPONENT:
           offset = readUnsignedShort(v);
           v += 2;
           xav.visitXOffset(offset);
@@ -1377,6 +1378,7 @@ public class ClassReader {
         // {
         // } reference_info;
         case METHOD_RECEIVER:
+        case METHOD_RECEIVER_COMPONENT:
           break;
 
         // 0x08/0x09: local variable
@@ -1387,7 +1389,7 @@ public class ClassReader {
         //   u2 index;
         // } reference_info;
         case LOCAL_VARIABLE:
-        case LOCAL_VARIABLE_GENERIC_OR_ARRAY:
+        case LOCAL_VARIABLE_COMPONENT:
           table_length = readUnsignedShort(v);
           v += 2;
           assert table_length == 1; // FIXME
@@ -1406,7 +1408,7 @@ public class ClassReader {
         // {
         // } reference_info;
         case METHOD_RETURN:
-        case METHOD_RETURN_GENERIC_OR_ARRAY:
+        case METHOD_RETURN_COMPONENT:
           break;
 
         // 0x0C*/0x0D: method parameter
@@ -1415,7 +1417,7 @@ public class ClassReader {
         //        we assume the index is zero
         // } reference_info;
         case METHOD_PARAMETER:
-        case METHOD_PARAMETER_GENERIC_OR_ARRAY:
+        case METHOD_PARAMETER_COMPONENT:
           int param = readByte(v);
           v++;
           xav.visitXParamIndex(param);
@@ -1425,7 +1427,7 @@ public class ClassReader {
         // {
         // } reference_info;
         case FIELD:
-        case FIELD_GENERIC_OR_ARRAY:
+        case FIELD_COMPONENT:
           break;
 
         // 0x10/0x11: class type parameter bound
@@ -1435,9 +1437,9 @@ public class ClassReader {
         //   u1 bound_index;
         // } reference_info;
         case CLASS_TYPE_PARAMETER_BOUND:
-        case CLASS_TYPE_PARAMETER_BOUND_GENERIC_OR_ARRAY:
+        case CLASS_TYPE_PARAMETER_BOUND_COMPONENT:
         case METHOD_TYPE_PARAMETER_BOUND:
-        case METHOD_TYPE_PARAMETER_BOUND_GENERIC_OR_ARRAY:
+        case METHOD_TYPE_PARAMETER_BOUND_COMPONENT:
           param_index = readByte(v);
           v++;
           xav.visitXParamIndex(param_index);
@@ -1452,7 +1454,7 @@ public class ClassReader {
         //    u1 type_index;
         // } reference_info;
         case CLASS_EXTENDS:
-        case CLASS_EXTENDS_GENERIC_OR_ARRAY:
+        case CLASS_EXTENDS_COMPONENT:
             type_index = readUnsignedShort(v);
             if (type_index == 0xFF) type_index = -1;
             v += 2;
@@ -1469,9 +1471,9 @@ public class ClassReader {
         // {
         // } reference_info;
         case NEW_TYPE_ARGUMENT:
-        case NEW_TYPE_ARGUMENT_GENERIC_OR_ARRAY:
+        case NEW_TYPE_ARGUMENT_COMPONENT:
         case METHOD_TYPE_ARGUMENT:
-        case METHOD_TYPE_ARGUMENT_GENERIC_OR_ARRAY:
+        case METHOD_TYPE_ARGUMENT_COMPONENT:
             offset = readUnsignedShort(v);
             v += 2;
             xav.visitXOffset(offset);
@@ -1487,19 +1489,8 @@ public class ClassReader {
         //    reference_info wildcard_target_type
         // } reference_info;
         case WILDCARD_BOUND:
-        case WILDCARD_BOUND_GENERIC_OR_ARRAY:
+        case WILDCARD_BOUND_COMPONENT:
             // XXX: Parse here
-          break;
-
-        // 0x1E/0x1F*: class literal
-        // {
-        //    u1 type_index;
-        // } reference_info;
-        case CLASS_LITERAL:
-        case CLASS_LITERAL_GENERIC_OR_ARRAY:
-            offset = this.readUnsignedShort(v);
-            v += 2;
-            xav.visitXOffset(offset);
           break;
 
         // 0x20/0x21*: method type parameter
@@ -1513,7 +1504,7 @@ public class ClassReader {
           xav.visitXParamIndex(param_index);
           break;
 
-          default: throw new RuntimeException(
+        default: throw new RuntimeException(
               "Unrecognized target type: " + target_type);
         }
 

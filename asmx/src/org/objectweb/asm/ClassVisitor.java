@@ -102,7 +102,7 @@ public interface ClassVisitor {
     AnnotationVisitor visitAnnotation(String desc, boolean visible);
 
     //jaime
-    ExtendedAnnotationVisitor visitExtendedAnnotation(String desc,
+    TypeAnnotationVisitor visitTypeAnnotation(String desc,
                                                       boolean visible);
     // end jaime
 

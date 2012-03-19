@@ -1,11 +1,13 @@
 package annotator.tests;
 
 public class ReceiverWithThrows {
-  public void foo() /* @Mutable*/ @java.lang.Mutable {
-    
+  /* @Mutable ReceiverWithThrows this */
+  public void foo(@java.lang.Mutable ReceiverWithThrows this) {
+
   }
-  
-  public void bar() @java.lang.ReadOnly  /* @ReadOnly*/ throws Exception {
-    
+
+  /* @ReadOnly ReceiverWithThrows this */
+  public void bar(@java.lang.ReadOnly ReceiverWithThrows this) throws Exception {
+
   }
 }

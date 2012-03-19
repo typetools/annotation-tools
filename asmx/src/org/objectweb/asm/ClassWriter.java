@@ -298,8 +298,8 @@ public class ClassWriter implements ClassVisitor {
 
     //jaime
     
-    private ExtendedAnnotationWriter xanns;
-    private ExtendedAnnotationWriter ixanns;
+    private TypeAnnotationWriter xanns;
+    private TypeAnnotationWriter ixanns;
     //end jaime
     
     /**
@@ -593,10 +593,10 @@ public class ClassWriter implements ClassVisitor {
     }
 
     //jaime
-    public ExtendedAnnotationVisitor visitExtendedAnnotation(String desc, boolean visible) {
+    public TypeAnnotationVisitor visitTypeAnnotation(String desc, boolean visible) {
       ByteVector bv = new ByteVector();
       bv.putShort(newUTF8(desc)).putShort(0);
-      ExtendedAnnotationWriter xaw = new ExtendedAnnotationWriter(this, true, bv, bv, 2);
+      TypeAnnotationWriter xaw = new TypeAnnotationWriter(this, true, bv, bv, 2);
       if(visible) {
         xaw.next = xanns;
         xanns = xaw;
