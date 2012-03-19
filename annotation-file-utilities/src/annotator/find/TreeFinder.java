@@ -162,14 +162,25 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       // System.out.println("node: " + node);
       // System.out.println("return: " + node.getReturnType());
 
-
       // location for the receiver annotation
       int receiverLoc;
 
       JCMethodDecl jcnode = (JCMethodDecl) node;
       List<JCExpression> throwsExpressions = jcnode.thrown;
       JCBlock body = jcnode.getBody();
-      List<JCTypeAnnotation> receiverAnnotations = jcnode.receiverAnnotations;
+      // TODO: this used to be jcnode.receiverAnnotations, which doesn't exist any more
+      // I'm not quite sure where this list is now.
+      // jcnode.recvparam.mods.annotations might still contain declaration annotations.
+      // By the point they are disambiguated, they've become TypeCompounds.
+      List<JCTypeAnnotation> receiverAnnotations;
+
+      if (jcnode.recvparam!=null) {
+        receiverAnnotations = com.sun.tools.javac.util.List.convert(JCTypeAnnotation.class, jcnode.recvparam.mods.annotations);
+      } else {
+        receiverAnnotations = Collections.emptyList();
+      }
+
+      // TODO WMD: the above needs to be updated.
 
       if (! throwsExpressions.isEmpty()) {
         // has a throws expression
@@ -917,7 +928,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
 
           // need to add "extends ... Object" around the type annotation
           i = new Insertion("extends " + i.getText() + " java.lang.Object", i.getCriteria(), i.getSeparateLine());
-      } else if ((node instanceof WildcardTree) // Easier than listing three tree kinds. Correct?              
+      } else if ((node instanceof WildcardTree) // Easier than listing three tree kinds. Correct?
                && ((WildcardTree)node).getBound()==null) {
           pos = tpf.scan(node, null);
 

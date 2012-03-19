@@ -36,7 +36,7 @@ import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Attribute;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.ExtendedAnnotationVisitor;
+import org.objectweb.asm.TypeAnnotationVisitor;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
@@ -302,16 +302,16 @@ public class TraceClassVisitor extends TraceAbstractVisitor implements
         return tav;
     }
 
-    public ExtendedAnnotationVisitor visitExtendedAnnotation(
+    public TypeAnnotationVisitor visitTypeAnnotation(
         final String desc,
         final boolean visible)
     {
         text.add("\n");
-        ExtendedAnnotationVisitor txav = 
-          super.visitExtendedAnnotation(desc, visible);
+        TypeAnnotationVisitor txav = 
+          super.visitTypeAnnotation(desc, visible);
         if (cv != null) {
-            ((TraceExtendedAnnotationVisitor) txav).xav =
-              cv.visitExtendedAnnotation(desc, visible);
+            ((TraceTypeAnnotationVisitor) txav).xav =
+              cv.visitTypeAnnotation(desc, visible);
         }
         return txav;
     }

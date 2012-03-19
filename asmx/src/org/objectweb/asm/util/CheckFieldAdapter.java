@@ -31,7 +31,7 @@ package org.objectweb.asm.util;
 
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Attribute;
-import org.objectweb.asm.ExtendedAnnotationVisitor;
+import org.objectweb.asm.TypeAnnotationVisitor;
 import org.objectweb.asm.FieldVisitor;
 
 /**
@@ -55,7 +55,7 @@ public class CheckFieldAdapter implements FieldVisitor {
     }
 
     // jaime
-    public ExtendedAnnotationVisitor visitExtendedAnnotation(String desc,
+    public TypeAnnotationVisitor visitTypeAnnotation(String desc,
                                                              boolean visible) {
         throw new RuntimeException("Jaime did not implement yet");
     }

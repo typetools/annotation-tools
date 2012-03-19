@@ -31,7 +31,7 @@ package org.objectweb.asm.optimizer;
 
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Attribute;
-import org.objectweb.asm.ExtendedAnnotationVisitor;
+import org.objectweb.asm.TypeAnnotationVisitor;
 import org.objectweb.asm.FieldVisitor;
 
 /**
@@ -66,7 +66,7 @@ public class FieldConstantsCollector implements FieldVisitor {
             fv.visitAnnotation(desc, visible), cp);
     }
 
-    public ExtendedAnnotationVisitor visitExtendedAnnotation(
+    public TypeAnnotationVisitor visitTypeAnnotation(
         final String desc,
         final boolean visible) {
       cp.newUTF8(desc);
@@ -75,8 +75,8 @@ public class FieldConstantsCollector implements FieldVisitor {
       } else {
         cp.newUTF8("RuntimeInvisibleTypeAnnotations");
       }
-      return new ExtendedAnnotationConstantsCollector(
-          fv.visitExtendedAnnotation(desc, visible), cp);
+      return new TypeAnnotationConstantsCollector(
+          fv.visitTypeAnnotation(desc, visible), cp);
     }
     
     public void visitAttribute(final Attribute attr) {

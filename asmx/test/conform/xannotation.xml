@@ -7,7 +7,7 @@
            failureproperty="test.failed">
       <batchtest fork="yes" todir="${out.test}/reports">
         <fileset dir="${test}/conform">
-          <include name="**/ExtendedAnnotationTest.java"/>
+          <include name="**/TypeAnnotationTest.java"/>
         </fileset>
       </batchtest>
       <formatter type="xml"/>

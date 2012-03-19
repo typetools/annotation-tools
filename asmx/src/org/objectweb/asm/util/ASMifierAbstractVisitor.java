@@ -33,7 +33,7 @@ import java.util.HashMap;
 
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Attribute;
-import org.objectweb.asm.ExtendedAnnotationVisitor;
+import org.objectweb.asm.TypeAnnotationVisitor;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.util.attrs.ASMifiable;
 
@@ -97,7 +97,7 @@ public class ASMifierAbstractVisitor extends AbstractVisitor {
      * @param visible <tt>true</tt> if the annotation is visible at runtime.
      * @return a visitor to visit the annotation values.
      */
-    public ExtendedAnnotationVisitor visitExtendedAnnotation(
+    public TypeAnnotationVisitor visitTypeAnnotation(
         final String desc,
         final boolean visible)
     {
@@ -105,12 +105,12 @@ public class ASMifierAbstractVisitor extends AbstractVisitor {
         buf.append("{\n")
                 .append("xav0 = ")
                 .append(name)
-                .append(".visitExtendedAnnotation(");
+                .append(".visitTypeAnnotation(");
         appendConstant(desc);
         buf.append(", ").append(visible).append(");\n");
         text.add(buf.toString());
-        ASMifierExtendedAnnotationVisitor xav = 
-          new ASMifierExtendedAnnotationVisitor(0);
+        ASMifierTypeAnnotationVisitor xav = 
+          new ASMifierTypeAnnotationVisitor(0);
         text.add(xav.getText());
         text.add("}\n");
         return xav;
