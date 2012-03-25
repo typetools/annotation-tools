@@ -828,9 +828,9 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
 
       if (debug) {
         debug("Considering insertion at tree:");
-        debug("  " + i);
-        debug("  " + Main.firstLine(node.toString()));
-        debug("  " + node.getClass());
+        debug("  Insertion: " + i);
+        debug("  First line of node: " + Main.firstLine(node.toString()));
+        debug("  Type of node: " + node.getClass());
       }
 
       if (!i.getCriteria().isSatisfiedBy(path, node)) {
@@ -838,8 +838,8 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
         continue;
       } else {
         debug("  ... satisfied!");
-        debug("    " + Main.firstLine(node.toString()));
-        debug("    " + node.getClass());
+        debug("    First line of node: " + Main.firstLine(node.toString()));
+        debug("    Type of node: " + node.getClass());
       }
 
       // Don't insert a duplicate if this particular annotation is already
