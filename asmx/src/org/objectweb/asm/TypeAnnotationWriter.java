@@ -87,7 +87,6 @@ final class TypeAnnotationWriter implements TypeAnnotationVisitor {
      */
     TypeAnnotationWriter prev;
 
-    
     // information for extended annotation type
     // typecasts and object creation:
     // {
@@ -125,7 +124,7 @@ final class TypeAnnotationWriter implements TypeAnnotationVisitor {
     private int xparam_index;
     private int xbound_index;
     private int xtype_index;
-    
+
     // ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
@@ -152,7 +151,7 @@ final class TypeAnnotationWriter implements TypeAnnotationVisitor {
         this.bv = bv;
         this.parent = parent;
         this.offset = offset;
-        
+
         // extended information
         this.xtarget_type = 0;
         this.xoffset = 0;
@@ -362,11 +361,11 @@ final class TypeAnnotationWriter implements TypeAnnotationVisitor {
     // ------------------------------------------------------------------------
     // Implementation of the TypeAnnotationVisitor interface
     // ------------------------------------------------------------------------
-    
+
     // below are all the methods for implementing extended annotations
     public void visitXTargetType(int target_type) {
       this.xtarget_type = target_type;
-      bv.putByte(target_type);
+      bv.putShort(target_type);
     }
 
     // used for typecasts, object creation, field generic/array
@@ -389,42 +388,42 @@ final class TypeAnnotationWriter implements TypeAnnotationVisitor {
       this.xlocations_index++;
       bv.putByte(location);
     }
-    
+
     // used for local variables
     public void visitXNumEntries(int num_entries) {
       bv.putShort(num_entries);
     }
-    
+
     // used for local variables
     public void visitXStartPc(int start_pc) {
       this.xstart_pc = start_pc;
       bv.putShort(start_pc);
     }
-    
+
     // used for local variables
     public void visitXLength(int length) {
       this.xlength = length;
       bv.putShort(length);
     }
-    
+
     // used for local variables
     public void visitXIndex(int index) {
       this.xindex = index;
       bv.putShort(index);
     }
-    
+
     // used for type parameter bounds
     public void visitXParamIndex(int param_index) {
       this.xparam_index = param_index;
       bv.putByte(param_index);
     }
-    
+
     // used for type parameter bounds
     public void visitXBoundIndex(int bound_index) {
       this.xbound_index = bound_index;
       bv.putByte(bound_index);
     }
-    
+
     // used for type index for class extends/implements and 
     // throws exception types
     public void visitXTypeIndex(int type_index) {
