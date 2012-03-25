@@ -680,17 +680,13 @@ public class ClassReader {
                     anns = u;
                 } else if (attrName.equals("RuntimeInvisibleAnnotations")) {
                     ianns = u;
-                } else if (attrName.equals("RuntimeVisibleTypeAnnotations"))
-                {
+                } else if (attrName.equals("RuntimeVisibleTypeAnnotations")) {
                   xanns = u;
-                } else if (attrName.equals("RuntimeInvisibleTypeAnnotations"))
-                {
+                } else if (attrName.equals("RuntimeInvisibleTypeAnnotations")) {
                   ixanns = u;
-                } else if (attrName.equals("RuntimeVisibleParameterAnnotations"))
-                {
+                } else if (attrName.equals("RuntimeVisibleParameterAnnotations")) {
                     mpanns = u;
-                } else if (attrName.equals("RuntimeInvisibleParameterAnnotations"))
-                {
+                } else if (attrName.equals("RuntimeInvisibleParameterAnnotations")) {
                     impanns = u;
                 } else {
                     attr = readAttribute(attrs,
@@ -1335,13 +1331,13 @@ public class ClassReader {
 
         // now handle
         //
-        // u1 target_type
+        // u2 target_type
         // { ...
         // } reference_info
         //
 
-        int target_type_value = readByte(v);
-        v++;
+        int target_type_value = readUnsignedShort(v);
+        v += 2;
         xav.visitXTargetType(target_type_value);
 
         int offset = 0;
@@ -1357,9 +1353,9 @@ public class ClassReader {
         TargetType target_type = TargetType.fromTargetTypeValue(target_type_value);
 
         switch(target_type) {
-        // 0x00/0x01: typecast
-        // 0x02/0x03: type test (instanceof)
-        // 0x04/0x05: object creation
+        // typecast
+        // type test (instanceof)
+        // object creation
         // {
         //   u2 offset;
         // } reference_info;
@@ -1374,14 +1370,14 @@ public class ClassReader {
           xav.visitXOffset(offset);
           break;
 
-        // 0x06/0x07*: method receiver
+        // method receiver
         // {
         // } reference_info;
         case METHOD_RECEIVER:
         case METHOD_RECEIVER_COMPONENT:
           break;
 
-        // 0x08/0x09: local variable
+        // local variable
         // u2 table_length;
         // {
         //   u2 start_pc;
@@ -1404,17 +1400,16 @@ public class ClassReader {
           xav.visitXIndex(index);
           break;
 
-        // 0x0A*/0x0B: method return type
+        // method return type
         // {
         // } reference_info;
         case METHOD_RETURN:
         case METHOD_RETURN_COMPONENT:
           break;
 
-        // 0x0C*/0x0D: method parameter
-        // { TODO:
-        //   TEMP this should contain the index but doesn't, so for the moment
-        //        we assume the index is zero
+        // method parameter
+        // {
+        //   u1 param;
         // } reference_info;
         case METHOD_PARAMETER:
         case METHOD_PARAMETER_COMPONENT:
@@ -1423,15 +1418,15 @@ public class ClassReader {
           xav.visitXParamIndex(param);
           break;
 
-        // 0x0E*/0x0F: field
+        // field
         // {
         // } reference_info;
         case FIELD:
         case FIELD_COMPONENT:
           break;
 
-        // 0x10/0x11: class type parameter bound
-        // 0x12/0x13: method type parameter bound
+        // class type parameter bound
+        // method type parameter bound
         // {
         //   u1 param_index;
         //   u1 bound_index;
@@ -1448,42 +1443,42 @@ public class ClassReader {
           xav.visitXBoundIndex(bound_index);
           break;
 
-        // 0x14/0x15: class extends/implements
-        // 0x16/0x17*: exception type in throws
+        // class extends/implements
+        // exception type in throws
         // {
         //    u1 type_index;
         // } reference_info;
         case CLASS_EXTENDS:
         case CLASS_EXTENDS_COMPONENT:
-            type_index = readUnsignedShort(v);
-            if (type_index == 0xFF) type_index = -1;
-            v += 2;
-            xav.visitXTypeIndex(type_index);
-            break;
+          type_index = readUnsignedShort(v);
+          if (type_index == 0xFF) type_index = -1;
+          v += 2;
+          xav.visitXTypeIndex(type_index);
+          break;
         case THROWS:
           type_index = readUnsignedShort(v);
           v += 2;
           xav.visitXTypeIndex(type_index);
           break;
 
-        // 0x18/0x19: type argument in constructor call
-        // 0x1A/0x1B: type argument in method call
+        // type argument in constructor call
+        // type argument in method call
         // {
         // } reference_info;
         case NEW_TYPE_ARGUMENT:
         case NEW_TYPE_ARGUMENT_COMPONENT:
         case METHOD_TYPE_ARGUMENT:
         case METHOD_TYPE_ARGUMENT_COMPONENT:
-            offset = readUnsignedShort(v);
-            v += 2;
-            xav.visitXOffset(offset);
+          offset = readUnsignedShort(v);
+          v += 2;
+          xav.visitXOffset(offset);
 
-            type_index = readByte(v);
-            v++;
-            xav.visitXTypeIndex(type_index);
+          type_index = readByte(v);
+          v++;
+          xav.visitXTypeIndex(type_index);
           break;
 
-        // 0x1C/0x1D: wildcard bound
+        // wildcard bound
         // {
         //    u1 wildcard_target_type;
         //    reference_info wildcard_target_type
@@ -1493,7 +1488,7 @@ public class ClassReader {
             // XXX: Parse here
           break;
 
-        // 0x20/0x21*: method type parameter
+        // method type parameter
         // {
         //    u1 param_index;
         // } reference_info;
