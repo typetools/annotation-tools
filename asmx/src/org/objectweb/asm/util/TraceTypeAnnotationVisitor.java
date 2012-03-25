@@ -1,6 +1,8 @@
 package org.objectweb.asm.util;
 
 import org.objectweb.asm.TypeAnnotationVisitor;
+
+import com.sun.tools.javac.code.TargetType;
 /**
  * An {@link TypeAnnotationVisitor} that prints a disassembled view of the
  * extended annotations it visits.
@@ -70,150 +72,141 @@ public class TraceTypeAnnotationVisitor extends TraceAnnotationVisitor
       buf.append("\n  extended annotation: \n");
       buf.append(doubleTab).append("target_type: ")
         .append(xtarget_type).append("\n");
-      
-      switch(xtarget_type) {
-      // 0x00/0x01: typecast
-      // 0x02/0x03: type test (instanceof)
-      // 0x04/0x05: object creation
+
+      TargetType tt = TargetType.fromTargetTypeValue(xtarget_type);
+      switch(tt) {
+      // typecast
+      // type test (instanceof)
+      // object creation
       // {
       //   u2 offset;
       // } reference_info;
-      case 0x00:
-      case 0x01:
-      case 0x02:
-      case 0x03:
-      case 0x04:
-      case 0x05:
+      case TYPECAST:
+      case TYPECAST_COMPONENT:
+      case INSTANCEOF:
+      case INSTANCEOF_COMPONENT:
+      case NEW:
+      case NEW_COMPONENT:
           buf.append(doubleTab).append("offset: ").append(xoffset).append("\n");
           break;
-        
-      // 0x06/0x07*: method receiver
+
+      // method receiver
       // {
       // } reference_info;
-      case 0x06:
-      case 0x07:
+      case METHOD_RECEIVER:
+      case METHOD_RECEIVER_COMPONENT:
           break;
-      
-      // 0x08/0x09: local variable
+
+      // local variable
       // {
       //   u2 start_pc;
       //   u2 length;
       //   u2 index;
       // } reference_info;
-      case 0x08:
-      case 0x09:
+      case LOCAL_VARIABLE:
+      case LOCAL_VARIABLE_COMPONENT:
           buf.append(doubleTab).append("start_pc: ").append(xstart_pc).append("\n");
           buf.append(doubleTab).append("length: ").append(xlength).append("\n");
           buf.append(doubleTab).append("index: ").append(xindex).append("\n");
           break;
-      
-      // 0x0A*/0x0B: method return type
+
+          // method return type
       // {
       // } reference_info;
-      case 0x0A:
-      case 0x0B:
+      case METHOD_RETURN:
+      case METHOD_RETURN_COMPONENT:
           break;
-      
-      // 0x0C*/0x0D: method parameter
+
+      // method parameter
       // {
       //   TEMP this should contain the index but doesn't, so for the moment
       //        we don't print an index
       // } reference_info;
-      case 0x0C:
-      case 0x0D:
+      case METHOD_PARAMETER:
+      case METHOD_PARAMETER_COMPONENT:
           buf.append(doubleTab).append("index: ").append("FIXME").append("\n");
           break;
-      
-      // 0x0E*/0x0F: field
+
+      // field
       // {
       // } reference_info;
-      case 0x0E:
-      case 0x0F:
+      case FIELD:
+      case FIELD_COMPONENT:
           break;
-      
-      // 0x10/0x11: class type parameter bound
-      // 0x12/0x13: method type parameter bound
+
+      // class type parameter bound
+      // method type parameter bound
       // {
       //   u1 bound_index;
       // } reference_info;
-      case 0x10:
-      case 0x11:
-      case 0x12:
-      case 0x13:
+      case CLASS_TYPE_PARAMETER_BOUND:
+      case CLASS_TYPE_PARAMETER_BOUND_COMPONENT:
+      case METHOD_TYPE_PARAMETER_BOUND:
+      case METHOD_TYPE_PARAMETER_BOUND_COMPONENT:
           buf.append(doubleTab).append("param_index: ").append(xparam_index).append("\n");
           buf.append(doubleTab).append("bound_index: ").append(xbound_index).append("\n");
           break;
-      
-      // 0x14/0x15: class extends/implements
-      // 0x16/0x17*: exception type in throws/implements
+
+      // class extends/implements
+      // exception type in throws/implements
       // {
       //   u1 type_index;  
       // }
-      case 0x14:
-      case 0x15:
-      case 0x16:
-      case 0x17:
+      case CLASS_EXTENDS:
+      case CLASS_EXTENDS_COMPONENT:
+      case THROWS:
+      // Undefined case THROWS_COMPONENT:
         buf.append(doubleTab).append("type_index: ").append(xtype_index).append("\n");
         break;
-        
-      // 0x18/0x19: type argument in constructor call
-      // 0x1A/0x1B: type argument in method call
+
+      // type argument in constructor call
+      // type argument in method call
       // {
       // } reference_info;
-      case 0x18:
-      case 0x19:
-      case 0x1A:
-      case 0x1B:
+      case NEW_TYPE_ARGUMENT:
+      case NEW_TYPE_ARGUMENT_COMPONENT:
+      case METHOD_TYPE_ARGUMENT:
+      case METHOD_TYPE_ARGUMENT_COMPONENT:
         break;
-          
-      // 0x1C/0x1D: wildcard bound
+
+      // wildcard bound
       // {
       //    u1 bound_index;
       // } reference_info;
-      case 0x1C:
-      case 0x1D:
+      case WILDCARD_BOUND:
+      case WILDCARD_BOUND_COMPONENT:
         buf.append(doubleTab).append("bound_index: ").append(xbound_index).append("\n");
         break;
-          
-      // 0x1E/0x1F*: class literal
-      // {
-      // } reference_info;
-      case 0x1E:
-      case 0x1F:
-        break;
-          
-      // 0x20/0x21*: method type parameter
+
+      // method type parameter
       // {        
       //    u1 param_index;
       // } reference_info;
-      case 0x20:
-      case 0x21:
+      case METHOD_TYPE_PARAMETER:
+      // Undefined case METHOD_TYPE_PARAMETER_COMPONENT:
         buf.append(doubleTab).append("param_index: ").append(xparam_index).append("\n");
         break;
-        
-        
-        default: throw new RuntimeException("Unrecognized target type: + " + xtarget_type);
+
+      default: throw new RuntimeException("Unrecognized target type: + " + xtarget_type);
       }
-      
+
       // now print out location string for generic target types
-      switch(xtarget_type) {
-      case 0x01:
-      case 0x03:
-      case 0x05:
-      case 0x07:
-      case 0x09:
-      case 0x0B:
-      case 0x0D:
-      case 0x0F:
-      case 0x11:
-      case 0x13:
-      case 0x15:
-      case 0x17:
-      case 0x19:
-      case 0x1B:
-      case 0x1D:
-      case 0x1F:
-      case 0x21:
+      switch(tt) {
+      case TYPECAST_COMPONENT:
+      case INSTANCEOF_COMPONENT:
+      case NEW_COMPONENT:
+      case METHOD_RECEIVER_COMPONENT:
+      case LOCAL_VARIABLE_COMPONENT:
+      case METHOD_RETURN_COMPONENT:
+      case METHOD_PARAMETER_COMPONENT:
+      case FIELD_COMPONENT:
+      case CLASS_TYPE_PARAMETER_BOUND_COMPONENT:
+      case METHOD_TYPE_PARAMETER_BOUND_COMPONENT:
+      case CLASS_EXTENDS_COMPONENT:
+      // Undefined case THROWS_COMPONENT:
+      case NEW_TYPE_ARGUMENT_COMPONENT:
+      case METHOD_TYPE_ARGUMENT_COMPONENT:
+      case WILDCARD_BOUND_COMPONENT:
         buf.append(doubleTab).append("location_length: " + xlocation_length).append("\n");
         buf.append(doubleTab).append("locations: ");
         boolean first = true;
@@ -227,10 +220,10 @@ public class TraceTypeAnnotationVisitor extends TraceAnnotationVisitor
         buf.append("\n");
       default : // do nothing;
       }
-      
+
       text.add(buf.toString());
     }
-    
+
     public void visitXTargetType(int target_type) {
       this.xtarget_type = target_type;
       if(xav != null) {
@@ -261,7 +254,7 @@ public class TraceTypeAnnotationVisitor extends TraceAnnotationVisitor
         xav.visitXLocation(location);
       }
     }
-    
+
     public void visitXNumEntries(int num_entries) {
       this.xnum_entries = num_entries;
       if(xav != null) {
@@ -275,35 +268,35 @@ public class TraceTypeAnnotationVisitor extends TraceAnnotationVisitor
         xav.visitXStartPc(start_pc);
       }
     }
-    
+
     public void visitXLength(int length) {
       this.xlength = length;
       if(xav != null) {
         xav.visitXLength(length);
       }
     }
-    
+
     public void visitXIndex(int index) {
       this.xindex = index;
       if(xav != null) {
         xav.visitXIndex(index);
       }
     }
-    
+
     public void visitXParamIndex(int param_index) {
       this.xparam_index = param_index;
       if(xav != null) {
         xav.visitXParamIndex(param_index);
       }
     }
-    
+
     public void visitXBoundIndex(int bound_index) {
       this.xbound_index = bound_index;
       if(xav != null) {
         xav.visitXBoundIndex(bound_index);
       }
     }
-    
+
     public void visitXTypeIndex(int type_index) {
       this.xtype_index = type_index;
       if(xav != null) {
