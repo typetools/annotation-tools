@@ -10,7 +10,7 @@ import checkers.nullness.quals.*;
  */
 public class InvalidTypeAnnotationException extends RuntimeException {
   static final long serialVersionUID = 20060712L; // Today's date.
-  
+
   /**
    * Constructs a new <code> InvalidTypeAnnotationException </code> with
    * the given error message.

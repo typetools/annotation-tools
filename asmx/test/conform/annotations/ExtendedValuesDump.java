@@ -148,9 +148,7 @@ public class ExtendedValuesDump implements Opcodes {
 
         return cw.toByteArray();
     }
-    
-    
-    
+
     public static byte[] dumpClassEmpty () throws Exception {
       
       ClassWriter cw = new ClassWriter(false);
@@ -158,11 +156,11 @@ public class ExtendedValuesDump implements Opcodes {
       MethodVisitor mv;
       AnnotationVisitor av0;
       TypeAnnotationVisitor xav0;
-      
+
       cw.visit(V1_5, ACC_PUBLIC + ACC_SUPER, "annotations/tests/classfile/cases/TestClassEmpty", null, "java/lang/Object", null);
-      
+
       cw.visitSource("TestClassEmpty.java", null);
-      
+
       {
         av0 = cw.visitAnnotation("Lannotations/tests/classfile/foo/A;", true);
         av0.visitEnd();
@@ -183,10 +181,10 @@ public class ExtendedValuesDump implements Opcodes {
         mv.visitEnd();
       }
       cw.visitEnd();
-      
+
       return cw.toByteArray();
     }
-    
+
     public static byte[] dumpClassNonEmpty () throws Exception {
 
       ClassWriter cw = new ClassWriter(false);
