@@ -65,7 +65,7 @@ public class ExtendedValues {
     if(o instanceof Map) {
 
     }
-    
+
     if(o instanceof Set[][]) {
       
     }
