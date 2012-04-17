@@ -33,6 +33,8 @@
  */
 package org.objectweb.asm;
 
+import com.sun.tools.javac.code.TargetType;
+
 /**
  * An {@link TypeAnnotationVisitor} that generates 
  * extended annotations in bytecode form.
@@ -153,7 +155,7 @@ final class TypeAnnotationWriter implements TypeAnnotationVisitor {
         this.offset = offset;
 
         // extended information
-        this.xtarget_type = 0;
+        this.xtarget_type = TargetType.UNKNOWN.targetTypeValue();
         this.xoffset = 0;
         this.xlocation_length = 0;
         this.xlocations = null;
@@ -364,70 +366,70 @@ final class TypeAnnotationWriter implements TypeAnnotationVisitor {
 
     // below are all the methods for implementing extended annotations
     public void visitXTargetType(int target_type) {
-      this.xtarget_type = target_type;
-      bv.putShort(target_type);
+        this.xtarget_type = target_type;
+        bv.putShort(target_type);
     }
 
     // used for typecasts, object creation, field generic/array
     public void visitXOffset(int offset) {
-      this.xoffset = offset; 
-      bv.putShort(offset);
+        this.xoffset = offset; 
+        bv.putShort(offset);
     }
 
     // used for generic type arguments or arrays
     public void visitXLocationLength(int location_length) {
-      this.xlocation_length = location_length;
-      this.xlocations = new int[location_length];
-      this.xlocations_index = 0;
-      bv.putShort(location_length);
+        this.xlocation_length = location_length;
+        this.xlocations = new int[location_length];
+        this.xlocations_index = 0;
+        bv.putShort(location_length);
     }
 
     // used for generic type arguments or arrays
     public void visitXLocation(int location) {
-      this.xlocations[this.xlocations_index] = location;
-      this.xlocations_index++;
-      bv.putByte(location);
+        this.xlocations[this.xlocations_index] = location;
+        this.xlocations_index++;
+        bv.putByte(location);
     }
 
     // used for local variables
     public void visitXNumEntries(int num_entries) {
-      bv.putShort(num_entries);
+        bv.putShort(num_entries);
     }
 
     // used for local variables
     public void visitXStartPc(int start_pc) {
-      this.xstart_pc = start_pc;
-      bv.putShort(start_pc);
+        this.xstart_pc = start_pc;
+        bv.putShort(start_pc);
     }
 
     // used for local variables
     public void visitXLength(int length) {
-      this.xlength = length;
-      bv.putShort(length);
+        this.xlength = length;
+        bv.putShort(length);
     }
 
     // used for local variables
     public void visitXIndex(int index) {
-      this.xindex = index;
-      bv.putShort(index);
+        this.xindex = index;
+        bv.putShort(index);
     }
 
     // used for type parameter bounds
     public void visitXParamIndex(int param_index) {
-      this.xparam_index = param_index;
-      bv.putByte(param_index);
+        this.xparam_index = param_index;
+        bv.putByte(param_index);
     }
 
     // used for type parameter bounds
     public void visitXBoundIndex(int bound_index) {
-      this.xbound_index = bound_index;
-      bv.putByte(bound_index);
+        this.xbound_index = bound_index;
+        bv.putByte(bound_index);
     }
 
     // used for type index for class extends/implements and 
     // throws exception types
     public void visitXTypeIndex(int type_index) {
-      this.xtype_index = type_index;
-      bv.putByte(type_index);
+        this.xtype_index = type_index;
+        bv.putByte(type_index);
     }
 }

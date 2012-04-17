@@ -70,7 +70,7 @@ public class MethodAdapter implements MethodVisitor {
         return mv.visitTypeAnnotation(desc, visible);
     }
     //end jaime
-    
+
     public AnnotationVisitor visitParameterAnnotation(
         final int parameter,
         final String desc,
