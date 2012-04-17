@@ -41,13 +41,13 @@ import org.objectweb.asm.FieldVisitor;
  */
 public class FieldNode extends MemberNode implements FieldVisitor {
 
-  // jaime
-  public TypeAnnotationVisitor visitTypeAnnotation(String desc,
+    // jaime
+    public TypeAnnotationVisitor visitTypeAnnotation(String desc,
                                                            boolean visible) {
-    throw new RuntimeException("Jaime did not implement yet");
-  }
-  //end jaime
-  
+        throw new RuntimeException("Jaime did not implement yet");
+    }
+    //end jaime
+
     /**
      * The field's access flags (see {@link org.objectweb.asm.Opcodes}). This
      * field also indicates if the field is synthetic and/or deprecated.

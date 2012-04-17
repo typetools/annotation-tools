@@ -122,7 +122,7 @@ public abstract class TraceAbstractVisitor extends AbstractVisitor {
         text.add(visible ? ")\n" : ") // invisible\n");
         return tav;
     }
-    
+
     //jaime
     public TypeAnnotationVisitor visitTypeAnnotation(
         final String desc,
@@ -177,9 +177,10 @@ public abstract class TraceAbstractVisitor extends AbstractVisitor {
 
     //jaime
     protected TraceTypeAnnotationVisitor createTraceTypeAnnotationVisitor() {
-      return new TraceTypeAnnotationVisitor();
+        return new TraceTypeAnnotationVisitor();
     }
     //end jaime
+
     /**
      * Appends an internal name, a type descriptor or a type signature to
      * {@link #buf buf}.
