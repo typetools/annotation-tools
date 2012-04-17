@@ -452,7 +452,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
    * corresponding field annotations in scene.
    */
   private class FieldAnnotationSceneWriter implements FieldVisitor {
-    // After being constructured, none of these fields should be null.
+    // After being constructed, none of these fields should be null.
 
     /**
      * Internal FieldVisitor all calls are delegated to.
