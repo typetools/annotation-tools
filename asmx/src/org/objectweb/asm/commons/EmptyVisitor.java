@@ -221,7 +221,7 @@ public class EmptyVisitor implements
     public AnnotationVisitor visitArray(String name) {
         return this;
     }
-    
+
     //jaime
     public void visitXTargetType(int target_type) {
     }

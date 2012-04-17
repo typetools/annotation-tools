@@ -46,10 +46,11 @@ import org.objectweb.asm.MethodVisitor;
  */
 public class ClassNode extends MemberNode implements ClassVisitor {
 
-  public TypeAnnotationVisitor visitTypeAnnotation(
-      String desc, boolean visible) {
-    throw new RuntimeException("Jaime did not implement yet");
-  }
+    public TypeAnnotationVisitor visitTypeAnnotation(
+        String desc, boolean visible) {
+        throw new RuntimeException("Jaime did not implement yet");
+    }
+
     /**
      * The class version.
      */

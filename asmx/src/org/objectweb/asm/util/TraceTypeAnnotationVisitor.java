@@ -3,6 +3,7 @@ package org.objectweb.asm.util;
 import org.objectweb.asm.TypeAnnotationVisitor;
 
 import com.sun.tools.javac.code.TargetType;
+
 /**
  * An {@link TypeAnnotationVisitor} that prints a disassembled view of the
  * extended annotations it visits.
@@ -25,7 +26,7 @@ public class TraceTypeAnnotationVisitor extends TraceAnnotationVisitor
      * {@link TraceAbstractVisitor}.
      */
     protected String doubleTab = tab + tab;
-    
+
     private int valueNumber = 0;
 
     // variables necessary in order to print reference info for
@@ -42,8 +43,7 @@ public class TraceTypeAnnotationVisitor extends TraceAnnotationVisitor
     private int xparam_index;
     private int xbound_index;
     private int xtype_index;
-    
-    
+
     /**
      * Constructs a new {@link TraceTypeAnnotationVisitor}.
      */
@@ -156,8 +156,8 @@ public class TraceTypeAnnotationVisitor extends TraceAnnotationVisitor
       case CLASS_EXTENDS_COMPONENT:
       case THROWS:
       // Undefined case THROWS_COMPONENT:
-        buf.append(doubleTab).append("type_index: ").append(xtype_index).append("\n");
-        break;
+          buf.append(doubleTab).append("type_index: ").append(xtype_index).append("\n");
+          break;
 
       // type argument in constructor call
       // type argument in method call
@@ -167,7 +167,7 @@ public class TraceTypeAnnotationVisitor extends TraceAnnotationVisitor
       case NEW_TYPE_ARGUMENT_COMPONENT:
       case METHOD_TYPE_ARGUMENT:
       case METHOD_TYPE_ARGUMENT_COMPONENT:
-        break;
+          break;
 
       // wildcard bound
       // {
@@ -175,8 +175,8 @@ public class TraceTypeAnnotationVisitor extends TraceAnnotationVisitor
       // } reference_info;
       case WILDCARD_BOUND:
       case WILDCARD_BOUND_COMPONENT:
-        buf.append(doubleTab).append("bound_index: ").append(xbound_index).append("\n");
-        break;
+          buf.append(doubleTab).append("bound_index: ").append(xbound_index).append("\n");
+          break;
 
       // method type parameter
       // {        
@@ -184,8 +184,8 @@ public class TraceTypeAnnotationVisitor extends TraceAnnotationVisitor
       // } reference_info;
       case METHOD_TYPE_PARAMETER:
       // Undefined case METHOD_TYPE_PARAMETER_COMPONENT:
-        buf.append(doubleTab).append("param_index: ").append(xparam_index).append("\n");
-        break;
+          buf.append(doubleTab).append("param_index: ").append(xparam_index).append("\n");
+          break;
 
       default: throw new RuntimeException("Unrecognized target type: + " + xtarget_type);
       }
@@ -207,17 +207,17 @@ public class TraceTypeAnnotationVisitor extends TraceAnnotationVisitor
       case NEW_TYPE_ARGUMENT_COMPONENT:
       case METHOD_TYPE_ARGUMENT_COMPONENT:
       case WILDCARD_BOUND_COMPONENT:
-        buf.append(doubleTab).append("location_length: " + xlocation_length).append("\n");
-        buf.append(doubleTab).append("locations: ");
-        boolean first = true;
-        for(int i = 0; i < xlocations.length ; i++) {
-          if(!first) {
-            buf.append(", ");
+          buf.append(doubleTab).append("location_length: " + xlocation_length).append("\n");
+          buf.append(doubleTab).append("locations: ");
+          boolean first = true;
+          for(int i = 0; i < xlocations.length ; i++) {
+              if(!first) {
+                  buf.append(", ");
+              }
+              first = false;
+              buf.append(xlocations[i]);
           }
-          first = false;
-          buf.append(xlocations[i]);
-        }
-        buf.append("\n");
+          buf.append("\n");
       default : // do nothing;
       }
 

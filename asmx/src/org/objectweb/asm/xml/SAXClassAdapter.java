@@ -108,7 +108,7 @@ public final class SAXClassAdapter extends SAXAdapter implements ClassVisitor {
 
     public TypeAnnotationVisitor visitTypeAnnotation(
         String desc, boolean visible) {
-      throw new RuntimeException("Jaime did not implement yet");
+        throw new RuntimeException("Jaime did not implement yet");
     }
 
     public void visit(

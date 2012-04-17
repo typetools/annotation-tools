@@ -48,12 +48,14 @@ import org.objectweb.asm.Type;
  * @author Eric Bruneton
  */
 public class MethodNode extends MemberNode implements MethodVisitor {
-  // jaime
-  public TypeAnnotationVisitor visitTypeAnnotation(String desc, 
+
+    // jaime
+    public TypeAnnotationVisitor visitTypeAnnotation(String desc, 
                                                     boolean visible) {
-    return null;
-  }
-  //end jaime
+        return null;
+    }
+    //end jaime
+
     /**
      * The method's access flags (see {@link Opcodes}). This field also
      * indicates if the method is synthetic and/or deprecated.
