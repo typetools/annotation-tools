@@ -120,12 +120,10 @@ class MethodWriter implements MethodVisitor {
     private AnnotationWriter ianns;
 
     //jaime
-    
     private TypeAnnotationWriter xanns;
-    
     private TypeAnnotationWriter ixanns;
-    
     //end jaime
+
     /**
      * The runtime visible parameter annotations of this method. May be
      * <tt>null</tt>.
@@ -587,6 +585,7 @@ class MethodWriter implements MethodVisitor {
         }
         return aw;
     }
+
     // jaime
     public TypeAnnotationVisitor visitTypeAnnotation(
         final String desc,
@@ -607,6 +606,7 @@ class MethodWriter implements MethodVisitor {
         return xaw;
     }
     //end jaime
+
     public AnnotationVisitor visitParameterAnnotation(
         final int parameter,
         final String desc,
