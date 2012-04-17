@@ -475,19 +475,19 @@ public class ClassReader {
         // TODO
         // visits the class extended annotations
         for (i = 1; i >= 0; --i) {
-          v = i == 0 ? ixanns : xanns;
-          if (v != 0) {
-              j = readUnsignedShort(v);
-              v += 2;
-              for (; j > 0; --j) {
-                  desc = readUTF8(v, c);
-                  v += 2;
-                  v = readTypeAnnotationValues(v,
-                          c,
-                          classVisitor.visitTypeAnnotation(desc, i != 0));
-              }
-          }
-      }
+            v = i == 0 ? ixanns : xanns;
+            if (v != 0) {
+                j = readUnsignedShort(v);
+                v += 2;
+                for (; j > 0; --j) {
+                    desc = readUTF8(v, c);
+                    v += 2;
+                    v = readTypeAnnotationValues(v,
+                            c,
+                            classVisitor.visitTypeAnnotation(desc, i != 0));
+                }
+            }
+        }
 
         // visits the class attributes
         while (cattrs != null) {
@@ -549,9 +549,9 @@ public class ClassReader {
                 } else if (attrName.equals("RuntimeInvisibleAnnotations")) {
                     ianns = u + 6;
                 } else if (attrName.equals("RuntimeVisibleTypeAnnotations")) {
-                  xanns = u + 6;
+                    xanns = u + 6;
                 } else if (attrName.equals("RuntimeInvisibleTypeAnnotations")) {
-                  ixanns = u + 6;
+                    ixanns = u + 6;
                 } else {
 
                     attr = readAttribute(attrs,
@@ -597,27 +597,27 @@ public class ClassReader {
                 //TODO
                 // now visit the extended annotations
                 if(xanns != 0) {
-                  v = xanns;
-                  k = readUnsignedShort(v);
-                  v += 2;
-                  for(; k > 0; --k) {
-                    desc = readUTF8(v, c);
+                    v = xanns;
+                    k = readUnsignedShort(v);
                     v += 2;
-                    v = readTypeAnnotationValues(v,
-                        c, fv.visitTypeAnnotation(desc, true));
-                  }
+                    for(; k > 0; --k) {
+                        desc = readUTF8(v, c);
+                        v += 2;
+                        v = readTypeAnnotationValues(v,
+                            c, fv.visitTypeAnnotation(desc, true));
+                    }
                 }
 
                 if(ixanns != 0) {
-                  v = ixanns;
-                  k = readUnsignedShort(v);
-                  v += 2;
-                  for(; k > 0; --k) {
-                    desc = readUTF8(v, c);
+                    v = ixanns;
+                    k = readUnsignedShort(v);
                     v += 2;
-                    v = readTypeAnnotationValues(v,
-                        c, fv.visitTypeAnnotation(desc, false));
-                  }
+                    for(; k > 0; --k) {
+                        desc = readUTF8(v, c);
+                        v += 2;
+                        v = readTypeAnnotationValues(v,
+                            c, fv.visitTypeAnnotation(desc, false));
+                    }
                 }
 
                 while (cattrs != null) {
@@ -681,9 +681,9 @@ public class ClassReader {
                 } else if (attrName.equals("RuntimeInvisibleAnnotations")) {
                     ianns = u;
                 } else if (attrName.equals("RuntimeVisibleTypeAnnotations")) {
-                  xanns = u;
+                    xanns = u;
                 } else if (attrName.equals("RuntimeInvisibleTypeAnnotations")) {
-                  ixanns = u;
+                    ixanns = u;
                 } else if (attrName.equals("RuntimeVisibleParameterAnnotations")) {
                     mpanns = u;
                 } else if (attrName.equals("RuntimeInvisibleParameterAnnotations")) {
@@ -803,9 +803,9 @@ public class ClassReader {
                             w = readTypeAnnotationValues(w,
                                   c,
                                   mv.visitTypeAnnotation(desc, j != 0));
-                      }
-                  }
-              }
+                        }
+                    }
+                }
 
                 if (mpanns != 0) {
                     readParameterAnnotations(mpanns, c, true, mv);
@@ -1480,7 +1480,7 @@ public class ClassReader {
 
         // wildcard bound
         // {
-        //    u1 wildcard_target_type;
+        //    u2 wildcard_target_type;
         //    reference_info wildcard_target_type
         // } reference_info;
         case WILDCARD_BOUND:
