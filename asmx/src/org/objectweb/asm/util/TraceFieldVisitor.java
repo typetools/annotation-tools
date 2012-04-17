@@ -63,8 +63,9 @@ public class TraceFieldVisitor extends TraceAbstractVisitor implements
 
     // jaime
     public TypeAnnotationVisitor visitTypeAnnotation(
-      final String desc,
-      final boolean visible) {
+        final String desc,
+        final boolean visible)
+    {
         TypeAnnotationVisitor xav = super.visitTypeAnnotation(desc, visible);
         if (fv != null) {
             ((TraceTypeAnnotationVisitor) xav).xav = fv.visitTypeAnnotation(desc, visible);
