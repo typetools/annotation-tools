@@ -614,13 +614,6 @@ extends EmptyVisitor {
           throw new Error("METHOD_TYPE_ARGUMENT_COMPONENT: to do");
           // break;
 
-        case WILDCARD_BOUND:
-          handleWildcardBound(aElement);
-          break;
-        case WILDCARD_BOUND_COMPONENT:
-          handleWildcardBoundGenericArray(aElement);
-          break;
-
         case METHOD_TYPE_PARAMETER:
           throw new Error("METHOD_TYPE_PARAMETER: to do");
 
@@ -928,32 +921,6 @@ extends EmptyVisitor {
 
     private void handleNewTypeArgumentGenericArray(AMethod aMethod) {
       if (strict) { System.err.println("Unhandled handleNewTypeArgumentGenericArray on aMethod: " + aMethod); }
-    }
-
-    private void handleWildcardBound(AElement aElement) {
-      if (aElement instanceof AClass) {
-        AClass aClass = (AClass) aElement;
-        System.out.println("Incomplete annotation on class: " + aElement);
-      } else if (aElement instanceof AMethod) {
-        AMethod aMethod = (AMethod) aElement;
-        aMethod.bounds.vivify(makeBoundLocation())
-            .tlAnnotationsHere.add(makeAnnotation());
-      } else if (aElement instanceof ATypeElement) {
-        ATypeElement aTypeElement = (ATypeElement) aElement;
-        aTypeElement.tlAnnotationsHere.add(makeAnnotation());
-      } else {
-        throw new RuntimeException("Invalid target element for wildcard bound: "
-            + aElement);
-      }
-    }
-
-    /*
-     * Creates the class type parameter bound annotation on aClass.
-     */
-    private void handleWildcardBoundGenericArray(AElement aElement) {
-      AMethod aMethod = (AMethod) aElement;
-      aMethod.bounds.vivify(makeBoundLocation()).innerTypes.vivify(
-          makeInnerTypeLocation()).tlAnnotationsHere.add(makeAnnotation());
     }
 
     /*
