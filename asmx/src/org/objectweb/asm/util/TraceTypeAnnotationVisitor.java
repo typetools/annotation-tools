@@ -169,15 +169,6 @@ public class TraceTypeAnnotationVisitor extends TraceAnnotationVisitor
       case METHOD_TYPE_ARGUMENT_COMPONENT:
           break;
 
-      // wildcard bound
-      // {
-      //    u1 bound_index;
-      // } reference_info;
-      case WILDCARD_BOUND:
-      case WILDCARD_BOUND_COMPONENT:
-          buf.append(doubleTab).append("bound_index: ").append(xbound_index).append("\n");
-          break;
-
       // method type parameter
       // {        
       //    u1 param_index;
@@ -206,7 +197,6 @@ public class TraceTypeAnnotationVisitor extends TraceAnnotationVisitor
       // Undefined case THROWS_COMPONENT:
       case NEW_TYPE_ARGUMENT_COMPONENT:
       case METHOD_TYPE_ARGUMENT_COMPONENT:
-      case WILDCARD_BOUND_COMPONENT:
           buf.append(doubleTab).append("location_length: " + xlocation_length).append("\n");
           buf.append(doubleTab).append("locations: ");
           boolean first = true;

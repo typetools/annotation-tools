@@ -1478,16 +1478,6 @@ public class ClassReader {
           xav.visitXTypeIndex(type_index);
           break;
 
-        // wildcard bound
-        // {
-        //    u2 wildcard_target_type;
-        //    reference_info wildcard_target_type
-        // } reference_info;
-        case WILDCARD_BOUND:
-        case WILDCARD_BOUND_COMPONENT:
-            // XXX: Parse here
-          break;
-
         // method type parameter
         // {
         //    u1 param_index;
