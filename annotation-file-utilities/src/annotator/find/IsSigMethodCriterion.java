@@ -26,21 +26,22 @@ public class IsSigMethodCriterion implements Criterion {
 
   // The context is used for determining the fully qualified name of methods.
   private static class Context {
-    public String packageName;
-    public List<String> imports;
+    public final String packageName;
+    public final List<String> imports;
     public Context(String packageName, List<String> imports) {
       this.packageName = packageName;
       this.imports = imports;
     }
   }
-  private static Map<CompilationUnitTree, Context> contextCache = new HashMap<CompilationUnitTree, Context>();
 
-  private String fullMethodName; // really the full JVML signature, sans return type
-  private String simpleMethodName;
+  private static final Map<CompilationUnitTree, Context> contextCache = new HashMap<CompilationUnitTree, Context>();
+
+  private final String fullMethodName; // really the full JVML signature, sans return type
+  private final String simpleMethodName;
   // list of parameters in Java, not JVML format
-  private List<String> fullyQualifiedParams;
+  private final List<String> fullyQualifiedParams;
   // in Java, not JVML, format.  may be "void"
-  private String returnType;
+  private final String returnType;
 
   public IsSigMethodCriterion(String methodName) {
     this.fullMethodName = methodName.substring(0, methodName.indexOf(")") + 1);

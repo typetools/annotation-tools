@@ -11,8 +11,8 @@ import com.sun.source.util.TreePath;
  */
 public class CastCriterion implements Criterion {
 
-  private String methodName;
-  private RelativeLocation loc;
+  private final String methodName;
+  private final RelativeLocation loc;
 
   public CastCriterion(String methodName, RelativeLocation loc) {
     this.methodName = methodName.substring(0, methodName.lastIndexOf(")") + 1);
@@ -39,12 +39,12 @@ public class CastCriterion implements Criterion {
       int indexInSource = CastScanner.indexOfCastTree(path, leaf);
       boolean b;
       if (loc.isBytecodeOffset()) {
-    	  int indexInClass = CastScanner.getMethodCastIndex(methodName, loc.offset);
-    	  b = (indexInSource == indexInClass);
+        int indexInClass = CastScanner.getMethodCastIndex(methodName, loc.offset);
+        b = (indexInSource == indexInClass);
       } else {
-    	  b = (indexInSource == loc.index);
+        b = (indexInSource == loc.index);
       }
-	  return b;
+      return b;
 
     } else {
       boolean b = this.isSatisfiedBy(path.getParentPath());
@@ -52,10 +52,12 @@ public class CastCriterion implements Criterion {
     }
   }
 
+  @Override
   public Kind getKind() {
     return Kind.CAST;
   }
 
+  @Override
   public String toString() {
     return "CastCriterion: in method: " + methodName + " location: " + loc;
   }

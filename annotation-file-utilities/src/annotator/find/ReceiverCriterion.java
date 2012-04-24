@@ -5,8 +5,8 @@ import com.sun.source.util.TreePath;
 
 public class ReceiverCriterion implements Criterion {
 
-  private String methodName; // no return type
-  private Criterion isSigMethodCriterion;
+  private final String methodName; // no return type
+  private final Criterion isSigMethodCriterion;
 
   public ReceiverCriterion(String methodName) {
     this.methodName = methodName;
@@ -39,10 +39,12 @@ public class ReceiverCriterion implements Criterion {
     return isSigMethodCriterion.isSatisfiedBy(path);
   }
 
+  @Override
   public Kind getKind() {
     return Kind.RECEIVER;
   }
 
+  @Override
   public String toString() {
     return "ReceiverCriterion for method: " + methodName;
   }

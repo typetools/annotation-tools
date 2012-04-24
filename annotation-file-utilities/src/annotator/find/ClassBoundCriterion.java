@@ -7,10 +7,10 @@ import com.sun.source.tree.Tree;
 
 public class ClassBoundCriterion implements Criterion {
 
-  private String className;
-  public BoundLocation boundLoc;
-  private Criterion notInMethodCriterion;
-  private Criterion boundLocCriterion;
+  private final String className;
+  public final BoundLocation boundLoc;
+  private final Criterion notInMethodCriterion;
+  private final Criterion boundLocCriterion;
 
   public ClassBoundCriterion(String className, BoundLocation boundLoc) {
     this.className = className;
@@ -37,10 +37,12 @@ public class ClassBoundCriterion implements Criterion {
       notInMethodCriterion.isSatisfiedBy(path);
   }
 
+  @Override
   public Kind getKind() {
     return Kind.CLASS_BOUND;
   }
 
+  @Override
   public String toString() {
     return "ClassBoundCriterion: for " + className + " at " + boundLoc;
   }

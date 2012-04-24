@@ -13,8 +13,8 @@ import com.sun.source.util.TreePath;
  */
 public class ExtImplsLocationCriterion implements Criterion {
 
-  private String classname;
-  private Integer index;
+  private final String classname;
+  private final Integer index;
 
   /**
    * @param classname The class name; for debugging purposes only, not used to constrain.

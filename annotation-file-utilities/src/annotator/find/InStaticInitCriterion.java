@@ -11,41 +11,41 @@ import com.sun.source.util.TreePath;
  */
 public class InStaticInitCriterion implements Criterion {
 
-	public int blockID;
-	public Criterion notInMethodCriterion;
+  public final int blockID;
+  public final Criterion notInMethodCriterion;
 
-	public InStaticInitCriterion(int blockID) {
-		this.blockID = blockID;
-		this.notInMethodCriterion = Criteria.notInMethod();
-	}
+  public InStaticInitCriterion(int blockID) {
+    this.blockID = blockID;
+    this.notInMethodCriterion = Criteria.notInMethod();
+  }
 
-	/** {@inheritDoc} */
-	@Override
-	public boolean isSatisfiedBy(TreePath path, Tree leaf) {
-		assert path == null || path.getLeaf() == leaf;
-		return isSatisfiedBy(path);
-	}
+  /** {@inheritDoc} */
+  @Override
+  public boolean isSatisfiedBy(TreePath path, Tree leaf) {
+    assert path == null || path.getLeaf() == leaf;
+    return isSatisfiedBy(path);
+  }
 
-	/** {@inheritDoc} */
-	@Override
-	public boolean isSatisfiedBy(TreePath path) {
-		while (path != null) {
-			if (CommonScanner.isStaticInit(path)) {
-				int indexInSource = StaticInitScanner.indexOfStaticInitTree(path);
-				return indexInSource == blockID;
-			}
-			path = path.getParentPath();
-		}
-		return false;
-	}
+  /** {@inheritDoc} */
+  @Override
+  public boolean isSatisfiedBy(TreePath path) {
+    while (path != null) {
+      if (CommonScanner.isStaticInit(path)) {
+        int indexInSource = StaticInitScanner.indexOfStaticInitTree(path);
+        return indexInSource == blockID;
+      }
+      path = path.getParentPath();
+    }
+    return false;
+  }
 
-	@Override
-    public Kind getKind() {
-		return Kind.IN_METHOD;
-	}
+  @Override
+  public Kind getKind() {
+    return Kind.IN_METHOD;
+  }
 
-	@Override
-    public String toString() {
-		return "In static initializer with index " + blockID;
-	}
+  @Override
+  public String toString() {
+    return "In static initializer with index " + blockID;
+  }
 }

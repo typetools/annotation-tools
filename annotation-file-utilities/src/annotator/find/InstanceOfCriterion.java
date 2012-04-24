@@ -9,8 +9,8 @@ import com.sun.source.util.TreePath;
 
 public class InstanceOfCriterion implements Criterion {
 
-  private String methodName;
-  private RelativeLocation loc;
+  private final String methodName;
+  private final RelativeLocation loc;
 
   public InstanceOfCriterion(String methodName, RelativeLocation loc) {
     this.methodName = methodName.substring(0, methodName.lastIndexOf(")") + 1);
@@ -64,12 +64,12 @@ public class InstanceOfCriterion implements Criterion {
       debug("return source: "+ indexInSource);
       boolean b;
       if (loc.isBytecodeOffset()) {
-    	  int indexInClass = InstanceOfScanner.getMethodInstanceOfIndex(methodName, loc.offset);
-          debug("return class: " + indexInClass);
-    	  b = (indexInSource == indexInClass);
+        int indexInClass = InstanceOfScanner.getMethodInstanceOfIndex(methodName, loc.offset);
+        debug("return class: " + indexInClass);
+        b = (indexInSource == indexInClass);
       } else {
-    	  b = (indexInSource == loc.index);
-          debug("return loc.index: " + loc.index);
+        b = (indexInSource == loc.index);
+        debug("return loc.index: " + loc.index);
       }
       debug("return new: " + b);
       return b;
@@ -80,6 +80,7 @@ public class InstanceOfCriterion implements Criterion {
     }
   }
 
+  @Override
   public Kind getKind() {
     return Kind.INSTANCE_OF;
   }
@@ -90,6 +91,7 @@ public class InstanceOfCriterion implements Criterion {
     }
   }
 
+  @Override
   public String toString() {
     return "InstanceOfCriterion: in method: " + methodName + " location: " + loc;
   }

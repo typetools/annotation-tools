@@ -7,10 +7,10 @@ import com.sun.source.tree.Tree;
 
 public class MethodBoundCriterion implements Criterion {
 
-  private String methodName;
+  private final String methodName;
   public BoundLocation boundLoc;
-  private Criterion sigMethodCriterion;
-  private Criterion boundLocationCriterion;
+  private final Criterion sigMethodCriterion;
+  private final Criterion boundLocationCriterion;
 
   public MethodBoundCriterion(String methodName, BoundLocation boundLoc) {
     this.methodName = methodName;
@@ -33,11 +33,13 @@ public class MethodBoundCriterion implements Criterion {
       boundLocationCriterion.isSatisfiedBy(path);
   }
 
-  public Kind getKind() {
+  @Override
+public Kind getKind() {
     return Kind.METHOD_BOUND;
   }
 
-  public String toString() {
+  @Override
+public String toString() {
     return "MethodBoundCriterion: method: " + methodName + " bound boundLoc: " + boundLoc;
   }
 }
