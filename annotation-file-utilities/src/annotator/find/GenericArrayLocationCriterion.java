@@ -20,8 +20,8 @@ public class GenericArrayLocationCriterion implements Criterion {
   private static final boolean debug = false;
 
   // the full location list
-  private List<Integer> location;
-  
+  private final List<Integer> location;
+
   // The last element of the location list -- that is,
   // location.get(location.size() - 1), or null if (location.size() == 0).
   // 
@@ -30,7 +30,7 @@ public class GenericArrayLocationCriterion implements Criterion {
   // Also TODO: locationInParent is not used for any logic in this class,
   // just abused by TreeFinder. See whether you can clean this up.
   Integer locationInParent;
-  
+
   // represents all but the last element of the location list
   // TODO: this field is initialized, but never read!
   // I removed it, see the version control history.
@@ -88,7 +88,7 @@ public class GenericArrayLocationCriterion implements Criterion {
       System.out.printf("GenericArrayLocationCriterion.isSatisfiedBy():%n  leaf of path: %s%n  searched location: %s%n",
               path.getLeaf(), location);
     }
-    
+
     if (locationInParent == null) {
       // no inner type location, want to annotate outermost type
       // e.g.,  @Readonly List list;
@@ -96,7 +96,7 @@ public class GenericArrayLocationCriterion implements Criterion {
       //        String @Readonly [] array;
       Tree leaf = path.getLeaf();
       Tree parent = path.getParentPath().getLeaf();
-      
+
       boolean result = ((leaf.getKind() == Tree.Kind.NEW_ARRAY)
                         || (leaf.getKind() == Tree.Kind.NEW_CLASS)
                         || ((isGenericOrArray(leaf)
@@ -139,19 +139,19 @@ public class GenericArrayLocationCriterion implements Criterion {
         return false;
       }
       Tree parent = parentPath.getLeaf();
-      
+
       if (parent.getKind() == Tree.Kind.ANNOTATED_TYPE) {
           // If the parent is an annotated type, we did not really go up a level.
           // Therefore, skip up one more level.
           parentPath = parentPath.getParentPath();
           parent = parentPath.getLeaf();
       }
-      
+
       if (debug) {
         System.out.printf("locationRemaining: %s, leaf: %s parent: %s %s%n",
                          locationRemaining, Main.treeToString(leaf), Main.treeToString(parent), parent.getClass());
       }
-      
+
       int loc = locationRemaining.get(locationRemaining.size()-1);
       if (parent.getKind() == Tree.Kind.PARAMETERIZED_TYPE) {
         // annotating List<@A Integer>
@@ -162,7 +162,7 @@ public class GenericArrayLocationCriterion implements Criterion {
         boolean found = false;
         if (childTrees.size() > loc ) {
           Tree childi = childTrees.get(loc);
-          
+
           if (childi.getKind() == Tree.Kind.ANNOTATED_TYPE) {
               childi = ((AnnotatedTypeTree) childi).getUnderlyingType();
           }
@@ -186,11 +186,11 @@ public class GenericArrayLocationCriterion implements Criterion {
         //                   Main.treeToString(parent), loc);
         WildcardTree wct = (WildcardTree) parent;
         Tree boundTree = wct.getBound();
-        
+
         if (debug) {
           System.out.printf("ExtendsWildcard with bound %s gives %s%n", boundTree, boundTree.equals(leaf));
         }
-        
+
         return boundTree.equals(leaf);
       } else if (parent.getKind() == Tree.Kind.SUPER_WILDCARD) {
         // annotating List<? super @A Integer>
@@ -198,7 +198,7 @@ public class GenericArrayLocationCriterion implements Criterion {
         //                   Main.treeToString(parent), loc);
         WildcardTree wct = (WildcardTree) parent;
         Tree boundTree = wct.getBound();
-        
+
         if (debug) {
           System.out.printf("SuperWildcard with bound %s gives %s%n", boundTree, boundTree.equals(leaf));
         }
@@ -262,7 +262,7 @@ public class GenericArrayLocationCriterion implements Criterion {
             Main.treeToString(parent), isGenericOrArray(parent),
             ! isGenericOrArray(parent));
     }
-    
+
     return ! isGenericOrArray(parent);
   }
 

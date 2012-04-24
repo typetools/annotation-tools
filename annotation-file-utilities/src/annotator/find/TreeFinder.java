@@ -103,7 +103,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
    */
   private static class TypePositionFinder extends TreeScanner<Integer, Void> {
 
-    private CompilationUnitTree tree;
+    private final CompilationUnitTree tree;
 
     public TypePositionFinder(CompilationUnitTree tree) {
       super();
@@ -245,7 +245,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       return result;
     }
 
-    static Map<Pair<TreePath,Tree>,TreePath> getPathCache2 = new HashMap<Pair<TreePath,Tree>,TreePath>();
+    private static Map<Pair<TreePath,Tree>,TreePath> getPathCache2 = new HashMap<Pair<TreePath,Tree>,TreePath>();
 
     /**
      * An alternative to TreePath.getPath(TreePath,Tree) that
@@ -624,7 +624,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
    */
   private static class DeclarationPositionFinder extends TreeScanner<Integer, Void> {
 
-    private CompilationUnitTree tree;
+    private final CompilationUnitTree tree;
 
     public DeclarationPositionFinder(CompilationUnitTree tree) {
       super();
@@ -725,11 +725,11 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     }
   }
 
-  private Map<Tree, TreePath> paths;
-  private TypePositionFinder tpf;
-  private DeclarationPositionFinder dpf;
-  private CompilationUnitTree tree;
-  private SetMultimap<Integer, Insertion> positions;
+  private final Map<Tree, TreePath> paths;
+  private final TypePositionFinder tpf;
+  private final DeclarationPositionFinder dpf;
+  private final CompilationUnitTree tree;
+  private final SetMultimap<Integer, Insertion> positions;
 
   /**
    * Creates a {@code TreeFinder} from a source tree.

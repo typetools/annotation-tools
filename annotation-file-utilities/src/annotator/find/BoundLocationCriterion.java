@@ -13,8 +13,8 @@ import com.sun.source.util.TreePath;
 public class BoundLocationCriterion implements Criterion {
 
   private Criterion parentCriterion;
-  private Integer boundIndex;
-  private Integer paramIndex;
+  private final Integer boundIndex;
+  private final Integer paramIndex;
 
 
   public BoundLocationCriterion(BoundLocation boundLoc) {
@@ -110,11 +110,13 @@ public class BoundLocationCriterion implements Criterion {
   }
 
   /** {@inheritDoc} */
+  @Override
   public Kind getKind() {
     return Kind.BOUND_LOCATION;
   }
 
   /** {@inheritDoc} */
+  @Override
   public String toString() {
     return "BoundCriterion: at param index: " + paramIndex +
       " at bound index: " + boundIndex;

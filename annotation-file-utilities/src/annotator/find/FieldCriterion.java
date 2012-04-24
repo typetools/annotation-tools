@@ -5,9 +5,9 @@ import com.sun.source.util.TreePath;
 
 public class FieldCriterion implements Criterion {
 
-  public String varName;
-  public Criterion varCriterion;
-  public Criterion notInMethodCriterion;
+  public final String varName;
+  public final Criterion varCriterion;
+  public final Criterion notInMethodCriterion;
 
   public FieldCriterion(String varName) {
     this.varName = varName;
@@ -37,10 +37,12 @@ public class FieldCriterion implements Criterion {
     }
   }
 
+  @Override
   public Kind getKind() {
     return Kind.FIELD;
   }
 
+  @Override
   public String toString() {
     return "FieldCriterion: " + varName;
   }

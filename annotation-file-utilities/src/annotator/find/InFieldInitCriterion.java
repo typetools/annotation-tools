@@ -10,9 +10,9 @@ import com.sun.source.util.TreePath;
  */
 public class InFieldInitCriterion implements Criterion {
 
-  public String varName;
-  public Criterion varCriterion;
-  public Criterion notInMethodCriterion;
+  public final String varName;
+  public final Criterion varCriterion;
+  public final Criterion notInMethodCriterion;
 
   public InFieldInitCriterion(String varName) {
     this.varName = varName;
@@ -30,19 +30,21 @@ public class InFieldInitCriterion implements Criterion {
   /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path) {
-	  while (path != null) {
-		  if (CommonScanner.isFieldInit(path)) {
-			  return varCriterion.isSatisfiedBy(path);
-		  }
-		  path = path.getParentPath();
-	  }
-	  return false;
+    while (path != null) {
+      if (CommonScanner.isFieldInit(path)) {
+        return varCriterion.isSatisfiedBy(path);
+      }
+      path = path.getParentPath();
+    }
+    return false;
   }
 
+  @Override
   public Kind getKind() {
     return Kind.FIELD;
   }
 
+  @Override
   public String toString() {
     return "In field initializer for field '" + varName + "'";
   }

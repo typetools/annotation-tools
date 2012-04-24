@@ -5,8 +5,8 @@ import com.sun.source.util.TreePath;
 
 public class ReturnTypeCriterion implements Criterion {
 
-  private String methodName;
-  private Criterion inMethodCriterion;
+  private final String methodName;
+  private final Criterion inMethodCriterion;
 
   public ReturnTypeCriterion(String methodName) {
     this.methodName = methodName; // substring(0, name.indexOf(")") + 1);
@@ -37,10 +37,12 @@ public class ReturnTypeCriterion implements Criterion {
     return result;
   }
 
+  @Override
   public Kind getKind() {
     return Kind.RETURN_TYPE;
   }
 
+  @Override
   public String toString() {
     return "ReturnTypeCriterion for method: " + methodName;
   }

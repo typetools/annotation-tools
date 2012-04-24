@@ -16,6 +16,7 @@ final class EnclosedByCriterion implements Criterion {
   }
 
   /** {@inheritDoc} */
+  @Override
   public Kind getKind() {
     return Kind.ENCLOSED_BY;
   }
@@ -44,6 +45,7 @@ final class EnclosedByCriterion implements Criterion {
   /**
    * {@inheritDoc}
    */
+  @Override
   public String toString() {
     return "enclosed by '" + kind + "'";
   }
