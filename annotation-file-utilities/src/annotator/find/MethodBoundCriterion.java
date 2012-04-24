@@ -8,7 +8,7 @@ import com.sun.source.tree.Tree;
 public class MethodBoundCriterion implements Criterion {
 
   private final String methodName;
-  public BoundLocation boundLoc;
+  public final BoundLocation boundLoc;
   private final Criterion sigMethodCriterion;
   private final Criterion boundLocationCriterion;
 
@@ -34,12 +34,12 @@ public class MethodBoundCriterion implements Criterion {
   }
 
   @Override
-public Kind getKind() {
+  public Kind getKind() {
     return Kind.METHOD_BOUND;
   }
 
   @Override
-public String toString() {
+  public String toString() {
     return "MethodBoundCriterion: method: " + methodName + " bound boundLoc: " + boundLoc;
   }
 }
