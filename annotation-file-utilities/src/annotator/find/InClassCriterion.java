@@ -33,8 +33,8 @@ final class InClassCriterion implements Criterion {
 
   static boolean debug = false;
 
-  final public String className;
-  boolean exactMatch;
+  public final String className;
+  private final boolean exactMatch;
 
   /** The argument is a fully-qualified class name. */
   public InClassCriterion(String className, boolean exactMatch) {
@@ -45,6 +45,7 @@ final class InClassCriterion implements Criterion {
   /**
    * {@inheritDoc}
    */
+  @Override
   public Kind getKind() {
     return Kind.IN_CLASS;
   }
@@ -86,7 +87,7 @@ final class InClassCriterion implements Criterion {
     for (Tree tree : trees) {
       boolean checkAnon = false;
 
-	  switch (tree.getKind()) {
+      switch (tree.getKind()) {
       case COMPILATION_UNIT:
         debug("InClassCriterion.isSatisfiedBy:%n  cname=%s%n  tree=%s%n", cname, tree);
         ExpressionTree packageTree = ((CompilationUnitTree) tree).getPackageName();
@@ -188,6 +189,7 @@ final class InClassCriterion implements Criterion {
   /**
    * {@inheritDoc}
    */
+  @Override
   public String toString() {
     return "In class '" + className + "'" + (exactMatch ? " (exactly)" : "");
   }

@@ -11,18 +11,20 @@ import com.sun.source.util.TreePath;
  */
 public class NewCriterion implements Criterion {
 
-  private String methodName;
-  private Criterion inMethodCriterion;
+  private final String methodName;
+  private final Criterion inMethodCriterion;
 
-  private RelativeLocation loc;
+  private final RelativeLocation loc;
 
   public NewCriterion(String methodName, RelativeLocation loc) {
     this.methodName = methodName.substring(0, methodName.lastIndexOf(")") + 1);
 
     if (!(methodName.startsWith("init for field") ||
-        methodName.startsWith("static init number"))) {
-        // keep strings consistent with text used in IndexFileSpecification
-        this.inMethodCriterion = Criteria.inMethod(methodName);
+            methodName.startsWith("static init number"))) {
+      // keep strings consistent with text used in IndexFileSpecification
+      this.inMethodCriterion = Criteria.inMethod(methodName);
+    } else {
+      this.inMethodCriterion = null;
     }
 
     this.loc = loc;
@@ -53,10 +55,10 @@ public class NewCriterion implements Criterion {
       // System.out.printf("indexInSource=%d%n", indexInSource);
       boolean b;
       if (loc.isBytecodeOffset()) {
-    	  int indexInClass = NewScanner.getMethodNewIndex(methodName, loc.offset);
-    	  b = (indexInSource == indexInClass);
+        int indexInClass = NewScanner.getMethodNewIndex(methodName, loc.offset);
+        b = (indexInSource == indexInClass);
       } else {
-    	  b = (indexInSource == loc.index);
+        b = (indexInSource == loc.index);
       }
       return b;
     } else {

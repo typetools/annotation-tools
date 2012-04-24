@@ -20,6 +20,7 @@ final class IsCriterion implements Criterion {
   /**
    * {@inheritDoc}
    */
+  @Override
   public Kind getKind() {
     return Kind.HAS_KIND;
   }
@@ -56,6 +57,7 @@ final class IsCriterion implements Criterion {
   /**
    * {@inheritDoc}
    */
+  @Override
   public String toString() {
     return "is " + kind.toString().toLowerCase() + " '" + name + "'";
   }

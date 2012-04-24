@@ -7,8 +7,8 @@ import com.sun.source.util.TreePath;
 
 public class ParamCriterion implements Criterion {
 
-  private String methodName;
-  private Integer paramPos;
+  private final String methodName;
+  private final Integer paramPos;
 
   public ParamCriterion(String methodName, Integer pos) {
     this.methodName = methodName.substring(0, methodName.indexOf(")") + 1);
@@ -50,12 +50,14 @@ public class ParamCriterion implements Criterion {
     return false;
   }
 
+  @Override
   public Kind getKind() {
     return Kind.PARAM;
   }
 
+  @Override
   public String toString() {
     return "ParamCriterion for method: " + methodName + " at position: " +
-    paramPos;
+            paramPos;
   }
 }
