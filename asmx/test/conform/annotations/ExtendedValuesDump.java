@@ -148,21 +148,19 @@ public class ExtendedValuesDump implements Opcodes {
 
         return cw.toByteArray();
     }
-    
-    
-    
+
     public static byte[] dumpClassEmpty () throws Exception {
       
       ClassWriter cw = new ClassWriter(false);
       FieldVisitor fv;
       MethodVisitor mv;
       AnnotationVisitor av0;
-      ExtendedAnnotationVisitor xav0;
-      
+      TypeAnnotationVisitor xav0;
+
       cw.visit(V1_5, ACC_PUBLIC + ACC_SUPER, "annotations/tests/classfile/cases/TestClassEmpty", null, "java/lang/Object", null);
-      
+
       cw.visitSource("TestClassEmpty.java", null);
-      
+
       {
         av0 = cw.visitAnnotation("Lannotations/tests/classfile/foo/A;", true);
         av0.visitEnd();
@@ -183,17 +181,17 @@ public class ExtendedValuesDump implements Opcodes {
         mv.visitEnd();
       }
       cw.visitEnd();
-      
+
       return cw.toByteArray();
     }
-    
+
     public static byte[] dumpClassNonEmpty () throws Exception {
 
       ClassWriter cw = new ClassWriter(false);
       FieldVisitor fv;
       MethodVisitor mv;
       AnnotationVisitor av0;
-      ExtendedAnnotationVisitor xav0;
+      TypeAnnotationVisitor xav0;
 
       cw.visit(V1_5, ACC_PUBLIC + ACC_SUPER, "annotations/tests/classfile/cases/TestClassNonEmpty", null, "java/lang/Object", null);
 
@@ -321,7 +319,7 @@ public class ExtendedValuesDump implements Opcodes {
       FieldVisitor fv;
       MethodVisitor mv;
       AnnotationVisitor av0;
-      ExtendedAnnotationVisitor xav0;
+      TypeAnnotationVisitor xav0;
 
       cw.visit(V1_5, ACC_PUBLIC + ACC_SUPER, "annotations/tests/classfile/cases/TestFieldSimple", null, "java/lang/Object", null);
 
@@ -415,7 +413,7 @@ public class ExtendedValuesDump implements Opcodes {
       FieldVisitor fv;
       MethodVisitor mv;
       AnnotationVisitor av0;
-      ExtendedAnnotationVisitor xav0;
+      TypeAnnotationVisitor xav0;
 
       cw.visit(V1_5, ACC_PUBLIC + ACC_SUPER, "annotations/tests/classfile/cases/TestFieldGeneric", "<T:Ljava/lang/Object;>Ljava/lang/Object;", "java/lang/Object", null);
 
@@ -467,7 +465,7 @@ public class ExtendedValuesDump implements Opcodes {
       {
       fv = cw.visitField(0, "testFieldGeneric", "Lannotations/tests/classfile/cases/TestFieldGeneric;", "Lannotations/tests/classfile/cases/TestFieldGeneric<TT;>;", null);
       {
-      xav0 = fv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/A;", true);
+      xav0 = fv.visitTypeAnnotation("Lannotations/tests/classfile/foo/A;", true);
       xav0.visitXTargetType(new Integer(11));
       xav0.visitXLocationLength(new Integer(1));
       xav0.visitXLocation(new Integer(0));
@@ -487,7 +485,7 @@ public class ExtendedValuesDump implements Opcodes {
       av0.visitEnd();
       }
       {
-      xav0 = fv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/F;", true);
+      xav0 = fv.visitTypeAnnotation("Lannotations/tests/classfile/foo/F;", true);
       xav0.visit("fieldA", new Integer(1));
       xav0.visit("fieldB", "n");
       xav0.visitXTargetType(new Integer(11));
@@ -496,14 +494,14 @@ public class ExtendedValuesDump implements Opcodes {
       xav0.visitEnd();
       }
       {
-      xav0 = fv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/A;", true);
+      xav0 = fv.visitTypeAnnotation("Lannotations/tests/classfile/foo/A;", true);
       xav0.visitXTargetType(new Integer(11));
       xav0.visitXLocationLength(new Integer(1));
       xav0.visitXLocation(new Integer(0));
       xav0.visitEnd();
       }
       {
-      xav0 = fv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/C;", true);
+      xav0 = fv.visitTypeAnnotation("Lannotations/tests/classfile/foo/C;", true);
       xav0.visit("fieldA", new Integer(-2));
       xav0.visit("fieldB", "nl");
       xav0.visitXTargetType(new Integer(11));
@@ -512,7 +510,7 @@ public class ExtendedValuesDump implements Opcodes {
       xav0.visitEnd();
       }
       {
-      xav0 = fv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+      xav0 = fv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
       xav0.visit("value", "nil");
       xav0.visitXTargetType(new Integer(11));
       xav0.visitXLocationLength(new Integer(2));
@@ -521,7 +519,7 @@ public class ExtendedValuesDump implements Opcodes {
       xav0.visitEnd();
       }
       {
-      xav0 = fv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/D;", true);
+      xav0 = fv.visitTypeAnnotation("Lannotations/tests/classfile/foo/D;", true);
       xav0.visit("fieldA", new Integer(-1));
       xav0.visit("fieldB", "hello");
       xav0.visit("fieldC", new int[] {3,2,4});
@@ -543,14 +541,14 @@ public class ExtendedValuesDump implements Opcodes {
       av0.visitEnd();
       }
       {
-      xav0 = fv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/A;", true);
+      xav0 = fv.visitTypeAnnotation("Lannotations/tests/classfile/foo/A;", true);
       xav0.visitXTargetType(new Integer(11));
       xav0.visitXLocationLength(new Integer(1));
       xav0.visitXLocation(new Integer(1));
       xav0.visitEnd();
       }
       {
-      xav0 = fv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+      xav0 = fv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
       xav0.visit("value", "inner most T");
       xav0.visitXTargetType(new Integer(11));
       xav0.visitXLocationLength(new Integer(2));
@@ -559,7 +557,7 @@ public class ExtendedValuesDump implements Opcodes {
       xav0.visitEnd();
       }
       {
-      xav0 = fv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/C;", true);
+      xav0 = fv.visitTypeAnnotation("Lannotations/tests/classfile/foo/C;", true);
       xav0.visit("fieldA", new Integer(256));
       xav0.visit("fieldB", "hello");
       xav0.visitXTargetType(new Integer(11));
@@ -569,7 +567,7 @@ public class ExtendedValuesDump implements Opcodes {
       xav0.visitEnd();
       }
       {
-      xav0 = fv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+      xav0 = fv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
       xav0.visit("value", "inner most F");
       xav0.visitXTargetType(new Integer(11));
       xav0.visitXLocationLength(new Integer(1));
@@ -629,7 +627,7 @@ public class ExtendedValuesDump implements Opcodes {
       FieldVisitor fv;
       MethodVisitor mv;
       AnnotationVisitor av0;
-      ExtendedAnnotationVisitor xav0;
+      TypeAnnotationVisitor xav0;
 
       cw.visit(V1_5, ACC_PUBLIC + ACC_SUPER, "annotations/tests/classfile/cases/TestLocalVariable", "<T:Ljava/lang/Object;>Ljava/lang/Object;", "java/lang/Object", null);
 
@@ -650,7 +648,7 @@ public class ExtendedValuesDump implements Opcodes {
       {
       mv = cw.visitMethod(ACC_PUBLIC, "<init>", "()V", null, null);
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/C;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/C;", true);
       xav0.visit("fieldA", new Integer(166));
       xav0.visit("fieldB", "good");
       xav0.visitXTargetType(new Integer(4));
@@ -688,7 +686,7 @@ public class ExtendedValuesDump implements Opcodes {
       {
       mv = cw.visitMethod(ACC_PUBLIC, "<init>", "(I)V", null, null);
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/A;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/A;", true);
       xav0.visitXTargetType(new Integer(4));
       xav0.visitXOffset(new Integer(0));
       xav0.visitEnd();
@@ -784,7 +782,7 @@ public class ExtendedValuesDump implements Opcodes {
       av0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
       xav0.visit("value", "hello");
       xav0.visitXTargetType(new Integer(4));
       xav0.visitXOffset(new Integer(2));
@@ -926,7 +924,7 @@ public class ExtendedValuesDump implements Opcodes {
       FieldVisitor fv;
       MethodVisitor mv;
       AnnotationVisitor av0;
-      ExtendedAnnotationVisitor xav0;
+      TypeAnnotationVisitor xav0;
 
       cw.visit(V1_5, ACC_PUBLIC + ACC_SUPER, "annotations/tests/classfile/cases/TestLocalVariableGenericArray", null, "java/lang/Object", null);
 
@@ -947,7 +945,7 @@ public class ExtendedValuesDump implements Opcodes {
       {
       mv = cw.visitMethod(ACC_PUBLIC, "<init>", "()V", null, null);
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
       xav0.visit("value", "good");
       xav0.visitXTargetType(new Integer(8));
       xav0.visitXStartPc(new Integer(37));
@@ -956,7 +954,7 @@ public class ExtendedValuesDump implements Opcodes {
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
       xav0.visit("value", "first param");
       xav0.visitXTargetType(new Integer(9));
       xav0.visitXStartPc(new Integer(37));
@@ -967,7 +965,7 @@ public class ExtendedValuesDump implements Opcodes {
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
       xav0.visit("value", "second param");
       xav0.visitXTargetType(new Integer(9));
       xav0.visitXStartPc(new Integer(37));
@@ -1059,7 +1057,7 @@ public class ExtendedValuesDump implements Opcodes {
       {
       mv = cw.visitMethod(ACC_PUBLIC, "someMethod", "()V", null, null);
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
       xav0.visit("value", "bad");
       xav0.visitXTargetType(new Integer(8));
       xav0.visitXStartPc(new Integer(8));
@@ -1068,7 +1066,7 @@ public class ExtendedValuesDump implements Opcodes {
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/C;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/C;", true);
       xav0.visit("fieldA", new Integer(0));
       xav0.visit("fieldB", "String");
       xav0.visitXTargetType(new Integer(9));
@@ -1118,7 +1116,7 @@ public class ExtendedValuesDump implements Opcodes {
       {
       mv = cw.visitMethod(ACC_PRIVATE, "someMethod2", "(I)I", null, null);
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/C;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/C;", true);
       xav0.visit("fieldA", new Integer(0));
       xav0.visit("fieldB", "Boolean");
       xav0.visitXTargetType(new Integer(8));
@@ -1128,7 +1126,7 @@ public class ExtendedValuesDump implements Opcodes {
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/A;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/A;", true);
       xav0.visitXTargetType(new Integer(9));
       xav0.visitXStartPc(new Integer(8));
       xav0.visitXLength(new Integer(66));
@@ -1138,7 +1136,7 @@ public class ExtendedValuesDump implements Opcodes {
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/A;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/A;", true);
       xav0.visitXTargetType(new Integer(8));
       xav0.visitXStartPc(new Integer(16));
       xav0.visitXLength(new Integer(58));
@@ -1146,7 +1144,7 @@ public class ExtendedValuesDump implements Opcodes {
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
       xav0.visit("value", "inner-type");
       xav0.visitXTargetType(new Integer(9));
       xav0.visitXStartPc(new Integer(16));
@@ -1223,7 +1221,7 @@ public class ExtendedValuesDump implements Opcodes {
       {
       mv = cw.visitMethod(ACC_PRIVATE, "someMethod3", "()Z", null, null);
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
       xav0.visit("value", "t");
       xav0.visitXTargetType(new Integer(8));
       xav0.visitXStartPc(new Integer(8));
@@ -1232,7 +1230,7 @@ public class ExtendedValuesDump implements Opcodes {
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
       xav0.visit("value", "map key string");
       xav0.visitXTargetType(new Integer(9));
       xav0.visitXStartPc(new Integer(8));
@@ -1243,7 +1241,7 @@ public class ExtendedValuesDump implements Opcodes {
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
       xav0.visit("value", "map value set");
       xav0.visitXTargetType(new Integer(9));
       xav0.visitXStartPc(new Integer(8));
@@ -1254,7 +1252,7 @@ public class ExtendedValuesDump implements Opcodes {
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/A;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/A;", true);
       xav0.visitXTargetType(new Integer(9));
       xav0.visitXStartPc(new Integer(8));
       xav0.visitXLength(new Integer(70));
@@ -1265,7 +1263,7 @@ public class ExtendedValuesDump implements Opcodes {
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/A;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/A;", true);
       xav0.visitXTargetType(new Integer(9));
       xav0.visitXStartPc(new Integer(10));
       xav0.visitXLength(new Integer(68));
@@ -1275,7 +1273,7 @@ public class ExtendedValuesDump implements Opcodes {
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/C;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/C;", true);
       xav0.visit("fieldA", new Integer(1));
       xav0.visit("fieldB", "set of maps");
       xav0.visitXTargetType(new Integer(9));
@@ -1287,7 +1285,7 @@ public class ExtendedValuesDump implements Opcodes {
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
       xav0.visit("value", "maps");
       xav0.visitXTargetType(new Integer(9));
       xav0.visitXStartPc(new Integer(10));
@@ -1299,7 +1297,7 @@ public class ExtendedValuesDump implements Opcodes {
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
       xav0.visit("value", "map key is integer");
       xav0.visitXTargetType(new Integer(9));
       xav0.visitXStartPc(new Integer(10));
@@ -1312,7 +1310,7 @@ public class ExtendedValuesDump implements Opcodes {
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
       xav0.visit("value", "map value is 2-d array");
       xav0.visitXTargetType(new Integer(9));
       xav0.visitXStartPc(new Integer(10));
@@ -1325,7 +1323,7 @@ public class ExtendedValuesDump implements Opcodes {
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
       xav0.visit("value", "first dimension");
       xav0.visitXTargetType(new Integer(9));
       xav0.visitXStartPc(new Integer(10));
@@ -1339,7 +1337,7 @@ public class ExtendedValuesDump implements Opcodes {
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
       xav0.visit("value", "second dimension");
       xav0.visitXTargetType(new Integer(9));
       xav0.visitXStartPc(new Integer(10));
@@ -1412,7 +1410,7 @@ public class ExtendedValuesDump implements Opcodes {
       {
       mv = cw.visitMethod(ACC_PROTECTED, "someMethod4", "()V", null, null);
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/A;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/A;", true);
       xav0.visitXTargetType(new Integer(9));
       xav0.visitXStartPc(new Integer(8));
       xav0.visitXLength(new Integer(10));
@@ -1471,7 +1469,7 @@ public class ExtendedValuesDump implements Opcodes {
       FieldVisitor fv;
       MethodVisitor mv;
       AnnotationVisitor av0;
-      ExtendedAnnotationVisitor xav0;
+      TypeAnnotationVisitor xav0;
 
       cw.visit(V1_5, ACC_PUBLIC + ACC_SUPER, "annotations/tests/classfile/cases/TestMethodReceiver", null, "java/lang/Object", null);
 
@@ -1495,12 +1493,12 @@ public class ExtendedValuesDump implements Opcodes {
       {
       mv = cw.visitMethod(ACC_PUBLIC, "test", "()V", null, null);
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/A;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/A;", true);
       xav0.visitXTargetType(new Integer(6));
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
       xav0.visit("value", "first method");
       xav0.visitXTargetType(new Integer(6));
       xav0.visitEnd();
@@ -1525,7 +1523,7 @@ public class ExtendedValuesDump implements Opcodes {
       {
       mv = cw.visitMethod(ACC_PRIVATE, "test2", "()V", null, null);
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/C;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/C;", true);
       xav0.visit("fieldA", new Integer(2));
       xav0.visit("fieldB", "rec");
       xav0.visitXTargetType(new Integer(6));
@@ -1551,7 +1549,7 @@ public class ExtendedValuesDump implements Opcodes {
       {
       mv = cw.visitMethod(ACC_PROTECTED, "test3", "()V", null, null);
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/A;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/A;", true);
       xav0.visitXTargetType(new Integer(6));
       xav0.visitEnd();
       }
@@ -1575,7 +1573,7 @@ public class ExtendedValuesDump implements Opcodes {
       {
       mv = cw.visitMethod(0, "test4", "()V", null, null);
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
       xav0.visit("value", "last method");
       xav0.visitXTargetType(new Integer(6));
       xav0.visitEnd();
@@ -1608,7 +1606,7 @@ public class ExtendedValuesDump implements Opcodes {
     FieldVisitor fv;
     MethodVisitor mv;
     AnnotationVisitor av0;
-    ExtendedAnnotationVisitor xav0;
+    TypeAnnotationVisitor xav0;
 
     cw.visit(V1_5, ACC_PUBLIC + ACC_SUPER, "annotations/tests/classfile/cases/TestMethodReturnTypeGenericArray", null, "java/lang/Object", null);
 
@@ -1655,7 +1653,7 @@ public class ExtendedValuesDump implements Opcodes {
     av0.visitEnd();
     }
     {
-    xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/A;", true);
+    xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/A;", true);
     xav0.visitXTargetType(new Integer(11));
     xav0.visitXLocationLength(new Integer(1));
     xav0.visitXLocation(new Integer(0));
@@ -1680,7 +1678,7 @@ public class ExtendedValuesDump implements Opcodes {
     av0.visitEnd();
     }
     {
-    xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+    xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
     xav0.visit("value", "on array element");
     xav0.visitXTargetType(new Integer(11));
     xav0.visitXLocationLength(new Integer(1));
@@ -1706,7 +1704,7 @@ public class ExtendedValuesDump implements Opcodes {
     av0.visitEnd();
     }
     {
-    xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+    xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
     xav0.visit("value", "on");
     xav0.visitXTargetType(new Integer(11));
     xav0.visitXLocationLength(new Integer(1));
@@ -1714,7 +1712,7 @@ public class ExtendedValuesDump implements Opcodes {
     xav0.visitEnd();
     }
     {
-    xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+    xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
     xav0.visit("value", "in");
     xav0.visitXTargetType(new Integer(11));
     xav0.visitXLocationLength(new Integer(1));
@@ -1736,14 +1734,14 @@ public class ExtendedValuesDump implements Opcodes {
     {
     mv = cw.visitMethod(ACC_PUBLIC, "test5", "()Ljava/util/Set;", "()Ljava/util/Set<[Ljava/lang/String;>;", null);
     {
-    xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/A;", true);
+    xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/A;", true);
     xav0.visitXTargetType(new Integer(11));
     xav0.visitXLocationLength(new Integer(1));
     xav0.visitXLocation(new Integer(0));
     xav0.visitEnd();
     }
     {
-    xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+    xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
     xav0.visit("value", "two-deep");
     xav0.visitXTargetType(new Integer(11));
     xav0.visitXLocationLength(new Integer(2));
@@ -1766,7 +1764,7 @@ public class ExtendedValuesDump implements Opcodes {
     {
     mv = cw.visitMethod(ACC_PUBLIC, "test6", "()Ljava/util/Map;", "()Ljava/util/Map<Ljava/util/Map<[Ljava/lang/String;Ljava/util/Set<Ljava/lang/String;>;>;Ljava/util/Set<[Ljava/lang/String;>;>;", null);
     {
-    xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+    xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
     xav0.visit("value", "map as key");
     xav0.visitXTargetType(new Integer(11));
     xav0.visitXLocationLength(new Integer(1));
@@ -1774,7 +1772,7 @@ public class ExtendedValuesDump implements Opcodes {
     xav0.visitEnd();
     }
     {
-    xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+    xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
     xav0.visit("value", "array of value");
     xav0.visitXTargetType(new Integer(11));
     xav0.visitXLocationLength(new Integer(2));
@@ -1783,7 +1781,7 @@ public class ExtendedValuesDump implements Opcodes {
     xav0.visitEnd();
     }
     {
-    xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+    xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
     xav0.visit("value", "inner-most value");
     xav0.visitXTargetType(new Integer(11));
     xav0.visitXLocationLength(new Integer(3));
@@ -1793,7 +1791,7 @@ public class ExtendedValuesDump implements Opcodes {
     xav0.visitEnd();
     }
     {
-    xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+    xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
     xav0.visit("value", "set as value");
     xav0.visitXTargetType(new Integer(11));
     xav0.visitXLocationLength(new Integer(1));
@@ -1801,7 +1799,7 @@ public class ExtendedValuesDump implements Opcodes {
     xav0.visitEnd();
     }
     {
-    xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+    xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
     xav0.visit("value", "innermost key or key");
     xav0.visitXTargetType(new Integer(11));
     xav0.visitXLocationLength(new Integer(3));
@@ -1811,7 +1809,7 @@ public class ExtendedValuesDump implements Opcodes {
     xav0.visitEnd();
     }
     {
-    xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/A;", true);
+    xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/A;", true);
     xav0.visitXTargetType(new Integer(11));
     xav0.visitXLocationLength(new Integer(2));
     xav0.visitXLocation(new Integer(0));
@@ -1819,7 +1817,7 @@ public class ExtendedValuesDump implements Opcodes {
     xav0.visitEnd();
     }
     {
-    xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/C;", true);
+    xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/C;", true);
     xav0.visit("fieldA", new Integer(1));
     xav0.visit("fieldB", "value of key");
     xav0.visitXTargetType(new Integer(11));
@@ -1829,7 +1827,7 @@ public class ExtendedValuesDump implements Opcodes {
     xav0.visitEnd();
     }
     {
-    xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/A;", true);
+    xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/A;", true);
     xav0.visitXTargetType(new Integer(11));
     xav0.visitXLocationLength(new Integer(3));
     xav0.visitXLocation(new Integer(0));
@@ -1860,7 +1858,7 @@ public class ExtendedValuesDump implements Opcodes {
       FieldVisitor fv;
       MethodVisitor mv;
       AnnotationVisitor av0;
-      ExtendedAnnotationVisitor xav0;
+      TypeAnnotationVisitor xav0;
 
       cw.visit(V1_5, ACC_PUBLIC + ACC_SUPER, "annotations/tests/classfile/cases/TestObjectCreation", null, "java/lang/Object", null);
 
@@ -1888,21 +1886,21 @@ public class ExtendedValuesDump implements Opcodes {
       {
       mv = cw.visitMethod(ACC_PUBLIC, "test", "()V", null, null);
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
       xav0.visit("value", "first new");
       xav0.visitXTargetType(new Integer(4));
       xav0.visitXOffset(new Integer(1));
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
       xav0.visit("value", "a string");
       xav0.visitXTargetType(new Integer(4));
       xav0.visitXOffset(new Integer(12));
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/A;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/A;", true);
       xav0.visitXTargetType(new Integer(4));
       xav0.visitXOffset(new Integer(23));
       xav0.visitEnd();
@@ -1946,13 +1944,13 @@ public class ExtendedValuesDump implements Opcodes {
       {
       mv = cw.visitMethod(ACC_PUBLIC, "test2", "()V", null, null);
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/A;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/A;", true);
       xav0.visitXTargetType(new Integer(4));
       xav0.visitXOffset(new Integer(7));
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/A;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/A;", true);
       xav0.visitXTargetType(new Integer(4));
       xav0.visitXOffset(new Integer(14));
       xav0.visitEnd();
@@ -1985,14 +1983,14 @@ public class ExtendedValuesDump implements Opcodes {
       {
       mv = cw.visitMethod(ACC_PUBLIC, "test3", "()V", null, null);
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
       xav0.visit("value", "new");
       xav0.visitXTargetType(new Integer(4));
       xav0.visitXOffset(new Integer(1));
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/A;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/A;", true);
       xav0.visitXTargetType(new Integer(4));
       xav0.visitXOffset(new Integer(12));
       xav0.visitEnd();
@@ -2027,13 +2025,13 @@ public class ExtendedValuesDump implements Opcodes {
       {
       mv = cw.visitMethod(ACC_PUBLIC, "test4", "()V", null, null);
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/A;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/A;", true);
       xav0.visitXTargetType(new Integer(4));
       xav0.visitXOffset(new Integer(1));
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
       xav0.visit("value", "self test");
       xav0.visitXTargetType(new Integer(4));
       xav0.visitXOffset(new Integer(13));
@@ -2078,7 +2076,7 @@ public class ExtendedValuesDump implements Opcodes {
       FieldVisitor fv;
       MethodVisitor mv;
       AnnotationVisitor av0;
-      ExtendedAnnotationVisitor xav0;
+      TypeAnnotationVisitor xav0;
 
       cw.visit(V1_5, ACC_PUBLIC + ACC_SUPER, "annotations/tests/classfile/cases/TestObjectCreationGenericArray", null, "java/lang/Object", null);
 
@@ -2106,14 +2104,14 @@ public class ExtendedValuesDump implements Opcodes {
       {
       mv = cw.visitMethod(ACC_PUBLIC, "test", "()V", null, null);
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
       xav0.visit("value", "first new");
       xav0.visitXTargetType(new Integer(4));
       xav0.visitXOffset(new Integer(3));
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/A;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/A;", true);
       xav0.visitXTargetType(new Integer(5));
       xav0.visitXOffset(new Integer(3));
       xav0.visitXLocationLength(new Integer(1));
@@ -2141,13 +2139,13 @@ public class ExtendedValuesDump implements Opcodes {
       {
       mv = cw.visitMethod(ACC_PUBLIC, "test2", "()V", null, null);
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/A;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/A;", true);
       xav0.visitXTargetType(new Integer(4));
       xav0.visitXOffset(new Integer(23));
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
       xav0.visit("value", "str");
       xav0.visitXTargetType(new Integer(5));
       xav0.visitXOffset(new Integer(23));
@@ -2183,14 +2181,14 @@ public class ExtendedValuesDump implements Opcodes {
       {
       mv = cw.visitMethod(ACC_PUBLIC, "test3", "()V", null, null);
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
       xav0.visit("value", "new");
       xav0.visitXTargetType(new Integer(4));
       xav0.visitXOffset(new Integer(1));
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
       xav0.visit("value", "map");
       xav0.visitXTargetType(new Integer(5));
       xav0.visitXOffset(new Integer(1));
@@ -2199,7 +2197,7 @@ public class ExtendedValuesDump implements Opcodes {
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/A;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/A;", true);
       xav0.visitXTargetType(new Integer(5));
       xav0.visitXOffset(new Integer(1));
       xav0.visitXLocationLength(new Integer(2));
@@ -2208,7 +2206,7 @@ public class ExtendedValuesDump implements Opcodes {
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
       xav0.visit("value", "map key string");
       xav0.visitXTargetType(new Integer(5));
       xav0.visitXOffset(new Integer(1));
@@ -2218,13 +2216,13 @@ public class ExtendedValuesDump implements Opcodes {
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/A;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/A;", true);
       xav0.visitXTargetType(new Integer(4));
       xav0.visitXOffset(new Integer(12));
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
       xav0.visit("value", "first level");
       xav0.visitXTargetType(new Integer(5));
       xav0.visitXOffset(new Integer(12));
@@ -2233,7 +2231,7 @@ public class ExtendedValuesDump implements Opcodes {
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
       xav0.visit("value", "value");
       xav0.visitXTargetType(new Integer(5));
       xav0.visitXOffset(new Integer(12));
@@ -2242,7 +2240,7 @@ public class ExtendedValuesDump implements Opcodes {
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
       xav0.visit("value", "on the array");
       xav0.visitXTargetType(new Integer(5));
       xav0.visitXOffset(new Integer(12));
@@ -2252,7 +2250,7 @@ public class ExtendedValuesDump implements Opcodes {
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
       xav0.visit("value", "on array elements");
       xav0.visitXTargetType(new Integer(5));
       xav0.visitXOffset(new Integer(12));
@@ -2292,13 +2290,13 @@ public class ExtendedValuesDump implements Opcodes {
       {
       mv = cw.visitMethod(ACC_PUBLIC, "test4", "()V", null, null);
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/A;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/A;", true);
       xav0.visitXTargetType(new Integer(4));
       xav0.visitXOffset(new Integer(1));
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
       xav0.visit("value", "key");
       xav0.visitXTargetType(new Integer(5));
       xav0.visitXOffset(new Integer(1));
@@ -2307,7 +2305,7 @@ public class ExtendedValuesDump implements Opcodes {
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
       xav0.visit("value", "value");
       xav0.visitXTargetType(new Integer(5));
       xav0.visitXOffset(new Integer(1));
@@ -2316,7 +2314,7 @@ public class ExtendedValuesDump implements Opcodes {
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
       xav0.visit("value", "key element");
       xav0.visitXTargetType(new Integer(5));
       xav0.visitXOffset(new Integer(1));
@@ -2326,7 +2324,7 @@ public class ExtendedValuesDump implements Opcodes {
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
       xav0.visit("value", "value array");
       xav0.visitXTargetType(new Integer(5));
       xav0.visitXOffset(new Integer(1));
@@ -2336,7 +2334,7 @@ public class ExtendedValuesDump implements Opcodes {
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
       xav0.visit("value", "value array element");
       xav0.visitXTargetType(new Integer(5));
       xav0.visitXOffset(new Integer(1));
@@ -2376,7 +2374,7 @@ public class ExtendedValuesDump implements Opcodes {
       FieldVisitor fv;
       MethodVisitor mv;
       AnnotationVisitor av0;
-      ExtendedAnnotationVisitor xav0;
+      TypeAnnotationVisitor xav0;
 
       cw.visit(V1_5, ACC_PUBLIC + ACC_SUPER, "annotations/tests/classfile/cases/TestTypecast", null, "java/lang/Object", null);
 
@@ -2428,20 +2426,20 @@ public class ExtendedValuesDump implements Opcodes {
       {
       mv = cw.visitMethod(ACC_PUBLIC, "test", "()V", null, null);
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/A;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/A;", true);
       xav0.visitXTargetType(new Integer(0));
       xav0.visitXOffset(new Integer(21));
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
       xav0.visit("value", "second cast");
       xav0.visitXTargetType(new Integer(0));
       xav0.visitXOffset(new Integer(32));
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/C;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/C;", true);
       xav0.visit("fieldA", new Integer(3));
       xav0.visit("fieldB", "cast");
       xav0.visitXTargetType(new Integer(0));
@@ -2449,7 +2447,7 @@ public class ExtendedValuesDump implements Opcodes {
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/C;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/C;", true);
       xav0.visit("fieldA", new Integer(4));
       xav0.visit("fieldB", "cast");
       xav0.visitXTargetType(new Integer(0));
@@ -2557,7 +2555,7 @@ public class ExtendedValuesDump implements Opcodes {
       FieldVisitor fv;
       MethodVisitor mv;
       AnnotationVisitor av0;
-      ExtendedAnnotationVisitor xav0;
+      TypeAnnotationVisitor xav0;
 
       cw.visit(V1_5, ACC_PUBLIC + ACC_SUPER, "annotations/tests/classfile/cases/TestTypecastGenericArray", null, "java/lang/Object", null);
 
@@ -2609,13 +2607,13 @@ public class ExtendedValuesDump implements Opcodes {
       {
       mv = cw.visitMethod(ACC_PUBLIC, "test", "()V", null, null);
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/A;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/A;", true);
       xav0.visitXTargetType(new Integer(0));
       xav0.visitXOffset(new Integer(21));
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
       xav0.visit("value", "second");
       xav0.visitXTargetType(new Integer(0));
       xav0.visitXOffset(new Integer(32));
@@ -2672,7 +2670,7 @@ public class ExtendedValuesDump implements Opcodes {
       {
       mv = cw.visitMethod(ACC_PUBLIC, "test2", "()V", null, null);
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/A;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/A;", true);
       xav0.visitXTargetType(new Integer(1));
       xav0.visitXOffset(new Integer(5));
       xav0.visitXLocationLength(new Integer(1));
@@ -2680,14 +2678,14 @@ public class ExtendedValuesDump implements Opcodes {
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
       xav0.visit("value", "B");
       xav0.visitXTargetType(new Integer(0));
       xav0.visitXOffset(new Integer(16));
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/C;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/C;", true);
       xav0.visit("fieldA", new Integer(2));
       xav0.visit("fieldB", "");
       xav0.visitXTargetType(new Integer(1));
@@ -2726,7 +2724,7 @@ public class ExtendedValuesDump implements Opcodes {
       {
       mv = cw.visitMethod(ACC_PUBLIC, "test3", "()V", null, null);
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/A;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/A;", true);
       xav0.visitXTargetType(new Integer(1));
       xav0.visitXOffset(new Integer(20));
       xav0.visitXLocationLength(new Integer(1));
@@ -2734,7 +2732,7 @@ public class ExtendedValuesDump implements Opcodes {
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
       xav0.visit("value", "v");
       xav0.visitXTargetType(new Integer(1));
       xav0.visitXOffset(new Integer(23));
@@ -2776,7 +2774,7 @@ public class ExtendedValuesDump implements Opcodes {
       {
       mv = cw.visitMethod(ACC_PUBLIC, "test4", "()V", null, null);
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/A;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/A;", true);
       xav0.visitXTargetType(new Integer(1));
       xav0.visitXOffset(new Integer(5));
       xav0.visitXLocationLength(new Integer(1));
@@ -2784,7 +2782,7 @@ public class ExtendedValuesDump implements Opcodes {
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
       xav0.visit("value", "second");
       xav0.visitXTargetType(new Integer(1));
       xav0.visitXOffset(new Integer(5));
@@ -2793,13 +2791,13 @@ public class ExtendedValuesDump implements Opcodes {
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/A;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/A;", true);
       xav0.visitXTargetType(new Integer(0));
       xav0.visitXOffset(new Integer(15));
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/A;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/A;", true);
       xav0.visitXTargetType(new Integer(1));
       xav0.visitXOffset(new Integer(15));
       xav0.visitXLocationLength(new Integer(1));
@@ -2807,14 +2805,14 @@ public class ExtendedValuesDump implements Opcodes {
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
       xav0.visit("value", "set");
       xav0.visitXTargetType(new Integer(0));
       xav0.visitXOffset(new Integer(30));
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/A;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/A;", true);
       xav0.visitXTargetType(new Integer(1));
       xav0.visitXOffset(new Integer(43));
       xav0.visitXLocationLength(new Integer(1));
@@ -2822,14 +2820,14 @@ public class ExtendedValuesDump implements Opcodes {
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
       xav0.visit("value", "on the set");
       xav0.visitXTargetType(new Integer(0));
       xav0.visitXOffset(new Integer(53));
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
       xav0.visit("value", "on value");
       xav0.visitXTargetType(new Integer(1));
       xav0.visitXOffset(new Integer(53));
@@ -2883,7 +2881,7 @@ public class ExtendedValuesDump implements Opcodes {
       {
       mv = cw.visitMethod(ACC_PUBLIC, "test5", "()V", null, null);
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
       xav0.visit("value", "string is key");
       xav0.visitXTargetType(new Integer(1));
       xav0.visitXOffset(new Integer(4));
@@ -2892,7 +2890,7 @@ public class ExtendedValuesDump implements Opcodes {
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
       xav0.visit("value", "2d-array is value");
       xav0.visitXTargetType(new Integer(1));
       xav0.visitXOffset(new Integer(4));
@@ -2901,7 +2899,7 @@ public class ExtendedValuesDump implements Opcodes {
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
       xav0.visit("value", "first dimension");
       xav0.visitXTargetType(new Integer(1));
       xav0.visitXOffset(new Integer(4));
@@ -2911,7 +2909,7 @@ public class ExtendedValuesDump implements Opcodes {
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
       xav0.visit("value", "second dimension");
       xav0.visitXTargetType(new Integer(1));
       xav0.visitXOffset(new Integer(4));
@@ -2956,7 +2954,7 @@ public class ExtendedValuesDump implements Opcodes {
       FieldVisitor fv;
       MethodVisitor mv;
       AnnotationVisitor av0;
-      ExtendedAnnotationVisitor xav0;
+      TypeAnnotationVisitor xav0;
 
       cw.visit(V1_5, ACC_PUBLIC + ACC_SUPER, "annotations/tests/classfile/cases/TestTypeTest", null, "java/lang/Object", null);
 
@@ -3008,20 +3006,20 @@ public class ExtendedValuesDump implements Opcodes {
       {
       mv = cw.visitMethod(ACC_PUBLIC, "test", "()V", null, null);
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
       xav0.visit("value", "ismap");
       xav0.visitXTargetType(new Integer(2));
       xav0.visitXOffset(new Integer(4));
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/A;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/A;", true);
       xav0.visitXTargetType(new Integer(2));
       xav0.visitXOffset(new Integer(14));
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
       xav0.visit("value", "islist");
       xav0.visitXTargetType(new Integer(2));
       xav0.visitXOffset(new Integer(24));
@@ -3070,13 +3068,13 @@ public class ExtendedValuesDump implements Opcodes {
       {
       mv = cw.visitMethod(ACC_PUBLIC, "test2", "()V", null, null);
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/A;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/A;", true);
       xav0.visitXTargetType(new Integer(2));
       xav0.visitXOffset(new Integer(4));
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/A;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/A;", true);
       xav0.visitXTargetType(new Integer(2));
       xav0.visitXOffset(new Integer(14));
       xav0.visitEnd();
@@ -3117,7 +3115,7 @@ public class ExtendedValuesDump implements Opcodes {
       {
       mv = cw.visitMethod(ACC_PUBLIC, "test3", "()V", null, null);
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
       xav0.visit("value", "instanceof object");
       xav0.visitXTargetType(new Integer(2));
       xav0.visitXOffset(new Integer(4));
@@ -3152,33 +3150,33 @@ public class ExtendedValuesDump implements Opcodes {
       {
       mv = cw.visitMethod(ACC_PUBLIC, "test4", "()V", null, null);
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/A;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/A;", true);
       xav0.visitXTargetType(new Integer(2));
       xav0.visitXOffset(new Integer(12));
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
       xav0.visit("value", "second");
       xav0.visitXTargetType(new Integer(2));
       xav0.visitXOffset(new Integer(28));
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/A;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/A;", true);
       xav0.visitXTargetType(new Integer(2));
       xav0.visitXOffset(new Integer(44));
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/B;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/B;", true);
       xav0.visit("value", "fourth");
       xav0.visitXTargetType(new Integer(2));
       xav0.visitXOffset(new Integer(60));
       xav0.visitEnd();
       }
       {
-      xav0 = mv.visitExtendedAnnotation("Lannotations/tests/classfile/foo/A;", true);
+      xav0 = mv.visitTypeAnnotation("Lannotations/tests/classfile/foo/A;", true);
       xav0.visitXTargetType(new Integer(2));
       xav0.visitXOffset(new Integer(76));
       xav0.visitEnd();

@@ -35,7 +35,7 @@ import java.io.PrintWriter;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.ExtendedAnnotationVisitor;
+import org.objectweb.asm.TypeAnnotationVisitor;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
@@ -232,7 +232,7 @@ public class ASMifierClassVisitor extends ASMifierAbstractVisitor implements
         text.add("FieldVisitor fv;\n");
         text.add("MethodVisitor mv;\n");
         text.add("AnnotationVisitor av0;\n");
-        text.add("ExtendedAnnotationVisitor xav0;\n\n");
+        text.add("TypeAnnotationVisitor xav0;\n\n");
 
         buf.setLength(0);
         buf.append("cw.visit(");
@@ -408,20 +408,20 @@ public class ASMifierClassVisitor extends ASMifierAbstractVisitor implements
         return av;
     }
     
-    public ExtendedAnnotationVisitor visitExtendedAnnotation(
+    public TypeAnnotationVisitor visitTypeAnnotation(
         final String desc,
         final boolean visible) 
     {
       buf.setLength(0);
       buf.append("{\n");
-      buf.append("xav0 = cw.visitExtendedAnnotation(");
+      buf.append("xav0 = cw.visitTypeAnnotation(");
       appendConstant(desc);
       buf.append(", ");
       buf.append(visible);
       buf.append(");\n");
       text.add(buf.toString());
-      ASMifierExtendedAnnotationVisitor xav = 
-        new ASMifierExtendedAnnotationVisitor(0);
+      ASMifierTypeAnnotationVisitor xav = 
+        new ASMifierTypeAnnotationVisitor(0);
       text.add(xav.getText());
       text.add("}\n");
       return xav;

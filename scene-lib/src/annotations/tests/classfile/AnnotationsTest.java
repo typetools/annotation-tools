@@ -24,7 +24,7 @@ import annotations.io.classfile.ClassFileWriter;
 import annotations.tests.classfile.foo.A;
 
 /**
- * This class is the testing framework for the class file/ index file
+ * This class is the testing framework for the class file/index file
  * annotations converter.  To add a new test,
  * <ul>
  *  <li>add the class name to array {@link #allTests}
@@ -408,7 +408,7 @@ public class AnnotationsTest extends TestCase {
   /**
    * Runs a test on class files for TestLocalVariable.
    */
-  public void IGNOREtestcLocalVariable() {
+  public void testcLocalVariable() {
     testAgainstClass(nameIndex("TestLocalVariable.jann"),
         nameClass("TestLocalVariable"));
   }
@@ -536,7 +536,7 @@ public class AnnotationsTest extends TestCase {
   /**
    * Runs a test on class files for TestMethodReturnTypeGenericArray.
    */
-  public void IGNOREtestcMethodReturnTypeGenericArray() {
+  public void testcMethodReturnTypeGenericArray() {
     testAgainstClass(nameIndex("TestMethodReturnTypeGenericArray.jann"),
         nameClass("TestMethodReturnTypeGenericArray"));
   }
@@ -544,7 +544,7 @@ public class AnnotationsTest extends TestCase {
   /**
    * Runs a test on index files for TestMethodReturnTypeGenericArray.
    */
-  public void IGNOREtestiMethodReturnTypeGenericArray() {
+  public void testiMethodReturnTypeGenericArray() {
     testAgainstIndexFile(nameIndex("TestMethodReturnTypeGenericArray.jann"),
         nameClass("TestMethodReturnTypeGenericArray.class"));
   }

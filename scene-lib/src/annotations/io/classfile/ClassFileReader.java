@@ -100,7 +100,7 @@ public class ClassFileReader {
             "Did you ensure that this class is on your classpath?");
         return;
       } catch(Exception e) {
-        System.out.println("Uknown error trying to extract annotations from: " +
+        System.out.println("Unknown error trying to extract annotations from: " +
             origName);
         System.out.println(e.getMessage());
         e.printStackTrace();
@@ -174,10 +174,9 @@ public class ClassFileReader {
     read(scene, new ClassReader(in));
   }
 
-  public static void read(AScene scene, ClassReader cr)
-  {
-      ClassAnnotationSceneReader ca = new ClassAnnotationSceneReader(scene);
-      cr.accept(ca, true);
+  public static void read(AScene scene, ClassReader cr) {
+    ClassAnnotationSceneReader ca = new ClassAnnotationSceneReader(scene);
+    cr.accept(ca, true);
   }
 
 }

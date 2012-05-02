@@ -31,7 +31,7 @@ package org.objectweb.asm.util;
 
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Attribute;
-import org.objectweb.asm.ExtendedAnnotationVisitor;
+import org.objectweb.asm.TypeAnnotationVisitor;
 import org.objectweb.asm.FieldVisitor;
 
 /**
@@ -62,12 +62,13 @@ public class TraceFieldVisitor extends TraceAbstractVisitor implements
     }
 
     // jaime
-    public ExtendedAnnotationVisitor visitExtendedAnnotation(
-      final String desc,
-      final boolean visible) {
-        ExtendedAnnotationVisitor xav = super.visitExtendedAnnotation(desc, visible);
+    public TypeAnnotationVisitor visitTypeAnnotation(
+        final String desc,
+        final boolean visible)
+    {
+        TypeAnnotationVisitor xav = super.visitTypeAnnotation(desc, visible);
         if (fv != null) {
-            ((TraceExtendedAnnotationVisitor) xav).xav = fv.visitExtendedAnnotation(desc, visible);
+            ((TraceTypeAnnotationVisitor) xav).xav = fv.visitTypeAnnotation(desc, visible);
         }
         return xav;
     }

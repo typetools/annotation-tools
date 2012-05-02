@@ -130,7 +130,8 @@ public class Main {
     for (String arg : file_args) {
       if (arg.endsWith(".java")) {
         javafiles.add(arg);
-      } else if (arg.endsWith(".jaif")) {
+      } else if (arg.endsWith(".jaif") ||
+                 arg.endsWith(".jann")) {
         try {
           Specification spec = new IndexFileSpecification(arg);
           List<Insertion> parsedSpec = spec.parse();

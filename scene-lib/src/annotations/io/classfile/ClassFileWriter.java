@@ -20,10 +20,10 @@ public class ClassFileWriter {
 
   @Option("-h print usage information and exit")
   public static boolean help = false;
- 
+
   @Option("print version information and exit")
   public static boolean version = false;
- 
+
   private static String linesep = System.getProperty("line.separator");
 
   static String usage
@@ -53,7 +53,7 @@ public class ClassFileWriter {
    *   -h, --help   print usage information and exit
    *   --version    print version information and exit
    *
-   * @param args options and clasess and index files to analyze;
+   * @param args options and classes and index files to analyze;
    * @throws IOException if a class file or index file cannot be opened/written
    */
   public static void main(String[] args) throws IOException {
@@ -119,7 +119,7 @@ public class ClassFileWriter {
        System.out.printf("IOException: %s%n", e.getMessage());
        return;
      } catch(Exception e) {
-       System.out.println("Uknown error trying to insert annotations from: " +
+       System.out.println("Unknown error trying to insert annotations from: " +
            indexFileName + " to " + className);
        System.out.println(e.getMessage());
        e.printStackTrace();
@@ -189,14 +189,14 @@ public class ClassFileWriter {
    */
   public static void insert(AScene scene, InputStream in,
       OutputStream out, boolean overwrite) throws IOException {
-      ClassReader cr = new ClassReader(in);
+    ClassReader cr = new ClassReader(in);
 
-      ClassAnnotationSceneWriter cw =
-        new ClassAnnotationSceneWriter(scene, overwrite);
+    ClassAnnotationSceneWriter cw =
+      new ClassAnnotationSceneWriter(scene, overwrite);
 
-      cr.accept(cw, false);
+    cr.accept(cw, false);
 
-      out.write(cw.toByteArray());
+    out.write(cw.toByteArray());
   }
 
   /**
