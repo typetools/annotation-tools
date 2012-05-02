@@ -288,8 +288,11 @@ public final class IndexFileWriter {
                 printElement(INDENT, "method " + mkey, m);
                 printBounds(INDENT + INDENT, m.bounds);
                 printTypeElementAndInnerTypes(INDENT + INDENT, "return", m.returnType);
-                if (!m.receiver.tlAnnotationsHere.isEmpty())
-                    printElement(INDENT + INDENT, "receiver", m.receiver);
+                if (!m.receiver.tlAnnotationsHere.isEmpty() || !m.receiver.innerTypes.isEmpty()) {
+                    // Only output the receiver if there is something to say. This is a bit
+                    // inconsistent with the return type, but so be it.
+                    printTypeElementAndInnerTypes(INDENT + INDENT, "receiver", m.receiver);
+                }
                 printNumberedAmbigiousElements(INDENT + INDENT, "parameter", m.parameters);
                 for (/*@ReadOnly*/ Map.Entry<LocalLocation, /*@ReadOnly*/ AElement> le
                         : m.locals.entrySet()) {

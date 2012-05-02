@@ -30,7 +30,7 @@
 package org.objectweb.asm.optimizer;
 
 import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.ExtendedAnnotationVisitor;
+import org.objectweb.asm.TypeAnnotationVisitor;
 import org.objectweb.asm.Type;
 
 /**

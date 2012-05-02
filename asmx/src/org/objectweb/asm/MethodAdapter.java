@@ -65,12 +65,12 @@ public class MethodAdapter implements MethodVisitor {
     }
 
     // jaime
-    public ExtendedAnnotationVisitor visitExtendedAnnotation(String desc, 
+    public TypeAnnotationVisitor visitTypeAnnotation(String desc, 
                                                              boolean visible) {
-        return mv.visitExtendedAnnotation(desc, visible);
+        return mv.visitTypeAnnotation(desc, visible);
     }
     //end jaime
-    
+
     public AnnotationVisitor visitParameterAnnotation(
         final int parameter,
         final String desc,

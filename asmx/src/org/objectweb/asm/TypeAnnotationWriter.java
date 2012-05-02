@@ -33,13 +33,15 @@
  */
 package org.objectweb.asm;
 
+import com.sun.tools.javac.code.TargetType;
+
 /**
- * An {@link ExtendedAnnotationVisitor} that generates 
+ * An {@link TypeAnnotationVisitor} that generates 
  * extended annotations in bytecode form.
  * 
  * @author jaimeq
  */
-final class ExtendedAnnotationWriter implements ExtendedAnnotationVisitor {
+final class TypeAnnotationWriter implements TypeAnnotationVisitor {
 
     /**
      * The class writer to which this annotation must be added.
@@ -80,14 +82,13 @@ final class ExtendedAnnotationWriter implements ExtendedAnnotationVisitor {
     /**
      * Next annotation writer. This field is used to store annotation lists.
      */
-    ExtendedAnnotationWriter next;
+    TypeAnnotationWriter next;
 
     /**
      * Previous annotation writer. This field is used to store annotation lists.
      */
-    ExtendedAnnotationWriter prev;
+    TypeAnnotationWriter prev;
 
-    
     // information for extended annotation type
     // typecasts and object creation:
     // {
@@ -125,13 +126,13 @@ final class ExtendedAnnotationWriter implements ExtendedAnnotationVisitor {
     private int xparam_index;
     private int xbound_index;
     private int xtype_index;
-    
+
     // ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
 
     /**
-     * Constructs a new {@link ExtendedAnnotationWriter}.
+     * Constructs a new {@link TypeAnnotationWriter}.
      * 
      * @param cw the class writer to which this annotation must be added.
      * @param named <tt>true<tt> if values are named, <tt>false</tt> otherwise.
@@ -140,7 +141,7 @@ final class ExtendedAnnotationWriter implements ExtendedAnnotationVisitor {
      * @param offset where in <tt>parent</tt> the number of annotation values must 
      *      be stored.
      */
-    ExtendedAnnotationWriter(
+    TypeAnnotationWriter(
         final ClassWriter cw,
         final boolean named,
         final ByteVector bv,
@@ -152,9 +153,9 @@ final class ExtendedAnnotationWriter implements ExtendedAnnotationVisitor {
         this.bv = bv;
         this.parent = parent;
         this.offset = offset;
-        
+
         // extended information
-        this.xtarget_type = 0;
+        this.xtarget_type = TargetType.UNKNOWN.targetTypeValue();
         this.xoffset = 0;
         this.xlocation_length = 0;
         this.xlocations = null;
@@ -291,7 +292,7 @@ final class ExtendedAnnotationWriter implements ExtendedAnnotationVisitor {
      */
     int getSize() {
         int size = 0;
-        ExtendedAnnotationWriter aw = this;
+        TypeAnnotationWriter aw = this;
         while (aw != null) {
             size += aw.bv.length;
             aw = aw.next;
@@ -308,8 +309,8 @@ final class ExtendedAnnotationWriter implements ExtendedAnnotationVisitor {
     void put(final ByteVector out) {
         int n = 0;
         int size = 2;
-        ExtendedAnnotationWriter aw = this;
-        ExtendedAnnotationWriter last = null;
+        TypeAnnotationWriter aw = this;
+        TypeAnnotationWriter last = null;
         while (aw != null) {
             ++n;
             size += aw.bv.length;
@@ -333,15 +334,15 @@ final class ExtendedAnnotationWriter implements ExtendedAnnotationVisitor {
      * @param panns an array of annotation writer lists.
      * @param out where the annotations must be put.
      */
-    static void put(final ExtendedAnnotationWriter[] panns, final ByteVector out) {
+    static void put(final TypeAnnotationWriter[] panns, final ByteVector out) {
         int size = 1 + 2 * panns.length;
         for (int i = 0; i < panns.length; ++i) {
             size += panns[i] == null ? 0 : panns[i].getSize();
         }
         out.putInt(size).putByte(panns.length);
         for (int i = 0; i < panns.length; ++i) {
-            ExtendedAnnotationWriter aw = panns[i];
-            ExtendedAnnotationWriter last = null;
+            TypeAnnotationWriter aw = panns[i];
+            TypeAnnotationWriter last = null;
             int n = 0;
             while (aw != null) {
                 ++n;
@@ -360,75 +361,75 @@ final class ExtendedAnnotationWriter implements ExtendedAnnotationVisitor {
     }
 
     // ------------------------------------------------------------------------
-    // Implementation of the ExtendedAnnotationVisitor interface
+    // Implementation of the TypeAnnotationVisitor interface
     // ------------------------------------------------------------------------
-    
+
     // below are all the methods for implementing extended annotations
     public void visitXTargetType(int target_type) {
-      this.xtarget_type = target_type;
-      bv.putByte(target_type);
+        this.xtarget_type = target_type;
+        bv.putShort(target_type);
     }
 
     // used for typecasts, object creation, field generic/array
     public void visitXOffset(int offset) {
-      this.xoffset = offset; 
-      bv.putShort(offset);
+        this.xoffset = offset; 
+        bv.putShort(offset);
     }
 
     // used for generic type arguments or arrays
     public void visitXLocationLength(int location_length) {
-      this.xlocation_length = location_length;
-      this.xlocations = new int[location_length];
-      this.xlocations_index = 0;
-      bv.putShort(location_length);
+        this.xlocation_length = location_length;
+        this.xlocations = new int[location_length];
+        this.xlocations_index = 0;
+        bv.putShort(location_length);
     }
 
     // used for generic type arguments or arrays
     public void visitXLocation(int location) {
-      this.xlocations[this.xlocations_index] = location;
-      this.xlocations_index++;
-      bv.putByte(location);
+        this.xlocations[this.xlocations_index] = location;
+        this.xlocations_index++;
+        bv.putByte(location);
     }
-    
+
     // used for local variables
     public void visitXNumEntries(int num_entries) {
-      bv.putShort(num_entries);
+        bv.putShort(num_entries);
     }
-    
+
     // used for local variables
     public void visitXStartPc(int start_pc) {
-      this.xstart_pc = start_pc;
-      bv.putShort(start_pc);
+        this.xstart_pc = start_pc;
+        bv.putShort(start_pc);
     }
-    
+
     // used for local variables
     public void visitXLength(int length) {
-      this.xlength = length;
-      bv.putShort(length);
+        this.xlength = length;
+        bv.putShort(length);
     }
-    
+
     // used for local variables
     public void visitXIndex(int index) {
-      this.xindex = index;
-      bv.putShort(index);
+        this.xindex = index;
+        bv.putShort(index);
     }
-    
+
     // used for type parameter bounds
     public void visitXParamIndex(int param_index) {
-      this.xparam_index = param_index;
-      bv.putByte(param_index);
+        this.xparam_index = param_index;
+        bv.putByte(param_index);
     }
-    
+
     // used for type parameter bounds
     public void visitXBoundIndex(int bound_index) {
-      this.xbound_index = bound_index;
-      bv.putByte(bound_index);
+        this.xbound_index = bound_index;
+        bv.putByte(bound_index);
     }
-    
+
     // used for type index for class extends/implements and 
     // throws exception types
     public void visitXTypeIndex(int type_index) {
-      this.xtype_index = type_index;
-      bv.putByte(type_index);
+        this.xtype_index = type_index;
+        bv.putByte(type_index);
     }
 }
