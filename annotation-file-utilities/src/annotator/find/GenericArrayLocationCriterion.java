@@ -20,7 +20,7 @@ public class GenericArrayLocationCriterion implements Criterion {
   private static final boolean debug = false;
 
   // the full location list
-  private List<Integer> location;
+  private final List<Integer> location;
 
   // The last element of the location list -- that is,
   // location.get(location.size() - 1), or null if (location.size() == 0).

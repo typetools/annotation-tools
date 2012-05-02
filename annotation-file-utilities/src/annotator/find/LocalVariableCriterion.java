@@ -16,8 +16,8 @@ import com.sun.tools.javac.util.Pair;
  */
 public class LocalVariableCriterion implements Criterion {
 
-  private String fullMethodName;
-  private LocalLocation loc;
+  private final String fullMethodName;
+  private final LocalLocation loc;
 
   public LocalVariableCriterion(String methodName, LocalLocation loc) {
     this.fullMethodName = methodName.substring(0, methodName.indexOf(")") + 1);
@@ -47,37 +47,36 @@ public class LocalVariableCriterion implements Criterion {
             && (! (parentPath.getParentPath().getLeaf() instanceof MethodTree))) {
           VariableTree vtt = (VariableTree) parent;
           String varName = vtt.getName().toString();
-          
+
           if (loc.varName!=null && loc.varName.equals(varName)) {
-        	  int varIndex = LocalVariableScanner.indexOfVarTree(path, vtt, varName);
-        		  
-        	  if (loc.varIndex==varIndex) {
-        		  // the location specifies a variable name and index and it matches the current variable
-        		  // -> hurray
-        		  return true;
-        	  }
-        	  return false;
+            int varIndex = LocalVariableScanner.indexOfVarTree(path, vtt, varName);
+
+            if (loc.varIndex==varIndex) {
+              // the location specifies a variable name and index and it matches the current variable
+              // -> hurray
+              return true;
+            }
+            return false;
           }
-          
+
           Pair<String, Pair<Integer, Integer>> key =
-            Pair.of(fullMethodName, Pair.of(loc.index, loc.scopeStart));
+                  Pair.of(fullMethodName, Pair.of(loc.index, loc.scopeStart));
           String potentialVarName =
-            LocalVariableScanner.getFromMethodNameIndexMap(key);
+                  LocalVariableScanner.getFromMethodNameIndexMap(key);
           if (potentialVarName != null) {
             if (varName.equals(potentialVarName)) {
               // now use methodNameCounter to ensure that if this is the
               // i'th variable of this name, its offset is the i'th offset
               // of all variables with this name
               List<Integer> allOffsetsWithThisName =
-                LocalVariableScanner.getFromMethodNameCounter(fullMethodName, potentialVarName);
+                      LocalVariableScanner.getFromMethodNameCounter(fullMethodName, potentialVarName);
 //                methodNameCounter.get(fullMethodName).get(potentialVarName);
               Integer thisVariablesOffset =
-                allOffsetsWithThisName.indexOf(loc.scopeStart);
+                      allOffsetsWithThisName.indexOf(loc.scopeStart);
 
               // now you need to make sure that this is the
               // thisVariablesOffset'th variable tree in the entire source
-              int i =
-                LocalVariableScanner.indexOfVarTree(path, parent, potentialVarName);
+              int i = LocalVariableScanner.indexOfVarTree(path, parent, potentialVarName);
 
               if (i == thisVariablesOffset) {
                 return true;
@@ -117,10 +116,12 @@ public class LocalVariableCriterion implements Criterion {
   }
 
 
+  @Override
   public Kind getKind() {
     return Kind.LOCAL_VARIABLE;
   }
 
+  @Override
   public String toString() {
     return "LocalVariableCriterion: in: " + fullMethodName + " loc: " + loc;
   }

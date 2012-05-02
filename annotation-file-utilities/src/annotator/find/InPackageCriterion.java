@@ -20,6 +20,7 @@ final class InPackageCriterion implements Criterion {
   /**
    * {@inheritDoc}
    */
+  @Override
   public Kind getKind() {
     return Kind.IN_PACKAGE;
   }
@@ -63,6 +64,7 @@ final class InPackageCriterion implements Criterion {
   /**
    * {@inheritDoc}
    */
+  @Override
   public String toString() {
     return "in package '" + name + "'";
   }

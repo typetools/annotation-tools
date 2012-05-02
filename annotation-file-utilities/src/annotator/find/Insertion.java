@@ -55,6 +55,7 @@ public class Insertion {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String toString() {
         return String.format("%s (nl=%b) @ %s", text, separateLine, criteria);
     }
