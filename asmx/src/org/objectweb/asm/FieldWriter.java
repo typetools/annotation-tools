@@ -86,10 +86,10 @@ final class FieldWriter implements FieldVisitor {
     private AnnotationWriter ianns;
 
     //jaime
-    private ExtendedAnnotationWriter xanns;
-    private ExtendedAnnotationWriter ixanns;
+    private TypeAnnotationWriter xanns;
+    private TypeAnnotationWriter ixanns;
     //end jaime
-    
+
     /**
      * The non standard attributes of this field. May be <tt>null</tt>.
      */
@@ -157,24 +157,23 @@ final class FieldWriter implements FieldVisitor {
         return aw;
     }
 
-    
     //jaime
-    public ExtendedAnnotationVisitor visitExtendedAnnotation(
+    public TypeAnnotationVisitor visitTypeAnnotation(
         final String desc,
         final boolean visible) {
-      ByteVector bv = new ByteVector();
-      // write type, and reserve space for values count
-      bv.putShort(cw.newUTF8(desc)).putShort(0);
-      ExtendedAnnotationWriter xaw = 
-        new ExtendedAnnotationWriter(cw, true, bv, bv, 2);
-      if(visible) {
-        xaw.next = xanns;
-        xanns = xaw;
-      } else {
-        xaw.next = ixanns;
-        ixanns = xaw;
-      }
-      return xaw;
+        ByteVector bv = new ByteVector();
+        // write type, and reserve space for values count
+        bv.putShort(cw.newUTF8(desc)).putShort(0);
+        TypeAnnotationWriter xaw = 
+          new TypeAnnotationWriter(cw, true, bv, bv, 2);
+        if(visible) {
+            xaw.next = xanns;
+            xanns = xaw;
+        } else {
+            xaw.next = ixanns;
+            ixanns = xaw;
+        }
+        return xaw;
     }
     // end jaime
 
@@ -229,12 +228,12 @@ final class FieldWriter implements FieldVisitor {
         }
         //jaime
         if (xanns != null) {
-          cw.newUTF8("RuntimeVisibleTypeAnnotations");
-          size += 8 + xanns.getSize();
+            cw.newUTF8("RuntimeVisibleTypeAnnotations");
+            size += 8 + xanns.getSize();
         }
         if (ixanns != null) {
-          cw.newUTF8("RuntimeInvisibleTypeAnnotations");
-          size += 8 + ixanns.getSize();
+            cw.newUTF8("RuntimeInvisibleTypeAnnotations");
+            size += 8 + ixanns.getSize();
         }
         // end jaime
         if (attrs != null) {
@@ -276,13 +275,13 @@ final class FieldWriter implements FieldVisitor {
         }
         //jaime
         if (xanns != null) {
-          ++attributeCount;
+            ++attributeCount;
         }
         if (ixanns != null) {
-          ++attributeCount;
+            ++attributeCount;
         }
         // end jaime
-        
+
         if (attrs != null) {
             attributeCount += attrs.getCount();
         }
@@ -314,17 +313,18 @@ final class FieldWriter implements FieldVisitor {
             out.putShort(cw.newUTF8("RuntimeInvisibleAnnotations"));
             ianns.put(out);
         }
+
         //jaime
         if (xanns != null) {
-          out.putShort(cw.newUTF8("RuntimeVisibleTypeAnnotations"));
-          xanns.put(out);
+            out.putShort(cw.newUTF8("RuntimeVisibleTypeAnnotations"));
+            xanns.put(out);
         }
         if (ixanns != null) {
-          out.putShort(cw.newUTF8("RuntimeInvisibleTypeAnnotations"));
-          ixanns.put(out);
+            out.putShort(cw.newUTF8("RuntimeInvisibleTypeAnnotations"));
+            ixanns.put(out);
         }
         // end jaime
-        
+
         if (attrs != null) {
             attrs.put(cw, null, 0, -1, -1, out);
         }

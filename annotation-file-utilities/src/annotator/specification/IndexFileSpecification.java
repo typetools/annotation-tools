@@ -276,7 +276,7 @@ public class IndexFileSpecification implements Specification {
 
     // parse receiver
     CriterionList receiverClist = clist.add(Criteria.receiver(methodName));
-    parseElement(receiverClist, method.receiver);
+    parseInnerAndOuterElements(receiverClist, method.receiver);
 
     // parse return type
     CriterionList returnClist = clist.add(Criteria.returnType(methodName));

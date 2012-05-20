@@ -1,0 +1,12 @@
+package:
+annotation @Bla:
+
+class WildcardAnnoBound:
+bound 0 & 0:
+inner-type 0, 0: @Bla
+
+class WildcardAnnoBound:
+method <init>(LWildcardAnnoBound;Ljava/util/List;)V:
+parameter 0:
+type: @Bla
+

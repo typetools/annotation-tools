@@ -703,6 +703,7 @@ public final class IndexFileParser {
             } else if (matchKeyword("receiver")) {
                 expectChar(':');
                 parseAnnotations(m.receiver);
+                parseInnerTypes(m.receiver);
             } else {
                 throw new Error("This can't happen");
             }

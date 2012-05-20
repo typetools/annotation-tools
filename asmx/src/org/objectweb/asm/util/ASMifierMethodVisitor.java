@@ -32,7 +32,7 @@ package org.objectweb.asm.util;
 import java.util.HashMap;
 
 import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.ExtendedAnnotationVisitor;
+import org.objectweb.asm.TypeAnnotationVisitor;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;

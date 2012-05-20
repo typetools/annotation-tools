@@ -8,8 +8,7 @@ import annotations.util.coll.*;
 import java.util.Map;
 
 /**
- * An annotated method; contains parameters, receiver, locals, typecasts, and
- * news.
+ * An annotated method; contains bounds, return, parameters, receiver, and throws.
  */
 public final class AMethod extends ABlock {
     /** The method's annotated type parameter bounds */
@@ -19,7 +18,7 @@ public final class AMethod extends ABlock {
     /** The method's annotated return type */
     public final ATypeElement returnType; // initialized in constructor
 
-    /** The method's annotated receiver */
+    /** The method's annotated receiver parameter type */
     public final ATypeElement receiver; // initialized in constructor
 
     /** The method's annotated parameters; map key is parameter index */
@@ -35,7 +34,7 @@ public final class AMethod extends ABlock {
       super("method: " + methodName);
       this.methodName = methodName;
       returnType = new ATypeElement("return type of " + methodName);
-      receiver = new ATypeElement("receiver of " + methodName);
+      receiver = new ATypeElement("receiver parameter type of " + methodName);
     }
 
     /**

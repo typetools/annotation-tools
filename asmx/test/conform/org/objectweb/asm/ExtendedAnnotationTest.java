@@ -46,11 +46,11 @@ import annotations.Values;
 import annotations.ValuesAnnotation;
 import annotations.ValuesEnum;
 
-public class ExtendedAnnotationTest extends TestCase {
+public class TypeAnnotationTest extends TestCase {
 
     private ValuesAnnotation a;
 
-    public ExtendedAnnotationTest(String name) {
+    public TypeAnnotationTest(String name) {
         super(name);
     }
 
@@ -202,7 +202,7 @@ public class ExtendedAnnotationTest extends TestCase {
         ClassNode cn = new ClassNode();
         cr.accept(cn, false);
     }
-    
+
     // TODO: figure out a more general way of finding a file given the
     // different ways of executing something in Eclipse, ant, and sub ant
     public String nameExpected(String className) {
@@ -219,7 +219,7 @@ public class ExtendedAnnotationTest extends TestCase {
       s = s.substring(0, s.lastIndexOf("asmx")+4);
       return s+"/test/conform/cases/"+className+".expected";
     }
-    
+
     /**
      * Runs a test on the given class by loading up its expected file and 
      * ensuring that they match the given bytecodes.
@@ -230,21 +230,21 @@ public class ExtendedAnnotationTest extends TestCase {
      */
     public void testRunner(String className, byte[] bytecodes) throws Exception {
       InputStream isExpected = new FileInputStream(nameExpected(className));
-      
+
       ClassReader crCorrect = new ClassReader(isExpected);
       ClassReader crGenerated = new ClassReader(bytecodes);
-      
+
       AnnotationVerifier av = new AnnotationVerifier();
-      
+
       crCorrect.accept(av.originalVisitor(), false);
       crGenerated.accept(av.newVisitor(), false);
-      try {   
+      try {
          av.verify();
       } catch(Exception e) {
         fail("AnnotationMismatch: " + e.toString());
       }
     }
-    
+
     /**
      * Runs an extended annotation test on TestClassEmpty.
      * 
@@ -253,7 +253,7 @@ public class ExtendedAnnotationTest extends TestCase {
     public void testClassEmpty() throws Exception {
       testRunner("TestClassEmpty", ExtendedValuesDump.dumpClassEmpty());
     }
-    
+
     /**
      * Runs an extended annotation test on TestClassNonEmpty.
      * 
@@ -262,7 +262,7 @@ public class ExtendedAnnotationTest extends TestCase {
     public void testClassNonEmpty() throws Exception {
       testRunner("TestClassNonEmpty", ExtendedValuesDump.dumpClassNonEmpty());
     }
-    
+
     /**
      * Runs an extended annotation test on TestFieldSimple.
      * 
@@ -271,7 +271,7 @@ public class ExtendedAnnotationTest extends TestCase {
     public void testFieldSimple() throws Exception {
       testRunner("TestFieldSimple", ExtendedValuesDump.dumpFieldSimple());
     }
-    
+
     /**
      * Runs an extended annotation test on TestFieldGeneric.
      * 
@@ -280,7 +280,7 @@ public class ExtendedAnnotationTest extends TestCase {
     public void testFieldGeneric() throws Exception {
       testRunner("TestFieldGeneric", ExtendedValuesDump.dumpFieldGeneric());
     }
-    
+
     /**
      * Runs an extended annotation test on TestLocalVariable.
      * 
@@ -289,7 +289,7 @@ public class ExtendedAnnotationTest extends TestCase {
     public void testLocalVariable() throws Exception {
       testRunner("TestLocalVariable", ExtendedValuesDump.dumpLocalVariable());
     }
-    
+
     /**
      * Runs an extended annotation test on TestLocalVariableGenericArray.
      * 
@@ -299,7 +299,7 @@ public class ExtendedAnnotationTest extends TestCase {
       testRunner("TestLocalVariableGenericArray", 
           ExtendedValuesDump.dumpLocalVariableGenericArray());
     }
-    
+
     /**
      * Runs an extended annotation test on TestMethodReceiver.
      * 
@@ -318,7 +318,7 @@ public class ExtendedAnnotationTest extends TestCase {
       testRunner("TestMethodReturnTypeGenericArray", 
           ExtendedValuesDump.dumpMethodReturnTypeGenericArray());
     }
-    
+
     /**
      * Runs an extended annotation test on TestObjectCreation.
      * 
@@ -327,7 +327,7 @@ public class ExtendedAnnotationTest extends TestCase {
     public void testObjectCreation() throws Exception {
       testRunner("TestObjectCreation", ExtendedValuesDump.dumpObjectCreation());
     }
-    
+
     /**
      * Runs an extended annotation test on TestObjectCreationGenericArray.
      * 
@@ -337,7 +337,7 @@ public class ExtendedAnnotationTest extends TestCase {
       testRunner("TestObjectCreationGenericArray", 
           ExtendedValuesDump.dumpObjectCreationGenericArray());
     }
-    
+
     /**
      * Runs an extended annotation test on TestTypecast.
      * 
@@ -346,7 +346,7 @@ public class ExtendedAnnotationTest extends TestCase {
     public void testTypecast() throws Exception {
       testRunner("TestTypecast", ExtendedValuesDump.dumpTypecast());
     }
-    
+
     /**
      * Runs an extended annotation test on TestTypecastGenericArray.
      * 
@@ -356,7 +356,7 @@ public class ExtendedAnnotationTest extends TestCase {
       testRunner("TestTypecastGenericArray", 
           ExtendedValuesDump.dumpTypecastGenericArray());
     }
-    
+
     /**
      * Runs an extended annotation test on TestTypeTest.
      * 
@@ -365,7 +365,7 @@ public class ExtendedAnnotationTest extends TestCase {
     public void testTypeTest() throws Exception {
       testRunner("TestTypeTest", ExtendedValuesDump.dumpTypeTest());
     }
-    
+
     private static final class TestClassLoader extends ClassLoader {
 
         private final String className;

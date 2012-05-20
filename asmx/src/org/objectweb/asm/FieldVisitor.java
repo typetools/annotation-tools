@@ -59,8 +59,8 @@ public interface FieldVisitor {
      * attributes of the field have been visited.
      */
     void visitEnd();
-    
+
     // jaime
-    ExtendedAnnotationVisitor visitExtendedAnnotation(String desc, 
+    TypeAnnotationVisitor visitTypeAnnotation(String desc, 
                                                       boolean visible);
 }

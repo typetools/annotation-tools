@@ -32,7 +32,7 @@ package org.objectweb.asm.commons;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Attribute;
 import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.ExtendedAnnotationVisitor;
+import org.objectweb.asm.TypeAnnotationVisitor;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
@@ -48,7 +48,7 @@ public class EmptyVisitor implements
         FieldVisitor,
         PrecompiledMethodVisitor, // changed from MethodVisitor
         AnnotationVisitor,
-        ExtendedAnnotationVisitor // jaime
+        TypeAnnotationVisitor // jaime
 {
 
     public void visit(
@@ -72,7 +72,7 @@ public class EmptyVisitor implements
     }
 
     // jaime
-    public ExtendedAnnotationVisitor visitExtendedAnnotation(String desc,
+    public TypeAnnotationVisitor visitTypeAnnotation(String desc,
                                                              boolean visible) {
         return this;
     }
@@ -221,7 +221,7 @@ public class EmptyVisitor implements
     public AnnotationVisitor visitArray(String name) {
         return this;
     }
-    
+
     //jaime
     public void visitXTargetType(int target_type) {
     }

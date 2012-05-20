@@ -36,3 +36,39 @@ field l3:
 type:
 inner-type 1: @GUT.quals.Rep
 
+
+package:
+class Wildcards:
+field l4:
+type:
+inner-type 0: @GUT.quals.Rep
+
+package:
+class Wildcards:
+field l4:
+type:
+inner-type 0, 0: @GUT.quals.Peer
+
+package:
+class Wildcards:
+field l4:
+type:
+inner-type 0, 0, 0: @GUT.quals.Rep
+
+package:
+class Wildcards:
+field l4:
+type:
+inner-type 0, 0, 0, 0: @GUT.quals.Peer
+
+package:
+class Wildcards:
+field l4:
+type:
+inner-type 0, 0, 1: @GUT.quals.Rep
+
+package:
+class Wildcards:
+field l4:
+type:
+inner-type 0, 1: @GUT.quals.Peer

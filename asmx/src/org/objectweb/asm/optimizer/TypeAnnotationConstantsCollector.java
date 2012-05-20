@@ -29,69 +29,69 @@
  */
 package org.objectweb.asm.optimizer;
 
-import org.objectweb.asm.ExtendedAnnotationVisitor;
+import org.objectweb.asm.TypeAnnotationVisitor;
 
 /**
- * An {@link ExtendedAnnotationVisitor} that collects the 
+ * An {@link TypeAnnotationVisitor} that collects the 
  * {@link Constant}s of the extended annotations it visits.
  * 
  * @author jaimeq
  */
-public class ExtendedAnnotationConstantsCollector 
+public class TypeAnnotationConstantsCollector 
   extends AnnotationConstantsCollector 
-  implements ExtendedAnnotationVisitor {
+  implements TypeAnnotationVisitor {
 
-    private ExtendedAnnotationVisitor xav;
+    private TypeAnnotationVisitor xav;
 
-    public ExtendedAnnotationConstantsCollector(
-        final ExtendedAnnotationVisitor xav,
+    public TypeAnnotationConstantsCollector(
+        final TypeAnnotationVisitor xav,
         final ConstantPool cp)
     {
-      super(xav, cp);
-      this.xav = xav;
+        super(xav, cp);
+        this.xav = xav;
     }
 
     public void visitXTargetType(int target_type) {
-      xav.visitXTargetType(target_type);
+        xav.visitXTargetType(target_type);
     }
 
     public void visitXOffset(int offset) {
-      xav.visitXOffset(offset);
+        xav.visitXOffset(offset);
     }
 
     public void visitXLocationLength(int location_length) {
-      xav.visitXLocationLength(location_length);
+        xav.visitXLocationLength(location_length);
     }
 
     public void visitXLocation(int location) {
-      xav.visitXLocation(location);
+        xav.visitXLocation(location);
     }
 
     public void visitXNumEntries(int num_entries) {
-      xav.visitXNumEntries(num_entries);
+        xav.visitXNumEntries(num_entries);
     }
 
     public void visitXStartPc(int start_pc) {
-      xav.visitXStartPc(start_pc);
+        xav.visitXStartPc(start_pc);
     }
 
     public void visitXLength(int length) {
-      xav.visitXLength(length);
+        xav.visitXLength(length);
     }
 
     public void visitXIndex(int index) {
-      xav.visitXIndex(index);
+        xav.visitXIndex(index);
     }
 
     public void visitXParamIndex(int param_index) {
-      xav.visitXParamIndex(param_index);
+        xav.visitXParamIndex(param_index);
     }
 
     public void visitXBoundIndex(int bound_index) {
-      xav.visitXBoundIndex(bound_index);
+        xav.visitXBoundIndex(bound_index);
     }
-    
+
     public void visitXTypeIndex(int type_index) {
-      xav.visitXTypeIndex(type_index);
+        xav.visitXTypeIndex(type_index);
     }
 }

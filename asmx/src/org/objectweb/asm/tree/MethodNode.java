@@ -36,7 +36,7 @@ import java.util.List;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Attribute;
 import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.ExtendedAnnotationVisitor;
+import org.objectweb.asm.TypeAnnotationVisitor;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
@@ -48,12 +48,14 @@ import org.objectweb.asm.Type;
  * @author Eric Bruneton
  */
 public class MethodNode extends MemberNode implements MethodVisitor {
-  // jaime
-  public ExtendedAnnotationVisitor visitExtendedAnnotation(String desc, 
+
+    // jaime
+    public TypeAnnotationVisitor visitTypeAnnotation(String desc, 
                                                     boolean visible) {
-    return null;
-  }
-  //end jaime
+        return null;
+    }
+    //end jaime
+
     /**
      * The method's access flags (see {@link Opcodes}). This field also
      * indicates if the method is synthetic and/or deprecated.

@@ -34,7 +34,7 @@ import java.util.Map;
 
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Attribute;
-import org.objectweb.asm.ExtendedAnnotationVisitor;
+import org.objectweb.asm.TypeAnnotationVisitor;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
@@ -280,9 +280,9 @@ public final class SAXCodeAdapter extends SAXAdapter implements MethodVisitor {
     }
 
     // jaime
-    public ExtendedAnnotationVisitor visitExtendedAnnotation(String desc, 
+    public TypeAnnotationVisitor visitTypeAnnotation(String desc, 
                                                       boolean visible) {
-      return null;
+        return null;
     }
     //end jaime
 
