@@ -386,7 +386,7 @@
 
     <mkdir dir="bin"/>
 
-    <javac srcdir="src" destdir="bin" debug="true" encoding="8859_1"
+    <javac fork="true" srcdir="src" destdir="bin" debug="true" encoding="8859_1"
       classpathref="libpath" includeantruntime="false">
       <!-- We are required to put jsr308's javac.jar on the bootclasspath so
            that those javac classes are found before the stock javac classes
