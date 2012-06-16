@@ -1,6 +1,9 @@
+import java.lang.annotation.*;
 import java.util.*;
 
+@Target(ElementType.TYPE_USE)
 @interface X {}
+@Target(ElementType.TYPE_USE)
 @interface Y {}
 
 public class GenericCellDoubled {
