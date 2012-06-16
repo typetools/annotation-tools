@@ -1,4 +1,8 @@
+import java.lang.annotation.*;
+
+@Target(ElementType.TYPE_USE)
 @interface Nullable {}
+@Target(ElementType.TYPE_USE)
 @interface NonNull {}
 
 public class NewInAnnotatedVariable {

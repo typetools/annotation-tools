@@ -17,10 +17,10 @@ package annotations.tests:
 annotation @C0AT: @java.lang.annotation.Target(value={TYPE_USE})
 
 package annotations.tests:
-annotation @A0B:
+annotation @A0B: @java.lang.annotation.Target(value={TYPE_USE})
 
 package annotations.tests:
-annotation @C0B:
+annotation @C0B: @java.lang.annotation.Target(value={TYPE_USE})
 
 package annotations.tests:
 annotation @A06:
@@ -35,10 +35,10 @@ package annotations.tests:
 annotation @C0C:
 
 package annotations.tests:
-annotation @A0D:
+annotation @A0D: @java.lang.annotation.Target(value={TYPE_USE})
 
 package annotations.tests:
-annotation @C0D:
+annotation @C0D: @java.lang.annotation.Target(value={TYPE_USE})
 
 package annotations.tests:
 annotation @A08:
@@ -47,40 +47,40 @@ package annotations.tests:
 annotation @C08:
 
 package annotations.tests:
-annotation @A09:
+annotation @A09: @java.lang.annotation.Target(value={TYPE_USE})
 
 package annotations.tests:
-annotation @C09:
+annotation @C09: @java.lang.annotation.Target(value={TYPE_USE})
 
 package annotations.tests:
-annotation @A00:
+annotation @A00: @java.lang.annotation.Target(value={TYPE_USE})
 
 package annotations.tests:
-annotation @C00:
+annotation @C00: @java.lang.annotation.Target(value={TYPE_USE})
 
 package annotations.tests:
-annotation @A01:
+annotation @A01: @java.lang.annotation.Target(value={TYPE_USE})
 
 package annotations.tests:
-annotation @C01:
+annotation @C01: @java.lang.annotation.Target(value={TYPE_USE})
 
 package annotations.tests:
-annotation @A02:
+annotation @A02: @java.lang.annotation.Target(value={TYPE_USE})
 
 package annotations.tests:
-annotation @C02:
+annotation @C02: @java.lang.annotation.Target(value={TYPE_USE})
 
 package annotations.tests:
-annotation @A04:
+annotation @A04: @java.lang.annotation.Target(value={TYPE_USE})
 
 package annotations.tests:
-annotation @C04:
+annotation @C04: @java.lang.annotation.Target(value={TYPE_USE})
 
 package annotations.tests:
-annotation @A05:
+annotation @A05: @java.lang.annotation.Target(value={TYPE_USE})
 
 package annotations.tests:
-annotation @C05:
+annotation @C05: @java.lang.annotation.Target(value={TYPE_USE})
 
 package annotations.tests:
 annotation @A0E:
@@ -89,10 +89,10 @@ package annotations.tests:
 annotation @C0E:
 
 package annotations.tests:
-annotation @A0F:
+annotation @A0F: @java.lang.annotation.Target(value={TYPE_USE})
 
 package annotations.tests:
-annotation @C0F:
+annotation @C0F: @java.lang.annotation.Target(value={TYPE_USE})
 
 package annotations.tests:
 class AnnotationTest: @annotations.tests.AClass @annotations.tests.CClass
