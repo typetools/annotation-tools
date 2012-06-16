@@ -4,42 +4,60 @@ import java.util.*;
 import java.lang.annotation.*;
 
 @interface AClass {}
+@Target(ElementType.TYPE_USE)
 @interface A00 {}
+@Target(ElementType.TYPE_USE)
 @interface A01 {}
+@Target(ElementType.TYPE_USE)
 @interface A02 {}
+@Target(ElementType.TYPE_USE)
 @interface A04 {}
+@Target(ElementType.TYPE_USE)
 @interface A05 {}
 @interface A06 {}
 @interface A08 {}
+@Target(ElementType.TYPE_USE)
 @interface A09 {}
 @interface A0A {}
 @Target(ElementType.TYPE_USE)
 @interface A0AT {}
+@Target(ElementType.TYPE_USE)
 @interface A0B {}
 @interface A0C {}
+@Target(ElementType.TYPE_USE)
 @interface A0D {}
 @interface A0E {}
+@Target(ElementType.TYPE_USE)
 @interface A0F {}
 @interface A10 {}
 @interface A11 {}
 @interface A12 {}
 @interface A13 {}
 @interface CClass {}
+@Target(ElementType.TYPE_USE)
 @interface C00 {}
+@Target(ElementType.TYPE_USE)
 @interface C01 {}
+@Target(ElementType.TYPE_USE)
 @interface C02 {}
+@Target(ElementType.TYPE_USE)
 @interface C04 {}
+@Target(ElementType.TYPE_USE)
 @interface C05 {}
 @interface C06 {}
 @interface C08 {}
+@Target(ElementType.TYPE_USE)
 @interface C09 {}
 @interface C0A {}
 @Target(ElementType.TYPE_USE)
 @interface C0AT {}
+@Target(ElementType.TYPE_USE)
 @interface C0B {}
 @interface C0C {}
+@Target(ElementType.TYPE_USE)
 @interface C0D {}
 @interface C0E {}
+@Target(ElementType.TYPE_USE)
 @interface C0F {}
 @interface C10 {}
 @interface C11 {}
