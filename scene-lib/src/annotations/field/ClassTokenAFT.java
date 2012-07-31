@@ -1,7 +1,9 @@
 package annotations.field;
 
+/*>>>
 import checkers.nullness.quals.*;
 import checkers.javari.quals.*;
+*/
 
 /**
  * A {@link ClassTokenAFT} is the type of an annotation field that holds a
@@ -54,7 +56,7 @@ public final /*@ReadOnly*/ class ClassTokenAFT extends ScalarAFT {
      */
     @Override
     public String format(Object o) {
-        return ((Class<?>) o).getName() + ".class";
+        return o + ".class";
     }
 
 }
