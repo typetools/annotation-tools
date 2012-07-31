@@ -1,7 +1,9 @@
 package annotations.io;
 
+/*>>>
 import checkers.nullness.quals.*;
 import checkers.javari.quals.*;
+*/
 
 import static java.io.StreamTokenizer.TT_EOF;
 import static java.io.StreamTokenizer.TT_NUMBER;
@@ -444,8 +446,7 @@ public final class IndexFileParser {
         }
     }
 
-    private ScalarAFT parseScalarAFT() throws IOException,
-            ParseException {
+    private ScalarAFT parseScalarAFT() throws IOException, ParseException {
         for (BasicAFT baft : BasicAFT.bafts.values()) {
             if (matchKeyword(baft.toString())) {
                 return baft;
