@@ -307,6 +307,9 @@ extends EmptyVisitor {
         c = double.class;
       } else if (c.equals(Type.class)) {
         annotationBuilder.addScalarField(name, ClassTokenAFT.ctaft, value);
+        // Return here, otherwise the annotationBuilder would be called
+        // twice for the same value.
+        return;
       } else if (!c.equals(String.class)) {
         // Only possible type for value is String, in which case c is already
         // String.class, or array of primitive
