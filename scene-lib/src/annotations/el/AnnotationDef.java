@@ -1,18 +1,18 @@
 package annotations.el;
 
+/*>>>
 import checkers.nullness.quals.Nullable;
 import checkers.javari.quals.ReadOnly;
+*/
 
 import java.io.File;
 import java.util.*;
 import java.lang.annotation.RetentionPolicy;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 import annotations.el.AElement;
 import annotations.AnnotationBuilder;
 import annotations.field.*;
-import annotations.util.coll.*;
 import annotations.Annotation;
 import annotations.Annotations;
 
