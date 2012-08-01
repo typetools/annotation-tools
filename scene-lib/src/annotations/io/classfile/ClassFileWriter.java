@@ -121,7 +121,6 @@ public class ClassFileWriter {
      } catch(Exception e) {
        System.out.println("Unknown error trying to insert annotations from: " +
            indexFileName + " to " + className);
-       System.out.println(e.getMessage());
        e.printStackTrace();
        System.out.println("Please submit a bug report at");
        System.out.println("  http://code.google.com/p/annotation-tools/issues");
