@@ -194,15 +194,23 @@ public final class IndexFileParser {
             return -1;
     }
 
-    private static final /*@ReadOnly*/ Set<String> primitiveTypeNames;
+    // Mapping from primitive types and void to their corresponding
+    // class objects. Class.forName doesn't directly support these.
+    // Using this map we can go from "void.class" to the correct
+    // Class object.
+    private static final /*@ReadOnly*/ Map<String, Class<?>> primitiveTypes;
     static {
-        /*@ReadOnly*/ String[] primitiveTypeNames1 =
-                { "byte", "short", "int", "long", "float", "double", "char",
-                        "boolean" };
-        Set<String> primitiveTypeNames2 =
-            new LinkedHashSet<String>();
-        Collections.addAll(primitiveTypeNames2, primitiveTypeNames1);
-        primitiveTypeNames = primitiveTypeNames2;
+        Map<String, Class<?>> pt = new LinkedHashMap<String, Class<?>>();
+        pt.put("byte", byte.class);
+        pt.put("short", short.class);
+        pt.put("int", int.class);
+        pt.put("long", long.class);
+        pt.put("float", float.class);
+        pt.put("double", double.class);
+        pt.put("char", char.class);
+        pt.put("boolean", boolean.class);
+        pt.put("void", void.class);
+        primitiveTypes = pt;
     }
 
     /** Parse scalar annotation value. */
@@ -259,45 +267,52 @@ public final class IndexFileParser {
             assert aft.isValidValue(val);
             return val;
         } else if (aft instanceof ClassTokenAFT) {
-            if (st.ttype != TT_WORD) {
-                throw new ParseException(
-                    "Expected an identifier or a primitive type");
+            // Expect the class name in the format that Class.forName accepts,
+            // which is some very strange format.
+            // Example inputs followed by their Java source ".class" equivalent:
+            //   [[I.class      for int[][].class
+            //   [java.util.Map for Map[].class
+            //   java.util.Map  for Map.class
+            // Have to use fully-qualified names, i.e. "Object" alone won't work.
+            // Also note use of primitiveTypes map for primitives and void.
+            int arrays = 0;
+            StringBuilder type = new StringBuilder();
+            while (matchChar('[')) {
+                // Array dimensions as prefix
+                ++arrays;
             }
-            String tokenType;
-            // it's a bit hard to tell .class from a class name segment, so
-            // if we accidentally read it as part of a fully qualified name,
-            // we set this flag
-            boolean alreadyAteDotClass = false;
-            if (matchKeyword("void"))
-                tokenType = "void";
-            else {
-                if (primitiveTypeNames.contains(st.sval)) {
-                    tokenType = st.sval;
-                    st.nextToken();
+            while (!matchKeyword("class")) {
+                if (st.ttype >= 0)
+                    type.append((char) st.ttype);
+                else if (st.ttype == TT_WORD)
+                    type.append(st.sval);
+                else
+                    throw new ParseException("Found something that doesn't belong in a signature");
+                st.nextToken();
+            }
+
+            // Drop the '.' before the "class"
+            type.deleteCharAt(type.length()-1);
+            // expectKeyword("class");
+
+            // Add arrays as prefix in the type.
+            while (arrays-->0) {
+                type.insert(0, '[');
+            }
+
+            try {
+                String sttype = type.toString();
+                Class<?> tktype;
+                if (primitiveTypes.containsKey(sttype)) {
+                    tktype = primitiveTypes.get(sttype);
                 } else {
-                    tokenType = expectIdentifier();
-                    while (matchChar('.')) {
-                        if (matchKeyword("class")) {
-                            alreadyAteDotClass = true;
-                            break;
-                        } else
-                            tokenType += "." + expectIdentifier();
-                    }
+                    tktype = Class.forName(sttype);
                 }
-                if (!alreadyAteDotClass) {
-                    // handle array layers
-                    while (matchChar('[')) {
-                        expectChar(']');
-                        tokenType += "[]";
-                    }
-                }
+                assert aft.isValidValue(tktype);
+                return tktype;
+            } catch (ClassNotFoundException e) {
+                throw new ParseException("Could not load class: " + type, e);
             }
-            if (!alreadyAteDotClass) {
-                expectChar('.');
-                expectKeyword("class");
-            }
-            assert aft.isValidValue(tokenType);
-            return tokenType;
         } else if (aft instanceof EnumAFT) {
             String name = expectQualifiedName();
             assert aft.isValidValue(name);
@@ -319,7 +334,7 @@ public final class IndexFileParser {
             assert aft.isValidValue(suba);
             return suba;
         } else {
-            throw new AssertionError();
+            throw new AssertionError("IndexFileParser.parseScalarAFV: unreachable code.");
         }
     }
 
