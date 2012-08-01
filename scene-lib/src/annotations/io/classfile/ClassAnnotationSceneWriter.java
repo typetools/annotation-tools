@@ -4,12 +4,13 @@
 
 package annotations.io.classfile;
 
+/*>>>
 import checkers.nullness.quals.*;
+*/
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.io.*;
 import java.lang.annotation.RetentionPolicy;
 
 import org.objectweb.asm.AnnotationVisitor;
@@ -386,6 +387,8 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
         aav.visitEnd();
       } else if (aft instanceof EnumAFT) {
         av.visitEnum(fieldName, ((EnumAFT) aft).typeName, value.toString());
+      } else if (aft instanceof ClassTokenAFT) {
+        av.visit(fieldName, org.objectweb.asm.Type.getType((Class)value));
       } else {
         // everything else is a string
         av.visit(fieldName, value);
