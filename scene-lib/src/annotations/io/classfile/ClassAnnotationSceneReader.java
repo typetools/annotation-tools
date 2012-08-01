@@ -306,7 +306,11 @@ extends EmptyVisitor {
       } else if (c.equals(Double.class)) {
         c = double.class;
       } else if (c.equals(Type.class)) {
-        annotationBuilder.addScalarField(name, ClassTokenAFT.ctaft, value);
+        try {
+          annotationBuilder.addScalarField(name, ClassTokenAFT.ctaft, Class.forName(((Type)value).getClassName()));
+        } catch (ClassNotFoundException e) {
+          throw new RuntimeException("Could not load Class for Type: " + value, e);
+        }
         // Return here, otherwise the annotationBuilder would be called
         // twice for the same value.
         return;
@@ -1030,7 +1034,11 @@ extends EmptyVisitor {
       if (value.getClass().equals(org.objectweb.asm.Type.class)) {
         // What if it's an annotation?
         aft = ClassTokenAFT.ctaft;
-        value = ((org.objectweb.asm.Type) value).getClassName();
+        try {
+          value = Class.forName(((org.objectweb.asm.Type) value).getClassName());
+        } catch (ClassNotFoundException e) {
+          throw new RuntimeException("Could not load Class for Type: " + value, e);
+        }
       } else {
         Class<?> vc = value.getClass();
         aft = BasicAFT.forType(vc);
