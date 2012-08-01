@@ -66,9 +66,9 @@ public final class IndexFileWriter {
     final PrintWriter pw;
 
     private void printValue(AnnotationFieldType aft, /*@ReadOnly*/ Object o) {
-        if (aft instanceof AnnotationAFT)
+        if (aft instanceof AnnotationAFT) {
             printAnnotation((Annotation) o);
-        else if (aft instanceof ArrayAFT) {
+        } else if (aft instanceof ArrayAFT) {
             ArrayAFT aaft = (ArrayAFT) aft;
             pw.print('{');
             if (!(o instanceof List)) {
@@ -92,12 +92,13 @@ public final class IndexFileWriter {
                 }
             }
             pw.print('}');
-        } else if (aft instanceof ClassTokenAFT)
-            pw.print((String) o + ".class");
-        else if (aft instanceof BasicAFT && o instanceof String)
+        } else if (aft instanceof ClassTokenAFT) {
+            pw.print(aft.format(o));
+        } else if (aft instanceof BasicAFT && o instanceof String) {
             pw.print(Strings.escape((String) o));
-        else
+        } else {
             pw.print(o.toString());
+        }
     }
 
     private void printAnnotation(Annotation a) {
