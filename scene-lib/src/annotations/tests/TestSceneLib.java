@@ -249,8 +249,8 @@ public /*@ReadOnly*/ class TestSceneLib extends TestCase {
         Annotation a = s1.classes.get("p1.Bar").lookup("p2.E");
 
         assertEquals("fooconstant", a.fieldValues.get("third"));
-        assertEquals("java.util.Map", a.fieldValues.get("fourth"));
-        assertEquals("int[][]", a.fieldValues.get("fifth"));
+        assertEquals("interface java.util.Map", a.fieldValues.get("fourth").toString());
+        assertEquals("class [[I", a.fieldValues.get("fifth").toString());
 
         List<?> first =
                 (List<?>) a.fieldValues.get("first");
@@ -262,8 +262,8 @@ public /*@ReadOnly*/ class TestSceneLib extends TestCase {
         Annotation a2 =
                 s1.classes.get("p1.Baz").lookup("p2.E");
         assertEquals("FOO_FOO", a2.fieldValues.get("third"));
-        assertEquals("java.util.LinkedHashMap", a2.fieldValues.get("fourth"));
-        assertEquals("void", a2.fieldValues.get("fifth"));
+        assertEquals("class java.util.LinkedHashMap", a2.fieldValues.get("fourth").toString());
+        assertEquals("void", a2.fieldValues.get("fifth").toString());
     }
 
     void doRewriteTest(LineNumberReader r) throws Exception {
