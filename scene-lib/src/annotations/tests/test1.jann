@@ -71,7 +71,7 @@ value=-6
 ,second=@p2.F(value="thestring"),
 third=fooconstant,
 fourth=java.util.Map.class,
-fifth=int[][].class
+fifth=[[I.class
 )
 
 // Test comment
