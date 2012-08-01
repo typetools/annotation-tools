@@ -39,8 +39,7 @@ public final /*@ReadOnly*/ class ClassTokenAFT extends ScalarAFT {
      */
     @Override
     public boolean isValidValue(Object o) {
-        // return o instanceof Class;
-        return o instanceof String;
+        return 	o instanceof java.lang.Class;
     }
 
     /**
@@ -56,7 +55,7 @@ public final /*@ReadOnly*/ class ClassTokenAFT extends ScalarAFT {
      */
     @Override
     public String format(Object o) {
-        return o + ".class";
+        return ((java.lang.Class)o).getName() + ".class";
     }
 
 }
