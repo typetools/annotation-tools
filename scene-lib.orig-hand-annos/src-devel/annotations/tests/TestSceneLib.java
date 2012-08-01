@@ -247,7 +247,7 @@ public /*@Unmodifiable*/ class TestSceneLib extends TestCase {
 
         assertEquals("fooconstant", a.fieldValues.get("third"));
         assertEquals("java.util.Map", a.fieldValues.get("fourth"));
-        assertEquals("int[][]", a.fieldValues.get("fifth"));
+        assertEquals("[[I", a.fieldValues.get("fifth"));
 
         /*@NonNull*/ List<?> first =
                 (/*@NonNull*/ List<?>) a.fieldValues.get("first");
