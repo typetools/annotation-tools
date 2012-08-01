@@ -1,7 +1,9 @@
 package annotations;
 
+/*>>>
 import checkers.nullness.quals.Nullable;
 import checkers.javari.quals.ReadOnly;
+*/
 
 import annotations.el.AnnotationDef;
 import annotations.field.AnnotationFieldType;
@@ -117,7 +119,14 @@ public final /*@ReadOnly*/ class Annotation {
                 Method m = jaType.getDeclaredMethod(fieldname);
                 Object val = m.invoke(ja);
                 if (! aft.isValidValue(val)) {
-                    if (val instanceof Object[]) {
+                    if (val instanceof Class[]) {
+                        Class[] vala = (Class[]) val;
+                        List<Class> vall = new ArrayList<Class>(vala.length);
+                        for (Class elt : vala) {
+                            vall.add(elt);
+                        }
+                        val = vall;
+                    } else if (val instanceof Object[]) {
                         Object[] vala = (Object[]) val;
                         List<Object> vall = new ArrayList<Object>(vala.length);
                         for (Object elt : vala) {
@@ -129,7 +138,7 @@ public final /*@ReadOnly*/ class Annotation {
                     }
                 }
                 assert aft.isValidValue(val)
-                    : String.format("invalid value %s for field %s of type %s; ja=%s", val, fieldname, aft, ja);
+                    : String.format("invalid value \"%s\" for field \"%s\" of class \"%s\" and expected type \"%s\"; ja=%s", val, val.getClass(), fieldname, aft, ja);
                 fieldValues.put(fieldname, val);
             }
         } catch (NoSuchMethodException e) {
