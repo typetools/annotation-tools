@@ -93,7 +93,7 @@ public abstract class Annotations {
         noFieldTypes = Collections.<String, AnnotationFieldType> emptyMap();
         noFieldValues = Collections.<String, Object> emptyMap();
 
-        // This is slightly complicated becase Retention's definition is
+        // This is slightly complicated because Retention's definition is
         // meta-annotated by itself, we have to define the annotation
         // before we can create the annotation on it.
         aftRetentionPolicy = new EnumAFT("java.lang.annotation.RetentionPolicy");
