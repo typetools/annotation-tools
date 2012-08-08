@@ -187,9 +187,9 @@ public class AnnotationBuilder {
      */
     public Annotation finish() {
         if (!active)
-            throw new IllegalStateException("Already finished");
+            throw new IllegalStateException("Already finished: " + this);
         if (arrayInProgress)
-            throw new IllegalStateException("Array in progress");
+            throw new IllegalStateException("Array in progress: " + this);
         active = false;
         if (def == null) {
             assert fieldTypes != null;
