@@ -971,7 +971,8 @@ extends EmptyVisitor {
 
     @Override
     public void visitEnd() {
-      super.visitEnd();
+      // Do not call super, as that already builds the annotation, causing an exception.
+      // super.visitEnd();
       if (trace) { System.out.printf("visitEnd on %s (%s)%n", this, this.getClass()); }
       Annotation a = super.makeAnnotation();
       parent.supplySubannotation(name, a);
