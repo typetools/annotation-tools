@@ -421,7 +421,7 @@
            executable="${jsr308javac}">
       <compilerarg value="-version"/>
       <compilerarg line="-target 5"/>
-      <compilerarg line="-processor checkers.nullness.NullnessChecker"/>
+      <compilerarg line="-processor checkers.nonnull.NonNullFbcChecker"/>
       <compilerarg line="-Xbootclasspath/p:${env.CHECKERS}/jdk/jdk.jar"/>
       <compilerarg value="-implicit:class"/>
       <compilerarg line="-Awarns -Xmaxwarns 10000"/>
