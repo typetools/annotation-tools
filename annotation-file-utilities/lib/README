@@ -11,9 +11,11 @@ includes the files in
   plume-lib/java/lib/
 in particular, the checkers-quals.jar there.
 
-Therefore, first build the Checker Framework, then put
-checkers-quals.jar into plume-lib/java/lib and rebuild plume-lib.
-Finally, rebuild annotation-tools.
+Therefore, follow these steps:
+ 1. Build the Checker Framework
+ 2. Put checkers-quals.jar into plume-lib/java/lib
+ 3. Rebuild plume-lib
+ 4. Rebuild annotation-tools.
 
 Also note the lovely dependency: the Checker Framework build needs the
 annotation-tools to build the annotated JDK.
