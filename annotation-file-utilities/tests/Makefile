@@ -21,7 +21,9 @@ export SHELL=/bin/bash -o pipefail
 
 
 DIFFS := $(wildcard *.goal)
-DIFFS := $(patsubst %.goal, %.diff, $(DIFFS))
+DISABLED := $(shell grep -le "@skip-test" $(DIFFS))
+FILTERED := $(filter-out $(DISABLED),$(DIFFS))
+DIFFS := $(patsubst %.goal, %.diff, $(FILTERED))
 
 DEBUG :=
 # Use this to enable some debugging.
@@ -34,11 +36,11 @@ all : $(DIFFS) system-test source-extension results
 
 .PHONY: source-extension
 source-extension:
-	${MAKE} -C source-extension
+	-${MAKE} -C source-extension #The minus(-) indicates that the process should continue if there is a failure
 
 .PHONY: system-test
 system-test:
-	${MAKE} -C system-test
+	-${MAKE} -C system-test      #The minus(-) indicates that the process should continue if there is a failure
 
 # Display results of all .diff files.
 .PHONY: results
