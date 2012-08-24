@@ -3,7 +3,16 @@
 ANNCAT ?= ../../../scene-lib/anncat
 XJAVAC ?= ../../../../jsr308-langtools/dist/bin/javac -g
 
+#Switch the lines below to deactivate this test
 all: clean results
+#all: warn_and_exit
+
+warn_and_exit:
+	@echo ""
+	@echo "******************************************************"
+	@echo "Warning: The sytem test has been temporarily disabled!"
+	@echo "******************************************************"
+	@echo ""
 
 results: out1 check-out2 out3 out4.class check-out5
 
