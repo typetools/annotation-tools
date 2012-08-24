@@ -5,10 +5,10 @@ package annotations.tests:
 annotation @CClass:
 
 package annotations.tests:
-annotation @A0A:
+annotation @A0A: @java.lang.annotation.Target(value={TYPE_USE,METHOD})
 
 package annotations.tests:
-annotation @C0A:
+annotation @C0A: @java.lang.annotation.Target(value={TYPE_USE,METHOD})
 
 package annotations.tests:
 annotation @A0AT: @java.lang.annotation.Target(value={TYPE_USE})
@@ -23,16 +23,16 @@ package annotations.tests:
 annotation @C0B: @java.lang.annotation.Target(value={TYPE_USE})
 
 package annotations.tests:
-annotation @A06:
+annotation @A06: @java.lang.annotation.Target(value={TYPE_USE,PARAMETER})
 
 package annotations.tests:
-annotation @C06:
+annotation @C06: @java.lang.annotation.Target(value={TYPE_USE,PARAMETER})
 
 package annotations.tests:
-annotation @A0C:
+annotation @A0C: @java.lang.annotation.Target(value={TYPE_USE,PARAMETER})
 
 package annotations.tests:
-annotation @C0C:
+annotation @C0C: @java.lang.annotation.Target(value={TYPE_USE,PARAMETER})
 
 package annotations.tests:
 annotation @A0D: @java.lang.annotation.Target(value={TYPE_USE})
@@ -83,10 +83,10 @@ package annotations.tests:
 annotation @C05: @java.lang.annotation.Target(value={TYPE_USE})
 
 package annotations.tests:
-annotation @A0E:
+annotation @A0E: @java.lang.annotation.Target(value={TYPE_USE,FIELD})
 
 package annotations.tests:
-annotation @C0E:
+annotation @C0E: @java.lang.annotation.Target(value={TYPE_USE,FIELD})
 
 package annotations.tests:
 annotation @A0F: @java.lang.annotation.Target(value={TYPE_USE})
