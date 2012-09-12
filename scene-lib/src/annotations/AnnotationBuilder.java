@@ -103,8 +103,8 @@ public class AnnotationBuilder {
         if (arrayInProgress)
             throw new IllegalStateException("Array in progress");
         if (fieldValues.containsKey(fieldName))
-            throw new IllegalArgumentException("Duplicate field "
-                                               + fieldName + " in " + fieldValues);
+            throw new IllegalArgumentException("Duplicate field \'"
+                                               + fieldName + "\' in " + fieldValues);
     }
 
     /**
