@@ -21,7 +21,9 @@ export SHELL=/bin/bash -o pipefail
 
 
 DIFFS := $(wildcard *.goal)
-DIFFS := $(patsubst %.goal, %.diff, $(DIFFS))
+DISABLED := $(shell grep -le "@skip-test" $(DIFFS))
+FILTERED := $(filter-out $(DISABLED),$(DIFFS))
+DIFFS := $(patsubst %.goal, %.diff, $(FILTERED))
 
 DEBUG :=
 # Use this to enable some debugging.
