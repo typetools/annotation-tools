@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# Insert annotations (from an annotation file) into a class file.
+# For usage information, run: insert-annotations --help 
+# See the annotation file utilities documentation for more information.
+
+ANNOTATION_FILE_UTILS=$(dirname $0)/../bin:$(dirname $0)/../annotation-file-utilities.jar
+# Contains new version of java.lang.annotation.ElementType.
+LANGTOOLS=${LANGTOOLS:-$(dirname $0)/../../../jsr308-langtools}
+JAVAC_JAR=${JAVAC_JAR:-${LANGTOOLS}/dist/lib/javac.jar}
+
+# Needs CLASSPATH to find user files
+java -ea -Xbootclasspath/p:${ANNOTATION_FILE_UTILS}:${JAVAC_JAR} -cp ${ANNOTATION_FILE_UTILS}:$CLASSPATH annotations.io.classfile.ClassFileWriter $@

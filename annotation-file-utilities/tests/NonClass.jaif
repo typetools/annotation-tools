@@ -1,0 +1,18 @@
+package:
+
+annotation @X:
+
+class NonClass$A:
+method m(Ljava/lang/Object;)V:
+parameter 0:
+type: @X
+
+class NonClass$B:
+method m()V:
+local l:
+type: @X
+
+class NonClass$C:
+method value()Ljava/lang/String;:
+return: @X
+
