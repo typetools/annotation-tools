@@ -14,19 +14,29 @@ import java.lang.annotation.*;
 @interface A04 {}
 @Target(ElementType.TYPE_USE)
 @interface A05 {}
+
+@Target({ElementType.TYPE_USE, ElementType.PARAMETER})
 @interface A06 {}
 @interface A08 {}
 @Target(ElementType.TYPE_USE)
 @interface A09 {}
+
+@Target({ElementType.TYPE_USE, ElementType.METHOD})
 @interface A0A {}
 @Target(ElementType.TYPE_USE)
 @interface A0AT {}
 @Target(ElementType.TYPE_USE)
 @interface A0B {}
+
+@Target({ElementType.TYPE_USE, ElementType.PARAMETER})
 @interface A0C {}
 @Target(ElementType.TYPE_USE)
 @interface A0D {}
+
+@Target({ElementType.TYPE_USE, ElementType.FIELD})
 @interface A0E {}
+
+
 @Target(ElementType.TYPE_USE)
 @interface A0F {}
 @interface A10 {}
@@ -44,18 +54,24 @@ import java.lang.annotation.*;
 @interface C04 {}
 @Target(ElementType.TYPE_USE)
 @interface C05 {}
+
+@Target({ElementType.TYPE_USE, ElementType.PARAMETER})
 @interface C06 {}
 @interface C08 {}
 @Target(ElementType.TYPE_USE)
 @interface C09 {}
+@Target({ElementType.TYPE_USE, ElementType.METHOD})
 @interface C0A {}
 @Target(ElementType.TYPE_USE)
 @interface C0AT {}
 @Target(ElementType.TYPE_USE)
 @interface C0B {}
+
+@Target({ElementType.TYPE_USE, ElementType.PARAMETER})
 @interface C0C {}
 @Target(ElementType.TYPE_USE)
 @interface C0D {}
+@Target({ElementType.TYPE_USE, ElementType.FIELD})
 @interface C0E {}
 @Target(ElementType.TYPE_USE)
 @interface C0F {}
