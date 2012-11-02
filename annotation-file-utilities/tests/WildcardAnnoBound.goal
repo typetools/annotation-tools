@@ -1,0 +1,11 @@
+import java.util.List;
+
+@interface Bla {}
+
+/**
+* @skip-test
+*/
+public class WildcardAnnoBound<X extends List<? extends @Bla Object>> {
+  WildcardAnnoBound(@Bla WildcardAnnoBound<X> n, X p) {
+  }
+}

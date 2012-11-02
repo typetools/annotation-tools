@@ -1,0 +1,279 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <title>Annotation File Utilities Changelog</title>
+</head>
+<body>
+<h1>Annotation File Utilities Changelog</h1>
+
+<p>
+This is the changelog for the
+<a href="annotation-file-utilities.html">Annotation File Utilities</a>.
+</p>
+
+<ul>
+
+  <li>
+    Version 3.4 (released September 11, 2012):
+    <ul>
+      <li>
+	Adapted to underlying changes in JSR 308.
+      </li>
+      <li>
+	Support .class literals as annotation attributes.
+      </li>
+    </ul>
+  </li>
+
+  <li>
+    Version 3.3 (released September 20, 2011):
+    <ul>
+      <li>
+	Improved support for annotations on array creation expressions.
+      </li>
+      <li>
+	Small tweaks to the code and documentation.
+      </li>
+    </ul>
+  </li>
+
+  <li>
+  Version 3.2 (released June 18, 2011):
+    <ul>
+      <li>
+	Support source code indexes, in contrast to the bytecode
+	centric indexes supported so far, which makes it easier for
+	source code centric tools to emit AFU files.
+	See Section "Support for source code indexes" in the
+	<a href="annotation-file-format.html">manual</a>.
+      </li>
+      <li>
+	Support annotating the bounds of class and method type
+	parameters and of wildcards, in particular also support
+	implicit bounds and make them explicit.
+	Also support adding declaration annotations on type parameters.
+      </li>
+      <li>
+	Better support for anonymous inner classes.
+      </li>
+      <li>
+	Improve handling of already existing annotations, in
+	particular for generic types.
+      </li>
+      <li>
+	Consistently do matching on methods using the erased signature.
+      </li>
+      <li>
+	Specify annotations on extends and implements clauses.
+      </li>
+      <li>
+	Handle interfaces, enums, etc. like classes.
+      </li>
+      <li>
+	Numerous small bug fixes and improvements.
+      </li>
+    </ul>
+  </li>
+
+  <li>
+  Version 3.1 (released September 18, 2010):
+    <ul>
+      <li>
+        Don't duplicate annotations that are in the source already.
+      </li>
+      <li>
+        Add <tt>--omit-annotation</tt> option to omit a given annotation
+        (example: <tt>@ThisMutable</tt>, which is the default and need not be
+        inserted in source files).
+      </li>
+      <li>
+        Bug fixes related to inner classes, array levels, multiple methods
+        with same signature but different return type (impossible in Java
+        code, but can occur in class files), parameter indices.
+      </li>
+      <li>
+        Switch from utilMDE library to
+        <a href="http://code.google.com/p/plume-lib/">plume-lib</a>.
+      </li>
+    </ul>
+  </li>
+
+  <li>
+  Version 3.0 (released December 21, 2009):
+    <ul>
+      <li>
+      Handle meta-annotations.
+      Previously, the Annotation File Utilities didn't handle meta-annotations
+      (annotations that are written on an annotation type declaration); in fact,
+      AFU simply fabricated retention information.  Now, meta-annotations are
+      handled uniformly with other annotations.
+      </li>
+
+      <li>
+      Distinguish type annotations from declaration annotations.
+      Previously, AFU assumed that all annotations were type annotations.  Now,
+      this information is looked up from the meta-annotations and is
+      distinguished in the file format (see below).
+      </li>
+
+      <li>
+      Read annotations from classfiles.
+      Previously, AFU created partial information for annotations in an ad hoc
+      way, and classfile reading did not work.  (The focus was on inserting
+      annotations in class files, not reading annotations from class files.)
+      Now, classfile reading is operational, and it is often not necessary to
+      declare annotations in an annotation file.  However, if the annotation is
+      declared in the annotation file, it should be consistent with its
+      declaration in the class file.
+      </li>
+
+      <li>Changes to annotation file format.
+
+	<ul>
+	  <li>Indicating meta-annotations
+
+	    <pre>  annotation visible @Nullable:</pre>
+
+	      becomes
+
+	    <pre>  annotation @Nullable: @Retention(value=RUNTIME)</pre>
+
+	      and if it's a type annotation, it should be 
+
+	    <pre>  annotation @Nullable: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})</pre>
+	  </li>
+	  <li>Locations for type and declaration annotations.
+
+	If p2.B is a declaration annotation on a method, it is written as before:
+
+	    <pre>  method foo(Ljava/util/Set;)V: @p2.B</pre>
+
+	If p2.B is a type annotation on a method return type, it is written in a
+	new location:
+
+	    <pre>  method foo(Ljava/util/Set;)V:
+    return: @p2.B</pre>
+
+	Fields and method parameters are treated similarly, but with
+	<tt>type</tt> marker instead of <tt>return</tt>.  So if p2.A is a
+	declaration annotation targeting the field, while p2.B is a type
+	annotation on the field, the field would be declared as:
+    
+    <pre> field s: @p2.A
+   type: @p2.B</pre>
+
+	Furthermore, <tt>inner-type:</tt> is permitted only after a keyword
+	that introduces a type, such as <tt>type</tt>, <tt>return</tt>, and
+	<tt>receiver</tt>, to prevent confusion (though the file format
+	becomes slightly more verbose).
+
+	  </li>
+	  <li>Permit qualified names in several places that only identifiers were
+	permitted before.  This enables use of names that contain periods, such
+	as inner classes, and also fully-qualified names.
+
+	  </li>
+	  <li>Permit two shorthands in annotation uses, as in Java.  If there is a
+	single field named "value", then its name may be omitted: @A(1) instead
+	of @A(value=1).  If an array has only one element, the braces may be
+	omitted:  @B(value=1) instead of @B(value={1}).  Both
+	shorthands may be combined:  @B(1) instead of @B(value={1}).
+	  </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+
+  <li>
+  Version 2.3.3 (released August 18, 2009):
+    <ul>
+      <li>Fix a few bugs.</li>
+    </ul>
+  </li>
+
+  <li>
+  Version 2.3.2 (released August 14, 2009):
+    <ul>
+      <li>Relax file format:  receiver may precede parameters (in spec &
+          implementation), parameters may omit "#" (in implementation only)</li>
+    </ul>
+  </li>
+
+  <li>
+  Version 2.3.1 (released August 12, 2009):
+    <ul>
+      <li>Fix many bugs.</li>
+    </ul>
+  </li>
+
+  <li>
+  Version 2.3 (released July 29, 2009):
+    <ul>
+      <li>Support <tt>-i --in-place</tt> argument.</li>
+      <li>Fix incorrect array brackets in tests.</li>
+      <li>Fix inserting annotations on receivers.</li>
+      <li>Improve documentation.</li>
+      <li>Improve error handling.</li>
+    </ul>
+  </li>
+
+  <li>
+  Version 2.2 (released December 7, 2008):
+    <ul>
+      <li>Permit Main to process multiple files at a time.</li>
+      <li>Don't re-insert annotations that are already present.</li>
+      <li>Add a space before annotation if there isn't one there.</li>
+      <li>Fix problems with array syntax; now adheres to the current JSR
+          308 syntax.</li>
+      <li>Improve error handling.</li>
+      <li>Code reorganization:  remove subdirectories and classes that
+          added complexity without commensurate functionality.</li>
+    </ul>
+  </li>
+
+  <li>
+  Version 2.1.2 (released April 28, 2008):
+  Minor updates to the &ldquo;Annotation File Format Specification&rdquo; (<a
+    href="http://types.cs.washington.edu/annotation-file-utilities/annotation-file-format.pdf">PDF</a>, <a
+    href="http://types.cs.washington.edu/annotation-file-utilities/annotation-file-format.html">HTML</a>).
+  </li>
+
+  <li>
+  Version 2.1.1 (released May 31, 2007):
+  Added support for two new annotation target_types; consult the
+  classfile specification (<a
+  href="http://types.cs.washington.edu/jsr308/specification/java-annotation-design.pdf">PDF</a>,
+  <a href="http://types.cs.washington.edu/jsr308/specification/java-annotation-design.html">HTML</a>).
+  </li>
+
+  <li>
+  Version 2.1 (released May 4, 2007):
+  Modified overall setup of distribution to be easier to understand.
+  </li>
+
+  <li>
+  Version 2.0 (released May 1, 2007):
+  Initial public release.
+  </li>
+
+  <li>
+  Version 1.0 (released March 19, 2007):
+  Preliminary release.
+  The <code>insert-to-annotations-source</code> tool only
+  operates on class, field and method signatures.
+  </li>
+
+</ul>
+
+<p>
+The original developer (through version 2.1.2) was Jaime Quinonez.
+</p>
+
+
+</body>
+</html>
+
+
+<!--  LocalWords:  utils bashrc tcsh tcshrc cshrc classpath AFU Ljava
+ -->
