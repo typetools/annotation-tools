@@ -34,10 +34,10 @@ public class InstanceOfScanner extends CommonScanner {
     ios.scan(path, null);
     return ios.index;
   }
-  
+
   private int index = -1;
   private boolean done = false;
-  private Tree tree;
+  private final Tree tree;
 
   /**
    * Creates an InstanceOfScanner that will scan the source tree for the
