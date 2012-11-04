@@ -1,0 +1,41 @@
+package annotations.tests.classfile.foo:
+annotation @A: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+
+annotation @B: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+	String value
+
+// annotation @C: @Retention(value=CLASS) @java.lang.annotation.Target(value={TYPE_USE})
+annotation @C: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+	int fieldA
+	String fieldB
+	
+package annotations.tests.classfile.cases:
+class TestObjectCreationGenericArray:
+	
+  method test()V : 
+  	new # 3 : @annotations.tests.classfile.foo.B(value="first new")
+  		inner-type 0 : @annotations.tests.classfile.foo.A
+  	  	
+  method test2()V :
+  	new # 23 : @annotations.tests.classfile.foo.A
+  		inner-type 0 : @annotations.tests.classfile.foo.B(value="str")
+  	
+  method test3()V :
+  	new # 1 : @annotations.tests.classfile.foo.B(value="new")
+			inner-type 0 : @annotations.tests.classfile.foo.B(value="map")
+			inner-type 0, 0 : @annotations.tests.classfile.foo.A
+			inner-type 0, 1 : @annotations.tests.classfile.foo.B(value="map key string")
+		new # 12 : @annotations.tests.classfile.foo.A
+  		inner-type 0 : @annotations.tests.classfile.foo.B(value="first level")
+  		inner-type 1 : @annotations.tests.classfile.foo.B(value="value")
+  		inner-type 1, 0 : @annotations.tests.classfile.foo.B(value="on the array")
+  		inner-type 1, 0, 0: @annotations.tests.classfile.foo.B(value="on array elements")
+  		
+  method test4()V :
+  	new # 1 : @annotations.tests.classfile.foo.A
+  		inner-type 0 : @annotations.tests.classfile.foo.B(value="key")
+  		inner-type 1 : @annotations.tests.classfile.foo.B(value="value")
+  		inner-type 0, 0 :@annotations.tests.classfile.foo.B(value="key element")
+  		inner-type 1, 0 : @annotations.tests.classfile.foo.B(value="value array")
+  		inner-type 1, 0, 0 : @annotations.tests.classfile.foo.B(value="value array element")
+  		  	  	

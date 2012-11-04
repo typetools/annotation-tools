@@ -1,0 +1,453 @@
+<?xml version="1.0"?>
+
+<project name="annotation-file-utilities" default="zipfile">
+  <description>
+     Ant build file for the annotation file utilities.
+     Run "ant -projecthelp" for a full list of options.
+  </description>
+
+  <property environment="env"/>
+
+  <property name="java-version" value="7"/>
+
+  <!-- Avoid conflicts between multiple users on the same computer. -->
+  <property name="tmpdir" location="${java.io.tmpdir}/${user.name}" />
+  <!-- The distribution is the result of zipping this directory. -->
+  <property name="temp-annotation-tools" location="${tmpdir}/annotation-tools" />
+
+  <!-- Can't I just reuse temp-annotation-file-utilities, rather than
+       having this separate directory? -->
+  <property name="temp-jarfile" location="${tmpdir}/annotation-file-utilities-jarfile" />
+
+<!--
+  <property name="jsr308-www" location="/afs/csail/group/pag/www/jsr308"/>
+-->
+  <property name="jsr308-www" location="/cse/www2/types"/>
+  <property name="jsr308-www-annotation-file-utilities"
+    location="${jsr308-www}/annotation-file-utilities"/>
+
+  <target name="init-properties">
+    <condition property="exists.build.properties">
+      <available file="build.properties"/>
+    </condition>
+    <fail
+      unless="exists.build.properties"
+      message="Local build.properites file is missing."/>
+
+    <property file="build.properties"/>
+
+    <fail
+      unless="global.build.properties"
+      message="Local build.properties file did not define global buildfile in property global.build.properties"/>
+    <condition property="exists.global.build.properties">
+      <available file="${global.build.properties}"/>
+    </condition>
+    <fail
+      unless="exists.global.build.properties"
+      message="File ${global.build.properties} file not found."/>
+    <property file="${global.build.properties}"/>
+
+    <fail
+      unless="user.build.properties"
+      message="Local build.properties file did not define global buildfile in property user.build.properties"/>
+    <condition property="exists.user.build.properties">
+      <available file="${user.build.properties}"/>
+    </condition>
+    <fail
+      unless="exists.user.build.properties"
+      message="File ${user.build.properties} file not found."/>
+    <property file="${user.build.properties}"/>
+
+    <echo message="annotations-compiler: ${annotations-compiler}"/>
+
+    <!-- convert relative to absolute pathname -->
+    <property name="annotations-compiler-absolute" location="${annotations-compiler}" />
+
+  </target>
+
+  <!-- Compiles all the subparts of the Annotation File Utilities. -->
+  <target name="init-dependencies"
+          depends="init-properties">
+      <ant dir="${asmx}" target="bin">
+        <property name="product.noshrink" value="true"/>
+      </ant>
+      <ant dir="${scene-lib}" target="bin"/>
+      <!-- repository version only: -->
+      <!-- I don't see the need for this. -->
+      <!-- <ant dir="${annotations-compiler}" antfile="make/build.xml" target="build"/> -->
+  </target>
+
+  <target name="init"
+          depends="init-properties, init-dependencies">
+    <fileset dir="src" id="src-files">
+      <include name="**/*.java"/>
+    </fileset>
+
+    <path id="libpath">
+      <!-- alternate for distribution:
+      <pathelement location="${annotations-compiler}/bin"/>
+      -->
+      <pathelement location="${annotations-compiler}/dist/lib/javac.jar"/>
+      <pathelement location="${annotation-tools}/annotation-file-utilities/lib/plume.jar"/>
+      <pathelement location="${annotation-tools}/annotation-file-utilities/lib/google-collect-1.0-rc3.jar"/>
+      <pathelement location="${scene-lib}/bin"/>
+      <pathelement location="${asmx}/bin"/>
+      <!-- additional for distribution:
+      <pathelement location="${jre1.6.0}"/>
+      -->
+    </path>
+  </target>
+
+  <path id="javadoc-sourcepath">
+    <pathelement location="src"/>
+  </path>
+
+  <target name="javadoc-clean">
+      <delete dir="javadoc"/>
+  </target>
+
+  <target name="javadoc" depends="javadoc-clean, init">
+      <javadoc sourcepathref="javadoc-sourcepath" 
+	      classpathref="libpath"
+	      packagenames="*"
+	      Overview="overview.html"
+	      destdir="javadoc" 
+	      access="public"
+	      />
+<!--
+	      noqualifier="annotations:annotations.el:annotations.field:annotations.io:annotations.io.classfile:annotations.util:annotations.util.coll:java.lang"
+-->
+  </target>
+
+  <target name="jarfile.check.uptodate">
+      <uptodate property="bin.uptodate" targetfile="annotation-file-utilities.jar">
+	<srcfiles dir="bin" />
+      </uptodate>
+      <uptodate property="asmx.bin.uptodate" targetfile="annotation-file-utilities.jar">
+	<srcfiles dir="${asmx}/bin" excludes="tmp/**"/>
+      </uptodate>
+      <uptodate property="scene-lib.bin.uptodate" targetfile="annotation-file-utilities.jar">
+	<srcfiles dir="${scene-lib}/bin" />
+      </uptodate>
+      <uptodate property="build.classes.uptodate" targetfile="annotation-file-utilities.jar">
+	<srcfiles dir="${annotations-compiler}/build/classes" />
+      </uptodate>
+      <uptodate property="build.bootstrap.classes.uptodate" targetfile="annotation-file-utilities.jar">
+	<srcfiles dir="${annotations-compiler}/build/bootstrap/classes" />
+      </uptodate>
+      <uptodate property="plume.uptodate" targetfile="annotation-file-utilities.jar" srcfile="lib/plume.jar"/>
+      <uptodate property="google-collect.uptodate" targetfile="annotation-file-utilities.jar" srcfile="lib/google-collect-1.0-rc3.jar"/>
+
+      <condition property="jarfile.uptodate">
+	<and>
+	  <isset property="bin.uptodate"/>
+	  <isset property="asmx.bin.uptodate"/>
+	  <isset property="scene-lib.bin.uptodate"/>
+	  <isset property="build.classes.uptodate"/>
+	  <isset property="build.bootstrap.classes.uptodate"/>
+	  <isset property="plume.uptodate"/>
+	  <isset property="google-collect.uptodate"/>
+	</and>
+      </condition>
+
+      <echo message="bin.uptodate: ${bin.uptodate}"/>
+      <echo message="asmx.bin.uptodate: ${asmx.bin.uptodate}"/>
+      <echo message="scene-lib.bin.uptodate: ${scene-lib.bin.uptodate}"/>
+      <echo message="build.classes.uptodate: ${build.classes.uptodate}"/>
+      <echo message="build.bootstrap.classes.uptodate: ${build.bootstrap.classes.uptodate}"/>
+      <echo message="plume.uptodate: ${plume.uptodate}"/>
+      <echo message="google-collect.uptodate: ${google-collect.uptodate}"/>
+      <echo message="jarfile.uptodate: ${jarfile.uptodate}"/>
+
+  </target>
+
+  <target name="jarfile"
+          depends="init,build,jarfile.check.uptodate"
+	  unless="jarfile.uptodate"
+          description="create the class library annotation-file-utilities.jar">
+
+    <echo message="Using temporary directory: ${temp-jarfile}"/>
+    <delete dir="${temp-jarfile}"/>
+    <mkdir dir="${temp-jarfile}"/>
+
+    <echo message="Copying .class files to ${temp-jarfile}"/>
+    <copy todir="${temp-jarfile}">
+      <fileset dir="bin" />
+      <fileset dir="${asmx}/bin" excludes="tmp/**"/>
+      <fileset dir="${scene-lib}/bin" />
+      <!-- Why are the classes included from both build and bootstrap?? -->
+      <fileset dir="${annotations-compiler}/build/classes" />
+      <fileset dir="${annotations-compiler}/build/bootstrap/classes" />
+    </copy>
+    <!-- Also need to get class files in libraries -->
+    <unjar src="lib/plume.jar" dest="${temp-jarfile}">
+      <patternset>
+        <include name="**/*.class"/>
+        <exclude name="META-INF/" />
+      </patternset>
+    </unjar>
+    <unjar src="lib/google-collect-1.0-rc3.jar" dest="${temp-jarfile}">
+      <patternset>
+        <include name="**/*.class"/>
+        <exclude name="META-INF/" />
+      </patternset>
+    </unjar>
+
+    <!-- Actually create a single .jar file of all the class files,
+         scripts and documentation -->
+    <echo message="Creating jarfile annotation-file-utilities.jar"/>
+    <jar destfile="annotation-file-utilities.jar">
+      <fileset dir="${temp-jarfile}"/>
+    </jar>
+
+    <!-- Delete class files copied over -->
+    <echo message="Deleting temporary directory: ${temp-jarfile}"/>
+    <delete dir="${temp-jarfile}"/>
+  </target>
+
+  <target name="check-hg-status" depends="init-properties">
+    <exec executable="hg"
+	  outputproperty="status.output">
+      <arg value="status" />
+    </exec>
+
+    <condition property="status.output.empty">
+      <equals
+        arg1="${status.output}"
+        arg2=""/>
+    </condition>
+
+    <fail unless="status.output.empty"
+          message="`hg status' did not return empty output.
+  Commit/add/remove files as appropriate, then re-try."/>
+  </target>
+
+  <!-- Copy files from repository to temporary directory from which they
+  will be packaged up. -->
+  <target name="update-workspace" depends="init-properties">
+    <delete dir="${temp-annotation-tools}" />
+
+    <exec executable="hg">
+      <arg value="archive" />
+      <arg value="${temp-annotation-tools}" />
+    </exec>
+    <delete dir="${temp-annotation-tools}/scene-lib.orig-hand-annos" />
+    <delete file="${temp-annotation-tools}/.hg_archival.txt" />
+    <delete file="${temp-annotation-tools}/.hgignore" />
+
+    <copy todir="${temp-annotation-tools}/annotation-file-utilities">
+      <fileset dir="${afu}">
+        <include name="annotation-file-format.dvi"/>
+        <include name="annotation-file-format.html"/>
+        <include name="annotation-file-format.pdf"/>
+        <include name="annotation-file-utilities.jar"/>
+        <include name="bin/**"/>
+      </fileset>
+    </copy>
+
+    <copy todir="${temp-annotation-tools}/asmx">
+      <fileset dir="${asmx}">
+        <include name="bin/**"/>
+      </fileset>
+    </copy>
+
+    <copy todir="${temp-annotation-tools}/scene-lib">
+      <fileset dir="${scene-lib}">
+        <include name="bin/**"/>
+      </fileset>
+    </copy>
+
+  </target>
+
+  <target name="zipfile"
+          depends="jarfile,annotation-file-format,run-tests,update-workspace"
+          description="create the distribution: annotation-tools.zip">
+    <!-- Create a new directory containing all the files and then zip that
+         directory, so that when the user unzips they extract exactly one
+         directory. -->
+
+    <!-- In order for the shell scripts to have the proper execution bit set,
+         include them specifically with the right permissions.  Ant presently
+         does not use the file's permissions themselves to do this. -->
+    <zip destfile="annotation-tools.zip" compress="true">
+      <fileset dir="${tmpdir}">
+        <include name="annotation-tools/"/>
+        <exclude name="annotation-tools/annotation-file-utilities/scripts/extract-annotations"/>
+        <exclude name="annotation-tools/annotation-file-utilities/scripts/insert-annotations"/>
+        <exclude name="annotation-tools/annotation-file-utilities/scripts/insert-annotations-to-source"/>
+      </fileset>
+      <zipfileset dir="${tmpdir}" filemode="755">
+        <include name="annotation-tools/annotation-file-utilities/scripts/extract-annotations"/>
+        <include name="annotation-tools/annotation-file-utilities/scripts/insert-annotations"/>
+        <include name="annotation-tools/annotation-file-utilities/scripts/insert-annotations-to-source"/>
+      </zipfileset>
+    </zip>
+
+    <!-- Delete temporary files once they have been zipped. -->
+<!--
+    <delete dir="${temp-annotation-file-utilities}"/>
+-->
+  </target>
+
+   <target name="web" depends="check-hg-status,clean,zipfile,check-hg-status"
+          description="export the zipfile, etc. to its website">
+    <echo message="Export location: ${jsr308-www-annotation-file-utilities}"/>
+    <echo message="Copying annotation-tools.zip"/>
+    <copy file="annotation-tools.zip"
+      todir="${jsr308-www-annotation-file-utilities}"/>
+
+    <echo message="Copying annotation-file-utilities.html"/>
+    <copy file="annotation-file-utilities.html"
+      todir="${jsr308-www-annotation-file-utilities}"/>
+    <copy file="changelog.html"
+      todir="${jsr308-www-annotation-file-utilities}"/>
+
+    <echo message="Copying annotation-file-format.{html,pdf"/>
+    <copy file="annotation-file-format.html"
+      todir="${jsr308-www-annotation-file-utilities}"/>
+    <copy file="annotation-file-format.pdf"
+      todir="${jsr308-www-annotation-file-utilities}"/>
+
+    <echo message="Updating link dates"/>
+<!--
+  TEMPORARY
+-->
+<!--
+    <exec executable="update-link-dates"
+          failonerror="true">
+      <arg value="${jsr308-www}/jsr308-webpage.html"/>
+    </exec>
+    <echo message="Checking HTML links"/>
+    <exec executable="/usr/bin/make"
+          failonerror="true">
+      <arg value="-C"/>
+      <arg value="../doc"/>
+      <arg value="checklinks"/>
+    </exec>
+-->
+
+  </target>
+
+  <!--
+    A problem is that the document date is the date that LaTeX was run
+    rather than the date of last modification; that should be fixed in
+    the document, perhaps.  -->
+  <!-- The user should run BibTeX periodically to update the .bbl file. -->
+  <target name="annotation-file-format"
+          description="Make documentation: annotation-file-format.{html,pdf}">
+    <exec executable="latex">
+      <arg value="annotation-file-format.tex"/>
+    </exec>
+    <exec executable="latex">
+      <arg value="annotation-file-format.tex"/>
+    </exec>
+    <exec executable="pdflatex">
+      <arg value="annotation-file-format.tex"/>
+    </exec>
+    <exec executable="hevea">
+      <arg value="-fix"/>
+      <arg value="-exec"/>
+      <arg value="xxdate.exe"/>
+      <arg value="urlhref.hva"/>
+      <arg value="annotation-file-format.tex"/>
+    </exec>
+  </target>
+
+  <target name="clean"
+          description="removes generated files (e.g., .jar, .zip)">
+    <delete dir="bin"/>
+
+    <!-- <echo message="Deleting temporary directory: ${temp-jarfile}"/> -->
+    <delete dir="${temp-jarfile}"/>
+    <delete dir="${temp-annotation-file-utilities}"/>
+
+    <!-- <echo message="Deleting previous distribution:  annotation-file-utilities.{jar,zip}"/> -->
+    <delete file="annotation-file-utilities.jar"/>
+    <delete file="annotation-tools.zip"/>
+    <exec dir="tests/" executable="make" failonerror="true">
+      <arg value="clean"/>
+    </exec>
+    <exec dir="tests/source-extension/" executable="make" failonerror="true">
+      <arg value="clean"/>
+    </exec>	
+    <exec dir="tests/system-test/" executable="make" failonerror="true">
+      <arg value="clean"/>
+    </exec>  
+  </target>
+
+  <target name="run-tests" depends="init-properties"
+          description="run tests for the annotator">
+    <exec dir="tests/" executable="make" failonerror="true">
+        <env key="XJAVAC" value="${annotations-compiler-absolute}/dist/bin/javac"/>
+        <env key="JAVAC_JAR" value="${annotations-compiler-absolute}/dist/lib/javac.jar"/>
+    </exec>
+  </target>
+
+  <target name="bin"
+          depends="build"/>
+
+  <target name="build"
+          depends="init"
+          description="compile all source files">
+
+    <mkdir dir="bin"/>
+
+    <javac fork="true" srcdir="src" destdir="bin" debug="true" encoding="8859_1"
+      classpathref="libpath" includeantruntime="false">
+      <!-- We are required to put jsr308's javac.jar on the bootclasspath so
+           that those javac classes are found before the stock javac classes
+           that the Mac OS includes on the bootclasspath (other platforms do
+           not make such inclusions) -->
+      <compilerarg value="-Xbootclasspath/p:${annotations-compiler-absolute}/dist/lib/javac.jar"/>
+    </javac>
+
+  </target>
+
+  <!-- Boilerplate to set jsr308javac property. Is there a better way? -->
+  <property environment="env"/>
+  <condition property="isUnix">
+    <os family="unix" />
+  </condition>
+  <condition property="isWindows">
+    <os family="windows" />
+  </condition>
+  <target name="init-jsr308javac-unix" if="isUnix">
+    <property name="jsr308javac" value="${env.CHECKERS}/binary/javac" />
+  </target>
+  <target name="init-jsr308javac-windows" if="isWindows">
+    <property name="jsr308javac" value="${env.CHECKERS}/binary/javac.bat" />
+  </target>
+
+  <target name="check-nullness"
+          description="Check for nullness errors."
+          depends="init,clean,init-jsr308javac-unix,init-jsr308javac-windows">
+    <mkdir dir="bin"/>
+    <javac srcdir="src" destdir="bin" debug="true" encoding="8859_1"
+           fork="yes"
+           executable="${jsr308javac}">
+      <compilerarg value="-version"/>
+      <compilerarg line="-target 5"/>
+      <compilerarg line="-processor checkers.nonnull.NonNullFbcChecker"/>
+      <compilerarg line="-Xbootclasspath/p:${env.CHECKERS}/jdk/jdk.jar"/>
+      <compilerarg value="-implicit:class"/>
+      <compilerarg line="-Awarns -Xmaxwarns 10000"/>
+      <classpath>
+        <path refid="libpath"/>
+        <pathelement location="${env.annotations}/checkers/checkers.jar"/>
+      </classpath>
+    </javac>
+  </target>
+
+
+  <!-- This tags table includes the scene library. -->
+  <target name="etags" depends="tags">
+  </target>
+  <target name="tags"
+          description="create Emacs TAGS table, including scene library files">
+    <exec executable="/bin/sh">
+      <arg value="-c"/>
+      <arg value="etags `find src -name '*.java' | sort-directory-order` `find ../scene-lib -name '*.java' | sort-directory-order`"/>
+    </exec>
+  </target>
+
+</project>

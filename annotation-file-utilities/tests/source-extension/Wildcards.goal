@@ -1,0 +1,15 @@
+import java.util.List;
+import java.util.Map;
+
+/**
+ * @skip-test
+ */
+public class Wildcards {
+  @GUT.quals.Rep
+  List<? extends @GUT.quals.Rep java.lang.Object> l1;
+  @GUT.quals.Rep
+  List<? extends @GUT.quals.Rep Object> l2;
+  Map<? extends @GUT.quals.Peer java.lang.Object, ? extends @GUT.quals.Rep java.lang.Object> l3;
+  Map<@GUT.quals.Rep ? extends @GUT.quals.Peer Map<@GUT.quals.Rep ? extends @GUT.quals.Peer java.lang.Object, @GUT.quals.Rep String>, @GUT.quals.Peer Object> l4;
+}
+
