@@ -175,9 +175,7 @@
       <fileset dir="bin" />
       <fileset dir="${asmx}/bin" excludes="tmp/**"/>
       <fileset dir="${scene-lib}/bin" />
-      <!-- Why are the classes included from both build and bootstrap?? -->
       <fileset dir="${annotations-compiler}/build/classes" />
-      <fileset dir="${annotations-compiler}/build/bootstrap/classes" />
     </copy>
     <!-- Also need to get class files in libraries -->
     <unjar src="lib/plume.jar" dest="${temp-jarfile}">
