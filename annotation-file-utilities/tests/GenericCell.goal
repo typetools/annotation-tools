@@ -1,0 +1,35 @@
+package annotator.tests;
+
+import java.util.List;
+
+/**
+ * @skip-test
+ */
+public class GenericCell {
+  private @java.lang.ThisMutable List<@java.lang.ThisMutable IntCell> internalList;
+
+  public GenericCell(@java.lang.Mutable List<@java.lang.Mutable IntCell> list) {
+    internalList = list;
+  }
+
+  public @java.lang.PolyRead List<@java.lang.PolyRead IntCell> getList(@java.lang.PolyRead GenericCell this) {
+    return internalList;
+  }
+
+  public static class IntCell {
+    private int i;
+
+    public IntCell(int in) {
+      this.i = in;
+    }
+
+    public void set(int in) /* mutable */ {
+      this.i = in;
+    }
+
+    public int get() /* readonly */ {
+      return i;
+    }
+  }
+
+}

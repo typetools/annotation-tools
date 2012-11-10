@@ -1,0 +1,60 @@
+package:
+annotation @Z:
+annotation @A:
+annotation @B:
+annotation @C:
+annotation @D:
+annotation @E:
+annotation @X:
+
+class NewArray:
+
+field names01:
+new *0:
+inner-type 0: @X
+
+// Illegal
+// field names02:
+// new *0:
+// inner-type 0: @X
+
+field names03:
+new *0:
+inner-type 0: @X
+
+field names0:
+new *0: @Z
+field names1:
+new *0:
+inner-type 0: @A
+field names2:
+new *0:
+inner-type 1: @B
+field names3:
+new *0:
+inner-type 2: @C
+field names4:
+new *0:
+inner-type 3: @D
+field names5:
+new *0:
+inner-type 4: @E
+
+field names10:
+new *0: @Z
+field names11:
+new *0:
+inner-type 0: @A
+field names12:
+new *0:
+inner-type 1: @B
+field names13:
+new *0:
+inner-type 2: @C
+field names14:
+new *0:
+inner-type 3: @D
+field names15:
+new *0:
+inner-type 4: @E
+

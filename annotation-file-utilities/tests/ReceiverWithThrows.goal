@@ -1,0 +1,16 @@
+package annotator.tests;
+
+/**
+ * @skip-test
+ */
+public class ReceiverWithThrows {
+  /* @Mutable ReceiverWithThrows this */
+  public void foo(@java.lang.Mutable ReceiverWithThrows this) {
+
+  }
+
+  /* @ReadOnly ReceiverWithThrows this */
+  public void bar(@java.lang.ReadOnly ReceiverWithThrows this) throws Exception {
+
+  }
+}

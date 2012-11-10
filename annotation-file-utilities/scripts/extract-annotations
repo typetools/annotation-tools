@@ -1,0 +1,24 @@
+#!/bin/sh
+
+# Extract annotations from a class file and write them to an annotation file.
+# For usage information, run: extract-annotations --help
+# See the annotation file utilities documentation for more information.
+
+ANNOTATION_FILE_UTILS=$(dirname $0)/../bin:$(dirname $0)/../annotation-file-utilities.jar
+# Contains new version of java.lang.annotation.ElementType.
+LANGTOOLS=${LANGTOOLS:-$(dirname $0)/../../../jsr308-langtools}
+JAVAC_JAR=${JAVAC_JAR:-${LANGTOOLS}/dist/lib/javac.jar}
+CHECKERS=${CHECKERS:-$(dirname $0)/../../../checker-framework/checkers}
+CHECKERS_JAR=${CHECKERS_JAR:-${CHECKERS}/checkers.jar}
+
+# AFU seems to bundle checkers.qualifiers in the
+# annotation-file-utilities.jar.  extract-annotations uses NonNull in
+# the jar as it is in the bootclasspath.  However, the annotation
+# NonNull has a dependency on AnnotatedPrimitiveType that doesn't get
+# bundled in the jar file, and bootclasspath classes cannot reference
+# classes found in CLASSPATH, so it cannot load the class
+# AnnotatedPrimitiveType causing the following bit of exception:
+
+# Needs CLASSPATH to find user files
+java -Xbootclasspath/p:${JAVAC_JAR} -ea -cp ${CHECKERS_JAR}:${ANNOTATION_FILE_UTILS}:${CLASSPATH} annotations.io.classfile.ClassFileReader $@
+
