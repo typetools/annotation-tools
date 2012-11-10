@@ -172,10 +172,10 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       // I'm not quite sure where this list is now.
       // jcnode.recvparam.mods.annotations might still contain declaration annotations.
       // By the point they are disambiguated, they've become TypeCompounds.
-      List<JCTypeAnnotation> receiverAnnotations;
+      List<JCAnnotation> receiverAnnotations;
 
-      if (jcnode.recvparam!=null) {
-        receiverAnnotations = com.sun.tools.javac.util.List.convert(JCTypeAnnotation.class, jcnode.recvparam.mods.annotations);
+      if (jcnode.recvparam != null) {
+        receiverAnnotations = jcnode.recvparam.mods.annotations;
       } else {
         receiverAnnotations = Collections.emptyList();
       }
