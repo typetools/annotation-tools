@@ -287,8 +287,8 @@ public class Main {
             if (comments) {
               if (toInsert.startsWith("extends ")) {
                 toInsert = "extends /*"
-                  + toInsert.substring(8, toInsert.length()-7)
-                  + "*/ Object";
+                  + toInsert.substring(8, toInsert.length()-17)
+                  + "*/ java.lang.Object";
               } else {
                 toInsert = "/*" + toInsert + "*/";
               }
