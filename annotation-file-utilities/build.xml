@@ -326,6 +326,18 @@
 
   </target>
 
+  <target name="annotation-file-format-clean"
+          description="removes generated documentation files">
+    <delete file="annotation-file-format.aux"/>
+    <delete file="annotation-file-format.dvi"/>
+    <delete file="annotation-file-format.haux"/>
+    <delete file="annotation-file-format.html"/>
+    <delete file="annotation-file-format.htoc"/>
+    <delete file="annotation-file-format.log"/>
+    <delete file="annotation-file-format.pdf"/>
+    <delete file="annotation-file-format.toc"/>
+  </target>
+
   <!--
     A problem is that the document date is the date that LaTeX was run
     rather than the date of last modification; that should be fixed in
@@ -351,7 +363,7 @@
     </exec>
   </target>
 
-  <target name="clean"
+  <target name="clean" depends="annotation-file-format-clean"
           description="removes generated files (e.g., .jar, .zip)">
     <delete dir="bin"/>
 
