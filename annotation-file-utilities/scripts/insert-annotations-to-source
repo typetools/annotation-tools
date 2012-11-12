@@ -4,7 +4,7 @@
 # For usage information, run: insert-annotations-to-source --help 
 # See the annotation file utilities documentation for more information.
 
-ANNOTATION_FILE_UTILS=$(dirname $0)/../bin:$(dirname $0)/../annotation-file-utilities.jar
+ANNOTATION_FILE_UTILS=$(dirname $0)/../bin:$(dirname $0)/../../scene-lib/bin:$(dirname $0)/../annotation-file-utilities.jar
 # Contains new version of java.lang.annotation.ElementType.
 LANGTOOLS=${LANGTOOLS:-$(dirname $0)/../../../jsr308-langtools}
 JAVAC_JAR=${JAVAC_JAR:-${LANGTOOLS}/dist/lib/javac.jar}
