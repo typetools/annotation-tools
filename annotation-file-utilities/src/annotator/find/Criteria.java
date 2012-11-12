@@ -59,12 +59,12 @@ public final class Criteria {
     assert path == null || path.getLeaf() == leaf;
     for (Criterion c : criteria) {
       if (! c.isSatisfiedBy(path, leaf)) {
-    	if (debug) {
+        if (debug) {
           System.out.printf("UNsatisfied criterion:%n    %s%n    %s%n", c, Main.pathToString(path));
-    	}
+        }
         return false;
       } else if (debug) {
-    	System.out.printf("satisfied criterion:%n    %s%n    %s%n", c, Main.pathToString(path));
+        System.out.printf("satisfied criterion:%n    %s%n    %s%n", c, Main.pathToString(path));
       }
     }
     return true;
@@ -86,7 +86,7 @@ public final class Criteria {
         }
         return false;
       } else if (debug) {
-    	System.out.println("satisfied criterion: " + c);
+        System.out.println("satisfied criterion: " + c);
       }
     }
     return true;
@@ -304,7 +304,7 @@ public final class Criteria {
   }
 
   public final static Criterion field(String varName) {
-	return new FieldCriterion(varName);
+    return new FieldCriterion(varName);
   }
 
   public final static Criterion inStaticInit(int blockID) {
