@@ -1,14 +1,14 @@
 package annotator.find;
 
-import annotator.Main;
-
-import java.util.*;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import annotations.el.BoundLocation;
 import annotations.el.InnerTypeLocation;
 import annotations.el.LocalLocation;
 import annotations.el.RelativeLocation;
 import annotations.el.TypeIndexLocation;
+import annotator.Main;
 
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
