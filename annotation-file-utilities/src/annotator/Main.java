@@ -268,29 +268,19 @@ public class Main {
           assert pos >= 0
             : "pos is negative: " + pos + " " + toInsertList.get(0) + " " + javafilename;
           for (Insertion iToInsert : toInsertList) {
-            String toInsert = iToInsert.getText();
+            String toInsert = iToInsert.getText(comments, abbreviate);
             if (! (toInsert.startsWith("@")
-                   || toInsert.startsWith("extends @"))) {
+                   || toInsert.startsWith("extends "))) {
               throw new Error("Insertion doesn't start with '@': " + toInsert);
             }
             if (abbreviate) {
-              Pair<String,String> ps = removePackage(toInsert);
-              if (ps.a != null) {
-                if (debug && !imports.contains(ps.a)) {
+              String packageName = iToInsert.getPackageName();
+              if (packageName != null) {
+                if (debug && !imports.contains(packageName)) {
                   System.out.printf("Need import %s%n  due to insertion %s%n",
-                                    ps.a, toInsert);
+                                    packageName, toInsert);
                 }
-                imports.add(ps.a);
-              }
-              toInsert = ps.b;
-            }
-            if (comments) {
-              if (toInsert.startsWith("extends ")) {
-                toInsert = "extends /*"
-                  + toInsert.substring(8, toInsert.length()-17)
-                  + "*/ java.lang.Object";
-              } else {
-                toInsert = "/*" + toInsert + "*/";
+                imports.add(packageName);
               }
             }
 
@@ -461,59 +451,6 @@ public class Main {
       return s.substring(0, newlineIndex) + "...";
     }
   }
-
-  /**
-   * Removes the leading package.
-   *
-   * @return given <code>@com.foo.bar(baz)</code> it returns the pair
-   * <code>{ com.foo, @bar(baz) }</code>.
-   */
-  private static Pair<String,String> removePackageInternal(String s) {
-    int nameEnd = s.indexOf("(");
-    if (nameEnd == -1) {
-      nameEnd = s.length();
-    }
-    int dotIndex = s.lastIndexOf(".", nameEnd);
-    if (dotIndex != -1) {
-      String packageName = s.substring(0, nameEnd);
-      if (packageName.startsWith("@")) {
-        return Pair.of(packageName.substring(1),
-                       "@" + s.substring(dotIndex + 1));
-      } else {
-        return Pair.of(packageName,
-                       s.substring(dotIndex + 1));
-      }
-    } else {
-      return Pair.of((String)null, s);
-    }
-  }
-
-  private static Pattern extendsObjectPattern
-    = Pattern.compile("^extends (.*) ((java\\.lang\\.)?Object)$");
-
-  /**
-   * Removes the leading package.
-   * Handles "extends @B Object" and "extends @B java.lang.Object" strings.
-   *
-   * @return given <code>@com.foo.bar(baz)</code> it returns the pair
-   * <code>{ com.foo, @bar(baz) }</code>.
-   */
-  public static Pair<String,String> removePackage(String s) {
-    String extendsWrapped = null;
-    Matcher m = extendsObjectPattern.matcher(s);
-    if (m.matches()) {
-      s = m.group(1);
-      extendsWrapped = m.group(2);
-    }
-    Pair<String,String> result = removePackageInternal(s);
-    // System.out.printf("removePackageInternal(%s) => %s%n", s, result);
-    if (extendsWrapped != null) {
-      return Pair.of(result.a, "extends " + result.b + " " + extendsWrapped);
-    } else {
-      return result;
-    }
-  }
-
 
   /**
    * Separates the annotation class from its arguments.
