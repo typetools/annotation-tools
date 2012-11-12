@@ -936,7 +936,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
           // @Retention(RetentionPolicy.CLASS)
           String ann = at.getAnnotationType().toString();
           String iann = Main.removeArgs(i.getText()).a.substring(1); // strip off the leading @
-          String iannNoPackage = Main.removePackage(iann).b;
+          String iannNoPackage = Insertion.removePackage(iann).b;
           // System.out.printf("Comparing: %s %s %s%n", ann, iann, iannNoPackage);
           if (ann.equals(iann) || ann.equals(iannNoPackage)) {
             debug("Already present, not reinserting: %s%n", ann);
@@ -968,7 +968,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
           pos = (nextpos1!=-1 && nextpos1 < nextpos2) ? nextpos1 : nextpos2;
 
           // need to add "extends ... Object" around the type annotation
-          i = new Insertion("extends " + i.getText() + " java.lang.Object", i.getCriteria(), i.getSeparateLine());
+          i = new TypeBoundExtendsInsertion(i.getText(), i.getCriteria(), i.getSeparateLine());
       } else if ((node instanceof WildcardTree) // Easier than listing three tree kinds. Correct?
                && ((WildcardTree)node).getBound()==null) {
           pos = tpf.scan(node, null);
@@ -978,7 +978,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
           pos = (nextpos1!=-1 && nextpos1 < nextpos2) ? nextpos1 : nextpos2;
 
           // need to add "extends ... Object" around the type annotation
-          i = new Insertion("extends " + i.getText() + " java.lang.Object", i.getCriteria(), i.getSeparateLine());
+          i = new TypeBoundExtendsInsertion(i.getText(), i.getCriteria(), i.getSeparateLine());
       } else {
         boolean typeScan = true;
         if (node.getKind() == Tree.Kind.METHOD) { // MethodTree
