@@ -271,7 +271,7 @@ public class Main {
             String toInsert = iToInsert.getText(comments, abbreviate);
             if (! (toInsert.startsWith("@")
                    || toInsert.startsWith("extends "))) {
-              throw new Error("Insertion doesn't start with '@': " + toInsert);
+              throw new Error("Illegal insertion: " + toInsert);
             }
             if (abbreviate) {
               String packageName = iToInsert.getPackageName();
