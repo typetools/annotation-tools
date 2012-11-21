@@ -1,0 +1,46 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <title>Annotation Scene Library overview</title>
+</head>
+
+<!-- Everything between <body> and </body> ends up in file overview-summary.html in the Javadoc. -->
+
+<body>
+The Annotation Scene Library provides classes to represent the annotations on a
+Java program and read and write those annotations in various formats.
+
+<h2>Structure</h2>
+
+<ul>
+<li>An {@link annotations.el.AScene} holds annotations for a set of classes
+and packages.
+</li>
+<li>A {@link annotations.el.AElement} represents one particular element of a
+Java program within an <code>AScene</code>.
+</li>
+<li>Package {@link annotations.io} provides routines to read and write
+{@link annotations.el.AScene}s in various formats.
+</li>
+<li>An {@link annotations.Annotation} represents an annotation (which might be a
+field of another annotation).  It can be attached to an {@link annotations.el.AElement}.
+</li>
+<li>An {@link annotations.AnnotationDef} represents an annotation definition,
+consisting of a definition name and field names and types
+({@link annotations.field.AnnotationFieldType}s).  It also indicates the
+annotation's retention policy.
+</li>
+</ul>
+
+<h2>Example</h2>
+
+<p>
+The example program <tt>annotations.tests.Example</tt> demonstrates the
+library's annotation-processing capabilities.  Its source code (and also
+example input and output) are distributed with the Scene Library.
+</p>
+
+</body>
+</html>

@@ -1,0 +1,179 @@
+<body>
+The Annotation Scene Library provides classes to represent the annotations on a
+Java program and read and write those annotations in various formats.
+
+<h2>Structure</h2>
+
+<ul>
+<li>An {@link annotations.el.AScene} can hold annotations for all the classes
+and packages that a client is considering.
+<li>A {@link annotations.el.AElement} represents one particular element of a
+Java program within an <code>AScene</code>.
+<li>Package {@link annotations.io} provides routines to read and write
+{@link annotations.el.AScene}s in various formats.
+<li>An {@link annotations.Annotation} represents an annotation that might be a
+field of another annotation.
+<li>An {@link annotations.AnnotationDef} represents an annotation definition,
+consisting of a definition name and field names and types
+({@link annotations.field.AnnotationFieldType}s).
+<li>A {@link annotations.TLAnnotation} represents a top-level annotation, which
+has a retention policy and can be attached to an
+{@link annotations.el.AElement}.
+</ul>
+
+<h2>Example</h2>
+Here is an example program that uses the library to perform some simple
+annotation processing.  While the example may seem arbitrary, it does
+serve to demonstrate what the library can do.
+
+<pre>
+package annotations.tests;
+
+import java.io.*;
+import java.util.*;
+
+import annotations.*;
+import annotations.el.*;
+import annotations.field.*;
+import annotations.io.*;
+
+// Invoke as: java Example &lt;input.jann&gt; &lt;ClassToProcess&gt; &lt;output.jann&gt;
+public class Example {
+    public static void main(/*@NonNull*/ String[/*@NonNull*/ /*@ReadOnly*/] args) {
+        /*@NonNull*/ AScene&lt;SimpleAnnotation&gt; scene;
+
+        System.out.println("Reading in " + args[0]);
+        try {
+            scene = new AScene&lt;SimpleAnnotation&gt;(SimpleAnnotationFactory.saf);
+            IndexFileParser.parse(new FileReader(args[0]), scene);
+        } catch (IOException e) {
+            e.printStackTrace(System.err);
+            return;
+        } catch (ParseException e) {
+            e.printStackTrace(System.err);
+            return;
+        }
+
+        System.out.println("Processing class " + args[1]);
+        // Get a handle on the class
+        AClass&lt;SimpleAnnotation&gt; clazz1 = scene.classes.get(args[1]);
+        if (clazz1 == null) {
+            System.out
+                    .println("That class is never mentioned in the annotation file!");
+            return;
+        }
+        /*@NonNull*/ AClass&lt;SimpleAnnotation&gt; clazz =
+                (/*@NonNull*/ AClass&lt;SimpleAnnotation&gt;) clazz1;
+
+        for (/*@NonNull*/ Map.Entry&lt;/*@NonNull*/ String, /*@NonNull*/ AMethod&lt;SimpleAnnotation&gt;&gt; me : clazz.methods
+                .entrySet()) {
+            /*@NonNull*/ AMethod&lt;SimpleAnnotation&gt; method = me.getValue();
+
+            TLAnnotation&lt;SimpleAnnotation&gt; rro =
+                    method.receiver.tlAnnotationsHere.lookup("ReadOnly");
+            if (rro == null)
+                System.out.println("Method " + me.getKey()
+                        + " might modify the receiver");
+            else
+                System.out.println("Method " + me.getKey()
+                        + " must not modify the receiver");
+
+            /*@NonNull*/ ATypeElement&lt;SimpleAnnotation&gt; param1 =
+                    method.parameters.vivify(0);
+            TLAnnotation&lt;SimpleAnnotation&gt; p1nn =
+                    param1.tlAnnotationsHere.lookup("NonNull");
+            if (p1nn == null) {
+                System.out.println("Annotating first parameter of "
+                        + me.getKey() + " nonnull");
+
+                /*@NonNull*/ AnnotationDef nonnullDef =
+                        new AnnotationDef(
+                                "NonNull",
+                                Collections
+                                        .&lt;/*@NonNull*/ String, /*@NonNull*/ AnnotationFieldType&gt; emptyMap());
+                /*@NonNull*/ SimpleAnnotation p1nn2 =
+                        new SimpleAnnotation(
+                                nonnullDef,
+                                Collections
+                                        .&lt;/*@NonNull*/ String, /*@NonNull*/ Object&gt; emptyMap());
+                param1.tlAnnotationsHere
+                        .add(new TLAnnotation&lt;SimpleAnnotation&gt;(
+                                new TLAnnotationDef(nonnullDef,
+                                        RetentionPolicy.RUNTIME), p1nn2));
+            }
+        }
+
+        System.out.println("Writing out " + args[2]);
+        try {
+            IndexFileWriter.write(scene, new FileWriter(args[2]));
+        } catch (IOException e) {
+            e.printStackTrace(System.err);
+            return;
+        } catch (DefException e) {
+            e.printStackTrace(System.err);
+            return;
+        }
+
+        System.out.println("Success.");
+    }
+}
+</pre>
+
+Running <code>java annotations.tests.Example input.jann foo.Bar output.jann</code>
+with this file <code>input.jann</code>:
+
+<pre>
+package:
+annotation visible @ReadOnly:
+annotation visible @NonNull:
+
+package foo:
+class Bar:
+	method getSomething(Ljava/lang/StringBuffer;):
+		receiver: @ReadOnly
+	method setSomething(Ljava/lang/String;):
+		parameter #0: @NonNull
+	method &lt;init&gt;(Ljava/lang/String;):
+</pre>
+
+produces this output on the terminal:
+
+<pre>
+Reading in input.jann
+Processing class foo.Bar
+Method getSomething must not modify the receiver
+Annotating first parameter of getSomething nonnull
+Method setSomething might modify the receiver
+Method &lt;init&gt; might modify the receiver
+Annotating first parameter of &lt;init&gt; nonnull
+Writing out output.jann
+Success.
+</pre>
+
+and this file <code>output.jann</code>:
+
+<pre>
+package :
+annotation visible @ReadOnly:
+
+package :
+annotation visible @NonNull:
+
+package foo:
+class Bar:
+
+    method getSomething(Ljava/lang/StringBuffer;):
+        parameter #0: @NonNull
+        receiver: @ReadOnly
+
+    method setSomething(Ljava/lang/String;):
+        parameter #0: @NonNull
+        receiver:
+
+    method &lt;init&gt;(Ljava/lang/String;):
+        parameter #0: @NonNull
+        receiver:
+
+</pre>
+
+</body>
