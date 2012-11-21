@@ -5,6 +5,7 @@ import java.util.*;
 import java.util.regex.*;
 import plume.*;
 
+import annotator.find.Criteria;
 import annotator.find.Insertion;
 import annotator.find.TreeFinder;
 import annotator.Source;
@@ -105,6 +106,7 @@ public class Main {
 
     if (debug) {
       TreeFinder.debug = true;
+      Criteria.debug = true;
     }
 
     if (help) {
