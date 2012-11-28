@@ -322,6 +322,7 @@ of the \\ \qquad    \bnfcmt annotation:   ``\texttt{@A(12)}'' rather than ``\tex
 \qquad    \bnfcmt while the annotation on the \bnflit{type} line is that of outermost type. \\
 \qquad    \bnflit{field} \bnfnt{name} \bnflit{:} \bnfnt{annotation}* \lineend  \\
 \qquad        \bnfnt{type-annotations}* \\
+\qquad        \bnfnt{insert-typecast-definition}* \\
 \\
 \bnfnt{method-definition} ::= \\
 \qquad    \bnfcmt The method-key consists of the name followed by the signature \\
@@ -343,6 +344,7 @@ of the \\ \qquad    \bnfcmt annotation:   ``\texttt{@A(12)}'' rather than ``\tex
 \qquad        \bnfnt{typecast-definition}* \\
 \qquad        \bnfnt{instanceof-definition}* \\
 \qquad        \bnfnt{new-definition}* \\
+\qquad        \bnfnt{insert-typecast-definition}* \\
 % TODO: exception types in catch clause
 % TODO: .class literals
 % TODO: type arguments in constructor and method calls
@@ -406,6 +408,11 @@ of the \\ \qquad    \bnfcmt annotation:   ``\texttt{@A(12)}'' rather than ``\tex
 \qquad    \bnflit{new} \bnfnt{loc}\bnflit{:} \bnfnt{annotation}* \lineend  \\
 \qquad    \bnfnt{type-argument-or-array-definition}* \\
 \\
+\bnfnt{insert-typecast-definition} ::= \\
+\qquad    \bnfcmt \bnfnt{ast-path} is described in Section~\ref{ast-paths}. \\
+\qquad    \bnfcmt \bnfnt{type} is the un-annotated type to cast to. \\
+\qquad    \bnflit{insert-typecast} \bnfnt{ast-path}\bnflit{:} \bnfnt{annotation}* \bnfnt{type} \lineend \\
+\\
 \bnfnt{loc} ::= \\
 \qquad    \bnfcmt ``\# integer'' is a bytecode offset, and ``* integer'' indicates which occurrence in the source. \\
 \qquad    \bnflit{\#} \bnfnt{integer} $|$ \bnflit{*} \bnfnt{integer}
@@ -427,8 +434,22 @@ fields, classes, etc., the \code{.class} file is not necessary.
 
 % TODO: annotations on wildcard bounds? 
 
+\subsection{Source code locations\label{additional-locations}}
 
-\subsection{Support for source code indexes\label{source-code-index}}
+The Annotation File Utilities supports two additional methods to specify a
+location: source code indexes and AST paths. Unfortunately, these methods only
+allow insertion of annotations in source code, not \code{.class} files.
+Therefore, in order to insert annotations in both \code{.class} files and source
+code, locations must be redundantly specified as bytecode offsets and source
+code locations. This can be done in a single \code{.jaif} file or two seperate
+\code{.jaif} files. However, since bytecode offsets and source code locations
+are not used to add annotations to signatures, it is not necessary to include
+redundant information to insert annotations on signatures in both \code{.class}
+files and source code.
+
+Source code indexes and AST paths are described below.
+
+\subsubsection{Source code indexes\label{source-code-index}}
 
 For some tools it is easier to generate the index into the source code
 instead of the bytecode offset.
@@ -475,7 +496,297 @@ the bytecode offsets that are introduced using \bnflit{\#}.
 % TODO: explain more about the pros/cons.
 % Maybe an example?
 
+\subsubsection{AST paths\label{ast-paths}}
 
+The Annotation File Utilities supports using a path through the AST (abstract
+syntax tree) to specify an arbitrary expression in source code to modify.
+Currently, AST paths can only be used to specify a location to insert a cast.
+
+An AST path represents a traversal through the AST nodes. AST paths are
+restricted for use in \bnfnt{field-definition}s and \bnfnt{method-definition}s.
+An AST path starts with the first element under the definition type. For
+methods this is \code{Block} and for fields this is \code{Variable}.
+
+An AST path is composed of one or more AST entries, separated by commas. Each
+AST entry is composed of a tree kind, a child selector, and an optional
+argument. An example AST entry is:
+
+\begin{verbatim}
+Block.statement 1
+\end{verbatim}
+
+The tree kind is \code{Block}, the child selector is \code{statement} and the
+argument is \code{1}.
+
+The available tree kinds correspond to the Java AST tree nodes (from the package
+\code{com.sun.source.tree}), but with ``Tree'' removed from the name. For
+example, the class \code{com.sun.source.tree.BlockTree} is represented as
+\code{Block}. The child selectors correspond to the method names of the given
+Java AST tree node, with ``get'' removed from the beginning of the method name
+and the first letter lowercased. In cases where the child selector method
+returns a list, the method name is made singular and the AST entry also contains
+an argument to select the index of the list to take. For example, the method
+\code{com.sun.source.tree.BlockTree.getStatements()} is represented as
+\code{Block.statement} and requires an argument to select the statement to take.
+
+The following is an example of an entire AST path:
+
+\begin{verbatim}
+Block.statement 1, Switch.case 1, Case.statement 0, ExpressionStatement.expression,
+    MethodInvocation.argument 0
+\end{verbatim}
+
+Since the above example starts with a \code{Block} it belongs in a
+\bnfnt{method-definition}. This AST path would select an expression that is in
+statement 1 of the method, case 1 of the switch statement, statement 0 of the
+case, and argument 0 of a method call (\code{ExpressionStatement} is just a
+wrapper around an expression that can also be a statement).
+
+The following is an example of an annotation file with AST paths used to specify
+where to insert casts.
+
+\begin{verbatim}
+package p:
+annotation @A:
+
+class ASTPathExample:
+
+field a:
+    insert-typecast Variable.initializer, Binary.rightOperand: @A Integer
+
+method m()V:
+    insert-typecast Block.statement 0, Variable.initializer: @A Integer
+    insert-typecast Block.statement 1, Switch.case 1, Case.statement 0,
+        ExpressionStatement.expression, MethodInvocation.argument 0: @A Integer
+\end{verbatim}
+
+And the matching source code:
+
+\begin{verbatim}
+package p;
+
+public class ASTPathExample {
+
+    private int a = 12 + 13;
+
+    public void m() {
+        int x = 1;
+        switch (x + 2) {
+            case 1:
+                System.out.println(1);
+                break;
+            case 2:
+                System.out.println(2 + x);
+                break;
+            default:
+                System.out.println(-1);
+        }
+    }
+}
+\end{verbatim}
+
+The following is the ouput, with the casts inserted.
+
+\begin{verbatim}
+package p;
+import p.A;
+
+public class ASTPathExample {
+
+    private int a = 12 + ((@A Integer) (13));
+
+    public void m() {
+        int x = ((@A Integer) (1));
+        switch (x + 2) {
+            case 1:
+                System.out.println(1);
+                break;
+            case 2:
+                System.out.println(((@A Integer) (2 + x)));
+                break;
+            default:
+                System.out.println(-1);
+        }
+    }
+}
+\end{verbatim}
+
+Note that two additional sets of parentheses are always added for each cast
+insertion: one set around the expression to be cast, and other set around the
+cast and the expression. This is to limit the cast to the entire expression, but
+nothing more. These parentheses may be unnecessary and can be removed by the
+programmer afterward. Also note that a cast can inserted on any expression, not
+just the lowest expression in the AST. For example, a cast could be inserted on
+the expression \code{i + j}, the literal \code{i}, and/or the literal \code{j}.
+
+To help create correct AST paths it may be useful to view the AST of a class.
+The Checker Framework has a processor to do this. The following command will
+output indented AST nodes for the entire input program.
+
+\begin{verbatim}
+javac -processor checkers.util.debug.TreeDebug ASTPathExample.java
+\end{verbatim}
+
+The following is the grammar for AST paths.
+
+\begin{tabbing}
+\qquad \= \kill
+\bnfnt{ast-path} ::= \\
+\qquad    \bnfnt{ast-entry} [ \bnflit{,} \bnfnt{ast-entry} ]+ \\
+\\
+\bnfnt{ast-entry} ::= \\
+\qquad    \bnfnt{annotated-type} \\
+\qquad    \bnfor{} \bnfnt{array-access} \\
+\qquad    \bnfor{} \bnfnt{array-type} \\
+\qquad    \bnfor{} \bnfnt{assert} \\
+\qquad    \bnfor{} \bnfnt{assignment} \\
+\qquad    \bnfor{} \bnfnt{binary} \\
+\qquad    \bnfor{} \bnfnt{block} \\
+\qquad    \bnfor{} \bnfnt{case} \\
+\qquad    \bnfor{} \bnfnt{catch} \\
+\qquad    \bnfor{} \bnfnt{compound-assignment} \\
+\qquad    \bnfor{} \bnfnt{conditional-expression} \\
+\qquad    \bnfor{} \bnfnt{do-while-loop} \\
+\qquad    \bnfor{} \bnfnt{enhanced-for-loop} \\
+\qquad    \bnfor{} \bnfnt{expression-statement} \\
+\qquad    \bnfor{} \bnfnt{for-loop} \\
+\qquad    \bnfor{} \bnfnt{if} \\
+\qquad    \bnfor{} \bnfnt{instance-of} \\
+\qquad    \bnfor{} \bnfnt{labeled-statement} \\
+\qquad    \bnfor{} \bnfnt{lambda-expression} \\
+\qquad    \bnfor{} \bnfnt{member-reference} \\
+\qquad    \bnfor{} \bnfnt{member-select} \\
+\qquad    \bnfor{} \bnfnt{method-invocation} \\
+\qquad    \bnfor{} \bnfnt{new-array} \\
+\qquad    \bnfor{} \bnfnt{new-class} \\
+\qquad    \bnfor{} \bnfnt{parameterized-type} \\
+\qquad    \bnfor{} \bnfnt{parenthesized} \\
+\qquad    \bnfor{} \bnfnt{return} \\
+\qquad    \bnfor{} \bnfnt{switch} \\
+\qquad    \bnfor{} \bnfnt{synchronized} \\
+\qquad    \bnfor{} \bnfnt{throw} \\
+\qquad    \bnfor{} \bnfnt{try} \\
+\qquad    \bnfor{} \bnfnt{type-cast} \\
+\qquad    \bnfor{} \bnfnt{unary} \\
+\qquad    \bnfor{} \bnfnt{union-type} \\
+\qquad    \bnfor{} \bnfnt{variable-type} \\
+\qquad    \bnfor{} \bnfnt{while-loop} \\
+\qquad    \bnfor{} \bnfnt{whildcard-tree} \\
+\\
+\bnfnt{annotated-type} :: = \\
+\qquad    \bnflit{AnnotatedType} \bnflit{.} ( ( \bnflit{annotation} \bnfnt{integer} ) \bnfor{} \bnflit{underlyingType} ) \\
+\\
+\bnfnt{array-access} ::= \\
+\qquad    \bnflit{ArrayAccess} \bnflit{.} ( \bnflit{expression} \bnfor{} \bnflit{index} ) \\
+\\
+\bnfnt{array-type} ::= \\
+\qquad    \bnflit{ArrayType} \bnflit{.} \bnflit{type} \\
+\\
+\bnfnt{assert} ::= \\
+\qquad    \bnflit{Assert} \bnflit{.} ( \bnflit{condition} \bnfor{} \bnflit{detail} ) \\
+\\
+\bnfnt{assignment} ::= \\
+\qquad    \bnflit{Assignment} \bnflit{.} ( \bnflit{variable} \bnfor{} \bnflit{expression} ) \\
+\\
+\bnfnt{binary} ::= \\
+\qquad    \bnflit{Binary} \bnflit{.} ( \bnflit{leftOperand} \bnfor{} \bnflit{rightOperand} ) \\
+\\
+\bnfnt{block} ::= \\
+\qquad    \bnflit{Block} \bnflit{.} \bnflit{statement} \bnfnt{integer} \\
+\\
+\bnfnt{case} ::= \\
+\qquad    \bnflit{Case} \bnflit{.} ( \bnflit{expression} \bnfor{} ( \bnflit{statement} \bnfnt{integer} ) ) \\
+\\
+\bnfnt{catch} ::= \\
+\qquad    \bnflit{Catch} \bnflit{.} ( \bnflit{parameter} \bnfor{} \bnflit{block} ) \\
+\\
+\bnfnt{compound-assignment} ::= \\
+\qquad    \bnflit{CompountAssignment} \bnflit{.} ( \bnflit{variable} \bnfor{} \bnflit{expression} ) \\
+\\
+\bnfnt{conditional-expression} ::= \\
+\qquad    \bnflit{ConditionalExpression} \bnflit{.} ( \bnflit{condition} \bnfor{} \bnflit{trueExpression} \bnfor{} \bnflit{falseExpression} ) \\
+\\
+\bnfnt{do-while-loop} ::= \\
+\qquad    \bnflit{DoWhileLoop} \bnflit{.} ( \bnflit{condition} \bnfor{} \bnflit{statement} ) \\
+\\
+\bnfnt{enhanced-for-loop} ::= \\
+\qquad    \bnflit{EnhancedForLoop} \bnflit{.} ( \bnflit{variable} \bnfor{} \bnflit{expression} \bnfor{} \bnflit{statement} ) \\
+\\
+\bnfnt{expression-statement} ::= \\
+\qquad    \bnflit{ExpressionStatement} \bnflit{.} \bnflit{expression} \\
+\\
+\bnfnt{for-loop} ::= \\
+\qquad    \bnflit{ForLoop} \bnflit{.} ( ( \bnflit{initializer} \bnfnt{integer} ) \bnfor{} \bnflit{condition} \bnfor{} ( \bnflit{update} \bnfnt{integer} )  \bnfor{} \bnflit{statement} ) \\
+\\
+\bnfnt{if} ::= \\
+\qquad    \bnflit{If} \bnflit{.} ( \bnflit{condition} \bnfor{} \bnflit{thenStatement} \bnfor{} \bnflit{elseStatement} ) \\
+\\
+\bnfnt{instance-of} ::= \\
+\qquad    \bnflit{InstanceOf} \bnflit{.} ( \bnflit{expression} \bnfor{} \bnflit{type} ) \\
+\\
+\bnfnt{labeled-statement} ::= \\
+\qquad    \bnflit{LabeledStatement} \bnflit{.} \bnflit{statement} \\
+\\
+\bnfnt{lambda-expression} ::= \\
+\qquad    \bnflit{LambdaExpression} \bnflit{.} ( ( \bnflit{parameter} \bnfnt{integer} ) \bnfor{} \bnflit{body} ) \\
+\\
+\bnfnt{member-reference} ::= \\
+\qquad    \bnflit{MemberReference} \bnflit{.} ( \bnflit{qualifierExpression} \bnfor{} ( \bnflit{typeArgument} \bnfnt{integer} ) ) \\
+\\
+\bnfnt{member-select} ::= \\
+\qquad    \bnflit{MemberSelect} \bnflit{.} \bnflit{expression} \\
+\\
+\bnfnt{method-invocation} ::= \\
+\qquad    \bnflit{MethodInvocation} \bnflit{.} ( ( \bnflit{typeArgument} \bnfnt{integer} ) \bnfor{} \bnflit{methodSelect} \\
+\qquad    \bnfor{} ( \bnflit{argument} \bnfnt{integer} ) ) \\
+\\
+\bnfnt{new-array} ::= \\
+\qquad    \bnflit{NewArray} \bnflit{.} ( \bnflit{type} \bnfor{} ( \bnflit{dimension} \bnfor{} \bnflit{initializer} ) \bnfnt{integer} ) \\
+\\
+\bnfnt{new-class} ::= \\
+\qquad    \bnflit{NewClass} \bnflit{.} ( \bnflit{enclosingExpression} \bnfor{} ( \bnflit{typeArgument} \bnfnt{integer} ) \bnfor{} \bnflit{identifier} \\
+\qquad    \bnfor{} ( \bnflit{argument} \bnfnt{integer} ) \bnfor{} \bnflit{classBody} ) \\
+\\
+\bnfnt{parameterized-type} ::= \\
+\qquad    \bnflit{ParameterizedType} \bnflit{.} ( \bnflit{type} \bnfor{} ( \bnflit{typeArgument} \bnfnt{integer} ) ) \\
+\\
+\bnfnt{parenthesized} ::= \\
+\qquad    \bnflit{Parenthesized} \bnflit{.} \bnflit{expression} \\
+\\
+\bnfnt{return} ::= \\
+\qquad    \bnflit{Return} \bnflit{.} \bnflit{expression} \\
+\\
+\bnfnt{switch} ::= \\
+\qquad    \bnflit{Switch} \bnflit{.} ( \bnflit{expression} \bnfor{} ( \bnflit{case} \bnfnt{integer} ) ) \\
+\\
+\bnfnt{synchronized} ::= \\
+\qquad    \bnflit{Synchronized} \bnflit{.} ( \bnflit{expression} \bnfor{} \bnflit{block} ) \\
+\\
+\bnfnt{throw} ::= \\
+\qquad    \bnflit{Throw} \bnflit{.} \bnflit{expression} \\
+\\
+\bnfnt{try} ::= \\
+\qquad    \bnflit{Try} \bnflit{.} ( \bnflit{block} \bnfor{} ( \bnflit{catch} \bnfnt{integer} ) \bnfor{} \bnflit{finallyBlock} \bnfor{} ( \bnflit{resource} \bnfnt{integer} ) ) \\
+\\
+\bnfnt{type-cast} ::= \\
+\qquad    \bnflit{TypeCast} \bnflit{.} ( \bnflit{type} \bnfor{} \bnflit{expression} ) \\
+\\
+\bnfnt{unary} ::= \\
+\qquad    \bnflit{Unary} \bnflit{.} \bnflit{expression} \\
+\\
+\bnfnt{union-type} ::= \\
+\qquad    \bnflit{UnionType} \bnflit{.} \bnflit{typeAlternative} \bnfnt{integer} \\
+\\
+\bnfnt{variable} ::= \\
+\qquad    \bnflit{Variable} \bnflit{.} ( \bnflit{type} \bnfor{} \bnflit{initializer} ) \\
+\\
+\bnfnt{while-loop} ::= \\
+\qquad    \bnflit{WhileLoop} \bnflit{.} ( \bnflit{condition} \bnfor{} \bnflit{statement} ) \\
+\\
+\bnfnt{wildcard} ::= \\
+\qquad    \bnflit{Wildcard} \bnflit{.} \bnflit{bound} \\
+\\
+\end{tabbing}
 
 \section{Example\label{example}}
 

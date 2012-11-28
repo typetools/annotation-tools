@@ -4,6 +4,7 @@ import checkers.javari.quals.ReadOnly;
 
 import java.util.Map;
 
+import annotations.io.ASTPath;
 import annotations.util.coll.VivifyingMap;
 
 /**
@@ -23,6 +24,10 @@ public class AExpression extends AElement {
     /** The method's annotated "new" invocations; map key is the offset of the new bytecode */
     public final VivifyingMap<RelativeLocation, ATypeElement> news =
             ATypeElement.<RelativeLocation>newVivifyingLHMap_ATE();
+
+    /** The method's annotated insert-typecast invocations; map key is the AST path to the insertion place */
+    public final VivifyingMap<ASTPath, AInsertTypecastTypeElement> insertTypecasts =
+            AInsertTypecastTypeElement.<ASTPath>newVivifyingLHMap_AITTE();
 
     protected Object id;
     
@@ -44,7 +49,8 @@ public class AExpression extends AElement {
 	protected boolean equalsExpression(/*@ReadOnly*/ AExpression o) /*@ReadOnly */{
 		return typecasts.equals(o.typecasts)
 				&& instanceofs.equals(o.instanceofs)
-				&& news.equals(o.news);
+				&& news.equals(o.news)
+				&& insertTypecasts.equals(o.insertTypecasts);
 	}
 	
     /**
@@ -53,7 +59,7 @@ public class AExpression extends AElement {
     @Override
     public int hashCode() /*@ReadOnly*/ {
 		return super.hashCode() + typecasts.hashCode() + instanceofs.hashCode()
-				+ news.hashCode();
+				+ news.hashCode() + insertTypecasts.hashCode();
     }
     
     /**
@@ -62,7 +68,7 @@ public class AExpression extends AElement {
     @Override
     public boolean prune() {
 		return super.prune() & typecasts.prune() & instanceofs.prune()
-				& news.prune();
+				& news.prune() & insertTypecasts.prune();
     }
     
     @Override
@@ -91,6 +97,15 @@ public class AExpression extends AElement {
         for (Map.Entry<RelativeLocation, ATypeElement> em : news.entrySet()) {
             sb.append("new: ");
             RelativeLocation loc = em.getKey();
+            sb.append(loc);
+            sb.append(": ");
+            AElement ae = em.getValue();
+            sb.append(ae.toString());
+            sb.append(' ');
+        }
+        for (Map.Entry<ASTPath, AInsertTypecastTypeElement> em : insertTypecasts.entrySet()) {
+            sb.append("insert-typecast: ");
+            ASTPath loc = em.getKey();
             sb.append(loc);
             sb.append(": ");
             AElement ae = em.getValue();
