@@ -272,7 +272,9 @@ public class Main {
           for (Insertion iToInsert : toInsertList) {
             String toInsert = iToInsert.getText(comments, abbreviate);
             if (! (toInsert.startsWith("@")
-                   || toInsert.startsWith("extends "))) {
+                   || toInsert.startsWith("extends ")
+                   || toInsert.startsWith("((")
+                   || toInsert.equals("))"))) {
               throw new Error("Illegal insertion: " + toInsert);
             }
             if (abbreviate) {
@@ -314,8 +316,11 @@ public class Main {
               char precedingChar = src.charAt(pos-1);
               if (! (Character.isWhitespace(precedingChar)
                      // No space if it's the first formal or generic parameter
+                     // or if it's a CloseParenthesesInsertion
                      || precedingChar == '('
-                     || precedingChar == '<')) {
+                     || precedingChar == '<'
+                     || precedingChar == '['
+                     || toInsert.equals("))"))) {
                 toInsert = " " + toInsert;
               }
             }
@@ -339,7 +344,9 @@ public class Main {
             }
             // add trailing whitespace
             // (test is not for "extends " because we just added a leading space, above)
-            if ((! gotSeparateLine) && (! toInsert.startsWith(" extends "))) {
+            if ((! gotSeparateLine) && (! toInsert.startsWith(" extends "))
+                    && (! toInsert.startsWith("((")) && (! toInsert.startsWith(" (("))
+                    && (! toInsert.equals("))"))) {
               toInsert = toInsert + " ";
             }
             src.insert(pos, toInsert);

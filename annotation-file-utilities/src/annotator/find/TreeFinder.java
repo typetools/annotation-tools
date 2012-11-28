@@ -23,6 +23,8 @@ import com.sun.source.tree.ArrayTypeTree;
 import com.sun.source.tree.BlockTree;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.CompilationUnitTree;
+import com.sun.source.tree.ExpressionStatementTree;
+import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.IdentifierTree;
 import com.sun.source.tree.InstanceOfTree;
 import com.sun.source.tree.MethodTree;
@@ -810,6 +812,8 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
             || node instanceof PrimitiveTypeTree
             // For the case with implicit upper bound
             || node instanceof TypeParameterTree
+            || node instanceof ExpressionTree
+            || node instanceof ExpressionStatementTree
             );
     if (res) return true;
 
@@ -833,6 +837,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       return null;
     }
 
+    debug("SCANNING: %s %s%n", node.getKind(), node);
     if (! handled(node)) {
       debug("Not handled, skipping (%s): %s%n", node.getClass(), node);
       // nothing to do
@@ -921,6 +926,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
               // TODO: is something similar needed for Arrays?
               break;
           }
+          // TODO: don't add cast insertion if it's already present.
         }
       }
       // System.out.printf("alreadyPresent = %s for %s of kind %s%n", alreadyPresent, node, node.getKind());
@@ -979,6 +985,14 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
 
           // need to add "extends ... Object" around the type annotation
           i = new TypeBoundExtendsInsertion(i.getText(), i.getCriteria(), i.getSeparateLine());
+      } else if (i instanceof CastInsertion) {
+          JCTree jcTree = (JCTree) node;
+          pos = jcTree.getStartPosition();
+
+          // Also add an insertion after the expression to close the parentheses.
+          Insertion close = new CloseParenthesisInsertion(i.getCriteria(), i.getSeparateLine());
+          int end = pos + jcTree.toString().length();
+          positions.put(end, close);
       } else {
         boolean typeScan = true;
         if (node.getKind() == Tree.Kind.METHOD) { // MethodTree
