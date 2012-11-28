@@ -26,7 +26,7 @@ public class ATypeElementWithType extends ATypeElement {
     }
 
     /**
-     * The un-annotated type to cast to.
+     * The un-annotated type.
      */
     private String type;
 
@@ -35,18 +35,18 @@ public class ATypeElementWithType extends ATypeElement {
     }
 
     /**
-     * Gets the un-annotated type to cast to.
+     * Gets the un-annotated type.
      *
-     * @return The un-annotated type to cast to.
+     * @return The un-annotated type.
      */
     public String getType() {
         return type;
     }
 
     /**
-     * Sets the unqualified type to cast to.
+     * Sets the un-annotated type.
      *
-     * @param type The unqualified type to cast to.
+     * @param type The un-annotated type.
      */
     public void setType(String type) {
         this.type = type;
