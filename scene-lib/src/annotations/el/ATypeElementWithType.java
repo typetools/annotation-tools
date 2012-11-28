@@ -5,21 +5,21 @@ import java.util.LinkedHashMap;
 import annotations.util.coll.VivifyingMap;
 
 /**
- * An {@link ATypeElement} that also stores the (unqualified) type for a cast
- * insertion.
+ * An {@link ATypeElement} that also stores an un-annotated type. This is useful for cast
+ * insertion or receiver insertion.
  */
-public class AInsertTypecastTypeElement extends ATypeElement {
+public class ATypeElementWithType extends ATypeElement {
 
-    static <K extends /*@ReadOnly*/ Object> VivifyingMap<K, AInsertTypecastTypeElement> newVivifyingLHMap_AITTE() {
-        return new VivifyingMap<K, AInsertTypecastTypeElement>(
-                new LinkedHashMap<K, AInsertTypecastTypeElement>()) {
+    static <K extends /*@ReadOnly*/ Object> VivifyingMap<K, ATypeElementWithType> newVivifyingLHMap_AITTE() {
+        return new VivifyingMap<K, ATypeElementWithType>(
+                new LinkedHashMap<K, ATypeElementWithType>()) {
             @Override
-            public  AInsertTypecastTypeElement createValueFor(K k) /*@ReadOnly*/ {
-                return new AInsertTypecastTypeElement(k);
+            public  ATypeElementWithType createValueFor(K k) /*@ReadOnly*/ {
+                return new ATypeElementWithType(k);
             }
 
             @Override
-            public boolean subPrune(AInsertTypecastTypeElement v) /*@ReadOnly*/ {
+            public boolean subPrune(ATypeElementWithType v) /*@ReadOnly*/ {
                 return v.prune();
             }
         };
@@ -30,7 +30,7 @@ public class AInsertTypecastTypeElement extends ATypeElement {
      */
     private String type;
 
-    AInsertTypecastTypeElement(Object description) {
+    ATypeElementWithType(Object description) {
         super(description);
     }
 
@@ -54,8 +54,8 @@ public class AInsertTypecastTypeElement extends ATypeElement {
 
     @Override
     public boolean equals(Object o) {
-      if (o instanceof AInsertTypecastTypeElement) {
-          AInsertTypecastTypeElement other = (AInsertTypecastTypeElement) o;
+      if (o instanceof ATypeElementWithType) {
+          ATypeElementWithType other = (ATypeElementWithType) o;
         return super.equals(other) && this.type.equals(other.type);
       } else {
         return false;
