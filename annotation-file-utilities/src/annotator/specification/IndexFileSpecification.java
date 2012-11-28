@@ -1,24 +1,42 @@
 package annotator.specification;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.objectweb.asm.ClassReader;
 
+import plume.FileIOException;
+import plume.Pair;
 import annotations.Annotation;
-import annotations.el.*;
+import annotations.el.ABlock;
+import annotations.el.AClass;
+import annotations.el.AElement;
+import annotations.el.AExpression;
+import annotations.el.AInsertTypecastTypeElement;
+import annotations.el.AMethod;
+import annotations.el.AScene;
+import annotations.el.ATypeElement;
+import annotations.el.AnnotationDef;
+import annotations.el.BoundLocation;
+import annotations.el.InnerTypeLocation;
+import annotations.el.LocalLocation;
+import annotations.el.RelativeLocation;
+import annotations.el.TypeIndexLocation;
 import annotations.field.AnnotationFieldType;
+import annotations.io.ASTPath;
 import annotations.io.IndexFileParser;
 import annotations.util.coll.VivifyingMap;
+import annotator.find.CastInsertion;
 import annotator.find.Criteria;
 import annotator.find.Insertion;
 import annotator.scanner.MethodOffsetClassVisitor;
 
 import com.sun.source.tree.Tree;
-
-import plume.FileIOException;
-import plume.Pair;
 
 public class IndexFileSpecification implements Specification {
 
@@ -211,8 +229,15 @@ public class IndexFileSpecification implements Specification {
     for (Pair<String,Boolean> p : getElementAnnotation(element)) {
       String annotationString = p.a;
       Boolean isDeclarationAnnotation = p.b;
-      Insertion ins = new Insertion(annotationString, clist.criteria(),
-                                    isDeclarationAnnotation);
+      Criteria criteria = clist.criteria();
+      Insertion ins;
+      if (element instanceof AInsertTypecastTypeElement) {
+          AInsertTypecastTypeElement typecast = (AInsertTypecastTypeElement) element;
+          ins = new CastInsertion(annotationString, criteria, false, typecast.getType());
+      } else {
+          ins = new Insertion(annotationString, clist.criteria(),
+                              isDeclarationAnnotation);
+      }
       debug("parsed: " + ins);
       this.insertions.add(ins);
     }
@@ -341,6 +366,15 @@ public class IndexFileSpecification implements Specification {
       ATypeElement instanceOf = entry.getValue();
       CriterionList instanceOfClist = clist.add(Criteria.instanceOf(methodName, loc));
       parseInnerAndOuterElements(instanceOfClist, instanceOf);
+    }
+
+    // parse insert typecasts of method
+    for (Entry<ASTPath, AInsertTypecastTypeElement> entry : exp.insertTypecasts.entrySet()) {
+      ASTPath astPath = entry.getKey();
+      AInsertTypecastTypeElement insertTypecast = entry.getValue();
+      clist.criteria().isOnMethod("cat");
+      CriterionList insertTypecastClist = clist.add(Criteria.astPath(astPath));
+      parseElement(insertTypecastClist, insertTypecast);
     }
   }
 }
