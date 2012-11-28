@@ -26,8 +26,8 @@ public class AExpression extends AElement {
             ATypeElement.<RelativeLocation>newVivifyingLHMap_ATE();
 
     /** The method's annotated insert-typecast invocations; map key is the AST path to the insertion place */
-    public final VivifyingMap<ASTPath, AInsertTypecastTypeElement> insertTypecasts =
-            AInsertTypecastTypeElement.<ASTPath>newVivifyingLHMap_AITTE();
+    public final VivifyingMap<ASTPath, ATypeElementWithType> insertTypecasts =
+            ATypeElementWithType.<ASTPath>newVivifyingLHMap_AITTE();
 
     protected Object id;
     
@@ -103,7 +103,7 @@ public class AExpression extends AElement {
             sb.append(ae.toString());
             sb.append(' ');
         }
-        for (Map.Entry<ASTPath, AInsertTypecastTypeElement> em : insertTypecasts.entrySet()) {
+        for (Map.Entry<ASTPath, ATypeElementWithType> em : insertTypecasts.entrySet()) {
             sb.append("insert-typecast: ");
             ASTPath loc = em.getKey();
             sb.append(loc);

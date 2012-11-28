@@ -17,10 +17,10 @@ import annotations.el.ABlock;
 import annotations.el.AClass;
 import annotations.el.AElement;
 import annotations.el.AExpression;
-import annotations.el.AInsertTypecastTypeElement;
 import annotations.el.AMethod;
 import annotations.el.AScene;
 import annotations.el.ATypeElement;
+import annotations.el.ATypeElementWithType;
 import annotations.el.AnnotationDef;
 import annotations.el.BoundLocation;
 import annotations.el.InnerTypeLocation;
@@ -231,8 +231,8 @@ public class IndexFileSpecification implements Specification {
       Boolean isDeclarationAnnotation = p.b;
       Criteria criteria = clist.criteria();
       Insertion ins;
-      if (element instanceof AInsertTypecastTypeElement) {
-          AInsertTypecastTypeElement typecast = (AInsertTypecastTypeElement) element;
+      if (element instanceof ATypeElementWithType) {
+          ATypeElementWithType typecast = (ATypeElementWithType) element;
           ins = new CastInsertion(annotationString, criteria, false, typecast.getType());
       } else {
           ins = new Insertion(annotationString, clist.criteria(),
@@ -369,9 +369,9 @@ public class IndexFileSpecification implements Specification {
     }
 
     // parse insert typecasts of method
-    for (Entry<ASTPath, AInsertTypecastTypeElement> entry : exp.insertTypecasts.entrySet()) {
+    for (Entry<ASTPath, ATypeElementWithType> entry : exp.insertTypecasts.entrySet()) {
       ASTPath astPath = entry.getKey();
-      AInsertTypecastTypeElement insertTypecast = entry.getValue();
+      ATypeElementWithType insertTypecast = entry.getValue();
       clist.criteria().isOnMethod("cat");
       CriterionList insertTypecastClist = clist.add(Criteria.astPath(astPath));
       parseElement(insertTypecastClist, insertTypecast);
