@@ -39,4 +39,10 @@ public class CastInsertion extends Insertion {
   public String getType() {
     return type;
   }
+
+  /** {@inheritDoc} */
+  @Override
+  public Kind getKind() {
+    return Kind.CAST;
+  }
 }
