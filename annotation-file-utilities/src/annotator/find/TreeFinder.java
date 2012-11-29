@@ -985,7 +985,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
 
           // need to add "extends ... Object" around the type annotation
           i = new TypeBoundExtendsInsertion(i.getText(), i.getCriteria(), i.getSeparateLine());
-      } else if (i instanceof CastInsertion) {
+      } else if (i.getKind() == Insertion.Kind.CAST) {
           JCTree jcTree = (JCTree) node;
           pos = jcTree.getStartPosition();
 
