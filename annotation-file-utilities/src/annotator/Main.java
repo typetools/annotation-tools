@@ -269,10 +269,6 @@ public class Main {
             : "pos is negative: " + pos + " " + toInsertList.get(0) + " " + javafilename;
           for (Insertion iToInsert : toInsertList) {
             String toInsert = iToInsert.getText(comments, abbreviate);
-            if (! (toInsert.startsWith("@")
-                   || toInsert.startsWith("extends "))) {
-              throw new Error("Illegal insertion: " + toInsert);
-            }
             if (abbreviate) {
               String packageName = iToInsert.getPackageName();
               if (packageName != null) {
