@@ -69,6 +69,9 @@ public class Insertion {
             packageName = ps.a;
             result = ps.b;
         }
+        if (!result.startsWith("@")) {
+            throw new Error("Illegal insertion, must start with @: " + result);
+        }
         if (comments) {
             return "/*" + result + "*/";
         }
