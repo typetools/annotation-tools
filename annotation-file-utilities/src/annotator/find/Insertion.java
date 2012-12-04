@@ -10,7 +10,8 @@ public class Insertion {
 
     public enum Kind {
         DEFAULT, // The general insertion
-        CAST
+        CAST,
+        RECEIVER
     }
 
     private final String text;
