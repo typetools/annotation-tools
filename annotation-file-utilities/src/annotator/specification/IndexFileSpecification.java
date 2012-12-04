@@ -34,6 +34,7 @@ import annotations.util.coll.VivifyingMap;
 import annotator.find.CastInsertion;
 import annotator.find.Criteria;
 import annotator.find.Insertion;
+import annotator.find.ReceiverInsertion;
 import annotator.scanner.MethodOffsetClassVisitor;
 
 import com.sun.source.tree.Tree;
@@ -231,12 +232,15 @@ public class IndexFileSpecification implements Specification {
       Boolean isDeclarationAnnotation = p.b;
       Criteria criteria = clist.criteria();
       Insertion ins;
-      if (element instanceof ATypeElementWithType) {
-          ATypeElementWithType typecast = (ATypeElementWithType) element;
-          ins = new CastInsertion(annotationString, criteria, false, typecast.getType());
+      if (criteria.isOnReceiver()) {
+          ins = new ReceiverInsertion(annotationString, criteria,
+                                      isDeclarationAnnotation);
+      } else if (element instanceof ATypeElementWithType) {
+        ATypeElementWithType typecast = (ATypeElementWithType) element;
+        ins = new CastInsertion(annotationString, criteria, false, typecast.getType());
       } else {
-          ins = new Insertion(annotationString, clist.criteria(),
-                              isDeclarationAnnotation);
+        ins = new Insertion(annotationString, criteria,
+                            isDeclarationAnnotation);
       }
       debug("parsed: " + ins);
       this.insertions.add(ins);

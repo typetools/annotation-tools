@@ -271,12 +271,22 @@ public class Main {
             : "pos is negative: " + pos + " " + toInsertList.get(0) + " " + javafilename;
           for (Insertion iToInsert : toInsertList) {
             String toInsert = iToInsert.getText(comments, abbreviate);
-            if (! (toInsert.startsWith("@")
-                   || toInsert.startsWith("extends ")
-                   || toInsert.startsWith("((")
-                   || toInsert.equals("))"))) {
+
+            // Remove leading comments and whitespace before checking if the insertion is legal.
+            String toInsertCheck = toInsert;
+            if (toInsert.startsWith("/*>>>")) {
+              toInsertCheck = toInsert.substring(5);
+            } else if (toInsert.startsWith("/*")) {
+              toInsertCheck = toInsert.substring(2);
+            }
+            toInsertCheck = toInsertCheck.trim();
+            if (! (toInsertCheck.startsWith("@")
+                   || toInsertCheck.startsWith("extends ")
+                   || toInsertCheck.startsWith("((")
+                   || toInsertCheck.startsWith("))"))) {
               throw new Error("Illegal insertion: " + toInsert);
             }
+
             if (abbreviate) {
               String packageName = iToInsert.getPackageName();
               if (packageName != null) {
@@ -346,7 +356,7 @@ public class Main {
             // (test is not for "extends " because we just added a leading space, above)
             if ((! gotSeparateLine) && (! toInsert.startsWith(" extends "))
                     && (! toInsert.startsWith("((")) && (! toInsert.startsWith(" (("))
-                    && (! toInsert.equals("))"))) {
+                    && (! toInsert.equals("))")) && (! toInsert.endsWith(" this"))) {
               toInsert = toInsert + " ";
             }
             src.insert(pos, toInsert);

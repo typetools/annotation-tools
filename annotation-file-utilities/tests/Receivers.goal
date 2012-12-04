@@ -1,0 +1,38 @@
+package annotator.tests;
+
+public class Receivers {
+    public void m(@checkers.igj.quals.ReadOnly Receivers this) {}
+
+    public void m(@checkers.igj.quals.ReadOnly Receivers this, int i) {}
+
+    public void m(@checkers.igj.quals.ReadOnly Receivers this, @Anno() String s) {}
+}
+
+class Receivers2 {
+    public void m(@checkers.igj.quals.ReadOnly Receivers2 this) {}
+
+    public void m(@checkers.igj.quals.ReadOnly Receivers2 this, int i) {}
+}
+
+class Receivers3<K, V> {
+    public void m(@checkers.igj.quals.ReadOnly Receivers3<K, V> this) {}
+
+    public void m(@checkers.igj.quals.ReadOnly Receivers3<K, V> this, int i) {}
+}
+
+class Receivers4<K, V> {
+    public void m(@checkers.igj.quals.ReadOnly Receivers4<K, V> this) {}
+
+    public void m(@checkers.igj.quals.ReadOnly Receivers4<K, V> this, int i) {}
+}
+
+interface Receivers5 {
+    public void m(@checkers.igj.quals.ReadOnly Receivers5 this);
+}
+
+enum Receivers6 {
+    TEST;
+    public void m(@checkers.igj.quals.ReadOnly Receivers6 this) {}
+}
+
+@interface Anno {}
