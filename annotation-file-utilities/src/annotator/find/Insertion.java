@@ -8,6 +8,12 @@ import plume.Pair;
  */
 public class Insertion {
 
+    public enum Kind {
+        DEFAULT, // The general insertion
+        CAST,
+        RECEIVER
+    }
+
     private final String text;
     private final Criteria criteria;
     // If non-null, then try to put annotation on its own line,
@@ -105,6 +111,13 @@ public class Insertion {
     @Override
     public String toString() {
         return String.format("%s (nl=%b) @ %s", text, separateLine, criteria);
+    }
+
+    /**
+     * Gets the kind of this insertion.
+     */
+    public Kind getKind() {
+        return Kind.DEFAULT;
     }
 
     /**

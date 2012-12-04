@@ -16,6 +16,7 @@ import java.io.Reader;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -23,6 +24,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+import plume.ArraysMDE;
 import plume.FileIOException;
 import annotations.Annotation;
 import annotations.AnnotationBuilder;
@@ -36,6 +38,7 @@ import annotations.el.AExpression;
 import annotations.el.AMethod;
 import annotations.el.AScene;
 import annotations.el.ATypeElement;
+import annotations.el.ATypeElementWithType;
 import annotations.el.AnnotationDef;
 import annotations.el.BoundLocation;
 import annotations.el.InnerTypeLocation;
@@ -50,6 +53,8 @@ import annotations.field.ClassTokenAFT;
 import annotations.field.EnumAFT;
 import annotations.field.ScalarAFT;
 import annotations.util.coll.VivifyingMap;
+
+import com.sun.source.tree.Tree.Kind;
 
 /**
  * IndexFileParser provides static methods
@@ -870,8 +875,218 @@ public final class IndexFileParser {
                 parseAnnotations(n);
                 parseInnerTypes(n);
             }
+            while (checkKeyword("insert-typecast")) {
+                matchKeyword("insert-typecast");
+                matched = true;
+                evermatched = true;
+                ASTPath astPath = parseASTPath();
+                expectChar(':');
+                ATypeElementWithType i = exp.insertTypecasts.vivify(astPath);
+                parseAnnotations(i);
+                String type = parseType();
+                i.setType(type);
+            }
         }
         return evermatched;
+    }
+
+    /**
+     * Parses an AST path.
+     * @return the AST path.
+     */
+    private ASTPath parseASTPath() throws IOException, ParseException {
+        ASTPath astPath = new ASTPath();
+        astPath.add(parseASTEntry());
+        while (matchChar(',')) {
+            astPath.add(parseASTEntry());
+        }
+        return astPath;
+    }
+
+    /**
+     * Parses and returns the next AST entry.
+     * @return A new AST entry.
+     * @throws ParseException if the next entry type is invalid.
+     */
+    private ASTPath.ASTEntry parseASTEntry() throws IOException, ParseException {
+        ASTPath.ASTEntry entry;
+        if (matchKeyword("AnnotatedType")) {
+            entry = newASTEntry(Kind.ANNOTATED_TYPE, new String[] {"annotation", "underlyingType"},
+                    new String[] {"annotation"});
+        } else if (matchKeyword("ArrayAccess")) {
+            entry = newASTEntry(Kind.ARRAY_ACCESS, new String[] {"expression", "index"});
+        } else if (matchKeyword("ArrayType")) {
+            entry = newASTEntry(Kind.ARRAY_TYPE, new String[] {"type"});
+        } else if (matchKeyword("Assert")) {
+            entry = newASTEntry(Kind.ASSERT, new String[] {"condition", "detail"});
+        } else if (matchKeyword("Assignment")) {
+            entry = newASTEntry(Kind.ASSIGNMENT, new String[] {"variable", "expression"});
+        } else if (matchKeyword("Binary")) {
+            // Always use Kind.PLUS for Binary
+            entry = newASTEntry(Kind.PLUS, new String[] {"leftOperand", "rightOperand"});
+        } else if (matchKeyword("Block")) {
+            entry = newASTEntry(Kind.BLOCK, new String[] {"statement"}, new String[] {"statement"});
+        } else if (matchKeyword("Case")) {
+            entry = newASTEntry(Kind.CASE, new String[] {"expression", "statement"},
+                    new String[] {"statement"});
+        } else if (matchKeyword("Catch")) {
+            entry = newASTEntry(Kind.CATCH, new String[] {"parameter", "block"});
+        } else if (matchKeyword("CompoundAssignment")) {
+            // Always use Kind.PLUS_ASSIGNMENT for CompoundAssignment
+            entry = newASTEntry(Kind.PLUS_ASSIGNMENT, new String[] {"variable", "expression"});
+        } else if (matchKeyword("ConditionalExpression")) {
+            entry = newASTEntry(Kind.CONDITIONAL_EXPRESSION,
+                    new String[] {"condition", "trueExpression", "falseExpression"});
+        } else if (matchKeyword("DoWhileLoop")) {
+            entry = newASTEntry(Kind.DO_WHILE_LOOP, new String[] {"condition", "statement"});
+        } else if (matchKeyword("EnhancedForLoop")) {
+            entry = newASTEntry(Kind.ENHANCED_FOR_LOOP, new String[] {"variable", "expression", "statement"});
+        } else if (matchKeyword("ExpressionStatement")) {
+            entry = newASTEntry(Kind.EXPRESSION_STATEMENT, new String[] {"expression"});
+        } else if (matchKeyword("ForLoop")) {
+            entry = newASTEntry(Kind.FOR_LOOP, new String[] {"initializer", "condition", "update", "statement"},
+                    new String[] {"initializer", "update"});
+        } else if (matchKeyword("If")) {
+            entry = newASTEntry(Kind.IF, new String[] {"condition", "thenStatement", "elseStatement"});
+        } else if (matchKeyword("InstanceOf")) {
+            entry = newASTEntry(Kind.INSTANCE_OF, new String[] {"expression", "type"});
+        } else if (matchKeyword("LabeledStatement")) {
+            entry = newASTEntry(Kind.LABELED_STATEMENT, new String[] {"statement"});
+        } else if (matchKeyword("LambdaExpression")) {
+            entry = newASTEntry(Kind.LAMBDA_EXPRESSION, new String[] {"parameter", "body"},
+                    new String[] {"parameter"});
+        } else if (matchKeyword("MemberReference")) {
+            entry = newASTEntry(Kind.MEMBER_REFERENCE,new String[] {"qualifierExpression", "typeArgument"},
+                    new String[] {"typeArgument"});
+        } else if (matchKeyword("MemberSelect")) {
+            entry = newASTEntry(Kind.MEMBER_SELECT, new String[] {"expression"});
+        } else if (matchKeyword("MethodInvocation")) {
+            entry = newASTEntry(Kind.METHOD_INVOCATION, new String[] {"typeArgument", "methodSelect", "argument"},
+                    new String[] {"typeArgument", "argument"});
+        } else if (matchKeyword("NewArray")) {
+            entry = newASTEntry(Kind.NEW_ARRAY, new String[] {"type", "dimension", "initializer"},
+                    new String[] {"dimension", "initializer"});
+        } else if (matchKeyword("NewClass")) {
+            entry = newASTEntry(Kind.NEW_CLASS, new String[] {"enclosingExpression", "typeArgument", "identifier", "argument", "classBody"},
+                    new String[] {"typeArgument", "argument"});
+        } else if (matchKeyword("ParameterizedType")) {
+            entry = newASTEntry(Kind.PARAMETERIZED_TYPE, new String[] {"type", "typeArgument"},
+                    new String[] {"typeArgument"});
+        } else if (matchKeyword("Parenthesized")) {
+            entry = newASTEntry(Kind.PARENTHESIZED, new String[] {"expression"});
+        } else if (matchKeyword("Return")) {
+            entry = newASTEntry(Kind.RETURN, new String[] {"expression"});
+        } else if (matchKeyword("Switch")) {
+            entry = newASTEntry(Kind.SWITCH, new String[] {"expression", "case"},
+                    new String[] {"case"});
+        } else if (matchKeyword("Synchronized")) {
+            entry = newASTEntry(Kind.SYNCHRONIZED, new String[] {"expression", "block"});
+        } else if (matchKeyword("Throw")) {
+            entry = newASTEntry(Kind.THROW, new String[] {"expression"});
+        } else if (matchKeyword("Try")) {
+            entry = newASTEntry(Kind.TRY, new String[] {"block", "catch", "finallyBlock"},
+                    new String[] {"catch"});
+        } else if (matchKeyword("TypeCast")) {
+            entry = newASTEntry(Kind.TYPE_CAST, new String[] {"type", "expression"});
+        } else if (matchKeyword("Unary")) {
+            // Always use Kind.UNARY_PLUS for Unary
+            entry = newASTEntry(Kind.UNARY_PLUS, new String[] {"expression"});
+        } else if (matchKeyword("UnionType")) {
+            entry = newASTEntry(Kind.UNION_TYPE, new String[] {"typeAlternative"},
+                    new String[] {"typeAlternative"});
+        } else if (matchKeyword("Variable")) {
+            entry = newASTEntry(Kind.VARIABLE, new String[] {"type", "initializer"});
+        } else if (matchKeyword("WhileLoop")) {
+            entry = newASTEntry(Kind.WHILE_LOOP, new String[] {"condition", "statement"});
+        } else if (matchKeyword("Wildcard")) {
+            // Always use Kind.UNBOUNDED_WILDCARD for Wildcard
+            entry = newASTEntry(Kind.UNBOUNDED_WILDCARD, new String[] {"bound"});
+        } else {
+            throw new ParseException("Invalid AST path type: " + st.sval);
+        }
+        return entry;
+    }
+
+    /**
+     * Parses and constructs a new AST entry, where none of the child selections require
+     * arguments. For example, the call:
+     *
+     * <pre>
+     * {@code newASTEntry(Kind.WHILE_LOOP, new String[] {"condition", "statement"});</pre>
+     *
+     * constructs a while loop AST entry, where the valid child selectors are "condition" or
+     * "statement".
+     *
+     * @param kind The kind of this AST entry.
+     * @param legalChildSelectors A list of the legal child selectors for this AST entry.
+     * @return A new {@link ASTPath.ASTEntry}.
+     * @throws ParseException if an illegal argument is found.
+     */
+    private ASTPath.ASTEntry newASTEntry(Kind kind, String[] legalChildSelectors) throws IOException, ParseException {
+        return newASTEntry(kind, legalChildSelectors, null);
+    }
+
+    /**
+     * Parses and constructs a new AST entry. For example, the call:
+     * 
+     * <pre>
+     * {@code newASTEntry(Kind.CASE, new String[] {"expression", "statement"}, new String[] {"statement"});
+     * </pre>
+     * 
+     * constructs a case AST entry, where the valid child selectors are
+     * "expression" or "statement" and the "statement" child selector requires
+     * an argument.
+     * 
+     * @param kind The kind of this AST entry.
+     * @param legalChildSelectors A list of the legal child selectors for this AST entry.
+     * @param argumentChildSelectors A list of the child selectors that also require an argument.
+     *                               Entries here should also be in the legalChildSelectors list.
+     * @return A new {@link ASTPath.ASTEntry}.
+     * @throws ParseException if an illegal argument is found.
+     */
+    private ASTPath.ASTEntry newASTEntry(Kind kind, String[] legalChildSelectors, String[] argumentChildSelectors) throws IOException, ParseException {
+        expectChar('.');
+        for (String arg : legalChildSelectors) {
+            if (matchKeyword(arg)) {
+                if (argumentChildSelectors != null && ArraysMDE.indexOf(argumentChildSelectors, arg) >= 0) {
+                    int index = expectNonNegative(matchNNInteger());
+                    return new ASTPath.ASTEntry(kind, arg, index);
+                } else {
+                    return new ASTPath.ASTEntry(kind, arg);
+                }
+            }
+        }
+        throw new ParseException("Invalid argument for " + kind + " (legal arguments - " + Arrays.toString(legalChildSelectors) + "): " + st.sval);
+    }
+
+    /**
+     * Parses and returns the next tokens as a Java type.
+     */
+    private String parseType() throws IOException, ParseException {
+        StringBuilder builder = new StringBuilder();
+        parseType(builder);
+        return builder.toString();
+    }
+
+    /**
+     * Parses the next tokens as a Java type. Stores the type information in the
+     * given StringBuilder.
+     */
+    private void parseType(StringBuilder builder) throws IOException, ParseException {
+        String id = expectQualifiedName();
+        builder.append(id);
+        if (checkChar('<')) {
+            expectChar('<');
+            builder.append('<');
+            parseType(builder);
+            while (checkChar(',')) {
+                expectChar(',');
+                builder.append(", ");
+                parseType(builder);
+            }
+            expectChar('>');
+            builder.append('>');
+        }
     }
 
     private void parseClass() throws IOException, ParseException {
