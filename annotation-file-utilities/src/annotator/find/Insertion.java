@@ -1,5 +1,8 @@
 package annotator.find;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 import plume.Pair;
 
 /**
@@ -21,10 +24,11 @@ public abstract class Insertion {
     private final boolean separateLine;
 
     /**
-     * The package name for the annotation being inserted by this Insertion.
-     * This will be null unless getText is called with abbreviate true.
+     * The package names for the annotations being inserted by this Insertion.
+     * This will be empty unless {@link #getText(boolean, boolean)} is called
+     * with abbreviate true.
      */
-    protected String packageName;
+    protected Set<String> packageNames;
 
     /**
      * Creates a new insertion.
@@ -35,6 +39,7 @@ public abstract class Insertion {
     public Insertion(Criteria criteria, boolean separateLine) {
         this.criteria = criteria;
         this.separateLine = separateLine;
+        this.packageNames = new LinkedHashSet<String>();
     }
 
     /**
@@ -72,12 +77,11 @@ public abstract class Insertion {
      * Gets the package name.
      *
      * @return The package name of the annotation being inserted by this
-     *         Insertion. Returns null if the annotation does not have a package
-     *         name or if this method is not called after getText is called with
-     *         abbreviate set to true.
+     *         Insertion. This will be empty unless
+     *         {@link #getText(boolean, boolean)} is called with abbreviate true.
      */
-    public String getPackageName() {
-        return packageName;
+    public Set<String> getPackageNames() {
+        return packageNames;
     }
 
     /**
