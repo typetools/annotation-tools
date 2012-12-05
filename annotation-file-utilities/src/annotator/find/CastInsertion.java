@@ -9,9 +9,9 @@ package annotator.find;
 public class CastInsertion extends Insertion {
 
   /**
-   * The un-annotated type to cast to.
+   * The type to cast to.
    */
-  private String type;
+  private InsertionType type;
 
   /**
    * Creates a new CastInsertion.
@@ -24,20 +24,14 @@ public class CastInsertion extends Insertion {
   public CastInsertion(String text, Criteria criteria,
       boolean separateLine, String type) {
     super(text, criteria, separateLine);
-    this.type = type;
+    this.type = new InsertionType(new Insertion(text, criteria, separateLine), type);
   }
 
   /** {@inheritDoc} */
   @Override
   public String getText(boolean comments, boolean abbreviate) {
-    return "((" + super.getText(comments, abbreviate) + " " + getType() + ") (";
-  }
-
-  /**
-   * Returns the (unqualified) type to cast to
-   */
-  public String getType() {
-    return type;
+    String result = "((" + type.getText(comments, abbreviate) + ") (";
+    return result;
   }
 
   /** {@inheritDoc} */
