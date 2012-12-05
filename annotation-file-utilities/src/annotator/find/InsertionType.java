@@ -2,6 +2,7 @@ package annotator.find;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Stores a generic type with annotations and converts it into a String.
@@ -87,11 +88,12 @@ public class InsertionType {
      *
      * @param comments true if annotations should be surrounded in comments.
      * @param abbreviate true if package names should be removed from annotations.
+     * @param packageNames a set to store the removed package names in (only used if abbreviate is true).
      * @return This type as text.
      */
-    public String getText(boolean comments, boolean abbreviate) {
+    public String getText(boolean comments, boolean abbreviate, Set<String> packageNames) {
         StringBuilder result = new StringBuilder();
-        getText(result, comments, abbreviate);
+        getText(result, comments, abbreviate, packageNames);
         return result.toString();
     }
 
@@ -99,9 +101,12 @@ public class InsertionType {
      * Builds up the resulting type in the given StringBuilder.
      */
     private void getText(StringBuilder result,
-            boolean comments, boolean abbreviate) {
+            boolean comments, boolean abbreviate, Set<String> packageNames) {
         for (Insertion anno : annotations) {
             result.append(anno.getText(comments, abbreviate));
+            if (abbreviate) {
+                packageNames.addAll(anno.getPackageNames());
+            }
             result.append(' ');
         }
         if (type.isEmpty()) {
@@ -112,11 +117,11 @@ public class InsertionType {
             if (!typeParams.isEmpty()) {
                 result.append('<');
                 typeParams.get(0).getText(result, comments,
-                        abbreviate);
+                        abbreviate, packageNames);
                 for (int i = 1; i < typeParams.size(); i++) {
                     result.append(", ");
                     typeParams.get(i).getText(result, comments,
-                            abbreviate);
+                            abbreviate, packageNames);
                 }
                 result.append('>');
             }
@@ -125,6 +130,6 @@ public class InsertionType {
 
     @Override
     public String toString() {
-        return getText(false, false);
+        return getText(false, false, null);
     }
 }
