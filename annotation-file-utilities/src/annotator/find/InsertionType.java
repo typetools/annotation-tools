@@ -3,8 +3,6 @@ package annotator.find;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.common.collect.Lists;
-
 /**
  * Stores a generic type with annotations and converts it into a String.
  */
@@ -22,9 +20,21 @@ public class InsertionType {
     private List<InsertionType> typeParams;
 
     /**
-     * The un-annotated, raw type.
+     * The un-annotated, raw type. This can be set to the empty String if a type
+     * is not necessary.
      */
     private String type;
+
+    /**
+     * Constructs a new InsertionType.
+     *
+     * @param type The un-annotated, raw type.
+     */
+    public InsertionType(String type) {
+        this.annotations = new ArrayList<Insertion>();
+        this.typeParams = new ArrayList<InsertionType>();
+        this.type = type;
+    }
 
     /**
      * Constructs a new InsertionType.
@@ -33,9 +43,43 @@ public class InsertionType {
      * @param type The un-annotated, raw type.
      */
     public InsertionType(Insertion outerAnnotation, String type) {
-        this.annotations = Lists.newArrayList(outerAnnotation);
-        this.typeParams = new ArrayList<InsertionType>();
+        this(type);
+        this.annotations.add(outerAnnotation);
+    }
+
+    /**
+     * Sets the raw, un-annotated type.
+     *
+     * @param type the type.
+     */
+    public void setType(String type) {
         this.type = type;
+    }
+
+    /**
+     * Gets the raw, un-annotated type.
+     */
+    public String getType() {
+        return type;
+    }
+
+    /**
+     * Gets the type parameter at the given index.
+     *
+     * @param index The index.
+     * @return The type parameter.
+     */
+    public InsertionType getTypeParameter(int index) {
+        return typeParams.get(index);
+    }
+
+    /**
+     * Adds the given type parameter to the next available index.
+     *
+     * @param child The type parameter to add.
+     */
+    public void addTypeParameter(InsertionType typeParam) {
+        typeParams.add(typeParam);
     }
 
     /**
@@ -60,17 +104,22 @@ public class InsertionType {
             result.append(anno.getText(comments, abbreviate));
             result.append(' ');
         }
-        result.append(type);
-        if (!typeParams.isEmpty()) {
-            result.append('<');
-            typeParams.get(0).getText(result, comments,
-                    abbreviate);
-            for (int i = 1; i < typeParams.size(); i++) {
-                result.append(", ");
-                typeParams.get(i).getText(result, comments,
+        if (type.isEmpty()) {
+            // If there's no type then remove the trailing space.
+            result.deleteCharAt(result.length() - 1);
+        } else {
+            result.append(type);
+            if (!typeParams.isEmpty()) {
+                result.append('<');
+                typeParams.get(0).getText(result, comments,
                         abbreviate);
+                for (int i = 1; i < typeParams.size(); i++) {
+                    result.append(", ");
+                    typeParams.get(i).getText(result, comments,
+                            abbreviate);
+                }
+                result.append('>');
             }
-            result.append('>');
         }
     }
 

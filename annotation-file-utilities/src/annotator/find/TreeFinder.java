@@ -915,15 +915,11 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
             parent = parent.getParentPath();
           }
           ClassTree clazz = (ClassTree) parent.getLeaf();
-          String type = clazz.getSimpleName().toString();
-          if (!clazz.getTypeParameters().isEmpty()) {
-            type += "<" + clazz.getTypeParameters().get(0);
-            for (int t = 1; t < clazz.getTypeParameters().size(); t++) {
-              type += ", " + clazz.getTypeParameters().get(t);
-            }
-            type += ">";
+          InsertionType type = receiver.getType();
+          type.setType(clazz.getSimpleName().toString());
+          for (TypeParameterTree tree : clazz.getTypeParameters()) {
+              type.addTypeParameter(new InsertionType(tree.toString()));
           }
-          receiver.setType(type);
         }
 
         // If the method doesn't have parameters, don't add a comma.

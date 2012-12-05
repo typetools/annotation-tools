@@ -7,11 +7,9 @@ package annotator.find;
 public class ReceiverInsertion extends Insertion {
 
     /**
-     * The type to use when inserting the receiver. If this is null, it is
-     * assumed that the receiver already exists and only the annotation will be
-     * inserted.
+     * The type to use when inserting the receiver.
      */
-    private String type;
+    private InsertionType type;
 
     /**
      * If true a comma will be added at the end of the insertion (only if also
@@ -32,8 +30,8 @@ public class ReceiverInsertion extends Insertion {
      */
     public ReceiverInsertion(String text, Criteria criteria,
             boolean separateLine) {
-        super(text, criteria, separateLine);
-        type = null;
+        super(criteria, separateLine);
+        type = new InsertionType(new AnnotationInsertion(text), "");
         addComma = false;
     }
 
@@ -48,19 +46,19 @@ public class ReceiverInsertion extends Insertion {
     }
 
     /**
-     * Add a type to this insertion. If type is not set, then it is assumed the
-     * receiver type is already present so it will not be added.
+     * Gets the type. It is assumed that the returned value will be modified
+     * to update the type to be inserted.
      */
-    public void setType(String type) {
-        this.type = type;
+    public InsertionType getType() {
+        return type;
     }
 
     @Override
     public String getText(boolean comments, boolean abbreviate) {
-        boolean commentAnnotation = comments && type == null;
-        String result = super.getText(commentAnnotation, abbreviate);
-        if (type != null) {
-            result += " " + type + " this";
+        boolean commentAnnotation = (comments && type.getType().isEmpty());
+        String result = type.getText(commentAnnotation, abbreviate);
+        if (!type.getType().isEmpty()) {
+            result += " this";
             if (addComma) {
                 result += ",";
             }
