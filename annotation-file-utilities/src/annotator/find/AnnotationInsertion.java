@@ -49,7 +49,7 @@ public class AnnotationInsertion extends Insertion {
         String result = annotation;
         if (abbreviate) {
             Pair<String, String> ps = removePackage(result);
-            packageName = ps.a;
+            packageNames.add(ps.a);
             result = ps.b;
         }
         if (!result.startsWith("@")) {

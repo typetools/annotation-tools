@@ -285,14 +285,12 @@ public class Main {
           for (Insertion iToInsert : toInsertList) {
             String toInsert = iToInsert.getText(comments, abbreviate);
             if (abbreviate) {
-              String packageName = iToInsert.getPackageName();
-              if (packageName != null) {
-                if (debug && !imports.contains(packageName)) {
-                  System.out.printf("Need import %s%n  due to insertion %s%n",
-                                    packageName, toInsert);
-                }
-                imports.add(packageName);
+              Set<String> packageNames = iToInsert.getPackageNames();
+              if (debug) {
+                System.out.printf("Need import %s%n  due to insertion %s%n",
+                                  packageNames, toInsert);
               }
+              imports.addAll(packageNames);
             }
 
             // Possibly add whitespace after the insertion

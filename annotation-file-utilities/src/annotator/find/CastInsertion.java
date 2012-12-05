@@ -30,7 +30,7 @@ public class CastInsertion extends Insertion {
   /** {@inheritDoc} */
   @Override
   public String getText(boolean comments, boolean abbreviate) {
-    String result = "((" + type.getText(comments, abbreviate) + ") (";
+    String result = "((" + type.getText(comments, abbreviate, packageNames) + ") (";
     return result;
   }
 

@@ -56,7 +56,7 @@ public class ReceiverInsertion extends Insertion {
     @Override
     public String getText(boolean comments, boolean abbreviate) {
         boolean commentAnnotation = (comments && type.getType().isEmpty());
-        String result = type.getText(commentAnnotation, abbreviate);
+        String result = type.getText(commentAnnotation, abbreviate, packageNames);
         if (!type.getType().isEmpty()) {
             result += " this";
             if (addComma) {
