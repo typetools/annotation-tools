@@ -6,15 +6,15 @@ import plume.Pair;
  * Specifies something that needs to be inserted into a source file, including
  * the "what" and the "where".
  */
-public class Insertion {
+public abstract class Insertion {
 
     public enum Kind {
-        DEFAULT, // The general insertion
+        ANNOTATION,
         CAST,
-        RECEIVER
+        RECEIVER,
+        CLOSE_PARENTHESIS
     }
 
-    private final String text;
     private final Criteria criteria;
     // If non-null, then try to put annotation on its own line,
     // horizontally aligned with the location.
@@ -24,17 +24,15 @@ public class Insertion {
      * The package name for the annotation being inserted by this Insertion.
      * This will be null unless getText is called with abbreviate true.
      */
-    private String packageName;
+    protected String packageName;
 
     /**
      * Creates a new insertion.
      *
-     * @param text the text to insert
      * @param criteria where to insert the text
      * @param separateLine whether to insert the text on its own
      */
-    public Insertion(String text, Criteria criteria, boolean separateLine) {
-        this.text = text;
+    public Insertion(Criteria criteria, boolean separateLine) {
         this.criteria = criteria;
         this.separateLine = separateLine;
     }
@@ -61,28 +59,14 @@ public class Insertion {
      * Gets the insertion text.
      *
      * @param comments
-     *            if true, the annotation will be surrounded by block comments.
+     *            if true, Java 8 features will be surrounded in comments.
      * @param abbreviate
-     *            if true, the package name will be removed from the annotation.
+     *            if true, the package name will be removed from the annotations.
      *            The package name can be retrieved again by calling the
      *            {@link #getPackageName()} method.
      * @return the text to insert
      */
-    public String getText(boolean comments, boolean abbreviate) {
-        String result = text;
-        if (abbreviate) {
-            Pair<String, String> ps = removePackage(result);
-            packageName = ps.a;
-            result = ps.b;
-        }
-        if (!result.startsWith("@")) {
-            throw new Error("Illegal insertion, must start with @: " + result);
-        }
-        if (comments) {
-            return "/*" + result + "*/";
-        }
-        return result;
-    }
+    public abstract String getText(boolean comments, boolean abbreviate);
 
     /**
      * Gets the package name.
@@ -110,15 +94,13 @@ public class Insertion {
      */
     @Override
     public String toString() {
-        return String.format("%s (nl=%b) @ %s", text, separateLine, criteria);
+        return String.format("(nl=%b) @ %s", separateLine, criteria);
     }
 
     /**
      * Gets the kind of this insertion.
      */
-    public Kind getKind() {
-        return Kind.DEFAULT;
-    }
+    public abstract Kind getKind();
 
     /**
      * Removes the leading package.

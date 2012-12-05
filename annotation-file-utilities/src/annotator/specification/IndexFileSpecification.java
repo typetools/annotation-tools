@@ -31,6 +31,7 @@ import annotations.field.AnnotationFieldType;
 import annotations.io.ASTPath;
 import annotations.io.IndexFileParser;
 import annotations.util.coll.VivifyingMap;
+import annotator.find.AnnotationInsertion;
 import annotator.find.CastInsertion;
 import annotator.find.Criteria;
 import annotator.find.Insertion;
@@ -239,7 +240,7 @@ public class IndexFileSpecification implements Specification {
         ATypeElementWithType typecast = (ATypeElementWithType) element;
         ins = new CastInsertion(annotationString, criteria, false, typecast.getType());
       } else {
-        ins = new Insertion(annotationString, criteria,
+        ins = new AnnotationInsertion(annotationString, criteria,
                             isDeclarationAnnotation);
       }
       debug("parsed: " + ins);

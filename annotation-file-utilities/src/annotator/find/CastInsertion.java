@@ -23,8 +23,8 @@ public class CastInsertion extends Insertion {
    */
   public CastInsertion(String text, Criteria criteria,
       boolean separateLine, String type) {
-    super(text, criteria, separateLine);
-    this.type = new InsertionType(new Insertion(text, criteria, separateLine), type);
+    super(criteria, separateLine);
+    this.type = new InsertionType(new AnnotationInsertion(text), type);
   }
 
   /** {@inheritDoc} */
