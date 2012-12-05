@@ -9,12 +9,17 @@ public class CloseParenthesisInsertion extends Insertion {
 
     public CloseParenthesisInsertion(Criteria criteria,
             boolean separateLine) {
-        super("", criteria, separateLine);
+        super(criteria, separateLine);
     }
 
     /** {@inheritDoc} */
     @Override
     public String getText(boolean comments, boolean abbreviate) {
         return "))";
+    }
+
+    /** {@inheritDoc} */
+    public Kind getKind() {
+        return Kind.CLOSE_PARENTHESIS;
     }
 }
