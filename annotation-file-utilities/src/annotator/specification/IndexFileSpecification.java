@@ -233,8 +233,8 @@ public class IndexFileSpecification implements Specification {
       Criteria criteria = clist.criteria();
       Insertion ins;
       if (criteria.isOnReceiver()) {
-          ins = new ReceiverInsertion(annotationString, criteria,
-                                      isDeclarationAnnotation);
+        ins = new ReceiverInsertion(annotationString, criteria,
+                                    isDeclarationAnnotation);
       } else if (element instanceof ATypeElementWithType) {
         ATypeElementWithType typecast = (ATypeElementWithType) element;
         ins = new CastInsertion(annotationString, criteria, false, typecast.getType());
