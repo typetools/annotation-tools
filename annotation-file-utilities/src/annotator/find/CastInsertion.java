@@ -26,6 +26,15 @@ public class CastInsertion extends Insertion {
     this.type = type;
   }
 
+  /**
+   * Gets the type for this insertion. It is assumed that the returned value will be modified
+   * to update the type to be inserted.
+   * @return the type
+   */
+  public Type getType() {
+      return type;
+  }
+
   /** {@inheritDoc} */
   @Override
   public String getText(boolean comments, boolean abbreviate) {

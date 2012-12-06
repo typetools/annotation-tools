@@ -1,3 +1,8 @@
+package annotation:
+annotation @A:
+annotation @B:
+annotation @C:
+
 package checkers.igj.quals:
 annotation @ReadOnly: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
 
@@ -56,3 +61,8 @@ class Receivers8:
 
     method m()V:
         receiver: @ReadOnly
+
+class Receivers9:
+
+    method m()V:
+        receiver: @ReadOnly @A @B @C
