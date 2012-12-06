@@ -238,13 +238,12 @@ public class IndexFileSpecification implements Specification {
       if (criteria.isOnReceiver()) {
         DeclaredType type = new DeclaredType();
         type.addAnnotation(annotationString);
-        ins = new ReceiverInsertion(type, criteria,
-                                    isDeclarationAnnotation);
+        ins = new ReceiverInsertion(type, criteria);
       } else if (element instanceof ATypeElementWithType) {
         ATypeElementWithType typecast = (ATypeElementWithType) element;
         Type type = typecast.getType();
         type.addAnnotation(annotationString);
-        ins = new CastInsertion(criteria, false, typecast.getType());
+        ins = new CastInsertion(criteria, typecast.getType());
       } else {
         ins = new AnnotationInsertion(annotationString, criteria,
                             isDeclarationAnnotation);
