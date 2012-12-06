@@ -920,7 +920,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
           DeclaredType type = receiver.getType();
           type.setName(clazz.getSimpleName().toString());
           for (TypeParameterTree tree : clazz.getTypeParameters()) {
-            type.addTypeParameter(IndexFileParser.parseType(tree.toString()));
+            type.addTypeParameter(new DeclaredType(tree.getName().toString()));
           }
         }
 

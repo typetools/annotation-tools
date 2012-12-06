@@ -35,8 +35,8 @@ enum Receivers6 {
     public void m(@checkers.igj.quals.ReadOnly Receivers6 this) {}
 }
 
-class Receivers7<K extends Object> {
-    public void m(@checkers.igj.quals.ReadOnly Receivers7<K extends Object> this) {}
+class Receivers7<K extends Object, V> {
+    public void m(@checkers.igj.quals.ReadOnly Receivers7<K, V> this) {}
 }
 
 class Receivers8<K extends Object> {
