@@ -2,6 +2,7 @@ package annotations.el;
 
 import java.util.LinkedHashMap;
 
+import type.Type;
 import annotations.util.coll.VivifyingMap;
 
 /**
@@ -28,7 +29,7 @@ public class ATypeElementWithType extends ATypeElement {
     /**
      * The un-annotated type.
      */
-    private String type;
+    private Type type;
 
     ATypeElementWithType(Object description) {
         super(description);
@@ -39,7 +40,7 @@ public class ATypeElementWithType extends ATypeElement {
      *
      * @return The un-annotated type.
      */
-    public String getType() {
+    public Type getType() {
         return type;
     }
 
@@ -48,7 +49,7 @@ public class ATypeElementWithType extends ATypeElement {
      *
      * @param type The un-annotated type.
      */
-    public void setType(String type) {
+    public void setType(Type type) {
         this.type = type;
     }
 

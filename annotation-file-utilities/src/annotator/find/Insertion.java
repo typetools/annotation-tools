@@ -1,9 +1,15 @@
 package annotator.find;
 
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 import plume.Pair;
+import type.ArrayType;
+import type.DeclaredType;
+import type.Type;
+import type.WildcardType;
+import type.WildcardType.BoundKind;
 
 /**
  * Specifies something that needs to be inserted into a source file, including
@@ -129,5 +135,75 @@ public abstract class Insertion {
         } else {
             return Pair.of((String) null, s);
         }
+    }
+
+    /**
+     * Converts the given type to a String. This method can't be in the
+     * {@link Type} class because this method relies on the {@link Insertion}
+     * class to format annotations, and the {@link Insertion} class is not
+     * available from {@link Type}.
+     *
+     * @param type
+     *            the type to convert
+     * @param comments
+     *            if true, Java 8 features will be surrounded in comments.
+     * @param abbreviate
+     *            if true, the package name will be removed from the annotations.
+     *            The package name can be retrieved again by calling the
+     *            {@link #getPackageName()} method.
+     * @return the type as a string
+     */
+    public String typeToString(Type type, boolean comments, boolean abbreviate) {
+        StringBuilder result = new StringBuilder();
+        for (String annotation : type.getAnnotations()) {
+            AnnotationInsertion ins = new AnnotationInsertion(annotation);
+            result.append(ins.getText(comments, abbreviate));
+            result.append(" ");
+            if (abbreviate) {
+                packageNames.addAll(ins.getPackageNames());
+            }
+        }
+        if (type instanceof DeclaredType) {
+            DeclaredType declaredType = (DeclaredType) type;
+            result.append(declaredType.getName());
+            List<Type> typeArguments = declaredType.getTypeParameters();
+            if (!typeArguments.isEmpty()) {
+                result.append('<');
+                result.append(typeToString(typeArguments.get(0), comments, abbreviate));
+                for (int i = 1; i < typeArguments.size(); i++) {
+                    result.append(", ");
+                    result.append(typeToString(typeArguments.get(i), comments, abbreviate));
+                }
+                result.append('>');
+            }
+            Type innerType = declaredType.getInnerType();
+            if (innerType != null) {
+                result.append('.');
+                result.append(typeToString(innerType, comments, abbreviate));
+            }
+        } else if (type instanceof ArrayType) {
+            ArrayType arrayType = (ArrayType) type;
+            result.append(typeToString(arrayType.getComponentType(), comments, abbreviate));
+            result.append("[]");
+        } else if (type instanceof WildcardType) {
+            WildcardType wildcardType = (WildcardType) type;
+            for (String annotation : wildcardType.getAnnotations()) {
+                AnnotationInsertion ins = new AnnotationInsertion(annotation);
+                result.append(ins.getText(comments, abbreviate));
+                result.append(" ");
+                if (abbreviate) {
+                    packageNames.addAll(ins.getPackageNames());
+                }
+            }
+            result.append(wildcardType.getTypeArgumentName());
+            if (wildcardType.getKind() != BoundKind.NONE) {
+                result.append(' ');
+                result.append(wildcardType.getKind());
+                result.append(' ');
+                result.append(typeToString(wildcardType.getBound(), comments, abbreviate));
+            }
+        }
+        // There will be extra whitespace at the end if this is only annotations, so trim
+        return result.toString().trim();
     }
 }

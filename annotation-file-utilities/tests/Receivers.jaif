@@ -46,3 +46,13 @@ class Receivers6:
 
     method m()V:
         receiver: @ReadOnly
+
+class Receivers7:
+
+    method m()V:
+        receiver: @ReadOnly
+
+class Receivers8:
+
+    method m()V:
+        receiver: @ReadOnly

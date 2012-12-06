@@ -26,6 +26,11 @@ import java.util.Set;
 
 import plume.ArraysMDE;
 import plume.FileIOException;
+import type.ArrayType;
+import type.DeclaredType;
+import type.Type;
+import type.WildcardType;
+import type.WildcardType.BoundKind;
 import annotations.Annotation;
 import annotations.AnnotationBuilder;
 import annotations.AnnotationFactory;
@@ -883,7 +888,7 @@ public final class IndexFileParser {
                 expectChar(':');
                 ATypeElementWithType i = exp.insertTypecasts.vivify(astPath);
                 parseAnnotations(i);
-                String type = parseType();
+                Type type = parseType();
                 i.setType(type);
             }
         }
@@ -1060,33 +1065,73 @@ public final class IndexFileParser {
     }
 
     /**
-     * Parses and returns the next tokens as a Java type.
+     * Parses the next tokens as a Java type.
      */
-    private String parseType() throws IOException, ParseException {
-        StringBuilder builder = new StringBuilder();
-        parseType(builder);
-        return builder.toString();
+    private Type parseType() throws IOException, ParseException {
+        if (matchChar('?')) {
+            return parseWildcardType();
+        } else {
+            String name = expectIdentifier();
+            if (checkKeyword("extends") || checkKeyword("super")) {
+                return parseWildcardType(name);
+            } else {
+                Type type = parseDeclaredType(name);
+                while (matchChar('[')) {
+                    expectChar(']');
+                    type = new ArrayType(type);
+                }
+                return type;
+            }
+        }
     }
 
     /**
-     * Parses the next tokens as a Java type. Stores the type information in the
-     * given StringBuilder.
+     * Parses the next tokens as a declared type.
      */
-    private void parseType(StringBuilder builder) throws IOException, ParseException {
-        String id = expectQualifiedName();
-        builder.append(id);
-        if (checkChar('<')) {
-            expectChar('<');
-            builder.append('<');
-            parseType(builder);
-            while (checkChar(',')) {
-                expectChar(',');
-                builder.append(", ");
-                parseType(builder);
+    private DeclaredType parseDeclaredType() throws IOException, ParseException {
+        return parseDeclaredType(expectIdentifier());
+    }
+
+    /**
+     * Parses the next tokens as a declared type.
+     * @param name the name of the initial identifier
+     */
+    private DeclaredType parseDeclaredType(String name) throws IOException, ParseException {
+        DeclaredType type = new DeclaredType(name);
+        if (matchChar('<')) {
+            type.addTypeParameter(parseType());
+            while (matchChar(',')) {
+                type.addTypeParameter(parseType());
             }
             expectChar('>');
-            builder.append('>');
         }
+        if (matchChar('.')) {
+            type.setInnerType(parseDeclaredType());
+        }
+        return type;
+    }
+
+    /**
+     * Parses the next tokens as a wildcard type.
+     */
+    private WildcardType parseWildcardType() throws IOException, ParseException {
+        return parseWildcardType("?");
+    }
+
+    /**
+     * Parses the next tokens as a wildcard type.
+     * @param typeArgumentName the name of the type argument
+     */
+    private WildcardType parseWildcardType(String typeArgumentName) throws IOException, ParseException {
+        BoundKind kind;
+        if (matchKeyword("extends")) {
+            kind = BoundKind.EXTENDS;
+        } else if (matchKeyword("super")) {
+            kind = BoundKind.SUPER;
+        } else {
+            return new WildcardType();
+        }
+        return new WildcardType(typeArgumentName, kind, parseType());
     }
 
     private void parseClass() throws IOException, ParseException {
@@ -1256,4 +1301,19 @@ public final class IndexFileParser {
         }
     }
 
+    /**
+     * Parse the given text into a {@link Type}.
+     * @param text the text to parse.
+     * @return the type.
+     */
+    public static Type parseType(String text) {
+        StringReader in = new StringReader(text);
+        IndexFileParser parser = new IndexFileParser(in, null);
+        try {
+            parser.st.nextToken();
+            return parser.parseType();
+        } catch (Exception e) {
+            throw new RuntimeException("Error parsing type from: '" + text + "'", e);
+        }
+    }
 }

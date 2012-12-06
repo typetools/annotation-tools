@@ -11,6 +11,8 @@ import java.util.Map;
 import javax.tools.JavaFileObject;
 
 import plume.Pair;
+import type.DeclaredType;
+import annotations.io.IndexFileParser;
 import annotator.Main;
 
 import com.google.common.collect.LinkedHashMultimap;
@@ -915,10 +917,10 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
             parent = parent.getParentPath();
           }
           ClassTree clazz = (ClassTree) parent.getLeaf();
-          InsertionType type = receiver.getType();
-          type.setType(clazz.getSimpleName().toString());
+          DeclaredType type = receiver.getType();
+          type.setName(clazz.getSimpleName().toString());
           for (TypeParameterTree tree : clazz.getTypeParameters()) {
-              type.addTypeParameter(new InsertionType(tree.toString()));
+            type.addTypeParameter(IndexFileParser.parseType(tree.toString()));
           }
         }
 
