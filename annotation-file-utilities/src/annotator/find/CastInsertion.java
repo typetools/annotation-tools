@@ -1,5 +1,7 @@
 package annotator.find;
 
+import type.Type;
+
 /**
  * Specifies an insertion of a cast into a source file. Stores the type of cast
  * to insert in addition to the annotation and location. Note that this
@@ -11,26 +13,24 @@ public class CastInsertion extends Insertion {
   /**
    * The type to cast to.
    */
-  private InsertionType type;
+  private Type type;
 
   /**
    * Creates a new CastInsertion.
    *
-   * @param text the text to insert
    * @param criteria where to insert the text
    * @param separateLine whether to insert the text on its own
    * @param type the un-annotated type to cast to
    */
-  public CastInsertion(String text, Criteria criteria,
-      boolean separateLine, String type) {
+  public CastInsertion(Criteria criteria, boolean separateLine, Type type) {
     super(criteria, separateLine);
-    this.type = new InsertionType(new AnnotationInsertion(text), type);
+    this.type = type;
   }
 
   /** {@inheritDoc} */
   @Override
   public String getText(boolean comments, boolean abbreviate) {
-    String result = "((" + type.getText(comments, abbreviate, packageNames) + ") (";
+    String result = "((" + typeToString(type, comments, abbreviate) + ") (";
     return result;
   }
 
