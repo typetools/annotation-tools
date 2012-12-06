@@ -35,7 +35,7 @@ enum Receivers6 {
     public void m() {}
 }
 
-class Receivers7<K extends Object> {
+class Receivers7<K extends Object, V> {
     public void m() {}
 }
 
