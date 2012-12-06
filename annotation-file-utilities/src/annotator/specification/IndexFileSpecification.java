@@ -230,26 +230,43 @@ public class IndexFileSpecification implements Specification {
 
   /** Fill in this.insertions with insertion pairs. */
   private void parseElement(CriterionList clist, AElement element) {
+    // Use at most one receiver and one cast insertion and add all of the
+    // annotations to the one insertion.
+    ReceiverInsertion receiver = null;
+    CastInsertion cast = null;
     for (Pair<String,Boolean> p : getElementAnnotation(element)) {
       String annotationString = p.a;
       Boolean isDeclarationAnnotation = p.b;
       Criteria criteria = clist.criteria();
-      Insertion ins;
       if (criteria.isOnReceiver()) {
-        DeclaredType type = new DeclaredType();
-        type.addAnnotation(annotationString);
-        ins = new ReceiverInsertion(type, criteria);
+        if (receiver == null) {
+          DeclaredType type = new DeclaredType();
+          type.addAnnotation(annotationString);
+          receiver = new ReceiverInsertion(type, criteria);
+        } else {
+          receiver.getType().addAnnotation(annotationString);
+        }
       } else if (element instanceof ATypeElementWithType) {
-        ATypeElementWithType typecast = (ATypeElementWithType) element;
-        Type type = typecast.getType();
-        type.addAnnotation(annotationString);
-        ins = new CastInsertion(criteria, typecast.getType());
+        if (cast == null) {
+          ATypeElementWithType typecast = (ATypeElementWithType) element;
+          Type type = typecast.getType();
+          type.addAnnotation(annotationString);
+          cast = new CastInsertion(criteria, typecast.getType());
+        } else {
+          cast.getType().addAnnotation(annotationString);
+        }
       } else {
-        ins = new AnnotationInsertion(annotationString, criteria,
-                            isDeclarationAnnotation);
+        Insertion ins = new AnnotationInsertion(annotationString, criteria,
+                                      isDeclarationAnnotation);
+        debug("parsed: " + ins);
+        this.insertions.add(ins);
       }
-      debug("parsed: " + ins);
-      this.insertions.add(ins);
+    }
+    if (receiver != null) {
+        this.insertions.add(receiver);
+    }
+    if (cast != null) {
+        this.insertions.add(cast);
     }
   }
 

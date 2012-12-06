@@ -43,4 +43,8 @@ class Receivers8<K extends Object> {
     public void m(@checkers.igj.quals.ReadOnly Receivers8<K> this) {}
 }
 
+class Receivers9 {
+    public void m(@checkers.igj.quals.ReadOnly @annotation.A @annotation.B @annotation.C Receivers9 this) {}
+}
+
 @interface Anno {}

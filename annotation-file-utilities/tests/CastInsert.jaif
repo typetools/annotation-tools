@@ -1,3 +1,8 @@
+package annotation:
+annotation @A:
+annotation @B:
+annotation @C:
+
 package checkers.nullness.quals:
 annotation @Nullable: @java.lang.annotation.Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE,TYPE_PARAMETER})
 
@@ -51,3 +56,4 @@ class CastInsert:
         insert-typecast Block.statement 27, WhileLoop.statement, ExpressionStatement.expression, Assignment.expression, Binary.leftOperand: @Nullable Integer
         insert-typecast Block.statement 28, ExpressionStatement.expression, MethodInvocation.methodSelect, MemberSelect.expression, MemberSelect.expression: @Nullable CastInsert
         insert-typecast Block.statement 29, ExpressionStatement.expression, MethodInvocation.methodSelect, MemberSelect.expression: @Nullable PrintStream
+        insert-typecast Block.statement 30, Variable.initializer: @Nullable @A @B @C String
