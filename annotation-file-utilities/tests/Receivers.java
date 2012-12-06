@@ -35,4 +35,12 @@ enum Receivers6 {
     public void m() {}
 }
 
+class Receivers7<K extends Object> {
+    public void m() {}
+}
+
+class Receivers8<K extends Object> {
+    public void m(Receivers8<K> this) {}
+}
+
 @interface Anno {}

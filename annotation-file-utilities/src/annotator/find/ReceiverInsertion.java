@@ -1,5 +1,7 @@
 package annotator.find;
 
+import type.DeclaredType;
+
 /**
  * An insertion for a method receiver. This supports inserting an annotation on
  * an existing receiver, and creating a new receiver if one is not present.
@@ -9,7 +11,7 @@ public class ReceiverInsertion extends Insertion {
     /**
      * The type to use when inserting the receiver.
      */
-    private InsertionType type;
+    private DeclaredType type;
 
     /**
      * If true a comma will be added at the end of the insertion (only if also
@@ -24,14 +26,14 @@ public class ReceiverInsertion extends Insertion {
      * the end of the receiver. Pass true to {@link #setAddComma(boolean)} to
      * change this.
      *
-     * @param text the annotation to insert
+     * @param type the type to use when inserting the receiver.
      * @param criteria where to insert the text
      * @param separateLine whether to insert the text on its own
      */
-    public ReceiverInsertion(String text, Criteria criteria,
+    public ReceiverInsertion(DeclaredType type, Criteria criteria,
             boolean separateLine) {
         super(criteria, separateLine);
-        type = new InsertionType(new AnnotationInsertion(text), "");
+        this.type = type;
         addComma = false;
     }
 
@@ -49,15 +51,15 @@ public class ReceiverInsertion extends Insertion {
      * Gets the type. It is assumed that the returned value will be modified
      * to update the type to be inserted.
      */
-    public InsertionType getType() {
+    public DeclaredType getType() {
         return type;
     }
 
     @Override
     public String getText(boolean comments, boolean abbreviate) {
-        boolean commentAnnotation = (comments && type.getType().isEmpty());
-        String result = type.getText(commentAnnotation, abbreviate, packageNames);
-        if (!type.getType().isEmpty()) {
+        boolean commentAnnotation = (comments && type.getName().isEmpty());
+        String result = typeToString(type, commentAnnotation, abbreviate);
+        if (!type.getName().isEmpty()) {
             result += " this";
             if (addComma) {
                 result += ",";
