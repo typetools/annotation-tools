@@ -19,11 +19,10 @@ public class CastInsertion extends Insertion {
    * Creates a new CastInsertion.
    *
    * @param criteria where to insert the text
-   * @param separateLine whether to insert the text on its own
    * @param type the un-annotated type to cast to
    */
-  public CastInsertion(Criteria criteria, boolean separateLine, Type type) {
-    super(criteria, separateLine);
+  public CastInsertion(Criteria criteria, Type type) {
+    super(criteria, false);
     this.type = type;
   }
 
