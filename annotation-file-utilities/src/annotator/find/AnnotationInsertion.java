@@ -49,8 +49,11 @@ public class AnnotationInsertion extends Insertion {
         String result = annotation;
         if (abbreviate) {
             Pair<String, String> ps = removePackage(result);
-            packageNames.add(ps.a);
+            String packageName = ps.a;
             result = ps.b;
+            if (packageName != null) {
+                packageNames.add(packageName);
+            }
         }
         if (!result.startsWith("@")) {
             throw new Error("Illegal insertion, must start with @: " + result);
