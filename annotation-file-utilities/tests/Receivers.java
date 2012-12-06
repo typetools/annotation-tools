@@ -43,4 +43,8 @@ class Receivers8<K extends Object> {
     public void m(Receivers8<K> this) {}
 }
 
+class Receivers9 {
+    public void m() {}
+}
+
 @interface Anno {}

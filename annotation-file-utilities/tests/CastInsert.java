@@ -70,6 +70,7 @@ public class CastInsert {
             i = i + 1;
         this.out.println();
         System.out.println();
+        Object obj = null;
         return 0;
     }
 }

@@ -70,6 +70,7 @@ public class CastInsert {
             i = ((@checkers.nullness.quals.Nullable Integer) (i)) + 1;
         ((@checkers.nullness.quals.Nullable CastInsert) (this)).out.println();
         ((@checkers.nullness.quals.Nullable PrintStream) (System.out)).println();
+        Object obj = ((@checkers.nullness.quals.Nullable @annotation.A @annotation.B @annotation.C String) (null));
         return 0;
     }
 }
