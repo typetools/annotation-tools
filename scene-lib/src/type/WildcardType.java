@@ -7,6 +7,7 @@ package type;
  *   ? extends Object
  *   ? super String
  * </pre>
+ * This can also be used with generic type arguments with bounds.
  */
 public class WildcardType extends Type {
 
@@ -33,6 +34,7 @@ public class WildcardType extends Type {
      * <pre>
      *   public class ClassName&lt;K extends Object&gt;
      * </pre>
+     * Can also be '?'.
      */
     private String typeArgumentName;
 
@@ -50,19 +52,7 @@ public class WildcardType extends Type {
      * Creates a new wildcard type with no bound.
      */
     public WildcardType() {
-        this(BoundKind.NONE, null);
-    }
-
-    /**
-     * Creates a new wildcard type.
-     * @param kind the bound kind.
-     * @param bound the bound.
-     */
-    public WildcardType(BoundKind kind, Type bound) {
-        super();
-        this.typeArgumentName = "?";
-        this.kind = kind;
-        this.bound = bound;
+        this("?", BoundKind.NONE, null);
     }
 
     /**
@@ -83,6 +73,7 @@ public class WildcardType extends Type {
      * <pre>
      *   public class ClassName&lt;K extends Object&gt;
      * </pre>
+     * Can also be '?'.
      * @return the name of the type argument.
      */
     public String getTypeArgumentName() {
