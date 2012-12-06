@@ -28,11 +28,9 @@ public class ReceiverInsertion extends Insertion {
      *
      * @param type the type to use when inserting the receiver.
      * @param criteria where to insert the text
-     * @param separateLine whether to insert the text on its own
      */
-    public ReceiverInsertion(DeclaredType type, Criteria criteria,
-            boolean separateLine) {
-        super(criteria, separateLine);
+    public ReceiverInsertion(DeclaredType type, Criteria criteria) {
+        super(criteria, false);
         this.type = type;
         addComma = false;
     }
