@@ -5,6 +5,6 @@
 	<classpathentry kind="lib" path="junit.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/asmx"/>
 	<classpathentry kind="lib" path="/annotation-file-utilities/lib/plume.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/langtools"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jsr308-langtools"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
