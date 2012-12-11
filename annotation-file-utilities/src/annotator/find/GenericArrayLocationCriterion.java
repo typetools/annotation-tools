@@ -10,6 +10,7 @@ import annotations.el.InnerTypeLocation;
 
 import com.sun.source.tree.*;
 import com.sun.source.util.TreePath;
+import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
 
 /**
  * GenericArrayLocationCriterion represents the criterion specifying the location
@@ -20,7 +21,7 @@ public class GenericArrayLocationCriterion implements Criterion {
   private static final boolean debug = false;
 
   // the full location list
-  private final List<Integer> location;
+  private final List<TypePathEntry> location;
 
   // The last element of the location list -- that is,
   // location.get(location.size() - 1), or null if (location.size() == 0).
@@ -29,7 +30,7 @@ public class GenericArrayLocationCriterion implements Criterion {
   // TODO: make private
   // Also TODO: locationInParent is not used for any logic in this class,
   // just abused by TreeFinder. See whether you can clean this up.
-  Integer locationInParent;
+  TypePathEntry locationInParent;
 
   // represents all but the last element of the location list
   // TODO: this field is initialized, but never read!
@@ -44,7 +45,7 @@ public class GenericArrayLocationCriterion implements Criterion {
    *  <code>Integer @A []</code>
    */
   public GenericArrayLocationCriterion() {
-    this(new ArrayList<Integer>());
+    this(new ArrayList<TypePathEntry>());
   }
 
   /**
@@ -57,7 +58,7 @@ public class GenericArrayLocationCriterion implements Criterion {
     this(innerTypeLoc.location);
   }
 
-  private GenericArrayLocationCriterion(List<Integer> location) {
+  private GenericArrayLocationCriterion(List<TypePathEntry> location) {
     this.location = location;
     if (location.size() == 0) {
       this.locationInParent = null;
@@ -119,7 +120,7 @@ public class GenericArrayLocationCriterion implements Criterion {
     }
 
     TreePath pathRemaining = path;
-    List<Integer> locationRemaining = new ArrayList<Integer>(location);
+    List<TypePathEntry> locationRemaining = new ArrayList<TypePathEntry>(location);
 
     while (locationRemaining.size() != 0) {
       // annotating an inner type
@@ -152,7 +153,9 @@ public class GenericArrayLocationCriterion implements Criterion {
                          locationRemaining, Main.treeToString(leaf), Main.treeToString(parent), parent.getClass());
       }
 
-      int loc = locationRemaining.get(locationRemaining.size()-1);
+      TypePathEntry loc = locationRemaining.get(locationRemaining.size()-1);
+      // TODO: add more error checking for loc.tag in the branches.
+
       if (parent.getKind() == Tree.Kind.PARAMETERIZED_TYPE) {
         // annotating List<@A Integer>
         // System.out.printf("parent instanceof ParameterizedTypeTree: %s loc=%d%n",
@@ -160,8 +163,8 @@ public class GenericArrayLocationCriterion implements Criterion {
         ParameterizedTypeTree ptt = (ParameterizedTypeTree) parent;
         List<? extends Tree> childTrees = ptt.getTypeArguments();
         boolean found = false;
-        if (childTrees.size() > loc ) {
-          Tree childi = childTrees.get(loc);
+        if (childTrees.size() > loc.arg ) {
+          Tree childi = childTrees.get(loc.arg);
 
           if (childi.getKind() == Tree.Kind.ANNOTATED_TYPE) {
               childi = ((AnnotatedTypeTree) childi).getUnderlyingType();
@@ -176,7 +179,7 @@ public class GenericArrayLocationCriterion implements Criterion {
           if (debug) {
             System.out.printf("Generic failed for leaf: %s: nr children: %d loc: %d child: %s%n",
                              leaf, childTrees.size(), loc,
-                             ((childTrees.size() > loc) ? childTrees.get(loc) : null));
+                             ((childTrees.size() > loc.arg) ? childTrees.get(loc.arg) : null));
           }
           return false;
         }
@@ -213,15 +216,14 @@ public class GenericArrayLocationCriterion implements Criterion {
         // System.out.printf("parent instanceof ArrayTypeTree: %s loc=%d%n",
         //                   parent, loc);
         Tree elt = ((ArrayTypeTree) parent).getType();
-        for (int i=0; i<loc; i++) {
-          if (! (elt.getKind() == Tree.Kind.ARRAY_TYPE)) { // ArrayTypeTree
-            if (debug) {
-              System.out.printf("Element: %s is not an ArrayTypeTree and therefore false.", elt);
-            }
-            return false;
+        if (! (elt.getKind() == Tree.Kind.ARRAY_TYPE)) { // ArrayTypeTree
+          if (debug) {
+            System.out.printf("Element: %s is not an ArrayTypeTree and therefore false.", elt);
           }
-          elt = ((ArrayTypeTree) elt).getType();
+          return false;
         }
+        elt = ((ArrayTypeTree) elt).getType();
+
         boolean b = elt.equals(leaf);
         if (debug) {
           System.out.printf("parent %s instanceof ArrayTypeTree: %b %s %s %d%n",

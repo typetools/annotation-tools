@@ -10,9 +10,9 @@ import javax.tools.*;
 import com.sun.source.tree.*;
 import com.sun.source.util.*;
 import com.sun.source.util.TreeScanner;
+import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
 import com.sun.tools.javac.tree.*;
 import com.sun.tools.javac.tree.JCTree.*;
-import javax.lang.model.element.Modifier;
 
 import com.google.common.collect.*;
 
@@ -28,7 +28,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
 
   public static boolean debug = false;
 
-  private static Integer arrayLocationInParent = null;
+  private static TypePathEntry arrayLocationInParent = null;
 
   private static void debug(String message) {
     if (debug)
@@ -560,7 +560,9 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       // We need to know what array dimension to return.  This is gross.
       int dim = ((arrayLocationInParent == null)
                  ? 0  // outermost type
-                 : arrayLocationInParent.intValue() + 1);
+                 // TODO: adapt to multiple separate ARRAY instead of value
+                 // : arrayLocationInParent.intValue() + 1);
+                 : 1);
       // Invariant:  na.dims.size() == 0  or  na.elems == null  (but not both)
       // If na.dims.size() != 0, na.elemtype is non-null.
       // If na.dims.size() == 0, na.elemtype may be null or non-null.
