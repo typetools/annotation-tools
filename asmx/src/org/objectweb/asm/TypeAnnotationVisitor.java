@@ -1,5 +1,7 @@
 package org.objectweb.asm;
 
+import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
+
 /** 
  * A visitor to visit a Java extended annotation.  The methods of this 
  * interface must be called in the following order:
@@ -53,7 +55,7 @@ public interface TypeAnnotationVisitor extends AnnotationVisitor {
    * 
    * @param location the location specified by the extended annotation
    */
-  void visitXLocation(int location);
+  void visitXLocation(TypePathEntry location);
 
   void visitXNumEntries(int num_entries);
 

@@ -5,6 +5,8 @@ import checkers.javari.quals.*;
 
 import java.util.*;
 
+import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
+
 import annotations.util.*;
 
 /**
@@ -18,7 +20,7 @@ public final /*@ReadOnly*/ class InnerTypeLocation {
      * in <code>Foo&lt;Bar&lt;Baz, &#064;X Baz&gt;&gt;</code> are
      * <code>{0, 1}</code>.
      */
-    public final /*@ReadOnly*/ List< Integer> location;
+    public final /*@ReadOnly*/ List<TypePathEntry> location;
 
     /**
      * Constructs an {@link InnerTypeLocation} from the given location string,
@@ -26,9 +28,9 @@ public final /*@ReadOnly*/ class InnerTypeLocation {
      * {@link ATypeElement} with zero-length location string is the
      * {@link ATypeElement} itself.)
      */
-    public InnerTypeLocation(/*@ReadOnly*/ List< Integer> location) {
+    public InnerTypeLocation(/*@ReadOnly*/ List<TypePathEntry> location) {
         this.location = Collections.unmodifiableList(
-                new ArrayList< Integer>(location));
+                new ArrayList<TypePathEntry>(location));
     }
 
     /**

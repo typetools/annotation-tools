@@ -12,6 +12,7 @@ import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.TypeAnnotationVisitor;
 
 import com.sun.tools.javac.code.TargetType;
+import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
 
 /**
  * A <code>SafeTypeAnnotationVisitor</code> wraps around an
@@ -44,7 +45,7 @@ implements TypeAnnotationVisitor {
   // method, and except for xLocationArgs, should all contain at most 1 element.
   private List<Integer> xIndexArgs;
   private List<Integer> xLengthArgs;
-  private List<Integer> xLocationArgs;
+  private List<TypePathEntry> xLocationArgs;
   private List<Integer> xLocationLengthArgs;
   private List<Integer> xOffsetArgs;
   private List<Integer> xStartPcArgs;
@@ -65,7 +66,7 @@ implements TypeAnnotationVisitor {
     // they should not contain more than one element.
     xIndexArgs = new ArrayList<Integer>(1);
     xLengthArgs = new ArrayList<Integer>(1);
-    xLocationArgs = new ArrayList<Integer>();
+    xLocationArgs = new ArrayList<TypePathEntry>();
     xLocationLengthArgs = new ArrayList<Integer>(1);
     xOffsetArgs = new ArrayList<Integer>(1);
     xStartPcArgs = new ArrayList<Integer>(1);
@@ -127,9 +128,9 @@ implements TypeAnnotationVisitor {
 
   /**
    * @inheritDoc
-   * @see org.objectweb.asm.TypeAnnotationVisitor#visitXLocation(int)
+   * @see org.objectweb.asm.TypeAnnotationVisitor#visitXLocation(TypePathEntry)
    */
-  public void visitXLocation(int location) {
+  public void visitXLocation(TypePathEntry location) {
     xLocationArgs.add(location);
     xav.visitXLocation(location);
   }
@@ -250,71 +251,79 @@ implements TypeAnnotationVisitor {
     }
 
     switch(TargetType.fromTargetTypeValue(xTargetTypeArgs.get(0))) {
-    case TYPECAST:
+    case CAST:
       checkListSize(0, 0, 0, 0, 1, 0, 0, 0, 0,
           "Invalid typecast annotation:");
       break;
+    /* TODO
     case TYPECAST_COMPONENT:
       checkListSize(0, 0, c, 1, 1, 0, 0, 0, 0,
       "Invalid typecast generic/array annotation:");
-      break;
+      break;*/
     case INSTANCEOF:
       checkListSize(0, 0, 0, 0, 1, 0, 0, 0, 0,
       "Invalid type test annotation:");
       break;
+    /* TODO
     case INSTANCEOF_COMPONENT:
       checkListSize(0, 0, c, 1, 1, 0, 0, 0, 0,
       "Invalid type test generic/array annotation:");
-      break;
+      break;*/
     case NEW:
       checkListSize(0, 0, 0, 0, 1, 0, 0, 0, 0,
       "Invalid object creation annotation:");
       break;
+    /* TODO
     case NEW_COMPONENT:
       checkListSize(0, 0, c, 1, 1, 0, 0, 0, 0,
       "Invalid object creation generic/array annotation:");
-      break;
+      break;*/
     case METHOD_RECEIVER:
       checkListSize(0, 0, 0, 0, 0, 0, 0, 0, 0,
       "Invalid method receiver annotation:");
       break;
+    /* TODO
     case METHOD_RECEIVER_COMPONENT:
       // TODO
       checkListSize(0, 0, 0, 0, 0, 0, 0, 0, 0,
       "Invalid method receiver generic/array annotation:");
-      break;
+      break;*/
     case LOCAL_VARIABLE:
       checkListSize(1, 1, 0, 0, 0, 1, 0, 0, 0,
       "Invalid local variable annotation:");
       break;
+    /* TODO
     case LOCAL_VARIABLE_COMPONENT:
       checkListSize(1, 1, c, 1, 0, 1, 0, 0, 0,
       "Invalid local variable generic/array annotation:");
-      break;
+      break;*/
     case METHOD_RETURN:
       checkListSize(0, 0, 0, 0, 0, 0, 0, 0, 0,
       "Invalid method return type annotation:");
       break;
+    /* TODO
     case METHOD_RETURN_COMPONENT:
       checkListSize(0, 0, c, 1, 0, 0, 0, 0, 0,
       "Invalid method return type generic/array annotation:");
-      break;
+      break;*/
     case METHOD_PARAMETER:
       checkListSize(0, 0, 0, 0, 0, 0, 1, 0, 0,
       "Invalid method parameter annotation:");
       break;
+    /* TODO
     case METHOD_PARAMETER_COMPONENT:
       checkListSize(0, 0, c, 1, 0, 0, 1, 0, 0,
       "Invalid method parameter generic/array annotation:");
-      break;
+      break;*/
     case FIELD:
       checkListSize(0, 0, c, 0, 0, 0, 0, 0, 0,
       "Invalid field annotation:");
       break;
+    /* TODO
     case FIELD_COMPONENT:
       checkListSize(0, 0, c, 1, 0, 0, 0, 0, 0,
       "Invalid field generic/array annotation:");
-      break;
+      break;*/
     case CLASS_TYPE_PARAMETER:
       checkListSize(0, 0, 0, 0, 0, 0, 1, 0, 0,
       "Invalid class type parameter annotation:");
@@ -323,10 +332,11 @@ implements TypeAnnotationVisitor {
       checkListSize(0, 0, 0, 0, 0, 0, 1, 1, 0,
       "Invalid class type parameter bound annotation:");
       break;
+    /* TODO
     case CLASS_TYPE_PARAMETER_BOUND_COMPONENT:
       checkListSize(0, 0, c, 1, 0, 0, 1, 1, 0,
       "Invalid class type parameter bound generic/array annotation:");
-      break;
+      break;*/
     case METHOD_TYPE_PARAMETER:
       checkListSize(0, 0, 0, 0, 0, 0, 1, 0, 0,
       "Invalid method type parameter annotation:");
@@ -335,18 +345,20 @@ implements TypeAnnotationVisitor {
       checkListSize(0, 0, 0, 0, 0, 0, 1, 1, 0,
       "Invalid method type parameter bound annotation:");
       break;
+    /* TODO
     case METHOD_TYPE_PARAMETER_BOUND_COMPONENT:
       checkListSize(0, 0, c, 1, 0, 0, 1, 1, 0,
       "Invalid method type parameter bound generic/array annotation:");
-      break;
+      break;*/
     case CLASS_EXTENDS:
       checkListSize(0, 0, 0, 0, 0, 0, 0, 0, 1,
       "Invalid class extends/implements annotation:");
       break;
+    /* TODO
     case CLASS_EXTENDS_COMPONENT:
       checkListSize(0, 0, 0, 0, 0, 0, 0, 0, 1,
       "Invalid class extends/implements generic/array annotation:");
-      break;
+      break;*/
     case THROWS:
       checkListSize(0, 0, 0, 0, 0, 0, 0, 0, 1,
       "Invalid exception type in throws annotation:");
@@ -368,7 +380,7 @@ implements TypeAnnotationVisitor {
    * @param methodName the name of the method whose arguments went into list
    * @param sb the StringBuilder to append error messages to
    */
-  private void appendMessage(List<Integer> list, int idealLength,
+  private void appendMessage(List<?> list, int idealLength,
       String methodName, StringBuilder sb) {
     if (list.size() != idealLength) {
       sb.append("\nInvalid method calls: ");

@@ -12,6 +12,8 @@ import static java.io.StreamTokenizer.TT_WORD;
 import java.io.*;
 import java.util.*;
 
+import com.sun.tools.javac.code.TypeAnnotationPosition;
+
 import plume.FileIOException;
 
 import annotations.*;
@@ -575,10 +577,12 @@ public final class IndexFileParser {
             ArrayList<Integer> locNumbers =
                     new ArrayList<Integer>();
             locNumbers.add(expectNonNegative(matchNNInteger()));
+            // TODO: currently, we simply read the binary representation.
+            // Should we read a higher-level format?
             while (matchChar(','))
                 locNumbers.add(expectNonNegative(matchNNInteger()));
             InnerTypeLocation loc =
-                    new InnerTypeLocation(locNumbers);
+                    new InnerTypeLocation(TypeAnnotationPosition.getTypePathFromBinary(locNumbers));
             AElement it = e.innerTypes.vivify(loc);
             expectChar(':');
             parseAnnotations(it);
