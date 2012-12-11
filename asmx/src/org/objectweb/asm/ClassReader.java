@@ -30,7 +30,7 @@
 package org.objectweb.asm;
 
 import com.sun.tools.javac.code.TargetType;
-import static com.sun.tools.javac.code.TargetType.*;
+import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -1318,26 +1318,15 @@ public class ClassReader {
         final char[] buf,
         final TypeAnnotationVisitor xav)
     {
-        int i = readUnsignedShort(v);
-        v += 2;
-        for (; i > 0; --i) {
-            String name = readUTF8(v, buf);
-            v += 2;
-            // can use the same method as for declaration annotations because
-            // the first part of an extended annotation matches the normal
-            // annotations
-            v = readAnnotationValue(v, buf, name, xav);
-        }
-
-        // now handle
+        // first handle
         //
-        // u2 target_type
+        // u1 target_type
         // { ...
         // } reference_info
         //
 
-        int target_type_value = readUnsignedShort(v);
-        v += 2;
+        int target_type_value = readByte(v);
+        v += 1;
         xav.visitXTargetType(target_type_value);
 
         int offset = 0;
@@ -1359,12 +1348,9 @@ public class ClassReader {
         // {
         //   u2 offset;
         // } reference_info;
-        case TYPECAST:
-        case TYPECAST_COMPONENT:
+        case CAST:
         case INSTANCEOF:
-        case INSTANCEOF_COMPONENT:
         case NEW:
-        case NEW_COMPONENT:
           offset = readUnsignedShort(v);
           v += 2;
           xav.visitXOffset(offset);
@@ -1374,7 +1360,6 @@ public class ClassReader {
         // {
         // } reference_info;
         case METHOD_RECEIVER:
-        case METHOD_RECEIVER_COMPONENT:
           break;
 
         // local variable
@@ -1385,7 +1370,6 @@ public class ClassReader {
         //   u2 index;
         // } reference_info;
         case LOCAL_VARIABLE:
-        case LOCAL_VARIABLE_COMPONENT:
           table_length = readUnsignedShort(v);
           v += 2;
           assert table_length == 1; // FIXME
@@ -1404,7 +1388,6 @@ public class ClassReader {
         // {
         // } reference_info;
         case METHOD_RETURN:
-        case METHOD_RETURN_COMPONENT:
           break;
 
         // method parameter
@@ -1412,17 +1395,25 @@ public class ClassReader {
         //   u1 param;
         // } reference_info;
         case METHOD_PARAMETER:
-        case METHOD_PARAMETER_COMPONENT:
           int param = readByte(v);
           v++;
           xav.visitXParamIndex(param);
+          break;
+
+        // lambda formal parameter
+        // {
+        //   u1 param;
+        // } reference_info;
+        case LAMBDA_FORMAL_PARAMETER:
+          int lambdaparam = readByte(v);
+          v++;
+          xav.visitXParamIndex(lambdaparam);
           break;
 
         // field
         // {
         // } reference_info;
         case FIELD:
-        case FIELD_COMPONENT:
           break;
 
         // class type parameter bound
@@ -1432,9 +1423,7 @@ public class ClassReader {
         //   u1 bound_index;
         // } reference_info;
         case CLASS_TYPE_PARAMETER_BOUND:
-        case CLASS_TYPE_PARAMETER_BOUND_COMPONENT:
         case METHOD_TYPE_PARAMETER_BOUND:
-        case METHOD_TYPE_PARAMETER_BOUND_COMPONENT:
           param_index = readByte(v);
           v++;
           xav.visitXParamIndex(param_index);
@@ -1449,7 +1438,6 @@ public class ClassReader {
         //    u1 type_index;
         // } reference_info;
         case CLASS_EXTENDS:
-        case CLASS_EXTENDS_COMPONENT:
           type_index = readUnsignedShort(v);
           if (type_index == 0xFF) type_index = -1;
           v += 2;
@@ -1463,12 +1451,12 @@ public class ClassReader {
 
         // type argument in constructor call
         // type argument in method call
+        // type argument in method reference
         // {
         // } reference_info;
-        case NEW_TYPE_ARGUMENT:
-        case NEW_TYPE_ARGUMENT_COMPONENT:
-        case METHOD_TYPE_ARGUMENT:
-        case METHOD_TYPE_ARGUMENT_COMPONENT:
+        case CONSTRUCTOR_INVOCATION_TYPE_ARGUMENT:
+        case METHOD_INVOCATION_TYPE_ARGUMENT:
+        case METHOD_REFERENCE_TYPE_ARGUMENT:
           offset = readUnsignedShort(v);
           v += 2;
           xav.visitXOffset(offset);
@@ -1493,17 +1481,29 @@ public class ClassReader {
               "Unrecognized target type: " + target_type);
         }
 
-        // now read in the location information if the target is an
-        // inner type, i.e., the target type is odd
-        if (target_type.hasLocation()) {
-            location_length = readUnsignedShort(v);
-            v += 2;
+        // now read in the location information
+        {
+            location_length = readByte(v);
+            v += 1;
             xav.visitXLocationLength(location_length);
-            for(int m = location_length; m > 0;--m) {
-              int location = readByte(v);
-              v++;
-              xav.visitXLocation(location);
+            for(int m = location_length * TypePathEntry.bytesPerEntry; m > 0;--m) {
+              int loctag = readByte(v);
+              int locarg = readByte(v);
+              v+=2;
+              xav.visitXLocation(TypePathEntry.fromBinary(loctag, locarg));
             }
+        }
+
+        // then read annotation values
+        int i = readUnsignedShort(v);
+        v += 2;
+        for (; i > 0; --i) {
+            String name = readUTF8(v, buf);
+            v += 2;
+            // can use the same method as for declaration annotations because
+            // the first part of an extended annotation matches the normal
+            // annotations
+            v = readAnnotationValue(v, buf, name, xav);
         }
 
         xav.visitEnd();

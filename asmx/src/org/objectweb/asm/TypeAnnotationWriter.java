@@ -34,6 +34,7 @@
 package org.objectweb.asm;
 
 import com.sun.tools.javac.code.TargetType;
+import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
 
 /**
  * An {@link TypeAnnotationVisitor} that generates 
@@ -118,7 +119,7 @@ final class TypeAnnotationWriter implements TypeAnnotationVisitor {
     private int xtarget_type;
     private int xoffset;
     private int xlocation_length;
-    private int xlocations[];
+    private TypePathEntry xlocations[];
     private int xlocations_index;
     private int xstart_pc;
     private int xlength;
@@ -379,16 +380,17 @@ final class TypeAnnotationWriter implements TypeAnnotationVisitor {
     // used for generic type arguments or arrays
     public void visitXLocationLength(int location_length) {
         this.xlocation_length = location_length;
-        this.xlocations = new int[location_length];
+        this.xlocations = new TypePathEntry[location_length];
         this.xlocations_index = 0;
-        bv.putShort(location_length);
+        bv.putByte(location_length);
     }
 
     // used for generic type arguments or arrays
-    public void visitXLocation(int location) {
+    public void visitXLocation(TypePathEntry location) {
         this.xlocations[this.xlocations_index] = location;
         this.xlocations_index++;
-        bv.putByte(location);
+        bv.putByte(location.tag.tag);
+        bv.putByte(location.arg);
     }
 
     // used for local variables

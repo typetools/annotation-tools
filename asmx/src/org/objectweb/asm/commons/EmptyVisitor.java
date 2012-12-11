@@ -38,6 +38,8 @@ import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.PrecompiledMethodVisitor;
 
+import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
+
 /**
  * An empty implementation of the ASM visitor interfaces.
  * 
@@ -229,7 +231,7 @@ public class EmptyVisitor implements
     }
     public void visitXLocationLength(int location_length) {
     }
-    public void visitXLocation(int location) {
+    public void visitXLocation(TypePathEntry location) {
     }
     public void visitXNumEntries(int num_entries) {
     }
