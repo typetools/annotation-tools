@@ -9,15 +9,47 @@ import static java.io.StreamTokenizer.TT_EOF;
 import static java.io.StreamTokenizer.TT_NUMBER;
 import static java.io.StreamTokenizer.TT_WORD;
 
-import java.io.*;
-import java.util.*;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.LineNumberReader;
+import java.io.Reader;
+import java.io.StreamTokenizer;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
 
 import plume.FileIOException;
-
-import annotations.*;
-import annotations.el.*;
-import annotations.field.*;
-import annotations.util.coll.*;
+import annotations.Annotation;
+import annotations.AnnotationBuilder;
+import annotations.AnnotationFactory;
+import annotations.Annotations;
+import annotations.ArrayBuilder;
+import annotations.el.ABlock;
+import annotations.el.AClass;
+import annotations.el.AElement;
+import annotations.el.AExpression;
+import annotations.el.AMethod;
+import annotations.el.AScene;
+import annotations.el.ATypeElement;
+import annotations.el.AnnotationDef;
+import annotations.el.BoundLocation;
+import annotations.el.InnerTypeLocation;
+import annotations.el.LocalLocation;
+import annotations.el.RelativeLocation;
+import annotations.el.TypeIndexLocation;
+import annotations.field.AnnotationAFT;
+import annotations.field.AnnotationFieldType;
+import annotations.field.ArrayAFT;
+import annotations.field.BasicAFT;
+import annotations.field.ClassTokenAFT;
+import annotations.field.EnumAFT;
+import annotations.field.ScalarAFT;
+import annotations.util.coll.VivifyingMap;
 
 /**
  * IndexFileParser provides static methods
