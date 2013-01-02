@@ -443,7 +443,7 @@
       <compilerarg line="-Awarns -Xmaxwarns 10000"/>
       <classpath>
         <path refid="libpath"/>
-        <pathelement location="${env.annotations}/checkers/checkers.jar"/>
+        <pathelement location="${env.annotations}/checkers/binary/checkers.jar"/>
       </classpath>
     </javac>
   </target>
