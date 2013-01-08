@@ -45,7 +45,7 @@ public class AnnotationInsertion extends Insertion {
      *            {@link #getPackageName()} method.
      * @return the text to insert
      */
-    public String getText(boolean comments, boolean abbreviate) {
+    protected String getText(boolean comments, boolean abbreviate) {
         String result = annotation;
         if (abbreviate) {
             Pair<String, String> ps = removePackage(result);

@@ -37,9 +37,25 @@ public class CastInsertion extends Insertion {
 
   /** {@inheritDoc} */
   @Override
-  public String getText(boolean comments, boolean abbreviate) {
+  protected String getText(boolean comments, boolean abbreviate) {
     String result = "((" + typeToString(type, comments, abbreviate) + ") (";
     return result;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  protected boolean addLeadingSpace(boolean gotSeparateLine, int pos,
+      char precedingChar) {
+    // Don't add a leading space if this cast is on the index of an array access.
+    return super.addLeadingSpace(gotSeparateLine, pos, precedingChar)
+           && precedingChar != '[';
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  protected boolean addTrailingSpace(boolean gotSeparateLine) {
+    // Never add a trailing space after the first part of a cast insertion.
+    return false;
   }
 
   /** {@inheritDoc} */
