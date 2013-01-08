@@ -175,9 +175,7 @@
       <fileset dir="bin" />
       <fileset dir="${asmx}/bin" excludes="tmp/**"/>
       <fileset dir="${scene-lib}/bin" />
-      <!-- Why are the classes included from both build and bootstrap?? -->
       <fileset dir="${annotations-compiler}/build/classes" />
-      <fileset dir="${annotations-compiler}/build/bootstrap/classes" />
     </copy>
     <!-- Also need to get class files in libraries -->
     <unjar src="lib/plume.jar" dest="${temp-jarfile}">
@@ -328,6 +326,18 @@
 
   </target>
 
+  <target name="annotation-file-format-clean"
+          description="removes generated documentation files">
+    <delete file="annotation-file-format.aux"/>
+    <delete file="annotation-file-format.dvi"/>
+    <delete file="annotation-file-format.haux"/>
+    <delete file="annotation-file-format.html"/>
+    <delete file="annotation-file-format.htoc"/>
+    <delete file="annotation-file-format.log"/>
+    <delete file="annotation-file-format.pdf"/>
+    <delete file="annotation-file-format.toc"/>
+  </target>
+
   <!--
     A problem is that the document date is the date that LaTeX was run
     rather than the date of last modification; that should be fixed in
@@ -353,7 +363,7 @@
     </exec>
   </target>
 
-  <target name="clean"
+  <target name="clean" depends="annotation-file-format-clean"
           description="removes generated files (e.g., .jar, .zip)">
     <delete dir="bin"/>
 
@@ -433,7 +443,7 @@
       <compilerarg line="-Awarns -Xmaxwarns 10000"/>
       <classpath>
         <path refid="libpath"/>
-        <pathelement location="${env.annotations}/checkers/checkers.jar"/>
+        <pathelement location="${env.annotations}/checkers/binary/checkers.jar"/>
       </classpath>
     </javac>
   </target>
