@@ -58,12 +58,47 @@ public abstract class Insertion {
     }
 
     /**
-     * Gets the insertion text (not commented or abbreviated).
+     * Gets the insertion text (not commented or abbreviated, and without added
+     * leading or trailing whitespace).
      *
      * @return the text to insert
      */
     public String getText() {
-        return getText(false, false);
+        return getText(false, false, true, 0, '\0');
+    }
+
+    /**
+     * Gets the insertion text with a leading and/or trailing space added based
+     * on the values of the {@code gotSeparateLine}, {@code pos}, and
+     * {@code precedingChar} parameters.
+     *
+     * @param comments
+     *            if true, Java 8 features will be surrounded in comments.
+     * @param abbreviate
+     *            if true, the package name will be removed from the annotations.
+     *            The package name can be retrieved again by calling the
+     *            {@link #getPackageName()} method.
+     * @param gotSeparateLine
+     *            {@code true} if this insertion is actually added on a separate
+     *            line.
+     * @param pos
+     *            the source position where this insertion will be inserted.
+     * @param precedingChar
+     *            the character directly preceding where this insertion will be
+     *            inserted. This value will be ignored if {@code pos} is 0.
+     *
+     * @return the text to insert
+     */
+    public String getText(boolean comments, boolean abbreviate,
+            boolean gotSeparateLine, int pos, char precedingChar) {
+        String toInsert = getText(comments, abbreviate);
+        if (addLeadingSpace(gotSeparateLine, pos, precedingChar)) {
+            toInsert = " " + toInsert;
+        }
+        if (addTrailingSpace(gotSeparateLine)) {
+            toInsert = toInsert + " ";
+        }
+        return toInsert;
     }
 
     /**
@@ -77,7 +112,48 @@ public abstract class Insertion {
      *            {@link #getPackageName()} method.
      * @return the text to insert
      */
-    public abstract String getText(boolean comments, boolean abbreviate);
+    protected abstract String getText(boolean comments, boolean abbreviate);
+
+    /**
+     * Indicates if a preceding space should be added to this insertion.
+     * Subclasses may override this method for custom leading space rules.
+     *
+     * @param gotSeparateLine
+     *            {@code true} if this insertion is actually added on a separate
+     *            line.
+     * @param pos
+     *            the source position where this insertion will be inserted.
+     * @param precedingChar
+     *            the character directly preceding where this insertion will be
+     *            inserted. This value will be ignored if {@code pos} is 0.
+     * @return {@code true} if a leading space should be added, {@code false}
+     *         otherwise.
+     */
+    protected boolean addLeadingSpace(boolean gotSeparateLine, int pos,
+            char precedingChar) {
+        // Don't add a preceding space if this insertion is on its own line,
+        // it's at the beginning of the file, the preceding character is already
+        // whitespace, or the preceding character is the first formal or generic
+        // parameter.
+        return !gotSeparateLine && pos != 0
+                && !Character.isWhitespace(precedingChar)
+                && precedingChar != '(' && precedingChar != '<';
+    }
+
+    /**
+     * Indicates if a trailing space should be added to this insertion.
+     * Subclasses may override this method for custom trailing space rules.
+     *
+     * @param gotSeparateLine
+     *            {@code true} if this insertion is actually added on a separate
+     *            line.
+     * @return {@code} true if a trailing space should be added, {@code false}
+     * otherwise.
+     */
+    protected boolean addTrailingSpace(boolean gotSeparateLine) {
+        // Don't added a trailing space if this insertion is on its own line.
+        return !gotSeparateLine;
+    }
 
     /**
      * Gets the package name.

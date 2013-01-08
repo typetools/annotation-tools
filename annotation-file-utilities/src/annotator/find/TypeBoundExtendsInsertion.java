@@ -25,8 +25,17 @@ public class TypeBoundExtendsInsertion extends AnnotationInsertion {
      * {@inheritDoc}
      */
     @Override
-    public String getText(boolean comments, boolean abbreviate) {
+    protected String getText(boolean comments, boolean abbreviate) {
         return "extends " + super.getText(comments, abbreviate)
                 + " java.lang.Object";
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected boolean addTrailingSpace(boolean gotSeparateLine) {
+        // Never add a trailing space for an extends insertion.
+        return false;
     }
 }
