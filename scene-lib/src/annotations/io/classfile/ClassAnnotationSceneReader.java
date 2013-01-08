@@ -516,6 +516,7 @@ extends EmptyVisitor {
           break;
         */
         case LOCAL_VARIABLE:
+        case RESOURCE_VARIABLE:
           handleMethodLocalVariable((AMethod) aElement);
           break;
         case NEW:

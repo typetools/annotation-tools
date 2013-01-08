@@ -101,6 +101,8 @@ public class TraceTypeAnnotationVisitor extends TraceAnnotationVisitor
       //   u2 index;
       // } reference_info;
       case LOCAL_VARIABLE:
+      // resource variable
+      case RESOURCE_VARIABLE:
           buf.append(doubleTab).append("start_pc: ").append(xstart_pc).append("\n");
           buf.append(doubleTab).append("length: ").append(xlength).append("\n");
           buf.append(doubleTab).append("index: ").append(xindex).append("\n");
