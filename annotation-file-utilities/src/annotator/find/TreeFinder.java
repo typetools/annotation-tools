@@ -1,7 +1,6 @@
 package annotator.find;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -12,6 +11,8 @@ import java.util.Map;
 import javax.tools.JavaFileObject;
 
 import plume.Pair;
+import type.DeclaredType;
+import annotations.io.IndexFileParser;
 import annotator.Main;
 
 import com.google.common.collect.LinkedHashMultimap;
@@ -20,9 +21,10 @@ import com.google.common.collect.SetMultimap;
 import com.sun.source.tree.AnnotatedTypeTree;
 import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.ArrayTypeTree;
-import com.sun.source.tree.BlockTree;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.CompilationUnitTree;
+import com.sun.source.tree.ExpressionStatementTree;
+import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.IdentifierTree;
 import com.sun.source.tree.InstanceOfTree;
 import com.sun.source.tree.MethodTree;
@@ -42,7 +44,6 @@ import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.JCTree.JCAnnotatedType;
 import com.sun.tools.javac.tree.JCTree.JCAnnotation;
 import com.sun.tools.javac.tree.JCTree.JCArrayTypeTree;
-import com.sun.tools.javac.tree.JCTree.JCBlock;
 import com.sun.tools.javac.tree.JCTree.JCClassDecl;
 import com.sun.tools.javac.tree.JCTree.JCCompilationUnit;
 import com.sun.tools.javac.tree.JCTree.JCExpression;
@@ -52,7 +53,6 @@ import com.sun.tools.javac.tree.JCTree.JCMethodDecl;
 import com.sun.tools.javac.tree.JCTree.JCModifiers;
 import com.sun.tools.javac.tree.JCTree.JCNewArray;
 import com.sun.tools.javac.tree.JCTree.JCNewClass;
-import com.sun.tools.javac.tree.JCTree.JCTypeAnnotation;
 import com.sun.tools.javac.tree.JCTree.JCTypeApply;
 import com.sun.tools.javac.tree.JCTree.JCTypeParameter;
 import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
@@ -203,82 +203,36 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       // System.out.println("node: " + node);
       // System.out.println("return: " + node.getReturnType());
 
-      // location for the receiver annotation
-      int receiverLoc;
-
       JCMethodDecl jcnode = (JCMethodDecl) node;
-      List<JCExpression> throwsExpressions = jcnode.thrown;
-      JCBlock body = jcnode.getBody();
-      // TODO: this used to be jcnode.receiverAnnotations, which doesn't exist any more
-      // I'm not quite sure where this list is now.
-      // jcnode.recvparam.mods.annotations might still contain declaration annotations.
-      // By the point they are disambiguated, they've become TypeCompounds.
-      List<JCTypeAnnotation> receiverAnnotations;
 
-      if (jcnode.recvparam!=null) {
-        receiverAnnotations = com.sun.tools.javac.util.List.convert(JCTypeAnnotation.class, jcnode.recvparam.mods.annotations);
+      int endOfHeader;
+      if (node.getBody() != null) {
+          endOfHeader = jcnode.body.getStartPosition();
       } else {
-        receiverAnnotations = Collections.emptyList();
+          endOfHeader = jcnode.getStartPosition() + jcnode.toString().length();
       }
 
-      // TODO WMD: the above needs to be updated.
-
-      if (! throwsExpressions.isEmpty()) {
-        // has a throws expression
-        IdentifierTree it = (IdentifierTree) leftmostIdentifier(throwsExpressions.get(0));
-        receiverLoc = this.visitIdentifier(it, p);
-        receiverLoc -= 7; // for the 'throws' clause
-
-        // Search backwards for the close paren.  Hope for no problems with
-        // comments.
-        JavaFileObject jfo = tree.getSourceFile();
-        try {
-          String s = String.valueOf(jfo.getCharContent(true));
-          for (int i = receiverLoc; i >= 0; i--) {
-            if (s.charAt(i) == ')') {
-              receiverLoc = i + 1;
-              break;
+      // Search backward for the open paren beginning the parameters.
+      // Hope for no problems with comments.
+      JavaFileObject jfo = tree.getSourceFile();
+      try {
+        String s = String.valueOf(jfo.getCharContent(true));
+        int parensOpen = 0;
+        for (int i = endOfHeader; i >= 0; i--) {
+          if (s.charAt(i) == ')') {
+            parensOpen++;
+          } else if (s.charAt(i) == '(') {
+            if (parensOpen == 1) {
+              return i + 1;
+            } else {
+              parensOpen--;
             }
           }
-        } catch(IOException e) {
-          throw new RuntimeException(e);
         }
-      } else if (body != null) {
-        // has a body
-        receiverLoc = body.pos;
-      } else if (! receiverAnnotations.isEmpty()) {
-        // has receiver annotations.  After them would be better, but for
-        // now put the new one at the front.
-        receiverLoc = receiverAnnotations.get(0).pos;
-      } else {
-        // try the last parameter, or failing that the return value
-        List<? extends VariableTree> params = jcnode.getParameters();
-        if (! params.isEmpty()) {
-          VariableTree lastParam = params.get(params.size()-1);
-          receiverLoc = ((JCVariableDecl) lastParam).pos;
-        } else {
-          receiverLoc = jcnode.restype.pos;
-        }
-
-        // Search forwards for the close paren.  Hope for no problems with
-        // comments.
-        JavaFileObject jfo = tree.getSourceFile();
-        try {
-          String s = String.valueOf(jfo.getCharContent(true));
-          for (int i = receiverLoc; i < s.length(); i++) {
-            if (s.charAt(i) == ')') {
-              receiverLoc = i + 1;
-              break;
-            }
-          }
-        } catch(IOException e) {
-          throw new RuntimeException(e);
-        }
+      } catch(IOException e) {
+        throw new RuntimeException(e);
       }
-
-      // TODO:
-      //debugging: System.out.println("result: " + receiverLoc);
-      return receiverLoc;
+      throw new RuntimeException("Couldn't find argument opening paren for: " + node);
     }
 
     static Map<Pair<CompilationUnitTree,Tree>,TreePath> getPathCache1 = new HashMap<Pair<CompilationUnitTree,Tree>,TreePath>();
@@ -805,11 +759,12 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
             || node instanceof NewArrayTree
             || node instanceof NewClassTree
             || node instanceof ParameterizedTypeTree
-            || node instanceof BlockTree
             || node instanceof ArrayTypeTree
             || node instanceof PrimitiveTypeTree
             // For the case with implicit upper bound
             || node instanceof TypeParameterTree
+            || node instanceof ExpressionTree
+            || node instanceof ExpressionStatementTree
             );
     if (res) return true;
 
@@ -833,6 +788,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       return null;
     }
 
+    debug("SCANNING: %s %s%n", node.getKind(), node);
     if (! handled(node)) {
       debug("Not handled, skipping (%s): %s%n", node.getClass(), node);
       // nothing to do
@@ -921,6 +877,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
               // TODO: is something similar needed for Arrays?
               break;
           }
+          // TODO: don't add cast insertion if it's already present.
         }
       }
       // System.out.printf("alreadyPresent = %s for %s of kind %s%n", alreadyPresent, node, node.getKind());
@@ -944,6 +901,31 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
             return super.scan(node, p);
           }
         }
+      }
+
+      if (i.getKind() == Insertion.Kind.RECEIVER) {
+        ReceiverInsertion receiver = (ReceiverInsertion) i;
+        MethodTree method = (MethodTree) node;
+
+        if (method.getReceiverParameter() == null) {
+          // If the method doesn't already have a receiver, find the name of the class
+          // with type parameters to create the receiver
+          TreePath parent = path;
+          while (parent.getLeaf().getKind() != Tree.Kind.CLASS
+                   && parent.getLeaf().getKind() != Tree.Kind.INTERFACE
+                   && parent.getLeaf().getKind() != Tree.Kind.ENUM) {
+            parent = parent.getParentPath();
+          }
+          ClassTree clazz = (ClassTree) parent.getLeaf();
+          DeclaredType type = receiver.getType();
+          type.setName(clazz.getSimpleName().toString());
+          for (TypeParameterTree tree : clazz.getTypeParameters()) {
+            type.addTypeParameter(new DeclaredType(tree.getName().toString()));
+          }
+        }
+
+        // If the method doesn't have parameters, don't add a comma.
+        receiver.setAddComma(method.getParameters().size() > 0);
       }
 
       // If this is a method, then it might have been selected because of
@@ -979,6 +961,14 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
 
           // need to add "extends ... Object" around the type annotation
           i = new TypeBoundExtendsInsertion(i.getText(), i.getCriteria(), i.getSeparateLine());
+      } else if (i.getKind() == Insertion.Kind.CAST) {
+          JCTree jcTree = (JCTree) node;
+          pos = jcTree.getStartPosition();
+
+          // Also add an insertion after the expression to close the parentheses.
+          Insertion close = new CloseParenthesisInsertion(i.getCriteria(), i.getSeparateLine());
+          int end = pos + jcTree.toString().length();
+          positions.put(end, close);
       } else {
         boolean typeScan = true;
         if (node.getKind() == Tree.Kind.METHOD) { // MethodTree

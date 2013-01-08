@@ -1,24 +1,46 @@
 package annotator.specification;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.objectweb.asm.ClassReader;
 
+import plume.FileIOException;
+import plume.Pair;
+import type.DeclaredType;
+import type.Type;
 import annotations.Annotation;
-import annotations.el.*;
+import annotations.el.ABlock;
+import annotations.el.AClass;
+import annotations.el.AElement;
+import annotations.el.AExpression;
+import annotations.el.AMethod;
+import annotations.el.AScene;
+import annotations.el.ATypeElement;
+import annotations.el.ATypeElementWithType;
+import annotations.el.AnnotationDef;
+import annotations.el.BoundLocation;
+import annotations.el.InnerTypeLocation;
+import annotations.el.LocalLocation;
+import annotations.el.RelativeLocation;
+import annotations.el.TypeIndexLocation;
 import annotations.field.AnnotationFieldType;
+import annotations.io.ASTPath;
 import annotations.io.IndexFileParser;
 import annotations.util.coll.VivifyingMap;
+import annotator.find.AnnotationInsertion;
+import annotator.find.CastInsertion;
 import annotator.find.Criteria;
 import annotator.find.Insertion;
+import annotator.find.ReceiverInsertion;
 import annotator.scanner.MethodOffsetClassVisitor;
 
 import com.sun.source.tree.Tree;
-
-import plume.FileIOException;
-import plume.Pair;
 
 public class IndexFileSpecification implements Specification {
 
@@ -208,13 +230,43 @@ public class IndexFileSpecification implements Specification {
 
   /** Fill in this.insertions with insertion pairs. */
   private void parseElement(CriterionList clist, AElement element) {
+    // Use at most one receiver and one cast insertion and add all of the
+    // annotations to the one insertion.
+    ReceiverInsertion receiver = null;
+    CastInsertion cast = null;
     for (Pair<String,Boolean> p : getElementAnnotation(element)) {
       String annotationString = p.a;
       Boolean isDeclarationAnnotation = p.b;
-      Insertion ins = new Insertion(annotationString, clist.criteria(),
-                                    isDeclarationAnnotation);
-      debug("parsed: " + ins);
-      this.insertions.add(ins);
+      Criteria criteria = clist.criteria();
+      if (criteria.isOnReceiver()) {
+        if (receiver == null) {
+          DeclaredType type = new DeclaredType();
+          type.addAnnotation(annotationString);
+          receiver = new ReceiverInsertion(type, criteria);
+        } else {
+          receiver.getType().addAnnotation(annotationString);
+        }
+      } else if (element instanceof ATypeElementWithType) {
+        if (cast == null) {
+          ATypeElementWithType typecast = (ATypeElementWithType) element;
+          Type type = typecast.getType();
+          type.addAnnotation(annotationString);
+          cast = new CastInsertion(criteria, typecast.getType());
+        } else {
+          cast.getType().addAnnotation(annotationString);
+        }
+      } else {
+        Insertion ins = new AnnotationInsertion(annotationString, criteria,
+                                      isDeclarationAnnotation);
+        debug("parsed: " + ins);
+        this.insertions.add(ins);
+      }
+    }
+    if (receiver != null) {
+        this.insertions.add(receiver);
+    }
+    if (cast != null) {
+        this.insertions.add(cast);
     }
   }
 
@@ -341,6 +393,15 @@ public class IndexFileSpecification implements Specification {
       ATypeElement instanceOf = entry.getValue();
       CriterionList instanceOfClist = clist.add(Criteria.instanceOf(methodName, loc));
       parseInnerAndOuterElements(instanceOfClist, instanceOf);
+    }
+
+    // parse insert typecasts of method
+    for (Entry<ASTPath, ATypeElementWithType> entry : exp.insertTypecasts.entrySet()) {
+      ASTPath astPath = entry.getKey();
+      ATypeElementWithType insertTypecast = entry.getValue();
+      clist.criteria().isOnMethod("cat");
+      CriterionList insertTypecastClist = clist.add(Criteria.astPath(astPath));
+      parseElement(insertTypecastClist, insertTypecast);
     }
   }
 }

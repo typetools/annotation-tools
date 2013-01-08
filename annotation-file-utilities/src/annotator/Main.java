@@ -1,21 +1,35 @@
 package annotator;
 
-import java.io.*;
-import java.util.*;
-import java.util.regex.*;
-import plume.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import plume.FileIOException;
+import plume.Option;
+import plume.Options;
+import plume.Pair;
+import plume.UtilMDE;
+import annotator.Source.CompilerException;
+import annotator.find.Criteria;
 import annotator.find.Insertion;
 import annotator.find.TreeFinder;
-import annotator.Source;
-import annotator.Source.CompilerException;
 import annotator.specification.IndexFileSpecification;
 import annotator.specification.Specification;
 
-import com.sun.source.tree.*;
+import com.google.common.collect.SetMultimap;
+import com.sun.source.tree.CompilationUnitTree;
+import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
-
-import com.google.common.collect.*;
 
 /**
  * This is the main class for the annotator, which inserts annotations in
@@ -105,6 +119,7 @@ public class Main {
 
     if (debug) {
       TreeFinder.debug = true;
+      Criteria.debug = true;
     }
 
     if (help) {
@@ -270,14 +285,12 @@ public class Main {
           for (Insertion iToInsert : toInsertList) {
             String toInsert = iToInsert.getText(comments, abbreviate);
             if (abbreviate) {
-              String packageName = iToInsert.getPackageName();
-              if (packageName != null) {
-                if (debug && !imports.contains(packageName)) {
-                  System.out.printf("Need import %s%n  due to insertion %s%n",
-                                    packageName, toInsert);
-                }
-                imports.add(packageName);
+              Set<String> packageNames = iToInsert.getPackageNames();
+              if (debug) {
+                System.out.printf("Need import %s%n  due to insertion %s%n",
+                                  packageNames, toInsert);
               }
+              imports.addAll(packageNames);
             }
 
             // Possibly add whitespace after the insertion
@@ -308,8 +321,11 @@ public class Main {
               char precedingChar = src.charAt(pos-1);
               if (! (Character.isWhitespace(precedingChar)
                      // No space if it's the first formal or generic parameter
+                     // or if it's a CloseParenthesesInsertion
                      || precedingChar == '('
-                     || precedingChar == '<')) {
+                     || precedingChar == '<'
+                     || precedingChar == '['
+                     || toInsert.equals("))"))) {
                 toInsert = " " + toInsert;
               }
             }
@@ -333,7 +349,9 @@ public class Main {
             }
             // add trailing whitespace
             // (test is not for "extends " because we just added a leading space, above)
-            if ((! gotSeparateLine) && (! toInsert.startsWith(" extends "))) {
+            if ((! gotSeparateLine) && (! toInsert.startsWith(" extends "))
+                    && (! toInsert.startsWith("((")) && (! toInsert.startsWith(" (("))
+                    && (! toInsert.equals("))")) && (! toInsert.endsWith(" this"))) {
               toInsert = toInsert + " ";
             }
             src.insert(pos, toInsert);

@@ -4,7 +4,7 @@ package annotator.find;
  * Specifies an insertion of an "extends @Annotation java.lang.Object" to a type
  * bound.
  */
-public class TypeBoundExtendsInsertion extends Insertion {
+public class TypeBoundExtendsInsertion extends AnnotationInsertion {
 
     /**
      * Creates a new TypeBoundExtendsInsertion.

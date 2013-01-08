@@ -1,36 +1,51 @@
 package annotator.find;
 
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+
 import plume.Pair;
+import type.ArrayType;
+import type.DeclaredType;
+import type.Type;
+import type.WildcardType;
+import type.WildcardType.BoundKind;
 
 /**
  * Specifies something that needs to be inserted into a source file, including
  * the "what" and the "where".
  */
-public class Insertion {
+public abstract class Insertion {
 
-    private final String text;
+    public enum Kind {
+        ANNOTATION,
+        CAST,
+        RECEIVER,
+        CLOSE_PARENTHESIS
+    }
+
     private final Criteria criteria;
     // If non-null, then try to put annotation on its own line,
     // horizontally aligned with the location.
     private final boolean separateLine;
 
     /**
-     * The package name for the annotation being inserted by this Insertion.
-     * This will be null unless getText is called with abbreviate true.
+     * The package names for the annotations being inserted by this Insertion.
+     * This will be empty unless {@link #getText(boolean, boolean)} is called
+     * with abbreviate true.
      */
-    private String packageName;
+    protected Set<String> packageNames;
 
     /**
      * Creates a new insertion.
      *
-     * @param text the text to insert
      * @param criteria where to insert the text
      * @param separateLine whether to insert the text on its own
      */
-    public Insertion(String text, Criteria criteria, boolean separateLine) {
-        this.text = text;
+    public Insertion(Criteria criteria, boolean separateLine) {
         this.criteria = criteria;
         this.separateLine = separateLine;
+        this.packageNames = new LinkedHashSet<String>();
     }
 
     /**
@@ -55,39 +70,24 @@ public class Insertion {
      * Gets the insertion text.
      *
      * @param comments
-     *            if true, the annotation will be surrounded by block comments.
+     *            if true, Java 8 features will be surrounded in comments.
      * @param abbreviate
-     *            if true, the package name will be removed from the annotation.
+     *            if true, the package name will be removed from the annotations.
      *            The package name can be retrieved again by calling the
      *            {@link #getPackageName()} method.
      * @return the text to insert
      */
-    public String getText(boolean comments, boolean abbreviate) {
-        String result = text;
-        if (abbreviate) {
-            Pair<String, String> ps = removePackage(result);
-            packageName = ps.a;
-            result = ps.b;
-        }
-        if (!result.startsWith("@")) {
-            throw new Error("Illegal insertion, must start with @: " + result);
-        }
-        if (comments) {
-            return "/*" + result + "*/";
-        }
-        return result;
-    }
+    public abstract String getText(boolean comments, boolean abbreviate);
 
     /**
      * Gets the package name.
      *
      * @return The package name of the annotation being inserted by this
-     *         Insertion. Returns null if the annotation does not have a package
-     *         name or if this method is not called after getText is called with
-     *         abbreviate set to true.
+     *         Insertion. This will be empty unless
+     *         {@link #getText(boolean, boolean)} is called with abbreviate true.
      */
-    public String getPackageName() {
-        return packageName;
+    public Set<String> getPackageNames() {
+        return packageNames;
     }
 
     /**
@@ -104,8 +104,13 @@ public class Insertion {
      */
     @Override
     public String toString() {
-        return String.format("%s (nl=%b) @ %s", text, separateLine, criteria);
+        return String.format("(nl=%b) @ %s", separateLine, criteria);
     }
+
+    /**
+     * Gets the kind of this insertion.
+     */
+    public abstract Kind getKind();
 
     /**
      * Removes the leading package.
@@ -130,5 +135,75 @@ public class Insertion {
         } else {
             return Pair.of((String) null, s);
         }
+    }
+
+    /**
+     * Converts the given type to a String. This method can't be in the
+     * {@link Type} class because this method relies on the {@link Insertion}
+     * class to format annotations, and the {@link Insertion} class is not
+     * available from {@link Type}.
+     *
+     * @param type
+     *            the type to convert
+     * @param comments
+     *            if true, Java 8 features will be surrounded in comments.
+     * @param abbreviate
+     *            if true, the package name will be removed from the annotations.
+     *            The package name can be retrieved again by calling the
+     *            {@link #getPackageName()} method.
+     * @return the type as a string
+     */
+    public String typeToString(Type type, boolean comments, boolean abbreviate) {
+        StringBuilder result = new StringBuilder();
+        for (String annotation : type.getAnnotations()) {
+            AnnotationInsertion ins = new AnnotationInsertion(annotation);
+            result.append(ins.getText(comments, abbreviate));
+            result.append(" ");
+            if (abbreviate) {
+                packageNames.addAll(ins.getPackageNames());
+            }
+        }
+        if (type instanceof DeclaredType) {
+            DeclaredType declaredType = (DeclaredType) type;
+            result.append(declaredType.getName());
+            List<Type> typeArguments = declaredType.getTypeParameters();
+            if (!typeArguments.isEmpty()) {
+                result.append('<');
+                result.append(typeToString(typeArguments.get(0), comments, abbreviate));
+                for (int i = 1; i < typeArguments.size(); i++) {
+                    result.append(", ");
+                    result.append(typeToString(typeArguments.get(i), comments, abbreviate));
+                }
+                result.append('>');
+            }
+            Type innerType = declaredType.getInnerType();
+            if (innerType != null) {
+                result.append('.');
+                result.append(typeToString(innerType, comments, abbreviate));
+            }
+        } else if (type instanceof ArrayType) {
+            ArrayType arrayType = (ArrayType) type;
+            result.append(typeToString(arrayType.getComponentType(), comments, abbreviate));
+            result.append("[]");
+        } else if (type instanceof WildcardType) {
+            WildcardType wildcardType = (WildcardType) type;
+            for (String annotation : wildcardType.getAnnotations()) {
+                AnnotationInsertion ins = new AnnotationInsertion(annotation);
+                result.append(ins.getText(comments, abbreviate));
+                result.append(" ");
+                if (abbreviate) {
+                    packageNames.addAll(ins.getPackageNames());
+                }
+            }
+            result.append(wildcardType.getTypeArgumentName());
+            if (wildcardType.getKind() != BoundKind.NONE) {
+                result.append(' ');
+                result.append(wildcardType.getKind());
+                result.append(' ');
+                result.append(typeToString(wildcardType.getBound(), comments, abbreviate));
+            }
+        }
+        // There will be extra whitespace at the end if this is only annotations, so trim
+        return result.toString().trim();
     }
 }
