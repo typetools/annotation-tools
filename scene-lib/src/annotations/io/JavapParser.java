@@ -205,6 +205,7 @@ public final class JavapParser {
                 subOuterType = ((AMethod) member).parameters.vivify(paramIdx).type;
                 break;
             case LOCAL_VARIABLE:
+            case RESOURCE_VARIABLE:
                 int index, scopeStart, scopeLength;
                 Matcher m = localLocRegex.matcher(line);
                 m.matches();

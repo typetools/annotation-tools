@@ -1370,6 +1370,8 @@ public class ClassReader {
         //   u2 index;
         // } reference_info;
         case LOCAL_VARIABLE:
+        // resource variable
+        case RESOURCE_VARIABLE:
           table_length = readUnsignedShort(v);
           v += 2;
           assert table_length == 1; // FIXME
