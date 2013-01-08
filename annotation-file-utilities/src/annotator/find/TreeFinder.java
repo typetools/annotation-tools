@@ -1,22 +1,64 @@
 package annotator.find;
 
-import annotator.Main;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
-import java.io.*;
-import java.util.*;
-
-import javax.tools.*;
-
-import com.sun.source.tree.*;
-import com.sun.source.util.*;
-import com.sun.source.util.TreeScanner;
-import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
-import com.sun.tools.javac.tree.*;
-import com.sun.tools.javac.tree.JCTree.*;
-
-import com.google.common.collect.*;
+import javax.tools.JavaFileObject;
 
 import plume.Pair;
+import annotator.Main;
+
+import com.google.common.collect.LinkedHashMultimap;
+import com.google.common.collect.Multimaps;
+import com.google.common.collect.SetMultimap;
+import com.sun.source.tree.AnnotatedTypeTree;
+import com.sun.source.tree.AnnotationTree;
+import com.sun.source.tree.ArrayTypeTree;
+import com.sun.source.tree.BlockTree;
+import com.sun.source.tree.ClassTree;
+import com.sun.source.tree.CompilationUnitTree;
+import com.sun.source.tree.IdentifierTree;
+import com.sun.source.tree.InstanceOfTree;
+import com.sun.source.tree.MethodTree;
+import com.sun.source.tree.ModifiersTree;
+import com.sun.source.tree.NewArrayTree;
+import com.sun.source.tree.NewClassTree;
+import com.sun.source.tree.ParameterizedTypeTree;
+import com.sun.source.tree.PrimitiveTypeTree;
+import com.sun.source.tree.Tree;
+import com.sun.source.tree.TypeCastTree;
+import com.sun.source.tree.TypeParameterTree;
+import com.sun.source.tree.VariableTree;
+import com.sun.source.tree.WildcardTree;
+import com.sun.source.util.TreePath;
+import com.sun.source.util.TreeScanner;
+import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
+import com.sun.tools.javac.tree.JCTree;
+import com.sun.tools.javac.tree.JCTree.JCAnnotatedType;
+import com.sun.tools.javac.tree.JCTree.JCAnnotation;
+import com.sun.tools.javac.tree.JCTree.JCArrayTypeTree;
+import com.sun.tools.javac.tree.JCTree.JCBlock;
+import com.sun.tools.javac.tree.JCTree.JCClassDecl;
+import com.sun.tools.javac.tree.JCTree.JCCompilationUnit;
+import com.sun.tools.javac.tree.JCTree.JCExpression;
+import com.sun.tools.javac.tree.JCTree.JCFieldAccess;
+import com.sun.tools.javac.tree.JCTree.JCIdent;
+import com.sun.tools.javac.tree.JCTree.JCMethodDecl;
+import com.sun.tools.javac.tree.JCTree.JCModifiers;
+import com.sun.tools.javac.tree.JCTree.JCNewArray;
+import com.sun.tools.javac.tree.JCTree.JCNewClass;
+import com.sun.tools.javac.tree.JCTree.JCTypeAnnotation;
+import com.sun.tools.javac.tree.JCTree.JCTypeApply;
+import com.sun.tools.javac.tree.JCTree.JCTypeParameter;
+import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
+import com.sun.tools.javac.tree.JCTree.JCWildcard;
+import com.sun.tools.javac.tree.TreeInfo;
 
 /**
  * A {@code TreeScanner} that is able to locate program elements in an
@@ -897,7 +939,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
           // @Retention(RetentionPolicy.CLASS)
           String ann = at.getAnnotationType().toString();
           String iann = Main.removeArgs(i.getText()).a.substring(1); // strip off the leading @
-          String iannNoPackage = Main.removePackage(iann).b;
+          String iannNoPackage = Insertion.removePackage(iann).b;
           // System.out.printf("Comparing: %s %s %s%n", ann, iann, iannNoPackage);
           if (ann.equals(iann) || ann.equals(iannNoPackage)) {
             debug("Already present, not reinserting: %s%n", ann);
@@ -929,7 +971,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
           pos = (nextpos1!=-1 && nextpos1 < nextpos2) ? nextpos1 : nextpos2;
 
           // need to add "extends ... Object" around the type annotation
-          i = new Insertion("extends " + i.getText() + " java.lang.Object", i.getCriteria(), i.getSeparateLine());
+          i = new TypeBoundExtendsInsertion(i.getText(), i.getCriteria(), i.getSeparateLine());
       } else if ((node instanceof WildcardTree) // Easier than listing three tree kinds. Correct?
                && ((WildcardTree)node).getBound()==null) {
           pos = tpf.scan(node, null);
@@ -939,7 +981,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
           pos = (nextpos1!=-1 && nextpos1 < nextpos2) ? nextpos1 : nextpos2;
 
           // need to add "extends ... Object" around the type annotation
-          i = new Insertion("extends " + i.getText() + " java.lang.Object", i.getCriteria(), i.getSeparateLine());
+          i = new TypeBoundExtendsInsertion(i.getText(), i.getCriteria(), i.getSeparateLine());
       } else {
         boolean typeScan = true;
         if (node.getKind() == Tree.Kind.METHOD) { // MethodTree
