@@ -286,17 +286,8 @@ public class Main {
           assert pos >= 0
             : "pos is negative: " + pos + " " + toInsertList.get(0) + " " + javafilename;
           for (Insertion iToInsert : toInsertList) {
-            String toInsert = iToInsert.getText(comments, abbreviate);
-            if (abbreviate) {
-              Set<String> packageNames = iToInsert.getPackageNames();
-              if (debug) {
-                System.out.printf("Need import %s%n  due to insertion %s%n",
-                                  packageNames, toInsert);
-              }
-              imports.addAll(packageNames);
-            }
-
             // Possibly add whitespace after the insertion
+            String trailingWhitespace = "";
             boolean gotSeparateLine = false;
             if (iToInsert.getSeparateLine()) {
               // System.out.printf("getSeparateLine=true for insertion at pos %d: %s%n", pos, iToInsert);
@@ -314,23 +305,27 @@ public class Main {
                   || (src.charAt(pos-indentation-1) == '\f'
                       || src.charAt(pos-indentation-1) == '\n'
                       || src.charAt(pos-indentation-1) == '\r')) {
-                toInsert = toInsert + fileLineSep + src.substring(pos-indentation, pos);
+                trailingWhitespace = fileLineSep + src.substring(pos-indentation, pos);
                 gotSeparateLine = true;
               }
             }
 
-            // Possibly add a leading space before the insertion
-            if ((! gotSeparateLine) && (pos != 0)) {
-              char precedingChar = src.charAt(pos-1);
-              if (! (Character.isWhitespace(precedingChar)
-                     // No space if it's the first formal or generic parameter
-                     // or if it's a CloseParenthesesInsertion
-                     || precedingChar == '('
-                     || precedingChar == '<'
-                     || precedingChar == '['
-                     || toInsert.equals("))"))) {
-                toInsert = " " + toInsert;
+            char precedingChar;
+            if (pos != 0) {
+              precedingChar = src.charAt(pos - 1);
+            } else {
+              precedingChar = '\0';
+            }
+
+            String toInsert = iToInsert.getText(comments, abbreviate,
+                    gotSeparateLine, pos, precedingChar) + trailingWhitespace;
+            if (abbreviate) {
+              Set<String> packageNames = iToInsert.getPackageNames();
+              if (debug) {
+                System.out.printf("Need import %s%n  due to insertion %s%n",
+                                  packageNames, toInsert);
               }
+              imports.addAll(packageNames);
             }
 
             // If it's already there, don't re-insert.  This is a hack!
@@ -350,13 +345,7 @@ public class Main {
                 continue;
               }
             }
-            // add trailing whitespace
-            // (test is not for "extends " because we just added a leading space, above)
-            if ((! gotSeparateLine) && (! toInsert.startsWith(" extends "))
-                    && (! toInsert.startsWith("((")) && (! toInsert.startsWith(" (("))
-                    && (! toInsert.equals("))")) && (! toInsert.endsWith(" this"))) {
-              toInsert = toInsert + " ";
-            }
+
             src.insert(pos, toInsert);
             if (verbose) {
               System.out.print(".");

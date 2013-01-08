@@ -14,8 +14,23 @@ public class CloseParenthesisInsertion extends Insertion {
 
     /** {@inheritDoc} */
     @Override
-    public String getText(boolean comments, boolean abbreviate) {
+    protected String getText(boolean comments, boolean abbreviate) {
         return "))";
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected boolean addLeadingSpace(boolean gotSeparateLine, int pos,
+            char precedingChar) {
+        // Never add a leading space when inserting closing parentheses.
+        return false;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected boolean addTrailingSpace(boolean gotSeparateLine) {
+        // Never add a trailing space when inserting closing parentheses.
+        return false;
     }
 
     /** {@inheritDoc} */

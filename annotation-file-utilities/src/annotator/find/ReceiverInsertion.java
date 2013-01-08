@@ -53,8 +53,9 @@ public class ReceiverInsertion extends Insertion {
         return type;
     }
 
+    /** {@inheritDoc} */
     @Override
-    public String getText(boolean comments, boolean abbreviate) {
+    protected String getText(boolean comments, boolean abbreviate) {
         boolean commentAnnotation = (comments && type.getName().isEmpty());
         String result = typeToString(type, commentAnnotation, abbreviate);
         if (!type.getName().isEmpty()) {
@@ -67,6 +68,17 @@ public class ReceiverInsertion extends Insertion {
             result = "/*>>> " + result + " */";
         }
         return result;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected boolean addTrailingSpace(boolean gotSeparateLine) {
+        // If the type is not already in the source and the receiver is the only
+        // parameter, don't add a trailing space.
+        if (!type.getName().isEmpty() && !addComma) {
+            return false;
+        }
+        return super.addTrailingSpace(gotSeparateLine);
     }
 
     /** {@inheritDoc} */
