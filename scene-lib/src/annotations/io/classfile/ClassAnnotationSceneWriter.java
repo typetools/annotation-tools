@@ -24,6 +24,7 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.commons.EmptyVisitor;
 
 import com.sun.tools.javac.code.TargetType;
+import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
 
 import annotations.*;
 import annotations.el.*;
@@ -286,7 +287,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
             TypeAnnotationVisitor xav = visitTypeAnnotation(tla);
 
             visitFields(xav, tla);
-            visitTargetType(xav, TargetType.CLASS_TYPE_PARAMETER_BOUND_COMPONENT);
+            visitTargetType(xav, TargetType.CLASS_TYPE_PARAMETER_BOUND);
             visitBound(xav, bloc);
             visitLocations(xav, itloc);
             xav.visitEnd();
@@ -407,9 +408,9 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
    * Have xav visit the location length  and all locations in loc.
    */
   private void visitLocations(TypeAnnotationVisitor xav, InnerTypeLocation loc) {
-    List<Integer> location = loc.location;
+    List<TypePathEntry> location = loc.location;
     xav.visitXLocationLength(location.size());
-    for (Integer l : location) {
+    for (TypePathEntry l : location) {
       xav.visitXLocation(l);
     }
   }
@@ -574,7 +575,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
           TypeAnnotationVisitor xav =
             fv.visitTypeAnnotation(classNameToDesc(name(tla)), isRuntimeRetention(tla));
           visitFields(xav, tla);
-          visitTargetType(xav, TargetType.FIELD_COMPONENT);
+          visitTargetType(xav, TargetType.FIELD);
           visitLocations(xav, fieldInnerEntry.getKey());
           xav.visitEnd();
         }
@@ -760,7 +761,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
           TypeAnnotationVisitor xav = visitTypeAnnotation(tla);
 
           visitFields(xav, tla);
-          visitTargetType(xav, TargetType.METHOD_RETURN_COMPONENT);
+          visitTargetType(xav, TargetType.METHOD_RETURN);
           // information for raw type (return type)
           //  (none)
           // information for generic/array (on return type)
@@ -803,7 +804,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
             TypeAnnotationVisitor xav = visitTypeAnnotation(tla);
 
             visitFields(xav, tla);
-            visitTargetType(xav, TargetType.METHOD_TYPE_PARAMETER_BOUND_COMPONENT);
+            visitTargetType(xav, TargetType.METHOD_TYPE_PARAMETER_BOUND);
             visitBound(xav, bloc);
             visitLocations(xav, itloc);
             xav.visitEnd();
@@ -841,7 +842,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
 
             TypeAnnotationVisitor xav = visitTypeAnnotation(tla);
             visitFields(xav, tla);
-            visitTargetType(xav, TargetType.LOCAL_VARIABLE_COMPONENT);
+            visitTargetType(xav, TargetType.LOCAL_VARIABLE);
             // information for raw type (local variable)
             visitLocalVar(xav, localLocation);
             // information for generic/array (on local variable)
@@ -887,7 +888,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
 
             TypeAnnotationVisitor xav = visitTypeAnnotation(tla);
             visitFields(xav, tla);
-            visitTargetType(xav, TargetType.NEW_COMPONENT);
+            visitTargetType(xav, TargetType.NEW);
             // information for raw type (object creation)
             visitOffset(xav, offset);
             // information for generic/array (on object creation)
@@ -937,7 +938,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
             TypeAnnotationVisitor xav = visitTypeAnnotation(tla);
             visitFields(xav, tla);
             visitTargetType(xav,
-                TargetType.METHOD_PARAMETER_COMPONENT);
+                TargetType.METHOD_PARAMETER);
             // information for raw type (parameter)
             //  (none)
             // information for generic/array (on parameter)
@@ -973,7 +974,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
 
           TypeAnnotationVisitor xav = visitTypeAnnotation(tla);
           visitFields(xav, tla);
-          visitTargetType(xav, TargetType.METHOD_RECEIVER_COMPONENT);
+          visitTargetType(xav, TargetType.METHOD_RECEIVER);
           // information for generic/array (on receiver)
           visitLocations(xav, aReceiverLocation);
           xav.visitEnd();
@@ -1001,7 +1002,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
 
           TypeAnnotationVisitor xav = visitTypeAnnotation(tla);
           visitFields(xav, tla);
-          visitTargetType(xav, TargetType.TYPECAST);
+          visitTargetType(xav, TargetType.CAST);
           visitOffset(xav, offset);
           xav.visitEnd();
         }
@@ -1016,7 +1017,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
 
             TypeAnnotationVisitor xav = visitTypeAnnotation(tla);
             visitFields(xav, tla);
-            visitTargetType(xav, TargetType.TYPECAST_COMPONENT);
+            visitTargetType(xav, TargetType.CAST);
             // information for raw type (typecast)
             visitOffset(xav, offset);
             // information for generic/array (on typecast)
@@ -1061,7 +1062,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
 
             TypeAnnotationVisitor xav = visitTypeAnnotation(tla);
             visitFields(xav, tla);
-            visitTargetType(xav, TargetType.INSTANCEOF_COMPONENT);
+            visitTargetType(xav, TargetType.INSTANCEOF);
             // information for raw type (typetest)
             visitOffset(xav, offset);
             // information for generic/array (on typtest)

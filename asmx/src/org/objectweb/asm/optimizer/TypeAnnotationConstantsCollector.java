@@ -31,6 +31,8 @@ package org.objectweb.asm.optimizer;
 
 import org.objectweb.asm.TypeAnnotationVisitor;
 
+import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
+
 /**
  * An {@link TypeAnnotationVisitor} that collects the 
  * {@link Constant}s of the extended annotations it visits.
@@ -63,7 +65,7 @@ public class TypeAnnotationConstantsCollector
         xav.visitXLocationLength(location_length);
     }
 
-    public void visitXLocation(int location) {
+    public void visitXLocation(TypePathEntry location) {
         xav.visitXLocation(location);
     }
 

@@ -3,6 +3,8 @@ package org.objectweb.asm.util;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.TypeAnnotationVisitor;
 
+import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
+
 /**
  * An {@link TypeAnnotationVisitor} that prints the ASM code that generates 
  *  the extended annotations it visits.
@@ -126,10 +128,10 @@ public class ASMifierTypeAnnotationVisitor extends AbstractVisitor
         text.add(buf.toString());
     }
 
-    public void visitXLocation(int location) {
+    public void visitXLocation(TypePathEntry location) {
         buf.setLength(0);
         buf.append("xav").append(id).append(".visitXLocation(");
-        appendConstant(buf, location);
+        buf.append(location.toString());
         buf.append(");\n");
         text.add(buf.toString());
     }

@@ -38,6 +38,7 @@ import com.sun.source.tree.VariableTree;
 import com.sun.source.tree.WildcardTree;
 import com.sun.source.util.TreePath;
 import com.sun.source.util.TreeScanner;
+import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.JCTree.JCAnnotatedType;
 import com.sun.tools.javac.tree.JCTree.JCAnnotation;
@@ -69,7 +70,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
 
   public static boolean debug = false;
 
-  private static Integer arrayLocationInParent = null;
+  private static TypePathEntry arrayLocationInParent = null;
 
   private static void debug(String message) {
     if (debug)
@@ -213,10 +214,10 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       // I'm not quite sure where this list is now.
       // jcnode.recvparam.mods.annotations might still contain declaration annotations.
       // By the point they are disambiguated, they've become TypeCompounds.
-      List<JCTypeAnnotation> receiverAnnotations;
+      List<JCAnnotation> receiverAnnotations;
 
-      if (jcnode.recvparam!=null) {
-        receiverAnnotations = com.sun.tools.javac.util.List.convert(JCTypeAnnotation.class, jcnode.recvparam.mods.annotations);
+      if (jcnode.recvparam != null) {
+        receiverAnnotations = jcnode.recvparam.mods.annotations;
       } else {
         receiverAnnotations = Collections.emptyList();
       }
@@ -601,7 +602,9 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       // We need to know what array dimension to return.  This is gross.
       int dim = ((arrayLocationInParent == null)
                  ? 0  // outermost type
-                 : arrayLocationInParent.intValue() + 1);
+                 // TODO: adapt to multiple separate ARRAY instead of value
+                 // : arrayLocationInParent.intValue() + 1);
+                 : 1);
       // Invariant:  na.dims.size() == 0  or  na.elems == null  (but not both)
       // If na.dims.size() != 0, na.elemtype is non-null.
       // If na.dims.size() == 0, na.elemtype may be null or non-null.

@@ -1,19 +1,19 @@
 package annotations.tests;
 
 import checkers.nullness.quals.*;
-import checkers.nullness.quals.NonNull;
 import checkers.javari.quals.ReadOnly;
 
 import java.io.*;
 import java.util.*;
 import java.lang.annotation.RetentionPolicy;
 
+import com.sun.tools.javac.code.TypeAnnotationPosition;
+
 import junit.framework.*;
 import annotations.*;
 import annotations.el.*;
 import annotations.field.*;
 import annotations.io.*;
-import annotations.util.coll.*;
 
 import plume.FileIOException;
 
@@ -128,8 +128,9 @@ public /*@ReadOnly*/ class TestSceneLib extends TestCase {
         Object dummy2 = 
           s1.classes.vivify("Foo").methods.vivify("y()Z").parameters.vivify(5).type.innerTypes;
         s1.classes.vivify("Foo").methods.vivify("y()Z").parameters.vivify(5).type.innerTypes
-                .vivify(new InnerTypeLocation(Arrays
-                                .asList(new Integer[] { 1, 2 }))).tlAnnotationsHere
+                .vivify(new InnerTypeLocation(
+                        TypeAnnotationPosition.getTypePathFromBinary(
+                                Arrays.asList(new Integer[] { 1, 2 })))).tlAnnotationsHere
                 .add(myAuthor);
 
         doParseTest(fooIndexContents, s1);
@@ -140,9 +141,9 @@ public /*@ReadOnly*/ class TestSceneLib extends TestCase {
         assertEquals(Collections.singletonMap("value", "spam"), ann.fieldValues);
         ATypeElement l = (ATypeElement) constructor.locals
                         .get(new LocalLocation(1, 3, 5)).type;
-        AElement i = (AElement) l.innerTypes
-                        .get(new InnerTypeLocation(
-                                Collections.singletonList(0)));
+        AElement i = (AElement) l.innerTypes.get(new InnerTypeLocation(
+                TypeAnnotationPosition.getTypePathFromBinary(
+                                Collections.singletonList(0))));
         assertNotNull(i.lookup("p2.C"));
         AElement l2 =
                 constructor.locals.get(new LocalLocation(1, 3, 6));
@@ -599,7 +600,7 @@ public /*@ReadOnly*/ class TestSceneLib extends TestCase {
     private void assignId(ATypeElement myField, int id,
             Integer... ls) {
         AElement el = myField.innerTypes.vivify(
-                new InnerTypeLocation(Arrays.asList(ls)));
+                new InnerTypeLocation(TypeAnnotationPosition.getTypePathFromBinary(Arrays.asList(ls))));
         el.tlAnnotationsHere.add(makeTLIdAnno(id));
     }
 
@@ -650,7 +651,7 @@ public /*@ReadOnly*/ class TestSceneLib extends TestCase {
             assertTrue(mapper.saw[i]);
         // make sure it vivified #10 and our annotation stuck
         AElement e10 = myAFieldType.innerTypes.get(
-                new InnerTypeLocation(Arrays.asList(1, 3)));
+                new InnerTypeLocation(TypeAnnotationPosition.getTypePathFromBinary(Arrays.asList(1, 3))));
         assertNotNull(e10);
         int e10aid = (Integer) e10.lookup("IdAnno").getFieldValue("id");
         assertEquals(e10aid, 10);

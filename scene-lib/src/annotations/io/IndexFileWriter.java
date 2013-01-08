@@ -8,6 +8,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.util.*;
 
+import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
+
 import annotations.*;
 import annotations.el.*;
 import annotations.field.*;
@@ -157,7 +159,7 @@ public final class IndexFileWriter {
             /*@ReadOnly*/ AElement it = ite.getValue();
             pw.print(indentation + INDENT + "inner-type");
             boolean first = true;
-            for (int l : loc.location) {
+            for (TypePathEntry l : loc.location) {
                 if (first)
                     pw.print(' ');
                 else
@@ -196,7 +198,7 @@ public final class IndexFileWriter {
             /*@ReadOnly*/ AElement it = ite.getValue();
             pw.print(indentation + INDENT + INDENT + "inner-type");
             boolean first = true;
-            for (int l : loc.location) {
+            for (TypePathEntry l : loc.location) {
                 if (first)
                     pw.print(' ');
                 else
