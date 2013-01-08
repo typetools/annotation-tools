@@ -157,6 +157,9 @@ public class Main {
           if (omit_annotation != null) {
             List<Insertion> filtered = new ArrayList<Insertion>(parsedSpec.size());
             for (Insertion insertion : parsedSpec) {
+              // TODO: this won't omit annotations if the insertion is more than
+              // just the annotation (such as if the insertion is a cast
+              // insertion or a 'this' parameter in a method declaration).
               if (! omit_annotation.equals(insertion.getText())) {
                 filtered.add(insertion);
               }
