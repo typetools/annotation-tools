@@ -38,7 +38,7 @@ package org.objectweb.asm;
  * 
  * @author Eric Bruneton
  */
-public interface ClassVisitor {
+public interface ClassVisitor extends MemberVisitor {
 
     /**
      * Visits the header of the class.
@@ -100,11 +100,6 @@ public interface ClassVisitor {
      * @return a non null visitor to visit the annotation values.
      */
     AnnotationVisitor visitAnnotation(String desc, boolean visible);
-
-    //jaime
-    TypeAnnotationVisitor visitTypeAnnotation(String desc,
-                                                      boolean visible);
-    // end jaime
 
     /**
      * Visits a non standard attribute of the class.

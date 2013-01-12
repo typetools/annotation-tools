@@ -105,4 +105,9 @@ public interface TypeAnnotationVisitor extends AnnotationVisitor {
    * @param type_index
    */
   public void visitXTypeIndex(int type_index);
+
+  /**
+   * Visits the annotation name and arguments size.
+   */
+  public void visitXNameAndArgsSize();
 }

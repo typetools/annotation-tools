@@ -32,7 +32,7 @@ public class TestLocalVariableGenericArray {
     s.add(s.toString());
   }
 
-  private int someMethod2(int i) {
+  public int someMethod2(int i) {
     Set<Boolean> s = new HashSet<Boolean>();
     Set<Integer> ints = new HashSet<Integer>();
     boolean b = someMethod3();
@@ -42,7 +42,7 @@ public class TestLocalVariableGenericArray {
     return i;
   }
 
-  private boolean someMethod3() {
+  public boolean someMethod3() {
     Map<String, Set<String>> t = new HashMap<String, Set<String>>();
     Map<String, Set<Map<Integer, String[][]>>> s = null;
 

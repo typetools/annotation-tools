@@ -440,6 +440,9 @@ public class AnnotationVerifier {
     public void visitEnd() {
     }
 
+    public void visitXNameAndArgsSize() {
+    }
+
     public void visitEnum(String name, String desc, String value) {
       enumArgsName.add(name);
       enumArgsDesc.add(desc);

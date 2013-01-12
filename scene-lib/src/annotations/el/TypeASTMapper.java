@@ -89,12 +89,10 @@ public abstract class TypeASTMapper<N> {
             // at least one array layer to confuse us
             int layers = 0;
             while ((elType = getElementType(n)) != null) {
-                // TODO was: ls.add(layers);
                 ls.add(TypePathEntry.ARRAY);
                 // System.out.printf("layers=%d, map(%s, getInnerType(%s, %s)=%s)%n",
                 //                   layers, elType, te, ls, getInnerType(te, ls));
                 map(elType, getInnerType(te, ls));
-                ls.remove(ls.size() - 1);
                 n = elType;
                 layers++;
             }
@@ -102,17 +100,16 @@ public abstract class TypeASTMapper<N> {
             // // map it to the prefix
             // map(n, getInnerType(te, ls));
 
-            // hack for type arguments of the innermost element type
-            // TODO was: ls.add(layers-1);
-            ls.add(TypePathEntry.ARRAY); // or should it be type argument?
             int nta = numTypeArguments(n);
             for (int tai = 0; tai < nta; tai++) {
-                // TODO was: ls.add(tai);
                 ls.add(new TypePathEntry(TypePathEntryKind.TYPE_ARGUMENT, tai));
                 traverse1(getTypeArgument(n, tai), te, ls);
                 ls.remove(ls.size() - 1);
             }
-            ls.remove(ls.size() - 1);
+
+            for (int i = 0; i < layers; i++) {
+            	ls.remove(ls.size() - 1);
+            }
         }
     }
 

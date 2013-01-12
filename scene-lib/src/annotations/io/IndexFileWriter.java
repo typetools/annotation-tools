@@ -164,13 +164,21 @@ public final class IndexFileWriter {
                     pw.print(' ');
                 else
                     pw.print(',');
-                pw.print(l);
+                pw.print(typePathEntryToString(l));
                 first = false;
             }
             pw.print(':');
             printAnnotations(it);
             pw.println();
         }
+    }
+
+    /**
+     * Converts the given {@link TypePathEntry} to a string of the form
+     * {@code tag, arg}, where tag and arg are both integers.
+     */
+    private String typePathEntryToString(TypePathEntry t) {
+    	return t.tag.tag + ", " + t.arg;
     }
 
     private void printNumberedAmbigiousElements(String indentation,
@@ -203,7 +211,7 @@ public final class IndexFileWriter {
                     pw.print(' ');
                 else
                     pw.print(',');
-                pw.print(l);
+                pw.print(typePathEntryToString(l));
                 first = false;
             }
             pw.print(':');

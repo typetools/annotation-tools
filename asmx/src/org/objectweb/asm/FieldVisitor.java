@@ -36,7 +36,7 @@ package org.objectweb.asm;
  * 
  * @author Eric Bruneton
  */
-public interface FieldVisitor {
+public interface FieldVisitor extends MemberVisitor {
     /**
      * Visits an annotation of the field.
      * 
@@ -59,8 +59,4 @@ public interface FieldVisitor {
      * attributes of the field have been visited.
      */
     void visitEnd();
-
-    // jaime
-    TypeAnnotationVisitor visitTypeAnnotation(String desc, 
-                                                      boolean visible);
 }
