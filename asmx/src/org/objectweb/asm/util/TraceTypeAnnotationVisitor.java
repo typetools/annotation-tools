@@ -277,4 +277,7 @@ public class TraceTypeAnnotationVisitor extends TraceAnnotationVisitor
         xav.visitXTypeIndex(type_index);
       }
     }
+
+    public void visitXNameAndArgsSize() {
+    }
 }

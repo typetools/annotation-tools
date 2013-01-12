@@ -199,6 +199,9 @@ implements TypeAnnotationVisitor {
     xav.visitXTypeIndex(type_index);
   }
 
+  public void visitXNameAndArgsSize() {
+  }
+
   /**
    * Visits the end of the annotation, and also performs a check
    *  to ensure that the information this has visited specifies a legal
@@ -252,7 +255,7 @@ implements TypeAnnotationVisitor {
 
     switch(TargetType.fromTargetTypeValue(xTargetTypeArgs.get(0))) {
     case CAST:
-      checkListSize(0, 0, 0, 0, 1, 0, 0, 0, 0,
+      checkListSize(0, 0, 0, 1, 1, 0, 0, 0, 0,
           "Invalid typecast annotation:");
       break;
     /* TODO

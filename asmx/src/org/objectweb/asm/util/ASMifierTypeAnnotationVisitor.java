@@ -191,4 +191,7 @@ public class ASMifierTypeAnnotationVisitor extends AbstractVisitor
         buf.append(");\n");
         text.add(buf.toString());
     }
+
+    public void visitXNameAndArgsSize() {
+    }
 }
