@@ -96,4 +96,8 @@ public class TypeAnnotationConstantsCollector
     public void visitXTypeIndex(int type_index) {
         xav.visitXTypeIndex(type_index);
     }
+
+    public void visitXNameAndArgsSize() {
+        xav.visitXNameAndArgsSize();
+    }
 }

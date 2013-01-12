@@ -44,7 +44,7 @@ package org.objectweb.asm;
  * 
  * @author Eric Bruneton
  */
-public interface MethodVisitor {
+public interface MethodVisitor extends MemberVisitor {
 
     // -------------------------------------------------------------------------
     // Annotations and non standard attributes
@@ -69,16 +69,6 @@ public interface MethodVisitor {
      * @return a non null visitor to visit the annotation values.
      */
     AnnotationVisitor visitAnnotation(String desc, boolean visible);
-
-    /**
-     * Visits a type annotation of this method.
-     * 
-     * @param desc the class descriptor of the annotation class.
-     * @param visible <tt>true</tt> if the annotation is visible at runtime.
-     * @return a non null visitor to visit the annotation values.
-     */
-    TypeAnnotationVisitor visitTypeAnnotation(String desc, 
-                                                      boolean visible);
 
     /**
      * Visits an annotation of a parameter this method.

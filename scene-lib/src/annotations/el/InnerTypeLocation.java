@@ -14,6 +14,13 @@ import annotations.util.*;
  * inner type (namely the location string) inside its {@link ATypeElement}.
  */
 public final /*@ReadOnly*/ class InnerTypeLocation {
+
+    /**
+     * An {@link InnerTypeLocation} containing no locations.
+     */
+    public static final InnerTypeLocation EMPTY_INNER_TYPE_LOCATION = new InnerTypeLocation(
+            Collections.<TypePathEntry> emptyList());
+
     /**
      * The location numbers of the inner type as defined in the extended
      * annotation specification.  For example, the location numbers of &#064;X
