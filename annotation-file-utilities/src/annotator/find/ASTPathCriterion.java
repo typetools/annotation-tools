@@ -130,7 +130,8 @@ public class ASTPathCriterion implements Criterion {
                 return false;
             }
 
-            if (actualNode.getKind() == Tree.Kind.ANNOTATED_TYPE) {
+            switch (actualNode.getKind()) {
+            case ANNOTATED_TYPE:
                 AnnotatedTypeTree annotatedType = (AnnotatedTypeTree) actualNode;
                 if (astNode.getChildSelector().equals("annotation")) {
                     next = annotatedType.getAnnotations().get(
@@ -138,62 +139,56 @@ public class ASTPathCriterion implements Criterion {
                 } else {
                     next = annotatedType.getUnderlyingType();
                 }
-            } else if (actualNode.getKind() == Tree.Kind.ARRAY_ACCESS) {
+                break;
+            case ARRAY_ACCESS:
                 ArrayAccessTree arrayAccess = (ArrayAccessTree) actualNode;
                 if (astNode.getChildSelector().equals("expression")) {
                     next = arrayAccess.getExpression();
                 } else {
                     next = arrayAccess.getIndex();
                 }
-            } else if (actualNode.getKind() == Tree.Kind.ARRAY_TYPE) {
+                break;
+            case ARRAY_TYPE:
                 ArrayTypeTree arrayType = (ArrayTypeTree) actualNode;
                 next = arrayType.getType();
-            } else if (actualNode.getKind() == Tree.Kind.ASSERT) {
+                break;
+            case ASSERT:
                 AssertTree azzert = (AssertTree) actualNode;
                 if (astNode.getChildSelector().equals("condition")) {
                     next = azzert.getCondition();
                 } else {
                     next = azzert.getDetail();
                 }
-            } else if (actualNode.getKind() == Tree.Kind.ASSIGNMENT) {
+                break;
+            case ASSIGNMENT:
                 AssignmentTree assignment = (AssignmentTree) actualNode;
                 if (astNode.getChildSelector().equals("variable")) {
                     next = assignment.getVariable();
                 } else {
                     next = assignment.getExpression();
                 }
-            } else if (isBinaryOperator(actualNode.getKind())) {
-                BinaryTree binary = (BinaryTree) actualNode;
-                if (astNode.getChildSelector().equals("leftOperand")) {
-                    next = binary.getLeftOperand();
-                } else {
-                    next = binary.getRightOperand();
-                }
-            } else if (actualNode.getKind() == Tree.Kind.BLOCK) {
+                break;
+            case BLOCK:
                 BlockTree block = (BlockTree) actualNode;
                 next = block.getStatements().get(astNode.getArgument());
-            } else if (actualNode.getKind() == Tree.Kind.CASE) {
+                break;
+            case CASE:
                 CaseTree caze = (CaseTree) actualNode;
                 if (astNode.getChildSelector().equals("expression")) {
                     next = caze.getExpression();
                 } else {
                     next = caze.getStatements().get(astNode.getArgument());
                 }
-            } else if (actualNode.getKind() == Tree.Kind.CATCH) {
+                break;
+            case CATCH:
                 CatchTree cach = (CatchTree) actualNode;
                 if (astNode.getChildSelector().equals("parameter")) {
                     next = cach.getParameter();
                 } else {
                     next = cach.getBlock();
                 }
-            } else if (isCompoundAssignment(actualNode.getKind())) {
-                CompoundAssignmentTree compoundAssignment = (CompoundAssignmentTree) actualNode;
-                if (astNode.getChildSelector().equals("variable")) {
-                    next = compoundAssignment.getVariable();
-                } else {
-                    next = compoundAssignment.getExpression();
-                }
-            } else if (actualNode.getKind() == Tree.Kind.CONDITIONAL_EXPRESSION) {
+                break;
+            case CONDITIONAL_EXPRESSION:
                 ConditionalExpressionTree conditionalExpression = (ConditionalExpressionTree) actualNode;
                 if (astNode.getChildSelector().equals("condition")) {
                     next = conditionalExpression.getCondition();
@@ -202,14 +197,16 @@ public class ASTPathCriterion implements Criterion {
                 } else {
                     next = conditionalExpression.getFalseExpression();
                 }
-            } else if (actualNode.getKind() == Tree.Kind.DO_WHILE_LOOP) {
+                break;
+            case DO_WHILE_LOOP:
                 DoWhileLoopTree doWhileLoop = (DoWhileLoopTree) actualNode;
                 if (astNode.getChildSelector().equals("condition")) {
                     next = doWhileLoop.getCondition();
                 } else {
                     next = doWhileLoop.getStatement();
                 }
-            } else if (actualNode.getKind() == Tree.Kind.ENHANCED_FOR_LOOP) {
+                break;
+            case ENHANCED_FOR_LOOP:
                 EnhancedForLoopTree enhancedForLoop = (EnhancedForLoopTree) actualNode;
                 if (astNode.getChildSelector().equals("variable")) {
                     next = enhancedForLoop.getVariable();
@@ -218,10 +215,12 @@ public class ASTPathCriterion implements Criterion {
                 } else {
                     next = enhancedForLoop.getStatement();
                 }
-            } else if (actualNode.getKind() == Tree.Kind.EXPRESSION_STATEMENT) {
+                break;
+            case EXPRESSION_STATEMENT:
                 ExpressionStatementTree expressionStatement = (ExpressionStatementTree) actualNode;
                 next = expressionStatement.getExpression();
-            } else if (actualNode.getKind() == Tree.Kind.FOR_LOOP) {
+                break;
+            case FOR_LOOP:
                 ForLoopTree forLoop = (ForLoopTree) actualNode;
                 if (astNode.getChildSelector().equals("initializer")) {
                     next = forLoop.getInitializer().get(astNode.getArgument());
@@ -232,7 +231,8 @@ public class ASTPathCriterion implements Criterion {
                 } else {
                     next = forLoop.getStatement();
                 }
-            } else if (actualNode.getKind() == Tree.Kind.IF) {
+                break;
+            case IF:
                 IfTree iff = (IfTree) actualNode;
                 if (astNode.getChildSelector().equals("condition")) {
                     next = iff.getCondition();
@@ -241,17 +241,20 @@ public class ASTPathCriterion implements Criterion {
                 } else {
                     next = iff.getElseStatement();
                 }
-            } else if (actualNode.getKind() == Tree.Kind.INSTANCE_OF) {
+                break;
+            case INSTANCE_OF:
                 InstanceOfTree instanceOf = (InstanceOfTree) actualNode;
                 if (astNode.getChildSelector().equals("expression")) {
                     next = instanceOf.getExpression();
                 } else {
                     next = instanceOf.getType();
                 }
-            } else if (actualNode.getKind() == Tree.Kind.LABELED_STATEMENT) {
+                break;
+            case LABELED_STATEMENT:
                 LabeledStatementTree labeledStatement = (LabeledStatementTree) actualNode;
                 next = labeledStatement.getStatement();
-            } else if (actualNode.getKind() == Tree.Kind.LAMBDA_EXPRESSION) {
+                break;
+            case LAMBDA_EXPRESSION:
                 LambdaExpressionTree lambdaExpression = (LambdaExpressionTree) actualNode;
                 if (astNode.getChildSelector().equals("parameter")) {
                     next = lambdaExpression.getParameters().get(
@@ -259,7 +262,8 @@ public class ASTPathCriterion implements Criterion {
                 } else {
                     next = lambdaExpression.getBody();
                 }
-            } else if (actualNode.getKind() == Tree.Kind.MEMBER_REFERENCE) {
+                break;
+            case MEMBER_REFERENCE:
                 MemberReferenceTree memberReference = (MemberReferenceTree) actualNode;
                 if (astNode.getChildSelector().equals("qualifierExpression")) {
                     next = memberReference.getQualifierExpression();
@@ -267,10 +271,12 @@ public class ASTPathCriterion implements Criterion {
                     next = memberReference.getTypeArguments().get(
                             astNode.getArgument());
                 }
-            } else if (actualNode.getKind() == Tree.Kind.MEMBER_SELECT) {
+                break;
+            case MEMBER_SELECT:
                 MemberSelectTree memberSelect = (MemberSelectTree) actualNode;
                 next = memberSelect.getExpression();
-            } else if (actualNode.getKind() == Tree.Kind.METHOD_INVOCATION) {
+                break;
+            case METHOD_INVOCATION:
                 MethodInvocationTree methodInvocation = (MethodInvocationTree) actualNode;
                 if (astNode.getChildSelector().equals("typeArgument")) {
                     next = methodInvocation.getTypeArguments().get(
@@ -281,7 +287,8 @@ public class ASTPathCriterion implements Criterion {
                     next = methodInvocation.getArguments().get(
                             astNode.getArgument());
                 }
-            } else if (actualNode.getKind() == Tree.Kind.NEW_ARRAY) {
+                break;
+            case NEW_ARRAY:
                 NewArrayTree newArray = (NewArrayTree) actualNode;
                 if (astNode.getChildSelector().equals("type")) {
                     next = newArray.getType();
@@ -291,7 +298,8 @@ public class ASTPathCriterion implements Criterion {
                     next = newArray.getInitializers()
                             .get(astNode.getArgument());
                 }
-            } else if (actualNode.getKind() == Tree.Kind.NEW_CLASS) {
+                break;
+            case NEW_CLASS:
                 NewClassTree newClass = (NewClassTree) actualNode;
                 if (astNode.getChildSelector().equals("enclosingExpression")) {
                     next = newClass.getEnclosingExpression();
@@ -305,7 +313,8 @@ public class ASTPathCriterion implements Criterion {
                 } else {
                     next = newClass.getClassBody();
                 }
-            } else if (actualNode.getKind() == Tree.Kind.PARAMETERIZED_TYPE) {
+                break;
+            case PARAMETERIZED_TYPE:
                 ParameterizedTypeTree parameterizedType = (ParameterizedTypeTree) actualNode;
                 if (astNode.getChildSelector().equals("type")) {
                     next = parameterizedType.getType();
@@ -313,30 +322,36 @@ public class ASTPathCriterion implements Criterion {
                     next = parameterizedType.getTypeArguments().get(
                             astNode.getArgument());
                 }
-            } else if (actualNode.getKind() == Tree.Kind.PARENTHESIZED) {
+                break;
+            case PARENTHESIZED:
                 ParenthesizedTree parenthesized = (ParenthesizedTree) actualNode;
                 next = parenthesized.getExpression();
-            } else if (actualNode.getKind() == Tree.Kind.RETURN) {
+                break;
+            case RETURN:
                 ReturnTree returnn = (ReturnTree) actualNode;
                 next = returnn.getExpression();
-            } else if (actualNode.getKind() == Tree.Kind.SWITCH) {
+                break;
+            case SWITCH:
                 SwitchTree zwitch = (SwitchTree) actualNode;
                 if (astNode.getChildSelector().equals("expression")) {
                     next = zwitch.getExpression();
                 } else {
                     next = zwitch.getCases().get(astNode.getArgument());
                 }
-            } else if (actualNode.getKind() == Tree.Kind.SYNCHRONIZED) {
+                break;
+            case SYNCHRONIZED:
                 SynchronizedTree synchronizzed = (SynchronizedTree) actualNode;
                 if (astNode.getChildSelector().equals("expression")) {
                     next = synchronizzed.getExpression();
                 } else {
                     next = synchronizzed.getBlock();
                 }
-            } else if (actualNode.getKind() == Tree.Kind.THROW) {
+                break;
+            case THROW:
                 ThrowTree throww = (ThrowTree) actualNode;
                 next = throww.getExpression();
-            } else if (actualNode.getKind() == Tree.Kind.TRY) {
+                break;
+            case TRY:
                 TryTree tryy = (TryTree) actualNode;
                 if (astNode.getChildSelector().equals("block")) {
                     next = tryy.getBlock();
@@ -347,37 +362,60 @@ public class ASTPathCriterion implements Criterion {
                 } else {
                     next = tryy.getResources().get(astNode.getArgument());
                 }
-            } else if (actualNode.getKind() == Tree.Kind.TYPE_CAST) {
+                break;
+            case TYPE_CAST:
                 TypeCastTree typeCast = (TypeCastTree) actualNode;
                 if (astNode.getChildSelector().equals("type")) {
                     next = typeCast.getType();
                 } else {
                     next = typeCast.getExpression();
                 }
-            } else if (isUnaryOperator(actualNode.getKind())) {
-                UnaryTree unary = (UnaryTree) actualNode;
-                next = unary.getExpression();
-            } else if (actualNode.getKind() == Tree.Kind.UNION_TYPE) {
+                break;
+            case UNION_TYPE:
                 UnionTypeTree unionType = (UnionTypeTree) actualNode;
                 next = unionType.getTypeAlternatives().get(
                         astNode.getArgument());
-            } else if (actualNode.getKind() == Tree.Kind.VARIABLE) {
+                break;
+            case VARIABLE:
                 VariableTree var = (VariableTree) actualNode;
                 if (astNode.getChildSelector().equals("initializer")) {
                     next = var.getInitializer();
                 } else if (astNode.getChildSelector().equals("type")) {
                     next = var.getType();
                 }
-            } else if (actualNode.getKind() == Tree.Kind.WHILE_LOOP) {
+                break;
+            case WHILE_LOOP:
                 WhileLoopTree whileLoop = (WhileLoopTree) actualNode;
                 if (astNode.getChildSelector().equals("condition")) {
                     next = whileLoop.getCondition();
                 } else {
                     next = whileLoop.getStatement();
                 }
-            } else if (isWildcard(actualNode.getKind())) {
-                WildcardTree wildcard = (WildcardTree) actualNode;
-                next = wildcard.getBound();
+                break;
+            default:
+                if (isBinaryOperator(actualNode.getKind())) {
+                    BinaryTree binary = (BinaryTree) actualNode;
+                    if (astNode.getChildSelector().equals("leftOperand")) {
+                        next = binary.getLeftOperand();
+                    } else {
+                        next = binary.getRightOperand();
+                    }
+                } else if (isCompoundAssignment(actualNode.getKind())) {
+                    CompoundAssignmentTree compoundAssignment = (CompoundAssignmentTree) actualNode;
+                    if (astNode.getChildSelector().equals("variable")) {
+                        next = compoundAssignment.getVariable();
+                    } else {
+                        next = compoundAssignment.getExpression();
+                    }
+                } else if (isUnaryOperator(actualNode.getKind())) {
+                    UnaryTree unary = (UnaryTree) actualNode;
+                    next = unary.getExpression();
+                } else if (isWildcard(actualNode.getKind())) {
+                    WildcardTree wildcard = (WildcardTree) actualNode;
+                    next = wildcard.getBound();
+                } else {
+                    throw new IllegalArgumentException("Illegal kind: " + actualNode.getKind());
+                }
             }
 
             if (debug) {
