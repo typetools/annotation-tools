@@ -107,4 +107,10 @@ public class DeclaredType extends Type {
     public DeclaredType getInnerType() {
         return innerType;
     }
+
+    /** {@inheritDoc} */
+    @Override
+    public Kind getKind() {
+        return Kind.DECLARED;
+    }
 }

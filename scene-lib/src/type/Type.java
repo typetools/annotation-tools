@@ -11,6 +11,15 @@ import java.util.List;
 public abstract class Type {
 
     /**
+     * The different kinds of {@link Type}s.
+     */
+    public enum Kind {
+        ARRAY,
+        DECLARED,
+        WILDCARD
+    }
+
+    /**
      * The annotations on the outer type. Empty if there are none.
      */
     private List<String> annotations;
@@ -47,4 +56,10 @@ public abstract class Type {
     public List<String> getAnnotations() {
         return Collections.unmodifiableList(annotations);
     }
+
+    /**
+     * Gets the {@link Kind} of this {@link Type}.
+     * @return the kind.
+     */
+    public abstract Kind getKind();
 }

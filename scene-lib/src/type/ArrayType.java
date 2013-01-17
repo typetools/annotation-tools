@@ -26,4 +26,10 @@ public class ArrayType extends Type {
     public Type getComponentType() {
         return componentType;
     }
+
+    /** {@inheritDoc} */
+    @Override
+    public Kind getKind() {
+        return Kind.ARRAY;
+    }
 }

@@ -239,7 +239,9 @@ public abstract class Insertion {
                 packageNames.addAll(ins.getPackageNames());
             }
         }
-        if (type instanceof DeclaredType) {
+
+        switch (type.getKind()) {
+        case DECLARED:
             DeclaredType declaredType = (DeclaredType) type;
             result.append(declaredType.getName());
             List<Type> typeArguments = declaredType.getTypeParameters();
@@ -257,11 +259,13 @@ public abstract class Insertion {
                 result.append('.');
                 result.append(typeToString(innerType, comments, abbreviate));
             }
-        } else if (type instanceof ArrayType) {
+            break;
+        case ARRAY:
             ArrayType arrayType = (ArrayType) type;
             result.append(typeToString(arrayType.getComponentType(), comments, abbreviate));
             result.append("[]");
-        } else if (type instanceof WildcardType) {
+            break;
+        case WILDCARD:
             WildcardType wildcardType = (WildcardType) type;
             for (String annotation : wildcardType.getAnnotations()) {
                 AnnotationInsertion ins = new AnnotationInsertion(annotation);
@@ -272,12 +276,15 @@ public abstract class Insertion {
                 }
             }
             result.append(wildcardType.getTypeArgumentName());
-            if (wildcardType.getKind() != BoundKind.NONE) {
+            if (wildcardType.getBoundKind() != BoundKind.NONE) {
                 result.append(' ');
-                result.append(wildcardType.getKind());
+                result.append(wildcardType.getBoundKind());
                 result.append(' ');
                 result.append(typeToString(wildcardType.getBound(), comments, abbreviate));
             }
+            break;
+        default:
+            throw new RuntimeException("Illegal kind: " + type.getKind());
         }
         // There will be extra whitespace at the end if this is only annotations, so trim
         return result.toString().trim();
