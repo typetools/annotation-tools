@@ -1,5 +1,7 @@
 package type;
 
+import type.Type.Kind;
+
 /**
  * A Java wildcard type. For example:
  * <pre>
@@ -41,7 +43,7 @@ public class WildcardType extends Type {
     /**
      * The bound kind of this wildcard. {@code NONE} if there is no bound.
      */
-    private BoundKind kind;
+    private BoundKind boundKind;
 
     /**
      * The bound of this wildcard. {@code null} if there is none.
@@ -58,13 +60,13 @@ public class WildcardType extends Type {
     /**
      * Creates a new wildcard type.
      * @param typeArgumentName the name of the type argument.
-     * @param kind the bound kind.
+     * @param boundKind the bound kind.
      * @param bound the bound.
      */
-    public WildcardType(String typeArgumentName, BoundKind kind, Type bound) {
+    public WildcardType(String typeArgumentName, BoundKind boundKind, Type bound) {
         super();
         this.typeArgumentName = typeArgumentName;
-        this.kind = kind;
+        this.boundKind = boundKind;
         this.bound = bound;
     }
 
@@ -92,7 +94,13 @@ public class WildcardType extends Type {
      * Gets the bound kind of this wildcard ({@code NONE} if there is none).
      * @return the bound kind.
      */
-    public BoundKind getKind() {
-        return kind;
+    public BoundKind getBoundKind() {
+        return boundKind;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Kind getKind() {
+        return Kind.WILDCARD;
     }
 }
