@@ -1,9 +1,6 @@
 import java.util.List;
 import java.util.Map;
 
-/**
- * @skip-test
- */
 public class Wildcards {
   @GUT.quals.Rep
   List<? extends @GUT.quals.Rep java.lang.Object> l1;

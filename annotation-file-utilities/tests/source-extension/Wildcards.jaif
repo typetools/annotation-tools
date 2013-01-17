@@ -6,7 +6,7 @@ package:
 class Wildcards:
 field l1:
 type:
-inner-type 0: @GUT.quals.Rep
+inner-type 3, 0, 2, 0: @GUT.quals.Rep
 
 package:
 class Wildcards:
@@ -22,53 +22,53 @@ package:
 class Wildcards:
 field l2:
 type:
-inner-type 0: @GUT.quals.Rep
+inner-type 3, 0, 2, 0: @GUT.quals.Rep
 
 package:
 class Wildcards:
 field l3:
 type:
-inner-type 0: @GUT.quals.Peer
+inner-type 3, 0, 2, 0: @GUT.quals.Peer
 
 package:
 class Wildcards:
 field l3:
 type:
-inner-type 1: @GUT.quals.Rep
+inner-type 3, 1, 2, 0: @GUT.quals.Rep
 
 
 package:
 class Wildcards:
 field l4:
 type:
-inner-type 0: @GUT.quals.Rep
+inner-type 3, 0: @GUT.quals.Rep
 
 package:
 class Wildcards:
 field l4:
 type:
-inner-type 0, 0: @GUT.quals.Peer
+inner-type 3, 0, 2, 0: @GUT.quals.Peer
 
 package:
 class Wildcards:
 field l4:
 type:
-inner-type 0, 0, 0: @GUT.quals.Rep
+inner-type 3, 0, 2, 0, 3, 0: @GUT.quals.Rep
 
 package:
 class Wildcards:
 field l4:
 type:
-inner-type 0, 0, 0, 0: @GUT.quals.Peer
+inner-type 3, 0, 2, 0, 3, 0, 2, 0: @GUT.quals.Peer
 
 package:
 class Wildcards:
 field l4:
 type:
-inner-type 0, 0, 1: @GUT.quals.Rep
+inner-type 3, 0, 2, 0, 3, 1: @GUT.quals.Rep
 
 package:
 class Wildcards:
 field l4:
 type:
-inner-type 0, 1: @GUT.quals.Peer
+inner-type 3, 1: @GUT.quals.Peer
