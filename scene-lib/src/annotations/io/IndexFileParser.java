@@ -916,96 +916,96 @@ public final class IndexFileParser {
     private ASTPath.ASTEntry parseASTEntry() throws IOException, ParseException {
         ASTPath.ASTEntry entry;
         if (matchKeyword("AnnotatedType")) {
-            entry = newASTEntry(Kind.ANNOTATED_TYPE, new String[] {"annotation", "underlyingType"},
-                    new String[] {"annotation"});
+            entry = newASTEntry(Kind.ANNOTATED_TYPE, new String[] {ASTPath.ANNOTATION, ASTPath.UNDERLYING_TYPE},
+                    new String[] {ASTPath.ANNOTATION});
         } else if (matchKeyword("ArrayAccess")) {
-            entry = newASTEntry(Kind.ARRAY_ACCESS, new String[] {"expression", "index"});
+            entry = newASTEntry(Kind.ARRAY_ACCESS, new String[] {ASTPath.EXPRESSION, ASTPath.INDEX});
         } else if (matchKeyword("ArrayType")) {
-            entry = newASTEntry(Kind.ARRAY_TYPE, new String[] {"type"});
+            entry = newASTEntry(Kind.ARRAY_TYPE, new String[] {ASTPath.TYPE});
         } else if (matchKeyword("Assert")) {
-            entry = newASTEntry(Kind.ASSERT, new String[] {"condition", "detail"});
+            entry = newASTEntry(Kind.ASSERT, new String[] {ASTPath.CONDITION, ASTPath.DETAIL});
         } else if (matchKeyword("Assignment")) {
-            entry = newASTEntry(Kind.ASSIGNMENT, new String[] {"variable", "expression"});
+            entry = newASTEntry(Kind.ASSIGNMENT, new String[] {ASTPath.VARIABLE, ASTPath.EXPRESSION});
         } else if (matchKeyword("Binary")) {
             // Always use Kind.PLUS for Binary
-            entry = newASTEntry(Kind.PLUS, new String[] {"leftOperand", "rightOperand"});
+            entry = newASTEntry(Kind.PLUS, new String[] {ASTPath.LEFT_OPERAND, ASTPath.RIGHT_OPERAND});
         } else if (matchKeyword("Block")) {
-            entry = newASTEntry(Kind.BLOCK, new String[] {"statement"}, new String[] {"statement"});
+            entry = newASTEntry(Kind.BLOCK, new String[] {ASTPath.STATEMENT}, new String[] {ASTPath.STATEMENT});
         } else if (matchKeyword("Case")) {
-            entry = newASTEntry(Kind.CASE, new String[] {"expression", "statement"},
-                    new String[] {"statement"});
+            entry = newASTEntry(Kind.CASE, new String[] {ASTPath.EXPRESSION, ASTPath.STATEMENT},
+                    new String[] {ASTPath.STATEMENT});
         } else if (matchKeyword("Catch")) {
-            entry = newASTEntry(Kind.CATCH, new String[] {"parameter", "block"});
+            entry = newASTEntry(Kind.CATCH, new String[] {ASTPath.PARAMETER, ASTPath.BLOCK});
         } else if (matchKeyword("CompoundAssignment")) {
             // Always use Kind.PLUS_ASSIGNMENT for CompoundAssignment
-            entry = newASTEntry(Kind.PLUS_ASSIGNMENT, new String[] {"variable", "expression"});
+            entry = newASTEntry(Kind.PLUS_ASSIGNMENT, new String[] {ASTPath.VARIABLE, ASTPath.EXPRESSION});
         } else if (matchKeyword("ConditionalExpression")) {
             entry = newASTEntry(Kind.CONDITIONAL_EXPRESSION,
-                    new String[] {"condition", "trueExpression", "falseExpression"});
+                    new String[] {ASTPath.CONDITION, ASTPath.TRUE_EXPRESSION, ASTPath.FALSE_EXPRESSION});
         } else if (matchKeyword("DoWhileLoop")) {
-            entry = newASTEntry(Kind.DO_WHILE_LOOP, new String[] {"condition", "statement"});
+            entry = newASTEntry(Kind.DO_WHILE_LOOP, new String[] {ASTPath.CONDITION, ASTPath.STATEMENT});
         } else if (matchKeyword("EnhancedForLoop")) {
-            entry = newASTEntry(Kind.ENHANCED_FOR_LOOP, new String[] {"variable", "expression", "statement"});
+            entry = newASTEntry(Kind.ENHANCED_FOR_LOOP, new String[] {ASTPath.VARIABLE, ASTPath.EXPRESSION, ASTPath.STATEMENT});
         } else if (matchKeyword("ExpressionStatement")) {
-            entry = newASTEntry(Kind.EXPRESSION_STATEMENT, new String[] {"expression"});
+            entry = newASTEntry(Kind.EXPRESSION_STATEMENT, new String[] {ASTPath.EXPRESSION});
         } else if (matchKeyword("ForLoop")) {
-            entry = newASTEntry(Kind.FOR_LOOP, new String[] {"initializer", "condition", "update", "statement"},
-                    new String[] {"initializer", "update"});
+            entry = newASTEntry(Kind.FOR_LOOP, new String[] {ASTPath.INITIALIZER, ASTPath.CONDITION, ASTPath.UPDATE, ASTPath.STATEMENT},
+                    new String[] {ASTPath.INITIALIZER, ASTPath.UPDATE});
         } else if (matchKeyword("If")) {
-            entry = newASTEntry(Kind.IF, new String[] {"condition", "thenStatement", "elseStatement"});
+            entry = newASTEntry(Kind.IF, new String[] {ASTPath.CONDITION, ASTPath.THEN_STATEMENT, ASTPath.ELSE_STATEMENT});
         } else if (matchKeyword("InstanceOf")) {
-            entry = newASTEntry(Kind.INSTANCE_OF, new String[] {"expression", "type"});
+            entry = newASTEntry(Kind.INSTANCE_OF, new String[] {ASTPath.EXPRESSION, ASTPath.TYPE});
         } else if (matchKeyword("LabeledStatement")) {
-            entry = newASTEntry(Kind.LABELED_STATEMENT, new String[] {"statement"});
+            entry = newASTEntry(Kind.LABELED_STATEMENT, new String[] {ASTPath.STATEMENT});
         } else if (matchKeyword("LambdaExpression")) {
-            entry = newASTEntry(Kind.LAMBDA_EXPRESSION, new String[] {"parameter", "body"},
-                    new String[] {"parameter"});
+            entry = newASTEntry(Kind.LAMBDA_EXPRESSION, new String[] {ASTPath.PARAMETER, ASTPath.BODY},
+                    new String[] {ASTPath.PARAMETER});
         } else if (matchKeyword("MemberReference")) {
-            entry = newASTEntry(Kind.MEMBER_REFERENCE,new String[] {"qualifierExpression", "typeArgument"},
-                    new String[] {"typeArgument"});
+            entry = newASTEntry(Kind.MEMBER_REFERENCE,new String[] {ASTPath.QUALIFIER_EXPRESSION, ASTPath.TYPE_ARGUMENT},
+                    new String[] {ASTPath.TYPE_ARGUMENT});
         } else if (matchKeyword("MemberSelect")) {
-            entry = newASTEntry(Kind.MEMBER_SELECT, new String[] {"expression"});
+            entry = newASTEntry(Kind.MEMBER_SELECT, new String[] {ASTPath.EXPRESSION});
         } else if (matchKeyword("MethodInvocation")) {
-            entry = newASTEntry(Kind.METHOD_INVOCATION, new String[] {"typeArgument", "methodSelect", "argument"},
-                    new String[] {"typeArgument", "argument"});
+            entry = newASTEntry(Kind.METHOD_INVOCATION, new String[] {ASTPath.TYPE_ARGUMENT, ASTPath.METHOD_SELECT, ASTPath.ARGUMENT},
+                    new String[] {ASTPath.TYPE_ARGUMENT, ASTPath.ARGUMENT});
         } else if (matchKeyword("NewArray")) {
-            entry = newASTEntry(Kind.NEW_ARRAY, new String[] {"type", "dimension", "initializer"},
-                    new String[] {"dimension", "initializer"});
+            entry = newASTEntry(Kind.NEW_ARRAY, new String[] {ASTPath.TYPE, ASTPath.DIMENSION, ASTPath.INITIALIZER},
+                    new String[] {ASTPath.DIMENSION, ASTPath.INITIALIZER});
         } else if (matchKeyword("NewClass")) {
-            entry = newASTEntry(Kind.NEW_CLASS, new String[] {"enclosingExpression", "typeArgument", "identifier", "argument", "classBody"},
-                    new String[] {"typeArgument", "argument"});
+            entry = newASTEntry(Kind.NEW_CLASS, new String[] {ASTPath.ENCLOSING_EXPRESSION, ASTPath.TYPE_ARGUMENT, ASTPath.IDENTIFIER, ASTPath.ARGUMENT, ASTPath.CLASS_BODY},
+                    new String[] {ASTPath.TYPE_ARGUMENT, ASTPath.ARGUMENT});
         } else if (matchKeyword("ParameterizedType")) {
-            entry = newASTEntry(Kind.PARAMETERIZED_TYPE, new String[] {"type", "typeArgument"},
-                    new String[] {"typeArgument"});
+            entry = newASTEntry(Kind.PARAMETERIZED_TYPE, new String[] {ASTPath.TYPE, ASTPath.TYPE_ARGUMENT},
+                    new String[] {ASTPath.TYPE_ARGUMENT});
         } else if (matchKeyword("Parenthesized")) {
-            entry = newASTEntry(Kind.PARENTHESIZED, new String[] {"expression"});
+            entry = newASTEntry(Kind.PARENTHESIZED, new String[] {ASTPath.EXPRESSION});
         } else if (matchKeyword("Return")) {
-            entry = newASTEntry(Kind.RETURN, new String[] {"expression"});
+            entry = newASTEntry(Kind.RETURN, new String[] {ASTPath.EXPRESSION});
         } else if (matchKeyword("Switch")) {
-            entry = newASTEntry(Kind.SWITCH, new String[] {"expression", "case"},
-                    new String[] {"case"});
+            entry = newASTEntry(Kind.SWITCH, new String[] {ASTPath.EXPRESSION, ASTPath.CASE},
+                    new String[] {ASTPath.CASE});
         } else if (matchKeyword("Synchronized")) {
-            entry = newASTEntry(Kind.SYNCHRONIZED, new String[] {"expression", "block"});
+            entry = newASTEntry(Kind.SYNCHRONIZED, new String[] {ASTPath.EXPRESSION, ASTPath.BLOCK});
         } else if (matchKeyword("Throw")) {
-            entry = newASTEntry(Kind.THROW, new String[] {"expression"});
+            entry = newASTEntry(Kind.THROW, new String[] {ASTPath.EXPRESSION});
         } else if (matchKeyword("Try")) {
-            entry = newASTEntry(Kind.TRY, new String[] {"block", "catch", "finallyBlock"},
-                    new String[] {"catch"});
+            entry = newASTEntry(Kind.TRY, new String[] {ASTPath.BLOCK, ASTPath.CATCH, ASTPath.FINALLY_BLOCK},
+                    new String[] {ASTPath.CATCH});
         } else if (matchKeyword("TypeCast")) {
-            entry = newASTEntry(Kind.TYPE_CAST, new String[] {"type", "expression"});
+            entry = newASTEntry(Kind.TYPE_CAST, new String[] {ASTPath.TYPE, ASTPath.EXPRESSION});
         } else if (matchKeyword("Unary")) {
             // Always use Kind.UNARY_PLUS for Unary
-            entry = newASTEntry(Kind.UNARY_PLUS, new String[] {"expression"});
+            entry = newASTEntry(Kind.UNARY_PLUS, new String[] {ASTPath.EXPRESSION});
         } else if (matchKeyword("UnionType")) {
-            entry = newASTEntry(Kind.UNION_TYPE, new String[] {"typeAlternative"},
-                    new String[] {"typeAlternative"});
+            entry = newASTEntry(Kind.UNION_TYPE, new String[] {ASTPath.TYPE_ALTERNATIVE},
+                    new String[] {ASTPath.TYPE_ALTERNATIVE});
         } else if (matchKeyword("Variable")) {
-            entry = newASTEntry(Kind.VARIABLE, new String[] {"type", "initializer"});
+            entry = newASTEntry(Kind.VARIABLE, new String[] {ASTPath.TYPE, ASTPath.INITIALIZER});
         } else if (matchKeyword("WhileLoop")) {
-            entry = newASTEntry(Kind.WHILE_LOOP, new String[] {"condition", "statement"});
+            entry = newASTEntry(Kind.WHILE_LOOP, new String[] {ASTPath.CONDITION, ASTPath.STATEMENT});
         } else if (matchKeyword("Wildcard")) {
             // Always use Kind.UNBOUNDED_WILDCARD for Wildcard
-            entry = newASTEntry(Kind.UNBOUNDED_WILDCARD, new String[] {"bound"});
+            entry = newASTEntry(Kind.UNBOUNDED_WILDCARD, new String[] {ASTPath.BOUND});
         } else {
             throw new ParseException("Invalid AST path type: " + st.sval);
         }

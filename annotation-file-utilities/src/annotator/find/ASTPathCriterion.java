@@ -133,7 +133,7 @@ public class ASTPathCriterion implements Criterion {
             switch (actualNode.getKind()) {
             case ANNOTATED_TYPE:
                 AnnotatedTypeTree annotatedType = (AnnotatedTypeTree) actualNode;
-                if (astNode.getChildSelector().equals("annotation")) {
+                if (astNode.getChildSelector().equals(ASTPath.ANNOTATION)) {
                     next = annotatedType.getAnnotations().get(
                             astNode.getArgument());
                 } else {
@@ -142,7 +142,7 @@ public class ASTPathCriterion implements Criterion {
                 break;
             case ARRAY_ACCESS:
                 ArrayAccessTree arrayAccess = (ArrayAccessTree) actualNode;
-                if (astNode.getChildSelector().equals("expression")) {
+                if (astNode.getChildSelector().equals(ASTPath.EXPRESSION)) {
                     next = arrayAccess.getExpression();
                 } else {
                     next = arrayAccess.getIndex();
@@ -154,7 +154,7 @@ public class ASTPathCriterion implements Criterion {
                 break;
             case ASSERT:
                 AssertTree azzert = (AssertTree) actualNode;
-                if (astNode.getChildSelector().equals("condition")) {
+                if (astNode.getChildSelector().equals(ASTPath.CONDITION)) {
                     next = azzert.getCondition();
                 } else {
                     next = azzert.getDetail();
@@ -162,7 +162,7 @@ public class ASTPathCriterion implements Criterion {
                 break;
             case ASSIGNMENT:
                 AssignmentTree assignment = (AssignmentTree) actualNode;
-                if (astNode.getChildSelector().equals("variable")) {
+                if (astNode.getChildSelector().equals(ASTPath.VARIABLE)) {
                     next = assignment.getVariable();
                 } else {
                     next = assignment.getExpression();
@@ -174,7 +174,7 @@ public class ASTPathCriterion implements Criterion {
                 break;
             case CASE:
                 CaseTree caze = (CaseTree) actualNode;
-                if (astNode.getChildSelector().equals("expression")) {
+                if (astNode.getChildSelector().equals(ASTPath.EXPRESSION)) {
                     next = caze.getExpression();
                 } else {
                     next = caze.getStatements().get(astNode.getArgument());
@@ -182,7 +182,7 @@ public class ASTPathCriterion implements Criterion {
                 break;
             case CATCH:
                 CatchTree cach = (CatchTree) actualNode;
-                if (astNode.getChildSelector().equals("parameter")) {
+                if (astNode.getChildSelector().equals(ASTPath.PARAMETER)) {
                     next = cach.getParameter();
                 } else {
                     next = cach.getBlock();
@@ -190,9 +190,9 @@ public class ASTPathCriterion implements Criterion {
                 break;
             case CONDITIONAL_EXPRESSION:
                 ConditionalExpressionTree conditionalExpression = (ConditionalExpressionTree) actualNode;
-                if (astNode.getChildSelector().equals("condition")) {
+                if (astNode.getChildSelector().equals(ASTPath.CONDITION)) {
                     next = conditionalExpression.getCondition();
-                } else if (astNode.getChildSelector().equals("trueExpression")) {
+                } else if (astNode.getChildSelector().equals(ASTPath.TRUE_EXPRESSION)) {
                     next = conditionalExpression.getTrueExpression();
                 } else {
                     next = conditionalExpression.getFalseExpression();
@@ -200,7 +200,7 @@ public class ASTPathCriterion implements Criterion {
                 break;
             case DO_WHILE_LOOP:
                 DoWhileLoopTree doWhileLoop = (DoWhileLoopTree) actualNode;
-                if (astNode.getChildSelector().equals("condition")) {
+                if (astNode.getChildSelector().equals(ASTPath.CONDITION)) {
                     next = doWhileLoop.getCondition();
                 } else {
                     next = doWhileLoop.getStatement();
@@ -208,9 +208,9 @@ public class ASTPathCriterion implements Criterion {
                 break;
             case ENHANCED_FOR_LOOP:
                 EnhancedForLoopTree enhancedForLoop = (EnhancedForLoopTree) actualNode;
-                if (astNode.getChildSelector().equals("variable")) {
+                if (astNode.getChildSelector().equals(ASTPath.VARIABLE)) {
                     next = enhancedForLoop.getVariable();
-                } else if (astNode.getChildSelector().equals("expression")) {
+                } else if (astNode.getChildSelector().equals(ASTPath.EXPRESSION)) {
                     next = enhancedForLoop.getExpression();
                 } else {
                     next = enhancedForLoop.getStatement();
@@ -222,11 +222,11 @@ public class ASTPathCriterion implements Criterion {
                 break;
             case FOR_LOOP:
                 ForLoopTree forLoop = (ForLoopTree) actualNode;
-                if (astNode.getChildSelector().equals("initializer")) {
+                if (astNode.getChildSelector().equals(ASTPath.INITIALIZER)) {
                     next = forLoop.getInitializer().get(astNode.getArgument());
-                } else if (astNode.getChildSelector().equals("condition")) {
+                } else if (astNode.getChildSelector().equals(ASTPath.CONDITION)) {
                     next = forLoop.getCondition();
-                } else if (astNode.getChildSelector().equals("update")) {
+                } else if (astNode.getChildSelector().equals(ASTPath.UPDATE)) {
                     next = forLoop.getUpdate().get(astNode.getArgument());
                 } else {
                     next = forLoop.getStatement();
@@ -234,9 +234,9 @@ public class ASTPathCriterion implements Criterion {
                 break;
             case IF:
                 IfTree iff = (IfTree) actualNode;
-                if (astNode.getChildSelector().equals("condition")) {
+                if (astNode.getChildSelector().equals(ASTPath.CONDITION)) {
                     next = iff.getCondition();
-                } else if (astNode.getChildSelector().equals("thenStatement")) {
+                } else if (astNode.getChildSelector().equals(ASTPath.THEN_STATEMENT)) {
                     next = iff.getThenStatement();
                 } else {
                     next = iff.getElseStatement();
@@ -244,7 +244,7 @@ public class ASTPathCriterion implements Criterion {
                 break;
             case INSTANCE_OF:
                 InstanceOfTree instanceOf = (InstanceOfTree) actualNode;
-                if (astNode.getChildSelector().equals("expression")) {
+                if (astNode.getChildSelector().equals(ASTPath.EXPRESSION)) {
                     next = instanceOf.getExpression();
                 } else {
                     next = instanceOf.getType();
@@ -256,7 +256,7 @@ public class ASTPathCriterion implements Criterion {
                 break;
             case LAMBDA_EXPRESSION:
                 LambdaExpressionTree lambdaExpression = (LambdaExpressionTree) actualNode;
-                if (astNode.getChildSelector().equals("parameter")) {
+                if (astNode.getChildSelector().equals(ASTPath.PARAMETER)) {
                     next = lambdaExpression.getParameters().get(
                             astNode.getArgument());
                 } else {
@@ -265,7 +265,7 @@ public class ASTPathCriterion implements Criterion {
                 break;
             case MEMBER_REFERENCE:
                 MemberReferenceTree memberReference = (MemberReferenceTree) actualNode;
-                if (astNode.getChildSelector().equals("qualifierExpression")) {
+                if (astNode.getChildSelector().equals(ASTPath.QUALIFIER_EXPRESSION)) {
                     next = memberReference.getQualifierExpression();
                 } else {
                     next = memberReference.getTypeArguments().get(
@@ -278,10 +278,10 @@ public class ASTPathCriterion implements Criterion {
                 break;
             case METHOD_INVOCATION:
                 MethodInvocationTree methodInvocation = (MethodInvocationTree) actualNode;
-                if (astNode.getChildSelector().equals("typeArgument")) {
+                if (astNode.getChildSelector().equals(ASTPath.TYPE_ARGUMENT)) {
                     next = methodInvocation.getTypeArguments().get(
                             astNode.getArgument());
-                } else if (astNode.getChildSelector().equals("methodSelect")) {
+                } else if (astNode.getChildSelector().equals(ASTPath.METHOD_SELECT)) {
                     next = methodInvocation.getMethodSelect();
                 } else {
                     next = methodInvocation.getArguments().get(
@@ -290,9 +290,9 @@ public class ASTPathCriterion implements Criterion {
                 break;
             case NEW_ARRAY:
                 NewArrayTree newArray = (NewArrayTree) actualNode;
-                if (astNode.getChildSelector().equals("type")) {
+                if (astNode.getChildSelector().equals(ASTPath.TYPE)) {
                     next = newArray.getType();
-                } else if (astNode.getChildSelector().equals("dimension")) {
+                } else if (astNode.getChildSelector().equals(ASTPath.DIMENSION)) {
                     next = newArray.getDimensions().get(astNode.getArgument());
                 } else {
                     next = newArray.getInitializers()
@@ -301,14 +301,14 @@ public class ASTPathCriterion implements Criterion {
                 break;
             case NEW_CLASS:
                 NewClassTree newClass = (NewClassTree) actualNode;
-                if (astNode.getChildSelector().equals("enclosingExpression")) {
+                if (astNode.getChildSelector().equals(ASTPath.ENCLOSING_EXPRESSION)) {
                     next = newClass.getEnclosingExpression();
-                } else if (astNode.getChildSelector().equals("typeArgument")) {
+                } else if (astNode.getChildSelector().equals(ASTPath.TYPE_ARGUMENT)) {
                     next = newClass.getTypeArguments().get(
                             astNode.getArgument());
-                } else if (astNode.getChildSelector().equals("identifier")) {
+                } else if (astNode.getChildSelector().equals(ASTPath.IDENTIFIER)) {
                     next = newClass.getIdentifier();
-                } else if (astNode.getChildSelector().equals("argument")) {
+                } else if (astNode.getChildSelector().equals(ASTPath.ARGUMENT)) {
                     next = newClass.getArguments().get(astNode.getArgument());
                 } else {
                     next = newClass.getClassBody();
@@ -316,7 +316,7 @@ public class ASTPathCriterion implements Criterion {
                 break;
             case PARAMETERIZED_TYPE:
                 ParameterizedTypeTree parameterizedType = (ParameterizedTypeTree) actualNode;
-                if (astNode.getChildSelector().equals("type")) {
+                if (astNode.getChildSelector().equals(ASTPath.TYPE)) {
                     next = parameterizedType.getType();
                 } else {
                     next = parameterizedType.getTypeArguments().get(
@@ -333,7 +333,7 @@ public class ASTPathCriterion implements Criterion {
                 break;
             case SWITCH:
                 SwitchTree zwitch = (SwitchTree) actualNode;
-                if (astNode.getChildSelector().equals("expression")) {
+                if (astNode.getChildSelector().equals(ASTPath.EXPRESSION)) {
                     next = zwitch.getExpression();
                 } else {
                     next = zwitch.getCases().get(astNode.getArgument());
@@ -341,7 +341,7 @@ public class ASTPathCriterion implements Criterion {
                 break;
             case SYNCHRONIZED:
                 SynchronizedTree synchronizzed = (SynchronizedTree) actualNode;
-                if (astNode.getChildSelector().equals("expression")) {
+                if (astNode.getChildSelector().equals(ASTPath.EXPRESSION)) {
                     next = synchronizzed.getExpression();
                 } else {
                     next = synchronizzed.getBlock();
@@ -353,11 +353,11 @@ public class ASTPathCriterion implements Criterion {
                 break;
             case TRY:
                 TryTree tryy = (TryTree) actualNode;
-                if (astNode.getChildSelector().equals("block")) {
+                if (astNode.getChildSelector().equals(ASTPath.BLOCK)) {
                     next = tryy.getBlock();
-                } else if (astNode.getChildSelector().equals("catch")) {
+                } else if (astNode.getChildSelector().equals(ASTPath.CATCH)) {
                     next = tryy.getCatches().get(astNode.getArgument());
-                } else if (astNode.getChildSelector().equals("finallyBlock")) {
+                } else if (astNode.getChildSelector().equals(ASTPath.FINALLY_BLOCK)) {
                     next = tryy.getFinallyBlock();
                 } else {
                     next = tryy.getResources().get(astNode.getArgument());
@@ -365,7 +365,7 @@ public class ASTPathCriterion implements Criterion {
                 break;
             case TYPE_CAST:
                 TypeCastTree typeCast = (TypeCastTree) actualNode;
-                if (astNode.getChildSelector().equals("type")) {
+                if (astNode.getChildSelector().equals(ASTPath.TYPE)) {
                     next = typeCast.getType();
                 } else {
                     next = typeCast.getExpression();
@@ -378,15 +378,15 @@ public class ASTPathCriterion implements Criterion {
                 break;
             case VARIABLE:
                 VariableTree var = (VariableTree) actualNode;
-                if (astNode.getChildSelector().equals("initializer")) {
+                if (astNode.getChildSelector().equals(ASTPath.INITIALIZER)) {
                     next = var.getInitializer();
-                } else if (astNode.getChildSelector().equals("type")) {
+                } else {
                     next = var.getType();
                 }
                 break;
             case WHILE_LOOP:
                 WhileLoopTree whileLoop = (WhileLoopTree) actualNode;
-                if (astNode.getChildSelector().equals("condition")) {
+                if (astNode.getChildSelector().equals(ASTPath.CONDITION)) {
                     next = whileLoop.getCondition();
                 } else {
                     next = whileLoop.getStatement();
@@ -395,14 +395,14 @@ public class ASTPathCriterion implements Criterion {
             default:
                 if (isBinaryOperator(actualNode.getKind())) {
                     BinaryTree binary = (BinaryTree) actualNode;
-                    if (astNode.getChildSelector().equals("leftOperand")) {
+                    if (astNode.getChildSelector().equals(ASTPath.LEFT_OPERAND)) {
                         next = binary.getLeftOperand();
                     } else {
                         next = binary.getRightOperand();
                     }
                 } else if (isCompoundAssignment(actualNode.getKind())) {
                     CompoundAssignmentTree compoundAssignment = (CompoundAssignmentTree) actualNode;
-                    if (astNode.getChildSelector().equals("variable")) {
+                    if (astNode.getChildSelector().equals(ASTPath.VARIABLE)) {
                         next = compoundAssignment.getVariable();
                     } else {
                         next = compoundAssignment.getExpression();
