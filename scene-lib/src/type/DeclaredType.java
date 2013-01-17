@@ -10,6 +10,9 @@ import java.util.List;
  *   <em>type</em>
  *   <em>type</em>&lt;<em>type parameters</em>&gt;.<em>inner type</em>
  * <pre>
+ *
+ * Types are stored with the outer most type at the top of the type tree. This
+ * is opposite to the way types are stored in javac.
  */
 public class DeclaredType extends Type {
 

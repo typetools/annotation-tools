@@ -1,10 +1,10 @@
 package annotator.find;
 
-// only used for debugging
 import java.util.ArrayList;
 import java.util.List;
 
 import annotations.el.InnerTypeLocation;
+//only used for debugging
 import annotator.Main;
 
 import com.sun.source.tree.AnnotatedTypeTree;
