@@ -2,9 +2,6 @@ package annotator.tests;
 
 import java.util.List;
 
-/**
- * @skip-test
- */
 public class GenericCell {
   private @java.lang.ThisMutable List<@java.lang.ThisMutable IntCell> internalList;
 
