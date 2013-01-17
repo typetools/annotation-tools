@@ -17,6 +17,7 @@ import java.lang.annotation.*;
 
 @Target({ElementType.TYPE_USE, ElementType.PARAMETER})
 @interface A06 {}
+@Target(ElementType.TYPE_USE)
 @interface A08 {}
 @Target(ElementType.TYPE_USE)
 @interface A09 {}
@@ -57,6 +58,7 @@ import java.lang.annotation.*;
 
 @Target({ElementType.TYPE_USE, ElementType.PARAMETER})
 @interface C06 {}
+@Target(ElementType.TYPE_USE)
 @interface C08 {}
 @Target(ElementType.TYPE_USE)
 @interface C09 {}
