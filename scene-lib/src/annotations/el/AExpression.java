@@ -27,7 +27,7 @@ public class AExpression extends AElement {
 
     /** The method's annotated insert-typecast invocations; map key is the AST path to the insertion place */
     public final VivifyingMap<ASTPath, ATypeElementWithType> insertTypecasts =
-            ATypeElementWithType.<ASTPath>newVivifyingLHMap_AITTE();
+            ATypeElementWithType.<ASTPath>newVivifyingLHMap_ATEWT();
 
     protected Object id;
     

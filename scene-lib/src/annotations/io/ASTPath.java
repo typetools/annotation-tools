@@ -41,7 +41,7 @@ public class ASTPath extends ArrayList<ASTPath.ASTEntry> {
         /**
          * Constructs a new AST entry, without an argument.
          *
-         * See {@link #ASTPath(Kind, String, int)} for an example. of the parameters.
+         * See {@link #ASTPath(Kind, String, int)} for an example of the parameters.
          *
          * @param treeKind The kind of this AST entry.
          * @param childSelector The child selector to this AST entry.

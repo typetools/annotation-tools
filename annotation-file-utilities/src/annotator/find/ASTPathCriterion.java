@@ -61,7 +61,7 @@ public class ASTPathCriterion implements Criterion {
     /**
      * Constructs a new ASTPathCriterion to match the given AST path.
      * <p>
-     * This assumes that the astPath is valid. Specifically, that all of it's
+     * This assumes that the astPath is valid. Specifically, that all of its
      * arguments have been previously validated.
      *
      * @param astPath
@@ -84,12 +84,20 @@ public class ASTPathCriterion implements Criterion {
         if (path == null) {
             return false;
         }
+
+        // actualPath stores the path through the source code AST to this
+        // location (specified by the "path" parameter to this method). It is
+        // computed by traversing from this location up the source code AST
+        // until it reaches a method node (this gets only the part of the path
+        // within a method) or class node (this gets only the part of the path
+        // within a field).
         List<Tree> actualPath = new ArrayList<Tree>();
         while (path != null && path.getLeaf().getKind() != Tree.Kind.METHOD
                 && path.getLeaf().getKind() != Tree.Kind.CLASS) {
             actualPath.add(0, path.getLeaf());
             path = path.getParentPath();
         }
+
         if (debug) {
             System.out.println("ASTPathCriterion.isSatisfiedBy");
             System.out.println("  " + astPath);
@@ -107,6 +115,12 @@ public class ASTPathCriterion implements Criterion {
         for (int i = 0; i < astPath.size() && i < actualPath.size(); i++) {
             ASTPath.ASTEntry astNode = astPath.get(i);
             Tree actualNode = actualPath.get(i);
+
+            // Based on the child selector and (optional) argument in "astNode",
+            // "next" will get set to the next source node below "actualNode".
+            // Then "next" will be compared with the node following "astNode"
+            // in "actualPath". If it's not a match, this is not the correct
+            // location. If it is a match, keep going.
             Tree next = null;
             if (debug) {
                 System.out.println("astNode: " + astNode);
@@ -383,12 +397,23 @@ public class ASTPathCriterion implements Criterion {
      * Determines if the given kinds match, false otherwise. Two kinds match if
      * they're exactly the same or if the two kinds are both compound
      * assignments, unary operators, binary operators or wildcards.
+     * <p>
+     * This is necessary because in the JAIF file these kinds are represented by
+     * their general types (i.e. BinaryOperator, CompoundOperator, etc.) rather
+     * than their kind (i.e. PLUS, MINUS, PLUS_ASSIGNMENT, XOR_ASSIGNMENT,
+     * etc.). Internally, a single kind is used to represent each general type
+     * (i.e. PLUS is used for BinaryOperator, PLUS_ASSIGNMENT is used for
+     * CompoundAssignment, etc.). Yet, the actual source nodes have the correct
+     * kind. So if an AST path entry has a PLUS kind, that really means it could
+     * be any BinaryOperator, resulting in PLUS matching any other
+     * BinaryOperator.
      *
      * @param kind1
      *            The first kind to match.
      * @param kind2
      *            The second kind to match.
-     * @return true if the kinds match, as described above.
+     * @return {@code true} if the kinds match as described above, {@code false}
+     *         otherwise.
      */
     private boolean kindsMatch(Tree.Kind kind1, Tree.Kind kind2) {
         return kind1 == kind2

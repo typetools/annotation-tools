@@ -20,14 +20,23 @@ public class ReceiverInsertion extends Insertion {
     private boolean addComma;
 
     /**
-     * Construct a ReceiverInsertion. Initially only the annotation and not the
-     * receiver will be inserted. Call {@link #setType(String)} to add a type
-     * and therefore insert a receiver. Initially a comma will not be added to
-     * the end of the receiver. Pass true to {@link #setAddComma(boolean)} to
-     * change this.
-     *
+     * Construct a ReceiverInsertion.
+     * <p>
+     * If the receiver parameter already exists in the method declaration, then
+     * pass a DeclaredType thats name is the empty String. This will only insert
+     * an annotation on the existing receiver.
+     * <p>
+     * To insert the annotation and the receiver (for example,
+     * {@code @Anno Type this}) the name should be set to the type to insert.
+     * This can either be done before calling this constructor, or by modifying
+     * the return value of {@link #getType()}.
+     * <p>
+     * A comma will not be added to the end of the receiver. In the case that
+     * there is a parameter following the inserted receiver pass {@code true} to
+     * {@link #setAddComma(boolean)} to add a comma to the end of the receiver.
+     * 
      * @param type the type to use when inserting the receiver.
-     * @param criteria where to insert the text
+     * @param criteria where to insert the text.
      */
     public ReceiverInsertion(DeclaredType type, Criteria criteria) {
         super(criteria, false);
@@ -36,9 +45,10 @@ public class ReceiverInsertion extends Insertion {
     }
 
     /**
-     * If true a comma will be added at the end of the receiver. This will open
-     * happen if a receiver is inserted (that is if {@link #setType(String)} has
-     * been passed a non-null value). This is useful if the method already has
+     * If {@code true} a comma will be added at the end of the receiver. This
+     * will only happen if a receiver is inserted (see
+     * {@link #ReceiverInsertion(DeclaredType, Criteria)} for a description of
+     * when a receiver is inserted). This is useful if the method already has
      * one or more parameters.
      */
     public void setAddComma(boolean addComma) {
