@@ -112,6 +112,18 @@ public class ASTPath extends ArrayList<ASTPath.ASTEntry> {
         }
 
         /**
+         * Determines if the given string is equal to this AST path entry's
+         * child selector.
+         *
+         * @param s the string to compare to.
+         * @return {@code true} if the string matches the child selector,
+         *         {@code false} otherwise.
+         */
+        public boolean childSelectorIs(String s) {
+            return childSelector.equals(s);
+        }
+
+        /**
          * Gets the argument of this AST entry. For example, in
          * <pre>
          * {@code
