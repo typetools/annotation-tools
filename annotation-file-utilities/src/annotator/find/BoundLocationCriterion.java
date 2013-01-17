@@ -13,21 +13,21 @@ import com.sun.source.util.TreePath;
 public class BoundLocationCriterion implements Criterion {
 
   private Criterion parentCriterion;
-  private final Integer boundIndex;
-  private final Integer paramIndex;
+  private final int boundIndex;
+  private final int paramIndex;
 
 
   public BoundLocationCriterion(BoundLocation boundLoc) {
     this(boundLoc.boundIndex, boundLoc.paramIndex);
   }
 
-  private BoundLocationCriterion(Integer boundIndex, Integer paramIndex) {
+  private BoundLocationCriterion(int boundIndex, int paramIndex) {
     this.boundIndex = boundIndex;
     this.paramIndex = paramIndex;
 
-    if (boundIndex != null) {
-      this.parentCriterion = new BoundLocationCriterion(null, paramIndex);
-    } else if (paramIndex != null) {
+    if (boundIndex != -1) {
+      this.parentCriterion = new BoundLocationCriterion(-1, paramIndex);
+    } else if (paramIndex != -1) {
       this.parentCriterion = null;
     }
   }
@@ -66,7 +66,7 @@ public class BoundLocationCriterion implements Criterion {
 
     // if boundIndex is not null, need to check that this is right bound
     // in parent
-    if (boundIndex != null) {
+    if (boundIndex != -1) {
       if (parent instanceof TypeParameterTree) {
         TypeParameterTree tpt = (TypeParameterTree) parent;
         List<? extends Tree> bounds = tpt.getBounds();
@@ -82,7 +82,7 @@ public class BoundLocationCriterion implements Criterion {
           // then permit the match here.
           returnValue = parentCriterion.isSatisfiedBy(path);
       }
-    } else if (paramIndex != null) {
+    } else if (paramIndex != -1) {
       // if paramIndex is not null, need to ensure this present
       // typeparameter tree represents the correct parameter
       if (parent instanceof MethodTree || parent instanceof ClassTree) {
