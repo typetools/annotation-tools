@@ -9,7 +9,7 @@ class FieldSimpleGeneric:
 
     field field:
         type: @java.lang.Mutable
-        inner-type 0: @java.lang.ReadOnly
+        inner-type 3, 0: @java.lang.ReadOnly
 
     method <init>()V:
 

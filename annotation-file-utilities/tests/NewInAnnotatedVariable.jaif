@@ -25,7 +25,7 @@ package :
 class NewInAnnotatedVariable:
 field b4:
 type:
-inner-type 0: @NonNull
+inner-type 0, 0: @NonNull
 
 package :
 class NewInAnnotatedVariable:
@@ -36,4 +36,4 @@ package :
 class NewInAnnotatedVariable:
 field b4:
 new *0:
-inner-type 0: @NonNull
+inner-type 0, 0: @NonNull

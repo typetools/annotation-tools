@@ -12,7 +12,7 @@ class ConstructorParamMultiple:
             type: @java.lang.ReadOnly
         parameter #1:
             type: @java.lang.ReadOnly
-            inner-type 0: @java.lang.Mutable
+            inner-type 3, 0: @java.lang.Mutable
         parameter #2:
             type: @java.lang.ReadOnly
 

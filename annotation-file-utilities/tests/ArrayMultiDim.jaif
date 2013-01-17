@@ -13,22 +13,22 @@ class ArrayMultiDim:
 
     field field:
         type: @D
-            inner-type 0: @E
-            inner-type 1: @F
-            inner-type 2: @C
+            inner-type 0, 0: @E
+            inner-type 0, 0, 0, 0: @F
+            inner-type 0, 0, 0, 0, 0, 0: @C
 
     field field2:
         new *0: @D
-            inner-type 0: @E
-            inner-type 1: @F
-            inner-type 2: @C
+            inner-type 0, 0: @E
+            inner-type 0, 0, 0, 0: @F
+            inner-type 0, 0, 0, 0, 0, 0: @C
 
     field field3:
         type: @D
-            inner-type 0: @E
-            inner-type 1: @F
-            inner-type 2: @C
+            inner-type 0, 0: @E
+            inner-type 0, 0, 0, 0: @F
+            inner-type 0, 0, 0, 0, 0, 0: @C
         new *0: @D
-            inner-type 0: @E
-            inner-type 1: @F
-            inner-type 2: @C
+            inner-type 0, 0: @E
+            inner-type 0, 0, 0, 0: @F
+            inner-type 0, 0, 0, 0, 0, 0: @C
