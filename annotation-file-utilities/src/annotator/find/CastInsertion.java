@@ -4,9 +4,18 @@ import type.Type;
 
 /**
  * Specifies an insertion of a cast into a source file. Stores the type of cast
- * to insert in addition to the annotation and location. Note that this
- * insertion leaves two unclosed parenthesis and requires the use of a
- * {@link CloseParenthesisInsertion} after the expression that's being casted.
+ * to insert in addition to the annotation and location.
+ * <p>
+ * In order to restrict the cast to only the specified expression, a cast
+ * insertion is of the form:
+ *
+ * <pre>
+ * ((<em>cast type</em>) (<em>original expression</em>))
+ * </pre>
+ *
+ * This insertion inserts the cast type and parentheses that go before the
+ * original expression. A {@link CloseParenthesisInsertion} must be used
+ * after the expression to close the parentheses left open by this insertion.
  */
 public class CastInsertion extends Insertion {
 
