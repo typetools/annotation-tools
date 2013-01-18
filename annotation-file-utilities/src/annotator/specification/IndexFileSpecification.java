@@ -35,6 +35,7 @@ import annotations.io.IndexFileParser;
 import annotations.util.coll.VivifyingMap;
 import annotator.find.AnnotationInsertion;
 import annotator.find.CastInsertion;
+import annotator.find.CloseParenthesisInsertion;
 import annotator.find.Criteria;
 import annotator.find.Insertion;
 import annotator.find.ReceiverInsertion;
@@ -234,6 +235,7 @@ public class IndexFileSpecification implements Specification {
     // annotations to the one insertion.
     ReceiverInsertion receiver = null;
     CastInsertion cast = null;
+    CloseParenthesisInsertion closeParen = null;
     for (Pair<String,Boolean> p : getElementAnnotation(element)) {
       String annotationString = p.a;
       Boolean isDeclarationAnnotation = p.b;
@@ -252,6 +254,7 @@ public class IndexFileSpecification implements Specification {
           Type type = typecast.getType();
           type.addAnnotation(annotationString);
           cast = new CastInsertion(criteria, typecast.getType());
+          closeParen = new CloseParenthesisInsertion(criteria, cast.getSeparateLine());
         } else {
           cast.getType().addAnnotation(annotationString);
         }
@@ -267,6 +270,7 @@ public class IndexFileSpecification implements Specification {
     }
     if (cast != null) {
         this.insertions.add(cast);
+        this.insertions.add(closeParen);
     }
   }
 
