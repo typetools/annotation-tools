@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * A representation of a Java type. Handles type parameters, wildcards, arrays
+ * A representation of a Java type. Handles type parameters, bounded types, arrays
  * and inner types.
  */
 public abstract class Type {
@@ -15,8 +15,8 @@ public abstract class Type {
      */
     public enum Kind {
         ARRAY,
-        DECLARED,
-        WILDCARD
+        BOUNDED,
+        DECLARED
     }
 
     /**
