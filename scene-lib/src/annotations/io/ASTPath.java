@@ -189,4 +189,10 @@ public class ASTPath {
     public boolean isEmpty() {
         return path.isEmpty();
     }
+
+    /** {@inheritDoc} */
+    @Override
+    public String toString() {
+        return "ASTPath: " + path.toString();
+    }
 }
