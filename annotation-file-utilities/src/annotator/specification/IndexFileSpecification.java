@@ -403,7 +403,6 @@ public class IndexFileSpecification implements Specification {
     for (Entry<ASTPath, ATypeElementWithType> entry : exp.insertTypecasts.entrySet()) {
       ASTPath astPath = entry.getKey();
       ATypeElementWithType insertTypecast = entry.getValue();
-      clist.criteria().isOnMethod("cat");
       CriterionList insertTypecastClist = clist.add(Criteria.astPath(astPath));
       parseElement(insertTypecastClist, insertTypecast);
     }
