@@ -320,9 +320,13 @@ of the \\ \qquad    \bnfcmt annotation:   ``\texttt{@A(12)}'' rather than ``\tex
 \bnfnt{field-definition} ::= \\
 \qquad    \bnfcmt The annotation on the \bnflit{field} line is that of the field declaration, \\
 \qquad    \bnfcmt while the annotation on the \bnflit{type} line is that of outermost type. \\
+\qquad    \bnfcmt \bnfnt{source-insert-typecast-definition} is described in Section~\ref{ast-paths}. \\
+\qquad    \bnfcmt Casts can only be inserted on a field if the field is initialized at declaration. \\
+\qquad    \bnfcmt Otherwise, if the field is assigned in a method the cast can be inserted within a \\
+\qquad    \bnfcmt \bnfnt{method-definition} rule. \\
 \qquad    \bnflit{field} \bnfnt{name} \bnflit{:} \bnfnt{annotation}* \lineend  \\
 \qquad        \bnfnt{type-annotations}* \\
-\qquad        \bnfnt{insert-typecast-definition}* \\
+\qquad        \bnfnt{source-insert-typecast-definition}* \\
 \\
 \bnfnt{method-definition} ::= \\
 \qquad    \bnfcmt The method-key consists of the name followed by the signature \\
@@ -332,6 +336,7 @@ of the \\ \qquad    \bnfcmt annotation:   ``\texttt{@A(12)}'' rather than ``\tex
 \qquad Using \code{javap -s} makes it easy to find the signature.\\
 \qquad    \bnfcmt ``\code{<init>}'' and ``\code{<clinit>}'' are used to name instance and class initialization methods.\\
 \qquad    \bnfcmt The annotation on the \bnflit{method} line is that on the method, not on the return value. \\
+\qquad    \bnfcmt The \bnfnt{source-*-definition} rules are described in Section~\ref{additional-locations}. \\
 % TODO: Ensure the tool uses generic signatures and init/clinit.
 \qquad    \bnflit{method} \bnfnt{method-key} \bnflit{:} \bnfnt{annotation}* \lineend \\
 \qquad        \bnfnt{typeparam-definition}* \\
@@ -344,7 +349,11 @@ of the \\ \qquad    \bnfcmt annotation:   ``\texttt{@A(12)}'' rather than ``\tex
 \qquad        \bnfnt{typecast-definition}* \\
 \qquad        \bnfnt{instanceof-definition}* \\
 \qquad        \bnfnt{new-definition}* \\
-\qquad        \bnfnt{insert-typecast-definition}* \\
+\qquad        \bnfnt{source-variable-definition}* \\
+\qquad        \bnfnt{source-typecast-definition}* \\
+\qquad        \bnfnt{source-instanceof-definition}* \\
+\qquad        \bnfnt{source-new-definition}* \\
+\qquad        \bnfnt{source-insert-typecast-definition}* \\
 % TODO: exception types in catch clause
 % TODO: .class literals
 % TODO: type arguments in constructor and method calls
@@ -379,7 +388,8 @@ of the \\ \qquad    \bnfcmt annotation:   ``\texttt{@A(12)}'' rather than ``\tex
 \\
 \bnfnt{parameter-definition} ::= \\
 \qquad    \bnfcmt The integer is the index of the formal parameter in the method \\
-\qquad    \bnfcmt (i.e., 0 is the first formal parameter). \\
+\qquad    \bnfcmt (i.e., 0 is the first formal parameter. The receiver parameter is not index 0. \\
+\qquad    \bnfcmt Use \bnfnt{receiver-definition} to annotate the receiver parameter.) \\
 \qquad    \bnfcmt The annotation on the \bnflit{parameter} line is that of the formal parameter declaration, \\
 \qquad    \bnfcmt while the annotation on the \bnflit{type} line is that of the outermost type of the parameter. \\
 \qquad    \bnflit{parameter} \bnfnt{integer} \bnflit{:} \bnfnt{annotation}* \lineend \\
@@ -390,32 +400,27 @@ of the \\ \qquad    \bnfcmt annotation:   ``\texttt{@A(12)}'' rather than ``\tex
 \qquad    \bnfcmt fields of the annotations on this variable~\cite{JSR308}. \\
 \qquad    \bnfcmt The annotation on the \bnflit{local} line is that of the variable declaration, \\
 \qquad    \bnfcmt while the annotation on the \bnflit{type} line is that of the outermost type of the variable. \\
+\qquad    \bnfcmt A source code index can be used instead. See \bnfnt{source-variable-definition} in Section~\ref{source-code-index}. \\
 \qquad    \bnflit{local} \bnfnt{integer} \bnflit{\#} \bnfnt{integer} \bnflit{+} \bnfnt{integer} \bnflit{:} \bnfnt{annotation}* \lineend \\
 \qquad    \bnfnt{type-annotations}* \\
 \\
 \bnfnt{typecast-definition} ::= \\
 \qquad    \bnfcmt The integer is the offset field of the annotation~\cite{JSR308}. \\
-\qquad    \bnflit{typecast} \bnfnt{loc}\bnflit{:} \bnfnt{annotation}* \lineend \\
+\qquad    \bnfcmt A source code index can be used instead. See \bnfnt{source-typecast-definition} in Section~\ref{source-code-index}. \\
+\qquad    \bnflit{typecast} \bnflit{\#} \bnfnt{integer} \bnflit{:} \bnfnt{annotation}* \lineend \\
 \qquad    \bnfnt{type-argument-or-array-definition}* \\
 \\
 \bnfnt{instanceof-definition} ::= \\
 \qquad    \bnfcmt The integer is the offset field of the annotation~\cite{JSR308}. \\
-\qquad    \bnflit{instanceof} \bnfnt{loc}\bnflit{:} \bnfnt{annotation}* \lineend \\
+\qquad    \bnfcmt A source code index can be used instead. See \bnfnt{source-instanceof-definition} in Section~\ref{source-code-index}. \\
+\qquad    \bnflit{instanceof} \bnflit{\#} \bnfnt{integer} \bnflit{:} \bnfnt{annotation}* \lineend \\
 \qquad    \bnfnt{type-argument-or-array-definition}* \\
 \\
 \bnfnt{new-definition} ::= \\
 \qquad    \bnfcmt The integer is the offset field of the annotation~\cite{JSR308}. \\
-\qquad    \bnflit{new} \bnfnt{loc}\bnflit{:} \bnfnt{annotation}* \lineend  \\
+\qquad    \bnfcmt A source code index can be used instead. See \bnfnt{source-new-definition} in Section~\ref{source-code-index}. \\
+\qquad    \bnflit{new} \bnflit{\#} \bnfnt{integer} \bnflit{:} \bnfnt{annotation}* \lineend  \\
 \qquad    \bnfnt{type-argument-or-array-definition}* \\
-\\
-\bnfnt{insert-typecast-definition} ::= \\
-\qquad    \bnfcmt \bnfnt{ast-path} is described in Section~\ref{ast-paths}. \\
-\qquad    \bnfcmt \bnfnt{type} is the un-annotated type to cast to. \\
-\qquad    \bnflit{insert-typecast} \bnfnt{ast-path}\bnflit{:} \bnfnt{annotation}* \bnfnt{type} \lineend \\
-\\
-\bnfnt{loc} ::= \\
-\qquad    \bnfcmt ``\# integer'' is a bytecode offset, and ``* integer'' indicates which occurrence in the source. \\
-\qquad    \bnflit{\#} \bnfnt{integer} $|$ \bnflit{*} \bnfnt{integer}
 \end{tabbing}
 
 
@@ -501,6 +506,13 @@ the bytecode offsets that are introduced using \bnflit{\#}.
 The Annotation File Utilities supports using a path through the AST (abstract
 syntax tree) to specify an arbitrary expression in source code to modify.
 Currently, AST paths can only be used to specify a location to insert a cast.
+
+\begin{tabbing}
+\bnfnt{source-insert-typecast-definition} ::= \\
+\qquad    \bnfcmt \bnfnt{ast-path} is described below. \\
+\qquad    \bnfcmt \bnfnt{type} is the un-annotated type to cast to. \\
+\qquad    \bnflit{insert-typecast} \bnfnt{ast-path}\bnflit{:} \bnfnt{annotation}* \bnfnt{type} \lineend \\
+\end{tabbing}
 
 An AST path represents a traversal through the AST nodes. AST paths are
 restricted for use in \bnfnt{field-definition}s and \bnfnt{method-definition}s.
@@ -612,12 +624,18 @@ public class ASTPathExample {
 \end{verbatim}
 
 Note that two additional sets of parentheses are always added for each cast
-insertion: one set around the expression to be cast, and other set around the
-cast and the expression. This is to limit the cast to the entire expression, but
+insertion: one set around the expression to be cast, and the other set around the
+cast and the expression. For example, a cast insertion looks like this:
+
+\begin{Verbatim}[commandchars=\\\{\}]
+((\textit{cast type}) (\textit{original expression}))
+\end{Verbatim}
+
+This is to limit the cast to the entire expression, but
 nothing more. These parentheses may be unnecessary and can be removed by the
-programmer afterward. Also note that a cast can inserted on any expression, not
+programmer afterward. Also note that a cast can be inserted on any expression, not
 just the lowest expression in the AST. For example, a cast could be inserted on
-the expression \code{i + j}, the literal \code{i}, and/or the literal \code{j}.
+the expression \code{i + j}, the identifier \code{i}, and/or the identifier \code{j}.
 
 To help create correct AST paths it may be useful to view the AST of a class.
 The Checker Framework has a processor to do this. The following command will
@@ -671,7 +689,7 @@ The following is the grammar for AST paths.
 \qquad    \bnfor{} \bnfnt{union-type} \\
 \qquad    \bnfor{} \bnfnt{variable-type} \\
 \qquad    \bnfor{} \bnfnt{while-loop} \\
-\qquad    \bnfor{} \bnfnt{whildcard-tree} \\
+\qquad    \bnfor{} \bnfnt{wildcard-tree} \\
 \\
 \bnfnt{annotated-type} :: = \\
 \qquad    \bnflit{AnnotatedType} \bnflit{.} ( ( \bnflit{annotation} \bnfnt{integer} ) \bnfor{} \bnflit{underlyingType} ) \\
