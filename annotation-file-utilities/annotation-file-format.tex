@@ -353,8 +353,8 @@ of the \\ \qquad    \bnfcmt annotation:   ``\texttt{@A(12)}'' rather than ``\tex
 \qquad        \bnfnt{type-argument-or-array-definition}* \\
 \\
 \bnfnt{type-argument-or-array-definition} ::= \\
-\qquad    \bnfcmt The integer list here contains the values of the ``\ahref{http://types.cs.washington.edu/jsr308/specification/java-annotation-design.html#class-file:ext:ri:typearg}{location}'' array~\cite{JSR308}. \\ % Section 4.3.12
-\qquad    \bnflit{inner-type} \bnfnt{integer} [ \bnflit{,} \bnfnt{integer} ]+ \bnflit{:} \bnfnt{annotation}* \lineend \\
+\qquad    \bnfcmt The integer list here contains the values of the ``\ahref{http://types.cs.washington.edu/jsr308/specification/java-annotation-design.html#sec32}{type\_path}'' structure~\cite{JSR308}. \\ % Section 4.3.12
+\qquad    \bnflit{inner-type} \bnfnt{integer} \bnflit{,} \bnfnt{integer} [ \bnflit{,} \bnfnt{integer} \bnflit{,} \bnfnt{integer} ]* \bnflit{:} \bnfnt{annotation}* \lineend \\
 \\
 \bnfnt{typeparam-definition} ::= \\
 \qquad    \bnfcmt The integer is the zero-based type parameter index. \\
