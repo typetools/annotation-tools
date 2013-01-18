@@ -12,7 +12,7 @@ import java.util.List;
  *   <em>type</em>&lt;<em>type parameters</em>&gt;.<em>inner type</em>
  * </pre>
  * 
- * A {@code DeclaredType} can represent a wildcard by using '?' as the
+ * A {@code DeclaredType} can represent a wildcard by using "?" as the
  * {@code name}. If this type is a wildcard, it is illegal to call
  * {@link #addTypeParameter(Type)}, {@link #getTypeParameter(int)},
  * {@link #getTypeParameters()}, {@link #setInnerType(DeclaredType)}, and
@@ -30,7 +30,7 @@ public class DeclaredType extends Type {
     public static final String WILDCARD = "?";
 
     /**
-     * The raw, un-annotated name of this type. '?' for a wildcard.
+     * The raw, un-annotated name of this type. "?" for a wildcard.
      */
     private String name;
 
@@ -46,7 +46,7 @@ public class DeclaredType extends Type {
 
     /**
      * Creates a new declared type with no type parameters or inner type.
-     * @param name the raw, un-annotated name of this type, or '?' for a
+     * @param name the raw, un-annotated name of this type, or "?" for a
      *             wildcard.
      */
     public DeclaredType(String name) {
