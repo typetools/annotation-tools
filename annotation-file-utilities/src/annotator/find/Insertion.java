@@ -226,22 +226,15 @@ public abstract class Insertion {
      * @param abbreviate
      *            if true, the package name will be removed from the annotations.
      *            The package name can be retrieved again by calling the
-     *            {@link #getPackageName()} method.
+     *            {@link #getPackageNames()} method.
      * @return the type as a string
      */
     public String typeToString(Type type, boolean comments, boolean abbreviate) {
         StringBuilder result = new StringBuilder();
-        for (String annotation : type.getAnnotations()) {
-            AnnotationInsertion ins = new AnnotationInsertion(annotation);
-            result.append(ins.getText(comments, abbreviate));
-            result.append(" ");
-            if (abbreviate) {
-                packageNames.addAll(ins.getPackageNames());
-            }
-        }
 
         switch (type.getKind()) {
         case DECLARED:
+            writeAnnotations(type, result, comments, abbreviate);
             DeclaredType declaredType = (DeclaredType) type;
             result.append(declaredType.getName());
             List<Type> typeArguments = declaredType.getTypeParameters();
@@ -263,9 +256,14 @@ public abstract class Insertion {
         case ARRAY:
             ArrayType arrayType = (ArrayType) type;
             result.append(typeToString(arrayType.getComponentType(), comments, abbreviate));
+            if (!arrayType.getAnnotations().isEmpty()) {
+                result.append(' ');
+            }
+            writeAnnotations(type, result, comments, abbreviate);
             result.append("[]");
             break;
         case WILDCARD:
+            writeAnnotations(type, result, comments, abbreviate);
             WildcardType wildcardType = (WildcardType) type;
             for (String annotation : wildcardType.getAnnotations()) {
                 AnnotationInsertion ins = new AnnotationInsertion(annotation);
@@ -288,5 +286,35 @@ public abstract class Insertion {
         }
         // There will be extra whitespace at the end if this is only annotations, so trim
         return result.toString().trim();
+    }
+
+    /**
+     * Writes the annotations on the given type to the given
+     * {@link StringBuilder}.
+     *
+     * @param type
+     *            contains the annotations to write. Only the annotations
+     *            directly on the type will be written. Subtypes will be
+     *            ignored.
+     * @param result
+     *            where to write the annotations.
+     * @param comments
+     *            if {@code true}, Java 8 features will be surrounded in
+     *            comments.
+     * @param abbreviate
+     *            if {@code true}, the package name will be removed from the
+     *            annotations. The package name can be retrieved again by
+     *            calling the {@link #getPackageNames()} method.
+     */
+    private void writeAnnotations(Type type, StringBuilder result,
+            boolean comments, boolean abbreviate) {
+        for (String annotation : type.getAnnotations()) {
+            AnnotationInsertion ins = new AnnotationInsertion(annotation);
+            result.append(ins.getText(comments, abbreviate));
+            result.append(" ");
+            if (abbreviate) {
+                packageNames.addAll(ins.getPackageNames());
+            }
+        }
     }
 }
