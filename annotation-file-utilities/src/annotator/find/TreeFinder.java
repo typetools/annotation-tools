@@ -964,11 +964,9 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       } else if (i.getKind() == Insertion.Kind.CAST) {
           JCTree jcTree = (JCTree) node;
           pos = jcTree.getStartPosition();
-
-          // Also add an insertion after the expression to close the parentheses.
-          Insertion close = new CloseParenthesisInsertion(i.getCriteria(), i.getSeparateLine());
-          int end = pos + jcTree.toString().length();
-          positions.put(end, close);
+      } else if (i.getKind() == Insertion.Kind.CLOSE_PARENTHESIS) {
+          JCTree jcTree = (JCTree) node;
+          pos = jcTree.getStartPosition() + jcTree.toString().length();
       } else {
         boolean typeScan = true;
         if (node.getKind() == Tree.Kind.METHOD) { // MethodTree
