@@ -1,13 +1,14 @@
 package annotations.io;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import com.sun.source.tree.Tree.Kind;
 
 /**
  * A path through the AST.
  */
-public class ASTPath extends ArrayList<ASTPath.ASTEntry> {
+public class ASTPath {
 
     // Constants for the various child selectors.
     public static final String ANNOTATION = "annotation";
@@ -43,8 +44,6 @@ public class ASTPath extends ArrayList<ASTPath.ASTEntry> {
     public static final String UNDERLYING_TYPE = "underlyingType";
     public static final String UPDATE = "update";
     public static final String VARIABLE = "variable";
-
-    private static final long serialVersionUID = 8943256308307232336L;
 
     /**
      * A single entry in an AST path.
@@ -148,5 +147,46 @@ public class ASTPath extends ArrayList<ASTPath.ASTEntry> {
             }
             return result;
         }
+    }
+
+    /**
+     * Stores the AST entries in this AST path.
+     */
+    private List<ASTEntry> path;
+
+    /**
+     * Constructs an empty AST path.
+     */
+    public ASTPath() {
+        path = new ArrayList<ASTEntry>();
+    }
+
+    /**
+     * Appends the given AST entry to the end of this path.
+     */
+    public void add(ASTEntry entry) {
+        path.add(entry);
+    }
+
+    /**
+     * @return the AST entry at the given index.
+     */
+    public ASTEntry get(int index) {
+        return path.get(index);
+    }
+
+    /**
+     * @return the number of AST entries in this AST path.
+     */
+    public int size() {
+        return path.size();
+    }
+
+    /**
+     * @return {@code true} if this AST path contains zero AST entries,
+     *         {@code false} otherwise.
+     */
+    public boolean isEmpty() {
+        return path.isEmpty();
     }
 }
