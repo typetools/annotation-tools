@@ -8,8 +8,7 @@ import plume.Pair;
 import type.ArrayType;
 import type.DeclaredType;
 import type.Type;
-import type.WildcardType;
-import type.WildcardType.BoundKind;
+import type.BoundedType;
 
 /**
  * Specifies something that needs to be inserted into a source file, including
@@ -237,20 +236,22 @@ public abstract class Insertion {
             writeAnnotations(type, result, comments, abbreviate);
             DeclaredType declaredType = (DeclaredType) type;
             result.append(declaredType.getName());
-            List<Type> typeArguments = declaredType.getTypeParameters();
-            if (!typeArguments.isEmpty()) {
-                result.append('<');
-                result.append(typeToString(typeArguments.get(0), comments, abbreviate));
-                for (int i = 1; i < typeArguments.size(); i++) {
-                    result.append(", ");
-                    result.append(typeToString(typeArguments.get(i), comments, abbreviate));
+            if (!declaredType.isWildcard()) {
+                List<Type> typeArguments = declaredType.getTypeParameters();
+                if (!typeArguments.isEmpty()) {
+                    result.append('<');
+                    result.append(typeToString(typeArguments.get(0), comments, abbreviate));
+                    for (int i = 1; i < typeArguments.size(); i++) {
+                        result.append(", ");
+                        result.append(typeToString(typeArguments.get(i), comments, abbreviate));
+                    }
+                    result.append('>');
                 }
-                result.append('>');
-            }
-            Type innerType = declaredType.getInnerType();
-            if (innerType != null) {
-                result.append('.');
-                result.append(typeToString(innerType, comments, abbreviate));
+                Type innerType = declaredType.getInnerType();
+                if (innerType != null) {
+                    result.append('.');
+                    result.append(typeToString(innerType, comments, abbreviate));
+                }
             }
             break;
         case ARRAY:
@@ -262,24 +263,13 @@ public abstract class Insertion {
             writeAnnotations(type, result, comments, abbreviate);
             result.append("[]");
             break;
-        case WILDCARD:
-            writeAnnotations(type, result, comments, abbreviate);
-            WildcardType wildcardType = (WildcardType) type;
-            for (String annotation : wildcardType.getAnnotations()) {
-                AnnotationInsertion ins = new AnnotationInsertion(annotation);
-                result.append(ins.getText(comments, abbreviate));
-                result.append(" ");
-                if (abbreviate) {
-                    packageNames.addAll(ins.getPackageNames());
-                }
-            }
-            result.append(wildcardType.getTypeArgumentName());
-            if (wildcardType.getBoundKind() != BoundKind.NONE) {
-                result.append(' ');
-                result.append(wildcardType.getBoundKind());
-                result.append(' ');
-                result.append(typeToString(wildcardType.getBound(), comments, abbreviate));
-            }
+        case BOUNDED:
+            BoundedType boundedType = (BoundedType) type;
+            result.append(typeToString(boundedType.getType(), comments, abbreviate));
+            result.append(' ');
+            result.append(boundedType.getBoundKind());
+            result.append(' ');
+            result.append(typeToString(boundedType.getBound(), comments, abbreviate));
             break;
         default:
             throw new RuntimeException("Illegal kind: " + type.getKind());

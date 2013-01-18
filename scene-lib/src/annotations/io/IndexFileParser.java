@@ -29,8 +29,8 @@ import plume.FileIOException;
 import type.ArrayType;
 import type.DeclaredType;
 import type.Type;
-import type.WildcardType;
-import type.WildcardType.BoundKind;
+import type.BoundedType;
+import type.BoundedType.BoundKind;
 import annotations.Annotation;
 import annotations.AnnotationBuilder;
 import annotations.AnnotationFactory;
@@ -1068,20 +1068,21 @@ public final class IndexFileParser {
      * Parses the next tokens as a Java type.
      */
     private Type parseType() throws IOException, ParseException {
+        DeclaredType declaredType;
         if (matchChar('?')) {
-            return parseWildcardType();
+            declaredType = new DeclaredType(DeclaredType.WILDCARD);
         } else {
-            String name = expectIdentifier();
-            if (checkKeyword("extends") || checkKeyword("super")) {
-                return parseWildcardType(name);
-            } else {
-                Type type = parseDeclaredType(name);
-                while (matchChar('[')) {
-                    expectChar(']');
-                    type = new ArrayType(type);
-                }
-                return type;
+            declaredType = parseDeclaredType();
+        }
+        if (checkKeyword("extends") || checkKeyword("super")) {
+            return parseBoundedType(declaredType);
+        } else {
+            Type type = declaredType;
+            while (matchChar('[')) {
+                expectChar(']');
+                type = new ArrayType(type);
             }
+            return type;
         }
     }
 
@@ -1112,26 +1113,19 @@ public final class IndexFileParser {
     }
 
     /**
-     * Parses the next tokens as a wildcard type.
+     * Parses the next tokens as a bounded type.
+     * @param type the base type.
      */
-    private WildcardType parseWildcardType() throws IOException, ParseException {
-        return parseWildcardType("?");
-    }
-
-    /**
-     * Parses the next tokens as a wildcard type.
-     * @param typeArgumentName the name of the type argument
-     */
-    private WildcardType parseWildcardType(String typeArgumentName) throws IOException, ParseException {
+    private BoundedType parseBoundedType(DeclaredType type) throws IOException, ParseException {
         BoundKind kind;
         if (matchKeyword("extends")) {
             kind = BoundKind.EXTENDS;
         } else if (matchKeyword("super")) {
             kind = BoundKind.SUPER;
         } else {
-            return new WildcardType();
+            throw new ParseException("Illegal bound kind: " + st.sval);
         }
-        return new WildcardType(typeArgumentName, kind, parseType());
+        return new BoundedType(type, kind, parseDeclaredType());
     }
 
     private void parseClass() throws IOException, ParseException {

@@ -6,18 +6,31 @@ import java.util.List;
 
 /**
  * A Java type with optional type parameters and inner type. For example:
+ * 
  * <pre>
  *   <em>type</em>
  *   <em>type</em>&lt;<em>type parameters</em>&gt;.<em>inner type</em>
- * <pre>
- *
+ * </pre>
+ * 
+ * A {@code DeclaredType} can represent a wildcard by using '?' as the
+ * {@code name}. If this type is a wildcard, it is illegal to call
+ * {@link #addTypeParameter(Type)}, {@link #getTypeParameter(int)},
+ * {@link #getTypeParameters()}, {@link #setInnerType(DeclaredType)}, and
+ * {@link #getInnerType()}. If called, an {@link IllegalStateException} will be
+ * thrown.
+ * <p>
  * Types are stored with the outer most type at the top of the type tree. This
  * is opposite to the way types are stored in javac.
  */
 public class DeclaredType extends Type {
 
     /**
-     * The raw, un-annotated name of this type.
+     * The {@code name} of a wildcard type.
+     */
+    public static final String WILDCARD = "?";
+
+    /**
+     * The raw, un-annotated name of this type. '?' for a wildcard.
      */
     private String name;
 
@@ -33,7 +46,8 @@ public class DeclaredType extends Type {
 
     /**
      * Creates a new declared type with no type parameters or inner type.
-     * @param name the raw, un-annotated name of this type.
+     * @param name the raw, un-annotated name of this type, or '?' for a
+     *             wildcard.
      */
     public DeclaredType(String name) {
         super();
@@ -71,6 +85,7 @@ public class DeclaredType extends Type {
      * @param typeParameter the type paramter.
      */
     public void addTypeParameter(Type typeParameter) {
+        checkWildcard();
         typeParameters.add(typeParameter);
     }
 
@@ -80,6 +95,7 @@ public class DeclaredType extends Type {
      * @return the type paramter.
      */
     public Type getTypeParameter(int index) {
+        checkWildcard();
         return typeParameters.get(index);
     }
 
@@ -89,6 +105,7 @@ public class DeclaredType extends Type {
      * @return the type parameters.
      */
     public List<Type> getTypeParameters() {
+        checkWildcard();
         return Collections.unmodifiableList(typeParameters);
     }
 
@@ -97,6 +114,7 @@ public class DeclaredType extends Type {
      * @param innerType the inner type.
      */
     public void setInnerType(DeclaredType innerType) {
+        checkWildcard();
         this.innerType = innerType;
     }
 
@@ -105,6 +123,7 @@ public class DeclaredType extends Type {
      * @return the inner type or {@code null}.
      */
     public DeclaredType getInnerType() {
+        checkWildcard();
         return innerType;
     }
 
@@ -112,5 +131,23 @@ public class DeclaredType extends Type {
     @Override
     public Kind getKind() {
         return Kind.DECLARED;
+    }
+
+    /**
+     * Determines if this type is a wildcard.
+     * @return {@code true} if this type is a wildcard, {@code false} otherwise.
+     */
+    public boolean isWildcard() {
+        return WILDCARD.equals(name);
+    }
+
+    /**
+     * Throw an {@link IllegalStateException} if this type is a wildcard.
+     */
+    private void checkWildcard() {
+        if (isWildcard()) {
+            throw new IllegalStateException("This method can't be called "
+                    + "since this DeclaredType is a wildcard.");
+        }
     }
 }
