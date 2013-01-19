@@ -510,7 +510,7 @@ extends EmptyVisitor {
             if (strict) { System.err.println("Unhandled NEW annotation for " + aElement); }
           }
           break;
-        case METHOD_PARAMETER:
+        case METHOD_FORMAL_PARAMETER:
           handleMethodParameterType((AMethod) aElement);
           break;
         case METHOD_RECEIVER:
