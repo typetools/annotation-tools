@@ -935,7 +935,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
             if (shouldSkip(tla)) continue;
 
             TypeAnnotationVisitor av = visitTypeAnnotation(tla);
-            visitTargetType(av, TargetType.METHOD_PARAMETER);
+            visitTargetType(av, TargetType.METHOD_FORMAL_PARAMETER);
             visitParameterIndex(av, index);
             visitLocations(av, InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION);
             visitFields(av, tla);
@@ -952,7 +952,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
 
             TypeAnnotationVisitor xav = visitTypeAnnotation(tla);
             visitTargetType(xav,
-                TargetType.METHOD_PARAMETER);
+                TargetType.METHOD_FORMAL_PARAMETER);
             // information for raw type (parameter)
             //  (none)
             // information for generic/array (on parameter)

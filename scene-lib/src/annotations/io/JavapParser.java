@@ -197,7 +197,7 @@ public final class JavapParser {
             case METHOD_RECEIVER:
                 subOuterType = ((AMethod) member).receiver;
                 break;
-            case METHOD_PARAMETER:
+            case METHOD_FORMAL_PARAMETER:
                 int paramIdx = Integer.parseInt(
                         line.substring(
                         line.indexOf(paramIdxHead) + paramIdxHead.length()));
