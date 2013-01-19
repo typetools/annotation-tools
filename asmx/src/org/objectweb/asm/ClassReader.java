@@ -1385,7 +1385,7 @@ public class ClassReader {
         // {
         //   u1 param;
         // } reference_info;
-        case METHOD_PARAMETER:
+        case METHOD_FORMAL_PARAMETER:
           param_index = readByte(v);
           v++;
           break;

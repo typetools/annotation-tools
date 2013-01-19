@@ -119,7 +119,7 @@ public class TraceTypeAnnotationVisitor extends TraceAnnotationVisitor
       //   TEMP this should contain the index but doesn't, so for the moment
       //        we don't print an index
       // } reference_info;
-      case METHOD_PARAMETER:
+      case METHOD_FORMAL_PARAMETER:
           buf.append(doubleTab).append("index: ").append("FIXME").append("\n");
           break;
 

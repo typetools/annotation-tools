@@ -309,12 +309,12 @@ implements TypeAnnotationVisitor {
       checkListSize(0, 0, c, 1, 0, 0, 0, 0, 0,
       "Invalid method return type generic/array annotation:");
       break;*/
-    case METHOD_PARAMETER:
+    case METHOD_FORMAL_PARAMETER:
       checkListSize(0, 0, 0, 0, 0, 0, 1, 0, 0,
       "Invalid method parameter annotation:");
       break;
     /* TODO
-    case METHOD_PARAMETER_COMPONENT:
+    case METHOD_FORMAL_PARAMETER_COMPONENT:
       checkListSize(0, 0, c, 1, 0, 0, 1, 0, 0,
       "Invalid method parameter generic/array annotation:");
       break;*/
