@@ -255,7 +255,7 @@ implements TypeAnnotationVisitor {
 
     switch(TargetType.fromTargetTypeValue(xTargetTypeArgs.get(0))) {
     case CAST:
-      checkListSize(0, 0, 0, 1, 1, 0, 0, 0, 0,
+      checkListSize(0, 0, c, 1, 1, 0, 0, 0, 0,
           "Invalid typecast annotation:");
       break;
     /* TODO
@@ -264,7 +264,7 @@ implements TypeAnnotationVisitor {
       "Invalid typecast generic/array annotation:");
       break;*/
     case INSTANCEOF:
-      checkListSize(0, 0, 0, 0, 1, 0, 0, 0, 0,
+      checkListSize(0, 0, c, 1, 1, 0, 0, 0, 0,
       "Invalid type test annotation:");
       break;
     /* TODO
@@ -273,7 +273,7 @@ implements TypeAnnotationVisitor {
       "Invalid type test generic/array annotation:");
       break;*/
     case NEW:
-      checkListSize(0, 0, 0, 0, 1, 0, 0, 0, 0,
+      checkListSize(0, 0, c, 1, 1, 0, 0, 0, 0,
       "Invalid object creation annotation:");
       break;
     /* TODO
@@ -282,7 +282,7 @@ implements TypeAnnotationVisitor {
       "Invalid object creation generic/array annotation:");
       break;*/
     case METHOD_RECEIVER:
-      checkListSize(0, 0, 0, 0, 0, 0, 0, 0, 0,
+      checkListSize(0, 0, c, 1, 0, 0, 0, 0, 0,
       "Invalid method receiver annotation:");
       break;
     /* TODO
@@ -292,7 +292,7 @@ implements TypeAnnotationVisitor {
       "Invalid method receiver generic/array annotation:");
       break;*/
     case LOCAL_VARIABLE:
-      checkListSize(1, 1, 0, 0, 0, 1, 0, 0, 0,
+      checkListSize(1, 1, c, 1, 0, 1, 0, 0, 0,
       "Invalid local variable annotation:");
       break;
     /* TODO
@@ -301,7 +301,7 @@ implements TypeAnnotationVisitor {
       "Invalid local variable generic/array annotation:");
       break;*/
     case METHOD_RETURN:
-      checkListSize(0, 0, 0, 0, 0, 0, 0, 0, 0,
+      checkListSize(0, 0, c, 1, 0, 0, 0, 0, 0,
       "Invalid method return type annotation:");
       break;
     /* TODO
@@ -310,7 +310,7 @@ implements TypeAnnotationVisitor {
       "Invalid method return type generic/array annotation:");
       break;*/
     case METHOD_FORMAL_PARAMETER:
-      checkListSize(0, 0, 0, 0, 0, 0, 1, 0, 0,
+      checkListSize(0, 0, c, 1, 0, 0, 1, 0, 0,
       "Invalid method parameter annotation:");
       break;
     /* TODO
@@ -319,7 +319,7 @@ implements TypeAnnotationVisitor {
       "Invalid method parameter generic/array annotation:");
       break;*/
     case FIELD:
-      checkListSize(0, 0, c, 0, 0, 0, 0, 0, 0,
+      checkListSize(0, 0, c, 1, 0, 0, 0, 0, 0,
       "Invalid field annotation:");
       break;
     /* TODO
@@ -328,11 +328,11 @@ implements TypeAnnotationVisitor {
       "Invalid field generic/array annotation:");
       break;*/
     case CLASS_TYPE_PARAMETER:
-      checkListSize(0, 0, 0, 0, 0, 0, 1, 0, 0,
+      checkListSize(0, 0, c, 1, 0, 0, 1, 0, 0,
       "Invalid class type parameter annotation:");
       break;
     case CLASS_TYPE_PARAMETER_BOUND:
-      checkListSize(0, 0, 0, 0, 0, 0, 1, 1, 0,
+      checkListSize(0, 0, c, 1, 0, 0, 1, 1, 0,
       "Invalid class type parameter bound annotation:");
       break;
     /* TODO
@@ -341,11 +341,11 @@ implements TypeAnnotationVisitor {
       "Invalid class type parameter bound generic/array annotation:");
       break;*/
     case METHOD_TYPE_PARAMETER:
-      checkListSize(0, 0, 0, 0, 0, 0, 1, 0, 0,
+      checkListSize(0, 0, c, 1, 0, 0, 1, 0, 0,
       "Invalid method type parameter annotation:");
       break;
     case METHOD_TYPE_PARAMETER_BOUND:
-      checkListSize(0, 0, 0, 0, 0, 0, 1, 1, 0,
+      checkListSize(0, 0, c, 1, 0, 0, 1, 1, 0,
       "Invalid method type parameter bound annotation:");
       break;
     /* TODO
@@ -354,7 +354,7 @@ implements TypeAnnotationVisitor {
       "Invalid method type parameter bound generic/array annotation:");
       break;*/
     case CLASS_EXTENDS:
-      checkListSize(0, 0, 0, 0, 0, 0, 0, 0, 1,
+      checkListSize(0, 0, c, 1, 0, 0, 0, 0, 1,
       "Invalid class extends/implements annotation:");
       break;
     /* TODO
@@ -363,7 +363,7 @@ implements TypeAnnotationVisitor {
       "Invalid class extends/implements generic/array annotation:");
       break;*/
     case THROWS:
-      checkListSize(0, 0, 0, 0, 0, 0, 0, 0, 1,
+      checkListSize(0, 0, c, 1, 0, 0, 0, 0, 1,
       "Invalid exception type in throws annotation:");
       break;
     default:
