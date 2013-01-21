@@ -54,6 +54,9 @@ implements TypeAnnotationVisitor {
   private List<Integer> xBoundIndexArgs;
   private List<Integer> xTypeIndexArgs;
 
+  // Counts the number of times visitXNameAndArgsSize is called.
+  private int xNameAndArgsCount;
+
   /**
    * Constructs a new <code> SafeTypeAnnotationVisitor </code> that
    *  delegates all calls to the given visitor.
@@ -74,6 +77,7 @@ implements TypeAnnotationVisitor {
     xParamIndexArgs = new ArrayList<Integer>(1);
     xBoundIndexArgs = new ArrayList<Integer>(1);
     xTypeIndexArgs = new ArrayList<Integer>(1);
+    xNameAndArgsCount = 0;
   }
 
   /**
@@ -200,6 +204,8 @@ implements TypeAnnotationVisitor {
   }
 
   public void visitXNameAndArgsSize() {
+    xNameAndArgsCount++;
+    xav.visitXNameAndArgsSize();
   }
 
   /**
@@ -244,6 +250,12 @@ implements TypeAnnotationVisitor {
     if (xTargetTypeArgs.size() != 1) {
       throw new
       InvalidTypeAnnotationException("More than one target type visited.");
+    }
+
+    if (xNameAndArgsCount != 1) {
+      throw new InvalidTypeAnnotationException("Name and args count should "
+          + " be visited 1 time, actually visited " + xNameAndArgsCount
+          + " times.");
     }
 
     // Since the correct size of xLocationArgs is specified by
