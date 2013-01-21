@@ -1507,6 +1507,8 @@ public class ClassReader {
         for (TypePathEntry location : locations) {
             xav.visitXLocation(location);
         }
+        // Visit the annotation name and save space for the values count.
+        xav.visitXNameAndArgsSize();
 
         // then read annotation values
         int i = readUnsignedShort(v);
