@@ -1,8 +1,5 @@
 package annotator.tests;
 
-/**
- * @skip-test
- */
 public class ReceiverWithThrows {
   /* @Mutable ReceiverWithThrows this */
   public void foo(@java.lang.Mutable ReceiverWithThrows this) {

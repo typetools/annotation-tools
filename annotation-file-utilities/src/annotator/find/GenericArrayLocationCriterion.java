@@ -1,15 +1,18 @@
 package annotator.find;
 
-// only used for debugging
-import annotator.Main;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import annotations.el.InnerTypeLocation;
+//only used for debugging
+import annotator.Main;
 
-import com.sun.source.tree.*;
+import com.sun.source.tree.AnnotatedTypeTree;
+import com.sun.source.tree.ArrayTypeTree;
+import com.sun.source.tree.ParameterizedTypeTree;
+import com.sun.source.tree.Tree;
+import com.sun.source.tree.WildcardTree;
 import com.sun.source.util.TreePath;
 import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
 import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntryKind;
