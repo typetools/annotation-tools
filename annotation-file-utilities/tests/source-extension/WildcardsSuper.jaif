@@ -7,7 +7,7 @@ package:
 class WildcardsSuper:
 field f:
 type:
-inner-type 0: @GUT.quals.Peer
+inner-type 3, 0, 2, 0: @GUT.quals.Peer
 
 package:
 class WildcardsSuper:

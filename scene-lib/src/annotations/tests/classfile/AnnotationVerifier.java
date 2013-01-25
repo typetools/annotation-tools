@@ -19,6 +19,8 @@ import org.objectweb.asm.commons.EmptyVisitor;
 
 import plume.UtilMDE;
 
+import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
+
 /**
  * An <code>AnnotationVerifier</code> provides a way to check to see if two
  * versions of the same class (from two different <code>.class</code> files),
@@ -333,7 +335,7 @@ public class AnnotationVerifier {
 
     private List<Integer> xIndexArgs;
     private List<Integer> xLengthArgs;
-    private List<Integer> xLocationArgs;
+    private List<TypePathEntry> xLocationArgs;
     private List<Integer> xLocationLengthArgs;
     private List<Integer> xOffsetArgs;
     private List<Integer> xStartPcArgs;
@@ -360,7 +362,7 @@ public class AnnotationVerifier {
 
       xIndexArgs = new ArrayList<Integer>();
       xLengthArgs = new ArrayList<Integer>();
-      xLocationArgs = new ArrayList<Integer>();
+      xLocationArgs = new ArrayList<TypePathEntry>();
       xLocationLengthArgs = new ArrayList<Integer>();
       xOffsetArgs = new ArrayList<Integer>();
       xStartPcArgs = new ArrayList<Integer>();
@@ -378,7 +380,7 @@ public class AnnotationVerifier {
       xLengthArgs.add(length);
     }
 
-    public void visitXLocation(int location) {
+    public void visitXLocation(TypePathEntry location) {
       xLocationArgs.add(location);
     }
 
@@ -436,6 +438,9 @@ public class AnnotationVerifier {
     }
 
     public void visitEnd() {
+    }
+
+    public void visitXNameAndArgsSize() {
     }
 
     public void visitEnum(String name, String desc, String value) {

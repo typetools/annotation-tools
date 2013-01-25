@@ -12,15 +12,15 @@ class GenericCell:
 
     field internalList:
         type: @java.lang.ThisMutable
-        inner-type 0: @java.lang.ThisMutable
+        inner-type 3, 0: @java.lang.ThisMutable
 
     method <init>(Ljava/util/List;)V:
         parameter #0:
             type: @java.lang.Mutable
-            inner-type 0: @java.lang.Mutable
+            inner-type 3, 0: @java.lang.Mutable
 
     method getList()Ljava/util/List;:
         return: @java.lang.PolyRead
-            inner-type 0: @java.lang.PolyRead
+            inner-type 3, 0: @java.lang.PolyRead
         receiver: @java.lang.PolyRead
 

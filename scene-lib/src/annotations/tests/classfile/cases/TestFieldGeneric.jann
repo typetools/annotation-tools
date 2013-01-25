@@ -37,27 +37,27 @@ class TestFieldGeneric: @annotations.tests.classfile.foo.A
 						 @annotations.tests.classfile.foo.F(fieldA = 1, fieldB = "if")
   field testFieldGeneric: 
 	type:
-  				inner-type 0 : @annotations.tests.classfile.foo.A
+  				inner-type 3, 0 : @annotations.tests.classfile.foo.A
   				
   				
   // Set<TestFieldGeneric<Set<TestFieldGeneric>>> nestedSet;
     
     field nestedSet: @annotations.tests.classfile.foo.B(value="nested")
 	type:
-  				inner-type 0 : @annotations.tests.classfile.foo.F(fieldA=1, fieldB="n")
-  				inner-type 0 : @annotations.tests.classfile.foo.A
-  				inner-type 0, 0 : @annotations.tests.classfile.foo.B(value="nil")
-  				inner-type 0 : @annotations.tests.classfile.foo.C(fieldA=-2, fieldB="nl")
-  				inner-type 0, 0, 0 : @annotations.tests.classfile.foo.D(fieldA=-1, fieldB="hello", fieldC={3,2,4})
+  				inner-type 3, 0 : @annotations.tests.classfile.foo.F(fieldA=1, fieldB="n")
+  				inner-type 3, 0 : @annotations.tests.classfile.foo.A
+  				inner-type 3, 0, 3, 0 : @annotations.tests.classfile.foo.B(value="nil")
+  				inner-type 3, 0 : @annotations.tests.classfile.foo.C(fieldA=-2, fieldB="nl")
+  				inner-type 3, 0, 3, 0, 3, 0 : @annotations.tests.classfile.foo.D(fieldA=-1, fieldB="hello", fieldC={3,2,4})
   				
   // Map<Set<TestFieldGeneric>, TestFieldGeneric<T>> nestedMap;
   
   	field nestedMap: @annotations.tests.classfile.foo.C(fieldA=1, fieldB="nested")
 	    type:
-  				inner-type 1 : @annotations.tests.classfile.foo.A
-  				inner-type 1, 0 : @annotations.tests.classfile.foo.B(value="inner most T")
-  				inner-type 0, 0 : @annotations.tests.classfile.foo.C(fieldA=256, fieldB="hello")
-  				inner-type 0 : @annotations.tests.classfile.foo.B(value="inner most F")
+  				inner-type 3, 1 : @annotations.tests.classfile.foo.A
+  				inner-type 3, 1, 3, 0 : @annotations.tests.classfile.foo.B(value="inner most T")
+  				inner-type 3, 0, 3, 0 : @annotations.tests.classfile.foo.C(fieldA=256, fieldB="hello")
+  				inner-type 3, 0 : @annotations.tests.classfile.foo.B(value="inner most F")
   
 
   				

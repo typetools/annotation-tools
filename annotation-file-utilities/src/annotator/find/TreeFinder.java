@@ -40,6 +40,8 @@ import com.sun.source.tree.VariableTree;
 import com.sun.source.tree.WildcardTree;
 import com.sun.source.util.TreePath;
 import com.sun.source.util.TreeScanner;
+import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
+import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntryKind;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.JCTree.JCAnnotatedType;
 import com.sun.tools.javac.tree.JCTree.JCAnnotation;
@@ -68,8 +70,6 @@ import com.sun.tools.javac.tree.TreeInfo;
 public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
 
   public static boolean debug = false;
-
-  private static Integer arrayLocationInParent = null;
 
   private static void debug(String message) {
     if (debug)
@@ -142,7 +142,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
    * elements.  For instance, type annotations for a declaration should be
    * placed before the type rather than the variable name.
    */
-  private static class TypePositionFinder extends TreeScanner<Integer, Void> {
+  private static class TypePositionFinder extends TreeScanner<Integer, Insertion> {
 
     private final CompilationUnitTree tree;
 
@@ -176,6 +176,11 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
           // There is nowhere to attach the annotation, so for now return
           // the "?" tree itself.
           return t;
+        case ANNOTATED_TYPE:
+          // If this type already has annotations on it, get the underlying
+          // type, without annotations.
+          t = ((JCAnnotatedType) t).underlyingType;
+          break;
         default:
           throw new RuntimeException(String.format("Unrecognized type (kind=%s, class=%s): %s", t.getKind(), t.getClass(), t));
         }
@@ -183,7 +188,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     }
 
     @Override
-    public Integer visitVariable(VariableTree node, Void p) {
+    public Integer visitVariable(VariableTree node, Insertion ins) {
       JCTree jt = ((JCVariableDecl) node).getType();
       debug("visitVariable: %s %s%n", jt, jt.getClass());
       if (jt instanceof JCTypeApply) {
@@ -197,9 +202,9 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     // When a method is visited, it is visited for the receiver, not the
     // return value and not the declaration itself.
     @Override
-    public Integer visitMethod(MethodTree node, Void p) {
+    public Integer visitMethod(MethodTree node, Insertion ins) {
       debug("TypePositionFinder.visitMethod");
-      super.visitMethod(node, p);
+      super.visitMethod(node, ins);
       // System.out.println("node: " + node);
       // System.out.println("return: " + node.getReturnType());
 
@@ -272,7 +277,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     }
 
     @Override
-    public Integer visitIdentifier(IdentifierTree node, Void p) {
+    public Integer visitIdentifier(IdentifierTree node, Insertion ins) {
       debug("TypePositionFinder.visitIdentifier(%s)", node);
       // for arrays, need to indent inside array, not right before type
       Tree parent = parent(node);
@@ -299,19 +304,19 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     }
 
     @Override
-    public Integer visitTypeParameter(TypeParameterTree node, Void p) {
+    public Integer visitTypeParameter(TypeParameterTree node, Insertion ins) {
       JCTypeParameter tp = (JCTypeParameter) node;
       return tp.getStartPosition();
     }
 
     @Override
-    public Integer visitWildcard(WildcardTree node, Void p) {
+    public Integer visitWildcard(WildcardTree node, Insertion ins) {
       JCWildcard wc = (JCWildcard) node;
       return wc.getStartPosition();
     }
 
     @Override
-    public Integer visitPrimitiveType(PrimitiveTypeTree node, Void p) {
+    public Integer visitPrimitiveType(PrimitiveTypeTree node, Insertion ins) {
       debug("TypePositionFinder.visitPrimitiveType(%s)", node);
       // want exact same logistics as with visitIdentifier
       Tree parent = parent(node);
@@ -329,7 +334,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     }
 
     @Override
-      public Integer visitParameterizedType(ParameterizedTypeTree node, Void p) {
+      public Integer visitParameterizedType(ParameterizedTypeTree node, Insertion ins) {
       Tree parent = parent(node);
       debug("TypePositionFinder.visitParameterizedType %s parent=%s%n", node, parent);
       Integer i = null;
@@ -429,7 +434,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     }
 
     @Override
-    public Integer visitArrayType(ArrayTypeTree node, Void p) {
+    public Integer visitArrayType(ArrayTypeTree node, Insertion ins) {
       debug("TypePositionFinder.visitArrayType(%s)", node);
       JCArrayTypeTree att = (JCArrayTypeTree) node;
       debug("TypePositionFinder.visitArrayType(%s) preferred = %s%n", node, att.getPreferredPosition());
@@ -451,7 +456,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     }
 
     @Override
-    public Integer visitCompilationUnit(CompilationUnitTree node, Void p) {
+    public Integer visitCompilationUnit(CompilationUnitTree node, Insertion ins) {
       debug("TypePositionFinder.visitCompilationUnit");
       JCCompilationUnit cu = (JCCompilationUnit) node;
       JCTree.JCExpression pid = cu.pid;
@@ -480,7 +485,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     }
 
     @Override
-    public Integer visitClass(ClassTree node, Void p) {
+    public Integer visitClass(ClassTree node, Insertion ins) {
       debug("TypePositionFinder.visitClass");
       JCClassDecl cd = (JCClassDecl) node;
       if (cd.mods != null) {
@@ -549,13 +554,10 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     //   new int[][] {...}
     //   { ... }            -- as in: String[] names2 = { "Alice", "Bob" };
     @Override
-    public Integer visitNewArray(NewArrayTree node, Void p) {
+    public Integer visitNewArray(NewArrayTree node, Insertion ins) {
       debug("TypePositionFinder.visitNewArray");
       JCNewArray na = (JCNewArray) node;
-      // We need to know what array dimension to return.  This is gross.
-      int dim = ((arrayLocationInParent == null)
-                 ? 0  // outermost type
-                 : arrayLocationInParent.intValue() + 1);
+      int dim = ins.getCriteria().getGenericArrayLocation().getLocation().size();
       // Invariant:  na.dims.size() == 0  or  na.elems == null  (but not both)
       // If na.dims.size() != 0, na.elemtype is non-null.
       // If na.dims.size() == 0, na.elemtype may be null or non-null.
@@ -597,7 +599,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     }
 
     @Override
-    public Integer visitNewClass(NewClassTree node, Void p) {
+    public Integer visitNewClass(NewClassTree node, Insertion ins) {
       JCNewClass na = (JCNewClass) node;
       JCExpression className = na.clazz;
       // System.out.printf("classname %s (%s)%n", className, className.getClass());
@@ -618,7 +620,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
         // System.out.printf("classname %s (%s)%n", className, className.getClass());
       }
 
-      return visitIdentifier((IdentifierTree) className, p);
+      return visitIdentifier((IdentifierTree) className, ins);
     }
 
   }
@@ -765,17 +767,23 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
             || node instanceof TypeParameterTree
             || node instanceof ExpressionTree
             || node instanceof ExpressionStatementTree
+            || node instanceof WildcardTree
             );
     if (res) return true;
 
-    // We also need to handle un-bounded wildcards,
-    // because there is no bound that would be visited later.
-    if (node instanceof WildcardTree
-            && (((WildcardTree)node).getBound() == null)) {
-        return true;
-    }
-
     return false;
+  }
+
+  /**
+   * Determines if the last {@link TypePathEntry} in the given list is a
+   * {@link TypePathEntryKind#WILDCARD}.
+   *
+   * @param location the list to check.
+   * @return {@code true} if the last {@link TypePathEntry} is a
+   *         {@link TypePathEntryKind#WILDCARD}, {@code false} otherwise.
+   */
+  private boolean wildcardLast(List<TypePathEntry> location) {
+    return location.get(location.size() - 1).tag == TypePathEntryKind.WILDCARD;
   }
 
   /**
@@ -938,12 +946,13 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
 
       if ((node.getKind() == Tree.Kind.METHOD) && (i.getCriteria().isOnReturnType())) {
         // looking for the return type
-        pos = tpf.scan(((MethodTree)node).getReturnType(), null);
+        pos = tpf.scan(((MethodTree)node).getReturnType(), i);
         assert handled(node);
         debug("pos = %d at return type node: %s%n", pos, ((JCMethodDecl)node).getReturnType().getClass());
       } else if ((node.getKind() == Tree.Kind.TYPE_PARAMETER) // TypeParameterTree
-                 && (i.getCriteria().onBoundZero())) {
-          pos = tpf.scan(node, null);
+                 && (i.getCriteria().onBoundZero())
+                 && ((TypeParameterTree) node).getBounds().isEmpty()) {
+          pos = tpf.scan(node, i);
 
           Integer nextpos1 = getFirstInstanceAfter(',', pos+1, tree);
           Integer nextpos2 = getFirstInstanceAfter('>', pos+1, tree);
@@ -952,8 +961,9 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
           // need to add "extends ... Object" around the type annotation
           i = new TypeBoundExtendsInsertion(i.getText(), i.getCriteria(), i.getSeparateLine());
       } else if ((node instanceof WildcardTree) // Easier than listing three tree kinds. Correct?
-               && ((WildcardTree)node).getBound()==null) {
-          pos = tpf.scan(node, null);
+               && ((WildcardTree)node).getBound()==null
+               && wildcardLast(i.getCriteria().getGenericArrayLocation().getLocation())) {
+          pos = tpf.scan(node, i);
 
           Integer nextpos1 = getFirstInstanceAfter(',', pos+1, tree);
           Integer nextpos2 = getFirstInstanceAfter('>', pos+1, tree);
@@ -977,19 +987,8 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
         }
         if (typeScan) {
           // looking for the type
-
-          { // handle finding a particular array level.  Yuck!
-            GenericArrayLocationCriterion galc = i.getCriteria().getGenericArrayLocation();
-            if (galc != null) {
-              arrayLocationInParent = galc.locationInParent;
-              // System.out.printf("Set arrayLocationInParent to %s for %s%n", arrayLocationInParent, node);
-            } else {
-              arrayLocationInParent = null;
-              // System.out.printf("No arrayLocationInParent for %s%n", node);
-            }
-          }
           debug("Calling tpf.scan(%s: %s)%n", node.getClass(), node);
-          pos = tpf.scan(node, null);
+          pos = tpf.scan(node, i);
           assert handled(node);
           debug("pos = %d at type: %s (%s)%n", pos, node.toString(), node.getClass());
         } else {

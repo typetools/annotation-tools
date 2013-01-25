@@ -18,33 +18,33 @@ class TestTypecastGenericArray:
   	
   method test2()V :
   	typecast # 5 : 
-  		inner-type 0 : @annotations.tests.classfile.foo.A
+  		inner-type 3, 0 : @annotations.tests.classfile.foo.A
     typecast # 16 : @annotations.tests.classfile.foo.B(value="B")
-    	inner-type 0 : @annotations.tests.classfile.foo.C(fieldA=2,fieldB="")
+    	inner-type 3, 0 : @annotations.tests.classfile.foo.C(fieldA=2,fieldB="")
     	
   method test3()V :
   	typecast # 20 : 
-  		inner-type 0 : @annotations.tests.classfile.foo.A
+  		inner-type 3, 0 : @annotations.tests.classfile.foo.A
     typecast # 23 :
-    	inner-type 0 : @annotations.tests.classfile.foo.B(value="v")
+    	inner-type 3, 0 : @annotations.tests.classfile.foo.B(value="v")
     	
   method test4()V :
     typecast # 5 :
-    	inner-type 0 : @annotations.tests.classfile.foo.A
-    	inner-type 1 : @annotations.tests.classfile.foo.B(value="second")
+    	inner-type 3, 0 : @annotations.tests.classfile.foo.A
+    	inner-type 3, 1 : @annotations.tests.classfile.foo.B(value="second")
     typecast # 15 : @annotations.tests.classfile.foo.A	
-    	inner-type 0 : @annotations.tests.classfile.foo.A
+    	inner-type 3, 0 : @annotations.tests.classfile.foo.A
     typecast # 30 : @ annotations.tests.classfile.foo.B(value="set")
-    	inner-type 0 : 
+    	inner-type 3, 0 :
     typecast # 43 : 
-    	inner-type 1 : @annotations.tests.classfile.foo.A
+    	inner-type 3, 1 : @annotations.tests.classfile.foo.A
     typecast # 53 : @annotations.tests.classfile.foo.B(value="on the set")
-    	inner-type 0 : @annotations.tests.classfile.foo.B(value="on value")
+    	inner-type 3, 0 : @annotations.tests.classfile.foo.B(value="on value")
     	
   method test5()V :
   	typecast # 4 :
-  		inner-type 0 : @annotations.tests.classfile.foo.B(value="string is key")
-  		inner-type 1 : @annotations.tests.classfile.foo.B(value="2d-array is value")
-  		inner-type 1 , 0 : @annotations.tests.classfile.foo.B(value="first dimension")
-  		inner-type 1 , 1 : @annotations.tests.classfile.foo.B(value="second dimension")
+  		inner-type 3, 0 : @annotations.tests.classfile.foo.B(value="string is key")
+  		inner-type 3, 1 : @annotations.tests.classfile.foo.B(value="2d-array is value")
+  		inner-type 3, 1, 0, 0 : @annotations.tests.classfile.foo.B(value="first dimension")
+  		inner-type 3, 1, 0, 0, 0, 0 : @annotations.tests.classfile.foo.B(value="second dimension")
   		

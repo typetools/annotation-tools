@@ -3,6 +3,7 @@ package org.objectweb.asm.util;
 import org.objectweb.asm.TypeAnnotationVisitor;
 
 import com.sun.tools.javac.code.TargetType;
+import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
 
 /**
  * An {@link TypeAnnotationVisitor} that prints a disassembled view of the
@@ -34,7 +35,7 @@ public class TraceTypeAnnotationVisitor extends TraceAnnotationVisitor
     private int xtarget_type;
     private int xoffset;
     private int xlocation_length;
-    private int xlocations[];
+    private TypePathEntry xlocations[];
     private int xlocations_index;
     private int xnum_entries;
     private int xstart_pc;
@@ -81,12 +82,9 @@ public class TraceTypeAnnotationVisitor extends TraceAnnotationVisitor
       // {
       //   u2 offset;
       // } reference_info;
-      case TYPECAST:
-      case TYPECAST_COMPONENT:
+      case CAST:
       case INSTANCEOF:
-      case INSTANCEOF_COMPONENT:
       case NEW:
-      case NEW_COMPONENT:
           buf.append(doubleTab).append("offset: ").append(xoffset).append("\n");
           break;
 
@@ -94,7 +92,6 @@ public class TraceTypeAnnotationVisitor extends TraceAnnotationVisitor
       // {
       // } reference_info;
       case METHOD_RECEIVER:
-      case METHOD_RECEIVER_COMPONENT:
           break;
 
       // local variable
@@ -104,7 +101,8 @@ public class TraceTypeAnnotationVisitor extends TraceAnnotationVisitor
       //   u2 index;
       // } reference_info;
       case LOCAL_VARIABLE:
-      case LOCAL_VARIABLE_COMPONENT:
+      // resource variable
+      case RESOURCE_VARIABLE:
           buf.append(doubleTab).append("start_pc: ").append(xstart_pc).append("\n");
           buf.append(doubleTab).append("length: ").append(xlength).append("\n");
           buf.append(doubleTab).append("index: ").append(xindex).append("\n");
@@ -114,7 +112,6 @@ public class TraceTypeAnnotationVisitor extends TraceAnnotationVisitor
       // {
       // } reference_info;
       case METHOD_RETURN:
-      case METHOD_RETURN_COMPONENT:
           break;
 
       // method parameter
@@ -122,8 +119,16 @@ public class TraceTypeAnnotationVisitor extends TraceAnnotationVisitor
       //   TEMP this should contain the index but doesn't, so for the moment
       //        we don't print an index
       // } reference_info;
-      case METHOD_PARAMETER:
-      case METHOD_PARAMETER_COMPONENT:
+      case METHOD_FORMAL_PARAMETER:
+          buf.append(doubleTab).append("index: ").append("FIXME").append("\n");
+          break;
+
+      // lambda formal parameter
+      // {
+      //   TEMP this should contain the index but doesn't, so for the moment
+      //        we don't print an index
+      // } reference_info;
+      case LAMBDA_FORMAL_PARAMETER:
           buf.append(doubleTab).append("index: ").append("FIXME").append("\n");
           break;
 
@@ -131,7 +136,6 @@ public class TraceTypeAnnotationVisitor extends TraceAnnotationVisitor
       // {
       // } reference_info;
       case FIELD:
-      case FIELD_COMPONENT:
           break;
 
       // class type parameter bound
@@ -140,9 +144,7 @@ public class TraceTypeAnnotationVisitor extends TraceAnnotationVisitor
       //   u1 bound_index;
       // } reference_info;
       case CLASS_TYPE_PARAMETER_BOUND:
-      case CLASS_TYPE_PARAMETER_BOUND_COMPONENT:
       case METHOD_TYPE_PARAMETER_BOUND:
-      case METHOD_TYPE_PARAMETER_BOUND_COMPONENT:
           buf.append(doubleTab).append("param_index: ").append(xparam_index).append("\n");
           buf.append(doubleTab).append("bound_index: ").append(xbound_index).append("\n");
           break;
@@ -153,20 +155,18 @@ public class TraceTypeAnnotationVisitor extends TraceAnnotationVisitor
       //   u1 type_index;  
       // }
       case CLASS_EXTENDS:
-      case CLASS_EXTENDS_COMPONENT:
       case THROWS:
-      // Undefined case THROWS_COMPONENT:
           buf.append(doubleTab).append("type_index: ").append(xtype_index).append("\n");
           break;
 
       // type argument in constructor call
       // type argument in method call
+      // type argument in method reference
       // {
       // } reference_info;
-      case NEW_TYPE_ARGUMENT:
-      case NEW_TYPE_ARGUMENT_COMPONENT:
-      case METHOD_TYPE_ARGUMENT:
-      case METHOD_TYPE_ARGUMENT_COMPONENT:
+      case CONSTRUCTOR_INVOCATION_TYPE_ARGUMENT:
+      case METHOD_INVOCATION_TYPE_ARGUMENT:
+      case METHOD_REFERENCE_TYPE_ARGUMENT:
           break;
 
       // method type parameter
@@ -174,7 +174,6 @@ public class TraceTypeAnnotationVisitor extends TraceAnnotationVisitor
       //    u1 param_index;
       // } reference_info;
       case METHOD_TYPE_PARAMETER:
-      // Undefined case METHOD_TYPE_PARAMETER_COMPONENT:
           buf.append(doubleTab).append("param_index: ").append(xparam_index).append("\n");
           break;
 
@@ -182,21 +181,7 @@ public class TraceTypeAnnotationVisitor extends TraceAnnotationVisitor
       }
 
       // now print out location string for generic target types
-      switch(tt) {
-      case TYPECAST_COMPONENT:
-      case INSTANCEOF_COMPONENT:
-      case NEW_COMPONENT:
-      case METHOD_RECEIVER_COMPONENT:
-      case LOCAL_VARIABLE_COMPONENT:
-      case METHOD_RETURN_COMPONENT:
-      case METHOD_PARAMETER_COMPONENT:
-      case FIELD_COMPONENT:
-      case CLASS_TYPE_PARAMETER_BOUND_COMPONENT:
-      case METHOD_TYPE_PARAMETER_BOUND_COMPONENT:
-      case CLASS_EXTENDS_COMPONENT:
-      // Undefined case THROWS_COMPONENT:
-      case NEW_TYPE_ARGUMENT_COMPONENT:
-      case METHOD_TYPE_ARGUMENT_COMPONENT:
+      if (xlocation_length != 0) {
           buf.append(doubleTab).append("location_length: " + xlocation_length).append("\n");
           buf.append(doubleTab).append("locations: ");
           boolean first = true;
@@ -208,7 +193,6 @@ public class TraceTypeAnnotationVisitor extends TraceAnnotationVisitor
               buf.append(xlocations[i]);
           }
           buf.append("\n");
-      default : // do nothing;
       }
 
       text.add(buf.toString());
@@ -230,14 +214,14 @@ public class TraceTypeAnnotationVisitor extends TraceAnnotationVisitor
 
     public void visitXLocationLength(int location_length) {
       this.xlocation_length = location_length;
-      this.xlocations = new int[this.xlocation_length];
+      this.xlocations = new TypePathEntry[this.xlocation_length];
       this.xlocations_index = 0;
       if(xav != null) {
         xav.visitXLocationLength(location_length);
       }
     }
 
-    public void visitXLocation(int location) {
+    public void visitXLocation(TypePathEntry location) {
       this.xlocations[xlocations_index] = location;
       this.xlocations_index++;
       if(xav != null) {
@@ -292,5 +276,8 @@ public class TraceTypeAnnotationVisitor extends TraceAnnotationVisitor
       if(xav != null) {
         xav.visitXTypeIndex(type_index);
       }
+    }
+
+    public void visitXNameAndArgsSize() {
     }
 }
