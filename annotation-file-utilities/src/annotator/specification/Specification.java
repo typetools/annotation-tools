@@ -2,10 +2,9 @@ package annotator.specification;
 
 import java.util.List;
 
-// import annotations.io.FileIOException;
-import annotator.find.Insertion;
-
 import plume.FileIOException;
+import annotator.find.Insertion;
+// import annotations.io.FileIOException;
 
 /**
  * Represents a file containing a "specification" for placing annotations on

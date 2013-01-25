@@ -4,7 +4,7 @@ package annotator.find;
  * Specifies an insertion of an "extends @Annotation java.lang.Object" to a type
  * bound.
  */
-public class TypeBoundExtendsInsertion extends Insertion {
+public class TypeBoundExtendsInsertion extends AnnotationInsertion {
 
     /**
      * Creates a new TypeBoundExtendsInsertion.
@@ -25,8 +25,17 @@ public class TypeBoundExtendsInsertion extends Insertion {
      * {@inheritDoc}
      */
     @Override
-    public String getText(boolean comments, boolean abbreviate) {
+    protected String getText(boolean comments, boolean abbreviate) {
         return "extends " + super.getText(comments, abbreviate)
                 + " java.lang.Object";
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected boolean addTrailingSpace(boolean gotSeparateLine) {
+        // Never add a trailing space for an extends insertion.
+        return false;
     }
 }

@@ -8,6 +8,7 @@ import annotations.el.InnerTypeLocation;
 import annotations.el.LocalLocation;
 import annotations.el.RelativeLocation;
 import annotations.el.TypeIndexLocation;
+import annotations.io.ASTPath;
 import annotator.Main;
 
 import com.sun.source.tree.Tree;
@@ -148,6 +149,21 @@ public final class Criteria {
         }
       }
     }
+    return false;
+  }
+
+  /**
+   * Determines whether this is the criteria on an AST path.
+   *
+   * @return true iff this is the criteria on an AST path.
+   */
+  public boolean isASTPath() {
+    for (Criterion c : criteria) {
+      if (c.getKind() == Criterion.Kind.AST_PATH) {
+        return true;
+      }
+    }
+
     return false;
   }
 
@@ -369,4 +385,7 @@ public final class Criteria {
     return new ClassBoundCriterion(className, boundLoc);
   }
 
+  public final static Criterion astPath(ASTPath astPath) {
+    return new ASTPathCriterion(astPath);
+  }
 }
