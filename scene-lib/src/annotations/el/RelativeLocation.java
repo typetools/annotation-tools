@@ -22,21 +22,27 @@ public final /*@ReadOnly*/ class RelativeLocation {
     public final int index;
 
     /**
+     * The type index used for intersection types in casts.
+     */
+    public final int type_index;
+
+    /**
      * Constructs a new {@link RelativeLocation}; the arguments are assigned to
      * the fields of the same names.
      * Use -1 for the relative location that you're not using
      */
-    private RelativeLocation(int offset, int index) {
+    private RelativeLocation(int offset, int index, int type_index) {
         this.offset = offset;
         this.index = index;
+        this.type_index = type_index;
     }
 
-    public static RelativeLocation createOffset(int offset) {
-        return new RelativeLocation(offset, -1);
+    public static RelativeLocation createOffset(int offset, int type_index) {
+        return new RelativeLocation(offset, -1, type_index);
     }
 
-    public static RelativeLocation createIndex(int index) {
-        return new RelativeLocation(-1, index);
+    public static RelativeLocation createIndex(int index, int type_index) {
+        return new RelativeLocation(-1, index, type_index);
     }
 
     public boolean isBytecodeOffset() {
