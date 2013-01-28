@@ -135,6 +135,7 @@ public final class JavapParser {
 
     private static final String paramIdxHead = "parameter = ";
     private static final String offsetHead = "offset = ";
+    private static final String typeIndexHead = "type_index = ";
     private static final Pattern localLocRegex =
         Pattern.compile("^\\s*start_pc = (\\d+), length = (\\d+), index = (\\d+)$");
     private static final String itlnHead = "location = ";
@@ -144,6 +145,13 @@ public final class JavapParser {
                 line.substring(line.indexOf(offsetHead) + offsetHead.length()));
         nextLine();
         return offset;
+    }
+
+    private int parseTypeIndex() throws IOException, ParseException {
+        int typeIndex = Integer.parseInt(
+                line.substring(line.indexOf(typeIndexHead) + typeIndexHead.length()));
+        nextLine();
+        return typeIndex;
     }
 
     private List<Integer> parseInnerTypeLocationNums() throws IOException, ParseException {
@@ -220,19 +228,20 @@ public final class JavapParser {
             case CAST:
             {
                 int offset = parseOffset();
-                subOuterType = ((AMethod) member).typecasts.vivify(RelativeLocation.createOffset(offset));
+                int typeIndex = parseTypeIndex(); 
+                subOuterType = ((AMethod) member).typecasts.vivify(RelativeLocation.createOffset(offset, typeIndex));
                 break;
             }
             case INSTANCEOF:
             {
                 int offset = parseOffset();
-                subOuterType = ((AMethod) member).instanceofs.vivify(RelativeLocation.createOffset(offset));
+                subOuterType = ((AMethod) member).instanceofs.vivify(RelativeLocation.createOffset(offset, 0));
                 break;
             }
             case NEW:
             {
                 int offset = parseOffset();
-                subOuterType = ((AMethod) member).news.vivify(RelativeLocation.createOffset(offset));
+                subOuterType = ((AMethod) member).news.vivify(RelativeLocation.createOffset(offset, 0));
                 break;
             }
             // TEMP

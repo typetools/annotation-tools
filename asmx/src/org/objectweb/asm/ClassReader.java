@@ -1335,15 +1335,16 @@ public class ClassReader {
         TargetType target_type = TargetType.fromTargetTypeValue(target_type_value);
 
         switch(target_type) {
-        // typecast
         // type test (instanceof)
         // object creation
+        // constructor/method reference receiver
         // {
         //   u2 offset;
         // } reference_info;
-        case CAST:
         case INSTANCEOF:
         case NEW:
+        case CONSTRUCTOR_REFERENCE_RECEIVER:
+        case METHOD_REFERENCE_RECEIVER:
           offset = readUnsignedShort(v);
           v += 2;
           break;
@@ -1390,15 +1391,6 @@ public class ClassReader {
           v++;
           break;
 
-        // lambda formal parameter
-        // {
-        //   u1 param;
-        // } reference_info;
-        case LAMBDA_FORMAL_PARAMETER:
-          param_index = readByte(v);
-          v++;
-          break;
-
         // field
         // {
         // } reference_info;
@@ -1434,13 +1426,19 @@ public class ClassReader {
           v += 2;
           break;
 
+        // typecast
         // type argument in constructor call
         // type argument in method call
+        // type argument in constructor reference
         // type argument in method reference
         // {
+        //   u2 offset;
+        //   u1 type_index;
         // } reference_info;
+        case CAST:
         case CONSTRUCTOR_INVOCATION_TYPE_ARGUMENT:
         case METHOD_INVOCATION_TYPE_ARGUMENT:
+        case CONSTRUCTOR_REFERENCE_TYPE_ARGUMENT:
         case METHOD_REFERENCE_TYPE_ARGUMENT:
           offset = readUnsignedShort(v);
           v += 2;

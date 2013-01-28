@@ -623,8 +623,14 @@ extends EmptyVisitor {
     /*
      * Returns the offset for this annotation.
      */
-    private RelativeLocation makeOffset() {
-      return RelativeLocation.createOffset(xOffsetArgs.get(0));
+    private RelativeLocation makeOffset(boolean needTypeIndex) {
+      int typeIndex;
+      if (needTypeIndex) {
+        typeIndex = xTypeIndexArgs.get(0);
+      } else {
+        typeIndex = 0;
+      }
+      return RelativeLocation.createOffset(xOffsetArgs.get(0), typeIndex);
     }
 
     /*
@@ -723,9 +729,9 @@ extends EmptyVisitor {
      */
     private void handleMethodObjectCreation(AMethod aMethod) {
       if (xLocationsArgs.isEmpty()) {
-        aMethod.news.vivify(makeOffset()).tlAnnotationsHere.add(makeAnnotation());
+        aMethod.news.vivify(makeOffset(false)).tlAnnotationsHere.add(makeAnnotation());
       } else {
-        aMethod.news.vivify(makeOffset()).innerTypes.vivify(
+        aMethod.news.vivify(makeOffset(false)).innerTypes.vivify(
             makeInnerTypeLocation()).tlAnnotationsHere.add(makeAnnotation());
       }
     }
@@ -751,10 +757,10 @@ extends EmptyVisitor {
      */
     private void handleMethodTypecast(AMethod aMethod) {
       if (xLocationsArgs.isEmpty()) {
-        aMethod.typecasts.vivify(makeOffset()).tlAnnotationsHere.add(
+        aMethod.typecasts.vivify(makeOffset(true)).tlAnnotationsHere.add(
             makeAnnotation());
       } else {
-        aMethod.typecasts.vivify(makeOffset()).innerTypes.vivify(
+        aMethod.typecasts.vivify(makeOffset(true)).innerTypes.vivify(
             makeInnerTypeLocation()).tlAnnotationsHere.add(makeAnnotation());
       }
     }
@@ -778,10 +784,10 @@ extends EmptyVisitor {
      */
     private void handleMethodInstanceOf(AMethod aMethod) {
       if (xLocationsArgs.isEmpty()) {
-        aMethod.instanceofs.vivify(makeOffset()).tlAnnotationsHere.add(
+        aMethod.instanceofs.vivify(makeOffset(false)).tlAnnotationsHere.add(
             makeAnnotation());
       } else {
-        aMethod.typecasts.vivify(makeOffset()).innerTypes.vivify(
+        aMethod.typecasts.vivify(makeOffset(false)).innerTypes.vivify(
             makeInnerTypeLocation()).tlAnnotationsHere.add(makeAnnotation());
       }
     }

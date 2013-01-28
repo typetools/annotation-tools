@@ -835,11 +835,21 @@ public final class IndexFileParser {
                 if (checkChar('#')) {
                     expectChar('#');
                     int offset = expectNonNegative(matchNNInteger());
-                    loc = RelativeLocation.createOffset(offset);
+                    int type_index = 0;
+                    if (checkChar(',')) {
+                        expectChar(',');
+                        type_index = expectNonNegative(matchNNInteger());
+                    }
+                    loc = RelativeLocation.createOffset(offset, type_index);
                 } else {
                     expectChar('*');
                     int index = expectNonNegative(matchNNInteger());
-                    loc = RelativeLocation.createIndex(index);
+                    int type_index = 0;
+                    if (checkChar(',')) {
+                        expectChar(',');
+                        type_index = expectNonNegative(matchNNInteger());
+                    }
+                    loc = RelativeLocation.createIndex(index, type_index);
                 }
                 ATypeElement t = exp.typecasts.vivify(loc);
                 expectChar(':');
@@ -854,11 +864,11 @@ public final class IndexFileParser {
                 if (checkChar('#')) {
                     expectChar('#');
                     int offset = expectNonNegative(matchNNInteger());
-                    loc = RelativeLocation.createOffset(offset);
+                    loc = RelativeLocation.createOffset(offset, 0);
                 } else {
                     expectChar('*');
                     int index = expectNonNegative(matchNNInteger());
-                    loc = RelativeLocation.createIndex(index);
+                    loc = RelativeLocation.createIndex(index, 0);
                 }
                 ATypeElement i = exp.instanceofs.vivify(loc);
                 expectChar(':');
@@ -873,11 +883,11 @@ public final class IndexFileParser {
                 if (checkChar('#')) {
                     expectChar('#');
                     int offset = expectNonNegative(matchNNInteger());
-                    loc = RelativeLocation.createOffset(offset);
+                    loc = RelativeLocation.createOffset(offset, 0);
                 } else {
                     expectChar('*');
                     int index = expectNonNegative(matchNNInteger());
-                    loc = RelativeLocation.createIndex(index);
+                    loc = RelativeLocation.createIndex(index, 0);
                 }
                 ATypeElement n = exp.news.vivify(loc);
                 expectChar(':');

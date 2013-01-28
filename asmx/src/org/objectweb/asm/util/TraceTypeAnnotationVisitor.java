@@ -28,8 +28,6 @@ public class TraceTypeAnnotationVisitor extends TraceAnnotationVisitor
      */
     protected String doubleTab = tab + tab;
 
-    private int valueNumber = 0;
-
     // variables necessary in order to print reference info for
     // extended annotation
     private int xtarget_type;
@@ -37,7 +35,6 @@ public class TraceTypeAnnotationVisitor extends TraceAnnotationVisitor
     private int xlocation_length;
     private TypePathEntry xlocations[];
     private int xlocations_index;
-    private int xnum_entries;
     private int xstart_pc;
     private int xlength;
     private int xindex;
@@ -76,15 +73,16 @@ public class TraceTypeAnnotationVisitor extends TraceAnnotationVisitor
 
       TargetType tt = TargetType.fromTargetTypeValue(xtarget_type);
       switch(tt) {
-      // typecast
       // type test (instanceof)
       // object creation
+      // constructor/method reference receiver
       // {
       //   u2 offset;
       // } reference_info;
-      case CAST:
       case INSTANCEOF:
       case NEW:
+      case CONSTRUCTOR_REFERENCE_RECEIVER:
+      case METHOD_REFERENCE_RECEIVER:
           buf.append(doubleTab).append("offset: ").append(xoffset).append("\n");
           break;
 
@@ -108,7 +106,7 @@ public class TraceTypeAnnotationVisitor extends TraceAnnotationVisitor
           buf.append(doubleTab).append("index: ").append(xindex).append("\n");
           break;
 
-          // method return type
+      // method return type
       // {
       // } reference_info;
       case METHOD_RETURN:
@@ -120,15 +118,6 @@ public class TraceTypeAnnotationVisitor extends TraceAnnotationVisitor
       //        we don't print an index
       // } reference_info;
       case METHOD_FORMAL_PARAMETER:
-          buf.append(doubleTab).append("index: ").append("FIXME").append("\n");
-          break;
-
-      // lambda formal parameter
-      // {
-      //   TEMP this should contain the index but doesn't, so for the moment
-      //        we don't print an index
-      // } reference_info;
-      case LAMBDA_FORMAL_PARAMETER:
           buf.append(doubleTab).append("index: ").append("FIXME").append("\n");
           break;
 
@@ -159,14 +148,22 @@ public class TraceTypeAnnotationVisitor extends TraceAnnotationVisitor
           buf.append(doubleTab).append("type_index: ").append(xtype_index).append("\n");
           break;
 
+      // typecast
       // type argument in constructor call
       // type argument in method call
+      // type argument in constructor reference
       // type argument in method reference
       // {
+      //   u2 offset;
+      //   u1 type_index;
       // } reference_info;
+      case CAST:
       case CONSTRUCTOR_INVOCATION_TYPE_ARGUMENT:
       case METHOD_INVOCATION_TYPE_ARGUMENT:
+      case CONSTRUCTOR_REFERENCE_TYPE_ARGUMENT:
       case METHOD_REFERENCE_TYPE_ARGUMENT:
+          buf.append(doubleTab).append("offset: ").append(xoffset).append("\n");
+          buf.append(doubleTab).append("type_index: ").append(xtype_index).append("\n");
           break;
 
       // method type parameter
@@ -230,7 +227,6 @@ public class TraceTypeAnnotationVisitor extends TraceAnnotationVisitor
     }
 
     public void visitXNumEntries(int num_entries) {
-      this.xnum_entries = num_entries;
       if(xav != null) {
         xav.visitXNumEntries(num_entries);
       }
