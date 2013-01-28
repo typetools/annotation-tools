@@ -442,11 +442,11 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
   }
 
   private void visitParameterIndex(TypeAnnotationVisitor xav, int index) {
-	  xav.visitXParamIndex(index);
+    xav.visitXParamIndex(index);
   }
 
   private void visitTypeIndex(TypeAnnotationVisitor xav, int index) {
-	  xav.visitXTypeIndex(index);
+    xav.visitXTypeIndex(index);
   }
 
   /**
@@ -1012,6 +1012,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
           if (strict) { System.err.println("ClassAnnotationSceneWriter.ensureVisitTypecastAnnotation: no bytecode offset found!"); }
         }
         int offset = entry.getKey().offset;
+        int typeIndex = entry.getKey().type_index;
         ATypeElement aTypecast = entry.getValue();
         for (Annotation tla : aTypecast.tlAnnotationsHere) {
           if (shouldSkip(tla)) continue;
@@ -1019,6 +1020,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
           TypeAnnotationVisitor xav = visitTypeAnnotation(tla);
           visitTargetType(xav, TargetType.CAST);
           visitOffset(xav, offset);
+          visitTypeIndex(xav, typeIndex);
           visitLocations(xav, InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION);
           visitFields(xav, tla);
           xav.visitEnd();
@@ -1036,6 +1038,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
             visitTargetType(xav, TargetType.CAST);
             // information for raw type (typecast)
             visitOffset(xav, offset);
+            visitTypeIndex(xav, typeIndex);
             // information for generic/array (on typecast)
             visitLocations(xav, aTypecastLocation);
             visitFields(xav, tla);
