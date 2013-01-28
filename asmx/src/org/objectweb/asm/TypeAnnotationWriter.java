@@ -1,5 +1,5 @@
 // Source code copied from AnnotationWriter.java, and modified to 
-//  accomodate extended annotations.  
+//  accommodate extended annotations.  
 // Specifically, the int x* fields and visitX* methods were added.
 
 /***
@@ -33,7 +33,6 @@
  */
 package org.objectweb.asm;
 
-import com.sun.tools.javac.code.TargetType;
 import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
 
 /**
@@ -95,43 +94,8 @@ final class TypeAnnotationWriter implements TypeAnnotationVisitor {
      */
     TypeAnnotationWriter prev;
 
-    // information for extended annotation type
-    // typecasts and object creation:
-    // {
-    //   u2 offset;
-    // } reference_info;
-    //
-    // local variables:
-    // {
-    //   u2 start_pc;
-    //   u2 length;
-    //   u2 index;
-    // } reference_info;
-    //
-    // generic type arguments or arrays
-    // {
-    //   u2 offset;
-    //   u2 location_length;
-    //   u1 location[location_length];
-    // } reference_info;
-    // 
-    // class extends/implements
-    // exception type in throws
-    // {
-    //   u1 type_index;
-    // }
-    private int xsize; // size of additional extended information
-    private int xtarget_type;
-    private int xoffset;
-    private int xlocation_length;
     private TypePathEntry xlocations[];
     private int xlocations_index;
-    private int xstart_pc;
-    private int xlength;
-    private int xindex;
-    private int xparam_index;
-    private int xbound_index;
-    private int xtype_index;
 
     // ------------------------------------------------------------------------
     // Constructor
@@ -160,9 +124,6 @@ final class TypeAnnotationWriter implements TypeAnnotationVisitor {
         this.desc = desc;
 
         // extended information
-        this.xtarget_type = TargetType.UNKNOWN.targetTypeValue();
-        this.xoffset = 0;
-        this.xlocation_length = 0;
         this.xlocations = null;
         this.xlocations_index = 0;
     }
@@ -371,19 +332,16 @@ final class TypeAnnotationWriter implements TypeAnnotationVisitor {
 
     // below are all the methods for implementing extended annotations
     public void visitXTargetType(int target_type) {
-        this.xtarget_type = target_type;
         bv.putByte(target_type);
     }
 
     // used for typecasts, object creation, field generic/array
     public void visitXOffset(int offset) {
-        this.xoffset = offset; 
         bv.putShort(offset);
     }
 
     // used for generic type arguments or arrays
     public void visitXLocationLength(int location_length) {
-        this.xlocation_length = location_length;
         this.xlocations = new TypePathEntry[location_length];
         this.xlocations_index = 0;
         bv.putByte(location_length);
@@ -404,38 +362,32 @@ final class TypeAnnotationWriter implements TypeAnnotationVisitor {
 
     // used for local variables
     public void visitXStartPc(int start_pc) {
-        this.xstart_pc = start_pc;
         bv.putShort(start_pc);
     }
 
     // used for local variables
     public void visitXLength(int length) {
-        this.xlength = length;
         bv.putShort(length);
     }
 
     // used for local variables
     public void visitXIndex(int index) {
-        this.xindex = index;
         bv.putShort(index);
     }
 
     // used for type parameter bounds
     public void visitXParamIndex(int param_index) {
-        this.xparam_index = param_index;
         bv.putByte(param_index);
     }
 
     // used for type parameter bounds
     public void visitXBoundIndex(int bound_index) {
-        this.xbound_index = bound_index;
         bv.putByte(bound_index);
     }
 
     // used for type index for class extends/implements and 
     // throws exception types
     public void visitXTypeIndex(int type_index) {
-        this.xtype_index = type_index;
         bv.putByte(type_index);
     }
 
