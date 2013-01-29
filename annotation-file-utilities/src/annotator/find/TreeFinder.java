@@ -847,6 +847,16 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
         debug("    Type of node: " + node.getClass());
       }
 
+      // As per the JSR308 specification, receiver parameters are not allowed
+      // on method declarations of anonymous inner classes.
+      if (i.getCriteria().isOnReceiver()
+              && path.getParentPath().getParentPath().getLeaf().getKind() == Tree.Kind.NEW_CLASS) {
+        System.err.println("WARNING: Cannot insert a receiver parameter on a method "
+            + "declaration of an anonymous inner class. This insertion will be skipped.\n"
+            + "    Insertion: " + i);
+        continue;
+      }
+
       // Don't insert a duplicate if this particular annotation is already
       // present at this location.
       List<? extends AnnotationTree> alreadyPresent = null;
