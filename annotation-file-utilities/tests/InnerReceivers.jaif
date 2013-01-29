@@ -1,0 +1,8 @@
+package:
+    annotation @X: @java.lang.annotation.Target(value={TYPE_USE})
+
+    // Try to insert a receiver parameter on a method declaration in an
+    // anonymous inner class. This is illegal, so should do nothing.
+    class InnerReceivers$1:
+        method m()V:
+            receiver: @X
