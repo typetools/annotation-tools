@@ -8,6 +8,6 @@ public class WildcardAnnoBound<X extends List<? extends @Bla Object>> {
   }
 }
 
-class NoBound<X extends @A java.lang.Object> {}
+class NoBound<X extends java.lang. @A Object> {}
 
 class Bounds<@A X extends @B Object & @C Comparable<@D int @E []> & @F Map<@G ? extends @H Object, @I ?>, @J Y> {}
