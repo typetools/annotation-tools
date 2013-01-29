@@ -594,8 +594,7 @@ public class ClassWriter implements ClassVisitor {
     //jaime
     public TypeAnnotationVisitor visitTypeAnnotation(String desc, boolean visible) {
         ByteVector bv = new ByteVector();
-        bv.putShort(newUTF8(desc)).putShort(0);
-        TypeAnnotationWriter xaw = new TypeAnnotationWriter(this, true, bv, bv, 2);
+        TypeAnnotationWriter xaw = new TypeAnnotationWriter(this, true, bv, bv, desc);
         if(visible) {
             xaw.next = xanns;
             xanns = xaw;

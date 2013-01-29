@@ -8,5 +8,5 @@ class TypeCastGeneric:
 
     method foo(Ljava/lang/Object;)V:
         typecast #1:
-            inner-type 0: @java.lang.Mutable
+            inner-type 3, 0: @java.lang.Mutable
 

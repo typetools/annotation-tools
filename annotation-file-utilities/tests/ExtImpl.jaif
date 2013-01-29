@@ -9,17 +9,17 @@ annotation @F:
 
 class ExtImpl$C1:
 extends: @A
-inner-type 0: @B
-inner-type 1: @C
+inner-type 3, 0: @B
+inner-type 3, 1: @C
 implements 0: @D
-inner-type 0: @E
-inner-type 1: @F
+inner-type 3, 0: @E
+inner-type 3, 1: @F
 
 class ExtImpl$C2:
 implements 0: @A
-inner-type 0: @B
-inner-type 1: @C
+inner-type 3, 0: @B
+inner-type 3, 1: @C
 implements 1: @D
-inner-type 0: @E
-inner-type 1: @F
+inner-type 3, 0: @E
+inner-type 3, 1: @F
 

@@ -13,24 +13,24 @@ class ArrayParamSimple:
     method m1([Ljava/lang/Integer;)V:
         parameter #0:
 	    type:
-                inner-type 0: @java.lang.ReadOnly
+                inner-type 0, 0: @java.lang.ReadOnly
 
     method m2([Ljava/lang/Integer;)V:
         parameter #0:
 	    type: @java.lang.ReadOnly
-                inner-type 0:
+                inner-type 0, 0:
 
     method m3([Ljava/lang/Integer;)V:
         parameter #0:
 	    type:
-                inner-type 0: @java.lang.Nullable
+                inner-type 0, 0: @java.lang.Nullable
 
     method m4([Ljava/lang/Integer;)V:
         parameter #0:
 	    type: @java.lang.Nullable
-                inner-type 0:
+                inner-type 0, 0:
 
 // The tool properly issues a warning about inner-type on a declaration location.
 //     method m5([Ljava/lang/Integer;)V:
 //         parameter #0:
-//             inner-type 0: @java.lang.Nullable
+//             inner-type 0, 0: @java.lang.Nullable

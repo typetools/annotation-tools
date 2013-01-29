@@ -16,6 +16,7 @@ import java.io.Reader;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -23,7 +24,15 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.sun.tools.javac.code.TypeAnnotationPosition;
+
+import plume.ArraysMDE;
 import plume.FileIOException;
+import type.ArrayType;
+import type.DeclaredType;
+import type.Type;
+import type.BoundedType;
+import type.BoundedType.BoundKind;
 import annotations.Annotation;
 import annotations.AnnotationBuilder;
 import annotations.AnnotationFactory;
@@ -36,6 +45,7 @@ import annotations.el.AExpression;
 import annotations.el.AMethod;
 import annotations.el.AScene;
 import annotations.el.ATypeElement;
+import annotations.el.ATypeElementWithType;
 import annotations.el.AnnotationDef;
 import annotations.el.BoundLocation;
 import annotations.el.InnerTypeLocation;
@@ -50,6 +60,8 @@ import annotations.field.ClassTokenAFT;
 import annotations.field.EnumAFT;
 import annotations.field.ScalarAFT;
 import annotations.util.coll.VivifyingMap;
+
+import com.sun.source.tree.Tree.Kind;
 
 /**
  * IndexFileParser provides static methods
@@ -607,10 +619,12 @@ public final class IndexFileParser {
             ArrayList<Integer> locNumbers =
                     new ArrayList<Integer>();
             locNumbers.add(expectNonNegative(matchNNInteger()));
+            // TODO: currently, we simply read the binary representation.
+            // Should we read a higher-level format?
             while (matchChar(','))
                 locNumbers.add(expectNonNegative(matchNNInteger()));
             InnerTypeLocation loc =
-                    new InnerTypeLocation(locNumbers);
+                    new InnerTypeLocation(TypeAnnotationPosition.getTypePathFromBinary(locNumbers));
             AElement it = e.innerTypes.vivify(loc);
             expectChar(':');
             parseAnnotations(it);
@@ -821,11 +835,21 @@ public final class IndexFileParser {
                 if (checkChar('#')) {
                     expectChar('#');
                     int offset = expectNonNegative(matchNNInteger());
-                    loc = RelativeLocation.createOffset(offset);
+                    int type_index = 0;
+                    if (checkChar(',')) {
+                        expectChar(',');
+                        type_index = expectNonNegative(matchNNInteger());
+                    }
+                    loc = RelativeLocation.createOffset(offset, type_index);
                 } else {
                     expectChar('*');
                     int index = expectNonNegative(matchNNInteger());
-                    loc = RelativeLocation.createIndex(index);
+                    int type_index = 0;
+                    if (checkChar(',')) {
+                        expectChar(',');
+                        type_index = expectNonNegative(matchNNInteger());
+                    }
+                    loc = RelativeLocation.createIndex(index, type_index);
                 }
                 ATypeElement t = exp.typecasts.vivify(loc);
                 expectChar(':');
@@ -840,11 +864,11 @@ public final class IndexFileParser {
                 if (checkChar('#')) {
                     expectChar('#');
                     int offset = expectNonNegative(matchNNInteger());
-                    loc = RelativeLocation.createOffset(offset);
+                    loc = RelativeLocation.createOffset(offset, 0);
                 } else {
                     expectChar('*');
                     int index = expectNonNegative(matchNNInteger());
-                    loc = RelativeLocation.createIndex(index);
+                    loc = RelativeLocation.createIndex(index, 0);
                 }
                 ATypeElement i = exp.instanceofs.vivify(loc);
                 expectChar(':');
@@ -859,19 +883,263 @@ public final class IndexFileParser {
                 if (checkChar('#')) {
                     expectChar('#');
                     int offset = expectNonNegative(matchNNInteger());
-                    loc = RelativeLocation.createOffset(offset);
+                    loc = RelativeLocation.createOffset(offset, 0);
                 } else {
                     expectChar('*');
                     int index = expectNonNegative(matchNNInteger());
-                    loc = RelativeLocation.createIndex(index);
+                    loc = RelativeLocation.createIndex(index, 0);
                 }
                 ATypeElement n = exp.news.vivify(loc);
                 expectChar(':');
                 parseAnnotations(n);
                 parseInnerTypes(n);
             }
+            while (checkKeyword("insert-typecast")) {
+                matchKeyword("insert-typecast");
+                matched = true;
+                evermatched = true;
+                ASTPath astPath = parseASTPath();
+                expectChar(':');
+                ATypeElementWithType i = exp.insertTypecasts.vivify(astPath);
+                parseAnnotations(i);
+                Type type = parseType();
+                i.setType(type);
+            }
         }
         return evermatched;
+    }
+
+    /**
+     * Parses an AST path.
+     * @return the AST path.
+     */
+    private ASTPath parseASTPath() throws IOException, ParseException {
+        ASTPath astPath = new ASTPath();
+        astPath.add(parseASTEntry());
+        while (matchChar(',')) {
+            astPath.add(parseASTEntry());
+        }
+        return astPath;
+    }
+
+    /**
+     * Parses and returns the next AST entry.
+     * @return A new AST entry.
+     * @throws ParseException if the next entry type is invalid.
+     */
+    private ASTPath.ASTEntry parseASTEntry() throws IOException, ParseException {
+        ASTPath.ASTEntry entry;
+        if (matchKeyword("AnnotatedType")) {
+            entry = newASTEntry(Kind.ANNOTATED_TYPE, new String[] {ASTPath.ANNOTATION, ASTPath.UNDERLYING_TYPE},
+                    new String[] {ASTPath.ANNOTATION});
+        } else if (matchKeyword("ArrayAccess")) {
+            entry = newASTEntry(Kind.ARRAY_ACCESS, new String[] {ASTPath.EXPRESSION, ASTPath.INDEX});
+        } else if (matchKeyword("ArrayType")) {
+            entry = newASTEntry(Kind.ARRAY_TYPE, new String[] {ASTPath.TYPE});
+        } else if (matchKeyword("Assert")) {
+            entry = newASTEntry(Kind.ASSERT, new String[] {ASTPath.CONDITION, ASTPath.DETAIL});
+        } else if (matchKeyword("Assignment")) {
+            entry = newASTEntry(Kind.ASSIGNMENT, new String[] {ASTPath.VARIABLE, ASTPath.EXPRESSION});
+        } else if (matchKeyword("Binary")) {
+            // Always use Kind.PLUS for Binary
+            entry = newASTEntry(Kind.PLUS, new String[] {ASTPath.LEFT_OPERAND, ASTPath.RIGHT_OPERAND});
+        } else if (matchKeyword("Block")) {
+            entry = newASTEntry(Kind.BLOCK, new String[] {ASTPath.STATEMENT}, new String[] {ASTPath.STATEMENT});
+        } else if (matchKeyword("Case")) {
+            entry = newASTEntry(Kind.CASE, new String[] {ASTPath.EXPRESSION, ASTPath.STATEMENT},
+                    new String[] {ASTPath.STATEMENT});
+        } else if (matchKeyword("Catch")) {
+            entry = newASTEntry(Kind.CATCH, new String[] {ASTPath.PARAMETER, ASTPath.BLOCK});
+        } else if (matchKeyword("CompoundAssignment")) {
+            // Always use Kind.PLUS_ASSIGNMENT for CompoundAssignment
+            entry = newASTEntry(Kind.PLUS_ASSIGNMENT, new String[] {ASTPath.VARIABLE, ASTPath.EXPRESSION});
+        } else if (matchKeyword("ConditionalExpression")) {
+            entry = newASTEntry(Kind.CONDITIONAL_EXPRESSION,
+                    new String[] {ASTPath.CONDITION, ASTPath.TRUE_EXPRESSION, ASTPath.FALSE_EXPRESSION});
+        } else if (matchKeyword("DoWhileLoop")) {
+            entry = newASTEntry(Kind.DO_WHILE_LOOP, new String[] {ASTPath.CONDITION, ASTPath.STATEMENT});
+        } else if (matchKeyword("EnhancedForLoop")) {
+            entry = newASTEntry(Kind.ENHANCED_FOR_LOOP, new String[] {ASTPath.VARIABLE, ASTPath.EXPRESSION, ASTPath.STATEMENT});
+        } else if (matchKeyword("ExpressionStatement")) {
+            entry = newASTEntry(Kind.EXPRESSION_STATEMENT, new String[] {ASTPath.EXPRESSION});
+        } else if (matchKeyword("ForLoop")) {
+            entry = newASTEntry(Kind.FOR_LOOP, new String[] {ASTPath.INITIALIZER, ASTPath.CONDITION, ASTPath.UPDATE, ASTPath.STATEMENT},
+                    new String[] {ASTPath.INITIALIZER, ASTPath.UPDATE});
+        } else if (matchKeyword("If")) {
+            entry = newASTEntry(Kind.IF, new String[] {ASTPath.CONDITION, ASTPath.THEN_STATEMENT, ASTPath.ELSE_STATEMENT});
+        } else if (matchKeyword("InstanceOf")) {
+            entry = newASTEntry(Kind.INSTANCE_OF, new String[] {ASTPath.EXPRESSION, ASTPath.TYPE});
+        } else if (matchKeyword("LabeledStatement")) {
+            entry = newASTEntry(Kind.LABELED_STATEMENT, new String[] {ASTPath.STATEMENT});
+        } else if (matchKeyword("LambdaExpression")) {
+            entry = newASTEntry(Kind.LAMBDA_EXPRESSION, new String[] {ASTPath.PARAMETER, ASTPath.BODY},
+                    new String[] {ASTPath.PARAMETER});
+        } else if (matchKeyword("MemberReference")) {
+            entry = newASTEntry(Kind.MEMBER_REFERENCE,new String[] {ASTPath.QUALIFIER_EXPRESSION, ASTPath.TYPE_ARGUMENT},
+                    new String[] {ASTPath.TYPE_ARGUMENT});
+        } else if (matchKeyword("MemberSelect")) {
+            entry = newASTEntry(Kind.MEMBER_SELECT, new String[] {ASTPath.EXPRESSION});
+        } else if (matchKeyword("MethodInvocation")) {
+            entry = newASTEntry(Kind.METHOD_INVOCATION, new String[] {ASTPath.TYPE_ARGUMENT, ASTPath.METHOD_SELECT, ASTPath.ARGUMENT},
+                    new String[] {ASTPath.TYPE_ARGUMENT, ASTPath.ARGUMENT});
+        } else if (matchKeyword("NewArray")) {
+            entry = newASTEntry(Kind.NEW_ARRAY, new String[] {ASTPath.TYPE, ASTPath.DIMENSION, ASTPath.INITIALIZER},
+                    new String[] {ASTPath.DIMENSION, ASTPath.INITIALIZER});
+        } else if (matchKeyword("NewClass")) {
+            entry = newASTEntry(Kind.NEW_CLASS, new String[] {ASTPath.ENCLOSING_EXPRESSION, ASTPath.TYPE_ARGUMENT, ASTPath.IDENTIFIER, ASTPath.ARGUMENT, ASTPath.CLASS_BODY},
+                    new String[] {ASTPath.TYPE_ARGUMENT, ASTPath.ARGUMENT});
+        } else if (matchKeyword("ParameterizedType")) {
+            entry = newASTEntry(Kind.PARAMETERIZED_TYPE, new String[] {ASTPath.TYPE, ASTPath.TYPE_ARGUMENT},
+                    new String[] {ASTPath.TYPE_ARGUMENT});
+        } else if (matchKeyword("Parenthesized")) {
+            entry = newASTEntry(Kind.PARENTHESIZED, new String[] {ASTPath.EXPRESSION});
+        } else if (matchKeyword("Return")) {
+            entry = newASTEntry(Kind.RETURN, new String[] {ASTPath.EXPRESSION});
+        } else if (matchKeyword("Switch")) {
+            entry = newASTEntry(Kind.SWITCH, new String[] {ASTPath.EXPRESSION, ASTPath.CASE},
+                    new String[] {ASTPath.CASE});
+        } else if (matchKeyword("Synchronized")) {
+            entry = newASTEntry(Kind.SYNCHRONIZED, new String[] {ASTPath.EXPRESSION, ASTPath.BLOCK});
+        } else if (matchKeyword("Throw")) {
+            entry = newASTEntry(Kind.THROW, new String[] {ASTPath.EXPRESSION});
+        } else if (matchKeyword("Try")) {
+            entry = newASTEntry(Kind.TRY, new String[] {ASTPath.BLOCK, ASTPath.CATCH, ASTPath.FINALLY_BLOCK},
+                    new String[] {ASTPath.CATCH});
+        } else if (matchKeyword("TypeCast")) {
+            entry = newASTEntry(Kind.TYPE_CAST, new String[] {ASTPath.TYPE, ASTPath.EXPRESSION});
+        } else if (matchKeyword("Unary")) {
+            // Always use Kind.UNARY_PLUS for Unary
+            entry = newASTEntry(Kind.UNARY_PLUS, new String[] {ASTPath.EXPRESSION});
+        } else if (matchKeyword("UnionType")) {
+            entry = newASTEntry(Kind.UNION_TYPE, new String[] {ASTPath.TYPE_ALTERNATIVE},
+                    new String[] {ASTPath.TYPE_ALTERNATIVE});
+        } else if (matchKeyword("Variable")) {
+            entry = newASTEntry(Kind.VARIABLE, new String[] {ASTPath.TYPE, ASTPath.INITIALIZER});
+        } else if (matchKeyword("WhileLoop")) {
+            entry = newASTEntry(Kind.WHILE_LOOP, new String[] {ASTPath.CONDITION, ASTPath.STATEMENT});
+        } else if (matchKeyword("Wildcard")) {
+            // Always use Kind.UNBOUNDED_WILDCARD for Wildcard
+            entry = newASTEntry(Kind.UNBOUNDED_WILDCARD, new String[] {ASTPath.BOUND});
+        } else {
+            throw new ParseException("Invalid AST path type: " + st.sval);
+        }
+        return entry;
+    }
+
+    /**
+     * Parses and constructs a new AST entry, where none of the child selections require
+     * arguments. For example, the call:
+     *
+     * <pre>
+     * {@code newASTEntry(Kind.WHILE_LOOP, new String[] {"condition", "statement"});</pre>
+     *
+     * constructs a while loop AST entry, where the valid child selectors are "condition" or
+     * "statement".
+     *
+     * @param kind The kind of this AST entry.
+     * @param legalChildSelectors A list of the legal child selectors for this AST entry.
+     * @return A new {@link ASTPath.ASTEntry}.
+     * @throws ParseException if an illegal argument is found.
+     */
+    private ASTPath.ASTEntry newASTEntry(Kind kind, String[] legalChildSelectors) throws IOException, ParseException {
+        return newASTEntry(kind, legalChildSelectors, null);
+    }
+
+    /**
+     * Parses and constructs a new AST entry. For example, the call:
+     * 
+     * <pre>
+     * {@code newASTEntry(Kind.CASE, new String[] {"expression", "statement"}, new String[] {"statement"});
+     * </pre>
+     * 
+     * constructs a case AST entry, where the valid child selectors are
+     * "expression" or "statement" and the "statement" child selector requires
+     * an argument.
+     * 
+     * @param kind The kind of this AST entry.
+     * @param legalChildSelectors A list of the legal child selectors for this AST entry.
+     * @param argumentChildSelectors A list of the child selectors that also require an argument.
+     *                               Entries here should also be in the legalChildSelectors list.
+     * @return A new {@link ASTPath.ASTEntry}.
+     * @throws ParseException if an illegal argument is found.
+     */
+    private ASTPath.ASTEntry newASTEntry(Kind kind, String[] legalChildSelectors, String[] argumentChildSelectors) throws IOException, ParseException {
+        expectChar('.');
+        for (String arg : legalChildSelectors) {
+            if (matchKeyword(arg)) {
+                if (argumentChildSelectors != null && ArraysMDE.indexOf(argumentChildSelectors, arg) >= 0) {
+                    int index = expectNonNegative(matchNNInteger());
+                    return new ASTPath.ASTEntry(kind, arg, index);
+                } else {
+                    return new ASTPath.ASTEntry(kind, arg);
+                }
+            }
+        }
+        throw new ParseException("Invalid argument for " + kind + " (legal arguments - " + Arrays.toString(legalChildSelectors) + "): " + st.sval);
+    }
+
+    /**
+     * Parses the next tokens as a Java type.
+     */
+    private Type parseType() throws IOException, ParseException {
+        DeclaredType declaredType;
+        if (matchChar('?')) {
+            declaredType = new DeclaredType(DeclaredType.WILDCARD);
+        } else {
+            declaredType = parseDeclaredType();
+        }
+        if (checkKeyword("extends") || checkKeyword("super")) {
+            return parseBoundedType(declaredType);
+        } else {
+            Type type = declaredType;
+            while (matchChar('[')) {
+                expectChar(']');
+                type = new ArrayType(type);
+            }
+            return type;
+        }
+    }
+
+    /**
+     * Parses the next tokens as a declared type.
+     */
+    private DeclaredType parseDeclaredType() throws IOException, ParseException {
+        return parseDeclaredType(expectIdentifier());
+    }
+
+    /**
+     * Parses the next tokens as a declared type.
+     * @param name the name of the initial identifier
+     */
+    private DeclaredType parseDeclaredType(String name) throws IOException, ParseException {
+        DeclaredType type = new DeclaredType(name);
+        if (matchChar('<')) {
+            type.addTypeParameter(parseType());
+            while (matchChar(',')) {
+                type.addTypeParameter(parseType());
+            }
+            expectChar('>');
+        }
+        if (matchChar('.')) {
+            type.setInnerType(parseDeclaredType());
+        }
+        return type;
+    }
+
+    /**
+     * Parses the next tokens as a bounded type.
+     * @param type the base type.
+     */
+    private BoundedType parseBoundedType(DeclaredType type) throws IOException, ParseException {
+        BoundKind kind;
+        if (matchKeyword("extends")) {
+            kind = BoundKind.EXTENDS;
+        } else if (matchKeyword("super")) {
+            kind = BoundKind.SUPER;
+        } else {
+            throw new ParseException("Illegal bound kind: " + st.sval);
+        }
+        return new BoundedType(type, kind, parseDeclaredType());
     }
 
     private void parseClass() throws IOException, ParseException {
@@ -1041,4 +1309,19 @@ public final class IndexFileParser {
         }
     }
 
+    /**
+     * Parse the given text into a {@link Type}.
+     * @param text the text to parse.
+     * @return the type.
+     */
+    public static Type parseType(String text) {
+        StringReader in = new StringReader(text);
+        IndexFileParser parser = new IndexFileParser(in, null);
+        try {
+            parser.st.nextToken();
+            return parser.parseType();
+        } catch (Exception e) {
+            throw new RuntimeException("Error parsing type from: '" + text + "'", e);
+        }
+    }
 }

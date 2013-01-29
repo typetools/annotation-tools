@@ -8,6 +8,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.util.*;
 
+import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
+
 import annotations.*;
 import annotations.el.*;
 import annotations.field.*;
@@ -157,18 +159,26 @@ public final class IndexFileWriter {
             /*@ReadOnly*/ AElement it = ite.getValue();
             pw.print(indentation + INDENT + "inner-type");
             boolean first = true;
-            for (int l : loc.location) {
+            for (TypePathEntry l : loc.location) {
                 if (first)
                     pw.print(' ');
                 else
                     pw.print(',');
-                pw.print(l);
+                pw.print(typePathEntryToString(l));
                 first = false;
             }
             pw.print(':');
             printAnnotations(it);
             pw.println();
         }
+    }
+
+    /**
+     * Converts the given {@link TypePathEntry} to a string of the form
+     * {@code tag, arg}, where tag and arg are both integers.
+     */
+    private String typePathEntryToString(TypePathEntry t) {
+    	return t.tag.tag + ", " + t.arg;
     }
 
     private void printNumberedAmbigiousElements(String indentation,
@@ -196,12 +206,12 @@ public final class IndexFileWriter {
             /*@ReadOnly*/ AElement it = ite.getValue();
             pw.print(indentation + INDENT + INDENT + "inner-type");
             boolean first = true;
-            for (int l : loc.location) {
+            for (TypePathEntry l : loc.location) {
                 if (first)
                     pw.print(' ');
                 else
                     pw.print(',');
-                pw.print(l);
+                pw.print(typePathEntryToString(l));
                 first = false;
             }
             pw.print(':');

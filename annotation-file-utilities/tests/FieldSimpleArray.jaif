@@ -9,7 +9,7 @@ class FieldSimpleArray:
 
     field field:
         type: @java.lang.ReadOnly
-        inner-type 0: @java.lang.Mutable
+        inner-type 0, 0: @java.lang.Mutable
 
     method <init>()V:
 

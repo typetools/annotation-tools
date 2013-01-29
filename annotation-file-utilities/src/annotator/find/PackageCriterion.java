@@ -34,9 +34,6 @@ final class PackageCriterion implements Criterion {
       debug(String.format("PackageCriterion.isSatisfiedBy(%s, %s); this=%s", Main.pathToString(path), tree, this));
     }
 
-    if (path != null)
-      return false;
-
     if (tree.getKind() == Tree.Kind.COMPILATION_UNIT) {
       CompilationUnitTree cu = (CompilationUnitTree)tree;
       if (cu.getSourceFile().getName().endsWith("package-info.java")) {
