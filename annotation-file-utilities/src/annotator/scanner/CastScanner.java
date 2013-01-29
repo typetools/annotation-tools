@@ -27,7 +27,7 @@ public class CastScanner extends CommonScanner {
   public static int indexOfCastTree(TreePath origpath, Tree tree) {
     TreePath path = findCountingContext(origpath);
     if (path == null) {
-	  return -1;
+      return -1;
     }
 
     CastScanner lvts = new CastScanner(tree);
@@ -37,7 +37,7 @@ public class CastScanner extends CommonScanner {
 
   private int index = -1;
   private boolean done = false;
-  private Tree tree;
+  private final Tree tree;
 
   private CastScanner(Tree tree) {
     this.index = -1;
