@@ -162,10 +162,8 @@ final class FieldWriter implements FieldVisitor {
         final String desc,
         final boolean visible) {
         ByteVector bv = new ByteVector();
-        // write type, and reserve space for values count
-        bv.putShort(cw.newUTF8(desc)).putShort(0);
         TypeAnnotationWriter xaw = 
-          new TypeAnnotationWriter(cw, true, bv, bv, 2);
+          new TypeAnnotationWriter(cw, true, bv, bv, desc);
         if(visible) {
             xaw.next = xanns;
             xanns = xaw;

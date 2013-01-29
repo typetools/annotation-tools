@@ -15,42 +15,48 @@ public final /*@ReadOnly*/ class RelativeLocation {
      * The bytecode offset of the construct.
      */
     public final int offset;
-    
+
     /**
      * The source code index of the construct.
      */
     public final int index;
 
     /**
+     * The type index used for intersection types in casts.
+     */
+    public final int type_index;
+
+    /**
      * Constructs a new {@link RelativeLocation}; the arguments are assigned to
      * the fields of the same names.
      * Use -1 for the relative location that you're not using
      */
-    private RelativeLocation(int offset, int index) {
-    	this.offset = offset;
-    	this.index = index;
-    }
-    
-    public static RelativeLocation createOffset(int offset) {
-    	return new RelativeLocation(offset, -1);
+    private RelativeLocation(int offset, int index, int type_index) {
+        this.offset = offset;
+        this.index = index;
+        this.type_index = type_index;
     }
 
-    public static RelativeLocation createIndex(int index) {
-    	return new RelativeLocation(-1, index);
+    public static RelativeLocation createOffset(int offset, int type_index) {
+        return new RelativeLocation(offset, -1, type_index);
     }
-    
+
+    public static RelativeLocation createIndex(int index, int type_index) {
+        return new RelativeLocation(-1, index, type_index);
+    }
+
     public boolean isBytecodeOffset() {
-    	return offset>-1;
+        return offset>-1;
     }
-    
+
     public String getLocationString() {
-    	if (isBytecodeOffset()) {
-    		return "#" + offset;
-    	} else {
-    		return "*" + index;
-    	}
+        if (isBytecodeOffset()) {
+            return "#" + offset;
+        } else {
+            return "*" + index;
+        }
     }
-    
+
     /**
      * Returns whether this {@link RelativeLocation} equals <code>o</code>; a
      * slightly faster variant of {@link #equals(Object)} for when the argument
@@ -76,14 +82,14 @@ public final /*@ReadOnly*/ class RelativeLocation {
      */
     @Override
     public int hashCode() /*@ReadOnly*/ {
-		Hasher h = new Hasher();
-		h.mash(offset);
-		h.mash(index);
-		return h.hash;
+        Hasher h = new Hasher();
+        h.mash(offset);
+        h.mash(index);
+        return h.hash;
     }
 
     @Override
     public String toString() {
-    	return "RelativeLocation(" + getLocationString() + ")";
+        return "RelativeLocation(" + getLocationString() + ")";
     }
 }

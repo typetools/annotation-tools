@@ -1,21 +1,35 @@
 package annotator;
 
-import java.io.*;
-import java.util.*;
-import java.util.regex.*;
-import plume.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import plume.FileIOException;
+import plume.Option;
+import plume.Options;
+import plume.Pair;
+import plume.UtilMDE;
+import annotator.Source.CompilerException;
+import annotator.find.Criteria;
 import annotator.find.Insertion;
 import annotator.find.TreeFinder;
-import annotator.Source;
-import annotator.Source.CompilerException;
 import annotator.specification.IndexFileSpecification;
 import annotator.specification.Specification;
 
-import com.sun.source.tree.*;
+import com.google.common.collect.SetMultimap;
+import com.sun.source.tree.CompilationUnitTree;
+import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
-
-import com.google.common.collect.*;
 
 /**
  * This is the main class for the annotator, which inserts annotations in
@@ -105,6 +119,7 @@ public class Main {
 
     if (debug) {
       TreeFinder.debug = true;
+      Criteria.debug = true;
     }
 
     if (help) {
@@ -142,6 +157,9 @@ public class Main {
           if (omit_annotation != null) {
             List<Insertion> filtered = new ArrayList<Insertion>(parsedSpec.size());
             for (Insertion insertion : parsedSpec) {
+              // TODO: this won't omit annotations if the insertion is more than
+              // just the annotation (such as if the insertion is a cast
+              // insertion or a 'this' parameter in a method declaration).
               if (! omit_annotation.equals(insertion.getText())) {
                 filtered.add(insertion);
               }
@@ -268,19 +286,8 @@ public class Main {
           assert pos >= 0
             : "pos is negative: " + pos + " " + toInsertList.get(0) + " " + javafilename;
           for (Insertion iToInsert : toInsertList) {
-            String toInsert = iToInsert.getText(comments, abbreviate);
-            if (abbreviate) {
-              String packageName = iToInsert.getPackageName();
-              if (packageName != null) {
-                if (debug && !imports.contains(packageName)) {
-                  System.out.printf("Need import %s%n  due to insertion %s%n",
-                                    packageName, toInsert);
-                }
-                imports.add(packageName);
-              }
-            }
-
             // Possibly add whitespace after the insertion
+            String trailingWhitespace = "";
             boolean gotSeparateLine = false;
             if (iToInsert.getSeparateLine()) {
               // System.out.printf("getSeparateLine=true for insertion at pos %d: %s%n", pos, iToInsert);
@@ -298,20 +305,27 @@ public class Main {
                   || (src.charAt(pos-indentation-1) == '\f'
                       || src.charAt(pos-indentation-1) == '\n'
                       || src.charAt(pos-indentation-1) == '\r')) {
-                toInsert = toInsert + fileLineSep + src.substring(pos-indentation, pos);
+                trailingWhitespace = fileLineSep + src.substring(pos-indentation, pos);
                 gotSeparateLine = true;
               }
             }
 
-            // Possibly add a leading space before the insertion
-            if ((! gotSeparateLine) && (pos != 0)) {
-              char precedingChar = src.charAt(pos-1);
-              if (! (Character.isWhitespace(precedingChar)
-                     // No space if it's the first formal or generic parameter
-                     || precedingChar == '('
-                     || precedingChar == '<')) {
-                toInsert = " " + toInsert;
+            char precedingChar;
+            if (pos != 0) {
+              precedingChar = src.charAt(pos - 1);
+            } else {
+              precedingChar = '\0';
+            }
+
+            String toInsert = iToInsert.getText(comments, abbreviate,
+                    gotSeparateLine, pos, precedingChar) + trailingWhitespace;
+            if (abbreviate) {
+              Set<String> packageNames = iToInsert.getPackageNames();
+              if (debug) {
+                System.out.printf("Need import %s%n  due to insertion %s%n",
+                                  packageNames, toInsert);
               }
+              imports.addAll(packageNames);
             }
 
             // If it's already there, don't re-insert.  This is a hack!
@@ -331,11 +345,7 @@ public class Main {
                 continue;
               }
             }
-            // add trailing whitespace
-            // (test is not for "extends " because we just added a leading space, above)
-            if ((! gotSeparateLine) && (! toInsert.startsWith(" extends "))) {
-              toInsert = toInsert + " ";
-            }
+
             src.insert(pos, toInsert);
             if (verbose) {
               System.out.print(".");

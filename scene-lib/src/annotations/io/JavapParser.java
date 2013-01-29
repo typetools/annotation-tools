@@ -8,6 +8,7 @@ import java.util.regex.*;
 import java.lang.annotation.RetentionPolicy;
 
 import com.sun.tools.javac.code.TargetType;
+import com.sun.tools.javac.code.TypeAnnotationPosition;
 
 import annotations.*;
 import annotations.el.*;
@@ -134,6 +135,7 @@ public final class JavapParser {
 
     private static final String paramIdxHead = "parameter = ";
     private static final String offsetHead = "offset = ";
+    private static final String typeIndexHead = "type_index = ";
     private static final Pattern localLocRegex =
         Pattern.compile("^\\s*start_pc = (\\d+), length = (\\d+), index = (\\d+)$");
     private static final String itlnHead = "location = ";
@@ -143,6 +145,13 @@ public final class JavapParser {
                 line.substring(line.indexOf(offsetHead) + offsetHead.length()));
         nextLine();
         return offset;
+    }
+
+    private int parseTypeIndex() throws IOException, ParseException {
+        int typeIndex = Integer.parseInt(
+                line.substring(line.indexOf(typeIndexHead) + typeIndexHead.length()));
+        nextLine();
+        return typeIndex;
     }
 
     private List<Integer> parseInnerTypeLocationNums() throws IOException, ParseException {
@@ -189,15 +198,14 @@ public final class JavapParser {
             ATypeElement subOuterType;
             AElement subElement;
             switch (targetType) {
-            case FIELD_COMPONENT:
-            case METHOD_RETURN_COMPONENT:
+            case FIELD:
+            case METHOD_RETURN:
                 subOuterType = (ATypeElement) member;
                 break;
             case METHOD_RECEIVER:
-            case METHOD_RECEIVER_COMPONENT:
                 subOuterType = ((AMethod) member).receiver;
                 break;
-            case METHOD_PARAMETER_COMPONENT:
+            case METHOD_FORMAL_PARAMETER:
                 int paramIdx = Integer.parseInt(
                         line.substring(
                         line.indexOf(paramIdxHead) + paramIdxHead.length()));
@@ -205,7 +213,7 @@ public final class JavapParser {
                 subOuterType = ((AMethod) member).parameters.vivify(paramIdx).type;
                 break;
             case LOCAL_VARIABLE:
-            case LOCAL_VARIABLE_COMPONENT:
+            case RESOURCE_VARIABLE:
                 int index, scopeStart, scopeLength;
                 Matcher m = localLocRegex.matcher(line);
                 m.matches();
@@ -217,25 +225,23 @@ public final class JavapParser {
                 nextLine();
                 subOuterType = ((AMethod) member).locals.vivify(ll).type;
                 break;
-            case TYPECAST:
-            case TYPECAST_COMPONENT:
+            case CAST:
             {
                 int offset = parseOffset();
-                subOuterType = ((AMethod) member).typecasts.vivify(RelativeLocation.createOffset(offset));
+                int typeIndex = parseTypeIndex(); 
+                subOuterType = ((AMethod) member).typecasts.vivify(RelativeLocation.createOffset(offset, typeIndex));
                 break;
             }
             case INSTANCEOF:
-            case INSTANCEOF_COMPONENT:
             {
                 int offset = parseOffset();
-                subOuterType = ((AMethod) member).instanceofs.vivify(RelativeLocation.createOffset(offset));
+                subOuterType = ((AMethod) member).instanceofs.vivify(RelativeLocation.createOffset(offset, 0));
                 break;
             }
             case NEW:
-            case NEW_COMPONENT:
             {
                 int offset = parseOffset();
-                subOuterType = ((AMethod) member).news.vivify(RelativeLocation.createOffset(offset));
+                subOuterType = ((AMethod) member).news.vivify(RelativeLocation.createOffset(offset, 0));
                 break;
             }
             // TEMP
@@ -243,12 +249,13 @@ public final class JavapParser {
             default:
                 throw new AssertionError();
             }
-            if (targetType.hasLocation()) {
+            // TODO: update location representation
+            // if (targetType.) {
                 List<Integer> location = parseInnerTypeLocationNums();
-                InnerTypeLocation itl = new InnerTypeLocation(location);
+                InnerTypeLocation itl = new InnerTypeLocation(TypeAnnotationPosition.getTypePathFromBinary(location));
                 subElement = subOuterType.innerTypes.vivify(itl);
-            } else
-                subElement = subOuterType;
+            //} else
+            //    subElement = subOuterType;
             return subElement;
         default:
             throw new AssertionError();

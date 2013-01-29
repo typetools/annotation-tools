@@ -18,10 +18,10 @@ class ComplexLocationOne:
 
     field field:
         type: @java.lang.A
-        inner-type 0,0: @java.lang.C
-        inner-type 0,1,0: @java.lang.D
-        inner-type 0,1: @java.lang.E
-        inner-type 0: @java.lang.B
+        inner-type 3, 0, 3, 0: @java.lang.C
+        inner-type 3, 0, 3, 1, 0, 0: @java.lang.D
+        inner-type 3, 0, 3, 1: @java.lang.E
+        inner-type 3, 0: @java.lang.B
 
     method <init>()V:
 

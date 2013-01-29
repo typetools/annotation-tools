@@ -12,8 +12,8 @@ class FieldGenericArray:
 
     field field:
         type: @OuterMostType
-        inner-type 0: @InsideArray
-        inner-type 0,0: @GenericType
+        inner-type 0, 0: @InsideArray
+        inner-type 0, 0, 3, 0: @GenericType
 
     method <init>()V:
 

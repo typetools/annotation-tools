@@ -11,6 +11,6 @@ class NewGeneric:
 
     method foo(Ljava/lang/Object;)V:
         typecast #1: @java.lang.ReadOnly
-            inner-type 0: @java.lang.Mutable
+            inner-type 3, 0: @java.lang.Mutable
         typecast #6: @java.lang.Mutable
 

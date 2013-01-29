@@ -12,5 +12,5 @@ class LocalArray:
     method foo()V:
         local 1 #2+8:
             type: @java.lang.ReadOnly
-                inner-type 0: @java.lang.Mutable
+                inner-type 0, 0: @java.lang.Mutable
 
