@@ -17,107 +17,107 @@ import plume.Pair;
  * where the i^th index corresponds to the i^th new, using 0-based indexing.
  */
 public class NewScanner extends CommonScanner {
-	private static boolean debug = false;
+    private static boolean debug = false;
 
-	static Map<Pair<TreePath,Tree>, Integer> cache = new HashMap<Pair<TreePath,Tree>, Integer>();
+    static Map<Pair<TreePath,Tree>, Integer> cache = new HashMap<Pair<TreePath,Tree>, Integer>();
 
-	/**
-	 * Computes the index of the given new tree amongst all new trees
-	 * inside its method, using 0-based indexing. The tree has to be
-	 * either a NewClassTree or a NewArrayTree.  If the tree is not in
-	 * a method, then the index is computed 
-	 * 
-	 * @param origpath
-	 *            the path ending in the given cast tree
-	 * @param tree
-	 *            the cast tree to search for
-	 * @return the index of the given cast tree
-	 */
-	public static int indexOfNewTree(TreePath origpath, Tree tree) {
+    /**
+     * Computes the index of the given new tree amongst all new trees
+     * inside its method, using 0-based indexing. The tree has to be
+     * either a NewClassTree or a NewArrayTree.  If the tree is not in
+     * a method, then the index is computed
+     *
+     * @param origpath
+     *            the path ending in the given cast tree
+     * @param tree
+     *            the cast tree to search for
+     * @return the index of the given cast tree
+     */
+    public static int indexOfNewTree(TreePath origpath, Tree tree) {
         debug("indexOfNewTree: " + origpath.getLeaf());
 
-		Pair<TreePath,Tree> args = Pair.of(origpath, tree);
-		if (cache.containsKey(args)) {
-			return cache.get(args);
-		}
+        Pair<TreePath,Tree> args = Pair.of(origpath, tree);
+        if (cache.containsKey(args)) {
+            return cache.get(args);
+        }
 
-		TreePath path = findCountingContext(origpath);
-		if (path == null) {
-			return -1;
-		}
+        TreePath path = findCountingContext(origpath);
+        if (path == null) {
+            return -1;
+        }
 
-		NewScanner lvts = new NewScanner(tree);
-		lvts.scan(path, null);
-		cache.put(args, lvts.index);
+        NewScanner lvts = new NewScanner(tree);
+        lvts.scan(path, null);
+        cache.put(args, lvts.index);
 
-		return lvts.index;
-	}
+        return lvts.index;
+    }
 
-	private int index = -1;
-	private boolean done = false;
-	private Tree tree;
+    private int index = -1;
+    private boolean done = false;
+    private final Tree tree;
 
-	private NewScanner(Tree tree) {
-		this.index = -1;
-		this.done = false;
-		this.tree = tree;
-	}
+    private NewScanner(Tree tree) {
+        this.index = -1;
+        this.done = false;
+        this.tree = tree;
+    }
 
-	@Override
-	public Void visitNewClass(NewClassTree node, Void p) {
-		if (!done) {
-			index++;
-		}
-		if (tree == node) {
-			done = true;
-		}
-		return super.visitNewClass(node, p);
-	}
+    @Override
+    public Void visitNewClass(NewClassTree node, Void p) {
+        if (!done) {
+            index++;
+        }
+        if (tree == node) {
+            done = true;
+        }
+        return super.visitNewClass(node, p);
+    }
 
-	@Override
-	public Void visitNewArray(NewArrayTree node, Void p) {
-		if (!done) {
-			index++;
-		}
-		if (tree == node) {
-			done = true;
-		}
-		return super.visitNewArray(node, p);
-	}
+    @Override
+    public Void visitNewArray(NewArrayTree node, Void p) {
+        if (!done) {
+            index++;
+        }
+        if (tree == node) {
+            done = true;
+        }
+        return super.visitNewArray(node, p);
+    }
 
-	public static void debug(String s) {
-		if (debug) {
-			System.out.println(s);
-		}
-	}
+    public static void debug(String s) {
+        if (debug) {
+            System.out.println(s);
+        }
+    }
 
-	private static Map<String, List<Integer>> methodNameToNewOffsets =
-		new HashMap<String, List<Integer>>();
+    private static Map<String, List<Integer>> methodNameToNewOffsets =
+            new HashMap<String, List<Integer>>();
 
-	public static void addNewToMethod(String methodName, Integer offset) {
-		debug("adding new to method: " + methodName + " offset: " + offset);
-		List<Integer> offsetList = methodNameToNewOffsets.get(methodName);
-		if (offsetList == null) {
-			offsetList = new ArrayList<Integer>();
-			methodNameToNewOffsets.put(methodName, offsetList);
-		}
-		offsetList.add(offset);
-	}
+    public static void addNewToMethod(String methodName, Integer offset) {
+        debug("adding new to method: " + methodName + " offset: " + offset);
+        List<Integer> offsetList = methodNameToNewOffsets.get(methodName);
+        if (offsetList == null) {
+            offsetList = new ArrayList<Integer>();
+            methodNameToNewOffsets.put(methodName, offsetList);
+        }
+        offsetList.add(offset);
+    }
 
-	public static Integer getMethodNewIndex(String methodName, Integer offset) {
-		List<Integer> offsetList = methodNameToNewOffsets.get(methodName);
-		if (offsetList == null) {
-			throw new RuntimeException("NewScanner.getMethodNewIndex() : "
-					+ "did not find offsets for method: " + methodName);
-		}
+    public static Integer getMethodNewIndex(String methodName, Integer offset) {
+        List<Integer> offsetList = methodNameToNewOffsets.get(methodName);
+        if (offsetList == null) {
+            throw new RuntimeException("NewScanner.getMethodNewIndex() : "
+                    + "did not find offsets for method: " + methodName);
+        }
 
-		Integer offsetIndex = offsetList.indexOf(offset);
-		if (offsetIndex < 0) {
-			throw new RuntimeException("NewScanner.getMethodNewIndex() : "
-					+ "in method: " + methodName + " did not find offset: "
-					+ offset);
-		}
+        Integer offsetIndex = offsetList.indexOf(offset);
+        if (offsetIndex < 0) {
+            throw new RuntimeException("NewScanner.getMethodNewIndex() : "
+                    + "in method: " + methodName + " did not find offset: "
+                    + offset);
+        }
 
-		return offsetIndex;
-	}
+        return offsetIndex;
+    }
 }
