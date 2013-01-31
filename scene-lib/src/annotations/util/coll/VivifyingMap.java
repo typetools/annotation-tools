@@ -19,7 +19,7 @@ public abstract class VivifyingMap<K, V> extends WrapperMap<K, V> {
      * can provide a new map of your favorite class ({@link HashMap},
      * {@link LinkedHashMap}, etc.).
      */
-    public VivifyingMap(/*@PolyRead*/ Map<K, V> back) /*@PolyRead*/ {
+    public VivifyingMap(/*>>> @PolyRead VivifyingMap<K, V> this, */ /*@PolyRead*/ Map<K, V> back) {
         super(back);
     }
 
@@ -60,7 +60,7 @@ public abstract class VivifyingMap<K, V> extends WrapperMap<K, V> {
      * Returns a new, "empty" value to which the key <code>k</code> can be
      * mapped; subclasses must implement.
      */
-    protected abstract V createValueFor(K k) /*@ReadOnly*/;
+    protected abstract V createValueFor(/*>>> @ReadOnly VivifyingMap<K, V> this, */ K k);
 
     /**
      * Returns whether the given value is "empty" and thus may be discarded
@@ -68,5 +68,5 @@ public abstract class VivifyingMap<K, V> extends WrapperMap<K, V> {
      * some sort of recursive pruning on the value; for example, if the value
      * is another {@link VivifyingMap}, {@link #subPrune} could prune that map.
      */
-    protected abstract boolean subPrune(V v) /*@ReadOnly*/;
+    protected abstract boolean subPrune(/*>>> @ReadOnly VivifyingMap<K, V> this, */ V v);
 }

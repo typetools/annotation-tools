@@ -24,7 +24,7 @@ public class TypeIndexLocation {
 
   /** {@inheritDoc} */
   @Override
-  public int hashCode() /*@ReadOnly*/ {
+  public int hashCode(/*>>> @ReadOnly TypeIndexLocation this*/) {
        Hasher h = new Hasher();
       h.mash(typeIndex);
       return h.hash;

@@ -78,7 +78,7 @@ public final /*@ReadOnly*/ class LocalLocation {
      * {@inheritDoc}
      */
     @Override
-    public int hashCode() /*@ReadOnly*/ {
+    public int hashCode(/*>>> @ReadOnly LocalLocation this*/) {
 		Hasher h = new Hasher();
     	if (varName==null) {
 			h.mash(index);

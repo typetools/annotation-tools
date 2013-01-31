@@ -19,7 +19,7 @@ public interface KeyedSet<K, V> extends Set<V> {
      * @return the <code>Keyer</code> that this <code>KeyedSet</code> uses
      *         to obtain keys for elements
      */
-    public abstract Keyer<? extends K, ? super V> getKeyer() /*@ReadOnly*/;
+    public abstract Keyer<? extends K, ? super V> getKeyer(/*>>> @ReadOnly KeyedSet<K, V> this*/);
 
     /**
      * Calls
@@ -88,5 +88,5 @@ public interface KeyedSet<K, V> extends Set<V> {
      * @return the element with key <code>k</code>, or <code>null</code> if
      *         none
      */
-    public abstract V lookup(K k) /*@ReadOnly*/;
+    public abstract V lookup(/*>>> @ReadOnly KeyedSet<K, V> this, */ K k);
 }

@@ -190,7 +190,7 @@ public final /*@ReadOnly*/ class Annotation {
      * even if they were created by different {@link AnnotationFactory}s.
      */
     @Override
-    public final boolean equals(/*@ReadOnly*/ Object o) /*@ReadOnly*/ {
+    public final boolean equals(/*>>> @ReadOnly Annotation this,*/ /*@ReadOnly*/ Object o) {
         return o instanceof Annotation && equals((Annotation) o);
     }
 
@@ -201,7 +201,7 @@ public final /*@ReadOnly*/ class Annotation {
      * override this with a hard-coded "&amp;&amp;" of field comparisons to improve
      * performance.
      */
-    public boolean equals(Annotation o) /*@ReadOnly*/ {
+    public boolean equals(/*>>> @ReadOnly Annotation this,*/ Annotation o) {
         return def.equals(o.def())
             && fieldValues.equals(o.fieldValues);
     }
@@ -212,7 +212,7 @@ public final /*@ReadOnly*/ class Annotation {
      * this with a hard-coded XOR/addition of fields to improve performance.
      */
     @Override
-    public int hashCode() /*@ReadOnly*/ {
+    public int hashCode(/*>>> @ReadOnly Annotation this*/) {
         return def.hashCode() + fieldValues.hashCode();
     }
 
@@ -224,7 +224,7 @@ public final /*@ReadOnly*/ class Annotation {
      * approximation to how the annotation would appear in source code.
      */
     @Override
-    public String toString() /*@ReadOnly*/ {
+    public String toString(/*>>> @ReadOnly Annotation this*/) {
         StringBuilder sb = new StringBuilder("@");
         sb.append(def.name);
         if (!fieldValues.isEmpty()) {

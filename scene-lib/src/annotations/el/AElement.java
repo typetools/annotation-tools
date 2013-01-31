@@ -21,12 +21,12 @@ public class AElement {
         return new VivifyingMap<K, AElement>(
                 new LinkedHashMap<K, AElement>()) {
             @Override
-            public AElement createValueFor(K k) /*@ReadOnly*/ {
+            public AElement createValueFor(K k) {
                 return new AElement(k);
             }
 
             @Override
-            public boolean subPrune(AElement v) /*@ReadOnly*/ {
+            public boolean subPrune(AElement v) {
                 return v.prune();
             }
         };
@@ -39,12 +39,12 @@ public class AElement {
         return new VivifyingMap<K, AElement>(
                 new LinkedHashMap<K, AElement>()) {
             @Override
-            public AElement createValueFor(K k) /*@ReadOnly*/ {
+            public AElement createValueFor(K k) {
                 return new AElement(k, true);
             }
 
             @Override
-            public boolean subPrune(AElement v) /*@ReadOnly*/ {
+            public boolean subPrune(AElement v) {
                 return v.prune();
             }
         };
@@ -101,7 +101,7 @@ public class AElement {
      */
     @Override
     // Was final.  Removed that so that AnnotationDef can redefine.
-    public boolean equals(/*@ReadOnly*/ Object o) /*@ReadOnly*/ {
+    public boolean equals(/*>>> @ReadOnly AElement this, */ /*@ReadOnly*/ Object o) {
         return o instanceof AElement &&
             equals((/*@ReadOnly*/ AElement) o);
     }
@@ -118,11 +118,11 @@ public class AElement {
      * it shall call ((S) y).equalsS(x), which checks that x is a T and then
      * compares fields.
      */
-    public boolean equals(/*@ReadOnly*/ AElement o) /*@ReadOnly*/ {
+    public boolean equals(/*>>> @ReadOnly AElement this, */ /*@ReadOnly*/ AElement o) {
         return o.equalsElement(this);
     }
 
-    final boolean equalsElement(/*@ReadOnly*/ AElement o) /*@ReadOnly*/ {
+    final boolean equalsElement(/*>>> @ReadOnly AElement this, */ /*@ReadOnly*/ AElement o) {
         return tlAnnotationsHere.equals(o.tlAnnotationsHere);
     }
 
@@ -130,7 +130,7 @@ public class AElement {
      * {@inheritDoc}
      */
     @Override
-    public int hashCode() /*@ReadOnly*/ {
+    public int hashCode(/*>>> @ReadOnly AElement this*/) {
         return getClass().getName().hashCode() + tlAnnotationsHere.hashCode()
             + (type == null ? 0 : type.hashCode());
     }

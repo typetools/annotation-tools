@@ -19,7 +19,7 @@ public class WrapperMap<K, V> implements Map<K, V> {
     /**
      * Constructs a new {@link WrapperMap} with the given backing map.
      */
-    protected WrapperMap(/*@PolyRead*/ Map<K, V> back) /*@PolyRead*/ {
+    protected WrapperMap(/*>>> @PolyRead WrapperMap<K, V> this, */ /*@PolyRead*/ Map<K, V> back) {
         this.back = back;
     }
 
@@ -33,14 +33,14 @@ public class WrapperMap<K, V> implements Map<K, V> {
     /**
      * {@inheritDoc}
      */
-    public boolean containsKey(/*@ReadOnly*/ Object key) /*@ReadOnly*/ {
+    public boolean containsKey(/*>>> @ReadOnly WrapperMap<K, V> this, */ /*@ReadOnly*/ Object key) {
         return back.containsKey(key);
     }
 
     /**
      * {@inheritDoc}
      */
-    public boolean containsValue(/*@ReadOnly*/ Object value) /*@ReadOnly*/ {
+    public boolean containsValue(/*>>> @ReadOnly WrapperMap<K, V> this, */ /*@ReadOnly*/ Object value) {
         return back.containsValue(value);
     }
 
@@ -48,28 +48,28 @@ public class WrapperMap<K, V> implements Map<K, V> {
      * {@inheritDoc}
      */
     public /*@PolyRead*/ Set<java.util.Map.Entry<K, V>>
-        entrySet() /*@PolyRead*/ {
+        entrySet(/*>>> @PolyRead WrapperMap<K, V> this*/) {
         return back.entrySet();
     }
 
     /**
      * {@inheritDoc}
      */
-    public V get(/*@ReadOnly*/ Object key) /*@ReadOnly*/ {
+    public V get(/*>>> @ReadOnly WrapperMap<K, V> this, */ /*@ReadOnly*/ Object key) {
         return back.get(key);
     }
 
     /**
      * {@inheritDoc}
      */
-    public boolean isEmpty() /*@ReadOnly*/ {
+    public boolean isEmpty(/*>>> @ReadOnly WrapperMap<K, V> this*/) {
         return back.isEmpty();
     }
 
     /**
      * {@inheritDoc}
      */
-    public /*@PolyRead*/ Set<K> keySet() /*@PolyRead*/ {
+    public /*@PolyRead*/ Set<K> keySet(/*>>> @PolyRead WrapperMap<K, V> this*/) {
         return back.keySet();
     }
 
@@ -97,14 +97,14 @@ public class WrapperMap<K, V> implements Map<K, V> {
     /**
      * {@inheritDoc}
      */
-    public int size() /*@ReadOnly*/ {
+    public int size(/*>>> @ReadOnly WrapperMap<K, V> this*/) {
         return back.size();
     }
 
     /**
      * {@inheritDoc}
      */
-    public /*@PolyRead*/ Collection<V> values() /*@PolyRead*/ {
+    public /*@PolyRead*/ Collection<V> values(/*>>> @PolyRead WrapperMap<K, V> this*/) {
         return back.values();
     }
 
@@ -112,7 +112,7 @@ public class WrapperMap<K, V> implements Map<K, V> {
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(/*@ReadOnly*/ Object o) /*@ReadOnly*/ {
+    public boolean equals(/*>>> @ReadOnly WrapperMap<K, V> this, */ /*@ReadOnly*/ Object o) {
         return back.equals(o);
     }
 
@@ -120,7 +120,7 @@ public class WrapperMap<K, V> implements Map<K, V> {
      * {@inheritDoc}
      */
     @Override
-    public int hashCode() /*@ReadOnly*/ {
+    public int hashCode(/*>>> @ReadOnly WrapperMap<K, V> this*/) {
         return back.hashCode();
     }
 }
