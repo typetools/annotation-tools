@@ -165,23 +165,18 @@
         <copy todir="bin">
             <fileset dir="src" excludes="**/*.java"/>
         </copy>
-
-<!-- Optional lines for "javac":
-  executable=".../research/types/jsr308-langtools/dist/bin/javac"
--->
         <javac 
                destdir="bin" 
                debug="true" 
                classpathref="libpath"
                classpath="${libpath}"
-               includeantruntime="false">
+               includeantruntime="false"
+               fork="true"
+               executable="${annotations-compiler}/dist/bin/javac">
             <src refid="sourcepath"/>
             <compilerarg value="-Xbootclasspath/p:${toString:libpath}"/>
             <classpath refid="libpath"/>
         </javac> 
-
-        <!-- TODO: This relies on jsr308 compiler being first in your PATH. 
-             We should figure out how to call jsr 308 properly from Ant. -->
 <!--
        <pathconvert property="libpath" refid="libpath"/>
        <pathconvert property="source.files.java.spaceseparated" refid="source.files.java" pathsep=" "/>
