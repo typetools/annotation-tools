@@ -14,13 +14,13 @@ public abstract class EqualByStringRepresentation {
      * {@inheritDoc}
      */
     @Override
-    public abstract String toString() /*@ReadOnly*/;
+    public abstract String toString(/*>>> @ReadOnly EqualByStringRepresentation this*/);
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public final boolean equals(/*@ReadOnly*/ Object that) /*@ReadOnly*/ {
+    public final boolean equals(/*>>> @ReadOnly EqualByStringRepresentation this, */ /*@ReadOnly*/ Object that) {
         return that != null && this.getClass() == that.getClass()
                 && this.toString().equals(that.toString());
     }
@@ -29,7 +29,7 @@ public abstract class EqualByStringRepresentation {
      * {@inheritDoc}
      */
     @Override
-    public final int hashCode() /*@ReadOnly*/ {
+    public final int hashCode(/*>>> @ReadOnly EqualByStringRepresentation this*/) {
         return toString().hashCode();
     }
 }

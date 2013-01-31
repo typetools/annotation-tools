@@ -20,12 +20,12 @@ public class ATypeElement extends AElement {
         return new VivifyingMap<K, ATypeElement>(
                 new LinkedHashMap<K, ATypeElement>()) {
             @Override
-            public  ATypeElement createValueFor(K k) /*@ReadOnly*/ {
+            public  ATypeElement createValueFor(K k) {
                 return new ATypeElement(k);
             }
 
             @Override
-            public boolean subPrune(ATypeElement v) /*@ReadOnly*/ {
+            public boolean subPrune(ATypeElement v) {
                 return v.prune();
             }
         };
@@ -53,7 +53,7 @@ public class ATypeElement extends AElement {
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(/*@ReadOnly*/ AElement o) /*@ReadOnly*/ {
+    public boolean equals(/*>>> @ReadOnly ATypeElement this, */ /*@ReadOnly*/ AElement o) {
         if (!(o instanceof ATypeElement))
             return false;
         /*@ReadOnly*/ ATypeElement o2 = (/*@ReadOnly*/ ATypeElement) o;
@@ -61,7 +61,7 @@ public class ATypeElement extends AElement {
     }
 
     // note:  does not call super.equals, so does not check name
-    final boolean equalsTypeElement(/*@ReadOnly*/ ATypeElement o) /*@ReadOnly*/ {
+    final boolean equalsTypeElement(/*>>> @ReadOnly ATypeElement this, */ /*@ReadOnly*/ ATypeElement o) {
         return equalsElement(o) && innerTypes.equals(o.innerTypes)
             && (type == null ? o.type == null : type.equals(o.type));
     }
@@ -70,7 +70,7 @@ public class ATypeElement extends AElement {
      * {@inheritDoc}
      */
     @Override
-    public int hashCode() /*@ReadOnly*/ {
+    public int hashCode(/*>>> @ReadOnly ATypeElement this*/) {
         checkRep();
         return tlAnnotationsHere.hashCode() + innerTypes.hashCode();
     }

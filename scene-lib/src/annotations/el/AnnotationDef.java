@@ -148,7 +148,7 @@ public final /*@ReadOnly*/ class AnnotationDef extends AElement {
      * name with the same field names and types.
      */
     @Override
-    public boolean equals(/*@ReadOnly*/ Object o) /*@ReadOnly*/ {
+    public boolean equals(/*>>> @ReadOnly AnnotationDef this, */ /*@ReadOnly*/ Object o) {
         return o instanceof AnnotationDef
                 && equals((AnnotationDef) o);
     }
@@ -158,7 +158,7 @@ public final /*@ReadOnly*/ class AnnotationDef extends AElement {
      * slightly faster variant of {@link #equals(Object)} for when the argument
      * is statically known to be another nonnull {@link AnnotationDef}.
      */
-    public boolean equals(AnnotationDef o) /*@ReadOnly*/ {
+    public boolean equals(/*>>> @ReadOnly AnnotationDef this, */ AnnotationDef o) {
         boolean sameName = name.equals(o.name);
         boolean sameMetaAnnotations = equalsElement(o);
         boolean sameFieldTypes = fieldTypes.equals(o.fieldTypes);
@@ -178,7 +178,7 @@ public final /*@ReadOnly*/ class AnnotationDef extends AElement {
      * {@inheritDoc}
      */
     @Override
-    public int hashCode() /*@ReadOnly*/ {
+    public int hashCode(/*>>> @ReadOnly AnnotationDef this*/) {
         return name.hashCode()
             // Omit tlAnnotationsHere, becase it should be unique and, more
             // importantly, including it causes an infinite loop.

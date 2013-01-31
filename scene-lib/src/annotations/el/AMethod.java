@@ -41,12 +41,12 @@ public final class AMethod extends ABlock {
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(/*@ReadOnly*/ AElement o) /*@ReadOnly*/ {
+    public boolean equals(/*>>> @ReadOnly AMethod this, */ /*@ReadOnly*/ AElement o) {
         return o instanceof AMethod &&
             ((/*@ReadOnly*/ AMethod) o).equalsMethod(this);
     }
 
-    boolean equalsMethod(/*@ReadOnly*/ AMethod o) /*@ReadOnly*/ {
+    boolean equalsMethod(/*>>> @ReadOnly AMethod this, */ /*@ReadOnly*/ AMethod o) {
         parameters.prune();
         o.parameters.prune();
 
@@ -63,7 +63,7 @@ public final class AMethod extends ABlock {
      * {@inheritDoc}
      */
     @Override
-    public int hashCode() /*@ReadOnly*/ {
+    public int hashCode(/*>>> @ReadOnly AMethod this*/) {
         return super.hashCode() + bounds.hashCode()
                 + receiver.hashCode() + parameters.hashCode()
                 + throwsException.hashCode();

@@ -166,7 +166,7 @@ public abstract class Annotations {
     public static final Annotation rebuild(Annotation a) {
         AnnotationBuilder ab = AnnotationFactory.saf.beginAnnotation(a.def());
         if (ab != null) {
-            for (/*@ReadOnly*/ Map.Entry<String, AnnotationFieldType> fieldDef
+            for (Map. /*@ReadOnly*/ Entry<String, AnnotationFieldType> fieldDef
                     : a.def().fieldTypes.entrySet()) {
 
                 String fieldName = fieldDef.getKey();

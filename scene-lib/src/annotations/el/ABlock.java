@@ -26,12 +26,12 @@ public class ABlock extends AExpression {
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(/*@ReadOnly*/ AElement o) /*@ReadOnly*/ {
+    public boolean equals(/*>>> @ReadOnly ABlock this,*/ /*@ReadOnly*/ AElement o) {
         return o instanceof ABlock &&
             ((/*@ReadOnly*/ ABlock) o).equalsBlock(this);
     }
     
-    protected boolean equalsBlock(/*@ReadOnly*/ ABlock o) /*@ReadOnly*/ {
+    protected boolean equalsBlock(/*>>> @ReadOnly ABlock this,*/ /*@ReadOnly*/ ABlock o) {
     	return locals.equals(o.locals) && super.equalsExpression(o);
     }
     
@@ -39,7 +39,7 @@ public class ABlock extends AExpression {
      * {@inheritDoc}
      */
     @Override
-    public int hashCode() /*@ReadOnly*/ {
+    public int hashCode(/*>>> @ReadOnly ABlock this*/) {
     	return super.hashCode() + locals.hashCode();
     }
     

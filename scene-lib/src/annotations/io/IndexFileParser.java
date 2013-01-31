@@ -99,12 +99,12 @@ public final class IndexFileParser {
     }
 
     /** True if the next thing from st is the given character. */
-    private boolean checkChar(char c) /*@ReadOnly*/ {
+    private boolean checkChar(/*>>> @ReadOnly IndexFileParser this, */ char c) {
         return st.ttype == c;
     }
 
     /** True if the next thing from st is the given string token. */
-    private boolean checkKeyword(String s) /*@ReadOnly*/ {
+    private boolean checkKeyword(/*>>> @ReadOnly IndexFileParser this, */ String s) {
         return st.ttype == TT_WORD && st.sval.equals(s);
     }
 
@@ -175,7 +175,7 @@ public final class IndexFileParser {
         Collections.addAll(knownKeywords, knownKeywords_array);
     }
 
-    private boolean isValidIdentifier(String x) /*@ReadOnly*/ {
+    private boolean isValidIdentifier(/*>>> @ReadOnly IndexFileParser this, */ String x) {
         if (x.length() == 0 || !Character.isJavaIdentifierStart(x.charAt(0))
                 || knownKeywords.contains(x))
             return false;
@@ -185,7 +185,7 @@ public final class IndexFileParser {
         return true;
     }
 
-    private String checkIdentifier() /*@ReadOnly*/ {
+    private String checkIdentifier(/*>>> @ReadOnly IndexFileParser this*/) {
         if (st.sval == null)
             return null;
         else {
@@ -220,7 +220,7 @@ public final class IndexFileParser {
         return name;
     }
 
-    private int checkNNInteger() /*@ReadOnly*/ {
+    private int checkNNInteger(/*>>> @ReadOnly IndexFileParser this*/) {
         if (st.ttype == TT_NUMBER) {
             int x = (int) st.nval;
             if (x == st.nval && x >= 0) // shouldn't give us a huge number

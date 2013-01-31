@@ -28,7 +28,7 @@ public final class IndexFileWriter {
     private static final String INDENT = "    ";
 
     void printAnnotationDefBody(AnnotationDef d) {
-        for (/*@ReadOnly*/ Map.Entry<String, AnnotationFieldType> f : d.fieldTypes.entrySet()) {
+        for (Map. /*@ReadOnly*/ Entry<String, AnnotationFieldType> f : d.fieldTypes.entrySet()) {
             String fieldname = f.getKey();
             AnnotationFieldType fieldType = f.getValue();
             pw.println(INDENT + fieldType + " " + fieldname);
@@ -108,7 +108,7 @@ public final class IndexFileWriter {
         if (!a.fieldValues.isEmpty()) {
             pw.print('(');
             boolean first = true;
-            for (/*@ReadOnly*/ Map.Entry<String, /*@ReadOnly*/ Object> f
+            for (Map. /*@ReadOnly*/ Entry<String, /*@ReadOnly*/ Object> f
                     : a.fieldValues.entrySet()) {
                 if (!first)
                     pw.print(',');
@@ -153,7 +153,7 @@ public final class IndexFileWriter {
             return;
         }
         printElement(indentation, desc, e);
-        for (/*@ReadOnly*/ Map.Entry<InnerTypeLocation, /*@ReadOnly*/ ATypeElement> ite
+        for (Map. /*@ReadOnly*/ Entry<InnerTypeLocation, /*@ReadOnly*/ ATypeElement> ite
                 : e.innerTypes.entrySet()) {
             InnerTypeLocation loc = ite.getKey();
             /*@ReadOnly*/ AElement it = ite.getValue();
@@ -184,7 +184,7 @@ public final class IndexFileWriter {
     private void printNumberedAmbigiousElements(String indentation,
             String desc,
             /*@ReadOnly*/ Map<Integer, /*@ReadOnly*/ AElement> nels) {
-        for (/*@ReadOnly*/ Map.Entry<Integer, /*@ReadOnly*/ AElement> te
+        for (Map. /*@ReadOnly*/ Entry<Integer, /*@ReadOnly*/ AElement> te
                 : nels.entrySet()) {
             /*@ReadOnly*/ AElement t = te.getValue();
             printAmbElementAndInnerTypes(indentation,
@@ -200,7 +200,7 @@ public final class IndexFileWriter {
             return;
         }
         printElement(indentation + INDENT, "type", e.type);
-        for (/*@ReadOnly*/ Map.Entry<InnerTypeLocation, /*@ReadOnly*/ ATypeElement> ite
+        for (Map. /*@ReadOnly*/ Entry<InnerTypeLocation, /*@ReadOnly*/ ATypeElement> ite
                 : e.type.innerTypes.entrySet()) {
             InnerTypeLocation loc = ite.getKey();
             /*@ReadOnly*/ AElement it = ite.getValue();
@@ -223,7 +223,7 @@ public final class IndexFileWriter {
     private void printRelativeElements(String indentation,
             String desc,
             /*@ReadOnly*/ Map<RelativeLocation, /*@ReadOnly*/ ATypeElement> nels) {
-        for (/*@ReadOnly*/ Map.Entry<RelativeLocation, /*@ReadOnly*/ ATypeElement> te
+        for (Map. /*@ReadOnly*/ Entry<RelativeLocation, /*@ReadOnly*/ ATypeElement> te
                 : nels.entrySet()) {
             /*@ReadOnly*/ ATypeElement t = te.getValue();
             printTypeElementAndInnerTypes(indentation,
@@ -233,7 +233,7 @@ public final class IndexFileWriter {
 
     private void printBounds(String indentation,
             /*@ReadOnly*/ Map<BoundLocation, /*@ReadOnly*/ ATypeElement> bounds) {
-        for (/*@ReadOnly*/ Map.Entry<BoundLocation, /*@ReadOnly*/ ATypeElement> be
+        for (Map. /*@ReadOnly*/ Entry<BoundLocation, /*@ReadOnly*/ ATypeElement> be
                 : bounds.entrySet()) {
             BoundLocation bl = be.getKey();
             /*@ReadOnly*/ ATypeElement b = be.getValue();
@@ -250,7 +250,7 @@ public final class IndexFileWriter {
     private void printExtImpls(String indentation,
             /*@ReadOnly*/ Map<TypeIndexLocation, /*@ReadOnly*/ ATypeElement> extImpls) {
 
-        for (/*@ReadOnly*/ Map.Entry<TypeIndexLocation, /*@ReadOnly*/ ATypeElement> ei
+        for (Map. /*@ReadOnly*/ Entry<TypeIndexLocation, /*@ReadOnly*/ ATypeElement> ei
                 : extImpls.entrySet()) {
             TypeIndexLocation idx = ei.getKey();
             /*@ReadOnly*/ ATypeElement ty = ei.getValue();
@@ -269,7 +269,7 @@ public final class IndexFileWriter {
         odc.visit();
 
         // And then the annotated classes
-        for (/*@ReadOnly*/ Map.Entry<String, /*@ReadOnly*/ AClass> ce
+        for (Map. /*@ReadOnly*/ Entry<String, /*@ReadOnly*/ AClass> ce
                 : scene.classes.entrySet()) {
             String cname = ce.getKey();
             /*@ReadOnly*/ AClass c = ce.getValue();
@@ -283,7 +283,7 @@ public final class IndexFileWriter {
             printBounds(INDENT, c.bounds);
             printExtImpls(INDENT, c.extendsImplements);
 
-            for (/*@ReadOnly*/ Map.Entry<String, /*@ReadOnly*/ AElement> fe
+            for (Map. /*@ReadOnly*/ Entry<String, /*@ReadOnly*/ AElement> fe
                     : c.fields.entrySet()) {
                 String fname = fe.getKey();
                 /*@ReadOnly*/ AElement f = fe.getValue();
@@ -291,7 +291,7 @@ public final class IndexFileWriter {
                 printElement(INDENT, "field " + fname, f);
                 printTypeElementAndInnerTypes(INDENT + INDENT, "type", f.type);
             }
-            for (/*@ReadOnly*/ Map.Entry<String, /*@ReadOnly*/ AMethod> me
+            for (Map. /*@ReadOnly*/ Entry<String, /*@ReadOnly*/ AMethod> me
                     : c.methods.entrySet()) {
                 String mkey = me.getKey();
                 /*@ReadOnly*/ AMethod m = me.getValue();
@@ -305,7 +305,7 @@ public final class IndexFileWriter {
                     printTypeElementAndInnerTypes(INDENT + INDENT, "receiver", m.receiver);
                 }
                 printNumberedAmbigiousElements(INDENT + INDENT, "parameter", m.parameters);
-                for (/*@ReadOnly*/ Map.Entry<LocalLocation, /*@ReadOnly*/ AElement> le
+                for (Map. /*@ReadOnly*/ Entry<LocalLocation, /*@ReadOnly*/ AElement> le
                         : m.locals.entrySet()) {
                     LocalLocation loc = le.getKey();
                     /*@ReadOnly*/ AElement l = le.getValue();
