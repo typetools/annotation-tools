@@ -37,18 +37,18 @@ public class LinkedHashKeyedSet<K, V> extends AbstractSet<V> implements KeyedSet
      * {@inheritDoc}
      */
     @Override
-    public boolean contains(/*@ReadOnly*/ Object o) /*@ReadOnly*/ {
+    public boolean contains(/*>>> @ReadOnly LinkedHashKeyedSet<K, V> this, */ /*@ReadOnly*/ Object o) {
         return theValues.contains(o);
     }
 
     private class KeyedSetIterator implements Iterator<V> {
         private Iterator<V> itr = theValues.iterator();
 
-        public boolean hasNext() /*@ReadOnly*/ {
+        public boolean hasNext(/*>>> @ReadOnly KeyedSetIterator this*/) {
             return itr.hasNext();
         }
 
-        public V next() /*@ReadOnly*/ {
+        public V next(/*>>> @ReadOnly KeyedSetIterator this*/) {
             return itr.next();
         }
 
@@ -64,7 +64,7 @@ public class LinkedHashKeyedSet<K, V> extends AbstractSet<V> implements KeyedSet
      * {@inheritDoc}
      */
     @Override
-    public /*@PolyRead*/ Iterator<V> iterator() /*@PolyRead*/ {
+    public /*@PolyRead*/ Iterator<V> iterator(/*>>> @PolyRead LinkedHashKeyedSet<K, V> this*/) {
         return new KeyedSetIterator();
     }
 
@@ -72,7 +72,7 @@ public class LinkedHashKeyedSet<K, V> extends AbstractSet<V> implements KeyedSet
      * {@inheritDoc}
      */
     @Override
-    public /*@ReadOnly*/ Object[] toArray() /*@ReadOnly*/ {
+    public /*@ReadOnly*/ Object[] toArray(/*>>> @ReadOnly LinkedHashKeyedSet<K, V> this*/) {
         return theValues.toArray();
     }
 
@@ -80,7 +80,7 @@ public class LinkedHashKeyedSet<K, V> extends AbstractSet<V> implements KeyedSet
      * {@inheritDoc}
      */
     @Override
-    public <T> T[] toArray(T[] a) /*@ReadOnly*/ {
+    public <T> T[] toArray(/*>>> @ReadOnly LinkedHashKeyedSet<K, V> this, */ T[] a) {
         return theValues.toArray(a);
     }
 
@@ -153,7 +153,7 @@ public class LinkedHashKeyedSet<K, V> extends AbstractSet<V> implements KeyedSet
     /**
      * {@inheritDoc}
      */
-    public Keyer<? extends K, ? super V> getKeyer() /*@ReadOnly*/ {
+    public Keyer<? extends K, ? super V> getKeyer(/*>>> @ReadOnly LinkedHashKeyedSet<K, V> this*/) {
         return keyer;
     }
 

@@ -1,5 +1,7 @@
 package annotations.el;
 
+import checkers.javari.quals.ReadOnly;
+
 import java.util.LinkedHashMap;
 
 import type.Type;
@@ -26,12 +28,12 @@ public class ATypeElementWithType extends ATypeElement {
         return new VivifyingMap<K, ATypeElementWithType>(
                 new LinkedHashMap<K, ATypeElementWithType>()) {
             @Override
-            public  ATypeElementWithType createValueFor(K k) /*@ReadOnly*/ {
+            public  ATypeElementWithType createValueFor(K k) {
                 return new ATypeElementWithType(k);
             }
 
             @Override
-            public boolean subPrune(ATypeElementWithType v) /*@ReadOnly*/ {
+            public boolean subPrune(ATypeElementWithType v) {
                 return v.prune();
             }
         };

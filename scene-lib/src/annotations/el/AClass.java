@@ -22,12 +22,12 @@ public final class AClass extends AElement {
         return new VivifyingMap<String, AMethod>(
                 new LinkedHashMap<String, AMethod>()) {
             @Override
-            public  AMethod createValueFor(String k) /*@ReadOnly*/ {
+            public  AMethod createValueFor(String k) {
                 return new AMethod(k);
             }
 
             @Override
-            public boolean subPrune(AMethod v) /*@ReadOnly*/ {
+            public boolean subPrune(AMethod v) {
                 return v.prune();
             }
         };
@@ -37,12 +37,12 @@ public final class AClass extends AElement {
         return new VivifyingMap<Integer, ABlock>(
                 new LinkedHashMap<Integer, ABlock>()) {
             @Override
-            public  ABlock createValueFor(Integer k) /*@ReadOnly*/ {
+            public  ABlock createValueFor(Integer k) {
                 return new ABlock(k);
             }
 
             @Override
-            public boolean subPrune(ABlock v) /*@ReadOnly*/ {
+            public boolean subPrune(ABlock v) {
                 return v.prune();
             }
         };
@@ -52,12 +52,12 @@ public final class AClass extends AElement {
         return new VivifyingMap<String, AExpression>(
                 new LinkedHashMap<String, AExpression>()) {
             @Override
-            public  AExpression createValueFor(String k) /*@ReadOnly*/ {
+            public  AExpression createValueFor(String k) {
                 return new AExpression(k);
             }
 
             @Override
-            public boolean subPrune(AExpression v) /*@ReadOnly*/ {
+            public boolean subPrune(AExpression v) {
                 return v.prune();
             }
         };
@@ -102,12 +102,12 @@ public final class AClass extends AElement {
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(/*@ReadOnly*/ AElement o) /*@ReadOnly*/ {
+    public boolean equals(/*>>> @ReadOnly AClass this,*/ /*@ReadOnly*/ AElement o) {
         return o instanceof AClass &&
             ((/*@ReadOnly*/ AClass) o).equalsClass(this);
     }
 
-    boolean equalsClass(/*@ReadOnly*/ AClass o) /*@ReadOnly*/ {
+    boolean equalsClass(/*>>> @ReadOnly AClass this,*/ /*@ReadOnly*/ AClass o) {
         return equalsElement(o) && bounds.equals(o.bounds)
             && methods.equals(o.methods) && fields.equals(o.fields)
             && extendsImplements.equals(o.extendsImplements);
@@ -117,7 +117,7 @@ public final class AClass extends AElement {
      * {@inheritDoc}
      */
     @Override
-    public int hashCode() /*@ReadOnly*/ {
+    public int hashCode(/*>>> @ReadOnly AClass this*/) {
         return super.hashCode() + bounds.hashCode()
             + methods.hashCode() + fields.hashCode()
             + extendsImplements.hashCode();

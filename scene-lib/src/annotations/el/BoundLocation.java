@@ -59,7 +59,7 @@ public final /*@ReadOnly*/ class BoundLocation {
      * {@inheritDoc}
      */
     @Override
-    public int hashCode() /*@ReadOnly*/ {
+    public int hashCode(/*>>> @ReadOnly BoundLocation this*/) {
         Hasher h = new Hasher();
         h.mash(paramIndex);
         h.mash(boundIndex);

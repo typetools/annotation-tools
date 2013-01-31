@@ -81,7 +81,7 @@ public final /*@ReadOnly*/ class RelativeLocation {
      * {@inheritDoc}
      */
     @Override
-    public int hashCode() /*@ReadOnly*/ {
+    public int hashCode(/*>>> @ReadOnly RelativeLocation this*/) {
         Hasher h = new Hasher();
         h.mash(offset);
         h.mash(index);

@@ -41,12 +41,12 @@ public class AExpression extends AElement {
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(/*@ReadOnly*/ AElement o) /*@ReadOnly*/ {
+    public boolean equals(/*>>> @ReadOnly AExpression this, */ /*@ReadOnly*/ AElement o) {
         return o instanceof AExpression &&
             ((/*@ReadOnly*/ AExpression) o).equalsExpression(this);
     }
     
-	protected boolean equalsExpression(/*@ReadOnly*/ AExpression o) /*@ReadOnly */{
+	protected boolean equalsExpression(/*>>> @ReadOnly AExpression this, */ /*@ReadOnly*/ AExpression o) {
 		return typecasts.equals(o.typecasts)
 				&& instanceofs.equals(o.instanceofs)
 				&& news.equals(o.news)
@@ -57,7 +57,7 @@ public class AExpression extends AElement {
      * {@inheritDoc}
      */
     @Override
-    public int hashCode() /*@ReadOnly*/ {
+    public int hashCode(/*>>> @ReadOnly AExpression this*/) {
 		return super.hashCode() + typecasts.hashCode() + instanceofs.hashCode()
 				+ news.hashCode() + insertTypecasts.hashCode();
     }
