@@ -1,5 +1,6 @@
 package annotator.find;
 
+import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
 
@@ -28,15 +29,37 @@ public class ReceiverCriterion implements Criterion {
       return false;
     }
 
-    // TODO: have changed receiver from annotating block to annotating method,
-    // and taking care of moving from method's type to after parameter list
-    // in TreeFinder.
-//    Tree leaf = path.getLeaf();
-//    if (leaf.getKind() == Tree.Kind.BLOCK) {
-//      return parentCriterion.isSatisfiedBy(path.getParentPath());
-//    }
-
-    return isSigMethodCriterion.isSatisfiedBy(path);
+    if (path.getLeaf().getKind() == Tree.Kind.METHOD) {
+      return isSigMethodCriterion.isSatisfiedBy(path);
+    } else {
+      // We may be attempting to insert an annotation on a type parameter of an
+      // existing receiver, so make sure this is the right receiver parameter:
+      // work up the tree to find the method declaration. Store the parameter we
+      // pass through up to the method declaration so we can make sure we came up
+      // through the receiver. Then check to make sure this is the correct method
+      // declaration.
+      Tree param = null;
+      TreePath parent = path;
+      while (parent != null && parent.getLeaf().getKind() != Tree.Kind.METHOD) {
+        if (parent.getLeaf().getKind() == Tree.Kind.VARIABLE) {
+          if (param == null) {
+            param = parent.getLeaf();
+          } else {
+            // The only variable we should pass through is the receiver parameter.
+            // If we pass through more than one then this isn't the right place.
+            return false;
+          }
+        }
+        parent = parent.getParentPath();
+      }
+      if (parent != null && param != null) {
+        MethodTree method = (MethodTree) parent.getLeaf();
+        if (param == method.getReceiverParameter()) {
+          return isSigMethodCriterion.isSatisfiedBy(parent);
+        }
+      }
+      return false;
+    }
   }
 
   @Override

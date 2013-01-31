@@ -921,7 +921,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
         }
       }
 
-      if (i.getKind() == Insertion.Kind.RECEIVER) {
+      if (i.getKind() == Insertion.Kind.RECEIVER && node.getKind() == Tree.Kind.METHOD) {
         ReceiverInsertion receiver = (ReceiverInsertion) i;
         MethodTree method = (MethodTree) node;
 

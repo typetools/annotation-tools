@@ -66,3 +66,15 @@ class Receivers9:
 
     method m()V:
         receiver: @ReadOnly @A @B @C
+
+class Receivers10:
+
+    method m()V:
+        receiver: @ReadOnly
+            inner-type 3, 0: @annotation.A
+            inner-type 3, 1: @annotation.B
+
+    method m(Lannotator/tests/Receivers10;)V:
+        receiver: @ReadOnly
+            inner-type 3, 0: @annotation.A
+            inner-type 3, 1: @annotation.B
