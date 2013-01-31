@@ -25,5 +25,7 @@ public class TestTypecast {
     int pi = 0;
     i = pi;
     o = pi;
+    o = (String & Comparable<String>) o;
+    o = (String & Map<String, ? extends Set<String>> & CharSequence) o;
   }
 }
