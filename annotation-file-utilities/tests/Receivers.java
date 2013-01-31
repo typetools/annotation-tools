@@ -47,4 +47,10 @@ class Receivers9 {
     public void m() {}
 }
 
+class Receivers10<K, V> {
+    public void m(Receivers10<K, V> this) {}
+
+    public void m(Receivers10<K, V> this, Receivers10<K, V> other) {}
+}
+
 @interface Anno {}
