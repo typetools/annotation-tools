@@ -1,9 +1,11 @@
 package annotations.el;
 
+import annotations.util.Hasher;
+
+/*>>>
 import checkers.nullness.quals.*;
 import checkers.javari.quals.ReadOnly;
-
-import annotations.util.*;
+*/
 
 /**
  * A {@link BoundLocation} holds location information for a bound of a type
@@ -68,6 +70,6 @@ public final /*@ReadOnly*/ class BoundLocation {
 
     @Override
     public String toString() {
-      return "BoundLocation(" + paramIndex + "," + boundIndex + ")";
+        return "BoundLocation(" + paramIndex + "," + boundIndex + ")";
     }
 }

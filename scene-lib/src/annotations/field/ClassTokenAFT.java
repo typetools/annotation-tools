@@ -55,7 +55,7 @@ public final /*@ReadOnly*/ class ClassTokenAFT extends ScalarAFT {
      */
     @Override
     public String format(Object o) {
-        return ((java.lang.Class)o).getName() + ".class";
+        return ((java.lang.Class<?>)o).getName() + ".class";
     }
 
 }

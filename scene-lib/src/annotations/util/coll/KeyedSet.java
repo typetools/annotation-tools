@@ -1,9 +1,11 @@
 package annotations.util.coll;
 
+import java.util.Set;
+
+/*>>>
 import checkers.nullness.quals.*;
 import checkers.javari.quals.*;
-
-import java.util.*;
+*/
 
 /**
  * A <code>KeyedSet</code> is a set whose members have distinct <em>keys</em>

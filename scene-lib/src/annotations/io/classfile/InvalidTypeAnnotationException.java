@@ -1,6 +1,8 @@
 package annotations.io.classfile;
 
+/*>>>
 import checkers.nullness.quals.*;
+*/
 
 /**
  * An <code>InvalidTypeAnnotationException </code> indicates that an
@@ -14,7 +16,7 @@ public class InvalidTypeAnnotationException extends RuntimeException {
   /**
    * Constructs a new <code> InvalidTypeAnnotationException </code> with
    * the given error message.
-   * 
+   *
    * @param msg a message describing what was wrong with the extended annotation
    */
   public InvalidTypeAnnotationException(String msg) {

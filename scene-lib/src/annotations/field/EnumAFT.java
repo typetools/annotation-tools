@@ -1,7 +1,9 @@
 package annotations.field;
 
+/*>>>
 import checkers.nullness.quals.*;
 import checkers.javari.quals.*;
+*/
 
 /**
  * An {@link EnumAFT} is the type of an annotation field that can hold an

@@ -1,12 +1,12 @@
 package annotations.field;
 
+/*>>>
 import checkers.nullness.quals.*;
 import checkers.javari.quals.*;
+*/
 
-import annotations.*;
+import annotations.Annotation;
 import annotations.el.AnnotationDef;
-
-import java.lang.annotation.RetentionPolicy;
 
 /**
  * An {@link AnnotationAFT} represents a subannotation as the type of an

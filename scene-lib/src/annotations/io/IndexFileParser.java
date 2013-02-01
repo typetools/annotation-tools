@@ -486,6 +486,7 @@ public final class IndexFileParser {
             if (ab == null) {
                 // don't care about the result
                 // but need to skip over it anyway
+                @SuppressWarnings("unused")
                 /*@ReadOnly*/ Object trash = parseAnnotationBody(d, AnnotationFactory.saf
                         .beginAnnotation(d));
             } else {
@@ -1047,15 +1048,15 @@ public final class IndexFileParser {
 
     /**
      * Parses and constructs a new AST entry. For example, the call:
-     * 
+     *
      * <pre>
      * {@code newASTEntry(Kind.CASE, new String[] {"expression", "statement"}, new String[] {"statement"});
      * </pre>
-     * 
+     *
      * constructs a case AST entry, where the valid child selectors are
      * "expression" or "statement" and the "statement" child selector requires
      * an argument.
-     * 
+     *
      * @param kind The kind of this AST entry.
      * @param legalChildSelectors A list of the legal child selectors for this AST entry.
      * @param argumentChildSelectors A list of the child selectors that also require an argument.

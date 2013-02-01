@@ -1,6 +1,8 @@
 package annotations.field;
 
+/*>>>
 import checkers.javari.quals.*;
+*/
 
 /**
  * Common superclass for non-array {@link AnnotationFieldType}s so that

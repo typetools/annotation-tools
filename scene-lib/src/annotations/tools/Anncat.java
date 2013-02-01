@@ -1,17 +1,19 @@
 package annotations.tools;
 
+/*>>>
 import checkers.nullness.quals.*;
+*/
 
 import java.io.*;
 
+import annotations.el.AScene;
+import annotations.el.DefException;
+import annotations.io.IndexFileParser;
+import annotations.io.IndexFileWriter;
+import annotations.io.JavapParser;
+import annotations.io.classfile.ClassFileReader;
+import annotations.io.classfile.ClassFileWriter;
 import plume.FileIOException;
-
-import annotations.*;
-import annotations.el.*;
-import annotations.io.*;
-import annotations.io.classfile.*;
-
-import checkers.nullness.quals.*;
 
 /** Concatenates multiple descriptions of annotations into a single one. **/
 public class Anncat {

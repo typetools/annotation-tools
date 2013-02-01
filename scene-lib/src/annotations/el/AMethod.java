@@ -1,11 +1,13 @@
 package annotations.el;
 
+/*>>>
 import checkers.nullness.quals.Nullable;
 import checkers.javari.quals.ReadOnly;
-
-import annotations.util.coll.*;
+*/
 
 import java.util.Map;
+
+import annotations.util.coll.VivifyingMap;
 
 /**
  * An annotated method; contains bounds, return, parameters, receiver, and throws.
@@ -28,7 +30,7 @@ public final class AMethod extends ABlock {
     public final VivifyingMap<TypeIndexLocation, ATypeElement> throwsException =
         ATypeElement.<TypeIndexLocation>newVivifyingLHMap_ATE();
 
-    private String methodName;
+    private final String methodName;
 
     AMethod(String methodName) {
       super("method: " + methodName);

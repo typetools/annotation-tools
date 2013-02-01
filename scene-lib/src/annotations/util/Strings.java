@@ -1,6 +1,8 @@
 package annotations.util;
 
+/*>>>
 import checkers.nullness.quals.*;
+*/
 
 /**
  * {@link Strings} provides useful static methods related to strings.

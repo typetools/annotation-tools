@@ -1,21 +1,24 @@
 package annotations.io;
 
+/*>>>
 import checkers.nullness.quals.*;
 import checkers.javari.quals.*;
+*/
 
-import java.io.*;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.Writer;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.util.*;
 
-import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
-
-import annotations.*;
+import annotations.Annotation;
 import annotations.el.*;
 import annotations.field.*;
-import annotations.util.*;
+import annotations.util.Strings;
 
-import static annotations.io.IOUtils.*;
+import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
 
 /**
  * IndexFileWriter provides two static methods named <code>write</code>
@@ -43,8 +46,8 @@ public final class IndexFileWriter {
 
         @Override
         protected void visitAnnotationDef(AnnotationDef d) {
-            pw.println("package " + packagePart(d.name) + ":");
-            pw.print("annotation @" + basenamePart(d.name) + ":");
+            pw.println("package " + annotations.io.IOUtils.packagePart(d.name) + ":");
+            pw.print("annotation @" + annotations.io.IOUtils.basenamePart(d.name) + ":");
             // TODO: We would only print Retention and Target annotations
             printAnnotations(requiredMetaannotations(d.tlAnnotationsHere));
             pw.println();
@@ -139,12 +142,14 @@ public final class IndexFileWriter {
         pw.println();
     }
 
+    /*
     private void printElementAndInnerTypes(String indentation,
             String desc,
-            /*@ReadOnly*/ AElement e) {
+            @ReadOnly AElement e) {
         printElement(indentation, desc, e);
         printTypeElementAndInnerTypes(indentation + INDENT, desc, e.type);
     }
+    */
 
     private void printTypeElementAndInnerTypes(String indentation,
             String desc,
@@ -273,8 +278,8 @@ public final class IndexFileWriter {
                 : scene.classes.entrySet()) {
             String cname = ce.getKey();
             /*@ReadOnly*/ AClass c = ce.getValue();
-            String pkg = packagePart(cname);
-            String basename = basenamePart(cname);
+            String pkg = annotations.io.IOUtils.packagePart(cname);
+            String basename = annotations.io.IOUtils.basenamePart(cname);
             pw.println("package " + pkg + ":");
             pw.print("class " + basename + ":");
             printAnnotations(c);
