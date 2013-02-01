@@ -1,6 +1,12 @@
 package:
     annotation @A: @java.lang.annotation.Target(value={TYPE_USE})
     annotation @B: @java.lang.annotation.Target(value={TYPE_USE})
+    annotation @C: @java.lang.annotation.Target(value={TYPE_USE})
+    annotation @D: @java.lang.annotation.Target(value={TYPE_USE})
+    annotation @E: @java.lang.annotation.Target(value={TYPE_USE})
+    annotation @F: @java.lang.annotation.Target(value={TYPE_USE})
+    annotation @G: @java.lang.annotation.Target(value={TYPE_USE})
+    annotation @H: @java.lang.annotation.Target(value={TYPE_USE})
     annotation @X: @java.lang.annotation.Target(value={TYPE_USE})
 
     // Try to insert a receiver parameter on a method declaration in an
@@ -14,3 +20,21 @@ package:
             receiver: @A
         method m()V:
             receiver: @B
+
+    class InnerReceivers:
+        method <init>()V:
+            receiver: @C
+        method m()V:
+            receiver: @D
+
+    class InnerReceivers$Inner1:
+        method <init>()V:
+            receiver: @E
+        method m()V:
+            receiver: @F
+
+    class InnerReceivers$Inner1$Inner2:
+        method <init>()V:
+            receiver: @G
+        method m()V:
+            receiver: @H
