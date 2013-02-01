@@ -82,7 +82,7 @@ public class DeclaredType extends Type {
 
     /**
      * Adds the given type parameter to this type.
-     * @param typeParameter the type paramter.
+     * @param typeParameter the type parameter.
      */
     public void addTypeParameter(Type typeParameter) {
         checkWildcard();
@@ -92,7 +92,7 @@ public class DeclaredType extends Type {
     /**
      * Gets the type parameter at the given index.
      * @param index the index.
-     * @return the type paramter.
+     * @return the type parameter.
      */
     public Type getTypeParameter(int index) {
         checkWildcard();
