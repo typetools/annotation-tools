@@ -1,7 +1,9 @@
 package annotations.tests;
 
+/*>>>
 import checkers.nullness.quals.*;
 import checkers.javari.quals.ReadOnly;
+*/
 
 import java.io.*;
 import java.util.*;
@@ -124,9 +126,11 @@ public /*@ReadOnly*/ class TestSceneLib extends TestCase {
         s1.classes.vivify("Foo");
         s1.classes.vivify("Foo").methods.vivify("y()Z");
         s1.classes.vivify("Foo").methods.vivify("y()Z").parameters.vivify(5);
-        Object dummy = 
+        @SuppressWarnings("unused")
+        Object dummy =
           s1.classes.vivify("Foo").methods.vivify("y()Z").parameters.vivify(5).type;
-        Object dummy2 = 
+        @SuppressWarnings("unused")
+        Object dummy2 =
           s1.classes.vivify("Foo").methods.vivify("y()Z").parameters.vivify(5).type.innerTypes;
         s1.classes.vivify("Foo").methods.vivify("y()Z").parameters.vivify(5).type.innerTypes
                 .vivify(new InnerTypeLocation(
@@ -342,6 +346,7 @@ public /*@ReadOnly*/ class TestSceneLib extends TestCase {
         return null;
     }
 
+    /*
     private static boolean containsAnnotation(Set<Annotation> annos, String name) {
         return getAnnotation(annos, name) != null;
     }
@@ -349,6 +354,7 @@ public /*@ReadOnly*/ class TestSceneLib extends TestCase {
     private static boolean isReadOnly(AElement e) {
         return e.lookup("ReadOnly") != null;
     }
+    */
 
     // I removed the filtering functionality, for lack of clients that use it. -MDE
     // public void testFilter() throws Exception {
@@ -552,9 +558,11 @@ public /*@ReadOnly*/ class TestSceneLib extends TestCase {
         }
     }
 
+    /*
     private static final AnnotationDef idAnnoDef =
         new AnnotationDef("IdAnno", null, Collections.singletonMap(
                 "id", BasicAFT.forType(int.class)));
+    */
     private static final AnnotationDef idAnnoTLDef =
       new AnnotationDef("IdAnno", Annotations.asRetentionClass,
                           Collections.singletonMap(

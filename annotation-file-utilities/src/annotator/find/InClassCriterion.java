@@ -112,7 +112,7 @@ final class InClassCriterion implements Criterion {
         // all four Kinds are represented by ClassTree
         ClassTree c = (ClassTree)tree;
         Name csn = c.getSimpleName();
-        
+
         if (csn == null) {
           debug("empty getSimpleName: InClassCriterion.isSatisfiedBy:%n  cname=%s%n  tree=%s%n", cname, tree);
           checkAnon = true;
@@ -201,6 +201,7 @@ final class InClassCriterion implements Criterion {
    * empty string).
    * @see #split(String s, String delim)
    **/
+  /*
   private static List<String> split(String s, char delim) {
     List<String> result = new ArrayList<String>();
     for (int delimpos = s.indexOf(delim); delimpos != -1; delimpos = s.indexOf(delim)) {
@@ -210,6 +211,7 @@ final class InClassCriterion implements Criterion {
     result.add(s);
     return result;
   }
+  */
 
   private static void debug(String message, Object... args) {
     if (debug) {

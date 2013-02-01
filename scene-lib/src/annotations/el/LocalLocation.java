@@ -1,9 +1,11 @@
 package annotations.el;
 
+import annotations.util.Hasher;
+
+/*>>>
 import checkers.nullness.quals.*;
 import checkers.javari.quals.*;
-
-import annotations.util.*;
+*/
 
 /**
  * A {@link LocalLocation} holds location information for a local
@@ -31,7 +33,7 @@ public final /*@ReadOnly*/ class LocalLocation {
      * the fields of the same names.
      */
     public LocalLocation(int index, int scopeStart, int scopeLength) {
-    	this.index = index;
+        this.index = index;
         this.scopeStart = scopeStart;
         this.scopeLength = scopeLength;
         this.varName = null;
@@ -40,16 +42,16 @@ public final /*@ReadOnly*/ class LocalLocation {
 
     public final String varName;
     public final int varIndex;
-    
+
     public LocalLocation(String varName, int varIndex) {
-    	this.index = -1;
+        this.index = -1;
         this.scopeStart = -1;
         this.scopeLength = -1;
-    	this.varName = varName;
-    	this.varIndex = varIndex;
+        this.varName = varName;
+        this.varIndex = varIndex;
     }
-    
-    
+
+
     /**
      * Returns whether this {@link LocalLocation} equals <code>o</code>; a
      * slightly faster variant of {@link #equals(Object)} for when the argument
@@ -79,24 +81,24 @@ public final /*@ReadOnly*/ class LocalLocation {
      */
     @Override
     public int hashCode(/*>>> @ReadOnly LocalLocation this*/) {
-		Hasher h = new Hasher();
-    	if (varName==null) {
-			h.mash(index);
-			h.mash(scopeStart);
-			h.mash(scopeLength);
-		} else {
-			h.mash(varName.hashCode());
-			h.mash(varIndex);
-		}
-		return h.hash;
+        Hasher h = new Hasher();
+        if (varName==null) {
+            h.mash(index);
+            h.mash(scopeStart);
+            h.mash(scopeLength);
+        } else {
+            h.mash(varName.hashCode());
+            h.mash(varIndex);
+        }
+        return h.hash;
     }
 
     @Override
     public String toString() {
-    	if (varName==null) {
-    		return "LocalLocation(" + index + ", " + scopeStart + ", " + scopeLength + ")";
-    	} else {
-    		return "LocalLocation(\"" + varName + "\" #" + varIndex + ")";
-    	}
+        if (varName==null) {
+            return "LocalLocation(" + index + ", " + scopeStart + ", " + scopeLength + ")";
+        } else {
+            return "LocalLocation(\"" + varName + "\" #" + varIndex + ")";
+        }
     }
 }

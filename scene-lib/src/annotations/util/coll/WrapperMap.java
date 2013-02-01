@@ -1,9 +1,13 @@
 package annotations.util.coll;
 
+import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
+
+/*>>>
 import checkers.nullness.quals.Nullable;
 import checkers.javari.quals.*;
-
-import java.util.*;
+*/
 
 /**
  * A {@link WrapperMap} is a map all of whose methods delegate by default to
@@ -26,6 +30,7 @@ public class WrapperMap<K, V> implements Map<K, V> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void clear() {
         back.clear();
     }
@@ -33,6 +38,7 @@ public class WrapperMap<K, V> implements Map<K, V> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean containsKey(/*>>> @ReadOnly WrapperMap<K, V> this, */ /*@ReadOnly*/ Object key) {
         return back.containsKey(key);
     }
@@ -40,6 +46,7 @@ public class WrapperMap<K, V> implements Map<K, V> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean containsValue(/*>>> @ReadOnly WrapperMap<K, V> this, */ /*@ReadOnly*/ Object value) {
         return back.containsValue(value);
     }
@@ -47,6 +54,7 @@ public class WrapperMap<K, V> implements Map<K, V> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public /*@PolyRead*/ Set<java.util.Map.Entry<K, V>>
         entrySet(/*>>> @PolyRead WrapperMap<K, V> this*/) {
         return back.entrySet();
@@ -55,6 +63,7 @@ public class WrapperMap<K, V> implements Map<K, V> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public V get(/*>>> @ReadOnly WrapperMap<K, V> this, */ /*@ReadOnly*/ Object key) {
         return back.get(key);
     }
@@ -62,6 +71,7 @@ public class WrapperMap<K, V> implements Map<K, V> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isEmpty(/*>>> @ReadOnly WrapperMap<K, V> this*/) {
         return back.isEmpty();
     }
@@ -69,6 +79,7 @@ public class WrapperMap<K, V> implements Map<K, V> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public /*@PolyRead*/ Set<K> keySet(/*>>> @PolyRead WrapperMap<K, V> this*/) {
         return back.keySet();
     }
@@ -76,6 +87,7 @@ public class WrapperMap<K, V> implements Map<K, V> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public V put(K key, V value) {
         return back.put(key, value);
     }
@@ -83,6 +95,7 @@ public class WrapperMap<K, V> implements Map<K, V> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void putAll(/*@ReadOnly*/ Map<? extends K, ? extends V> m) {
         back.putAll(m);
     }
@@ -90,6 +103,7 @@ public class WrapperMap<K, V> implements Map<K, V> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public V remove(/*@ReadOnly*/ Object key) {
         return back.remove(key);
     }
@@ -97,6 +111,7 @@ public class WrapperMap<K, V> implements Map<K, V> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int size(/*>>> @ReadOnly WrapperMap<K, V> this*/) {
         return back.size();
     }
@@ -104,6 +119,7 @@ public class WrapperMap<K, V> implements Map<K, V> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public /*@PolyRead*/ Collection<V> values(/*>>> @PolyRead WrapperMap<K, V> this*/) {
         return back.values();
     }

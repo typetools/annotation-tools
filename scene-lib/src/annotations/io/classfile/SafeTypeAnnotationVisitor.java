@@ -3,7 +3,9 @@
 
 package annotations.io.classfile;
 
+/*>>>
 import checkers.nullness.quals.*;
+*/
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,16 +45,16 @@ implements TypeAnnotationVisitor {
 
   // Each list keeps a record of what was passed in to the similarly-named
   // method, and except for xLocationArgs, should all contain at most 1 element.
-  private List<Integer> xIndexArgs;
-  private List<Integer> xLengthArgs;
-  private List<TypePathEntry> xLocationArgs;
-  private List<Integer> xLocationLengthArgs;
-  private List<Integer> xOffsetArgs;
-  private List<Integer> xStartPcArgs;
-  private List<Integer> xTargetTypeArgs;
-  private List<Integer> xParamIndexArgs;
-  private List<Integer> xBoundIndexArgs;
-  private List<Integer> xTypeIndexArgs;
+  private final List<Integer> xIndexArgs;
+  private final List<Integer> xLengthArgs;
+  private final List<TypePathEntry> xLocationArgs;
+  private final List<Integer> xLocationLengthArgs;
+  private final List<Integer> xOffsetArgs;
+  private final List<Integer> xStartPcArgs;
+  private final List<Integer> xTargetTypeArgs;
+  private final List<Integer> xParamIndexArgs;
+  private final List<Integer> xBoundIndexArgs;
+  private final List<Integer> xTypeIndexArgs;
 
   // Counts the number of times visitXNameAndArgsSize is called.
   private int xNameAndArgsCount;
@@ -84,6 +86,7 @@ implements TypeAnnotationVisitor {
    * @inheritDoc
    * @see org.objectweb.asm.AnnotationVisitor#visit(java.lang.String, java.lang.Object)
    */
+  @Override
   public void visit(String name, Object value) {
     xav.visit(name, value);
   }
@@ -92,6 +95,7 @@ implements TypeAnnotationVisitor {
    * @inheritDoc
    * @see org.objectweb.asm.AnnotationVisitor#visitAnnotation(java.lang.String, java.lang.String)
    */
+  @Override
   public AnnotationVisitor visitAnnotation(String name, String desc) {
     return xav.visitAnnotation(name, desc);
   }
@@ -100,6 +104,7 @@ implements TypeAnnotationVisitor {
    * @inheritDoc
    * @see org.objectweb.asm.AnnotationVisitor#visitArray(java.lang.String)
    */
+  @Override
   public AnnotationVisitor visitArray(String name) {
     return xav.visitArray(name);
   }
@@ -108,6 +113,7 @@ implements TypeAnnotationVisitor {
    * @inheritDoc
    * @see org.objectweb.asm.AnnotationVisitor#visitEnum(java.lang.String, java.lang.String, java.lang.String)
    */
+  @Override
   public void visitEnum(String name, String desc, String value) {
     xav.visitEnum(name, desc, value);
   }
@@ -116,6 +122,7 @@ implements TypeAnnotationVisitor {
    * @inheritDoc
    * @see org.objectweb.asm.TypeAnnotationVisitor#visitXIndex(int)
    */
+  @Override
   public void visitXIndex(int index) {
     xIndexArgs.add(index);
     xav.visitXIndex(index);
@@ -125,6 +132,7 @@ implements TypeAnnotationVisitor {
    * @inheritDoc
    * @see org.objectweb.asm.TypeAnnotationVisitor#visitXLength(int)
    */
+  @Override
   public void visitXLength(int length) {
     xLengthArgs.add(length);
     xav.visitXLength(length);
@@ -134,6 +142,7 @@ implements TypeAnnotationVisitor {
    * @inheritDoc
    * @see org.objectweb.asm.TypeAnnotationVisitor#visitXLocation(TypePathEntry)
    */
+  @Override
   public void visitXLocation(TypePathEntry location) {
     xLocationArgs.add(location);
     xav.visitXLocation(location);
@@ -143,6 +152,7 @@ implements TypeAnnotationVisitor {
    * @inheritDoc
    * @see org.objectweb.asm.TypeAnnotationVisitor#visitXLocationLength(int)
    */
+  @Override
   public void visitXLocationLength(int location_length) {
     xLocationLengthArgs.add(location_length);
     xav.visitXLocationLength(location_length);
@@ -152,11 +162,13 @@ implements TypeAnnotationVisitor {
    * @inheritDoc
    * @see org.objectweb.asm.TypeAnnotationVisitor#visitXOffset(int)
    */
+  @Override
   public void visitXOffset(int offset) {
     xOffsetArgs.add(offset);
     xav.visitXOffset(offset);
   }
 
+  @Override
   public void visitXNumEntries(int num_entries) {
   }
 
@@ -164,6 +176,7 @@ implements TypeAnnotationVisitor {
    * @inheritDoc
    * @see org.objectweb.asm.TypeAnnotationVisitor#visitXStartPc(int)
    */
+  @Override
   public void visitXStartPc(int start_pc) {
     xStartPcArgs.add(start_pc);
     xav.visitXStartPc(start_pc);
@@ -173,6 +186,7 @@ implements TypeAnnotationVisitor {
    * @inheritDoc
    * @see org.objectweb.asm.TypeAnnotationVisitor#visitXTargetType(int)
    */
+  @Override
   public void visitXTargetType(int target_type) {
     xTargetTypeArgs.add(target_type);
     xav.visitXTargetType(target_type);
@@ -182,6 +196,7 @@ implements TypeAnnotationVisitor {
    * @inheritDoc
    * @see org.objectweb.asm.TypeAnnotationVisitor#visitXParamIndex(int)
    */
+  @Override
   public void visitXParamIndex(int param_index) {
     xParamIndexArgs.add(param_index);
     xav.visitXParamIndex(param_index);
@@ -191,6 +206,7 @@ implements TypeAnnotationVisitor {
    * @inheritDoc
    * @see org.objectweb.asm.TypeAnnotationVisitor#visitXBoundIndex(int)
    */
+  @Override
   public void visitXBoundIndex(int bound_index) {
     if (bound_index != -1) {
       xBoundIndexArgs.add(bound_index);
@@ -198,11 +214,13 @@ implements TypeAnnotationVisitor {
     }
   }
 
+  @Override
   public void visitXTypeIndex(int type_index) {
     xTypeIndexArgs.add(type_index);
     xav.visitXTypeIndex(type_index);
   }
 
+  @Override
   public void visitXNameAndArgsSize() {
     xNameAndArgsCount++;
     xav.visitXNameAndArgsSize();
@@ -219,6 +237,7 @@ implements TypeAnnotationVisitor {
    *  has visited does not specify a legal extended annotation
    * @see org.objectweb.asm.AnnotationVisitor#visitEnd()
    */
+  @Override
   public void visitEnd() {
     if (xTargetTypeArgs.size() > 0) {
       checkX();

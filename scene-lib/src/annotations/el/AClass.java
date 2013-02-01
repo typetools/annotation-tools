@@ -1,13 +1,14 @@
 package annotations.el;
 
+import java.util.LinkedHashMap;
+
+import annotations.Annotation;
+import annotations.util.coll.VivifyingMap;
+
+/*>>>
 import checkers.nullness.quals.*;
 import checkers.javari.quals.*;
-
-import java.util.*;
-import static plume.UtilMDE.mapToString;
-
-import annotations.*;
-import annotations.util.coll.*;
+*/
 
 /** An annotated class */
 public final class AClass extends AElement {
@@ -47,7 +48,7 @@ public final class AClass extends AElement {
             }
         };
     }
-    
+
     private static VivifyingMap<String, AExpression> createFieldInitMap() {
         return new VivifyingMap<String, AExpression>(
                 new LinkedHashMap<String, AExpression>()) {
@@ -63,7 +64,7 @@ public final class AClass extends AElement {
         };
     }
 
-    
+
     /**
      * The class's annotated methods; a method's key consists of its name
      * followed by its erased signature in JVML format.
@@ -85,17 +86,17 @@ public final class AClass extends AElement {
     public final VivifyingMap<String, AExpression> fieldInits =
         createFieldInitMap();
 
-    private String className;
+    private final String className;
 
     // debug fields to keep track of all classes created
-    private static List<AClass> debugAllClasses = new ArrayList<AClass>();
-    private List<AClass> allClasses;
+    // private static List<AClass> debugAllClasses = new ArrayList<AClass>();
+    // private final List<AClass> allClasses;
 
     AClass(String className) {
       super("class: " + className);
       this.className = className;
-      debugAllClasses.add(this);
-      allClasses = debugAllClasses;
+      // debugAllClasses.add(this);
+      // allClasses = debugAllClasses;
     }
 
     /**
@@ -155,22 +156,22 @@ public final class AClass extends AElement {
         }
         sb.append(linePrefix);
         sb.append("Bounds:\n");
-        mapToString(sb, bounds, linePrefix + "  ");
+        plume.UtilMDE.mapToString(sb, bounds, linePrefix + "  ");
         sb.append(linePrefix);
         sb.append("Extends/implements:\n");
-        mapToString(sb, extendsImplements, linePrefix + "  ");
+        plume.UtilMDE.mapToString(sb, extendsImplements, linePrefix + "  ");
         sb.append(linePrefix);
         sb.append("Fields:\n");
-        mapToString(sb, fields, linePrefix + "  ");
+        plume.UtilMDE.mapToString(sb, fields, linePrefix + "  ");
         sb.append(linePrefix);
         sb.append("Field Initializers:\n");
-        mapToString(sb, fieldInits, linePrefix + "  ");
+        plume.UtilMDE.mapToString(sb, fieldInits, linePrefix + "  ");
         sb.append(linePrefix);
         sb.append("Static Initializers:\n");
-        mapToString(sb, staticInits, linePrefix + "  ");
+        plume.UtilMDE.mapToString(sb, staticInits, linePrefix + "  ");
         sb.append(linePrefix);
         sb.append("Methods:\n");
-        mapToString(sb, methods, linePrefix + "  ");
+        plume.UtilMDE.mapToString(sb, methods, linePrefix + "  ");
         return sb.toString();
     }
 

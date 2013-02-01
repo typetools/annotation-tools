@@ -1,15 +1,15 @@
 package annotations.tests;
 
+/*>>>
 import checkers.nullness.quals.NonNull;
 import checkers.javari.quals.ReadOnly;
+*/
 
 import java.io.*;
 import java.util.*;
-import java.lang.annotation.RetentionPolicy;
 
 import annotations.*;
 import annotations.el.*;
-import annotations.field.*;
 import annotations.io.*;
 
 /**

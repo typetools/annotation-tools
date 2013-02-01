@@ -3,11 +3,12 @@
 // an AScene.
 package annotations.io.classfile;
 
+/*>>>
 import checkers.nullness.quals.*;
+*/
 
+import java.io.File;
 import java.util.*;
-import java.io.*;
-import java.lang.annotation.RetentionPolicy;
 
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.TypeAnnotationVisitor;
@@ -16,12 +17,12 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.commons.EmptyVisitor;
 
-import com.sun.tools.javac.code.TargetType;
-import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
-
 import annotations.*;
 import annotations.el.*;
 import annotations.field.*;
+
+import com.sun.tools.javac.code.TargetType;
+import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
 
 /**
  * A <code> ClassAnnotationSceneReader </code> is a
@@ -61,7 +62,7 @@ extends EmptyVisitor {
   private static final boolean strict = false;
 
   // The scene into which this class will insert annotations.
-  private AScene scene;
+  private final AScene scene;
 
   // The AClass that represents this class in scene.
   private AClass aClass;
@@ -205,16 +206,16 @@ extends EmptyVisitor {
     // correctly interpret the information in visitEnd()
     // note that all of these should contain 0 or 1 elements,
     // except for xLocations, which is actually a list
-    private List<Integer> xTargetTypeArgs;
-    private List<Integer> xIndexArgs;
-    private List<Integer> xLengthArgs;
-    private List<TypePathEntry> xLocationsArgs;
-    private List<Integer> xLocationLengthArgs;
-    private List<Integer> xOffsetArgs;
-    private List<Integer> xStartPcArgs;
-    private List<Integer> xParamIndexArgs;
-    private List<Integer> xBoundIndexArgs;
-    private List<Integer> xTypeIndexArgs;
+    private final List<Integer> xTargetTypeArgs;
+    private final List<Integer> xIndexArgs;
+    private final List<Integer> xLengthArgs;
+    private final List<TypePathEntry> xLocationsArgs;
+    private final List<Integer> xLocationLengthArgs;
+    private final List<Integer> xOffsetArgs;
+    private final List<Integer> xStartPcArgs;
+    private final List<Integer> xParamIndexArgs;
+    private final List<Integer> xBoundIndexArgs;
+    private final List<Integer> xTypeIndexArgs;
 
     // private AnnotationDef getAnnotationDef(Object o) {
     //   if (o instanceof AnnotationDef) {
@@ -284,6 +285,7 @@ extends EmptyVisitor {
     /*
      * @see org.objectweb.asm.AnnotationVisitor#visit(java.lang.String, java.lang.Object)
      */
+    @Override
     public void visit(String name, Object value) {
       if (trace) { System.out.printf("visit(%s, %s) on %s%n", name, value, this); }
       // BasicAFT.forType(Class) expects int.class instead of Integer.class,
@@ -383,6 +385,7 @@ extends EmptyVisitor {
     /*
      * @see org.objectweb.asm.AnnotationVisitor#visitEnum(java.lang.String, java.lang.String, java.lang.String)
      */
+    @Override
     public void visitEnum(String name, String desc, String value) {
       if (trace) { System.out.printf("visitEnum(%s, %s) in %s (%s)%n", name, desc, this, this.getClass()); }
       annotationBuilder.addScalarField(name, new EnumAFT(desc), value);
@@ -391,6 +394,7 @@ extends EmptyVisitor {
     /*
      * @see org.objectweb.asm.AnnotationVisitor#visitAnnotation(java.lang.String, java.lang.String)
      */
+    @Override
     public AnnotationVisitor visitAnnotation(String name, String desc) {
       if (trace) { System.out.printf("visitAnnotation(%s, %s) in %s (%s)%n", name, desc, this, this.getClass()); }
       return new NestedAnnotationSceneReader(this, name, desc);
@@ -399,6 +403,7 @@ extends EmptyVisitor {
     /*
      * @see org.objectweb.asm.AnnotationVisitor#visitArray(java.lang.String)
      */
+    @Override
     public AnnotationVisitor visitArray(String name) {
       if (trace) { System.out.printf("visitArray(%s) in %s (%s)%n", name, this, this.getClass()); }
       ArrayAFT aaft = (ArrayAFT) annotationBuilder.fieldTypes().get(name);
@@ -409,6 +414,7 @@ extends EmptyVisitor {
     /*
      * @see org.objectweb.asm.TypeAnnotationVisitor#visitXTargetType(int)
      */
+    @Override
     public void visitXTargetType(int target_type) {
       xTargetTypeArgs.add(target_type);
     }
@@ -416,6 +422,7 @@ extends EmptyVisitor {
     /*
      * @see org.objectweb.asm.TypeAnnotationVisitor#visitXIndex(int)
      */
+    @Override
     public void visitXIndex(int index) {
       xIndexArgs.add(index);
     }
@@ -423,6 +430,7 @@ extends EmptyVisitor {
     /*
      * @see org.objectweb.asm.TypeAnnotationVisitor#visitXLength(int)
      */
+    @Override
     public void visitXLength(int length) {
       xLengthArgs.add(length);
     }
@@ -430,6 +438,7 @@ extends EmptyVisitor {
     /*
      * @see org.objectweb.asm.TypeAnnotationVisitor#visitXLocation(TypePathEntry)
      */
+    @Override
     public void visitXLocation(TypePathEntry location) {
       xLocationsArgs.add(location);
     }
@@ -437,6 +446,7 @@ extends EmptyVisitor {
     /*
      * @see org.objectweb.asm.TypeAnnotationVisitor#visitXLocationLength(int)
      */
+    @Override
     public void visitXLocationLength(int location_length) {
       xLocationLengthArgs.add(location_length);
     }
@@ -444,16 +454,19 @@ extends EmptyVisitor {
     /*
      * @see org.objectweb.asm.TypeAnnotationVisitor#visitXOffset(int)
      */
+    @Override
     public void visitXOffset(int offset) {
       xOffsetArgs.add(offset);
     }
 
+    @Override
     public void visitXNumEntries(int num_entries) {
     }
 
     /*
      * @see org.objectweb.asm.TypeAnnotationVisitor#visitXStartPc(int)
      */
+    @Override
     public void visitXStartPc(int start_pc) {
       xStartPcArgs.add(start_pc);
     }
@@ -461,6 +474,7 @@ extends EmptyVisitor {
     /*
      * @see org.objectweb.asm.TypeAnnotationVisitor#visitXBoundIndex(int)
      */
+    @Override
     public void visitXParamIndex(int param_index) {
       xParamIndexArgs.add(param_index);
     }
@@ -468,14 +482,17 @@ extends EmptyVisitor {
     /*
      * @see org.objectweb.asm.TypeAnnotationVisitor#visitXBoundIndex(int)
      */
+    @Override
     public void visitXBoundIndex(int bound_index) {
       xBoundIndexArgs.add(bound_index);
     }
 
+    @Override
     public void visitXTypeIndex(int type_index) {
       xTypeIndexArgs.add(type_index);
     }
 
+    @Override
     public void visitXNameAndArgsSize() {
     }
 
@@ -485,6 +502,7 @@ extends EmptyVisitor {
      *
      * @see org.objectweb.asm.TypeAnnotationVisitor#visitEnd()
      */
+    @Override
     public void visitEnd() {
       if (trace) { System.out.printf("visitEnd on %s (%s)%n", this, this.getClass()); }
       if (xTargetTypeArgs.size() >= 1) {
@@ -636,9 +654,11 @@ extends EmptyVisitor {
     /*
      * Returns the index for this annotation.
      */
+    /*
     private int makeIndex() {
       return xIndexArgs.get(0);
     }
+    */
 
     /*
      * Returns the bound location for this annotation.
@@ -878,9 +898,9 @@ extends EmptyVisitor {
    * (visitAnnotation()), it no longer needs to worry about that field.
    */
   private class NestedAnnotationSceneReader extends AnnotationSceneReader {
-    private AnnotationSceneReader parent;
-    private String name;
-    private String desc;
+    private final AnnotationSceneReader parent;
+    private final String name;
+    // private final String desc;
 
     public NestedAnnotationSceneReader(AnnotationSceneReader parent,
         String name, String desc) {
@@ -888,7 +908,7 @@ extends EmptyVisitor {
       if (trace) { System.out.printf("NestedAnnotationSceneReader(%s, %s, %s)%n", parent, name, desc); }
       this.parent = parent;
       this.name = name;
-      this.desc = desc;
+      // this.desc = desc;
     }
 
     @Override
@@ -920,10 +940,10 @@ extends EmptyVisitor {
   // in the superclass constructor to
   // disable superclass behaviors that would otherwise cause trouble.
   private class ArrayAnnotationSceneReader extends AnnotationSceneReader {
-    private AnnotationSceneReader parent;
+    private final AnnotationSceneReader parent;
     private ArrayBuilder arrayBuilder;
-    private ScalarAFT elementType;
-    private String arrayName;
+    // private ScalarAFT elementType;
+    private final String arrayName;
 
     // The element type may be unknown when this is called.
     // But AnnotationSceneReader expects to know the element type.
@@ -942,7 +962,7 @@ extends EmptyVisitor {
       if (trace) { System.out.printf("prepareForElement(%s) in %s (%s)%n", elementType, this, this.getClass()); }
       assert elementType != null; // but, does this happen when reading from classfile?
       if (arrayBuilder == null) {
-        this.elementType = elementType;
+        // this.elementType = elementType;
         arrayBuilder = parent.annotationBuilder.beginArrayField(arrayName,
                 new ArrayAFT(elementType));
       }
@@ -1024,11 +1044,13 @@ extends EmptyVisitor {
    */
   private class FieldAnnotationSceneReader extends EmptyVisitor implements FieldVisitor {
 
-    private String name;
-    private String desc;
-    private String signature;
-    private Object value;
-    private AElement aField;
+    /*
+    private final String name;
+    private final String desc;
+    private final String signature;
+    private final Object value;
+    */
+    private final AElement aField;
 
     public FieldAnnotationSceneReader(
         String name,
@@ -1036,10 +1058,12 @@ extends EmptyVisitor {
         String signature,
         Object value,
         AElement aField) {
+      /*
       this.name = name;
       this.desc = desc;
       this.signature = signature;
       this.value = value;
+      */
       this.aField = aField;
     }
 
@@ -1067,15 +1091,15 @@ extends EmptyVisitor {
    */
   private class MethodAnnotationSceneReader extends EmptyVisitor implements MethodVisitor {
 
-    private String name;
-    private String desc;
-    private String signature;
-    private AElement aMethod;
+    // private final String name;
+    // private final String desc;
+    // private final String signature;
+    private final AElement aMethod;
 
     public MethodAnnotationSceneReader(String name, String desc, String signature, AElement aMethod) {
-      this.name = name;
-      this.desc = desc;
-      this.signature = signature;
+      // this.name = name;
+      // this.desc = desc;
+      // this.signature = signature;
       this.aMethod = aMethod;
     }
 

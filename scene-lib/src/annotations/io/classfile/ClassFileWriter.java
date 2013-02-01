@@ -1,14 +1,16 @@
 package annotations.io.classfile;
 
+/*>>>
 import checkers.nullness.quals.*;
+*/
 
 import java.io.*;
-import plume.*;
 
 import org.objectweb.asm.ClassReader;
 
-import annotations.Annotation;
-import annotations.AnnotationFactory;
+import plume.Option;
+import plume.Options;
+
 import annotations.el.AScene;
 import annotations.io.IndexFileParser;
 
@@ -57,7 +59,6 @@ public class ClassFileWriter {
    * @throws IOException if a class file or index file cannot be opened/written
    */
   public static void main(String[] args) throws IOException {
-    boolean printUsage = false;
     Options options = new Options(usage, ClassFileWriter.class);
 
     args = options.parse_or_usage(args);

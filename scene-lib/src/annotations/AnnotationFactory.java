@@ -1,12 +1,13 @@
 package annotations;
 
+/*>>>
 import checkers.nullness.quals.*;
 import checkers.javari.quals.*;
+*/
 
-import java.util.*;
-import java.lang.annotation.RetentionPolicy;
+import java.util.Map;
+import java.util.Set;
 
-import annotations.field.*;
 import annotations.el.AnnotationDef;
 
 /**

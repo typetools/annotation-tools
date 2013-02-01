@@ -1,9 +1,11 @@
 package annotations.util.coll;
 
+import java.util.*;
+
+/*>>>
 import checkers.nullness.quals.*;
 import checkers.javari.quals.*;
-
-import java.util.*;
+*/
 
 /**
  * A simple implementation of {@link KeyedSet} backed by an insertion-order
@@ -42,16 +44,19 @@ public class LinkedHashKeyedSet<K, V> extends AbstractSet<V> implements KeyedSet
     }
 
     private class KeyedSetIterator implements Iterator<V> {
-        private Iterator<V> itr = theValues.iterator();
+        private final Iterator<V> itr = theValues.iterator();
 
+        @Override
         public boolean hasNext(/*>>> @ReadOnly KeyedSetIterator this*/) {
             return itr.hasNext();
         }
 
+        @Override
         public V next(/*>>> @ReadOnly KeyedSetIterator this*/) {
             return itr.next();
         }
 
+        @Override
         public void remove() {
             itr.remove();
         }
@@ -105,6 +110,7 @@ public class LinkedHashKeyedSet<K, V> extends AbstractSet<V> implements KeyedSet
     /**
      * {@inheritDoc}
      */
+    @Override
     public V add(V o, int conflictBehavior, int equalBehavior) {
         K key = keyer.getKeyFor(o);
         V old = theMap.get(key);
@@ -153,6 +159,7 @@ public class LinkedHashKeyedSet<K, V> extends AbstractSet<V> implements KeyedSet
     /**
      * {@inheritDoc}
      */
+    @Override
     public Keyer<? extends K, ? super V> getKeyer(/*>>> @ReadOnly LinkedHashKeyedSet<K, V> this*/) {
         return keyer;
     }
@@ -160,6 +167,7 @@ public class LinkedHashKeyedSet<K, V> extends AbstractSet<V> implements KeyedSet
     /**
      * {@inheritDoc}
      */
+    @Override
     public V replace(V v) {
         return theMap.put(keyer.getKeyFor(v), v);
     }
@@ -167,6 +175,7 @@ public class LinkedHashKeyedSet<K, V> extends AbstractSet<V> implements KeyedSet
     /**
      * {@inheritDoc}
      */
+    @Override
     public V lookup(K k) {
         return theMap.get(k);
     }

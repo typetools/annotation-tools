@@ -1,9 +1,12 @@
 package annotations.util.coll;
 
+import java.util.Iterator;
+import java.util.Map;
+
+/*>>>
 import checkers.nullness.quals.Nullable;
 import checkers.javari.quals.*;
-
-import java.util.*;
+*/
 
 /**
  * A {@link VivifyingMap} is a map that can create "empty" values on demand

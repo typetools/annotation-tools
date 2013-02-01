@@ -1,21 +1,26 @@
 package annotations.io;
 
+/*>>>
 import checkers.nullness.quals.*;
+*/
 
 import java.io.*;
-import java.util.*;
-import java.util.regex.*;
 import java.lang.annotation.RetentionPolicy;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import annotations.Annotation;
+import annotations.AnnotationBuilder;
+import annotations.AnnotationFactory;
+import annotations.Annotations;
+import annotations.el.*;
 
 import com.sun.tools.javac.code.TargetType;
 import com.sun.tools.javac.code.TypeAnnotationPosition;
 
-import annotations.*;
-import annotations.el.*;
-
 import plume.FileIOException;
-
-import static annotations.io.IOUtils.*;
 
 /**
  * <code>JavapParser</code> provides a static method that parses a class dump
@@ -228,7 +233,7 @@ public final class JavapParser {
             case CAST:
             {
                 int offset = parseOffset();
-                int typeIndex = parseTypeIndex(); 
+                int typeIndex = parseTypeIndex();
                 subOuterType = ((AMethod) member).typecasts.vivify(RelativeLocation.createOffset(offset, typeIndex));
                 break;
             }
@@ -368,7 +373,7 @@ public final class JavapParser {
             int nameEnd = line.indexOf(' ');
             String className = (nameEnd == -1) ? line
                     : line.substring(0, line.indexOf(' '));
-            String pp = packagePart(className), bp = basenamePart(className);
+            String pp = annotations.io.IOUtils.packagePart(className), bp = annotations.io.IOUtils.basenamePart(className);
             nextLine();
             if (bp.equals("package-info"))
                 parseClass(scene.packages.vivify(pp));

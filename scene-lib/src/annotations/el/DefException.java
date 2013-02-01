@@ -1,8 +1,8 @@
 package annotations.el;
 
+/*>>>
 import checkers.nullness.quals.*;
-
-import annotations.*;
+*/
 
 /**
  * Thrown by {@link DefCollector} if the scene contains two different

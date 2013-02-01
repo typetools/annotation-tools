@@ -1,6 +1,8 @@
 package annotations.util.coll;
 
+/*>>>
 import checkers.javari.quals.ReadOnly;
+*/
 
 /**
  * A {@link Keyer} supplies keys for the elements of a {@link KeyedSet}.

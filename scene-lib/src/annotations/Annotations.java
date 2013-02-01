@@ -1,13 +1,15 @@
 package annotations;
 
+import java.lang.annotation.RetentionPolicy;
+import java.util.*;
+
+import annotations.el.AnnotationDef;
+import annotations.field.*;
+
+/*>>>
 import checkers.nullness.quals.*;
 import checkers.javari.quals.*;
-
-import java.util.*;
-import java.lang.annotation.*;
-
-import annotations.field.*;
-import annotations.el.*;
+*/
 
 /**
  * This noninstantiable class provides useful static methods related to

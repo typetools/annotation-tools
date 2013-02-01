@@ -12,7 +12,6 @@ import javax.tools.JavaFileObject;
 
 import plume.Pair;
 import type.DeclaredType;
-import annotations.io.IndexFileParser;
 import annotator.Main;
 
 import com.google.common.collect.LinkedHashMultimap;
@@ -256,12 +255,13 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       return result;
     }
 
-    private static Map<Pair<TreePath,Tree>,TreePath> getPathCache2 = new HashMap<Pair<TreePath,Tree>,TreePath>();
+    // private static Map<Pair<TreePath,Tree>,TreePath> getPathCache2 = new HashMap<Pair<TreePath,Tree>,TreePath>();
 
     /**
      * An alternative to TreePath.getPath(TreePath,Tree) that
      * caches its results.
      */
+    /*
     public static TreePath getPath(TreePath path, Tree target) {
       Pair<TreePath,Tree> args = Pair.of(path, target);
       if (getPathCache2.containsKey(args)) {
@@ -271,6 +271,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       getPathCache2.put(args, result);
       return result;
     }
+    */
 
     private Tree parent(Tree node) {
       return getPath(tree, node).getParentPath().getLeaf();
@@ -1073,6 +1074,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     return Multimaps.unmodifiableSetMultimap(positions);
   }
 
+  /*
   private static void printPath(TreePath path) {
     System.out.printf("-----path:%n");
     if (path != null) {
@@ -1082,5 +1084,5 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     }
     System.out.printf("-----end path.%n");
   }
-
+  */
 }

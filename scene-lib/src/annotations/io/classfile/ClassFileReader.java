@@ -1,13 +1,14 @@
 package annotations.io.classfile;
 
+/*>>>
 import checkers.nullness.quals.*;
+*/
 
 import java.io.*;
 import plume.*;
 
 import org.objectweb.asm.ClassReader;
 
-import annotations.*;
 import annotations.el.AScene;
 import annotations.io.IndexFileWriter;
 
@@ -22,10 +23,10 @@ public class ClassFileReader {
 
   @Option("-h print usage information and exit")
   public static boolean help = false;
- 
+
   @Option("print version information and exit")
   public static boolean version = false;
- 
+
   private static String linesep = System.getProperty("line.separator");
 
   static String usage
