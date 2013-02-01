@@ -1,4 +1,6 @@
 package:
+    annotation @A: @java.lang.annotation.Target(value={TYPE_USE})
+    annotation @B: @java.lang.annotation.Target(value={TYPE_USE})
     annotation @X: @java.lang.annotation.Target(value={TYPE_USE})
 
     // Try to insert a receiver parameter on a method declaration in an
@@ -6,3 +8,9 @@ package:
     class InnerReceivers$1:
         method m()V:
             receiver: @X
+
+    class InnerReceivers$1$Inner:
+        method <init>()V:
+            receiver: @A
+        method m()V:
+            receiver: @B

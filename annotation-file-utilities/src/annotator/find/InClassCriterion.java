@@ -129,7 +129,8 @@ final class InClassCriterion implements Criterion {
         } else if (cname.startsWith(treeClassName + "$")
                    || (cname.startsWith(treeClassName + "."))) {
           cname = cname.substring(treeClassName.length()+1);
-        } else {
+        } else if (!treeClassName.isEmpty()) {
+          // treeClassName is empty for anonymous inner class
           // System.out.println("cname else: " + cname);
           debug("false InClassCriterion.isSatisfiedBy:%n  cname=%s%n  tree=%s%n", cname, tree);
           return false;
