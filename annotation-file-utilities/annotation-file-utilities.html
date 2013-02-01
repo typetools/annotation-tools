@@ -1,0 +1,337 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <title>Annotation File Utilities</title>
+</head>
+<body>
+<h1>Annotation File Utilities</h1>
+
+<p>Contents:</p>
+<!-- start toc.  do not edit; run html-update-toc instead -->
+    <ul>
+      <li><a href="#motivation">Motivation</a>
+        <ul>
+          <li><a href="#jaif-file">External storage of annotations</a></li>
+          <li><a href="#annotation-file-utilities-description">Annotation File Utilities</a></li>
+        </ul></li>
+      <li><a href="#installation">Installation</a>
+        <ul>
+          <li><a href="#viewing-source">Building from source</a></li>
+        </ul></li>
+      <li><a href="#using">Using the Annotation File Utilities</a>
+        <ul>
+          <li><a href="#insert-annotations">Insert-annotations</a></li>
+          <li><a href="#extract-annotations">Extract-annotations</a></li>
+          <li><a href="#insert-annotations-to-source">Insert-annotations-to-source</a></li>
+        </ul></li>
+      <li><a href="#feedback">Feedback</a>
+        <ul>
+          <li><a href="#change-log">Change Log</a></li>
+        </ul></li>
+    </ul>
+<!-- end toc -->
+
+
+
+<hr />
+<h2 id="motivation">Motivation</h2>
+
+<p>
+Java annotations are meta-data about Java program elements, as in
+&ldquo;<code><font color="red">@Deprecated</font> class Date
+{&nbsp;...&nbsp;}</code>&rdquo; or &ldquo;<code>List&lt;<font color="red">@NonNull</font> String&gt;</code>&rdquo;.
+Ordinarily, Java annotations are
+written in the 
+source code of a <code>.java</code> Java source file.  When
+<code>javac</code> compiles the source code, it inserts the annotations in
+the resulting <code>.class</code> file (as
+&ldquo;attributes&rdquo;).
+</p>
+
+<!-- 
+  I've moved text from here to the annotation-file-format document, but feel
+  free to improve that document.
+-->
+
+<h3 id="jaif-file">External storage of annotations</h3>
+
+<p>
+Sometimes, it is convenient to specify
+the annotations outside the source code or the <code>.class</code> file.
+The document
+&ldquo;Annotation File Format Specification&rdquo; (<a
+    href="http://types.cs.washington.edu/annotation-file-utilities/annotation-file-format.pdf">PDF</a>, <a
+    href="http://types.cs.washington.edu/annotation-file-utilities/annotation-file-format.html">HTML</a>)
+defines a textual format for annotations,
+and it also motivates reasons why such a file format is necessary in
+addition to the <code>.java</code> and <code>.class</code> formats.  The
+file format supports both the declaration annotations introduced in Java 5, and also the
+<a href="http://types.cs.washington.edu/jsr308/">type annotations</a> that
+will appear in a forthcoming version of Java.
+</p>
+
+<p>
+An annotation file
+conventionally has the extension <code>.jaif</code> (for Java Annotation Index
+File).
+</p>
+
+
+<h3 id="annotation-file-utilities-description">Annotation File Utilities</h3>
+
+<p>
+Programmers need to be able to transfer annotations
+between the three possible locations for annotations &mdash; source code, class files,
+and annotation files.   Programmers will want to extract
+annotations from source and class files to an annotation file in order to easily
+read annotations, while various tools will only read annotations from
+source and class files.  The Annotation File Utilities provide three tools
+to read and write annotation files.
+</p>
+
+<ul>
+  <li> <a href="#insert-annotations"><code>insert-annotations</code></a> reads annotations from an annotation file
+       and inserts them into a class file</li> 
+  <li> <a href="#extract-annotations"><code>extract-annotations</code></a> reads annotations from a class file
+       and writes them out to an annotation file</li>
+  <li> <a href="#insert-annotations-to-source"><code>insert-annotations-to-source</code></a> reads annotations from an
+       annotation file and inserts them into a Java source file</li>
+</ul>
+
+<p>
+There is no
+<code>extract-annotations-from-source</code> tool:  one can
+compile the source code and then use
+<code>extract-annotations</code> to read the annotations from the class
+file.
+</p>
+
+
+<hr />
+<h2 id="installation">Installation</h2>
+
+<p>
+The following instructions assume either a Linux or Windows system using a command-line environment.  
+</p>
+
+<p>
+The current distribution is <code>Annotation File Utilities version
+3.4</code>, released September 11, 2012.
+</p>
+
+<ol>
+<li>
+  Download 
+  <a href="http://types.cs.washington.edu/annotation-file-utilities/annotation-tools.zip">annotation-tools.zip</a>.
+</li>
+
+<li>
+  Creade a directory named
+  <code>annotation-tools</code> by 
+  unpacking the distribution zipfile (a standard place to do this is in a
+  directory <code>~/jsr308/</code>:
+
+  <pre><code>unzip annotation-tools.zip</code></pre>
+</li>
+
+<li>
+Add the annotation-file-utilities directory to your path.
+
+<ul>
+<li>
+For <b>Unix</b> (including Linux and MacOS), add the directory to your PATH
+environment variable.  If your shell is sh or bash, add to your
+<tt>~/.bashrc</tt> or <tt>~/.bash_profile</tt> file:
+<pre><code>export PATH=${PATH}:<em>/path/to</em>/annotation-tools/annotation-file-utilities/scripts</code></pre>
+<!-- Omitted to save space and simplify instructions
+For csh/tcsh, add to ~/.tcshrc or ~/.cshrc or ~/.login:
+<pre><code>setenv PATH=${PATH}:/path/to/annotation-file-utilities/</code></pre>
+-->
+</li>
+<li>
+For <b>Windows</b>, add the directory to your 
+<code>PATH</code> system
+variable by going to
+
+<pre><code> Control Panel -> System -> Advanced -> Environment Variables </code></pre>
+
+From there, find the <code> PATH </code> variable under &ldquo;System variables&rdquo;
+and append to it the directory containing all the tools.
+</li>
+</ul>
+</li>
+</ol>
+
+
+<!-- I think this is obvious, so I have commented it out -MDE. -->
+<!--
+<p>
+To update the annotation file utilities, simply download the most recent <code>annotation-tools.zip</code> file from this website and replace the existing <code>annotation-tools.zip</code>, then extract the file just as when you first installed it.  As long as you followed the above instructions, no further work needs to be done.
+</p>
+-->
+
+<h3 id="viewing-source">Building from source</h3>
+
+<p>
+The annotation file utilities are pre-compiled (a jar file is included in
+the distribution), so most users do not need to compile it themselves.
+</p>
+
+<p>
+There are two ways to obtain the source code.
+Source code is provided in the distribution.
+Alternately, see the source code repository at
+<a href="http://code.google.com/p/annotation-tools/">http://code.google.com/p/annotation-tools/</a>.
+</p>
+
+<p>
+To compile, run
+<code>ant jarfile</code> from the <code>annotation-file-utilities</code>
+subdirectory.  If the <code>javac</code> and <code>java</code> programs are
+not on your execution path, see the notes near the top of
+<code>annotation-file-utilities/tests/Makefile</code>.
+</p>
+
+
+<hr />
+<h2 id="using">Using the Annotation File Utilities</h2>
+
+<p>
+To use the tools, simply run them from the command-line with the
+appropriate arguments.  The following instructions are for running the
+tools on a Linux/Unix/MacOS machine.
+The tools work identically on Windows, except
+the extension <code>.bat</code> needs to be appended to the tool name (for
+example, Windows users would execute <code>insert-annotations.bat</code>
+instead of <code>insert-annotations</code>).
+</p>
+
+<h3 id="insert-annotations"> Insert-annotations </h3>
+
+<p>
+To insert annotations specified by an annotation file into a class file, use the
+insert-annotations tool.  Running:
+</p>
+
+<pre><code>insert-annotations mypackage.MyClass indexFile.jaif</code></pre>
+
+<p>
+will read in all the annotations from the annotation file
+<code>indexFile.jaif</code> and insert those annotations pertaining to
+<code>mypackage.myClass</code> into the class file for
+<code>mypackage.MyClass</code>, outputting the final class file to
+<code>mypackage.MyClass.class</code> in the present working directory.
+Note that the class file for <code>mypackage.MyClass</code> must be located
+on your classpath.  Run:
+</p>
+
+<pre><code>insert-annotations --help</code></pre>
+
+<p>
+for full usage information.
+</p>
+
+
+<h3 id="extract-annotations"> Extract-annotations </h3>
+
+<p>
+To extract annotations from a class file and write them to an annotation file,
+use the extract-annotations tool.  Running:
+</p>
+
+<pre><code>extract-annotations mypackage.MyClass</code></pre>
+
+<p>
+will locate the class file for <code>mypackage.MyClass</code>, read all
+annotations from it, and write the results in annotation file format to
+<code>mypackage.MyClass.jaif</code> in the present working directory.  Note
+that <code>mypackage.MyClass</code> must be located on your classpath.
+Run:
+</p>
+
+<pre><code>extract-annotations --help</code></pre>
+
+<p>
+for full usage information.
+</p>
+
+
+<h3 id="insert-annotations-to-source">Insert-annotations-to-source </h3>
+
+<p>
+To insert annotations specified by an annotation file into a Java source file,
+use the insert-annotations-to-source tool.  Running:
+</p>
+
+<pre><code>insert-annotations-to-source indexFile.jaif mypackage/MyClass.java</code></pre>
+
+<p>
+will read all the annotations from <code>indexFile.jaif</code>, insert them
+into their appropriate locations in <code>mypackage/MyClass.java</code>,
+and write the results to <code>annotated/mypackage/MyClass.java</code>.
+For full usage information, run:
+</p>
+
+<pre><code>insert-annotations-to-source --help</code></pre>
+
+<p>
+If you wish to insert annotations into method bodies, you must have the
+associated class <code>mypackage.MyClass.class</code> on your classpath.
+You can insert annotations on class/field/method declarations and
+signatures without the class on your classpath.
+</p>
+
+
+
+<hr />
+<h2 id="feedback"> Feedback </h2>
+
+<p>
+To submit a bug report or request a new feature, use the
+<a href="http://code.google.com/p/annotation-tools/issues/list">issue
+  tracker</a>.  When reporting a bug, please include exact instructions in
+how to reproduce it, and please also attach relevant input files.  This
+will let us resolve the issue quickly.
+</p>
+
+<p>
+You can also reach the developers at 
+<a href="mailto:annotation-tools-dev@googlegroups.com">annotation-tools-dev@googlegroups.com</a>.
+But please use the
+  <a href="http://code.google.com/p/annotation-tools/issues/list">issue
+  tracker</a> for bug reports and feature requests.
+</p>
+
+
+<h3 id="change-log"> Change Log </h3>
+
+<p>
+The <a href="changelog.html">changelog</a> describes what is new in each release.
+</p>
+
+
+<hr/>
+
+<p>
+Last revised: June 18, 2011
+</p>
+
+</body>
+</html>
+
+<!--
+  This makes Emacs update the "Last revised" paragraph above every time
+  you save the file.
+-->
+<!--
+Local Variables:
+time-stamp-start: "^Last revised: "
+time-stamp-end: "\\.?$"
+time-stamp-format: "%:b %:d, %:y"
+time-stamp-line-limit: -30
+End:
+-->
+
+<!--  LocalWords:  utils bashrc tcsh tcshrc cshrc classpath
+ -->
