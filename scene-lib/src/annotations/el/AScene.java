@@ -1,12 +1,14 @@
 package annotations.el;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import annotations.util.coll.VivifyingMap;
+
+/*>>>
 import checkers.nullness.quals.Nullable;
 import checkers.javari.quals.ReadOnly;
-
-import java.util.*;
-
-import annotations.*;
-import annotations.util.coll.*;
+*/
 
 /**
  * An <code>AScene</code> (annotated scene) represents the annotations on a

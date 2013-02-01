@@ -1,6 +1,8 @@
 package annotations.util;
 
+/*>>>
 import checkers.nullness.quals.*;
+*/
 
 /**
  * A simple class to mash a lot of data into a hash code for use in

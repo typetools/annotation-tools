@@ -1,12 +1,16 @@
 package annotations.el;
 
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
+import annotations.Annotation;
+import annotations.util.coll.VivifyingMap;
+
+/*>>>
 import checkers.nullness.quals.Nullable;
 import checkers.javari.quals.ReadOnly;
-
-import java.util.*;
-
-import annotations.*;
-import annotations.util.coll.*;
+*/
 
 /**
  * An <code>AElement</code> represents a Java element and the annotations it
@@ -32,7 +36,7 @@ public class AElement {
         };
     }
 
-    
+
     // Different than the above in that the elements are guaranteed to
     // contain a non-null "type" field.
     static <K extends /*@ReadOnly*/ Object> VivifyingMap<K, AElement> newVivifyingLHMap_AET() {
@@ -70,7 +74,7 @@ public class AElement {
     }
 
     // general descrition of the element
-    private Object description;
+    private final Object description;
 
     AElement(Object description) {
         this(description, false);
@@ -154,8 +158,8 @@ public class AElement {
       sb.append(" : ");
       tlAnnotationsHereFormatted(sb);
       if (type!=null) {
-    	  sb.append(' ');
-    	  sb.append(type.toString());
+          sb.append(' ');
+          sb.append(type.toString());
       }
       return sb.toString();
     }

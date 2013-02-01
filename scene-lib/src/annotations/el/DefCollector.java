@@ -1,14 +1,16 @@
 package annotations.el;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
+import annotations.Annotation;
+import annotations.field.AnnotationAFT;
+import annotations.field.AnnotationFieldType;
+
+/*>>>
 import checkers.nullness.quals.*;
 import checkers.javari.quals.*;
-
-import java.io.*;
-import java.util.*;
-
-import annotations.*;
-import annotations.field.*;
-import annotations.util.coll.*;
+*/
 
 /**
  * A DefCollector supplies a visitor for the annotation definitions in an

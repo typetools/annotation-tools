@@ -1,10 +1,11 @@
 package annotations.tests;
 
+/*>>>
 import checkers.nullness.quals.*;
+*/
 
 import java.io.*;
 
-import annotations.*;
 import annotations.el.*;
 import annotations.io.*;
 import annotations.io.classfile.*;

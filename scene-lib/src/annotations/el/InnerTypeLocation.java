@@ -1,13 +1,17 @@
 package annotations.el;
 
+/*>>>
 import checkers.nullness.quals.*;
 import checkers.javari.quals.*;
+*/
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import annotations.util.Hasher;
 
 import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
-
-import annotations.util.*;
 
 /**
  * An {@link InnerTypeLocation} holds the location information for an
@@ -66,7 +70,7 @@ public final /*@ReadOnly*/ class InnerTypeLocation {
      */
     @Override
     public int hashCode() {
-         Hasher h = new Hasher();
+        Hasher h = new Hasher();
         h.mash(location.hashCode());
         return h.hash;
     }

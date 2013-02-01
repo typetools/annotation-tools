@@ -1,7 +1,9 @@
 package annotations.util;
 
+/*>>>
 import checkers.nullness.quals.*;
 import checkers.javari.quals.*;
+*/
 
 /**
  * {@link EqualByStringRepresentation} is a "mix-in" class for objects that are

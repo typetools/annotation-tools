@@ -441,6 +441,7 @@ public class IsSigMethodCriterion implements Criterion {
 //    throw new RuntimeException("Invalid TypeKind: " + tk);
 //  }
 
+  /*
   private boolean isPrimitive(String s) {
     return
       s.equals("boolean") ||
@@ -452,6 +453,7 @@ public class IsSigMethodCriterion implements Criterion {
       s.equals("long") ||
       s.equals("short");
   }
+  */
 
   private boolean isPrimitiveLetter(String s) {
     return
@@ -465,6 +467,7 @@ public class IsSigMethodCriterion implements Criterion {
       s.equals("S");
   }
 
+  /*
   private String primitiveLetter(String s) {
     if (s.equals("boolean")) {
       return "Z";
@@ -486,6 +489,7 @@ public class IsSigMethodCriterion implements Criterion {
       throw new RuntimeException("IsSigMethodCriterion: unknown primitive: " + s);
     }
   }
+  */
 
   @Override
   public String toString() {

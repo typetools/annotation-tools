@@ -91,7 +91,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
   /**
    * The scene from which to get additional annotations.
    */
-  private AScene scene;
+  private final AScene scene;
 
   /**
    * The representation of this class in the scene.
@@ -102,7 +102,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
    * A list of annotations on this class that this has already visited
    *  in the class file.
    */
-  private List<String> existingClassAnnotations;
+  private final List<String> existingClassAnnotations;
 
   /**
    * Whether or not this has visited the corresponding annotations in scene.
@@ -113,7 +113,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
    * Whether or not to overwrite existing annotations on the same element
    *  in a class file if a similar annotation is found in scene.
    */
-  private boolean overwrite;
+  private final boolean overwrite;
 
   /**
    * Constructs a new <code> ClassAnnotationSceneWriter </code> that will
@@ -303,7 +303,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
         // TODO: How is this annotation written back out?
         if (strict) { System.err.println("ClassAnnotationSceneWriter: ignoring Extends/Implements annotation " + idx + " with type: " + aty); }
       }
-      
+
     }
   }
 
@@ -398,7 +398,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
       } else if (aft instanceof EnumAFT) {
         av.visitEnum(fieldName, ((EnumAFT) aft).typeName, value.toString());
       } else if (aft instanceof ClassTokenAFT) {
-        av.visit(fieldName, org.objectweb.asm.Type.getType((Class)value));
+        av.visit(fieldName, org.objectweb.asm.Type.getType((Class<?>)value));
       } else {
         // everything else is a string
         av.visit(fieldName, value);
@@ -470,18 +470,18 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
     /**
      * Internal FieldVisitor all calls are delegated to.
      */
-    private FieldVisitor fv;
+    private final FieldVisitor fv;
 
     /**
      * List of all annotations this has already visited.
      */
-    private List<String> existingFieldAnnotations;
+    private final List<String> existingFieldAnnotations;
 
     /**
      * The AElement that represents this field in the AScene the
      *   class is visiting.
      */
-    private AElement aField;
+    private final AElement aField;
 
     /**
      * Constructs a new FieldAnnotationSceneWriter with the given name that
@@ -608,7 +608,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
     /**
      * The AMethod that represents this method in scene.
      */
-    private AMethod aMethod;
+    private final AMethod aMethod;
 
     /**
      * Whether or not this has visit the method's annotations in scene.
@@ -618,7 +618,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
     /**
      * The existing annotations this method has visited.
      */
-    private List<String> existingMethodAnnotations;
+    private final List<String> existingMethodAnnotations;
 
     /**
      * Constructs a new MethodAnnotationSceneWriter with the given name and

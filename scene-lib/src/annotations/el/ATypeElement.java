@@ -1,12 +1,15 @@
 package annotations.el;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import annotations.Annotation;
+import annotations.util.coll.VivifyingMap;
+
+/*>>>
 import checkers.nullness.quals.Nullable;
 import checkers.javari.quals.ReadOnly;
-
-import java.util.*;
-
-import annotations.*;
-import annotations.util.coll.*;
+*/
 
 /**
  * An {@link AElement} that represents a type might have annotations on inner
@@ -41,8 +44,8 @@ public class ATypeElement extends AElement {
     public Object description;
 
     ATypeElement(Object description) {
-      super(description);
-      this.description = description;
+        super(description);
+        this.description = description;
     }
 
     void checkRep() {
@@ -93,8 +96,8 @@ public class ATypeElement extends AElement {
         sb.append(description);
         sb.append(" : ");
         for (Annotation a : tlAnnotationsHere) {
-          sb.append(a.toString());
-          sb.append(" ");
+            sb.append(a.toString());
+            sb.append(" ");
         }
         sb.append("{");
         String linePrefix = "  ";

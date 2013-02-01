@@ -1,9 +1,12 @@
 package annotations.el;
 
+/*>>>
 import checkers.nullness.quals.*;
 import checkers.javari.quals.*;
+*/
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
 import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntryKind;
@@ -108,7 +111,7 @@ public abstract class TypeASTMapper<N> {
             }
 
             for (int i = 0; i < layers; i++) {
-            	ls.remove(ls.size() - 1);
+                ls.remove(ls.size() - 1);
             }
         }
     }
