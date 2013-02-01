@@ -928,19 +928,52 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
 
         if (method.getReceiverParameter() == null) {
           // If the method doesn't already have a receiver, find the name of the class
-          // with type parameters to create the receiver
+          // with type parameters to create the receiver. Walk up the tree and
+          // pick up class names to add to the receiver type. Since we're
+          // starting from the innermost class, the classes we get to at earlier
+          // iterations of the loop are inside of the classes we get to at later
+          // iterations.
           TreePath parent = path;
-          while (parent.getLeaf().getKind() != Tree.Kind.CLASS
-                   && parent.getLeaf().getKind() != Tree.Kind.INTERFACE
-                   && parent.getLeaf().getKind() != Tree.Kind.ENUM) {
+          // This is the outermost type, currently containing only the
+          // annotation to add to the receiver.
+          DeclaredType outerType = receiver.getType();
+          // This holds the inner types as they're being read in.
+          DeclaredType innerTypes = null;
+          while (parent.getLeaf().getKind() != Tree.Kind.COMPILATION_UNIT
+              && parent.getLeaf().getKind() != Tree.Kind.NEW_CLASS) {
+            Tree leaf = parent.getLeaf();
+            if (leaf.getKind() == Tree.Kind.CLASS
+                || leaf.getKind() == Tree.Kind.INTERFACE
+                || leaf.getKind() == Tree.Kind.ENUM) {
+              ClassTree clazz = (ClassTree) leaf;
+              String className = clazz.getSimpleName().toString();
+              // className will be empty for the CLASS node directly inside an
+              // anonymous inner class NEW_CLASS node.
+              if (!className.isEmpty()) {
+                DeclaredType inner = new DeclaredType(className);
+                for (TypeParameterTree tree : clazz.getTypeParameters()) {
+                  inner.addTypeParameter(new DeclaredType(tree.getName().toString()));
+                }
+                if (innerTypes == null) {
+                  // This is the first type we've read in, so set it as the
+                  // innermost type.
+                  innerTypes = inner;
+                } else {
+                  // inner (the type just read in this iteration) is outside of
+                  // innerTypes (the types already read in previous iterations).
+                  inner.setInnerType(innerTypes);
+                  innerTypes = inner;
+                }
+              }
+            }
             parent = parent.getParentPath();
           }
-          ClassTree clazz = (ClassTree) parent.getLeaf();
-          DeclaredType type = receiver.getType();
-          type.setName(clazz.getSimpleName().toString());
-          for (TypeParameterTree tree : clazz.getTypeParameters()) {
-            type.addTypeParameter(new DeclaredType(tree.getName().toString()));
-          }
+
+          // Merge innerTypes into outerType: outerType only has the annotations
+          // on the receiver, while innerTypes has everything else.
+          outerType.setName(innerTypes.getName());
+          outerType.setTypeParameters(innerTypes.getTypeParameters());
+          outerType.setInnerType(innerTypes.getInnerType());
         }
 
         // If the method doesn't have parameters, don't add a comma.

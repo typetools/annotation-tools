@@ -10,4 +10,22 @@ public class InnerReceivers {
             void m(@B Inner this) {}
         }
     };
+
+    public InnerReceivers(@C InnerReceivers this) {}
+
+    void m(@D InnerReceivers this) {}
+
+    class Inner1<Y, Z> {
+
+        public Inner1(@E InnerReceivers.Inner1<Y, Z> this) {}
+
+        void m(@F InnerReceivers.Inner1<Y, Z> this) {}
+
+        class Inner2 {
+
+            public Inner2(@G InnerReceivers.Inner1<Y, Z>.Inner2 this) {}
+
+            void m(@H InnerReceivers.Inner1<Y, Z>.Inner2 this) {}
+        }
+    }
 }

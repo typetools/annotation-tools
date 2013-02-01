@@ -15,9 +15,9 @@ import java.util.List;
  * A {@code DeclaredType} can represent a wildcard by using "?" as the
  * {@code name}. If this type is a wildcard, it is illegal to call
  * {@link #addTypeParameter(Type)}, {@link #getTypeParameter(int)},
- * {@link #getTypeParameters()}, {@link #setInnerType(DeclaredType)}, and
- * {@link #getInnerType()}. If called, an {@link IllegalStateException} will be
- * thrown.
+ * {@link #getTypeParameters()}, {@link #setInnerType(DeclaredType)},
+ * {@link #getInnerType()}, and {@link #setTypeParameters(List)}. If called, an
+ * {@link IllegalStateException} will be thrown.
  * <p>
  * Types are stored with the outer most type at the top of the type tree. This
  * is opposite to the way types are stored in javac.
@@ -87,6 +87,15 @@ public class DeclaredType extends Type {
     public void addTypeParameter(Type typeParameter) {
         checkWildcard();
         typeParameters.add(typeParameter);
+    }
+
+    /**
+     * Sets the type parameters of this type.
+     * @param typeParameters the type parameters.
+     */
+    public void setTypeParameters(List<Type> typeParameters) {
+        checkWildcard();
+        this.typeParameters = typeParameters;
     }
 
     /**
