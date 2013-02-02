@@ -6,6 +6,10 @@ public class CastInsert {
     private int c = 12 + 13;
     private String str = "this" + "is".concat("string");
 
+    void m() {
+        int i;
+    }
+
     int m(String y, String[] z, int i) {
         String x = new String();
         String s;
