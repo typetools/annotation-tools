@@ -180,11 +180,18 @@ public class Main {
             throw e;
           }
         } catch (FileIOException e) {
-          System.err.println("Error while parsing annotation file " + arg);
+          // Add 1 to the line number since line numbers in text editors are usually one-based.
+          System.err.println("Error while parsing annotation file " + arg + " at line "
+              + (e.lineNumber + 1) + ":");
           if (e.getMessage() != null) {
-            System.err.println(e.getMessage());
+            System.err.println('\t' + e.getMessage());
           }
-          e.printStackTrace();
+          if (e.getCause() != null && e.getCause().getMessage() != null) {
+            System.err.println('\t' + e.getCause().getMessage());
+          }
+          if (debug) {
+            e.printStackTrace();
+          }
           System.exit(1);
         }
       } else {
