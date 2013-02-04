@@ -241,14 +241,15 @@ elements of any package.
 \qquad    \bnfnt{annotation-field-definition}* \\
 \\
 \bnfnt{annotation-field-definition} ::= \\
-\qquad    \bnfnt{type} \bnfnt{name} \lineend
+\qquad    \bnfnt{annotation-field-type} \bnfnt{name} \lineend \\
+\\
+\bnfnt{annotation-field-type} ::= \\
+% TODO: comment what unknown[] is
+\qquad    \bnfcmt \bnfnt{primitive-type} is any Java primitive type (\texttt{int}, \texttt{boolean}, etc.). \\
+\qquad    (\bnfnt{primitive-type} \bnfor{} \bnflit{String} \bnfor{} \bnflit{Class}
+    \bnfor{} (\bnflit{enum} \bnfnt{name}) \bnfor{} (\bnflit{annotation-field} \bnfnt{name})) \bnflit{[]}? \\
+\qquad        \bnfor{} \bnflit{unknown[]} \lineend
 \end{tabbing}
-
-% TODO: the valid syntax must be described here.
-% From annotations.io.IndexFileParser.parseScalarAFT() it looks like
-% "Class", "enum", annotations.field.BasicAFT.bafts, and annotation-field
-% are valid.
-% Also arrays and even an "unknown[]" seems to be possible.
 
 
 \subsection{Class definitions\label{class-definitions}}
