@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Set;
 
 import plume.ArraysMDE;
+import plume.Assert.AssertionException;
 import plume.FileIOException;
 import type.ArrayType;
 import type.BoundedType;
@@ -527,7 +528,8 @@ public final class IndexFileParser {
         } else {
             throw new ParseException(
                     "Expected the beginning of an annotation field type: "
-                    + "a primitive type, `String', `Class', `enum', or `annotation-field'");
+                    + "a primitive type, `String', `Class', `enum', or `annotation-field'. Got '"
+                    + st.sval + "'.");
         }
     }
 
@@ -623,8 +625,12 @@ public final class IndexFileParser {
             // Should we read a higher-level format?
             while (matchChar(','))
                 locNumbers.add(expectNonNegative(matchNNInteger()));
-            InnerTypeLocation loc =
-                    new InnerTypeLocation(TypeAnnotationPosition.getTypePathFromBinary(locNumbers));
+            InnerTypeLocation loc;
+            try {
+                loc = new InnerTypeLocation(TypeAnnotationPosition.getTypePathFromBinary(locNumbers));
+            } catch (AssertionError ex) {
+                throw new ParseException(ex.getMessage(), ex);
+            }
             AElement it = e.innerTypes.vivify(loc);
             expectChar(':');
             parseAnnotations(it);
@@ -1199,8 +1205,8 @@ public final class IndexFileParser {
                 else if (checkKeyword("package") || st.ttype == TT_EOF)
                     break;
                 else
-                    throw new ParseException(
-                                             "Expected `annotation', `class', or `package', found `" + st.sval + "', ttype:" + st.ttype);
+                    throw new ParseException("Expected: `annotation', `class', or `package'. Found: `"
+                            + st.sval + "', ttype:" + st.ttype);
             }
         }
     }
