@@ -24,15 +24,13 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-import com.sun.tools.javac.code.TypeAnnotationPosition;
-
 import plume.ArraysMDE;
 import plume.FileIOException;
 import type.ArrayType;
-import type.DeclaredType;
-import type.Type;
 import type.BoundedType;
 import type.BoundedType.BoundKind;
+import type.DeclaredType;
+import type.Type;
 import annotations.Annotation;
 import annotations.AnnotationBuilder;
 import annotations.AnnotationFactory;
@@ -62,6 +60,7 @@ import annotations.field.ScalarAFT;
 import annotations.util.coll.VivifyingMap;
 
 import com.sun.source.tree.Tree.Kind;
+import com.sun.tools.javac.code.TypeAnnotationPosition;
 
 /**
  * IndexFileParser provides static methods
