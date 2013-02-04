@@ -285,7 +285,7 @@ inner class or the outer class.)
 \qquad    \bnfcmt The name may be the annotation's simple name, unless the file \\
 \qquad    \bnfcmt contains definitions for two annotations with the same simple name. \\
 \qquad    \bnfcmt In this case, the binary name of the annotation name is required \\
-\qquad    \bnfcmt (like the fully-qualified name, but with \$ for inner classes)s. \\
+\qquad    \bnfcmt (like the fully-qualified name, but with \$ for inner classes). \\
 \qquad    \bnflit{@}\bnfnt{name} [ \bnflit{(} \bnfnt{annotation-field} [ \bnflit{,} \bnfnt{annotation-field} ]+ \bnflit{)} ] \\
 \\
 \bnfnt{annotation-field} ::= \\
@@ -333,7 +333,7 @@ of the \\ \qquad    \bnfcmt annotation:   ``\texttt{@A(12)}'' rather than ``\tex
 \qquad    \bnfcmt in JVML format, for example: ``\code{foo([ILjava/lang/String;)V}''. \\
 \qquad    \bnfcmt Note that the signature is the erased signature of the method and does not\\
 \qquad    \bnfcmt contain generic type information, but does contain the return type. \\
-\qquad Using \code{javap -s} makes it easy to find the signature.\\
+\qquad    \bnfcmt Using \code{javap -s} makes it easy to find the signature.\\
 \qquad    \bnfcmt ``\code{<init>}'' and ``\code{<clinit>}'' are used to name instance and class initialization methods.\\
 \qquad    \bnfcmt The annotation on the \bnflit{method} line is that on the method, not on the return value. \\
 \qquad    \bnfcmt The \bnfnt{source-*-definition} rules are described in Section~\ref{additional-locations}. \\
