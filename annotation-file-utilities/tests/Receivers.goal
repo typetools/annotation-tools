@@ -3,7 +3,11 @@ package annotator.tests;
 public class Receivers {
     public void m(@checkers.igj.quals.ReadOnly Receivers this) {}
 
+    public void           spaces(@checkers.igj.quals.ReadOnly Receivers this) {}
+
     public void m(@checkers.igj.quals.ReadOnly Receivers this, int i) {}
+
+    public void           spaces(@checkers.igj.quals.ReadOnly Receivers this, int i) {}
 
     public void m(@checkers.igj.quals.ReadOnly Receivers this, @Anno() String s) {}
 }
@@ -11,7 +15,11 @@ public class Receivers {
 class Receivers2 {
     public void m(@checkers.igj.quals.ReadOnly Receivers2 this) {}
 
+    public void           spaces(@checkers.igj.quals.ReadOnly Receivers2 this) {}
+
     public void m(@checkers.igj.quals.ReadOnly Receivers2 this, int i) {}
+
+    public void           spaces(@checkers.igj.quals.ReadOnly Receivers2 this, int i) {}
 }
 
 class Receivers3<K, V> {
