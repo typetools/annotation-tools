@@ -209,10 +209,20 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
 
       JCMethodDecl jcnode = (JCMethodDecl) node;
 
+      if (node.getReceiverParameter() != null) {
+        return ((JCTree) node.getReceiverParameter()).getStartPosition();
+      } else if (!node.getParameters().isEmpty()) {
+        return ((JCTree) node.getParameters().get(0)).getStartPosition();
+      }
+
       int endOfHeader;
       if (node.getBody() != null) {
           endOfHeader = jcnode.body.getStartPosition();
       } else {
+          // TODO: additional spaces in the method header don't appear in the
+          // toString, so this will actually be short of the end of the header
+          // if there are additional spaces, for example:
+          // public void          m();
           endOfHeader = jcnode.getStartPosition() + jcnode.toString().length();
       }
 
