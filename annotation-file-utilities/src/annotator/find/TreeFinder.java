@@ -26,6 +26,7 @@ import com.sun.source.tree.ExpressionStatementTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.IdentifierTree;
 import com.sun.source.tree.InstanceOfTree;
+import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.ModifiersTree;
 import com.sun.source.tree.NewArrayTree;
@@ -302,6 +303,14 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
 
       debug("visitIdentifier(%s) => %d where parent (%s) = %s%n", node, i, parent.getClass(), parent);
       return i;
+    }
+
+    @Override
+    public Integer visitMemberSelect(MemberSelectTree node, Insertion ins) {
+        debug("TypePositionFinder.visitMemberSelect(%s)", node);
+        JCFieldAccess raw = (JCFieldAccess) node;
+        // Add 1 so it's after the '.'
+        return raw.pos + 1;
     }
 
     @Override

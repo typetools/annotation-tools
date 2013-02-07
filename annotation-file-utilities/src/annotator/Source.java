@@ -91,6 +91,10 @@ public final class Source {
 
             for (CompilationUnitTree tree : task.parse())
                 compUnits.add(tree);
+
+            // Add type information to the AST.
+            task.analyze();
+
             return compUnits;
 
         } catch (IOException e) {
