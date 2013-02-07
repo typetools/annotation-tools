@@ -30,7 +30,13 @@ public class ReceiverCriterion implements Criterion {
     }
 
     if (path.getLeaf().getKind() == Tree.Kind.METHOD) {
-      return isSigMethodCriterion.isSatisfiedBy(path);
+      if (isSigMethodCriterion.isSatisfiedBy(path)) {
+          MethodTree leaf = (MethodTree) path.getLeaf();
+          // If the method already has a receiver, then insert directly on the
+          // receiver, not on the method.
+          return leaf.getReceiverParameter() == null;
+      }
+      return false;
     } else {
       // We may be attempting to insert an annotation on a type parameter of an
       // existing receiver, so make sure this is the right receiver parameter:
