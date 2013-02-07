@@ -21,6 +21,7 @@ public final class Source {
     private StandardJavaFileManager fileManager;
     private JavacTask task;
     private StringBuilder source;
+    private DiagnosticCollector<JavaFileObject> diagnostics;
 
     /**
      * Signifies that a problem has occurred with the compiler that produces
@@ -47,8 +48,10 @@ public final class Source {
         if (compiler == null)
             throw new CompilerException("could not get compiler instance");
 
+        diagnostics = new DiagnosticCollector<JavaFileObject>();
+
         // Get the file manager for locating input files.
-        this.fileManager = compiler.getStandardFileManager(null, null, null);
+        this.fileManager = compiler.getStandardFileManager(diagnostics, null, null);
         if (fileManager == null)
             throw new CompilerException("could not get file manager");
 
@@ -63,7 +66,7 @@ public final class Source {
         // Create a task.
         // This seems to require that the file names end in .java
         CompilationTask cTask =
-            compiler.getTask(null, fileManager, null, optsList, null, fileObjs);
+            compiler.getTask(null, fileManager, diagnostics, optsList, null, fileObjs);
         if (!(cTask instanceof JavacTask))
             throw new CompilerException("could not get a valid JavacTask: " + cTask.getClass());
         this.task = (JavacTask)cTask;
@@ -94,6 +97,17 @@ public final class Source {
 
             // Add type information to the AST.
             task.analyze();
+
+            List<Diagnostic<? extends JavaFileObject>> errors = diagnostics.getDiagnostics();
+            if (!diagnostics.getDiagnostics().isEmpty()) {
+                for (Diagnostic<? extends JavaFileObject> d : errors) {
+                    System.err.println(d);
+                }
+                int size = errors.size();
+                System.err.println(size + " error" + (size != 1 ? "s" : ""));
+                System.err.println("WARNING: Error processing input source files. Please fix and try again.");
+                System.exit(1);
+            }
 
             return compUnits;
 
