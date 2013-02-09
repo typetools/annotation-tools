@@ -6,6 +6,7 @@ import java.util.regex.*;
 import javax.lang.model.element.Name;
 
 import annotator.scanner.AnonymousClassScanner;
+import annotator.scanner.LocalClassScanner;
 
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.CompilationUnitTree;
@@ -64,9 +65,11 @@ final class InClassCriterion implements Criterion {
   }
 
   static Pattern anonclassPattern;
+  static Pattern localClassPattern;
   static {
     //for JDK 7: anonclassPattern = Pattern.compile("^(?<num>[0-9]+)(\\$(?<remaining>.*))?$");
     anonclassPattern = Pattern.compile("^([0-9]+)(\\$(.*))?$");
+    localClassPattern = Pattern.compile("^([0-9]+)([^$]+)(\\$(.*))?$");
   }
 
   public static boolean isSatisfiedBy(TreePath path, String className, boolean exactMatch) {
@@ -84,8 +87,10 @@ final class InClassCriterion implements Criterion {
     }
     Collections.reverse(trees);
 
-    for (Tree tree : trees) {
+    for (int i = 0; i < trees.size(); i++) {
+      Tree tree = trees.get(i);
       boolean checkAnon = false;
+      boolean checkLocal = false;
 
       switch (tree.getKind()) {
       case COMPILATION_UNIT:
@@ -108,6 +113,14 @@ final class InClassCriterion implements Criterion {
       case ENUM:
       case ANNOTATION_TYPE:
         debug("InClassCriterion.isSatisfiedBy:%n  cname=%s%n  tree=%s%n", cname, tree);
+
+        if (i > 0 && trees.get(i - 1).getKind() == Tree.Kind.BLOCK) {
+          // Section 14.3 of the JLS says "every local class declaration
+          // statement is immediately contained by a block".
+          checkLocal = true;
+          debug("found local class: InClassCriterion.isSatisfiedBy:%n  cname=%s%n  tree=%s%n", cname, tree);
+          break;
+        }
 
         // all four Kinds are represented by ClassTree
         ClassTree c = (ClassTree)tree;
@@ -177,6 +190,30 @@ final class InClassCriterion implements Criterion {
 
         if (anonclassNum != actualIndexInSource) {
           debug("false[anonclassNum %d %d] InClassCriterion.isSatisfiedBy:%n  cname=%s%n  tree=%s%n", anonclassNum, actualIndexInSource, cname, tree);
+          return false;
+        }
+      } else if (checkLocal) {
+        ClassTree c = (ClassTree) tree;
+        String treeClassName = c.getSimpleName().toString();
+
+        Matcher localClassMatcher = localClassPattern.matcher(cname);
+        if (!localClassMatcher.matches()) {
+          debug("false[localClassMatcher] InClassCriterion.isSatisfiedBy:%n  cname=%s%n  tree=%s%n", cname, tree);
+          return false;
+        }
+        String localClassNumString = localClassMatcher.group(1);
+        String localClassName = localClassMatcher.group(2);
+        int localClassNum = Integer.parseInt(localClassNumString);
+
+        int actualIndexInSource = LocalClassScanner.indexOfClassTree(path, c);
+
+        if (actualIndexInSource == localClassNum && treeClassName.startsWith(localClassName)) {
+          cname = localClassMatcher.group(4);
+          if (cname == null) {
+            cname = "";
+          }
+        } else {
+          debug("false[localClassNum %d %d] InClassCriterion.isSatisfiedBy:%n  cname=%s%n  tree=%s%n", localClassNum, actualIndexInSource, cname, tree);
           return false;
         }
       }

@@ -1,0 +1,45 @@
+public class LocalClass {
+
+    @A(1) Object f;
+
+    void m() {
+        class InnerLocalClass {
+            @A(2) Object f;
+        }
+        new Object() {
+            @A(3) Object f;
+
+            class Test{
+                Object f;
+            }
+        };
+    }
+
+    void m2() {
+        class InnerLocalClass {
+            @A(5) Object f;
+
+            class Inner {
+                @A(6) Object f;
+
+                void m() {
+                    new Object() {
+                        Object f;
+                    };
+                }
+            }
+        }
+    }
+
+    void m3() {
+        class OuterLocalClass {
+            @A(8) Object f;
+
+            void m() {
+                class InnerLocalClass {
+                    Object f;
+                }
+            }
+        }
+    }
+}
