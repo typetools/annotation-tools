@@ -112,6 +112,13 @@ final class InClassCriterion implements Criterion {
       case INTERFACE:
       case ENUM:
       case ANNOTATION_TYPE:
+        if (i > 0 && trees.get(i - 1).getKind() == Tree.Kind.NEW_CLASS) {
+          // For an anonymous class, the CLASS tree is always directly inside of
+          // a NEW_CLASS tree. If that's the case here then skip this iteration
+          // since we've already looked at the new class tree in the previous
+          // iteration.
+          break;
+        }
         debug("InClassCriterion.isSatisfiedBy:%n  cname=%s%n  tree=%s%n", cname, tree);
 
         if (i > 0 && trees.get(i - 1).getKind() == Tree.Kind.BLOCK) {
@@ -126,7 +133,7 @@ final class InClassCriterion implements Criterion {
         ClassTree c = (ClassTree)tree;
         Name csn = c.getSimpleName();
 
-        if (csn == null) {
+        if (csn == null || csn.length() == 0) {
           debug("empty getSimpleName: InClassCriterion.isSatisfiedBy:%n  cname=%s%n  tree=%s%n", cname, tree);
           checkAnon = true;
           break;

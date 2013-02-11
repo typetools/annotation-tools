@@ -13,7 +13,7 @@ import com.sun.source.util.TreePathScanner;
  * the file. Thus, if i = 2, it will have a name of the form
  * OuterClass$2InnerClass.
  */
-public class LocalClassScanner extends TreePathScanner<Void, Void> {
+public class LocalClassScanner extends TreePathScanner<Void, Integer> {
 
   /**
    * Given a local class, computes and returns its 1-based index in the given
@@ -24,15 +24,23 @@ public class LocalClassScanner extends TreePathScanner<Void, Void> {
    * @return the index of the local class in the source code
    */
   public static int indexOfClassTree(TreePath path, ClassTree localClass) {
-    // This seems like too much:  only want to move up to wherever
-    // numbering starts. -MDE
-    // Move all the way to the top of the source tree in order
-    // to visit every class in source file.
-    while (path.getParentPath() != null) {
+    // Move up to the CLASS tree enclosing this CLASS tree and start the tree
+    // traversal from there. This prevents us from counting local classes that
+    // are in a different part of the tree and therefore aren't included in the
+    // index number.
+    int classesFound = 0;
+    boolean localClassFound = false;
+    while (path.getParentPath() != null && classesFound < 1) {
+      if (path.getLeaf() == localClass) {
+        localClassFound = true;
+      }
       path = path.getParentPath();
+      if (localClassFound && path.getLeaf().getKind() == Tree.Kind.CLASS) {
+        classesFound++;
+      }
     }
     LocalClassScanner lcs = new LocalClassScanner(localClass);
-    lcs.scan(path, null);
+    lcs.scan(path, 0);
     if (lcs.found) {
       return lcs.index;
     } else {
@@ -56,20 +64,26 @@ public class LocalClassScanner extends TreePathScanner<Void, Void> {
     this.localClass = localClass;
   }
 
+  // The level parameter keeps us from traversing too low in the tree and
+  // counting classes that aren't included in the index number.
+
   @Override
-  public Void visitBlock(BlockTree node, Void p) {
-    // Visit blocks since a local class can only be in a block. Then visit each
-    // statement of the block to see if any are the correct local class.
-    for (StatementTree statement : node.getStatements()) {
-      if (!found && statement.getKind() == Tree.Kind.CLASS) {
-        ClassTree c = (ClassTree) statement;
-        if (localClass == statement) {
-          found = true;
-        } else if (c.getSimpleName().equals(localClass.getSimpleName())) {
-          index++;
+  public Void visitBlock(BlockTree node, Integer level) {
+    if (level < 1) {
+      // Visit blocks since a local class can only be in a block. Then visit each
+      // statement of the block to see if any are the correct local class.
+      for (StatementTree statement : node.getStatements()) {
+        if (!found && statement.getKind() == Tree.Kind.CLASS) {
+          ClassTree c = (ClassTree) statement;
+          if (localClass == statement) {
+            found = true;
+          } else if (c.getSimpleName().equals(localClass.getSimpleName())) {
+            index++;
+          }
         }
       }
+      super.visitBlock(node, level + 1);
     }
-    return super.visitBlock(node, p);
+    return null;
   }
 }
