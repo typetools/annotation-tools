@@ -11,7 +11,19 @@ public class LocalClass {
 
             class Test{
                 Object f;
+
+                void m() {
+                    new Object() {
+                        Object f;
+                    };
+                    new Object() {
+                        Object f;
+                    };
+                }
             }
+        };
+        new Object() {
+            Object f;
         };
     }
 
@@ -26,6 +38,15 @@ public class LocalClass {
                     new Object() {
                         Object f;
                     };
+                    new Object() {
+                        Object f;
+                    };
+                }
+            }
+
+            void m() {
+                class OuterLocalClass {
+                    Object f;
                 }
             }
         }
