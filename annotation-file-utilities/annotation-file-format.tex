@@ -269,7 +269,10 @@ Inner classes are treated as ordinary classes whose names happen to contain
 (To change this, the grammar would have to be extended with a closing
 delimiter for classes; otherwise, it would be ambiguous whether a
 field/method appearing after an inner class definition belonged to the
-inner class or the outer class.)
+inner class or the outer class.) The syntax for inner class names is the same as
+is used by the \code{javac} compiler. A good way to get an idea of the inner
+class names for a class is to compile the class and look at the filenames of the
+\code{.class} files that are produced.
 
 % TODO: Are we sure about the comment for the "annotation" section below?
 % Perhaps we could add that if a class is in the same package
