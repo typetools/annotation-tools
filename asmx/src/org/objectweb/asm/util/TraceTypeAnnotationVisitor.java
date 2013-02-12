@@ -81,8 +81,8 @@ public class TraceTypeAnnotationVisitor extends TraceAnnotationVisitor
       // } reference_info;
       case INSTANCEOF:
       case NEW:
-      case CONSTRUCTOR_REFERENCE_RECEIVER:
-      case METHOD_REFERENCE_RECEIVER:
+      case CONSTRUCTOR_REFERENCE:
+      case METHOD_REFERENCE:
           buf.append(doubleTab).append("offset: ").append(xoffset).append("\n");
           break;
 
