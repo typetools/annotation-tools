@@ -1,0 +1,12 @@
+package java.lang:
+annotation @SuppressWarnings:
+    String value
+
+package annotator.tests:
+class DuplicateAnnotation:
+
+    method m1()V: @java.lang.SuppressWarnings("A")
+    method m2()V: @java.lang.SuppressWarnings("B")
+    method m3()V: @java.lang.SuppressWarnings("C")
+    method m4()V: @java.lang.SuppressWarnings("D")
+    method m5()V: @java.lang.SuppressWarnings("E")

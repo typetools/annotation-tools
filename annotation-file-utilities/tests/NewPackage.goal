@@ -1,0 +1,5 @@
+public class NewPackage {
+  public NewPackage() {
+    Object o = new @X java.util.LinkedList();
+  }
+}
