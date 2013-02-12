@@ -1,11 +1,12 @@
 package annotations.field;
 
+/*>>>
 import checkers.nullness.quals.*;
 import checkers.javari.quals.*;
+*/
 
-import java.util.*;
-
-import annotations.util.coll.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A <code>BasicAFT</code> represents a primitive or {@link String} annotation

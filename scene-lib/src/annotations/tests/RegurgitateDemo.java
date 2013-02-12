@@ -1,15 +1,14 @@
 package annotations.tests;
 
+/*>>>
 import checkers.nullness.quals.NonNull;
 import checkers.javari.quals.*;
+*/
 
 import java.io.*;
 
-import annotations.*;
 import annotations.el.*;
 import annotations.io.*;
-
-import checkers.nullness.quals.*;
 
 public class RegurgitateDemo {
     public static void main(/*@NonNull*/ String /*@NonNull*/ /*@ReadOnly*/ [] args) {

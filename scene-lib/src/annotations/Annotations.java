@@ -1,13 +1,15 @@
 package annotations;
 
+import java.lang.annotation.RetentionPolicy;
+import java.util.*;
+
+import annotations.el.AnnotationDef;
+import annotations.field.*;
+
+/*>>>
 import checkers.nullness.quals.*;
 import checkers.javari.quals.*;
-
-import java.util.*;
-import java.lang.annotation.*;
-
-import annotations.field.*;
-import annotations.el.*;
+*/
 
 /**
  * This noninstantiable class provides useful static methods related to
@@ -166,7 +168,7 @@ public abstract class Annotations {
     public static final Annotation rebuild(Annotation a) {
         AnnotationBuilder ab = AnnotationFactory.saf.beginAnnotation(a.def());
         if (ab != null) {
-            for (/*@ReadOnly*/ Map.Entry<String, AnnotationFieldType> fieldDef
+            for (Map. /*@ReadOnly*/ Entry<String, AnnotationFieldType> fieldDef
                     : a.def().fieldTypes.entrySet()) {
 
                 String fieldName = fieldDef.getKey();

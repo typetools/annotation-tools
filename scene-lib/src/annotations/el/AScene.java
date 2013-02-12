@@ -1,12 +1,14 @@
 package annotations.el;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import annotations.util.coll.VivifyingMap;
+
+/*>>>
 import checkers.nullness.quals.Nullable;
 import checkers.javari.quals.ReadOnly;
-
-import java.util.*;
-
-import annotations.*;
-import annotations.util.coll.*;
+*/
 
 /**
  * An <code>AScene</code> (annotated scene) represents the annotations on a
@@ -59,12 +61,12 @@ public final class AScene {
                     new LinkedHashMap<String, AClass>()) {
                 @Override
                 public  AClass createValueFor(
-                 String k) /*@ReadOnly*/ {
+                 String k) {
                     return new AClass(k);
                 }
 
                 @Override
-                public boolean subPrune(AClass v) /*@ReadOnly*/ {
+                public boolean subPrune(AClass v) {
                     return v.prune();
                 }
             };
@@ -81,7 +83,7 @@ public final class AScene {
      * also apply to {@link AScene#equals(Object)}.
      */
     @Override
-    public boolean equals(/*@ReadOnly*/ Object o) /*@ReadOnly*/ {
+    public boolean equals(/*>>> @ReadOnly AScene this, */ /*@ReadOnly*/ Object o) {
         return o instanceof AScene
                 && equals((/*@ReadOnly*/ AScene) o);
     }
@@ -91,7 +93,7 @@ public final class AScene {
      * slightly faster variant of {@link #equals(Object)} for when the argument
      * is statically known to be another nonnull {@link AScene}.
      */
-    public boolean equals(/*@ReadOnly*/ AScene o) /*@ReadOnly*/ {
+    public boolean equals(/*>>> @ReadOnly AScene this, */ /*@ReadOnly*/ AScene o) {
         return classes.equals(o.classes) && packages.equals(o.packages);
     }
 
@@ -99,7 +101,7 @@ public final class AScene {
      * {@inheritDoc}
      */
     @Override
-    public int hashCode() /*@ReadOnly*/ {
+    public int hashCode(/*>>> @ReadOnly AScene this*/) {
         return classes.hashCode() + packages.hashCode();
     }
 

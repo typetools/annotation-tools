@@ -45,9 +45,9 @@ import com.sun.source.tree.Tree;
 
 public class IndexFileSpecification implements Specification {
 
-  private List<Insertion> insertions = new ArrayList<Insertion>();
-  private AScene scene;
-  private String indexFileName;
+  private final List<Insertion> insertions = new ArrayList<Insertion>();
+  private final AScene scene;
+  private final String indexFileName;
 
   // If set, do not attempt to read class files with Asm.
   // Mostly for debugging and workarounds.
@@ -86,11 +86,13 @@ public class IndexFileSpecification implements Specification {
     }
   }
 
+  /*
   private static void debug(String s, Object... args) {
     if (debug) {
       System.out.printf(s, args);
     }
   }
+  */
 
   /** Fill in this.insertions with insertion pairs. */
   private void parseScene() {

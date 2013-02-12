@@ -1,16 +1,15 @@
 package annotations.tests;
 
+/*>>>
 import checkers.nullness.quals.*;
+*/
 
 import java.io.*;
 
 import plume.FileIOException;
 
-import annotations.*;
 import annotations.el.*;
 import annotations.io.*;
-
-import checkers.nullness.quals.*;
 
 public class JavapDemo {
     public static void main(String[] args) throws IOException, FileIOException, DefException {

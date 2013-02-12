@@ -1,9 +1,11 @@
 package annotations.util.coll;
 
+import java.util.*;
+
+/*>>>
 import checkers.nullness.quals.*;
 import checkers.javari.quals.*;
-
-import java.util.*;
+*/
 
 /**
  * A simple implementation of {@link KeyedSet} backed by an insertion-order
@@ -37,21 +39,24 @@ public class LinkedHashKeyedSet<K, V> extends AbstractSet<V> implements KeyedSet
      * {@inheritDoc}
      */
     @Override
-    public boolean contains(/*@ReadOnly*/ Object o) /*@ReadOnly*/ {
+    public boolean contains(/*>>> @ReadOnly LinkedHashKeyedSet<K, V> this, */ /*@ReadOnly*/ Object o) {
         return theValues.contains(o);
     }
 
     private class KeyedSetIterator implements Iterator<V> {
-        private Iterator<V> itr = theValues.iterator();
+        private final Iterator<V> itr = theValues.iterator();
 
-        public boolean hasNext() /*@ReadOnly*/ {
+        @Override
+        public boolean hasNext(/*>>> @ReadOnly KeyedSetIterator this*/) {
             return itr.hasNext();
         }
 
-        public V next() /*@ReadOnly*/ {
+        @Override
+        public V next(/*>>> @ReadOnly KeyedSetIterator this*/) {
             return itr.next();
         }
 
+        @Override
         public void remove() {
             itr.remove();
         }
@@ -64,7 +69,7 @@ public class LinkedHashKeyedSet<K, V> extends AbstractSet<V> implements KeyedSet
      * {@inheritDoc}
      */
     @Override
-    public /*@PolyRead*/ Iterator<V> iterator() /*@PolyRead*/ {
+    public /*@PolyRead*/ Iterator<V> iterator(/*>>> @PolyRead LinkedHashKeyedSet<K, V> this*/) {
         return new KeyedSetIterator();
     }
 
@@ -72,7 +77,7 @@ public class LinkedHashKeyedSet<K, V> extends AbstractSet<V> implements KeyedSet
      * {@inheritDoc}
      */
     @Override
-    public /*@ReadOnly*/ Object[] toArray() /*@ReadOnly*/ {
+    public /*@ReadOnly*/ Object[] toArray(/*>>> @ReadOnly LinkedHashKeyedSet<K, V> this*/) {
         return theValues.toArray();
     }
 
@@ -80,7 +85,7 @@ public class LinkedHashKeyedSet<K, V> extends AbstractSet<V> implements KeyedSet
      * {@inheritDoc}
      */
     @Override
-    public <T> T[] toArray(T[] a) /*@ReadOnly*/ {
+    public <T> T[] toArray(/*>>> @ReadOnly LinkedHashKeyedSet<K, V> this, */ T[] a) {
         return theValues.toArray(a);
     }
 
@@ -105,6 +110,7 @@ public class LinkedHashKeyedSet<K, V> extends AbstractSet<V> implements KeyedSet
     /**
      * {@inheritDoc}
      */
+    @Override
     public V add(V o, int conflictBehavior, int equalBehavior) {
         K key = keyer.getKeyFor(o);
         V old = theMap.get(key);
@@ -153,13 +159,15 @@ public class LinkedHashKeyedSet<K, V> extends AbstractSet<V> implements KeyedSet
     /**
      * {@inheritDoc}
      */
-    public Keyer<? extends K, ? super V> getKeyer() /*@ReadOnly*/ {
+    @Override
+    public Keyer<? extends K, ? super V> getKeyer(/*>>> @ReadOnly LinkedHashKeyedSet<K, V> this*/) {
         return keyer;
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public V replace(V v) {
         return theMap.put(keyer.getKeyFor(v), v);
     }
@@ -167,6 +175,7 @@ public class LinkedHashKeyedSet<K, V> extends AbstractSet<V> implements KeyedSet
     /**
      * {@inheritDoc}
      */
+    @Override
     public V lookup(K k) {
         return theMap.get(k);
     }

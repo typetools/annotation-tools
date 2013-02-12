@@ -50,23 +50,23 @@ public class LocalVariableScanner extends CommonScanner {
    * three different cases.
    */
   /*
-	public static int indexOfVarTreeInStaticInit(TreePath path, Tree tree, String varName) {
-		// only start searching from within this method
-	    path = findEnclosingStaticInit(path);
-	    if (path == null) {
-	      return -1;
-	    }
+  public static int indexOfVarTreeInStaticInit(TreePath path, Tree tree, String varName) {
+    // only start searching from within this method
+      path = findEnclosingStaticInit(path);
+      if (path == null) {
+        return -1;
+      }
 
-	    LocalVariableScanner lvts = new LocalVariableScanner(tree, varName);
-		lvts.scan(path, null);
-		return lvts.index;
-	}
+      LocalVariableScanner lvts = new LocalVariableScanner(tree, varName);
+      lvts.scan(path, null);
+      return lvts.index;
+  }
   */
-  
+
   private int index = -1;
   private boolean done = false;
-  private Tree varTree;
-  private String varName;
+  private final Tree varTree;
+  private final String varName;
 
   private LocalVariableScanner(Tree varTree, String varName) {
     this.index = -1;

@@ -3,7 +3,11 @@ package annotator.tests;
 public class Receivers {
     public void m() {}
 
+    public void           spaces() {}
+
     public void m(int i) {}
+
+    public void           spaces(int i) {}
 
     public void m(@Anno() String s) {}
 }
@@ -11,7 +15,11 @@ public class Receivers {
 class Receivers2 {
     public void m(Receivers2 this) {}
 
+    public void           spaces(Receivers2 this) {}
+
     public void m(Receivers2 this, int i) {}
+
+    public void           spaces(Receivers2 this, int i) {}
 }
 
 class Receivers3<K, V> {
@@ -45,6 +53,12 @@ class Receivers8<K extends Object> {
 
 class Receivers9 {
     public void m() {}
+}
+
+class Receivers10<K, V> {
+    public void m(Receivers10<K, V> this) {}
+
+    public void m(Receivers10<K, V> this, Receivers10<K, V> other) {}
 }
 
 @interface Anno {}

@@ -1,9 +1,11 @@
 package annotations.el;
 
+import annotations.util.Hasher;
+
+/*>>>
 import checkers.nullness.quals.*;
 import checkers.javari.quals.*;
-
-import annotations.util.*;
+*/
 
 /**
  * A {@link RelativeLocation} holds location information for a
@@ -63,7 +65,7 @@ public final /*@ReadOnly*/ class RelativeLocation {
      * is statically known to be another nonnull {@link RelativeLocation}.
      */
     public boolean equals(RelativeLocation l) {
-        return offset == l.offset && index == l.index;
+        return offset == l.offset && index == l.index && type_index == l.type_index;
     }
 
     /**
@@ -81,10 +83,11 @@ public final /*@ReadOnly*/ class RelativeLocation {
      * {@inheritDoc}
      */
     @Override
-    public int hashCode() /*@ReadOnly*/ {
+    public int hashCode(/*>>> @ReadOnly RelativeLocation this*/) {
         Hasher h = new Hasher();
         h.mash(offset);
         h.mash(index);
+        h.mash(type_index);
         return h.hash;
     }
 

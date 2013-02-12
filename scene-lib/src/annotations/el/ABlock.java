@@ -1,6 +1,8 @@
 package annotations.el;
 
+/*>>>
 import checkers.javari.quals.ReadOnly;
+*/
 
 import java.util.Map;
 
@@ -21,28 +23,28 @@ public class ABlock extends AExpression {
     ABlock(Object id) {
         super(id);
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(/*@ReadOnly*/ AElement o) /*@ReadOnly*/ {
+    public boolean equals(/*>>> @ReadOnly ABlock this,*/ /*@ReadOnly*/ AElement o) {
         return o instanceof ABlock &&
             ((/*@ReadOnly*/ ABlock) o).equalsBlock(this);
     }
-    
-    protected boolean equalsBlock(/*@ReadOnly*/ ABlock o) /*@ReadOnly*/ {
+
+    protected boolean equalsBlock(/*>>> @ReadOnly ABlock this,*/ /*@ReadOnly*/ ABlock o) {
     	return locals.equals(o.locals) && super.equalsExpression(o);
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
-    public int hashCode() /*@ReadOnly*/ {
+    public int hashCode(/*>>> @ReadOnly ABlock this*/) {
     	return super.hashCode() + locals.hashCode();
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -50,7 +52,7 @@ public class ABlock extends AExpression {
     public boolean prune() {
         return super.prune() & locals.prune();
     }
-    
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();

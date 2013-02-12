@@ -1,9 +1,9 @@
 package annotations.field;
 
+/*>>>
 import checkers.nullness.quals.*;
 import checkers.javari.quals.*;
-
-import annotations.*;
+*/
 
 import java.util.Collection;
 

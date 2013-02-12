@@ -1,13 +1,13 @@
 package annotations.field;
 
+/*>>>
 import checkers.nullness.quals.*;
 import checkers.javari.quals.*;
+*/
 
-import annotations.*;
-import annotations.util.*;
 import annotations.el.AnnotationDef;
+import annotations.util.EqualByStringRepresentation;
 
-import java.lang.annotation.RetentionPolicy;
 import java.util.Map;
 
 /**

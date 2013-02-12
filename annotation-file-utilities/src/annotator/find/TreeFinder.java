@@ -12,7 +12,6 @@ import javax.tools.JavaFileObject;
 
 import plume.Pair;
 import type.DeclaredType;
-import annotations.io.IndexFileParser;
 import annotator.Main;
 
 import com.google.common.collect.LinkedHashMultimap;
@@ -210,10 +209,20 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
 
       JCMethodDecl jcnode = (JCMethodDecl) node;
 
+      if (node.getReceiverParameter() != null) {
+        return ((JCTree) node.getReceiverParameter()).getStartPosition();
+      } else if (!node.getParameters().isEmpty()) {
+        return ((JCTree) node.getParameters().get(0)).getStartPosition();
+      }
+
       int endOfHeader;
       if (node.getBody() != null) {
           endOfHeader = jcnode.body.getStartPosition();
       } else {
+          // TODO: additional spaces in the method header don't appear in the
+          // toString, so this will actually be short of the end of the header
+          // if there are additional spaces, for example:
+          // public void          m();
           endOfHeader = jcnode.getStartPosition() + jcnode.toString().length();
       }
 
@@ -256,12 +265,13 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       return result;
     }
 
-    private static Map<Pair<TreePath,Tree>,TreePath> getPathCache2 = new HashMap<Pair<TreePath,Tree>,TreePath>();
+    // private static Map<Pair<TreePath,Tree>,TreePath> getPathCache2 = new HashMap<Pair<TreePath,Tree>,TreePath>();
 
     /**
      * An alternative to TreePath.getPath(TreePath,Tree) that
      * caches its results.
      */
+    /*
     public static TreePath getPath(TreePath path, Tree target) {
       Pair<TreePath,Tree> args = Pair.of(path, target);
       if (getPathCache2.containsKey(args)) {
@@ -271,6 +281,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       getPathCache2.put(args, result);
       return result;
     }
+    */
 
     private Tree parent(Tree node) {
       return getPath(tree, node).getParentPath().getLeaf();
@@ -847,6 +858,16 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
         debug("    Type of node: " + node.getClass());
       }
 
+      // As per the JSR308 specification, receiver parameters are not allowed
+      // on method declarations of anonymous inner classes.
+      if (i.getCriteria().isOnReceiver()
+              && path.getParentPath().getParentPath().getLeaf().getKind() == Tree.Kind.NEW_CLASS) {
+        System.err.println("WARNING: Cannot insert a receiver parameter on a method "
+            + "declaration of an anonymous inner class. This insertion will be skipped.\n"
+            + "    Insertion: " + i);
+        continue;
+      }
+
       // Don't insert a duplicate if this particular annotation is already
       // present at this location.
       List<? extends AnnotationTree> alreadyPresent = null;
@@ -911,7 +932,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
         }
       }
 
-      if (i.getKind() == Insertion.Kind.RECEIVER) {
+      if (i.getKind() == Insertion.Kind.RECEIVER && node.getKind() == Tree.Kind.METHOD) {
         ReceiverInsertion receiver = (ReceiverInsertion) i;
         MethodTree method = (MethodTree) node;
 
@@ -1063,6 +1084,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     return Multimaps.unmodifiableSetMultimap(positions);
   }
 
+  /*
   private static void printPath(TreePath path) {
     System.out.printf("-----path:%n");
     if (path != null) {
@@ -1072,5 +1094,5 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     }
     System.out.printf("-----end path.%n");
   }
-
+  */
 }

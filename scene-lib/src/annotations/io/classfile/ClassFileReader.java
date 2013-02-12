@@ -1,13 +1,14 @@
 package annotations.io.classfile;
 
+/*>>>
 import checkers.nullness.quals.*;
+*/
 
 import java.io.*;
 import plume.*;
 
 import org.objectweb.asm.ClassReader;
 
-import annotations.*;
 import annotations.el.AScene;
 import annotations.io.IndexFileWriter;
 
@@ -18,14 +19,14 @@ import annotations.io.IndexFileWriter;
 public class ClassFileReader {
 
   public static final String INDEX_UTILS_VERSION
-    = "Annotation File Utilities v3.4";
+    = "Annotation File Utilities v3.5";
 
   @Option("-h print usage information and exit")
   public static boolean help = false;
- 
+
   @Option("print version information and exit")
   public static boolean version = false;
- 
+
   private static String linesep = System.getProperty("line.separator");
 
   static String usage

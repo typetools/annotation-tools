@@ -1,11 +1,13 @@
 package annotations.el;
 
+/*>>>
 import checkers.nullness.quals.Nullable;
 import checkers.javari.quals.ReadOnly;
-
-import annotations.util.coll.*;
+*/
 
 import java.util.Map;
+
+import annotations.util.coll.VivifyingMap;
 
 /**
  * An annotated method; contains bounds, return, parameters, receiver, and throws.
@@ -28,7 +30,7 @@ public final class AMethod extends ABlock {
     public final VivifyingMap<TypeIndexLocation, ATypeElement> throwsException =
         ATypeElement.<TypeIndexLocation>newVivifyingLHMap_ATE();
 
-    private String methodName;
+    private final String methodName;
 
     AMethod(String methodName) {
       super("method: " + methodName);
@@ -41,12 +43,12 @@ public final class AMethod extends ABlock {
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(/*@ReadOnly*/ AElement o) /*@ReadOnly*/ {
+    public boolean equals(/*>>> @ReadOnly AMethod this, */ /*@ReadOnly*/ AElement o) {
         return o instanceof AMethod &&
             ((/*@ReadOnly*/ AMethod) o).equalsMethod(this);
     }
 
-    boolean equalsMethod(/*@ReadOnly*/ AMethod o) /*@ReadOnly*/ {
+    boolean equalsMethod(/*>>> @ReadOnly AMethod this, */ /*@ReadOnly*/ AMethod o) {
         parameters.prune();
         o.parameters.prune();
 
@@ -63,7 +65,7 @@ public final class AMethod extends ABlock {
      * {@inheritDoc}
      */
     @Override
-    public int hashCode() /*@ReadOnly*/ {
+    public int hashCode(/*>>> @ReadOnly AMethod this*/) {
         return super.hashCode() + bounds.hashCode()
                 + receiver.hashCode() + parameters.hashCode()
                 + throwsException.hashCode();

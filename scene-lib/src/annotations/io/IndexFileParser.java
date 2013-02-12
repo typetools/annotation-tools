@@ -24,15 +24,14 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-import com.sun.tools.javac.code.TypeAnnotationPosition;
-
 import plume.ArraysMDE;
+import plume.Assert.AssertionException;
 import plume.FileIOException;
 import type.ArrayType;
-import type.DeclaredType;
-import type.Type;
 import type.BoundedType;
 import type.BoundedType.BoundKind;
+import type.DeclaredType;
+import type.Type;
 import annotations.Annotation;
 import annotations.AnnotationBuilder;
 import annotations.AnnotationFactory;
@@ -62,6 +61,7 @@ import annotations.field.ScalarAFT;
 import annotations.util.coll.VivifyingMap;
 
 import com.sun.source.tree.Tree.Kind;
+import com.sun.tools.javac.code.TypeAnnotationPosition;
 
 /**
  * IndexFileParser provides static methods
@@ -99,12 +99,12 @@ public final class IndexFileParser {
     }
 
     /** True if the next thing from st is the given character. */
-    private boolean checkChar(char c) /*@ReadOnly*/ {
+    private boolean checkChar(/*>>> @ReadOnly IndexFileParser this, */ char c) {
         return st.ttype == c;
     }
 
     /** True if the next thing from st is the given string token. */
-    private boolean checkKeyword(String s) /*@ReadOnly*/ {
+    private boolean checkKeyword(/*>>> @ReadOnly IndexFileParser this, */ String s) {
         return st.ttype == TT_WORD && st.sval.equals(s);
     }
 
@@ -175,7 +175,7 @@ public final class IndexFileParser {
         Collections.addAll(knownKeywords, knownKeywords_array);
     }
 
-    private boolean isValidIdentifier(String x) /*@ReadOnly*/ {
+    private boolean isValidIdentifier(/*>>> @ReadOnly IndexFileParser this, */ String x) {
         if (x.length() == 0 || !Character.isJavaIdentifierStart(x.charAt(0))
                 || knownKeywords.contains(x))
             return false;
@@ -185,7 +185,7 @@ public final class IndexFileParser {
         return true;
     }
 
-    private String checkIdentifier() /*@ReadOnly*/ {
+    private String checkIdentifier(/*>>> @ReadOnly IndexFileParser this*/) {
         if (st.sval == null)
             return null;
         else {
@@ -220,7 +220,7 @@ public final class IndexFileParser {
         return name;
     }
 
-    private int checkNNInteger() /*@ReadOnly*/ {
+    private int checkNNInteger(/*>>> @ReadOnly IndexFileParser this*/) {
         if (st.ttype == TT_NUMBER) {
             int x = (int) st.nval;
             if (x == st.nval && x >= 0) // shouldn't give us a huge number
@@ -486,6 +486,7 @@ public final class IndexFileParser {
             if (ab == null) {
                 // don't care about the result
                 // but need to skip over it anyway
+                @SuppressWarnings("unused")
                 /*@ReadOnly*/ Object trash = parseAnnotationBody(d, AnnotationFactory.saf
                         .beginAnnotation(d));
             } else {
@@ -527,7 +528,8 @@ public final class IndexFileParser {
         } else {
             throw new ParseException(
                     "Expected the beginning of an annotation field type: "
-                    + "a primitive type, `String', `Class', `enum', or `annotation-field'");
+                    + "a primitive type, `String', `Class', `enum', or `annotation-field'. Got '"
+                    + st.sval + "'.");
         }
     }
 
@@ -623,8 +625,12 @@ public final class IndexFileParser {
             // Should we read a higher-level format?
             while (matchChar(','))
                 locNumbers.add(expectNonNegative(matchNNInteger()));
-            InnerTypeLocation loc =
-                    new InnerTypeLocation(TypeAnnotationPosition.getTypePathFromBinary(locNumbers));
+            InnerTypeLocation loc;
+            try {
+                loc = new InnerTypeLocation(TypeAnnotationPosition.getTypePathFromBinary(locNumbers));
+            } catch (AssertionError ex) {
+                throw new ParseException(ex.getMessage(), ex);
+            }
             AElement it = e.innerTypes.vivify(loc);
             expectChar(':');
             parseAnnotations(it);
@@ -1047,15 +1053,15 @@ public final class IndexFileParser {
 
     /**
      * Parses and constructs a new AST entry. For example, the call:
-     * 
+     *
      * <pre>
      * {@code newASTEntry(Kind.CASE, new String[] {"expression", "statement"}, new String[] {"statement"});
      * </pre>
-     * 
+     *
      * constructs a case AST entry, where the valid child selectors are
      * "expression" or "statement" and the "statement" child selector requires
      * an argument.
-     * 
+     *
      * @param kind The kind of this AST entry.
      * @param legalChildSelectors A list of the legal child selectors for this AST entry.
      * @param argumentChildSelectors A list of the child selectors that also require an argument.
@@ -1199,8 +1205,8 @@ public final class IndexFileParser {
                 else if (checkKeyword("package") || st.ttype == TT_EOF)
                     break;
                 else
-                    throw new ParseException(
-                                             "Expected `annotation', `class', or `package', found `" + st.sval + "', ttype:" + st.ttype);
+                    throw new ParseException("Expected: `annotation', `class', or `package'. Found: `"
+                            + st.sval + "', ttype:" + st.ttype);
             }
         }
     }

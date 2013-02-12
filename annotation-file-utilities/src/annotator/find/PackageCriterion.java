@@ -5,8 +5,6 @@ import annotator.Main;
 import com.sun.source.tree.*;
 import com.sun.source.util.TreePath;
 
-import javax.tools.JavaFileObject;
-
 /**
  * Represents the criterion that a program element is in a method with a
  * certain name.

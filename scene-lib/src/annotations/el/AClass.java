@@ -1,13 +1,14 @@
 package annotations.el;
 
+import java.util.LinkedHashMap;
+
+import annotations.Annotation;
+import annotations.util.coll.VivifyingMap;
+
+/*>>>
 import checkers.nullness.quals.*;
 import checkers.javari.quals.*;
-
-import java.util.*;
-import static plume.UtilMDE.mapToString;
-
-import annotations.*;
-import annotations.util.coll.*;
+*/
 
 /** An annotated class */
 public final class AClass extends AElement {
@@ -22,12 +23,12 @@ public final class AClass extends AElement {
         return new VivifyingMap<String, AMethod>(
                 new LinkedHashMap<String, AMethod>()) {
             @Override
-            public  AMethod createValueFor(String k) /*@ReadOnly*/ {
+            public  AMethod createValueFor(String k) {
                 return new AMethod(k);
             }
 
             @Override
-            public boolean subPrune(AMethod v) /*@ReadOnly*/ {
+            public boolean subPrune(AMethod v) {
                 return v.prune();
             }
         };
@@ -37,33 +38,33 @@ public final class AClass extends AElement {
         return new VivifyingMap<Integer, ABlock>(
                 new LinkedHashMap<Integer, ABlock>()) {
             @Override
-            public  ABlock createValueFor(Integer k) /*@ReadOnly*/ {
+            public  ABlock createValueFor(Integer k) {
                 return new ABlock(k);
             }
 
             @Override
-            public boolean subPrune(ABlock v) /*@ReadOnly*/ {
+            public boolean subPrune(ABlock v) {
                 return v.prune();
             }
         };
     }
-    
+
     private static VivifyingMap<String, AExpression> createFieldInitMap() {
         return new VivifyingMap<String, AExpression>(
                 new LinkedHashMap<String, AExpression>()) {
             @Override
-            public  AExpression createValueFor(String k) /*@ReadOnly*/ {
+            public  AExpression createValueFor(String k) {
                 return new AExpression(k);
             }
 
             @Override
-            public boolean subPrune(AExpression v) /*@ReadOnly*/ {
+            public boolean subPrune(AExpression v) {
                 return v.prune();
             }
         };
     }
 
-    
+
     /**
      * The class's annotated methods; a method's key consists of its name
      * followed by its erased signature in JVML format.
@@ -85,29 +86,29 @@ public final class AClass extends AElement {
     public final VivifyingMap<String, AExpression> fieldInits =
         createFieldInitMap();
 
-    private String className;
+    private final String className;
 
     // debug fields to keep track of all classes created
-    private static List<AClass> debugAllClasses = new ArrayList<AClass>();
-    private List<AClass> allClasses;
+    // private static List<AClass> debugAllClasses = new ArrayList<AClass>();
+    // private final List<AClass> allClasses;
 
     AClass(String className) {
       super("class: " + className);
       this.className = className;
-      debugAllClasses.add(this);
-      allClasses = debugAllClasses;
+      // debugAllClasses.add(this);
+      // allClasses = debugAllClasses;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(/*@ReadOnly*/ AElement o) /*@ReadOnly*/ {
+    public boolean equals(/*>>> @ReadOnly AClass this,*/ /*@ReadOnly*/ AElement o) {
         return o instanceof AClass &&
             ((/*@ReadOnly*/ AClass) o).equalsClass(this);
     }
 
-    boolean equalsClass(/*@ReadOnly*/ AClass o) /*@ReadOnly*/ {
+    boolean equalsClass(/*>>> @ReadOnly AClass this,*/ /*@ReadOnly*/ AClass o) {
         return equalsElement(o) && bounds.equals(o.bounds)
             && methods.equals(o.methods) && fields.equals(o.fields)
             && extendsImplements.equals(o.extendsImplements);
@@ -117,7 +118,7 @@ public final class AClass extends AElement {
      * {@inheritDoc}
      */
     @Override
-    public int hashCode() /*@ReadOnly*/ {
+    public int hashCode(/*>>> @ReadOnly AClass this*/) {
         return super.hashCode() + bounds.hashCode()
             + methods.hashCode() + fields.hashCode()
             + extendsImplements.hashCode();
@@ -155,22 +156,22 @@ public final class AClass extends AElement {
         }
         sb.append(linePrefix);
         sb.append("Bounds:\n");
-        mapToString(sb, bounds, linePrefix + "  ");
+        plume.UtilMDE.mapToString(sb, bounds, linePrefix + "  ");
         sb.append(linePrefix);
         sb.append("Extends/implements:\n");
-        mapToString(sb, extendsImplements, linePrefix + "  ");
+        plume.UtilMDE.mapToString(sb, extendsImplements, linePrefix + "  ");
         sb.append(linePrefix);
         sb.append("Fields:\n");
-        mapToString(sb, fields, linePrefix + "  ");
+        plume.UtilMDE.mapToString(sb, fields, linePrefix + "  ");
         sb.append(linePrefix);
         sb.append("Field Initializers:\n");
-        mapToString(sb, fieldInits, linePrefix + "  ");
+        plume.UtilMDE.mapToString(sb, fieldInits, linePrefix + "  ");
         sb.append(linePrefix);
         sb.append("Static Initializers:\n");
-        mapToString(sb, staticInits, linePrefix + "  ");
+        plume.UtilMDE.mapToString(sb, staticInits, linePrefix + "  ");
         sb.append(linePrefix);
         sb.append("Methods:\n");
-        mapToString(sb, methods, linePrefix + "  ");
+        plume.UtilMDE.mapToString(sb, methods, linePrefix + "  ");
         return sb.toString();
     }
 

@@ -12,7 +12,13 @@ class Receivers:
     method m()V:
         receiver: @ReadOnly
 
+    method spaces()V:
+        receiver: @ReadOnly
+
     method m(I)V:
+        receiver: @ReadOnly
+
+    method spaces(I)V:
         receiver: @ReadOnly
 
     method m(Ljava/lang/String;)V:
@@ -23,7 +29,13 @@ class Receivers2:
     method m()V:
         receiver: @ReadOnly
 
+    method spaces()V:
+        receiver: @ReadOnly
+
     method m(I)V:
+        receiver: @ReadOnly
+
+    method spaces(I)V:
         receiver: @ReadOnly
 
 class Receivers3:
@@ -66,3 +78,15 @@ class Receivers9:
 
     method m()V:
         receiver: @ReadOnly @A @B @C
+
+class Receivers10:
+
+    method m()V:
+        receiver: @ReadOnly
+            inner-type 3, 0: @annotation.A
+            inner-type 3, 1: @annotation.B
+
+    method m(Lannotator/tests/Receivers10;)V:
+        receiver: @ReadOnly
+            inner-type 3, 0: @annotation.A
+            inner-type 3, 1: @annotation.B

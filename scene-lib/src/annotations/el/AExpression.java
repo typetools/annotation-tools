@@ -1,6 +1,8 @@
 package annotations.el;
 
+/*>>>
 import checkers.javari.quals.ReadOnly;
+*/
 
 import java.util.Map;
 
@@ -30,47 +32,47 @@ public class AExpression extends AElement {
             ATypeElementWithType.<ASTPath>newVivifyingLHMap_ATEWT();
 
     protected Object id;
-    
+
     AExpression(Object id) {
         super(id);
-        
+
         this.id = id;
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(/*@ReadOnly*/ AElement o) /*@ReadOnly*/ {
+    public boolean equals(/*>>> @ReadOnly AExpression this, */ /*@ReadOnly*/ AElement o) {
         return o instanceof AExpression &&
             ((/*@ReadOnly*/ AExpression) o).equalsExpression(this);
     }
-    
-	protected boolean equalsExpression(/*@ReadOnly*/ AExpression o) /*@ReadOnly */{
-		return typecasts.equals(o.typecasts)
-				&& instanceofs.equals(o.instanceofs)
-				&& news.equals(o.news)
-				&& insertTypecasts.equals(o.insertTypecasts);
+
+    protected boolean equalsExpression(/*>>> @ReadOnly AExpression this, */ /*@ReadOnly*/ AExpression o) {
+        return typecasts.equals(o.typecasts)
+                && instanceofs.equals(o.instanceofs)
+                && news.equals(o.news)
+                && insertTypecasts.equals(o.insertTypecasts);
 	}
-	
+
     /**
      * {@inheritDoc}
      */
     @Override
-    public int hashCode() /*@ReadOnly*/ {
-		return super.hashCode() + typecasts.hashCode() + instanceofs.hashCode()
-				+ news.hashCode() + insertTypecasts.hashCode();
+    public int hashCode(/*>>> @ReadOnly AExpression this*/) {
+        return super.hashCode() + typecasts.hashCode() + instanceofs.hashCode()
+                + news.hashCode() + insertTypecasts.hashCode();
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
     public boolean prune() {
-		return super.prune() & typecasts.prune() & instanceofs.prune()
-				& news.prune() & insertTypecasts.prune();
+        return super.prune() & typecasts.prune() & instanceofs.prune()
+                & news.prune() & insertTypecasts.prune();
     }
-    
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
