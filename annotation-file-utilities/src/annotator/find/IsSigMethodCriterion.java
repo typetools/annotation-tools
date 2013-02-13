@@ -243,17 +243,19 @@ public class IsSigMethodCriterion implements Criterion {
   private boolean matchWithPrefix(String fullType, String simpleType, String prefix) {
 
     // maybe simpleType is in JVML format
-    String simpleType2 = simpleType.replace(".", "/");
+    String simpleType2 = simpleType.replace("/", ".");
+
+    String fullType2 = fullType.replace("$", ".");
+
     /* unused String prefix2 = (prefix.endsWith(".")
                       ? prefix.substring(0, prefix.length() - 1)
                       : prefix); */
-
-    boolean b = (fullType.equals(prefix + simpleType2)
+    boolean b = (fullType2.equals(prefix + simpleType2)
                  // Hacky way to handle the possibility that fulltype is an
                  // inner type but simple type is unqualified.
                  || (fullType.startsWith(prefix)
                      && fullType.endsWith("$" + simpleType2)));
-    if (Criteria.debug) debug(String.format("matchWithPrefix(%s, %s, %s) => %s)%n", fullType, simpleType, prefix, b));
+    if (Criteria.debug) debug(String.format("matchWithPrefix(%s, %s, %s) => %s)%n", fullType2, simpleType, prefix, b));
     return b;
   }
 

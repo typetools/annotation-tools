@@ -4,18 +4,25 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.lang.model.type.TypeKind;
+
 import annotations.el.InnerTypeLocation;
 //only used for debugging
 import annotator.Main;
 
 import com.sun.source.tree.AnnotatedTypeTree;
 import com.sun.source.tree.ArrayTypeTree;
+import com.sun.source.tree.NewArrayTree;
+import com.sun.source.tree.NewClassTree;
 import com.sun.source.tree.ParameterizedTypeTree;
 import com.sun.source.tree.Tree;
+import com.sun.source.tree.VariableTree;
 import com.sun.source.tree.WildcardTree;
 import com.sun.source.util.TreePath;
 import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
 import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntryKind;
+import com.sun.tools.javac.tree.JCTree.JCExpression;
+import com.sun.tools.javac.tree.JCTree.JCFieldAccess;
 
 /**
  * GenericArrayLocationCriterion represents the criterion specifying the location
@@ -97,12 +104,64 @@ public class GenericArrayLocationCriterion implements Criterion {
               path.getLeaf(), location);
     }
 
+    TreePath pathRemaining = path;
+    Tree leaf = path.getLeaf();
+
+    // Don't allow annotations directly on these tree kinds if the child type is
+    // a MEMBER_SELECT. This way we'll continue to traverse deeper in the tree
+    // to find the correct MEMBER_SELECT.
+    Tree child = null;
+    if (leaf.getKind() == Tree.Kind.PARAMETERIZED_TYPE) {
+      child = ((ParameterizedTypeTree) leaf).getType();
+    } else if (leaf.getKind() == Tree.Kind.VARIABLE) {
+      child = ((VariableTree) leaf).getType();
+    } else if (leaf.getKind() == Tree.Kind.NEW_CLASS) {
+      child = ((NewClassTree) leaf).getIdentifier();
+    } else if (leaf.getKind() == Tree.Kind.NEW_ARRAY && !location.isEmpty()) {
+      child = ((NewArrayTree) leaf).getType();
+    }
+    if (child != null && child.getKind() == Tree.Kind.MEMBER_SELECT) {
+      return false;
+    }
+
+    if (leaf.getKind() == Tree.Kind.MEMBER_SELECT) {
+      JCFieldAccess fieldAccess = (JCFieldAccess) leaf;
+      if (fieldAccess.type != null && fieldAccess.type.getKind() == TypeKind.DECLARED
+          && fieldAccess.type.tsym.isStatic()) {
+        // If this MEMBER_SELECT is for a static class...
+        if (location.isEmpty()) {
+          // ...and it does not go on a compound type, this is the right place.
+          return true;
+        } else if (isGenericOrArray(path.getParentPath().getLeaf())
+            && isGenericOrArray(path.getParentPath().getParentPath().getLeaf())) {
+          // If the two parents above this are compound types, then skip
+          // the compound type directly above. For example, to get to Outer.Inner
+          // of Outer.Inner<K, V> we had to get through the PARAMETERIZED_TYPE
+          // node. But we didn't go deeper in the compound type in the way the
+          // type path defines, we just went deeper to get to the outer type. So
+          // skip this node later when checking to make sure that we're in the
+          // correct part of the compound type.
+          pathRemaining = path.getParentPath();
+        }
+      } else {
+        JCExpression exp = fieldAccess.getExpression();
+        if (exp.getKind() == Tree.Kind.MEMBER_SELECT && exp.type.getKind() == TypeKind.PACKAGE) {
+          if (location.isEmpty()) {
+            return true;
+          } // else, keep going to make sure we're in the right part of the
+            // compound type
+        } else {
+          return false;
+        }
+      }
+    }
+
     if (location.isEmpty()) {
       // no inner type location, want to annotate outermost type
       // e.g.,  @Readonly List list;
       //        @Readonly List<String> list;
       //        String @Readonly [] array;
-      Tree leaf = path.getLeaf();
+      leaf = path.getLeaf();
       Tree parent = path.getParentPath().getLeaf();
 
       boolean result = ((leaf.getKind() == Tree.Kind.NEW_ARRAY)
@@ -123,15 +182,23 @@ public class GenericArrayLocationCriterion implements Criterion {
         System.out.printf("GenericArrayLocationCriterion.isSatisfiedBy: locationInParent==null%n  leaf=%s (%s)%n  parent=%s (%s)%n  => %s (%s %s)%n",
                   leaf, leaf.getClass(), parent, parent.getClass(), result, isGenericOrArray(leaf), ! isGenericOrArray(parent));
       }
+
       return result;
     }
 
-    TreePath pathRemaining = path;
+    // If we've made it this far then we've determined that *if* this is the right
+    // place to insert the annotation this is the MEMBER_SELECT it should be
+    // inserted on. So remove the rest of the MEMBER_SELECTs to get down to the
+    // compound type and make sure the compound type location matches.
+    while (pathRemaining.getParentPath().getLeaf().getKind() == Tree.Kind.MEMBER_SELECT) {
+      pathRemaining = pathRemaining.getParentPath();
+    }
+
     List<TypePathEntry> locationRemaining = new ArrayList<TypePathEntry>(location);
 
     while (locationRemaining.size() != 0) {
       // annotating an inner type
-      Tree leaf = pathRemaining.getLeaf();
+      leaf = pathRemaining.getLeaf();
       if ((leaf.getKind() == Tree.Kind.NEW_ARRAY)
           && containsOnlyArray(locationRemaining)) {
         if (debug) {
@@ -290,7 +357,7 @@ public class GenericArrayLocationCriterion implements Criterion {
     //        @Readonly List<String> list;
     Tree parent = pathRemaining.getParentPath().getLeaf();
     if (debug) {
-      Tree leaf = pathRemaining.getLeaf();
+      leaf = pathRemaining.getLeaf();
       System.out.printf("No (remaining) inner type location:%n  leaf: %s %b%n  parent: %s %b%n  result: %s%n",
             Main.treeToString(leaf), isGenericOrArray(leaf),
             Main.treeToString(parent), isGenericOrArray(parent),
