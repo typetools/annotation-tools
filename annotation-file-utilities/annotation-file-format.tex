@@ -241,14 +241,15 @@ elements of any package.
 \qquad    \bnfnt{annotation-field-definition}* \\
 \\
 \bnfnt{annotation-field-definition} ::= \\
-\qquad    \bnfnt{type} \bnfnt{name} \lineend
+\qquad    \bnfnt{annotation-field-type} \bnfnt{name} \lineend \\
+\\
+\bnfnt{annotation-field-type} ::= \\
+\qquad    \bnfcmt \bnfnt{primitive-type} is any Java primitive type (\texttt{int}, \texttt{boolean}, etc.). \\
+\qquad    \bnfcmt These are described in detail in Section~\ref{types-and-values}. \\
+\qquad    (\bnfnt{primitive-type} \bnfor{} \bnflit{String} \bnfor{} \bnflit{Class}
+    \bnfor{} (\bnflit{enum} \bnfnt{name}) \bnfor{} (\bnflit{annotation-field} \bnfnt{name})) \bnflit{[]}? \\
+\qquad        \bnfor{} \bnflit{unknown[]} \lineend
 \end{tabbing}
-
-% TODO: the valid syntax must be described here.
-% From annotations.io.IndexFileParser.parseScalarAFT() it looks like
-% "Class", "enum", annotations.field.BasicAFT.bafts, and annotation-field
-% are valid.
-% Also arrays and even an "unknown[]" seems to be possible.
 
 
 \subsection{Class definitions\label{class-definitions}}
@@ -268,7 +269,10 @@ Inner classes are treated as ordinary classes whose names happen to contain
 (To change this, the grammar would have to be extended with a closing
 delimiter for classes; otherwise, it would be ambiguous whether a
 field/method appearing after an inner class definition belonged to the
-inner class or the outer class.)
+inner class or the outer class.) The syntax for inner class names is the same as
+is used by the \code{javac} compiler. A good way to get an idea of the inner
+class names for a class is to compile the class and look at the filenames of the
+\code{.class} files that are produced.
 
 % TODO: Are we sure about the comment for the "annotation" section below?
 % Perhaps we could add that if a class is in the same package
@@ -285,7 +289,7 @@ inner class or the outer class.)
 \qquad    \bnfcmt The name may be the annotation's simple name, unless the file \\
 \qquad    \bnfcmt contains definitions for two annotations with the same simple name. \\
 \qquad    \bnfcmt In this case, the binary name of the annotation name is required \\
-\qquad    \bnfcmt (like the fully-qualified name, but with \$ for inner classes)s. \\
+\qquad    \bnfcmt (like the fully-qualified name, but with \$ for inner classes). \\
 \qquad    \bnflit{@}\bnfnt{name} [ \bnflit{(} \bnfnt{annotation-field} [ \bnflit{,} \bnfnt{annotation-field} ]+ \bnflit{)} ] \\
 \\
 \bnfnt{annotation-field} ::= \\
@@ -333,7 +337,7 @@ of the \\ \qquad    \bnfcmt annotation:   ``\texttt{@A(12)}'' rather than ``\tex
 \qquad    \bnfcmt in JVML format, for example: ``\code{foo([ILjava/lang/String;)V}''. \\
 \qquad    \bnfcmt Note that the signature is the erased signature of the method and does not\\
 \qquad    \bnfcmt contain generic type information, but does contain the return type. \\
-\qquad Using \code{javap -s} makes it easy to find the signature.\\
+\qquad    \bnfcmt Using \code{javap -s} makes it easy to find the signature.\\
 \qquad    \bnfcmt ``\code{<init>}'' and ``\code{<clinit>}'' are used to name instance and class initialization methods.\\
 \qquad    \bnfcmt The annotation on the \bnflit{method} line is that on the method, not on the return value. \\
 \qquad    \bnfcmt The \bnfnt{source-*-definition} rules are described in Section~\ref{additional-locations}. \\
@@ -482,9 +486,8 @@ elements:
 \bnfnt{source-typecast-definition} ::= \\
 \qquad    \bnfcmt The first integer is the zero-based index of the
 typecast within the method and \\
-\qquad    \bnfcmt  the optional second integer is the type index of an intersection type~\cite{JSR308}. \\
+\qquad    \bnfcmt the optional second integer is the type index of an intersection type~\cite{JSR308}. \\
 \qquad    \bnfcmt The type index defaults to zero if not specified. \\
-\qquad    \bnfcmt A source code index can be used instead. See \bnfnt{source-typecast-definition} in Section~\ref{source-code-index}. \\
 \qquad    \bnflit{typecast} \bnflit{*} \bnfnt{integer} [ \bnflit{,} \bnfnt{integer} ] \bnflit{:} \bnfnt{annotation}* \lineend \\
 \qquad    \bnfnt{type-argument-or-array-definition}* \\
 \\
@@ -504,6 +507,12 @@ object or array creation within the method. \\
 
 We use the star literal \bnflit{*} to distinguish source indexes from
 the bytecode offsets that are introduced using \bnflit{\#}.
+
+Source code indexes only include occurrences in the class that exactly matches
+the name of the enclosing \bnfnt{class-definition} rule. Specifically,
+occurrences in nested classes are not included. Use a new
+\bnfnt{class-definition} rule with the name of the nested class for source code
+insertions in a nested class.
 
 % TODO: explain more about the pros/cons.
 % Maybe an example?

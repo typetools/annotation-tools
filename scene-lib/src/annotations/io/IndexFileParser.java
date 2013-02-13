@@ -24,15 +24,14 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-import com.sun.tools.javac.code.TypeAnnotationPosition;
-
 import plume.ArraysMDE;
+import plume.Assert.AssertionException;
 import plume.FileIOException;
 import type.ArrayType;
-import type.DeclaredType;
-import type.Type;
 import type.BoundedType;
 import type.BoundedType.BoundKind;
+import type.DeclaredType;
+import type.Type;
 import annotations.Annotation;
 import annotations.AnnotationBuilder;
 import annotations.AnnotationFactory;
@@ -62,6 +61,7 @@ import annotations.field.ScalarAFT;
 import annotations.util.coll.VivifyingMap;
 
 import com.sun.source.tree.Tree.Kind;
+import com.sun.tools.javac.code.TypeAnnotationPosition;
 
 /**
  * IndexFileParser provides static methods
@@ -528,7 +528,8 @@ public final class IndexFileParser {
         } else {
             throw new ParseException(
                     "Expected the beginning of an annotation field type: "
-                    + "a primitive type, `String', `Class', `enum', or `annotation-field'");
+                    + "a primitive type, `String', `Class', `enum', or `annotation-field'. Got '"
+                    + st.sval + "'.");
         }
     }
 
@@ -624,8 +625,12 @@ public final class IndexFileParser {
             // Should we read a higher-level format?
             while (matchChar(','))
                 locNumbers.add(expectNonNegative(matchNNInteger()));
-            InnerTypeLocation loc =
-                    new InnerTypeLocation(TypeAnnotationPosition.getTypePathFromBinary(locNumbers));
+            InnerTypeLocation loc;
+            try {
+                loc = new InnerTypeLocation(TypeAnnotationPosition.getTypePathFromBinary(locNumbers));
+            } catch (AssertionError ex) {
+                throw new ParseException(ex.getMessage(), ex);
+            }
             AElement it = e.innerTypes.vivify(loc);
             expectChar(':');
             parseAnnotations(it);
@@ -1200,8 +1205,8 @@ public final class IndexFileParser {
                 else if (checkKeyword("package") || st.ttype == TT_EOF)
                     break;
                 else
-                    throw new ParseException(
-                                             "Expected `annotation', `class', or `package', found `" + st.sval + "', ttype:" + st.ttype);
+                    throw new ParseException("Expected: `annotation', `class', or `package'. Found: `"
+                            + st.sval + "', ttype:" + st.ttype);
             }
         }
     }

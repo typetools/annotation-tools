@@ -12,7 +12,13 @@ class Receivers:
     method m()V:
         receiver: @ReadOnly
 
+    method spaces()V:
+        receiver: @ReadOnly
+
     method m(I)V:
+        receiver: @ReadOnly
+
+    method spaces(I)V:
         receiver: @ReadOnly
 
     method m(Ljava/lang/String;)V:
@@ -23,7 +29,13 @@ class Receivers2:
     method m()V:
         receiver: @ReadOnly
 
+    method spaces()V:
+        receiver: @ReadOnly
+
     method m(I)V:
+        receiver: @ReadOnly
+
+    method spaces(I)V:
         receiver: @ReadOnly
 
 class Receivers3:
