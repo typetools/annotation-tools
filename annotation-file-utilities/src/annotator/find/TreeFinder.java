@@ -850,226 +850,238 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
 
     for (Iterator<Insertion> it = p.iterator(); it.hasNext(); ) {
       Insertion i = it.next();
+      try {
+        if (debug) {
+          debug("Considering insertion at tree:");
+          debug("  Insertion: " + i);
+          debug("  First line of node: " + Main.firstLine(node.toString()));
+          debug("  Type of node: " + node.getClass());
+        }
 
-      if (debug) {
-        debug("Considering insertion at tree:");
-        debug("  Insertion: " + i);
-        debug("  First line of node: " + Main.firstLine(node.toString()));
-        debug("  Type of node: " + node.getClass());
-      }
+        if (!i.getCriteria().isSatisfiedBy(path, node)) {
+          debug("  ... not satisfied");
+          continue;
+        } else {
+          debug("  ... satisfied!");
+          debug("    First line of node: " + Main.firstLine(node.toString()));
+          debug("    Type of node: " + node.getClass());
+        }
 
-      if (!i.getCriteria().isSatisfiedBy(path, node)) {
-        debug("  ... not satisfied");
-        continue;
-      } else {
-        debug("  ... satisfied!");
-        debug("    First line of node: " + Main.firstLine(node.toString()));
-        debug("    Type of node: " + node.getClass());
-      }
+        // As per the JSR308 specification, receiver parameters are not allowed
+        // on method declarations of anonymous inner classes.
+        if (i.getCriteria().isOnReceiver()
+                && path.getParentPath().getParentPath().getLeaf().getKind() == Tree.Kind.NEW_CLASS) {
+          System.err.println("WARNING: Cannot insert a receiver parameter on a method "
+              + "declaration of an anonymous inner class. This insertion will be skipped.\n"
+              + "    Insertion: " + i);
+          continue;
+        }
 
-      // As per the JSR308 specification, receiver parameters are not allowed
-      // on method declarations of anonymous inner classes.
-      if (i.getCriteria().isOnReceiver()
-              && path.getParentPath().getParentPath().getLeaf().getKind() == Tree.Kind.NEW_CLASS) {
-        System.err.println("WARNING: Cannot insert a receiver parameter on a method "
-            + "declaration of an anonymous inner class. This insertion will be skipped.\n"
-            + "    Insertion: " + i);
-        continue;
-      }
-
-      // Don't insert a duplicate if this particular annotation is already
-      // present at this location.
-      List<? extends AnnotationTree> alreadyPresent = null;
-      if (path != null) {
-        for (Tree n : path) {
-          if (n.getKind() == Tree.Kind.CLASS) { // ClassTree
-            alreadyPresent = ((ClassTree) n).getModifiers().getAnnotations();
-            break;
-          } else if (n.getKind() == Tree.Kind.METHOD) { // MethodTree
-            alreadyPresent = ((MethodTree) n).getModifiers().getAnnotations();
-            break;
-          } else if (n.getKind() == Tree.Kind.VARIABLE) { // VariableTree
-            alreadyPresent = ((VariableTree) n).getModifiers().getAnnotations();
-            break;
-          } else if (n.getKind() == Tree.Kind.TYPE_CAST) { // TypeCastTree
-            Tree type = ((TypeCastTree) n).getType();
-            if (type.getKind() == Tree.Kind.ANNOTATED_TYPE) { // AnnotatedTypeTree
-              alreadyPresent = ((AnnotatedTypeTree) type).getAnnotations();
-            }
-            break;
-          } else if (n.getKind() == Tree.Kind.INSTANCE_OF) { // InstanceOfTree
-            Tree type = ((InstanceOfTree) n).getType();
-            if (type.getKind() == Tree.Kind.ANNOTATED_TYPE) { // AnnotatedTypeTree
-              alreadyPresent = ((AnnotatedTypeTree) type).getAnnotations();
-            }
-            break;
-          } else if (n.getKind() == Tree.Kind.NEW_CLASS) { // NewClassTree
-            JCNewClass nc = (JCNewClass) n;
-            if (nc.clazz.getKind() == Tree.Kind.ANNOTATED_TYPE) { // AnnotatedTypeTree
-              alreadyPresent = ((AnnotatedTypeTree) nc.clazz).getAnnotations();
-            }
-            break;
-          } else if (n.getKind() == Tree.Kind.PARAMETERIZED_TYPE) { // ParameterizedTypeTree
-              // If we pass through a parameterized type, stop, otherwise we
-              // mix up annotations on the outer type.
-              // TODO: is something similar needed for Arrays?
+        // Don't insert a duplicate if this particular annotation is already
+        // present at this location.
+        List<? extends AnnotationTree> alreadyPresent = null;
+        if (path != null) {
+          for (Tree n : path) {
+            if (n.getKind() == Tree.Kind.CLASS) { // ClassTree
+              alreadyPresent = ((ClassTree) n).getModifiers().getAnnotations();
               break;
+            } else if (n.getKind() == Tree.Kind.METHOD) { // MethodTree
+              alreadyPresent = ((MethodTree) n).getModifiers().getAnnotations();
+              break;
+            } else if (n.getKind() == Tree.Kind.VARIABLE) { // VariableTree
+              alreadyPresent = ((VariableTree) n).getModifiers().getAnnotations();
+              break;
+            } else if (n.getKind() == Tree.Kind.TYPE_CAST) { // TypeCastTree
+              Tree type = ((TypeCastTree) n).getType();
+              if (type.getKind() == Tree.Kind.ANNOTATED_TYPE) { // AnnotatedTypeTree
+                alreadyPresent = ((AnnotatedTypeTree) type).getAnnotations();
+              }
+              break;
+            } else if (n.getKind() == Tree.Kind.INSTANCE_OF) { // InstanceOfTree
+              Tree type = ((InstanceOfTree) n).getType();
+              if (type.getKind() == Tree.Kind.ANNOTATED_TYPE) { // AnnotatedTypeTree
+                alreadyPresent = ((AnnotatedTypeTree) type).getAnnotations();
+              }
+              break;
+            } else if (n.getKind() == Tree.Kind.NEW_CLASS) { // NewClassTree
+              JCNewClass nc = (JCNewClass) n;
+              if (nc.clazz.getKind() == Tree.Kind.ANNOTATED_TYPE) { // AnnotatedTypeTree
+                alreadyPresent = ((AnnotatedTypeTree) nc.clazz).getAnnotations();
+              }
+              break;
+            } else if (n.getKind() == Tree.Kind.PARAMETERIZED_TYPE) { // ParameterizedTypeTree
+                // If we pass through a parameterized type, stop, otherwise we
+                // mix up annotations on the outer type.
+                // TODO: is something similar needed for Arrays?
+                break;
+            }
+            // TODO: don't add cast insertion if it's already present.
           }
-          // TODO: don't add cast insertion if it's already present.
         }
-      }
-      // System.out.printf("alreadyPresent = %s for %s of kind %s%n", alreadyPresent, node, node.getKind());
-      // printPath(path);
-      if (alreadyPresent != null) {
-        for (AnnotationTree at : alreadyPresent) {
-          // Compare the to-be-inserted annotation to the existing
-          // annotation, ignoring its arguments (duplicate annotations are
-          // never allowed even if they differ in arguments).  If we did
-          // have to compare our arguments, we'd have to deal with enum
-          // arguments potentially being fully qualified or not:
-          // @Retention(java.lang.annotation.RetentionPolicy.CLASS) vs
-          // @Retention(RetentionPolicy.CLASS)
-          String ann = at.getAnnotationType().toString();
-          String iann = Main.removeArgs(i.getText()).a.substring(1); // strip off the leading @
-          String iannNoPackage = Insertion.removePackage(iann).b;
-          // System.out.printf("Comparing: %s %s %s%n", ann, iann, iannNoPackage);
-          if (ann.equals(iann) || ann.equals(iannNoPackage)) {
-            debug("Already present, not reinserting: %s%n", ann);
-            it.remove();
-            return super.scan(node, p);
+        // System.out.printf("alreadyPresent = %s for %s of kind %s%n", alreadyPresent, node, node.getKind());
+        // printPath(path);
+        if (alreadyPresent != null) {
+          for (AnnotationTree at : alreadyPresent) {
+            // Compare the to-be-inserted annotation to the existing
+            // annotation, ignoring its arguments (duplicate annotations are
+            // never allowed even if they differ in arguments).  If we did
+            // have to compare our arguments, we'd have to deal with enum
+            // arguments potentially being fully qualified or not:
+            // @Retention(java.lang.annotation.RetentionPolicy.CLASS) vs
+            // @Retention(RetentionPolicy.CLASS)
+            String ann = at.getAnnotationType().toString();
+            String iann = Main.removeArgs(i.getText()).a.substring(1); // strip off the leading @
+            String iannNoPackage = Insertion.removePackage(iann).b;
+            // System.out.printf("Comparing: %s %s %s%n", ann, iann, iannNoPackage);
+            if (ann.equals(iann) || ann.equals(iannNoPackage)) {
+              debug("Already present, not reinserting: %s%n", ann);
+              it.remove();
+              return super.scan(node, p);
+            }
           }
         }
-      }
 
-      if (i.getKind() == Insertion.Kind.RECEIVER && node.getKind() == Tree.Kind.METHOD) {
-        ReceiverInsertion receiver = (ReceiverInsertion) i;
-        MethodTree method = (MethodTree) node;
+        if (i.getKind() == Insertion.Kind.RECEIVER && node.getKind() == Tree.Kind.METHOD) {
+          ReceiverInsertion receiver = (ReceiverInsertion) i;
+          MethodTree method = (MethodTree) node;
 
-        if (method.getReceiverParameter() == null) {
-          // If the method doesn't already have a receiver, find the name of the class
-          // with type parameters to create the receiver. Walk up the tree and
-          // pick up class names to add to the receiver type. Since we're
-          // starting from the innermost class, the classes we get to at earlier
-          // iterations of the loop are inside of the classes we get to at later
-          // iterations.
-          TreePath parent = path;
-          // This is the outermost type, currently containing only the
-          // annotation to add to the receiver.
-          DeclaredType outerType = receiver.getType();
-          // This holds the inner types as they're being read in.
-          DeclaredType innerTypes = null;
-          while (parent.getLeaf().getKind() != Tree.Kind.COMPILATION_UNIT
-              && parent.getLeaf().getKind() != Tree.Kind.NEW_CLASS) {
-            Tree leaf = parent.getLeaf();
-            if (leaf.getKind() == Tree.Kind.CLASS
-                || leaf.getKind() == Tree.Kind.INTERFACE
-                || leaf.getKind() == Tree.Kind.ENUM) {
-              ClassTree clazz = (ClassTree) leaf;
-              String className = clazz.getSimpleName().toString();
-              // className will be empty for the CLASS node directly inside an
-              // anonymous inner class NEW_CLASS node.
-              if (!className.isEmpty()) {
-                DeclaredType inner = new DeclaredType(className);
-                for (TypeParameterTree tree : clazz.getTypeParameters()) {
-                  inner.addTypeParameter(new DeclaredType(tree.getName().toString()));
-                }
-                if (innerTypes == null) {
-                  // This is the first type we've read in, so set it as the
-                  // innermost type.
-                  innerTypes = inner;
-                } else {
-                  // inner (the type just read in this iteration) is outside of
-                  // innerTypes (the types already read in previous iterations).
-                  inner.setInnerType(innerTypes);
-                  innerTypes = inner;
+          if (method.getReceiverParameter() == null) {
+            // If the method doesn't already have a receiver, find the name of the class
+            // with type parameters to create the receiver. Walk up the tree and
+            // pick up class names to add to the receiver type. Since we're
+            // starting from the innermost class, the classes we get to at earlier
+            // iterations of the loop are inside of the classes we get to at later
+            // iterations.
+            TreePath parent = path;
+            // This is the outermost type, currently containing only the
+            // annotation to add to the receiver.
+            DeclaredType outerType = receiver.getType();
+            // This holds the inner types as they're being read in.
+            DeclaredType innerTypes = null;
+            while (parent.getLeaf().getKind() != Tree.Kind.COMPILATION_UNIT
+                && parent.getLeaf().getKind() != Tree.Kind.NEW_CLASS) {
+              Tree leaf = parent.getLeaf();
+              if (leaf.getKind() == Tree.Kind.CLASS
+                  || leaf.getKind() == Tree.Kind.INTERFACE
+                  || leaf.getKind() == Tree.Kind.ENUM) {
+                ClassTree clazz = (ClassTree) leaf;
+                String className = clazz.getSimpleName().toString();
+                // className will be empty for the CLASS node directly inside an
+                // anonymous inner class NEW_CLASS node.
+                if (!className.isEmpty()) {
+                  DeclaredType inner = new DeclaredType(className);
+                  for (TypeParameterTree tree : clazz.getTypeParameters()) {
+                    inner.addTypeParameter(new DeclaredType(tree.getName().toString()));
+                  }
+                  if (innerTypes == null) {
+                    // This is the first type we've read in, so set it as the
+                    // innermost type.
+                    innerTypes = inner;
+                  } else {
+                    // inner (the type just read in this iteration) is outside of
+                    // innerTypes (the types already read in previous iterations).
+                    inner.setInnerType(innerTypes);
+                    innerTypes = inner;
+                  }
                 }
               }
+              parent = parent.getParentPath();
             }
-            parent = parent.getParentPath();
+
+            // Merge innerTypes into outerType: outerType only has the annotations
+            // on the receiver, while innerTypes has everything else.
+            outerType.setName(innerTypes.getName());
+            outerType.setTypeParameters(innerTypes.getTypeParameters());
+            outerType.setInnerType(innerTypes.getInnerType());
           }
 
-          // Merge innerTypes into outerType: outerType only has the annotations
-          // on the receiver, while innerTypes has everything else.
-          outerType.setName(innerTypes.getName());
-          outerType.setTypeParameters(innerTypes.getTypeParameters());
-          outerType.setInnerType(innerTypes.getInnerType());
+          // If the method doesn't have parameters, don't add a comma.
+          receiver.setAddComma(method.getParameters().size() > 0);
         }
 
-        // If the method doesn't have parameters, don't add a comma.
-        receiver.setAddComma(method.getParameters().size() > 0);
-      }
+        // If this is a method, then it might have been selected because of
+        // the receiver, or because of the return value.  Distinguish those.
+        // One way would be to set a global variable here.  Another would be
+        // to look for a particular different node.  I will do the latter.
+        Integer pos;
 
-      // If this is a method, then it might have been selected because of
-      // the receiver, or because of the return value.  Distinguish those.
-      // One way would be to set a global variable here.  Another would be
-      // to look for a particular different node.  I will do the latter.
-      Integer pos;
+        debug("TreeFinder.scan: node=%s%n  critera=%s%n", node, i.getCriteria());
 
-      debug("TreeFinder.scan: node=%s%n  critera=%s%n", node, i.getCriteria());
-
-      if ((node.getKind() == Tree.Kind.METHOD) && (i.getCriteria().isOnReturnType())) {
-        // looking for the return type
-        pos = tpf.scan(((MethodTree)node).getReturnType(), i);
-        assert handled(node);
-        debug("pos = %d at return type node: %s%n", pos, ((JCMethodDecl)node).getReturnType().getClass());
-      } else if ((node.getKind() == Tree.Kind.TYPE_PARAMETER) // TypeParameterTree
-                 && (i.getCriteria().onBoundZero())
-                 && ((TypeParameterTree) node).getBounds().isEmpty()) {
-          pos = tpf.scan(node, i);
-
-          Integer nextpos1 = getFirstInstanceAfter(',', pos+1, tree);
-          Integer nextpos2 = getFirstInstanceAfter('>', pos+1, tree);
-          pos = (nextpos1!=-1 && nextpos1 < nextpos2) ? nextpos1 : nextpos2;
-
-          // need to add "extends ... Object" around the type annotation
-          i = new TypeBoundExtendsInsertion(i.getText(), i.getCriteria(), i.getSeparateLine());
-      } else if ((node instanceof WildcardTree) // Easier than listing three tree kinds. Correct?
-               && ((WildcardTree)node).getBound()==null
-               && wildcardLast(i.getCriteria().getGenericArrayLocation().getLocation())) {
-          pos = tpf.scan(node, i);
-
-          Integer nextpos1 = getFirstInstanceAfter(',', pos+1, tree);
-          Integer nextpos2 = getFirstInstanceAfter('>', pos+1, tree);
-          pos = (nextpos1!=-1 && nextpos1 < nextpos2) ? nextpos1 : nextpos2;
-
-          // need to add "extends ... Object" around the type annotation
-          i = new TypeBoundExtendsInsertion(i.getText(), i.getCriteria(), i.getSeparateLine());
-      } else if (i.getKind() == Insertion.Kind.CAST) {
-          JCTree jcTree = (JCTree) node;
-          pos = jcTree.getStartPosition();
-      } else if (i.getKind() == Insertion.Kind.CLOSE_PARENTHESIS) {
-          JCTree jcTree = (JCTree) node;
-          pos = jcTree.getStartPosition() + jcTree.toString().length();
-      } else {
-        boolean typeScan = true;
-        if (node.getKind() == Tree.Kind.METHOD) { // MethodTree
-          // looking for the receiver or the declaration
-          typeScan = i.getCriteria().isOnReceiver();
-        } else if (node.getKind() == Tree.Kind.CLASS) { // ClassTree
-          typeScan = ! i.getSeparateLine(); // hacky check
-        }
-        if (typeScan) {
-          // looking for the type
-          debug("Calling tpf.scan(%s: %s)%n", node.getClass(), node);
-          pos = tpf.scan(node, i);
+        if ((node.getKind() == Tree.Kind.METHOD) && (i.getCriteria().isOnReturnType())) {
+          // looking for the return type
+          pos = tpf.scan(((MethodTree)node).getReturnType(), i);
           assert handled(node);
-          debug("pos = %d at type: %s (%s)%n", pos, node.toString(), node.getClass());
+          debug("pos = %d at return type node: %s%n", pos, ((JCMethodDecl)node).getReturnType().getClass());
+        } else if ((node.getKind() == Tree.Kind.TYPE_PARAMETER) // TypeParameterTree
+                   && (i.getCriteria().onBoundZero())
+                   && ((TypeParameterTree) node).getBounds().isEmpty()) {
+            pos = tpf.scan(node, i);
+
+            Integer nextpos1 = getFirstInstanceAfter(',', pos+1, tree);
+            Integer nextpos2 = getFirstInstanceAfter('>', pos+1, tree);
+            pos = (nextpos1!=-1 && nextpos1 < nextpos2) ? nextpos1 : nextpos2;
+
+            // need to add "extends ... Object" around the type annotation
+            i = new TypeBoundExtendsInsertion(i.getText(), i.getCriteria(), i.getSeparateLine());
+        } else if ((node instanceof WildcardTree) // Easier than listing three tree kinds. Correct?
+                 && ((WildcardTree)node).getBound()==null
+                 && wildcardLast(i.getCriteria().getGenericArrayLocation().getLocation())) {
+            pos = tpf.scan(node, i);
+
+            Integer nextpos1 = getFirstInstanceAfter(',', pos+1, tree);
+            Integer nextpos2 = getFirstInstanceAfter('>', pos+1, tree);
+            pos = (nextpos1!=-1 && nextpos1 < nextpos2) ? nextpos1 : nextpos2;
+
+            // need to add "extends ... Object" around the type annotation
+            i = new TypeBoundExtendsInsertion(i.getText(), i.getCriteria(), i.getSeparateLine());
+        } else if (i.getKind() == Insertion.Kind.CAST) {
+            JCTree jcTree = (JCTree) node;
+            pos = jcTree.getStartPosition();
+        } else if (i.getKind() == Insertion.Kind.CLOSE_PARENTHESIS) {
+            JCTree jcTree = (JCTree) node;
+            pos = jcTree.getStartPosition() + jcTree.toString().length();
         } else {
-          // looking for the declaration
-          pos = dpf.scan(node, null);
-          assert pos != null;
-          debug("pos = %d at declaration: %s%n", pos, node.getClass());
+          boolean typeScan = true;
+          if (node.getKind() == Tree.Kind.METHOD) { // MethodTree
+            // looking for the receiver or the declaration
+            typeScan = i.getCriteria().isOnReceiver();
+          } else if (node.getKind() == Tree.Kind.CLASS) { // ClassTree
+            typeScan = ! i.getSeparateLine(); // hacky check
+          }
+          if (typeScan) {
+            // looking for the type
+            debug("Calling tpf.scan(%s: %s)%n", node.getClass(), node);
+            pos = tpf.scan(node, i);
+            assert handled(node);
+            debug("pos = %d at type: %s (%s)%n", pos, node.toString(), node.getClass());
+          } else {
+            // looking for the declaration
+            pos = dpf.scan(node, null);
+            assert pos != null;
+            debug("pos = %d at declaration: %s%n", pos, node.getClass());
+          }
         }
+
+        debug("  ... satisfied! at %d for node of type %s: %s", pos, node.getClass(), Main.treeToString(node));
+
+        if (pos != null) {
+          assert pos >= 0 : String.format("pos: %s%nnode: %s%ninsertion: %s%n", pos, node, i);
+          positions.put(pos, i);
+        }
+
+        it.remove();
+      } catch (Throwable e) {
+        System.err.println("Error processing insertion:");
+        System.err.println("\t" + i);
+        if (e.getMessage() != null) {
+          // If the message has multiple lines, indent them so it's easier to read.
+          System.err.println("\tError: " + e.getMessage().replace("\n", "\n\t\t"));
+        }
+        if (debug) {
+          e.printStackTrace();
+        }
+        System.err.println("\tThis insertion will be skipped.");
       }
-
-      debug("  ... satisfied! at %d for node of type %s: %s", pos, node.getClass(), Main.treeToString(node));
-
-      if (pos != null) {
-        assert pos >= 0 : String.format("pos: %s%nnode: %s%ninsertion: %s%n", pos, node, i);
-        positions.put(pos, i);
-      }
-
-      it.remove();
     }
 
     return super.scan(node, p);
