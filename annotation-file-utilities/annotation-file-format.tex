@@ -508,6 +508,12 @@ object or array creation within the method. \\
 We use the star literal \bnflit{*} to distinguish source indexes from
 the bytecode offsets that are introduced using \bnflit{\#}.
 
+Source code indexes only include occurrences in the class that exactly matches
+the name of the enclosing \bnfnt{class-definition} rule. Specifically,
+occurrences in nested classes are not included. Use a new
+\bnfnt{class-definition} rule with the name of the nested class for source code
+insertions in a nested class.
+
 % TODO: explain more about the pros/cons.
 % Maybe an example?
 
