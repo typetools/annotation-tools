@@ -1,7 +1,6 @@
 package type;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -40,6 +39,14 @@ public abstract class Type {
     }
 
     /**
+     * Replaces the annotations on this type with the given annotations.
+     * @param annotations the new annotations to be placed on this type.
+     */
+    public void setAnnotations(List<String> annotations) {
+        this.annotations = annotations;
+    }
+
+    /**
      * Gets an outer annotation on this type at the given index.
      * @param index the index.
      * @return the annotation.
@@ -49,12 +56,19 @@ public abstract class Type {
     }
 
     /**
-     * Gets an unmodifiable copy of the outer annotations on this type. This
+     * Gets a copy of the outer annotations on this type. This
      * will be empty if there are none.
      * @return the annotations.
      */
     public List<String> getAnnotations() {
-        return Collections.unmodifiableList(annotations);
+        return new ArrayList<String>(annotations);
+    }
+
+    /**
+     * Removes the annotations from this type.
+     */
+    public void clearAnnotations() {
+        annotations.clear();
     }
 
     /**

@@ -1,7 +1,6 @@
 package type;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -109,13 +108,13 @@ public class DeclaredType extends Type {
     }
 
     /**
-     * Gets an unmodifiable copy of the type parameters of this type. This will
+     * Gets a copy of the type parameters of this type. This will
      * be empty if there are none.
      * @return the type parameters.
      */
     public List<Type> getTypeParameters() {
         checkWildcard();
-        return Collections.unmodifiableList(typeParameters);
+        return new ArrayList<Type>(typeParameters);
     }
 
     /**

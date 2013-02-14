@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.lang.model.element.Modifier;
 import javax.tools.JavaFileObject;
 
 import plume.Pair;
@@ -1061,6 +1062,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     DeclaredType outerType = receiver.getType();
     // This holds the inner types as they're being read in.
     DeclaredType innerTypes = null;
+    boolean foundStaticClass = false;
     while (parent.getLeaf().getKind() != Tree.Kind.COMPILATION_UNIT
         && parent.getLeaf().getKind() != Tree.Kind.NEW_CLASS) {
       Tree leaf = parent.getLeaf();
@@ -1069,12 +1071,21 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
           || leaf.getKind() == Tree.Kind.ENUM) {
         ClassTree clazz = (ClassTree) leaf;
         String className = clazz.getSimpleName().toString();
+        boolean isStatic = clazz.getModifiers().getFlags().contains(Modifier.STATIC);
         // className will be empty for the CLASS node directly inside an
         // anonymous inner class NEW_CLASS node.
         if (!className.isEmpty()) {
           DeclaredType inner = new DeclaredType(className);
-          for (TypeParameterTree tree : clazz.getTypeParameters()) {
-            inner.addTypeParameter(new DeclaredType(tree.getName().toString()));
+          if (!foundStaticClass && isStatic) {
+            // If this is the first static class then move the annotations here.
+            inner.setAnnotations(outerType.getAnnotations());
+            outerType.clearAnnotations();
+            foundStaticClass = true;
+          }
+          if (!foundStaticClass) {
+            for (TypeParameterTree tree : clazz.getTypeParameters()) {
+              inner.addTypeParameter(new DeclaredType(tree.getName().toString()));
+            }
           }
           if (innerTypes == null) {
             // This is the first type we've read in, so set it as the
@@ -1092,10 +1103,14 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     }
 
     // Merge innerTypes into outerType: outerType only has the annotations
-    // on the receiver, while innerTypes has everything else.
+    // on the receiver, while innerTypes has everything else. innerTypes can
+    // have the annotations if it is a static class.
     outerType.setName(innerTypes.getName());
     outerType.setTypeParameters(innerTypes.getTypeParameters());
     outerType.setInnerType(innerTypes.getInnerType());
+    if (foundStaticClass && !innerTypes.getAnnotations().isEmpty()) {
+      outerType.setAnnotations(innerTypes.getAnnotations());
+    }
 
     // If the method doesn't have parameters, don't add a comma.
     receiver.setAddComma(method.getParameters().size() > 0);

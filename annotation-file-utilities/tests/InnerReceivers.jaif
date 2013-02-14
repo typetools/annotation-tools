@@ -3,12 +3,23 @@ package:
     annotation @B: @java.lang.annotation.Target(value={TYPE_USE})
     annotation @C: @java.lang.annotation.Target(value={TYPE_USE})
     annotation @D: @java.lang.annotation.Target(value={TYPE_USE})
+    annotation @D1: @java.lang.annotation.Target(value={TYPE_USE})
     annotation @E: @java.lang.annotation.Target(value={TYPE_USE})
     annotation @F: @java.lang.annotation.Target(value={TYPE_USE})
+    annotation @F1: @java.lang.annotation.Target(value={TYPE_USE})
     annotation @G: @java.lang.annotation.Target(value={TYPE_USE})
     annotation @H: @java.lang.annotation.Target(value={TYPE_USE})
+    annotation @I: @java.lang.annotation.Target(value={TYPE_USE})
+    annotation @J: @java.lang.annotation.Target(value={TYPE_USE})
+    annotation @K: @java.lang.annotation.Target(value={TYPE_USE})
+    annotation @L: @java.lang.annotation.Target(value={TYPE_USE})
+    annotation @M: @java.lang.annotation.Target(value={TYPE_USE})
+    annotation @N: @java.lang.annotation.Target(value={TYPE_USE})
+    annotation @O: @java.lang.annotation.Target(value={TYPE_USE})
+    annotation @P: @java.lang.annotation.Target(value={TYPE_USE})
     annotation @X: @java.lang.annotation.Target(value={TYPE_USE})
 
+package annotator.tests:
     // Try to insert a receiver parameter on a method declaration in an
     // anonymous inner class. This is illegal, so should do nothing.
     class InnerReceivers$1:
@@ -26,15 +37,39 @@ package:
             receiver: @C
         method m()V:
             receiver: @D
+        method m2()V:
+            receiver: @D1
 
     class InnerReceivers$Inner1:
         method <init>()V:
             receiver: @E
         method m()V:
             receiver: @F
+        method m2()V:
+            receiver: @F1
 
     class InnerReceivers$Inner1$Inner2:
         method <init>()V:
             receiver: @G
         method m()V:
             receiver: @H
+
+    class InnerReceivers$StaticInner1:
+        method <init>()V:
+            receiver: @I
+        method m()V:
+            receiver: @J
+        method m2()V:
+            receiver: @K
+
+    class Outer$StaticInner2:
+        method <init>()V:
+            receiver: @L
+        method m()V:
+            receiver: @M
+        method m2()V:
+            receiver: @N
+
+    class Outer$StaticInner2$StaticInner3:
+        method <init>()V:
+            receiver: @O
