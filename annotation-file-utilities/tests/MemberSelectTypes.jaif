@@ -18,6 +18,8 @@ package:
     annotation @Q: @java.lang.annotation.Target(value={TYPE_USE})
     annotation @R: @java.lang.annotation.Target(value={TYPE_USE})
     annotation @S: @java.lang.annotation.Target(value={TYPE_USE})
+    annotation @Anno: @java.lang.annotation.Target(value={TYPE_USE})
+        int value
 
     class MemberSelectTypes$Inner:
         method m()V:
@@ -28,6 +30,10 @@ package:
             receiver: @B
 
     class MemberSelectTypes:
+        bound 0 & 0: @Anno(0)
+        bound 0 & 1: @Anno(1)
+        extends: @Anno(2)
+        implements 0: @Anno(3)
         field o:
             type: @C
         field m1:

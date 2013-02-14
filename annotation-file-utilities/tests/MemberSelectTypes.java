@@ -1,9 +1,10 @@
 import java.util.Map;
 
-public class MemberSelectTypes {
+public class MemberSelectTypes<T extends java.lang.Object & java.lang.Comparable>
+        extends java.lang.Object implements java.io.Serializable {
 
     class Inner {
-        void m(MemberSelectTypes.Inner this) {}
+        void m(MemberSelectTypes<T>.Inner this) {}
     }
 
     static class StaticInner {
