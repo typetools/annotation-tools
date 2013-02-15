@@ -82,6 +82,18 @@ public class ReceiverInsertion extends Insertion {
 
     /** {@inheritDoc} */
     @Override
+    protected boolean addLeadingSpace(boolean gotSeparateLine, int pos,
+            char precedingChar) {
+        if (precedingChar == '.' && type.getName().isEmpty()) {
+            // If only the annotation is being inserted then don't insert a
+            // space if it's immediately after a '.'
+            return false;
+        }
+        return super.addLeadingSpace(gotSeparateLine, pos, precedingChar);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     protected boolean addTrailingSpace(boolean gotSeparateLine) {
         // If the type is not already in the source and the receiver is the only
         // parameter, don't add a trailing space.

@@ -250,12 +250,7 @@ public abstract class Insertion {
                 Type innerType = declaredType.getInnerType();
                 if (innerType != null) {
                     result.append('.');
-                    String inner = typeToString(innerType, comments, abbreviate);
-                    if (inner.startsWith("@")) {
-                        // Make sure there's a space if an annotation comes after the '.'
-                        result.append(' ');
-                    }
-                    result.append(inner);
+                    result.append(typeToString(innerType, comments, abbreviate));
                 }
             }
             break;
