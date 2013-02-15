@@ -1,4 +1,4 @@
-public class ClassTV3<X extends java.lang. @GUT.quals.Peer Object, Y extends java.lang. @GUT.quals.Rep Object, Z extends java.lang. @GUT.quals.Any Object> {
+public class ClassTV3<X extends java.lang.@GUT.quals.Peer Object, Y extends java.lang.@GUT.quals.Rep Object, Z extends java.lang.@GUT.quals.Any Object> {
   X f;
   Y g;
   Z h;
