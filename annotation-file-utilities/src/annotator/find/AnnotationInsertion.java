@@ -65,6 +65,15 @@ public class AnnotationInsertion extends Insertion {
     }
 
     /** {@inheritDoc} */
+    protected boolean addLeadingSpace(boolean gotSeparateLine, int pos,
+            char precedingChar) {
+        if (precedingChar == '.') {
+            return false;
+        }
+        return super.addLeadingSpace(gotSeparateLine, pos, precedingChar);
+    }
+
+    /** {@inheritDoc} */
     public Kind getKind() {
         return Kind.ANNOTATION;
     }
