@@ -19,6 +19,8 @@ import com.sun.source.tree.Tree;
 import com.sun.source.tree.TypeParameterTree;
 import com.sun.source.tree.VariableTree;
 import com.sun.source.util.TreePath;
+import com.sun.tools.javac.code.Flags;
+import com.sun.tools.javac.tree.JCTree.JCMethodDecl;
 
 import plume.UtilMDE;
 
@@ -279,6 +281,9 @@ public class IsSigMethodCriterion implements Criterion {
 
     if (leaf.getKind() != Tree.Kind.METHOD) {
       if (Criteria.debug) debug("IsSigMethodCriterion.isSatisfiedBy(" + Main.pathToString(path) + ") => false: not a METHOD tree");
+      return false;
+    } else if ((((JCMethodDecl) leaf).mods.flags & Flags.GENERATEDCONSTR) != 0) {
+      if (Criteria.debug) debug("IsSigMethodCriterion.isSatisfiedBy(" + Main.pathToString(path) + ") => false: generated constructor");
       return false;
     }
 
