@@ -7,39 +7,39 @@ public class InnerReceivers {
         void m() {}
 
         class Inner {
-            public Inner(@A Inner this) {}
+            void m(@A Inner this) {}
 
-            void m(@B Inner this) {}
+            void m1(@B Inner this) {}
         }
     };
 
-    public InnerReceivers(@C InnerReceivers this) {}
+    void m(@C InnerReceivers this) {}
 
-    void m(@D InnerReceivers this) {}
+    void m1(@D InnerReceivers this) {}
 
     void m2(annotator.tests.@D1 InnerReceivers this) {}
 
     class Inner1<Y, Z> {
 
-        public Inner1(@E InnerReceivers.Inner1<Y, Z> this) {}
+        void m(@E InnerReceivers.Inner1<Y, Z> this) {}
 
-        void m(@F InnerReceivers.Inner1<Y, Z> this) {}
+        void m1(@F InnerReceivers.Inner1<Y, Z> this) {}
 
         void m2(annotator.tests.@F1 InnerReceivers.Inner1<Y, Z> this) {}
 
         class Inner2 {
 
-            public Inner2(@G InnerReceivers.Inner1<Y, Z>.Inner2 this) {}
+            void m(@G InnerReceivers.Inner1<Y, Z>.Inner2 this) {}
 
-            void m(@H InnerReceivers.Inner1<Y, Z>.Inner2 this) {}
+            void m1(@H InnerReceivers.Inner1<Y, Z>.Inner2 this) {}
         }
     }
 
     static class StaticInner1 {
 
-        public StaticInner1(InnerReceivers.@I StaticInner1 this) {}
+        void m(InnerReceivers.@I StaticInner1 this) {}
 
-        void m(InnerReceivers.@J StaticInner1 this) {}
+        void m1(InnerReceivers.@J StaticInner1 this) {}
 
         void m2(annotator.tests.InnerReceivers.@K StaticInner1 this) {}
     }
@@ -48,15 +48,15 @@ public class InnerReceivers {
 class Outer<K> {
     static class StaticInner2 {
 
-        public StaticInner2(Outer.@L StaticInner2 this) {}
+        void m(Outer.@L StaticInner2 this) {}
 
-        void m(Outer.@M StaticInner2 this) {}
+        void m1(Outer.@M StaticInner2 this) {}
 
         void m2(annotator.tests.Outer.@N StaticInner2 this) {}
 
         static class StaticInner3 {
 
-            public StaticInner3(Outer.StaticInner2.@O StaticInner3 this) {}
+            void m(Outer.StaticInner2.@O StaticInner3 this) {}
         }
     }
 }
