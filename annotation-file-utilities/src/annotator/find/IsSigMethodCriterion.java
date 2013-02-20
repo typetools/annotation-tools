@@ -67,7 +67,7 @@ public class IsSigMethodCriterion implements Criterion {
     String returnTypeJvml = methodName.substring(methodName.indexOf(")") + 1);
     this.returnType = (returnTypeJvml.equals("V")
                        ? "void"
-                       : UtilMDE.classnameFromJvm(returnTypeJvml));
+                       : UtilMDE.fieldDescriptorToBinaryName(returnTypeJvml));
   }
 
   // params is in JVML format
@@ -76,7 +76,7 @@ public class IsSigMethodCriterion implements Criterion {
       // nextParam is in JVML format
       String nextParam = readNext(params);
       params = params.substring(nextParam.length());
-      fullyQualifiedParams.add(UtilMDE.classnameFromJvm(nextParam));
+      fullyQualifiedParams.add(UtilMDE.fieldDescriptorToBinaryName(nextParam));
     }
   }
 
