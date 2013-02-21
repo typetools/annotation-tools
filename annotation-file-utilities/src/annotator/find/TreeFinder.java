@@ -1023,20 +1023,29 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
 
         it.remove();
       } catch (Throwable e) {
-        System.err.println("Error processing insertion:");
-        System.err.println("\t" + i);
-        if (e.getMessage() != null) {
-          // If the message has multiple lines, indent them so it's easier to read.
-          System.err.println("\tError: " + e.getMessage().replace("\n", "\n\t\t"));
-        }
-        if (debug) {
-          e.printStackTrace();
-        }
-        System.err.println("\tThis insertion will be skipped.");
+        reportInsertionError(i, e);
       }
     }
 
     return super.scan(node, p);
+  }
+
+  /**
+   * Reports an error inserting an insertion to {@code System.err}.
+   * @param i The insertion that caused the error.
+   * @param e The error. If there's a message it will be printed.
+   */
+  public static void reportInsertionError(Insertion i, Throwable e) {
+    System.err.println("Error processing insertion:");
+    System.err.println("\t" + i);
+    if (e.getMessage() != null) {
+      // If the message has multiple lines, indent them so it's easier to read.
+      System.err.println("\tError: " + e.getMessage().replace("\n", "\n\t\t"));
+    }
+    if (debug) {
+      e.printStackTrace();
+    }
+    System.err.println("\tThis insertion will be skipped.");
   }
 
   /**
