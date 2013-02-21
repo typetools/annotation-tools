@@ -29,6 +29,12 @@ public abstract class Insertion {
     private final boolean separateLine;
 
     /**
+     * Whether this insertion has already been inserted into source code. See
+     * {@link ReceiverInsertion} for a better description of how this is used.
+     */
+    private boolean inserted;
+
+    /**
      * The package names for the annotations being inserted by this Insertion.
      * This will be empty unless {@link #getText(boolean, boolean)} is called
      * with abbreviate true.
@@ -45,6 +51,7 @@ public abstract class Insertion {
         this.criteria = criteria;
         this.separateLine = separateLine;
         this.packageNames = new LinkedHashSet<String>();
+        this.inserted = false;
     }
 
     /**
@@ -172,6 +179,28 @@ public abstract class Insertion {
      */
     public boolean getSeparateLine() {
         return separateLine;
+    }
+
+    /**
+     * Gets whether this insertion has already been inserted into source code.
+     * See {@link ReceiverInsertion} for a better description of how this is
+     * used.
+     * @return {@code true} if this insertion has already been inserted,
+     *         {@code false} otherwise.
+     */
+    public boolean getInserted() {
+        return inserted;
+    }
+
+    /**
+     * Sets whether this insertion has already been inserted into source code.
+     * See {@link ReceiverInsertion} for a better description of how this is
+     * used.
+     * @param inserted {@code true} if this insertion has already been inserted,
+     *         {@code false} otherwise.
+     */
+    public void setInserted(boolean inserted) {
+        this.inserted = inserted;
     }
 
     /**

@@ -231,22 +231,41 @@ public class IndexFileSpecification implements Specification {
     parseExpression(clist, "init for field " + fieldName + "()", exp);
   }
 
-  /** Fill in this.insertions with insertion pairs. */
-  private void parseElement(CriterionList clist, AElement element) {
+  /**
+   * Fill in this.insertions with insertion pairs.
+   * @param clist The criteria specifying the location of the insertions.
+   * @param element Holds the annotations to be inserted.
+   * @return A list of the {@link AnnotationInsertion}s that are created.
+   */
+  private List<Insertion> parseElement(CriterionList clist, AElement element) {
+    return parseElement(clist, element, new ArrayList<Insertion>());
+  }
+
+  /**
+   * Fill in this.insertions with insertion pairs.
+   * @param clist The criteria specifying the location of the insertions.
+   * @param element Holds the annotations to be inserted.
+   * @param innerTypeInsertions The insertions on the inner type of this
+   *         element. This is only used for receiver insertions. See
+   *         {@link ReceiverInsertion} for more details.
+   * @return A list of the {@link AnnotationInsertion}s that are created.
+   */
+  private List<Insertion> parseElement(CriterionList clist, AElement element, List<Insertion> innerTypeInsertions) {
     // Use at most one receiver and one cast insertion and add all of the
     // annotations to the one insertion.
     ReceiverInsertion receiver = null;
     CastInsertion cast = null;
     CloseParenthesisInsertion closeParen = null;
+    List<Insertion> annotationInsertions = new ArrayList<Insertion>();
     for (Pair<String,Boolean> p : getElementAnnotation(element)) {
       String annotationString = p.a;
       Boolean isDeclarationAnnotation = p.b;
       Criteria criteria = clist.criteria();
-      if (criteria.isOnReceiver()) {
+      if (criteria.isOnReceiver() && criteria.getGenericArrayLocation().getLocation().isEmpty()) {
         if (receiver == null) {
           DeclaredType type = new DeclaredType();
           type.addAnnotation(annotationString);
-          receiver = new ReceiverInsertion(type, criteria);
+          receiver = new ReceiverInsertion(type, criteria, innerTypeInsertions);
         } else {
           receiver.getType().addAnnotation(annotationString);
         }
@@ -265,6 +284,7 @@ public class IndexFileSpecification implements Specification {
                                       isDeclarationAnnotation);
         debug("parsed: " + ins);
         this.insertions.add(ins);
+        annotationInsertions.add(ins);
       }
     }
     if (receiver != null) {
@@ -274,18 +294,20 @@ public class IndexFileSpecification implements Specification {
         this.insertions.add(cast);
         this.insertions.add(closeParen);
     }
+    return annotationInsertions;
   }
 
   /** Fill in this.insertions with insertion pairs. */
   private void parseInnerAndOuterElements(CriterionList clist, ATypeElement typeElement) {
+    List<Insertion> innerInsertions = new ArrayList<Insertion>();
     for (Entry<InnerTypeLocation, ATypeElement> innerEntry: typeElement.innerTypes.entrySet()) {
       InnerTypeLocation innerLoc = innerEntry.getKey();
       AElement innerElement = innerEntry.getValue();
       CriterionList innerClist = clist.add(Criteria.atLocation(innerLoc));
-      parseElement(innerClist, innerElement);
+      innerInsertions.addAll(parseElement(innerClist, innerElement));
     }
     CriterionList outerClist = clist.add(Criteria.atLocation());
-    parseElement(outerClist, typeElement);
+    parseElement(outerClist, typeElement, innerInsertions);
   }
 
   // Returns a string representation of the annotations at the element.
