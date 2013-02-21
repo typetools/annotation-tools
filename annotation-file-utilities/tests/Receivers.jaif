@@ -2,6 +2,8 @@ package annotation:
 annotation @A:
 annotation @B:
 annotation @C:
+annotation @Inner: @java.lang.annotation.Target(value={TYPE_USE})
+    int value
 
 package checkers.igj.quals:
 annotation @ReadOnly: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
@@ -42,9 +44,13 @@ class Receivers3:
 
     method m()V:
         receiver: @ReadOnly
+            inner-type 3, 0: @Inner(0)
+            inner-type 3, 1: @Inner(1)
 
     method m(I)V:
         receiver: @ReadOnly
+            inner-type 3, 0: @Inner(0)
+            inner-type 3, 1: @Inner(1)
 
 class Receivers4:
 
@@ -68,6 +74,8 @@ class Receivers7:
 
     method m()V:
         receiver: @ReadOnly
+            inner-type 3, 0: @Inner(0)
+            inner-type 3, 1: @Inner(1)
 
 class Receivers8:
 

@@ -5,9 +5,11 @@ package:
     annotation @D: @java.lang.annotation.Target(value={TYPE_USE})
     annotation @D1: @java.lang.annotation.Target(value={TYPE_USE})
     annotation @E: @java.lang.annotation.Target(value={TYPE_USE})
+        int value
     annotation @F: @java.lang.annotation.Target(value={TYPE_USE})
     annotation @F1: @java.lang.annotation.Target(value={TYPE_USE})
     annotation @G: @java.lang.annotation.Target(value={TYPE_USE})
+        int value
     annotation @H: @java.lang.annotation.Target(value={TYPE_USE})
     annotation @I: @java.lang.annotation.Target(value={TYPE_USE})
     annotation @J: @java.lang.annotation.Target(value={TYPE_USE})
@@ -42,7 +44,14 @@ package annotator.tests:
 
     class InnerReceivers$Inner1:
         method m()V:
-            receiver: @E
+            receiver: @E(0)
+                inner-type 1, 0: @E(1)
+                inner-type 1, 0, 3, 0: @E(2)
+                inner-type 1, 0, 3, 1: @E(3)
+                // The following two annotations are in incorrect locations and
+                // should not be inserted.
+                inner-type 3, 0: @X
+                inner-type 3, 1: @X
         method m1()V:
             receiver: @F
         method m2()V:
@@ -50,13 +59,19 @@ package annotator.tests:
 
     class InnerReceivers$Inner1$Inner2:
         method m()V:
-            receiver: @G
+            receiver: @G(0)
+                inner-type 1, 0: @G(1)
+                inner-type 1, 0, 3, 0: @G(2)
+                inner-type 1, 0, 3, 1: @G(3)
+                inner-type 1, 0, 1, 0: @G(4)
         method m1()V:
             receiver: @H
 
     class InnerReceivers$StaticInner1:
         method m()V:
             receiver: @I
+                // Incorrect location, should not be inserted
+                inner-type 1, 0: @X
         method m1()V:
             receiver: @J
         method m2()V:
@@ -65,6 +80,8 @@ package annotator.tests:
     class Outer$StaticInner2:
         method m()V:
             receiver: @L
+                // Incorrect location, should not be inserted
+                inner-type 1, 0: @X
         method m1()V:
             receiver: @M
         method m2()V:
@@ -73,3 +90,5 @@ package annotator.tests:
     class Outer$StaticInner2$StaticInner3:
         method m()V:
             receiver: @O
+                // Incorrect location, should not be inserted
+                inner-type 1, 0: @X

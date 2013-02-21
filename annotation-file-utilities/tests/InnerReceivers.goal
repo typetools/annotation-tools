@@ -21,7 +21,7 @@ public class InnerReceivers {
 
     class Inner1<Y, Z> {
 
-        void m(@E InnerReceivers.Inner1<Y, Z> this) {}
+        void m(@E(0) InnerReceivers.@E(1) Inner1<@E(2) Y, @E(3) Z> this) {}
 
         void m1(@F InnerReceivers.Inner1<Y, Z> this) {}
 
@@ -29,7 +29,7 @@ public class InnerReceivers {
 
         class Inner2 {
 
-            void m(@G InnerReceivers.Inner1<Y, Z>.Inner2 this) {}
+            void m(@G(0) InnerReceivers.@G(1) Inner1<@G(2) Y, @G(3) Z>.@G(4) Inner2 this) {}
 
             void m1(@H InnerReceivers.Inner1<Y, Z>.Inner2 this) {}
         }
