@@ -363,7 +363,7 @@
     </exec>
   </target>
 
-  <target name="clean" depends="annotation-file-format-clean"
+  <target name="clean" depends="annotation-file-format-clean,clean-tests"
           description="removes generated files (e.g., .jar, .zip)">
     <delete dir="bin"/>
 
@@ -374,15 +374,6 @@
     <!-- <echo message="Deleting previous distribution:  annotation-file-utilities.{jar,zip}"/> -->
     <delete file="annotation-file-utilities.jar"/>
     <delete file="annotation-tools.zip"/>
-    <exec dir="tests/" executable="make" failonerror="true">
-      <arg value="clean"/>
-    </exec>
-    <exec dir="tests/source-extension/" executable="make" failonerror="true">
-      <arg value="clean"/>
-    </exec>	
-    <exec dir="tests/system-test/" executable="make" failonerror="true">
-      <arg value="clean"/>
-    </exec>  
   </target>
 
   <target name="run-tests" depends="init-properties"
@@ -390,6 +381,18 @@
     <exec dir="tests/" executable="make" failonerror="true">
         <env key="XJAVAC" value="${annotations-compiler-absolute}/dist/bin/javac"/>
         <env key="JAVAC_JAR" value="${annotations-compiler-absolute}/dist/lib/javac.jar"/>
+    </exec>
+  </target>
+
+  <target name="clean-tests" description="removes generated test files">
+    <exec dir="tests/" executable="make" failonerror="true">
+      <arg value="clean"/>
+    </exec>
+    <exec dir="tests/source-extension/" executable="make" failonerror="true">
+      <arg value="clean"/>
+    </exec>
+    <exec dir="tests/system-test/" executable="make" failonerror="true">
+      <arg value="clean"/>
     </exec>
   </target>
 

@@ -19,6 +19,8 @@ import com.sun.source.tree.Tree;
 import com.sun.source.tree.TypeParameterTree;
 import com.sun.source.tree.VariableTree;
 import com.sun.source.util.TreePath;
+import com.sun.tools.javac.code.Flags;
+import com.sun.tools.javac.tree.JCTree.JCMethodDecl;
 
 import plume.UtilMDE;
 
@@ -65,7 +67,7 @@ public class IsSigMethodCriterion implements Criterion {
     String returnTypeJvml = methodName.substring(methodName.indexOf(")") + 1);
     this.returnType = (returnTypeJvml.equals("V")
                        ? "void"
-                       : UtilMDE.classnameFromJvm(returnTypeJvml));
+                       : UtilMDE.fieldDescriptorToBinaryName(returnTypeJvml));
   }
 
   // params is in JVML format
@@ -74,7 +76,7 @@ public class IsSigMethodCriterion implements Criterion {
       // nextParam is in JVML format
       String nextParam = readNext(params);
       params = params.substring(nextParam.length());
-      fullyQualifiedParams.add(UtilMDE.classnameFromJvm(nextParam));
+      fullyQualifiedParams.add(UtilMDE.fieldDescriptorToBinaryName(nextParam));
     }
   }
 
@@ -243,17 +245,19 @@ public class IsSigMethodCriterion implements Criterion {
   private boolean matchWithPrefix(String fullType, String simpleType, String prefix) {
 
     // maybe simpleType is in JVML format
-    String simpleType2 = simpleType.replace(".", "/");
+    String simpleType2 = simpleType.replace("/", ".");
+
+    String fullType2 = fullType.replace("$", ".");
+
     /* unused String prefix2 = (prefix.endsWith(".")
                       ? prefix.substring(0, prefix.length() - 1)
                       : prefix); */
-
-    boolean b = (fullType.equals(prefix + simpleType2)
+    boolean b = (fullType2.equals(prefix + simpleType2)
                  // Hacky way to handle the possibility that fulltype is an
                  // inner type but simple type is unqualified.
                  || (fullType.startsWith(prefix)
                      && fullType.endsWith("$" + simpleType2)));
-    if (Criteria.debug) debug(String.format("matchWithPrefix(%s, %s, %s) => %s)%n", fullType, simpleType, prefix, b));
+    if (Criteria.debug) debug(String.format("matchWithPrefix(%s, %s, %s) => %s)%n", fullType2, simpleType, prefix, b));
     return b;
   }
 
@@ -277,6 +281,9 @@ public class IsSigMethodCriterion implements Criterion {
 
     if (leaf.getKind() != Tree.Kind.METHOD) {
       if (Criteria.debug) debug("IsSigMethodCriterion.isSatisfiedBy(" + Main.pathToString(path) + ") => false: not a METHOD tree");
+      return false;
+    } else if ((((JCMethodDecl) leaf).mods.flags & Flags.GENERATEDCONSTR) != 0) {
+      if (Criteria.debug) debug("IsSigMethodCriterion.isSatisfiedBy(" + Main.pathToString(path) + ") => false: generated constructor");
       return false;
     }
 

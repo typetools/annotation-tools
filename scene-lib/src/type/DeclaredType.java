@@ -1,7 +1,6 @@
 package type;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -15,9 +14,9 @@ import java.util.List;
  * A {@code DeclaredType} can represent a wildcard by using "?" as the
  * {@code name}. If this type is a wildcard, it is illegal to call
  * {@link #addTypeParameter(Type)}, {@link #getTypeParameter(int)},
- * {@link #getTypeParameters()}, {@link #setInnerType(DeclaredType)}, and
- * {@link #getInnerType()}. If called, an {@link IllegalStateException} will be
- * thrown.
+ * {@link #getTypeParameters()}, {@link #setInnerType(DeclaredType)},
+ * {@link #getInnerType()}, and {@link #setTypeParameters(List)}. If called, an
+ * {@link IllegalStateException} will be thrown.
  * <p>
  * Types are stored with the outer most type at the top of the type tree. This
  * is opposite to the way types are stored in javac.
@@ -82,7 +81,7 @@ public class DeclaredType extends Type {
 
     /**
      * Adds the given type parameter to this type.
-     * @param typeParameter the type paramter.
+     * @param typeParameter the type parameter.
      */
     public void addTypeParameter(Type typeParameter) {
         checkWildcard();
@@ -90,9 +89,18 @@ public class DeclaredType extends Type {
     }
 
     /**
+     * Sets the type parameters of this type.
+     * @param typeParameters the type parameters.
+     */
+    public void setTypeParameters(List<Type> typeParameters) {
+        checkWildcard();
+        this.typeParameters = typeParameters;
+    }
+
+    /**
      * Gets the type parameter at the given index.
      * @param index the index.
-     * @return the type paramter.
+     * @return the type parameter.
      */
     public Type getTypeParameter(int index) {
         checkWildcard();
@@ -100,13 +108,13 @@ public class DeclaredType extends Type {
     }
 
     /**
-     * Gets an unmodifiable copy of the type parameters of this type. This will
+     * Gets a copy of the type parameters of this type. This will
      * be empty if there are none.
      * @return the type parameters.
      */
     public List<Type> getTypeParameters() {
         checkWildcard();
-        return Collections.unmodifiableList(typeParameters);
+        return new ArrayList<Type>(typeParameters);
     }
 
     /**

@@ -64,6 +64,23 @@ public class AnnotationInsertion extends Insertion {
         return result;
     }
 
+    /**
+     * Gets the raw, unmodified annotation that was passed into the constructor.
+     * @return the annotation.
+     */
+    public String getAnnotation() {
+        return annotation;
+    }
+
+    /** {@inheritDoc} */
+    protected boolean addLeadingSpace(boolean gotSeparateLine, int pos,
+            char precedingChar) {
+        if (precedingChar == '.') {
+            return false;
+        }
+        return super.addLeadingSpace(gotSeparateLine, pos, precedingChar);
+    }
+
     /** {@inheritDoc} */
     public Kind getKind() {
         return Kind.ANNOTATION;

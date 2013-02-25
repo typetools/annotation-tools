@@ -6,6 +6,10 @@ public class CastInsert {
     private int c = ((@checkers.nullness.quals.Nullable Integer) (((@checkers.nullness.quals.Nullable Integer) (12)) + ((@checkers.nullness.quals.Nullable Integer) (13))));
     private String str = "this" + ((@checkers.nullness.quals.Nullable String) ("is")).concat(((@checkers.nullness.quals.Nullable String) ("string")));
 
+    void m() {
+        int i;
+    }
+
     int m(String y, String[] z, int i) {
         String x = ((@checkers.nullness.quals.Nullable String) (new String()));
         String s;
