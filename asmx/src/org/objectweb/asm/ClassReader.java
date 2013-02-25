@@ -1343,8 +1343,8 @@ public class ClassReader {
         // } reference_info;
         case INSTANCEOF:
         case NEW:
-        case CONSTRUCTOR_REFERENCE_RECEIVER:
-        case METHOD_REFERENCE_RECEIVER:
+        case CONSTRUCTOR_REFERENCE:
+        case METHOD_REFERENCE:
           offset = readUnsignedShort(v);
           v += 2;
           break;
