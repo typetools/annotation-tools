@@ -11,7 +11,7 @@ import com.sun.source.util.TreePathScanner;
  * class.  If the index is i, it is the ith anonymous class in the file.
  * Thus, if i = 2, it will have a name of the form NamedClass$2.
  */
-public class AnonymousClassScanner extends TreePathScanner<Void, Void> {
+public class AnonymousClassScanner extends TreePathScanner<Void, Integer> {
 
   /**
    * Given an anonymous class, computes and returns its 1-based index in the given tree representing
@@ -22,15 +22,23 @@ public class AnonymousClassScanner extends TreePathScanner<Void, Void> {
    * @return the index of the anonymous class in the source code
    */
   public static int indexOfClassTree(TreePath path, Tree anonclass) {
-    // This seems like too much:  only want to move up to wherever
-    // numbering starts. -MDE
-    // Move all the way to the top of the source tree in order
-    // to visit every class in source file.
-    while (path.getParentPath() != null) {
+    // Move up to the CLASS tree enclosing this CLASS tree and start the tree
+    // traversal from there. This prevents us from counting anonymous classes
+    // that are in a different part of the tree and therefore aren't included
+    // in the index number.
+    int classesFound = 0;
+    boolean anonclassFound = false;
+    while (path.getParentPath() != null && classesFound < 1) {
+      if (path.getLeaf() == anonclass) {
+        anonclassFound = true;
+      }
       path = path.getParentPath();
+      if (anonclassFound && path.getLeaf().getKind() == Tree.Kind.CLASS) {
+        classesFound++;
+      }
     }
     AnonymousClassScanner lvts = new AnonymousClassScanner(anonclass);
-    lvts.scan(path, null);
+    lvts.scan(path, 0);
     if (lvts.found) {
       return lvts.index;
     } else {
@@ -57,31 +65,39 @@ public class AnonymousClassScanner extends TreePathScanner<Void, Void> {
 
   // Slightly tricky counting:  if the target item is a CLASS, only count
   // CLASSes.  If it is a NEW_CLASS, only count NEW_CLASSes
+  // The level parameter keeps us from traversing too low in the tree and
+  // counting classes that aren't included in the index number.
 
   @Override
-  public Void visitClass(ClassTree node, Void p) {
-    if (!found && anonclass.getKind() == Tree.Kind.CLASS) {
-      if (anonclass == node) {
-        found = true;
-      } else if (node.getSimpleName().toString().trim().isEmpty()) {
-        // don't count classes with given names in source
-        index++;
+  public Void visitClass(ClassTree node, Integer level) {
+    if (level < 2) {
+      if (!found && anonclass.getKind() == Tree.Kind.CLASS) {
+        if (anonclass == node) {
+          found = true;
+        } else if (node.getSimpleName().toString().trim().isEmpty()) {
+          // don't count classes with given names in source
+          index++;
+        }
       }
+      super.visitClass(node, level + 1);
     }
-    return super.visitClass(node, p);
+    return null;
   }
 
   @Override
-  public Void visitNewClass(NewClassTree node, Void p) {
-    if (!found && anonclass.getKind() == Tree.Kind.NEW_CLASS) {
-      if (anonclass == node) {
-        found = true;
-      } else if (node.getClassBody() != null) {
-        // Need to make sure you actually are creating anoymous inner class,
-        // not just object creation.
-        index++;
+  public Void visitNewClass(NewClassTree node, Integer level) {
+    if (level < 2) {
+      if (!found && anonclass.getKind() == Tree.Kind.NEW_CLASS) {
+        if (anonclass == node) {
+          found = true;
+        } else if (node.getClassBody() != null) {
+          // Need to make sure you actually are creating anonymous inner class,
+          // not just object creation.
+          index++;
+        }
       }
+      super.visitNewClass(node, level + 1);
     }
-    return super.visitNewClass(node, p);
+    return null;
   }
 }

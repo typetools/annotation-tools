@@ -269,7 +269,10 @@ Inner classes are treated as ordinary classes whose names happen to contain
 (To change this, the grammar would have to be extended with a closing
 delimiter for classes; otherwise, it would be ambiguous whether a
 field/method appearing after an inner class definition belonged to the
-inner class or the outer class.)
+inner class or the outer class.) The syntax for inner class names is the same as
+is used by the \code{javac} compiler. A good way to get an idea of the inner
+class names for a class is to compile the class and look at the filenames of the
+\code{.class} files that are produced.
 
 % TODO: Are we sure about the comment for the "annotation" section below?
 % Perhaps we could add that if a class is in the same package
@@ -483,9 +486,8 @@ elements:
 \bnfnt{source-typecast-definition} ::= \\
 \qquad    \bnfcmt The first integer is the zero-based index of the
 typecast within the method and \\
-\qquad    \bnfcmt  the optional second integer is the type index of an intersection type~\cite{JSR308}. \\
+\qquad    \bnfcmt the optional second integer is the type index of an intersection type~\cite{JSR308}. \\
 \qquad    \bnfcmt The type index defaults to zero if not specified. \\
-\qquad    \bnfcmt A source code index can be used instead. See \bnfnt{source-typecast-definition} in Section~\ref{source-code-index}. \\
 \qquad    \bnflit{typecast} \bnflit{*} \bnfnt{integer} [ \bnflit{,} \bnfnt{integer} ] \bnflit{:} \bnfnt{annotation}* \lineend \\
 \qquad    \bnfnt{type-argument-or-array-definition}* \\
 \\
@@ -505,6 +507,12 @@ object or array creation within the method. \\
 
 We use the star literal \bnflit{*} to distinguish source indexes from
 the bytecode offsets that are introduced using \bnflit{\#}.
+
+Source code indexes only include occurrences in the class that exactly matches
+the name of the enclosing \bnfnt{class-definition} rule. Specifically,
+occurrences in nested classes are not included. Use a new
+\bnfnt{class-definition} rule with the name of the nested class for source code
+insertions in a nested class.
 
 % TODO: explain more about the pros/cons.
 % Maybe an example?

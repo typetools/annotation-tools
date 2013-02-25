@@ -3,19 +3,20 @@ package annotator.scanner;
 import com.sun.source.tree.BlockTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
+import com.sun.source.util.TreePathScanner;
 
 /**
  * StaticInitScanner scans the source tree and determines the index of a given static
  * initializer block, where the i^th index corresponds to the i^th static initializer,
  * using 0-based indexing.
  */
-public class StaticInitScanner extends CommonScanner {
+public class StaticInitScanner extends TreePathScanner<Void, Void> {
     public static int indexOfStaticInitTree(TreePath path) {
         // we allow to start with any path/tree within a static initializer.
         // first go to the enclosing static initializer
-        Tree tree = findEnclosingStaticInit(path).getLeaf();
+        Tree tree = CommonScanner.findEnclosingStaticInit(path).getLeaf();
         // find the enclosing class
-        path = findEnclosingClass(path);
+        path = CommonScanner.findEnclosingClass(path);
         if (tree==null || path == null) {
             return -1;
         }

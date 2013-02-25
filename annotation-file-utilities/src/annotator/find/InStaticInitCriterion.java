@@ -41,7 +41,7 @@ public class InStaticInitCriterion implements Criterion {
 
   @Override
   public Kind getKind() {
-    return Kind.IN_METHOD;
+    return Kind.IN_STATIC_INIT;
   }
 
   @Override

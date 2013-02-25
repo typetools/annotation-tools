@@ -1,5 +1,6 @@
 package annotator.scanner;
 
+import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
 import com.sun.source.util.TreePathScanner;
@@ -84,5 +85,12 @@ public class CommonScanner extends TreePathScanner<Void, Void> {
             }
         }
         return path;
+    }
+
+    // Don't scan into any classes so that occurrences in nested classes aren't
+    // counted.
+    @Override
+    public Void visitClass(ClassTree node, Void p) {
+        return p;
     }
 }
