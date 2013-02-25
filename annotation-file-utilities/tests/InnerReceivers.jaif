@@ -12,6 +12,8 @@ package:
         int value
     annotation @H: @java.lang.annotation.Target(value={TYPE_USE})
     annotation @I: @java.lang.annotation.Target(value={TYPE_USE})
+    annotation @I1: @java.lang.annotation.Target(value={TYPE_USE})
+        int value
     annotation @J: @java.lang.annotation.Target(value={TYPE_USE})
     annotation @K: @java.lang.annotation.Target(value={TYPE_USE})
     annotation @L: @java.lang.annotation.Target(value={TYPE_USE})
@@ -70,6 +72,18 @@ package annotator.tests:
     class InnerReceivers$StaticInner1:
         method m()V:
             receiver: @I
+                // Incorrect location, should not be inserted
+                inner-type 1, 0: @X
+        method m1()V:
+            receiver: @J
+        method m2()V:
+            receiver: @K
+
+    class InnerReceivers$StaticInner3:
+        method m()V:
+            receiver: @I1(0)
+                inner-type 3, 0: @I1(1)
+                inner-type 3, 1: @I1(2)
                 // Incorrect location, should not be inserted
                 inner-type 1, 0: @X
         method m1()V:

@@ -1094,16 +1094,18 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
         // anonymous inner class NEW_CLASS node.
         if (!className.isEmpty()) {
           DeclaredType inner = new DeclaredType(className);
+          if (staticType == null) {
+            // Only include type parameters on the classes to the right of and
+            // including the rightmost static class.
+            for (TypeParameterTree tree : clazz.getTypeParameters()) {
+              inner.addTypeParameter(new DeclaredType(tree.getName().toString()));
+            }
+          }
           if (staticType == null && isStatic) {
             // If this is the first static class then move the annotations here.
             inner.setAnnotations(outerType.getAnnotations());
             outerType.clearAnnotations();
             staticType = inner;
-          }
-          if (staticType == null) {
-            for (TypeParameterTree tree : clazz.getTypeParameters()) {
-              inner.addTypeParameter(new DeclaredType(tree.getName().toString()));
-            }
           }
           if (innerTypes == null) {
             // This is the first type we've read in, so set it as the
