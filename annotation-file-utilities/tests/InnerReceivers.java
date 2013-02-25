@@ -43,6 +43,15 @@ public class InnerReceivers {
 
         void m2(annotator.tests.InnerReceivers.StaticInner1 this) {}
     }
+
+    static class StaticInner3<Y, Z> {
+
+        void m() {}
+
+        void m1(InnerReceivers.StaticInner3<Y, Z> this) {}
+
+        void m2(annotator.tests.InnerReceivers.StaticInner3<Y, Z> this) {}
+    }
 }
 
 class Outer<K> {
