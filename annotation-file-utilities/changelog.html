@@ -18,7 +18,38 @@ This is the changelog for the
     Version 3.5.1 (released March 1, 2013):
     <ul>
       <li>
-        Small improvements to error messages when parsing JAIF files.
+        Small improvements to error messages when parsing JAIF files and for illegal source code insertions.
+      </li>
+      <li>
+        Installation instruction and manual improvements.
+      </li>
+      <li>
+        Better handling of source code insertions in anonymous and local classes.
+        <ul>
+          <li>
+            Allow source code insertions in a local class (a class defined within a method).
+          </li>
+          <li>
+            Bug fixes for anonymous and local class indexes.
+          </li>
+          <li>
+            Don't traverse into nested classes when calculating a source code index.
+          </li>
+        </ul>
+      </li>
+      <li>
+        Improved support for source code method declaration receiver parameter insertions.
+        <ul>
+          <li>
+            Use the full type name (Outer.Inner1.Inner2) for receiver insertions in inner classes.
+          </li>
+          <li>
+            Allow annotation insertions on compound types of method declaration receiver parameters.
+          </li>
+        </ul>
+      </li>
+      <li>
+        Insert source code annotations in the semantically correct place for qualified types.
       </li>
     </ul>
   </li>
