@@ -992,6 +992,20 @@ public class ClassReader {
                                 w += 4;
                             }
                         }
+                    } else if (attrName.equals("RuntimeInvisibleTypeAnnotations")) {
+                        k = readUnsignedShort(v + 6);
+                        w = v + 8;
+                        for (; k > 0; --k) {
+                            w = readTypeAnnotationValues(w,
+                                    c, mv, false);
+                        }
+                    } else if (attrName.equals("RuntimeVisibleTypeAnnotations")) {
+                        k = readUnsignedShort(v + 6);
+                        w = v + 8;
+                        for (; k > 0; --k) {
+                            w = readTypeAnnotationValues(w,
+                                    c, mv, true);
+                        }
                     } else {
                         for (k = 0; k < attrs.length; ++k) {
                             if (attrs[k].type.equals(attrName)) {
