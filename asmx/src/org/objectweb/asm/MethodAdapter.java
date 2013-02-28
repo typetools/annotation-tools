@@ -66,8 +66,10 @@ public class MethodAdapter implements MethodVisitor {
 
     // jaime
     public TypeAnnotationVisitor visitTypeAnnotation(String desc, 
-                                                             boolean visible) {
-        return mv.visitTypeAnnotation(desc, visible);
+        boolean visible,
+        boolean inCode)
+    {
+        return mv.visitTypeAnnotation(desc, visible, inCode);
     }
     //end jaime
 

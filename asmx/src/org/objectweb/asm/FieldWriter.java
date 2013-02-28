@@ -160,7 +160,9 @@ final class FieldWriter implements FieldVisitor {
     //jaime
     public TypeAnnotationVisitor visitTypeAnnotation(
         final String desc,
-        final boolean visible) {
+        final boolean visible,
+        final boolean inCode)
+    {
         ByteVector bv = new ByteVector();
         TypeAnnotationWriter xaw = 
           new TypeAnnotationWriter(cw, true, bv, bv, desc);

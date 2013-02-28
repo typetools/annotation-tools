@@ -47,7 +47,7 @@ import org.objectweb.asm.MethodVisitor;
 public class ClassNode extends MemberNode implements ClassVisitor {
 
     public TypeAnnotationVisitor visitTypeAnnotation(
-        String desc, boolean visible) {
+        String desc, boolean visible, boolean inCode) {
         throw new RuntimeException("Jaime did not implement yet");
     }
 

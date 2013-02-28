@@ -109,15 +109,15 @@ extends EmptyVisitor {
   @Override
   public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
     if (trace) { System.out.printf("visitAnnotation(%s, %s) in %s (%s)%n", desc, visible, this, this.getClass()); }
-    return visitTypeAnnotation(desc, visible);
+    return visitTypeAnnotation(desc, visible, false);
   }
 
   /**
    * @see org.objectweb.asm.commons.EmptyVisitor#visitTypeAnnotation(java.lang.String, boolean)
    */
   @Override
-  public TypeAnnotationVisitor visitTypeAnnotation(String desc, boolean visible) {
-    if (trace) { System.out.printf("visitTypeAnnotation(%s, %s); aClass=%s in %s (%s)%n", desc, visible, aClass, this, this.getClass()); }
+  public TypeAnnotationVisitor visitTypeAnnotation(String desc, boolean visible, boolean inCode) {
+    if (trace) { System.out.printf("visitTypeAnnotation(%s, %s, %s); aClass=%s in %s (%s)%n", desc, inCode, visible, aClass, this, this.getClass()); }
     return new AnnotationSceneReader(desc, visible, aClass);
   }
 
@@ -1074,8 +1074,8 @@ extends EmptyVisitor {
     }
 
     @Override
-    public TypeAnnotationVisitor visitTypeAnnotation(String desc, boolean visible) {
-      if (trace) { System.out.printf("visitTypeAnnotation(%s, %s); aField=%s, aField.type=%s in %s (%s)%n", desc, visible, aField, aField.type, this, this.getClass()); }
+    public TypeAnnotationVisitor visitTypeAnnotation(String desc, boolean visible, boolean inCode) {
+      if (trace) { System.out.printf("visitTypeAnnotation(%s, %s, %s); aField=%s, aField.type=%s in %s (%s)%n", desc, visible, inCode, aField, aField.type, this, this.getClass()); }
       return new AnnotationSceneReader(desc, visible, aField.type);
     }
   }
@@ -1106,12 +1106,12 @@ extends EmptyVisitor {
     @Override
     public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
       if (trace) { System.out.printf("visitAnnotation(%s, %s) in %s (%s)%n", desc, visible, this, this.getClass()); }
-      return visitTypeAnnotation(desc, visible);
+      return visitTypeAnnotation(desc, visible, false);
     }
 
     @Override
-    public TypeAnnotationVisitor visitTypeAnnotation(String desc, boolean visible) {
-      if (trace) { System.out.printf("visitTypeAnnotation(%s, %s) method=%s in %s (%s)%n", desc, visible, aMethod, this, this.getClass()); }
+    public TypeAnnotationVisitor visitTypeAnnotation(String desc, boolean visible, boolean inCode) {
+      if (trace) { System.out.printf("visitTypeAnnotation(%s, %s) method=%s in %s (%s)%n", desc, visible, inCode, aMethod, this, this.getClass()); }
       return new AnnotationSceneReader(desc, visible, aMethod);
     }
 

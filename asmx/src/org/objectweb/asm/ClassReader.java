@@ -1489,7 +1489,7 @@ public class ClassReader {
 
         String desc = readUTF8(v, buf);
         v += 2;
-        TypeAnnotationVisitor xav = mv.visitTypeAnnotation(desc, visible);
+        TypeAnnotationVisitor xav = mv.visitTypeAnnotation(desc, visible, false);
 
         xav.visitXTargetType(target_type_value);
         if (start_pc != null) {

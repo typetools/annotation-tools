@@ -134,6 +134,18 @@ class MethodWriter implements MethodVisitor {
     //end jaime
 
     /**
+     * The runtime visible type annotations of this method that belong in the
+     * <tt>Code</tt> attribute. May be <tt>null</tt>.
+     */
+    private TypeAnnotationWriter cxanns;
+
+    /**
+     * The runtime invisible type annotations of this method that belong in the
+     * <tt>Code</tt> attribute. May be <tt>null</tt>.
+     */
+    private TypeAnnotationWriter cixanns;
+
+    /**
      * The runtime visible parameter annotations of this method. May be
      * <tt>null</tt>.
      */
@@ -598,17 +610,28 @@ class MethodWriter implements MethodVisitor {
     // jaime
     public TypeAnnotationVisitor visitTypeAnnotation(
         final String desc,
-        final boolean visible)
+        final boolean visible,
+        final boolean inCode)
     {
         ByteVector bv = new ByteVector();
         TypeAnnotationWriter xaw = 
           new TypeAnnotationWriter(cw, true, bv, bv, desc);
-        if (visible) {
-            xaw.next = xanns;
-            xanns = xaw;
+        if (inCode) {
+            if (visible) {
+                xaw.next = cxanns;
+                cxanns = xaw;
+            } else {
+                xaw.next = cixanns;
+                cixanns = xaw;
+            }
         } else {
-            xaw.next = ixanns;
-            ixanns = xaw;
+            if (visible) {
+                xaw.next = xanns;
+                xanns = xaw;
+            } else {
+                xaw.next = ixanns;
+                ixanns = xaw;
+            }
         }
         return xaw;
     }
@@ -1254,6 +1277,14 @@ class MethodWriter implements MethodVisitor {
                 cw.newUTF8("LineNumberTable");
                 size += 8 + lineNumber.length;
             }
+            if (cxanns != null) {
+                cw.newUTF8("RuntimeVisibleTypeAnnotations");
+                size += 8 + cxanns.getSize();
+            }
+            if (cixanns != null) {
+                cw.newUTF8("RuntimeInvisibleTypeAnnotations");
+                size += 8 + cixanns.getSize();
+            }
             if (cattrs != null) {
                 size += cattrs.getSize(cw,
                         code.data,
@@ -1405,6 +1436,12 @@ class MethodWriter implements MethodVisitor {
             if (lineNumber != null) {
                 size += 8 + lineNumber.length;
             }
+            if (cxanns != null) {
+                size += 8 + cxanns.getSize();
+            }
+            if (cixanns != null) {
+                size += 8 + cixanns.getSize();
+            }
             if (cattrs != null) {
                 size += cattrs.getSize(cw,
                         code.data,
@@ -1436,6 +1473,12 @@ class MethodWriter implements MethodVisitor {
             if (lineNumber != null) {
                 ++attributeCount;
             }
+            if (cxanns != null) {
+                ++attributeCount;
+            }
+            if (cixanns != null) {
+                ++attributeCount;
+            }
             if (cattrs != null) {
                 attributeCount += cattrs.getCount();
             }
@@ -1454,6 +1497,14 @@ class MethodWriter implements MethodVisitor {
                 out.putShort(cw.newUTF8("LineNumberTable"));
                 out.putInt(lineNumber.length + 2).putShort(lineNumberCount);
                 out.putByteArray(lineNumber.data, 0, lineNumber.length);
+            }
+            if (cxanns != null) {
+                out.putShort(cw.newUTF8("RuntimeVisibleTypeAnnotations"));
+                cxanns.put(out);
+            }
+            if (cixanns != null) {
+                out.putShort(cw.newUTF8("RuntimeInvisibleTypeAnnotations"));
+                cixanns.put(out);
             }
             if (cattrs != null) {
                 cattrs.put(cw, code.data, code.length, maxLocals, maxStack, out);

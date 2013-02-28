@@ -99,7 +99,8 @@ public class ASMifierAbstractVisitor extends AbstractVisitor {
      */
     public TypeAnnotationVisitor visitTypeAnnotation(
         final String desc,
-        final boolean visible)
+        final boolean visible,
+        final boolean inCode)
     {
         buf.setLength(0);
         buf.append("{\n")
@@ -107,7 +108,8 @@ public class ASMifierAbstractVisitor extends AbstractVisitor {
                 .append(name)
                 .append(".visitTypeAnnotation(");
         appendConstant(desc);
-        buf.append(", ").append(visible).append(");\n");
+        buf.append(", ").append(visible);
+        buf.append(", ").append(inCode).append(");\n");
         text.add(buf.toString());
         ASMifierTypeAnnotationVisitor xav = 
           new ASMifierTypeAnnotationVisitor(0);

@@ -410,7 +410,8 @@ public class ASMifierClassVisitor extends ASMifierAbstractVisitor implements
     
     public TypeAnnotationVisitor visitTypeAnnotation(
         final String desc,
-        final boolean visible) 
+        final boolean visible,
+        final boolean inCode)
     {
       buf.setLength(0);
       buf.append("{\n");
@@ -418,6 +419,8 @@ public class ASMifierClassVisitor extends ASMifierAbstractVisitor implements
       appendConstant(desc);
       buf.append(", ");
       buf.append(visible);
+      buf.append(", ");
+      buf.append(inCode);
       buf.append(");\n");
       text.add(buf.toString());
       ASMifierTypeAnnotationVisitor xav = 
