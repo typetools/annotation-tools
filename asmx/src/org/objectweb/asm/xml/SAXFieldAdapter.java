@@ -65,7 +65,9 @@ public class SAXFieldAdapter implements FieldVisitor {
 
     // jaime
     public TypeAnnotationVisitor visitTypeAnnotation(String desc,
-                                                             boolean visible) {
+        boolean visible,
+        boolean inCode)
+    {
         throw new RuntimeException("Jaime did not implement yet");
     }
     //end jaime

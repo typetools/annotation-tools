@@ -281,7 +281,9 @@ public final class SAXCodeAdapter extends SAXAdapter implements MethodVisitor {
 
     // jaime
     public TypeAnnotationVisitor visitTypeAnnotation(String desc, 
-                                                      boolean visible) {
+        boolean visible,
+        boolean inCode)
+    {
         return null;
     }
     //end jaime

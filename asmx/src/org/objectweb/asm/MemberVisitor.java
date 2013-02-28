@@ -11,7 +11,9 @@ public interface MemberVisitor {
      *
      * @param desc the class descriptor of the annotation class.
      * @param visible <tt>true</tt> if the annotation is visible at runtime.
+     * @param inCode <tt>true</tt> if this annotation belongs in the <tt>Code</tt>
+     *               attribute, <tt>false</tt> otherwise. This is only used for methods.
      * @return a non null visitor to visit the annotation values.
      */
-    TypeAnnotationVisitor visitTypeAnnotation(String desc, boolean visible);
+    TypeAnnotationVisitor visitTypeAnnotation(String desc, boolean visible, boolean inCode);
 }

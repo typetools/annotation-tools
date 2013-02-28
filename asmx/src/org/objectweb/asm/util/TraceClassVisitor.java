@@ -304,14 +304,15 @@ public class TraceClassVisitor extends TraceAbstractVisitor implements
 
     public TypeAnnotationVisitor visitTypeAnnotation(
         final String desc,
-        final boolean visible)
+        final boolean visible,
+        final boolean inCode)
     {
         text.add("\n");
         TypeAnnotationVisitor txav = 
           super.visitTypeAnnotation(desc, visible);
         if (cv != null) {
             ((TraceTypeAnnotationVisitor) txav).xav =
-              cv.visitTypeAnnotation(desc, visible);
+              cv.visitTypeAnnotation(desc, visible, inCode);
         }
         return txav;
     }

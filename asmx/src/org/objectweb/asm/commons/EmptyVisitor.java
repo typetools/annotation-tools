@@ -75,7 +75,9 @@ public class EmptyVisitor implements
 
     // jaime
     public TypeAnnotationVisitor visitTypeAnnotation(String desc,
-                                                             boolean visible) {
+        boolean visible,
+        boolean inCode)
+    {
         return this;
     }
     //end jaime

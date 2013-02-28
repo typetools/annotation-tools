@@ -84,8 +84,10 @@ public class ClassAdapter implements ClassVisitor {
 
     //jaime
     public TypeAnnotationVisitor visitTypeAnnotation(String desc,
-                                                             boolean visible) {
-        return cv.visitTypeAnnotation(desc, visible);
+        boolean visible,
+        boolean inCode)
+    {
+        return cv.visitTypeAnnotation(desc, visible, inCode);
     }
     // end jaime
 
