@@ -69,14 +69,14 @@ public class FieldConstantsCollector implements FieldVisitor {
     public TypeAnnotationVisitor visitTypeAnnotation(
         final String desc,
         final boolean visible) {
-      cp.newUTF8(desc);
-      if(visible) {
-        cp.newUTF8("RuntimeVisibleTypeAnnotations");
-      } else {
-        cp.newUTF8("RuntimeInvisibleTypeAnnotations");
-      }
-      return new TypeAnnotationConstantsCollector(
-          fv.visitTypeAnnotation(desc, visible), cp);
+        cp.newUTF8(desc);
+        if(visible) {
+          cp.newUTF8("RuntimeVisibleTypeAnnotations");
+        } else {
+          cp.newUTF8("RuntimeInvisibleTypeAnnotations");
+        }
+        return new TypeAnnotationConstantsCollector(
+            fv.visitTypeAnnotation(desc, visible), cp);
     }
     
     public void visitAttribute(final Attribute attr) {

@@ -120,7 +120,16 @@ class MethodWriter implements MethodVisitor {
     private AnnotationWriter ianns;
 
     //jaime
+    /**
+     * The runtime visible type annotations of this method. May be
+     * <tt>null</tt>.
+     */
     private TypeAnnotationWriter xanns;
+
+    /**
+     * The runtime invisible type annotations of this method. May be
+     * <tt>null</tt>.
+     */
     private TypeAnnotationWriter ixanns;
     //end jaime
 
@@ -1294,13 +1303,13 @@ class MethodWriter implements MethodVisitor {
             cw.newUTF8("RuntimeInvisibleAnnotations");
             size += 8 + ianns.getSize();
         }
-        if(xanns != null) {
-          cw.newUTF8("RuntimeVisibleTypeAnnotations");
-          size += 8 + xanns.getSize();
+        if (xanns != null) {
+            cw.newUTF8("RuntimeVisibleTypeAnnotations");
+            size += 8 + xanns.getSize();
         }
-        if(ixanns != null) {
-          cw.newUTF8("RuntimeInvisibleTypeAnnotations");
-          size += 8 + ixanns.getSize();
+        if (ixanns != null) {
+            cw.newUTF8("RuntimeInvisibleTypeAnnotations");
+            size += 8 + ixanns.getSize();
         }
         if (panns != null) {
             cw.newUTF8("RuntimeVisibleParameterAnnotations");
@@ -1369,11 +1378,11 @@ class MethodWriter implements MethodVisitor {
         if (ianns != null) {
             ++attributeCount;
         }
-        if(xanns != null) {
-          ++attributeCount;
+        if (xanns != null) {
+            ++attributeCount;
         }
-        if(ixanns != null) {
-          ++attributeCount;
+        if (ixanns != null) {
+            ++attributeCount;
         }
         if (panns != null) {
             ++attributeCount;
@@ -1493,12 +1502,12 @@ class MethodWriter implements MethodVisitor {
             ianns.put(out);
         }
         if (xanns != null) {
-          out.putShort(cw.newUTF8("RuntimeVisibleTypeAnnotations"));
-          xanns.put(out);
+            out.putShort(cw.newUTF8("RuntimeVisibleTypeAnnotations"));
+            xanns.put(out);
         }
         if (ixanns != null) {
-          out.putShort(cw.newUTF8("RuntimeInvisibleTypeAnnotations"));
-          ixanns.put(out);
+            out.putShort(cw.newUTF8("RuntimeInvisibleTypeAnnotations"));
+            ixanns.put(out);
         }
         if (panns != null) {
             out.putShort(cw.newUTF8("RuntimeVisibleParameterAnnotations"));
