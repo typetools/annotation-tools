@@ -592,7 +592,10 @@ public class ClassWriter implements ClassVisitor {
     }
 
     //jaime
-    public TypeAnnotationVisitor visitTypeAnnotation(String desc, boolean visible) {
+    public TypeAnnotationVisitor visitTypeAnnotation(String desc,
+        boolean visible,
+        boolean inCode)
+    {
         ByteVector bv = new ByteVector();
         TypeAnnotationWriter xaw = new TypeAnnotationWriter(this, true, bv, bv, desc);
         if(visible) {
