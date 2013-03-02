@@ -1432,7 +1432,7 @@ public class ClassReader {
         // } reference_info;
         case CLASS_EXTENDS:
           type_index = readUnsignedShort(v);
-          if (type_index == 0xFF) type_index = -1;
+          if (type_index == 0xFFFF) type_index = -1;
           v += 2;
           break;
         case THROWS:
