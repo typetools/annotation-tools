@@ -14,7 +14,7 @@
 
 %HEVEA \footerfalse    % Disable hevea advertisement in footer
 
-\newcommand{\code}[1]{\ifmmode{\mbox{\smaller\ttfamily{#1}}}\else{\smaller\ttfamily #1}\fi}
+\newcommand{\code}[1]{\ifmmode{\mbox{\relax\ttfamily{#1}}}\else{\relax\ttfamily #1}\fi}
 %% Hevea version omits "\smaller"
 %HEVEA \renewcommand{\code}[1]{\ifmmode{\mbox{\ttfamily{#1}}}\else{\ttfamily #1}\fi}
 
@@ -557,7 +557,7 @@ Java AST tree node, with ``get'' removed from the beginning of the method name
 and the first letter lowercased. In cases where the child selector method
 returns a list, the method name is made singular and the AST entry also contains
 an argument to select the index of the list to take. For example, the method
-\code{com.sun.source.tree.BlockTree.getStatements()} is represented as
+\code{com\-.sun\-.source\-.tree\-.Block\-Tree\-.get\-Statements()} is represented as
 \code{Block.statement} and requires an argument to select the statement to take.
 
 The following is an example of an entire AST path:
