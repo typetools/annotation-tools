@@ -99,8 +99,8 @@ The Annotation File Utilities
 (\url{http://types.cs.washington.edu/annotation-file-utilities/}) are a set
 of tools that process annotation files.
 
-The file format discussed in this document supports both standard Java SE 6
-annotations and also the extended annotations proposed in JSR 308~\cite{JSR308}.
+The file format discussed in this document supports both standard Java SE 5
+declaration annotations and also the extended annotations proposed in JSR 308~\cite{JSR308}.
 Section ``Class File Format Extensions'' of the JSR 308 design document
 explains how the extended annotations are stored in the \code{.class}
 file.  The
@@ -113,8 +113,6 @@ user-friendly format that permits Java signatures to be directly specified.
 Furthermore, since the current design is closely aligned to the class file,
 it is convenient for tools that operate on \code{.class} files but less
 convenient for tools that operate on \code{.java} files.
-For the short term, the low-level format will serve our purpose, which is
-primarily to enable testing by the Javari developers.
 
 
 
@@ -274,8 +272,10 @@ In Java SE 7, annotations can be written only on method formal parameters and
 the declarations of packages, classes, methods, fields, and local variables.
 These are known as ``declaration annotations''. JSR 308~\cite{JSR308} extends
 Java to allow annotations on any use of a type, and on type parameter
-declarations. These are known as ``type annotations''and must be meta-annotated
+declarations. These are known as ``type annotations'' and must be meta-annotated
 with \code{ElementType.TYPE\_USE} and/or \code{ElementType.TYPE\_PARAMETER}.
+These meta-annotations are described in more detail in the JSR 308
+specification~\cite{JSR308}.
 
 For locations where only declaration annotations or type annotations are
 allowed the correct kind of annotation will be inserted. However, if both
@@ -404,7 +404,11 @@ and methods in the class.
 Class definitions
 are defined by the \code{class-definition} production of the following grammar.
 Note that we use \code{class-definition} also for interfaces, enums, and
-annotation types; for syntactic simplicity, we use \bnflit{class} for
+annotation types (to specify annotations in an existing annotation type, not to
+be confused with \bnfnt{annotation-definitions} described in
+Section~\ref{annotation-definitions}, which defines annotations to be used
+throughout an annotation file); for syntactic simplicity, we use \bnflit{class}
+for
 all such definitions.
 % TODO: add test cases for this.
 
