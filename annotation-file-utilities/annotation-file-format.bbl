@@ -1,5 +1,9 @@
 \begin{thebibliography}{LBR06}
 
+\bibitem[ASM]{ASM}
+ASM website.
+\newblock \url{http://asm.ow2.org/}.
+
 \bibitem[Ern08]{JSR308}
 Michael~D. Ernst.
 \newblock {Type Annotations} specification ({JSR} 308).

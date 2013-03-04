@@ -45,3 +45,10 @@ scene-lib/src/annotations/tests/example-output.jann
 *.class-generated-scene.txt
 
 .metadata
+
+Makefile.user
+
+annotation-file-utilities/figures/*.eps
+annotation-file-utilities/figures/*.pdf
+annotation-file-utilities/figures/*.png
+annotation-file-utilities/*.png
