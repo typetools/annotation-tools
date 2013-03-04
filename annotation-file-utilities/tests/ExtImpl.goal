@@ -1,0 +1,10 @@
+public class ExtImpl {
+  class Top<X, Y> {}
+  interface Iface<A, B> {}
+  interface Iface2<C, D> {}
+
+  class C1 extends @A Top<@B Object, @C String> implements @D Iface<@E Integer, @F String> {}
+
+  class C2 implements @A Iface<@B String, @C Object>, @D Iface2<@E Object, @F Float> {}
+}
+  

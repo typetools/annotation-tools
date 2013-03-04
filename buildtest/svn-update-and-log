@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Script to perform svn update and write a log.  Due to file access rules,
+# the entire command cannot be run from within the crontab.
+
+svn update > svn-update.log
