@@ -300,12 +300,11 @@ public class IndexFileSpecification implements Specification {
         }
       } else if (element instanceof ATypeElementWithType) {
         if (cast == null) {
-          ATypeElementWithType typecast = (ATypeElementWithType) element;
-          Type type = typecast.getType();
-          type.addAnnotation(annotationString);
-          Insertion.decorateType(innerTypeInsertions, type);
-          cast = new CastInsertion(criteria, typecast.getType());
-          closeParen = new CloseParenthesisInsertion(criteria, cast.getSeparateLine());
+          Pair<CastInsertion, CloseParenthesisInsertion> insertions = createCastInsertion(
+              ((ATypeElementWithType) element).getType(), annotationString,
+              innerTypeInsertions, criteria);
+          cast = insertions.a;
+          closeParen = insertions.b;
         } else {
           cast.getType().addAnnotation(annotationString);
         }
@@ -329,6 +328,32 @@ public class IndexFileSpecification implements Specification {
         this.insertions.add(closeParen);
     }
     return annotationInsertions;
+  }
+
+  /**
+   * Creates the {@link CastInsertion} and {@link CloseParenthesisInsertion}
+   * for a cast insertion.
+   *
+   * @param type The cast type to insert.
+   * @param annotationString The annotation on the outermost type, or
+   *         {@code null} if none. With no outermost annotation this cast
+   *         insertion will either be a cast without any annotations or a cast
+   *         with annotations only on the compound types.
+   * @param innerTypeInsertions The annotations on the inner types.
+   * @param criteria The criteria for the location of this insertion.
+   * @return The {@link CastInsertion} and {@link CloseParenthesisInsertion}.
+   */
+  private Pair<CastInsertion, CloseParenthesisInsertion> createCastInsertion(
+      Type type, String annotationString, List<Insertion> innerTypeInsertions,
+      Criteria criteria) {
+    if (annotationString != null) {
+      type.addAnnotation(annotationString);
+    }
+    Insertion.decorateType(innerTypeInsertions, type);
+    CastInsertion cast = new CastInsertion(criteria, type);
+    CloseParenthesisInsertion closeParen = new CloseParenthesisInsertion(
+        criteria, cast.getSeparateLine());
+    return new Pair<CastInsertion, CloseParenthesisInsertion>(cast, closeParen);
   }
 
   /**
