@@ -423,6 +423,10 @@ public abstract class Insertion {
                         throw new RuntimeException("Illegal TypePathEntryKind: " + tpe.tag);
                     }
                 }
+                if (type.getKind() == Type.Kind.BOUNDED) {
+                    // Annotations aren't allowed directly on the BoundedType, see BoundedType
+                    type = ((BoundedType) type).getType();
+                }
                 type.addAnnotation(((AnnotationInsertion) innerInsertion).getAnnotation());
             } catch (Throwable e) {
                 TreeFinder.reportInsertionError(innerInsertion, e);
