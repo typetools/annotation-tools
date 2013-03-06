@@ -84,6 +84,17 @@ public class ATypeElementWithType extends ATypeElement {
     }
 
     @Override
+    public boolean prune() {
+        boolean result = super.prune();
+        if (result && tlAnnotationsHere.isEmpty()) {
+            // If we're about to be pruned because we have no annotations, then
+            // stop the prune to just insert a cast with no annotations.
+            result = false;
+        }
+        return result;
+    }
+
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("AInsertTypecastTypeElement: ");

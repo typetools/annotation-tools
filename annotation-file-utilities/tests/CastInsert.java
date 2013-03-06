@@ -83,5 +83,7 @@ public class CastInsert {
         o = o;
         o = o;
         o = o;
+        o = o;
+        o = o;
     }
 }
