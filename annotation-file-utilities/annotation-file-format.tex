@@ -535,6 +535,10 @@ the \bnflit{insert-typecast} line then a cast with no annotations will be
 inserted or, if compound type annotations are specified, a cast with annotations
 only on the compound types will be inserted.
 
+Note that the type specified on the \bnflit{insert-typecast} line cannot contain
+any qualified type names. For example, use \code{Entry<String, Object>} instead
+of \code{Map.Entry<java.lang.String, java.lang.Obect>}.
+
 \begin{tabbing}
 \bnfnt{source-insert-typecast-definition} ::= \\
 \qquad    \bnfcmt \bnfnt{ast-path} is described below. \\
