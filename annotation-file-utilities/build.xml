@@ -19,13 +19,6 @@
        having this separate directory? -->
   <property name="temp-jarfile" location="${tmpdir}/annotation-file-utilities-jarfile" />
 
-<!--
-  <property name="jsr308-www" location="/afs/csail/group/pag/www/jsr308"/>
--->
-  <property name="jsr308-www" location="/cse/www2/types"/>
-  <property name="jsr308-www-annotation-file-utilities"
-    location="${jsr308-www}/annotation-file-utilities"/>
-
   <target name="init-properties">
     <condition property="exists.build.properties">
       <available file="build.properties"/>
@@ -287,43 +280,66 @@
 -->
   </target>
 
-   <target name="web" depends="check-hg-status,clean,zipfile,check-hg-status"
+  <macrodef name="update">
+    <attribute name="file"/>
+    <attribute name="start"/>
+    <attribute name="end" default=""/>
+    <attribute name="with"/>
+    <sequential>
+        <echo level="info" message="updating @{file}"/>
+        <replaceregexp file="@{file}" byline="true"
+                       match="@{start}.*@{end}" replace="@{start}@{with}@{end}"/>
+    </sequential>
+  </macrodef>
+
+  <target name="update-versions" depends="init-properties">
+    <fail unless="release.ver"  message="You must specify a release version to update to"/>
+    <fail unless="release.date" message="You must specify a release date to update to"/>
+
+    <update file="${annotation-tools}/annotation-file-utilities/annotation-file-utilities.html"
+            start="${afu.ver.0}" end="${afu.ver.1}"
+            with="${release.ver}, ${release.date}"/>
+
+      <update file="${annotation-tools}/annotation-file-utilities/annotation-file-utilities.html"
+              start="${afu.date.0}" end="${afu.date.1}"
+              with="${release.date}"/>
+
+    <property name="newCfrValue" value="Annotation File Utilities v${release.ver}"/>
+
+    <property name="ClassFileReaderPath" value="${annotation-tools}/scene-lib/src/annotations/io/classfile/ClassFileReader.java"/>
+    <echo level="info" message="updating ${ClassFileReaderPath}"/>
+    <replaceregexp file="${ClassFileReaderPath}" byline="true"
+                   match="${afu.cfr.pattern}" replace="${newCfrValue}"/>
+  </target>
+
+  <!-- TODO: I am not sure this target works as the original author intended
+       TODO: (i.e. I don't think check-hg-status gets executed twice)
+       TODO: but I am maintaining the previous behavior.
+       -->
+  <target name="web" depends="check-hg-status,web-no-checks,check-hg-status"/>
+
+  <!-- New release process runs checks prior to running the web-no-checks target-->
+  <target name="web-no-checks" depends="clean,zipfile"
           description="export the zipfile, etc. to its website">
-    <echo message="Export location: ${jsr308-www-annotation-file-utilities}"/>
+
+    <fail unless="deploy-dir" message="You must specify a deploy-dir, the live site deploy-dir=/cse/www2/types/annotation-file-utilities"/>
+
+    <echo message="Export location: ${deploy-dir}"/>
     <echo message="Copying annotation-tools.zip"/>
     <copy file="annotation-tools.zip"
-      todir="${jsr308-www-annotation-file-utilities}"/>
+      todir="${deploy-dir}"/>
 
     <echo message="Copying annotation-file-utilities.html"/>
     <copy file="annotation-file-utilities.html"
-      todir="${jsr308-www-annotation-file-utilities}"/>
+      todir="${deploy-dir}"/>
     <copy file="changelog.html"
-      todir="${jsr308-www-annotation-file-utilities}"/>
+      todir="${deploy-dir}"/>
 
     <echo message="Copying annotation-file-format.{html,pdf"/>
     <copy file="annotation-file-format.html"
-      todir="${jsr308-www-annotation-file-utilities}"/>
+      todir="${deploy-dir}"/>
     <copy file="annotation-file-format.pdf"
-      todir="${jsr308-www-annotation-file-utilities}"/>
-
-    <echo message="Updating link dates"/>
-<!--
-  TEMPORARY
--->
-<!--
-    <exec executable="update-link-dates"
-          failonerror="true">
-      <arg value="${jsr308-www}/jsr308-webpage.html"/>
-    </exec>
-    <echo message="Checking HTML links"/>
-    <exec executable="/usr/bin/make"
-          failonerror="true">
-      <arg value="-C"/>
-      <arg value="../doc"/>
-      <arg value="checklinks"/>
-    </exec>
--->
-
+      todir="${deploy-dir}"/>
   </target>
 
   <target name="annotation-file-format-clean"

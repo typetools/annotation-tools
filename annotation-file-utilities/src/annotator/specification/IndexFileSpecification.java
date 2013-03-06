@@ -238,7 +238,33 @@ public class IndexFileSpecification implements Specification {
    * @return A list of the {@link AnnotationInsertion}s that are created.
    */
   private List<Insertion> parseElement(CriterionList clist, AElement element) {
-    return parseElement(clist, element, new ArrayList<Insertion>());
+    return parseElement(clist, element, new ArrayList<Insertion>(), false);
+  }
+
+  /**
+   * Fill in this.insertions with insertion pairs.
+   * @param clist The criteria specifying the location of the insertions.
+   * @param element Holds the annotations to be inserted.
+   * @param isCastInsertion {@code true} if this for a cast insertion, {@code false}
+   *          otherwise.
+   * @return A list of the {@link AnnotationInsertion}s that are created.
+   */
+  private List<Insertion> parseElement(CriterionList clist, AElement element,
+      boolean isCastInsertion) {
+    return parseElement(clist, element, new ArrayList<Insertion>(), isCastInsertion);
+  }
+
+  /**
+   * Fill in this.insertions with insertion pairs.
+   * @param clist The criteria specifying the location of the insertions.
+   * @param element Holds the annotations to be inserted.
+   * @param add {@code true} if the create {@link AnnotationInsertion}s should
+   *         be added to {@link #insertions}, {@code false} otherwise.
+   * @return A list of the {@link AnnotationInsertion}s that are created.
+   */
+  private List<Insertion> parseElement(CriterionList clist, AElement element,
+      List<Insertion> innerTypeInsertions) {
+    return parseElement(clist, element, innerTypeInsertions, false);
   }
 
   /**
@@ -248,16 +274,30 @@ public class IndexFileSpecification implements Specification {
    * @param innerTypeInsertions The insertions on the inner type of this
    *         element. This is only used for receiver insertions. See
    *         {@link ReceiverInsertion} for more details.
+   * @param isCastInsertion {@code true} if this for a cast insertion, {@code false}
+   *          otherwise.
    * @return A list of the {@link AnnotationInsertion}s that are created.
    */
-  private List<Insertion> parseElement(CriterionList clist, AElement element, List<Insertion> innerTypeInsertions) {
+  private List<Insertion> parseElement(CriterionList clist, AElement element,
+      List<Insertion> innerTypeInsertions, boolean isCastInsertion) {
     // Use at most one receiver and one cast insertion and add all of the
     // annotations to the one insertion.
     ReceiverInsertion receiver = null;
     CastInsertion cast = null;
     CloseParenthesisInsertion closeParen = null;
     List<Insertion> annotationInsertions = new ArrayList<Insertion>();
-    for (Pair<String,Boolean> p : getElementAnnotation(element)) {
+    Set<Pair<String, Boolean>> elementAnnotations = getElementAnnotation(element);
+    if (element instanceof ATypeElementWithType && elementAnnotations.isEmpty()) {
+      // Still insert even if it's a cast insertion with no outer annotations to
+      // just insert a cast, or insert a cast with annotations on the compound
+      // types.
+      Pair<CastInsertion, CloseParenthesisInsertion> insertions = createCastInsertion(
+          ((ATypeElementWithType) element).getType(), null,
+          innerTypeInsertions, clist.criteria());
+      cast = insertions.a;
+      closeParen = insertions.b;
+    }
+    for (Pair<String,Boolean> p : elementAnnotations) {
       String annotationString = p.a;
       Boolean isDeclarationAnnotation = p.b;
       Criteria criteria = clist.criteria();
@@ -271,11 +311,11 @@ public class IndexFileSpecification implements Specification {
         }
       } else if (element instanceof ATypeElementWithType) {
         if (cast == null) {
-          ATypeElementWithType typecast = (ATypeElementWithType) element;
-          Type type = typecast.getType();
-          type.addAnnotation(annotationString);
-          cast = new CastInsertion(criteria, typecast.getType());
-          closeParen = new CloseParenthesisInsertion(criteria, cast.getSeparateLine());
+          Pair<CastInsertion, CloseParenthesisInsertion> insertions = createCastInsertion(
+              ((ATypeElementWithType) element).getType(), annotationString,
+              innerTypeInsertions, criteria);
+          cast = insertions.a;
+          closeParen = insertions.b;
         } else {
           cast.getType().addAnnotation(annotationString);
         }
@@ -283,7 +323,11 @@ public class IndexFileSpecification implements Specification {
         Insertion ins = new AnnotationInsertion(annotationString, criteria,
                                       isDeclarationAnnotation);
         debug("parsed: " + ins);
-        this.insertions.add(ins);
+        if (!isCastInsertion) {
+            // Annotations on compound types of a cast insertion will be
+            // inserted directly on the cast insertion.
+            this.insertions.add(ins);
+        }
         annotationInsertions.add(ins);
       }
     }
@@ -297,16 +341,62 @@ public class IndexFileSpecification implements Specification {
     return annotationInsertions;
   }
 
-  /** Fill in this.insertions with insertion pairs. */
+  /**
+   * Creates the {@link CastInsertion} and {@link CloseParenthesisInsertion}
+   * for a cast insertion.
+   *
+   * @param type The cast type to insert.
+   * @param annotationString The annotation on the outermost type, or
+   *         {@code null} if none. With no outermost annotation this cast
+   *         insertion will either be a cast without any annotations or a cast
+   *         with annotations only on the compound types.
+   * @param innerTypeInsertions The annotations on the inner types.
+   * @param criteria The criteria for the location of this insertion.
+   * @return The {@link CastInsertion} and {@link CloseParenthesisInsertion}.
+   */
+  private Pair<CastInsertion, CloseParenthesisInsertion> createCastInsertion(
+      Type type, String annotationString, List<Insertion> innerTypeInsertions,
+      Criteria criteria) {
+    if (annotationString != null) {
+      type.addAnnotation(annotationString);
+    }
+    Insertion.decorateType(innerTypeInsertions, type);
+    CastInsertion cast = new CastInsertion(criteria, type);
+    CloseParenthesisInsertion closeParen = new CloseParenthesisInsertion(
+        criteria, cast.getSeparateLine());
+    return new Pair<CastInsertion, CloseParenthesisInsertion>(cast, closeParen);
+  }
+
+  /**
+   * Fill in this.insertions with insertion pairs for the outer and inner types.
+   * @param clist The criteria specifying the location of the insertions.
+   * @param typeElement Holds the annotations to be inserted.
+   */
   private void parseInnerAndOuterElements(CriterionList clist, ATypeElement typeElement) {
+    parseInnerAndOuterElements(clist, typeElement, false);
+  }
+
+  /**
+   * Fill in this.insertions with insertion pairs for the outer and inner types.
+   * @param clist The criteria specifying the location of the insertions.
+   * @param typeElement Holds the annotations to be inserted.
+   * @param isCastInsertion {@code true} if this for a cast insertion, {@code false}
+   *          otherwise.
+   */
+  private void parseInnerAndOuterElements(CriterionList clist,
+      ATypeElement typeElement, boolean isCastInsertion) {
     List<Insertion> innerInsertions = new ArrayList<Insertion>();
     for (Entry<InnerTypeLocation, ATypeElement> innerEntry: typeElement.innerTypes.entrySet()) {
       InnerTypeLocation innerLoc = innerEntry.getKey();
       AElement innerElement = innerEntry.getValue();
       CriterionList innerClist = clist.add(Criteria.atLocation(innerLoc));
-      innerInsertions.addAll(parseElement(innerClist, innerElement));
+      innerInsertions.addAll(parseElement(innerClist, innerElement, isCastInsertion));
     }
-    CriterionList outerClist = clist.add(Criteria.atLocation());
+    CriterionList outerClist = clist;
+    if (!isCastInsertion) {
+      // Cast insertion is never on an existing type.
+      outerClist = clist.add(Criteria.atLocation());
+    }
     parseElement(outerClist, typeElement, innerInsertions);
   }
 
@@ -428,7 +518,7 @@ public class IndexFileSpecification implements Specification {
       ASTPath astPath = entry.getKey();
       ATypeElementWithType insertTypecast = entry.getValue();
       CriterionList insertTypecastClist = clist.add(Criteria.astPath(astPath));
-      parseElement(insertTypecastClist, insertTypecast);
+      parseInnerAndOuterElements(insertTypecastClist, insertTypecast, true);
     }
   }
 }
