@@ -212,6 +212,29 @@ public final class IndexFileParser {
         return id;
     }
 
+    private String checkPrimitiveType() {
+        if (st.sval == null) {
+            return null;
+        } else {
+            String val = st.sval;
+            if (st.ttype == TT_WORD && primitiveTypes.containsKey(val)) {
+                return st.sval;
+            } else {
+                return null;
+            }
+        }
+    }
+
+    private String matchPrimitiveType() throws IOException {
+        String x = checkPrimitiveType();
+        if (x != null) {
+            st.nextToken();
+            return x;
+        } else {
+            return null;
+        }
+    }
+
     // an identifier, or a sequence of dot-separated identifiers
     private String expectQualifiedName() throws IOException, ParseException {
         String name = expectIdentifier();
@@ -1111,7 +1134,14 @@ public final class IndexFileParser {
      * Parses the next tokens as a declared type.
      */
     private DeclaredType parseDeclaredType() throws IOException, ParseException {
-        return parseDeclaredType(expectIdentifier());
+        String type = matchIdentifier();
+        if (type == null) {
+            type = matchPrimitiveType();
+            if (type == null) {
+                throw new ParseException("Expected identifier or primitive type");
+            }
+        }
+        return parseDeclaredType(type);
     }
 
     /**

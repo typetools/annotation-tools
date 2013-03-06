@@ -81,5 +81,6 @@ public class CastInsert {
     void m2 (Object o) {
         o = o;
         o = o;
+        o = o;
     }
 }
