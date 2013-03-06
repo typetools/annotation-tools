@@ -530,7 +530,10 @@ For a cast insertion the type to cast to must be specified in the \code{.jaif}
 file. The annotations on the \bnflit{insert-typecast} line will be inserted on
 the outermost type of the type to cast to. If the type to cast to is a compound
 type then annotations on parts of the compound type are specified with the
-\bnfnt{type-argument-or-array-definition} rule.
+\bnfnt{type-argument-or-array-definition} rule. If there are no annotations on
+the \bnflit{insert-typecast} line then a cast with no annotations will be
+inserted or, if compound type annotations are specified, a cast with annotations
+only on the compound types will be inserted.
 
 \begin{tabbing}
 \bnfnt{source-insert-typecast-definition} ::= \\

@@ -286,7 +286,18 @@ public class IndexFileSpecification implements Specification {
     CastInsertion cast = null;
     CloseParenthesisInsertion closeParen = null;
     List<Insertion> annotationInsertions = new ArrayList<Insertion>();
-    for (Pair<String,Boolean> p : getElementAnnotation(element)) {
+    Set<Pair<String, Boolean>> elementAnnotations = getElementAnnotation(element);
+    if (element instanceof ATypeElementWithType && elementAnnotations.isEmpty()) {
+      // Still insert even if it's a cast insertion with no outer annotations to
+      // just insert a cast, or insert a cast with annotations on the compound
+      // types.
+      Pair<CastInsertion, CloseParenthesisInsertion> insertions = createCastInsertion(
+          ((ATypeElementWithType) element).getType(), null,
+          innerTypeInsertions, clist.criteria());
+      cast = insertions.a;
+      closeParen = insertions.b;
+    }
+    for (Pair<String,Boolean> p : elementAnnotations) {
       String annotationString = p.a;
       Boolean isDeclarationAnnotation = p.b;
       Criteria criteria = clist.criteria();
