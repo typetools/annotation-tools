@@ -77,4 +77,9 @@ public class CastInsert {
         Object obj = null;
         return 0;
     }
+
+    void m2 (Object o) {
+        o = o;
+        o = o;
+    }
 }
