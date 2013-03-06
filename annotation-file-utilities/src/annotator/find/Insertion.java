@@ -4,6 +4,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
+
 import plume.Pair;
 import type.ArrayType;
 import type.DeclaredType;
@@ -333,6 +335,101 @@ public abstract class Insertion {
             result.append(" ");
             if (abbreviate) {
                 packageNames.addAll(ins.getPackageNames());
+            }
+        }
+    }
+
+    /**
+     * Adds each of the given inner type insertions to the correct part of the
+     * type, based on the insertion's type path.
+     *
+     * @param innerTypeInsertions
+     *          The insertions to add to the type. These must be inner type
+     *          insertions, meaning each of the insertions' {@link Criteria}
+     *          must contain a {@link GenericArrayLocationCriterion} and
+     *          {@link GenericArrayLocationCriterion#getLocation()} must return a
+     *          non-empty list.
+     * @param outerType The type to add the insertions to.
+     */
+    public static void decorateType(List<Insertion> innerTypeInsertions, Type outerType) {
+        for (Insertion innerInsertion : innerTypeInsertions) {
+            // Set each annotation as inserted (even if it doesn't actually get
+            // inserted because of an error) to "disable" the insertion in the global
+            // insertion list.
+            innerInsertion.setInserted(true);
+
+            try {
+                if (innerInsertion.getKind() != Insertion.Kind.ANNOTATION) {
+                    throw new RuntimeException("Expected 'ANNOTATION' insertion kind, got '"
+                            + innerInsertion.getKind() + "'.");
+                }
+                GenericArrayLocationCriterion c = innerInsertion.getCriteria().getGenericArrayLocation();
+                if (c == null) {
+                    throw new RuntimeException("Missing type path.");
+                }
+
+                List<TypePathEntry> location = c.getLocation();
+                Type type = outerType;
+
+                // Use the type path entries to traverse through the type. Throw an
+                // exception and move on to the next inner type insertion if the type
+                // path and actual type don't match up.
+                for (TypePathEntry tpe : location) {
+                      switch (tpe.tag) {
+                      case ARRAY:
+                          if (type.getKind() == Type.Kind.ARRAY) {
+                              type = ((ArrayType) type).getComponentType();
+                          } else {
+                              throw new RuntimeException("Incorrect type path.");
+                          }
+                          break;
+                    case INNER_TYPE:
+                          if (type.getKind() == Type.Kind.DECLARED) {
+                            DeclaredType declaredType = (DeclaredType) type;
+                            if (declaredType.getInnerType() == null) {
+                              throw new RuntimeException("Incorrect type path: "
+                                      + "expected inner type but none exists.");
+                            }
+                            type = declaredType.getInnerType();
+                        } else {
+                            throw new RuntimeException("Incorrect type path.");
+                        }
+                        break;
+                    case WILDCARD:
+                        if (type.getKind() == Type.Kind.BOUNDED) {
+                            BoundedType boundedType = (BoundedType) type;
+                            if (boundedType.getBound() == null) {
+                              throw new RuntimeException("Incorrect type path: "
+                                      + "expected type bound but none exists.");
+                            }
+                            type = boundedType.getBound();
+                        } else {
+                            throw new RuntimeException("Incorrect type path.");
+                        }
+                        break;
+                    case TYPE_ARGUMENT:
+                        if (type.getKind() == Type.Kind.DECLARED) {
+                            DeclaredType declaredType = (DeclaredType) type;
+                            if (0 <= tpe.arg && tpe.arg < declaredType.getTypeParameters().size()) {
+                                type = ((DeclaredType) type).getTypeParameter(tpe.arg);
+                            } else {
+                                throw new RuntimeException("Incorrect type argument index: " + tpe.arg);
+                            }
+                        } else {
+                            throw new RuntimeException("Incorrect type path.");
+                        }
+                        break;
+                    default:
+                        throw new RuntimeException("Illegal TypePathEntryKind: " + tpe.tag);
+                    }
+                }
+                if (type.getKind() == Type.Kind.BOUNDED) {
+                    // Annotations aren't allowed directly on the BoundedType, see BoundedType
+                    type = ((BoundedType) type).getType();
+                }
+                type.addAnnotation(((AnnotationInsertion) innerInsertion).getAnnotation());
+            } catch (Throwable e) {
+                TreeFinder.reportInsertionError(innerInsertion, e);
             }
         }
     }
