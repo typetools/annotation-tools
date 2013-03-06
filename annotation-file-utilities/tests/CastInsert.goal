@@ -82,5 +82,6 @@ public class CastInsert {
         o = ((@checkers.nullness.quals.Nullable Map<@annotation.A String, @annotation.B Integer>) (o));
         o = ((@annotation.B Object @annotation.A [] @checkers.nullness.quals.Nullable []) (o));
         o = ((@annotation.B int @annotation.A [] @checkers.nullness.quals.Nullable []) (o));
+        o = ((@checkers.nullness.quals.Nullable List<@annotation.A ? extends @annotation.B Object>) (o));
     }
 }
