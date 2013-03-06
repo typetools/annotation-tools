@@ -12,8 +12,6 @@ import javax.lang.model.element.Modifier;
 import javax.tools.JavaFileObject;
 
 import plume.Pair;
-import type.ArrayType;
-import type.BoundedType;
 import type.DeclaredType;
 import type.Type;
 import annotator.Main;
@@ -1132,83 +1130,8 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       outerType.setAnnotations(innerTypes.getAnnotations());
     }
 
-    // Now insert the inner type annotations.
-    for (Insertion innerInsertion : receiver.getInnerTypeInsertions()) {
-      // Set each annotation as inserted (even if it doesn't actually get
-      // inserted because of an error) to "disable" the insertion in the global
-      // insertion list.
-      innerInsertion.setInserted(true);
-
-      try {
-        if (innerInsertion.getKind() != Insertion.Kind.ANNOTATION) {
-          throw new RuntimeException("Expected 'ANNOTATION' insertion kind, got '"
-                  + innerInsertion.getKind() + "'.");
-        }
-        GenericArrayLocationCriterion c = innerInsertion.getCriteria().getGenericArrayLocation();
-        if (c == null) {
-          throw new RuntimeException("Missing type path.");
-        }
-
-        List<TypePathEntry> location = c.getLocation();
-        Type type = (staticType == null) ? outerType : staticType;
-
-        // Use the type path entries to traverse through the type. Throw an
-        // exception and move on to the next inner type insertion if the type
-        // path and actual type don't match up.
-        for (TypePathEntry tpe : location) {
-          switch (tpe.tag) {
-          case ARRAY:
-            if (type.getKind() == Type.Kind.ARRAY) {
-              type = ((ArrayType) type).getComponentType();
-            } else {
-              throw new RuntimeException("Incorrect type path.");
-            }
-            break;
-          case INNER_TYPE:
-            if (type.getKind() == Type.Kind.DECLARED) {
-              DeclaredType declaredType = (DeclaredType) type;
-              if (declaredType.getInnerType() == null) {
-                throw new RuntimeException("Incorrect type path: "
-                    + "expected inner type but none exists.");
-              }
-              type = declaredType.getInnerType();
-            } else {
-              throw new RuntimeException("Incorrect type path.");
-            }
-            break;
-          case WILDCARD:
-            if (type.getKind() == Type.Kind.BOUNDED) {
-              BoundedType boundedType = (BoundedType) type;
-              if (boundedType.getBound() == null) {
-                throw new RuntimeException("Incorrect type path: "
-                    + "expected type bound but none exists.");
-              }
-              type = boundedType.getBound();
-            } else {
-              throw new RuntimeException("Incorrect type path.");
-            }
-            break;
-          case TYPE_ARGUMENT:
-            if (type.getKind() == Type.Kind.DECLARED) {
-              DeclaredType declaredType = (DeclaredType) type;
-              if (0 <= tpe.arg && tpe.arg < declaredType.getTypeParameters().size()) {
-                type = ((DeclaredType) type).getTypeParameter(tpe.arg);
-              } else {
-                throw new RuntimeException("Incorrect type argument index: " + tpe.arg);
-              }
-            } else {
-              throw new RuntimeException("Incorrect type path.");
-            }
-            break;
-          default:
-            throw new RuntimeException("Illegal TypePathEntryKind: " + tpe.tag);
-          }
-        }
-        type.addAnnotation(((AnnotationInsertion) innerInsertion).getAnnotation());
-      } catch (Throwable e) {
-        reportInsertionError(innerInsertion, e);
-      }
-    }
+    Type type = (staticType == null) ? outerType : staticType;
+    Insertion.decorateType(receiver.getInnerTypeInsertions(), type);
 
     // If the method doesn't have parameters, don't add a comma.
     receiver.setAddComma(method.getParameters().size() > 0);
