@@ -526,11 +526,18 @@ The Annotation File Utilities supports using a path through the AST (abstract
 syntax tree) to specify an arbitrary expression in source code to modify.
 Currently, AST paths can only be used to specify a location to insert a cast.
 
+For a cast insertion the type to cast to must be specified in the \code{.jaif}
+file. The annotations on the \bnflit{insert-typecast} line will be inserted on
+the outermost type of the type to cast to. If the type to cast to is a compound
+type then annotations on parts of the compound type are specified with the
+\bnfnt{type-argument-or-array-definition} rule.
+
 \begin{tabbing}
 \bnfnt{source-insert-typecast-definition} ::= \\
 \qquad    \bnfcmt \bnfnt{ast-path} is described below. \\
 \qquad    \bnfcmt \bnfnt{type} is the un-annotated type to cast to. \\
 \qquad    \bnflit{insert-typecast} \bnfnt{ast-path}\bnflit{:} \bnfnt{annotation}* \bnfnt{type} \lineend \\
+\qquad        \bnfnt{type-argument-or-array-definition}*
 \end{tabbing}
 
 An AST path represents a traversal through the AST nodes. AST paths are
