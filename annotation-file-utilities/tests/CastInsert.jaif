@@ -65,3 +65,6 @@ class CastInsert:
         insert-typecast Block.statement 1, ExpressionStatement.expression, Assignment.expression: @Nullable Object[][]
             inner-type 0, 0: @A
             inner-type 0, 0, 0, 0: @B
+        insert-typecast Block.statement 2, ExpressionStatement.expression, Assignment.expression: @Nullable int[][]
+            inner-type 0, 0: @A
+            inner-type 0, 0, 0, 0: @B
