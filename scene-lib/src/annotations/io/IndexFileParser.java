@@ -910,6 +910,7 @@ public final class IndexFileParser {
                 parseAnnotations(i);
                 Type type = parseType();
                 i.setType(type);
+                parseInnerTypes(i);
             }
         }
         return evermatched;

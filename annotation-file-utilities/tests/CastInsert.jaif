@@ -57,3 +57,11 @@ class CastInsert:
         insert-typecast Block.statement 28, ExpressionStatement.expression, MethodInvocation.methodSelect, MemberSelect.expression, MemberSelect.expression: @Nullable CastInsert
         insert-typecast Block.statement 29, ExpressionStatement.expression, MethodInvocation.methodSelect, MemberSelect.expression: @Nullable PrintStream
         insert-typecast Block.statement 30, Variable.initializer: @Nullable @A @B @C String
+
+    method m2(Ljava/lang/Object;)V:
+        insert-typecast Block.statement 0, ExpressionStatement.expression, Assignment.expression: @Nullable Map<String, Integer>
+            inner-type 3, 0: @A
+            inner-type 3, 1: @B
+        insert-typecast Block.statement 1, ExpressionStatement.expression, Assignment.expression: @Nullable Object[][]
+            inner-type 0, 0: @A
+            inner-type 0, 0, 0, 0: @B
