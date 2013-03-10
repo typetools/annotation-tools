@@ -6,7 +6,7 @@ DIA?=dia
 
 EPSFILES = scene-lib-type-hierarchy.eps
 PDFFILES = scene-lib-type-hierarchy.pdf
-PNGFILES = scene-lib-type-hierarchy.png
+PNGFILES = scene-lib-type-hierarchy.png tool-relations.png
 
 all: ${EPSFILES} ${PDFFILES} ${PNGFILES} png-copy
 
