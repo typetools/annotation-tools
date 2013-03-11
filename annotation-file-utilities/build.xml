@@ -358,9 +358,14 @@
     A problem is that the document date is the date that LaTeX was run
     rather than the date of last modification; that should be fixed in
     the document, perhaps.  -->
-  <!-- The user should run BibTeX periodically to update the .bbl file. -->
   <target name="annotation-file-format"
           description="Make documentation: annotation-file-format.{html,pdf}">
+    <exec executable="latex">
+      <arg value="annotation-file-format.tex"/>
+    </exec>
+    <exec executable="bibtex">
+      <arg value="annotation-file-format"/>
+    </exec>
     <exec executable="latex">
       <arg value="annotation-file-format.tex"/>
     </exec>
