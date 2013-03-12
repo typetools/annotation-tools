@@ -79,13 +79,13 @@ code or the \code{.class} file.
   parallelization, etc.)\ can store annotations in an annotation file without
   changing the main version of the source code.  (The developer's private
   version of the code could contain the annotations, but the developer
-  could copy them to the separate file before committing changes.)
+  could move them to the separate file before committing changes.)
 \item
   Tool writers may find it more convenient to use a textual file, rather
   than writing a Java or \code{.class} file parser.
 \item
   When debugging annotation-processing tools, a textual file format
-  (extracted from the Java or \code{.class} files) is easier to read, and
+  (extracted from the Java or \code{.class} files) is easier to read and
   is easier for use in testing.
 \end{itemize}
 
@@ -100,19 +100,20 @@ The Annotation File Utilities
 of tools that process annotation files.
 
 The file format discussed in this document supports both standard Java SE 5
-declaration annotations and also the extended annotations proposed in JSR 308~\cite{JSR308}.
-Section ``Class File Format Extensions'' of the JSR 308 design document
-explains how the extended annotations are stored in the \code{.class}
-file.  The
-annotation file closely follows the class file format.
+declaration annotations and also the type annotations that are introduced by Java SE 8.
+The file format provides a simple syntax to represent the structure of a Java
+program. For annotations in method bodies of \code{.class} files the annotation
+file closely follows
+section ``Class File Format Extensions'' of the JSR 308 design document~\cite{JSR308},
+which explains how the annotations are stored in the \code{.class}
+file.
 In that sense, the current design is extremely low-level, and users
-probably would not want to write the files by hand (but might fill in a
+probably would not want to write the files by hand (but they might fill in a
 template that a tool generated automatically).  As future work, we should
 design a more
 user-friendly format that permits Java signatures to be directly specified.
-Furthermore, since the current design is closely aligned to the class file,
-it is convenient for tools that operate on \code{.class} files but less
-convenient for tools that operate on \code{.java} files.
+For \code{.java} source files, the file format provides a separate, higher-level
+syntax for annotations in method bodies.
 
 
 
@@ -152,6 +153,13 @@ annotation index file''), but this is not required.
 
 \section{Grammar\label{grammar}}
 
+This section describes the annotation file format in detail by presenting it in
+the form of a grammar. Section~\ref{grammar-conventions} details the conventions
+of the grammar. Section~\ref{java-file-grammar} shows how to represent the
+basic structure of a Java program (classes, methods, etc.) in an annotation
+file. Section~\ref{annotations-grammar} shows how to add annotations to an
+annotation file.
+
 \subsection{Grammar conventions\label{grammar-conventions}}
 
 Throughout this document, ``name'' is any valid Java simple name or 
@@ -181,229 +189,56 @@ This is omitted from the grammar for simplicity.
 Block comments (``/* ... */'') are not allowed.
 
 The line end symbol \lineend{} is used for all the different line end
-conventions, that is, Windows- and Unix-style new lines are supported.
+conventions, that is, Windows- and Unix-style newlines are supported.
 
 
+\subsection{Java file grammar\label{java-file-grammar}}
 
-\subsection{Annotation file\label{annotation-file}}
+This section shows how to represent the basic structure of a Java program
+(classes, methods, etc.) in an annotation file. For Java elements that can
+contain annotations, this section will reference grammar productions contained
+in Section~\ref{annotations-grammar}, which describes how annotations are used
+in an annotation file.
 
-The annotation file itself contains one or more
-package definitions; each package definition describes one or more
-annotations and classes in that package.
-
-\begin{tabbing}
-\qquad \= \kill
-\bnfnt{annotation-file} ::= \\
-\qquad    \bnfnt{package-definition}+
-\end{tabbing}
+An annotation file has the same basic structure as a Java program. That is,
+there are packages, classes, fields and methods.
 
 The annotation file may omit certain program elements --- for instance, it
-may mention only some of the packages in your program, or only some of the
+may mention only some of the packages in a program, or only some of the
 classes in a package, or only some of the fields or methods of a class.
 Program elements that do not appear in the annotation file are treated as
 unannotated.
 
 
-\subsection{Annotation uses\label{annotation-uses}}
+\subsubsection{Package definitions\label{package-definitions}}
 
-% TODO: Are we sure about the comment for the "annotation" section below?
-% Perhaps we could add that if a class is in the same package
-% as an annotation it may always use the simple name (even if there's another
-% annotation with the same simple name in another package)? - MP 06/28
-
-The syntax for an annotation is the same as in a Java source file (except for
-one small change noted below).
-
-\begin{tabbing}
-\qquad \= \kill
-\bnfnt{annotation} ::= \\
-\qquad    \bnfcmt The name may be the annotation's simple name, unless the file \\
-\qquad    \bnfcmt contains definitions for two annotations with the same simple name. \\
-\qquad    \bnfcmt In this case, the binary name of the annotation name is required \\
-\qquad    \bnfcmt (like the fully-qualified name, but with \$ for inner classes). \\
-\qquad    \bnflit{@}\bnfnt{name} [ \bnflit{(} \bnfnt{annotation-field} [ \bnflit{,} \bnfnt{annotation-field} ]+ \bnflit{)} ] \\
-\\
-\bnfnt{annotation-field} ::= \\
-\qquad    \bnfcmt In Java, if a single-field annotation has a field named \\
-\qquad    \bnfcmt ``\texttt{value}'', then that field name may be elided in uses of the\\
-\qquad    \bnfcmt annotation:   ``\texttt{@A(12)}'' rather than ``\texttt{@A(value=12)}''. \\
-\qquad    \bnfcmt The same convention holds in an annotation file. \\
-\qquad    \bnfnt{name} \bnflit{=} \bnfnt{value}
-\end{tabbing}
-
-
-\subsection{Compound type annotations\label{compound-type-annotations}}
-
-A compound type is a parameterized, wildcard, array, or nested type. A ``type
-path'' is used to specify a location in a compound type for an annotation. A
-type path is composed one or more pairs of type kind and type argument index.
-
-\begin{tabbing}
-\qquad \= \kill
-\bnfnt{type-kind} ::= \\
-\qquad    \bnflit{0} \bnfcmt annotation is deeper in this array type \\
-\qquad    \bnfor{} \bnflit{1} \bnfcmt annotation is deeper in this nested type \\
-\qquad    \bnfor{} \bnflit{2} \bnfcmt annotation is on the bound of this wildcard type argument \\
-\qquad    \bnfor{} \bnflit{3} \bnfcmt annotation is on the i'th type argument of this parameterized type
-\end{tabbing}
-
-The type argument index must be \bnflit{0} unless the \bnfnt{type-kind} is
-\bnflit{3}. In this case, the type argument index selects which type argument
-of a parameterized type to use.
-
-Type paths are explained in more detail, with many examples to ease
-understanding, in Section 3.4 of the JSR 308 Specification.\footnotemark
-\footnotetext{\url{http://types.cs.washington.edu/jsr308/specification/java-annotation-design.html#class-file:ext:type_path}}
-
-\begin{tabbing}
-\qquad \= \kill
-\bnfnt{type-path} ::= \\
-\qquad    \bnfcmt The \bnfnt{integer} is the type argument index. \\
-\qquad    \bnfnt{type-kind} \bnflit{,} \bnfnt{integer} [ \bnflit{,} \bnfnt{type-kind} \bnflit{,} \bnfnt{integer} ]* \\
-\\
-\bnfnt{compound-type-definition} ::= \\
-\qquad    \bnflit{inner-type} \bnfnt{type-path} \bnflit{:} \bnfnt{annotation}* \lineend
-\end{tabbing}
-
-
-\subsection{Type annotations\label{type-annotations}}
-
-In Java SE 7, annotations can be written only on method formal parameters and
-the declarations of packages, classes, methods, fields, and local variables.
-These are known as ``declaration annotations''. JSR 308~\cite{JSR308} extends
-Java to allow annotations on any use of a type, and on type parameter
-declarations. These are known as ``type annotations'' and must be meta-annotated
-with \code{ElementType.TYPE\_USE} and/or \code{ElementType.TYPE\_PARAMETER}.
-These meta-annotations are described in more detail in the JSR 308
-specification~\cite{JSR308}.
-
-For locations where only declaration annotations or type annotations are
-allowed the correct kind of annotation will be inserted. However, if both
-declaration and type annotations are allowed at a location then the annotation
-defaults to a declaration annotation. To insert a type annotation instead,
-the annotation must be used in the \bnfnt{type-annotations} rule.
-
-\begin{tabbing}
-\qquad \= \kill
-\bnfnt{type-annotations} ::= \\
-\qquad    \bnfcmt holds the type annotations, as opposed to the declaration annotations \\
-\qquad        \bnflit{type:} \bnfnt{annotation}* \lineend \\
-\qquad        \bnfnt{compound-type-definition}*
-\end{tabbing}
-
-
-\subsection{Package definitions\label{package-definitions}}
-
-Package definitions describe a package containing a list of annotation
+At the root of an annotation file is one or more package definitions.
+A package definition describes a package containing a list of annotation
 definitions and classes.  A package definition also contains any
-annotations on the package itself (such as those from a
+annotations on the package (such as those from a
 \code{package-info.java} file).
 
 \begin{tabbing}
 \qquad \= \kill
+\bnfnt{annotation-file} ::= \\
+\qquad    \bnfnt{package-definition}+ \\
+\\
 \bnfnt{package-definition} ::= \\
-\qquad    \bnfcmt{To specify the default package, omit the name.} \\
-\qquad    \bnfcmt{Annotations on the default package are not allowed.} \\
-\qquad    \bnflit{package} [ \bnfnt{name}? \bnflit{:} \bnfnt{annotation}* ] \lineend \\
+\qquad    \bnflit{package} ( \bnflit{:} ) \bnfor{} ( \bnfnt{name} \bnflit{:} \bnfnt{decl-annotation}* ) \lineend \\
 \qquad    ( \bnfnt{annotation-definition} \bnfor{} \bnfnt{class-definition} ) *
 \end{tabbing}
 
-
-\subsection{Annotation definitions\label{annotation-definitions}}
-
-An annotation definition describes the annotation's fields and their
-types, so that they may be referenced in a compact way throughout the
-annotation file.
-
-The Annotation File Utilities can read annotation definitions from the
-classpath, so it is optional to define them in the annotation file.
-
-If an annotation is defined in the annotation file, then it must be defined
-before it is used.
-% either on a program element or as a field of another annotation definition.
-(This requirement makes it impossible to define, in an
-annotation file, an annotation that is meta-annotated with itself.)
-In the annotation file, the annotation definition appears within the
-package that defines the annotation.  The annotation may be applied to
-elements of any package.
+\noindent
+Use a package line of \code{package:} for the default package. Note that
+annotations on the default package are not allowed.
 
 
-\begin{tabbing}
-\qquad \= \kill
-\bnfnt{annotation-definition} ::= \\
-\qquad    \bnflit{annotation} \bnflit{@}\bnfnt{name}
-    \bnflit{:} \bnfnt{annotation}* \lineend  \\ 
-\qquad    \bnfnt{annotation-field-definition}* \\
-\\
-\bnfnt{annotation-field-definition} ::= \\
-\qquad    \bnfnt{annotation-field-type} \bnfnt{name} \lineend \\
-\\
-\bnfnt{annotation-field-type} ::= \\
-\qquad    \bnfcmt \bnfnt{primitive-type} is any Java primitive type (\texttt{int}, \texttt{boolean}, etc.). \\
-\qquad    \bnfcmt These are described in detail in Section~\ref{types-and-values}. \\
-\qquad    (\bnfnt{primitive-type} \bnfor{} \bnflit{String} \bnfor{} \bnflit{Class}
-    \bnfor{} (\bnflit{enum} \bnfnt{name}) \bnfor{} (\bnflit{annotation-field} \bnfnt{name})) \bnflit{[]}? \\
-\qquad        \bnfor{} \bnflit{unknown[]} \lineend
-\end{tabbing}
+\subsubsection{Class definitions\label{class-definitions}}
 
-
-\subsection{Type variable declarations\label{type-variable-declarations}}
-
-These annotations go on the declaration of a type variable, such as on \code{K}
-and \code{T} in
-
-\begin{verbatim}
-public class Class<K> {
-    public <T> void m() {
-        ...
-    }
-}
-\end{verbatim}
-
-The annotation must be a type annotation (see Section~\ref{type-annotations}).
-
-\begin{tabbing}
-\qquad \= \kill
-\bnfnt{typeparam-definition} ::= \\
-\qquad    \bnfcmt The integer is the zero-based type parameter index. \\
-\qquad    \bnflit{typeparam} \bnfnt{integer} \bnflit{:} \bnfnt{annotation}* \lineend
-\end{tabbing}
-
-
-\subsection{Type variable declaration bounds\label{type-variable-declaration-bounds}}
-
-These annotations go on a bound of a type variable declaration, such as on
-\code{Number} and \code{Date} in
-
-\begin{verbatim}
-public class Class<K extends Number> {
-    public <T extends Date> void () {
-        ....
-    }
-}
-\end{verbatim}
-
-The annotation must be a type annotation (see Section~\ref{type-annotations}).
-
-\begin{tabbing}
-\qquad \= \kill
-% The bound should really be a sub-element of the typeparam!
-\bnfnt{bound-definition} ::= \\
-\qquad    \bnfcmt The integers are respectively the parameter and bound indices of \\
-\qquad    \bnfcmt the type parameter bound~\cite{JSR308}. \\
-\qquad    \bnflit{bound} \bnfnt{integer} \bnflit{\&} \bnfnt{integer} \bnflit{:} \bnfnt{annotation}* \lineend \\
-\qquad    \bnfnt{compound-type-definition}*
-\end{tabbing}
-
-
-\subsection{Class definitions\label{class-definitions}}
-
-Class definitions describe the annotations present on the various
-program elements.  It is organized according to the hierarchy of fields
-and methods in the class.
-Class definitions
-are defined by the \code{class-definition} production of the following grammar.
-Note that we use \code{class-definition} also for interfaces, enums, and
+A class definition describes the annotations present on a class declaration,
+as well fields and methods of the class. It is organized according to
+the hierarchy of fields and methods in the class.
+Note that we use \bnfnt{class-definition} also for interfaces, enums, and
 annotation types (to specify annotations in an existing annotation type, not to
 be confused with \bnfnt{annotation-definitions} described in
 Section~\ref{annotation-definitions}, which defines annotations to be used
@@ -416,20 +251,16 @@ Inner classes are treated as ordinary classes whose names happen to contain
 \code{\$} signs and must be defined at the top level of a class definition file.
 (To change this, the grammar would have to be extended with a closing
 delimiter for classes; otherwise, it would be ambiguous whether a
-field/method appearing after an inner class definition belonged to the
+field or method appearing after an inner class definition belonged to the
 inner class or the outer class.) The syntax for inner class names is the same as
 is used by the \code{javac} compiler. A good way to get an idea of the inner
 class names for a class is to compile the class and look at the filenames of the
 \code{.class} files that are produced.
 
-The annotation on the \bnflit{class} line is the annotation on the class
-declaration (not the class name itself) and must be a declaration annotation
-(see Section~\ref{type-annotations}).
-
 \begin{tabbing}
 \qquad \= \kill
 \bnfnt{class-definition} ::= \\
-\qquad    \bnflit{class} \bnfnt{name} \bnflit{:} \bnfnt{annotation}* \lineend  \\
+\qquad    \bnflit{class} \bnfnt{name} \bnflit{:} \bnfnt{decl-annotation}* \lineend  \\
 % TODO: is the order really important? eg. can fields and methods not
 % be mixed?
 \qquad        \bnfnt{typeparam-definition}* \\
@@ -440,75 +271,110 @@ declaration (not the class name itself) and must be a declaration annotation
 \qquad        \bnfnt{method-definition}*
 \end{tabbing}
 
+\noindent
+Annotations on the \bnflit{class} line are annotations on the class declaration,
+not the class name.
 
-\subsubsection{Implements and extends\label{implements-and-extends}}
 
-Annotations can be inserted on the names of classes a class \code{implements} or
-\code{extends}. Only type annotations are allowed (see
-Section~\ref{type-annotations}).
+\paragraph{Type parameter definitions}
+
+The \bnfnt{typeparam-definition} production defines annotations on the
+declaration of a type parameter, such as on \code{K} and \code{T} in
+
+\begin{verbatim}
+public class Class<K> {
+    public <T> void m() {
+        ...
+    }
+}
+\end{verbatim}
+
+\begin{tabbing}
+\qquad \= \kill
+\bnfnt{typeparam-definition} ::= \\
+\qquad    \bnfcmt The integer is the zero-based type parameter index. \\
+\qquad    \bnflit{typeparam} \bnfnt{integer} \bnflit{:} \bnfnt{type-annotation}* \lineend
+\end{tabbing}
+
+
+\paragraph{Bound definitions}
+
+The \bnfnt{bound-definition} production defines annotations on a bound of a
+type variable declaration, such as on \code{Number} and \code{Date} in
+
+\begin{verbatim}
+public class Class<K extends Number> {
+    public <T extends Date> void m() {
+        ....
+    }
+}
+\end{verbatim}
+
+\begin{tabbing}
+\qquad \= \kill
+\bnfnt{bound-definition} ::= \\
+% The bound should really be a sub-element of the typeparam!
+\qquad    \bnfcmt The integers are respectively the parameter and bound indexes of \\
+\qquad    \bnfcmt the type parameter bound~\cite{JSR308}. \\
+\qquad    \bnflit{bound} \bnfnt{integer} \bnflit{\&} \bnfnt{integer} \bnflit{:} \bnfnt{type-annotation}* \lineend \\
+\qquad    \bnfnt{compound-type-definition}*
+\end{tabbing}
+
+
+\paragraph{Implements and extends definitions}
+
+The \bnfnt{extends-definition} and \bnfnt{implements-definition} productions
+define annotations on the names of classes a class \code{extends} or
+\code{implements}.
 
 \begin{tabbing}
 \qquad \= \kill
 \bnfnt{extends-definition} ::= \\
-\qquad    \bnflit{extends} \bnflit{:} \bnfnt{annotation}* \lineend  \\
+\qquad    \bnflit{extends} \bnflit{:} \bnfnt{type-annotation}* \lineend  \\
 \qquad        \bnfnt{compound-type-definition}* \\
 \\
 \bnfnt{implements-definition} ::= \\
 \qquad    \bnfcmt The integer is the zero-based index of the implemented interface. \\
-\qquad    \bnflit{implements} \bnfnt{integer} \bnflit{:} \bnfnt{annotation}* \lineend  \\
+\qquad    \bnflit{implements} \bnfnt{integer} \bnflit{:} \bnfnt{type-annotation}* \lineend  \\
 \qquad        \bnfnt{compound-type-definition}*
 \end{tabbing}
 
 
-\subsection{Field definitions\label{field-definitons}}
+\subsubsection{Field definitions\label{field-definitons}}
 
-For fields, an annotation on the \bnflit{field} line is that of the field
-declaration and must be a declaration annotation. Annotations on type of the
-field are declared within the \bnflit{type-annotations} rule and must be type
-annotations (see Section~\ref{type-annotations}).
-
-If a field is initialized at declaration then in bytecode the initialization is
-actually moved to the constructor when the class is compiled. Therefore,
-annotations on the initialization in bytecode go in the constructor
-(see Section~\ref{method-definitions}), rather than the field definition.
-However, source code insertions for field initializations are allowed and are
-described in Section~\ref{code-annotations}.
+A field definition can have annotations on the declaration, the type of the
+field, or --- if in source code --- the field's initialization.
 
 \begin{tabbing}
 \qquad \= \kill
 \bnfnt{field-definition} ::= \\
-\qquad    \bnflit{field} \bnfnt{name} \bnflit{:} \bnfnt{annotation}* \lineend  \\
+\qquad    \bnflit{field} \bnfnt{name} \bnflit{:} \bnfnt{decl-annotation}* \lineend \\
 \qquad        \bnfnt{type-annotations}* \\
-\qquad        \bnfnt{typecast-definition}* \\
-\qquad        \bnfnt{instanceof-definition}* \\
-\qquad        \bnfnt{new-definition}* \\
-\qquad        \bnfnt{source-insert-typecast-definition}*
+\qquad        \bnfnt{expression-annotations}*
 \end{tabbing}
 
+\noindent
+Annotations on the \bnflit{field} line are on the field declaration, not the
+type of the field.
 
-\subsection{Method definitions\label{method-definitions}}
+The \bnfnt{expression-annotations} production specifies annotations on the
+initialization expression of a field. If a field is initialized at declaration
+then in bytecode the initialization is moved to the constructor when the class
+is compiled. Therefore for bytecode, annotations on the initialization
+expression go in the constructor (see Section~\ref{method-definitions}), rather
+than the field definition. Source code annotations for the field initialization
+expression are valid on the field definition.
 
-The \bnflit{method-key} consists of the name followed by the signature in JVML
-format, for example:
 
-\begin{verbatim}
-foo([ILjava/lang/String;)V
-\end{verbatim}
+\subsubsection{Method definitions\label{method-definitions}}
 
-Note that the
-signature is the erased signature of the method and does not contain generic
-type information, but does contain the return type. Using \code{javap -s} makes
-it easy to find the signature. The method-keys ``\code{<init>}'' and
-``\code{<clinit>}'' are used to name instance (constructors) and class (static)
-initialization methods.
-
-The annotation on the \bnflit{method} line is that on the method declaration,
-not on the return value, and must be a declaration annotation.
+A method definition can have annotations on the method declaration, in the
+method header (return type, parameters, etc.), as well as the method body.
 
 \begin{tabbing}
 \qquad \= \kill
 \bnfnt{method-definition} ::= \\
-\qquad    \bnflit{method} \bnfnt{method-key} \bnflit{:} \bnfnt{annotation}* \lineend \\
+\qquad    \bnflit{method} \bnfnt{method-key} \bnflit{:} \bnfnt{decl-annotation}* \lineend \\
 \qquad        \bnfnt{typeparam-definition}* \\
 \qquad        \bnfnt{bound-definition}* \\
 \qquad        \bnfnt{return-definition}? \\
@@ -516,39 +382,112 @@ not on the return value, and must be a declaration annotation.
 \qquad        \bnfnt{parameter-definition}* \\
 % TODO: method throws
 \qquad        \bnfnt{variable-definition}* \\
-\qquad        \bnfnt{typecast-definition}* \\
-\qquad        \bnfnt{instanceof-definition}* \\
-\qquad        \bnfnt{new-definition}* \\
-\qquad        \bnfnt{source-insert-typecast-definition}* \\
+\qquad        \bnfnt{expression-annotations}*
+\end{tabbing}
+
+\noindent
+The annotations on the \bnflit{method} line are on the method declaration, not
+on the return value. The \bnfnt{method-key} consists of the name followed by the
+signature in JVML format. For example, the following method
+
+\begin{verbatim}
+boolean foo(int[] i, String s) {
+  ...
+}
+\end{verbatim}
+
+\noindent
+has the \bnfnt{method-key}:
+
+\begin{verbatim}
+foo([ILjava/lang/String;)Z
+\end{verbatim}
+
+Note that the
+signature is the erased signature of the method and does not contain generic
+type information, but does contain the return type. Using \code{javap -s} makes
+it easy to find the signature. The method keys ``\code{<init>}'' and
+``\code{<clinit>}'' are used to name instance (constructor) and class (static)
+initialization methods.
+
 % TODO: exception types in catch clause
 % TODO: .class literals
 % TODO: type arguments in constructor and method calls
-\\
+
+
+\paragraph{Return definition}
+
+A return definition defines the annotations on the return type of a method
+declaration.
+
+\begin{tabbing}
+\qquad \= \kill
 \bnfnt{return-definition} ::=  \\
-\qquad    \bnflit{return:} \bnfnt{annotation}* \lineend \\
-\qquad        \bnfnt{compound-type-definition}* \\
-\\
-\bnfnt{receiver-definition} ::=  \\
-\qquad    \bnflit{receiver:} \bnfnt{annotation}* \lineend \\
-\qquad    \bnfnt{compound-type-definition}* \\
-\\
-\bnfnt{parameter-definition} ::= \\
-\qquad    \bnfcmt The integer is the index of the formal parameter in the method \\
-\qquad    \bnfcmt (i.e., 0 is the first formal parameter. The receiver parameter is not index 0. \\
-\qquad    \bnfcmt Use \bnfnt{receiver-definition} to annotate the receiver parameter.) \\
-\qquad    \bnfcmt The annotations on the \bnflit{parameter} line are that of the formal parameter declaration, \\
-\qquad    \bnfcmt and must be declaration annotations. \\
-\qquad    \bnfcmt Type annotations are declared within the \bnfnt{type-annotations} rule. \\
-\qquad    \bnflit{parameter} \bnfnt{integer} \bnflit{:} \bnfnt{annotation}* \lineend \\
-\qquad    \bnfnt{type-annotations}*
+\qquad    \bnflit{return:} \bnfnt{type-annotation}* \lineend \\
+\qquad        \bnfnt{compound-type-definition}*
 \end{tabbing}
 
 
-\subsection{Code annotations\label{code-annotations}}
+\paragraph{Receiver definition}
 
-Annotations on variable declarations, typecasts, \code{instanceof}s, and
-\code{new}s are supported in annotation files. However, the syntax for
-specifying these annotations is different for bytecode and source code.
+A receiver definition defines the annotations on the type of the receiver
+parameter in a method declaration. A method receiver is the implicit formal
+parameter, \code{this}, used in non-static methods. For source code insertion,
+the receiver parameter will be inserted if it does not already exist.
+
+\begin{tabbing}
+\qquad \= \kill
+\bnfnt{receiver-definition} ::=  \\
+\qquad    \bnflit{receiver:} \bnfnt{type-annotation}* \lineend \\
+\qquad    \bnfnt{compound-type-definition}*
+\end{tabbing}
+
+
+\paragraph{Parameter definition}
+
+A parameter definition defines the annotations on a method parameter declaration
+and the type of a method parameter.
+
+\begin{tabbing}
+\qquad \= \kill
+\bnfnt{parameter-definition} ::= \\
+\qquad    \bnfcmt The integer is the index of the formal parameter in the method. \\
+\qquad    \bnflit{parameter} \bnfnt{integer} \bnflit{:} \bnfnt{decl-annotation}* \lineend \\
+\qquad    \bnfnt{type-annotations}*
+\end{tabbing}
+
+\noindent
+The annotations on the \bnflit{parameter} line are on the formal parameter
+declaration, not on the type of the parameter. A parameter index of 0 is the
+first formal parameter. The receiver parameter is not index 0. Use the
+\bnfnt{receiver-definition} production to annotate the receiver parameter.
+
+
+\subsubsection{Code annotations\label{code-annotations}}
+
+Certain elements in the body of a method or the initialization expression of a
+field can be annotated. The \bnfnt{expression-annotations} rule describes the
+annotations that can be added to a method body or a field initialization
+expression:
+
+\begin{tabbing}
+\qquad \= \kill
+\bnfnt{expression-annotations} ::= \\
+\qquad    \bnfnt{typecast-definition}* \\
+\qquad    \bnfnt{instanceof-definition}* \\
+\qquad    \bnfnt{new-definition}* \\
+\qquad    \bnfnt{source-insert-typecast-definition}*
+\end{tabbing}
+
+\noindent
+Additionally, a variable declaration in a method body can be annotated with the
+\bnfnt{variable-declaration} rule.
+
+Because of the differences between Java source code and \code{.class} files,
+the syntax for specifying these annotations is different for \code{.class} files
+and source code. For \code{.class} files we use a syntax called ``bytecode
+offsets''. For source code we use a different syntax called ``source code
+indexes''. These are both described below.
 
 In order to insert annotations in both \code{.class} files and source
 code, locations must be redundantly specified as bytecode offsets and source
@@ -558,12 +497,12 @@ are not used to add annotations to signatures, it is not necessary to include
 redundant information to insert annotations on signatures in both \code{.class}
 files and source code.
 
-Additionally, a typecast with annotations can be inserted into source code
-(rather than an annotation added to an existing typecast). This uses a third
-syntax that is described in Section~\ref{ast-paths}.
+Additionally, a typecast with annotations (rather than an annotation added to an
+existing typecast) can be inserted into source code. This uses a third
+syntax that is described below under ``AST paths''.
 
 
-\subsubsection{Bytecode offsets\label{bytecode-offsets}}
+\paragraph{Bytecode offsets}
 
 For annotations in bytecode the
 annotation file uses offsets into the bytecode array of the class file to
@@ -573,11 +512,11 @@ tool that maps such annotations from an annotation file into source code must
 have access to the specific \code{.class} file that was used to generate
 the annotation file.  For non-expression annotations such as those on methods,
 fields, classes, etc., the \code{.class} file is not necessary. The
-\code{javap -v} command is an effective technique to figure out bytecode
+\code{javap -v} command is an effective technique to discover bytecode
 offsets.
 
 
-\subsubsection{Source code indexes\label{source-code-indexes}}
+\paragraph{Source code indexes}
 
 For annotations in source code the annotation file uses indexes to select the
 correct expression. The index is a zero-based occurrence number of the
@@ -592,6 +531,7 @@ public void method() {
 }
 \end{verbatim}
 
+\noindent
 \code{@A} is on new, index 0. \code{@B} is on typecast, index 0. \code{@C} is on
 new, index 1. \code{@D} is on typecast, index 1.
 
@@ -602,7 +542,7 @@ occurrences in nested classes are not included. Use a new
 insertions in a nested class.
 
 
-\subsubsection{Code annotations grammar\label{code-annotations-grammar}}
+\paragraph{Code annotations grammar}
 
 For each kind of code annotation a separate location rule has been broken
 out. This location rule contains the bytecode offset syntax followed by the
@@ -623,10 +563,9 @@ We use \bnflit{\#} for bytecode offsets and \bnflit{*} for source code indexes.
 \qquad    \bnfor{} (\bnfnt{name} [\bnflit{*} \bnfnt{integer}]) \\
 \\
 \bnfnt{variable-definition} ::= \\
-\qquad    \bnfcmt The annotations on the \bnflit{local} line are that of the variable declaration \\
-\qquad    \bnfcmt and must be declaration annotations, while the annotations in the \bnfnt{type-annotations} \\
-\qquad    \bnfcmt rule are that of the outermost type of the variable. \\
-\qquad    \bnflit{local} \bnfnt{variable-location} \bnflit{:} \bnfnt{annotation}* \lineend \\
+\qquad    \bnfcmt The annotations on the \bnflit{local} line are on the variable declaration, \\
+\qquad    \bnfcmt not the type of the variable. \\
+\qquad    \bnflit{local} \bnfnt{variable-location} \bnflit{:} \bnfnt{decl-annotation}* \lineend \\
 \qquad    \bnfnt{type-annotations}* \\
 \\
 \bnfnt{typecast-location} ::= \\
@@ -640,17 +579,17 @@ We use \bnflit{\#} for bytecode offsets and \bnflit{*} for source code indexes.
 \qquad    \bnfor{} (\bnflit{*} \bnfnt{integer} [ \bnflit{,} \bnfnt{integer} ]) \\
 \\
 \bnfnt{typecast-definition} ::= \\
-\qquad    \bnflit{typecast} \bnfnt{typecast-location} \bnflit{:} \bnfnt{annotation}* \lineend \\
+\qquad    \bnflit{typecast} \bnfnt{typecast-location} \bnflit{:} \bnfnt{type-annotation}* \lineend \\
 \qquad    \bnfnt{compound-type-definition}* \\
 \\
 \bnfnt{instanceof-location} ::= \\
 \qquad    \bnfcmt Bytecode offset: the integer is the offset field of the annotation~\cite{JSR308}. \\
 \qquad    (\bnflit{\#} \bnfnt{integer}) \\
-\qquad    \bnfcmt Source code index: the integer is the zero-based index of the instanceof within the method. \\
+\qquad    \bnfcmt Source code index: the integer is the zero-based index of the \code{instanceof} within the method. \\
 \qquad    \bnfor{} (\bnflit{*} \bnfnt{integer}) \\
 \\
 \bnfnt{instanceof-definition} ::= \\
-\qquad    \bnflit{instanceof} \bnfnt{instanceof-location} \bnflit{:} \bnfnt{annotation}* \lineend \\
+\qquad    \bnflit{instanceof} \bnfnt{instanceof-location} \bnflit{:} \bnfnt{type-annotation}* \lineend \\
 \qquad    \bnfnt{compound-type-definition}* \\
 \\
 \bnfnt{new-location} ::= \\
@@ -661,14 +600,14 @@ We use \bnflit{\#} for bytecode offsets and \bnflit{*} for source code indexes.
 \qquad    \bnfor{} (\bnflit{*} \bnfnt{integer}) \\
 \\
 \bnfnt{new-definition} ::= \\
-\qquad    \bnflit{new} \bnfnt{new-location} \bnflit{:} \bnfnt{annotation}* \lineend  \\
+\qquad    \bnflit{new} \bnfnt{new-location} \bnflit{:} \bnfnt{type-annotation}* \lineend  \\
 \qquad    \bnfnt{compound-type-definition}*
 \end{tabbing}
 
 
-\subsubsection{AST paths\label{ast-paths}}
+\paragraph{AST paths}
 
-Additionally, the Annotation File Utilities supports using a path through the AST (abstract
+Additionally, an annotation file supports using a path through the AST (abstract
 syntax tree) to specify an arbitrary expression in source code to modify.
 Currently, AST paths can only be used to specify a location to insert a cast.
 
@@ -683,13 +622,13 @@ only on the compound types will be inserted.
 
 Note that the type specified on the \bnflit{insert-typecast} line cannot contain
 any qualified type names. For example, use \code{Entry<String, Object>} instead
-of \code{Map.Entry<java.lang.String, java.lang.Obect>}.
+of \code{Map.Entry<java.lang.String, java.lang.Object>}.
 
 \begin{tabbing}
 \bnfnt{source-insert-typecast-definition} ::= \\
 \qquad    \bnfcmt \bnfnt{ast-path} is described below. \\
 \qquad    \bnfcmt \bnfnt{type} is the un-annotated type to cast to. \\
-\qquad    \bnflit{insert-typecast} \bnfnt{ast-path}\bnflit{:} \bnfnt{annotation}* \bnfnt{type} \lineend \\
+\qquad    \bnflit{insert-typecast} \bnfnt{ast-path}\bnflit{:} \bnfnt{type-annotation}* \bnfnt{type} \lineend \\
 \qquad        \bnfnt{compound-type-definition}*
 \end{tabbing}
 
@@ -984,6 +923,159 @@ The following is the grammar for AST paths.
 \qquad    \bnflit{Wildcard} \bnflit{.} \bnflit{bound} \\
 \\
 \end{tabbing}
+
+
+\subsection{Annotations\label{annotations-grammar}}
+
+This section describes the details of how annotations are defined, how
+annotations are used, and the different kinds of annotations in an annotation
+file.
+
+
+\subsubsection{Annotation definitions\label{annotation-definitions}}
+
+An annotation definition describes the annotation's fields and their
+types, so that they may be referenced in a compact way throughout the
+annotation file. Any annotation that is used in an annotation file
+% either on a program element or as a field of another annotation definition.
+must be defined before use.
+(This requirement makes it impossible to define, in an
+annotation file, an annotation that is meta-annotated with itself.)
+The two exceptions to this rule are the \code{@java.lang.annotation.Target} and
+\code{@java.lang.annotation.Retention} meta-annotations. These meta-annotations
+are often used in annotation definitions so for ease of use are not required to
+be defined themselves.
+In the annotation file, the annotation definition appears within the
+package that defines the annotation.  The annotation may be applied to
+elements of any package.
+
+Note that these annotation definitions should not be confused with the
+\code{@interface} syntax used in a Java source file to declare an annotation. An
+annotation definition in an annotation file is only used internally. An
+annotation definition in an annotation file will often mirror an
+\code{@interface} annotation declaration in a Java source file in order to use
+that annotation in an annotation file.
+
+% TODO, see https://code.google.com/p/annotation-tools/issues/detail?id=25
+% The Annotation File Utilities can read annotation definitions from the
+% classpath, so it is optional to define them in the annotation file.
+
+\begin{tabbing}
+\qquad \= \kill
+\bnfnt{annotation-definition} ::= \\
+\qquad    \bnfcmt The \bnfnt{decl-annotation}s are the meta-annotations on this annotation. \\
+\qquad    \bnflit{annotation} \bnflit{@}\bnfnt{name}
+    \bnflit{:} \bnfnt{decl-annotation}* \lineend  \\ 
+\qquad    \bnfnt{annotation-field-definition}* \\
+\\
+\bnfnt{annotation-field-definition} ::= \\
+\qquad    \bnfnt{annotation-field-type} \bnfnt{name} \lineend \\
+\\
+\bnfnt{annotation-field-type} ::= \\
+\qquad    \bnfcmt \bnfnt{primitive-type} is any Java primitive type (\code{int}, \code{boolean}, etc.). \\
+\qquad    \bnfcmt These are described in detail in Section~\ref{types-and-values}. \\
+\qquad    (\bnfnt{primitive-type} \bnfor{} \bnflit{String} \bnfor{} \bnflit{Class}
+    \bnfor{} (\bnflit{enum} \bnfnt{name}) \bnfor{} (\bnflit{annotation-field} \bnfnt{name})) \bnflit{[]}? \\
+\qquad        \bnfor{} \bnflit{unknown[]} \lineend
+\end{tabbing}
+
+
+\subsubsection{Annotation uses\label{annotation-uses}}
+
+Java SE 8 has two kinds of annotations: ``declaration annotations'' and ``type
+annotations''. Declaration annotations can be written only on method formal
+parameters and the declarations of packages, classes, methods, fields, and local
+variables. Type annotations can be written on any use of a type, and on type
+parameter declarations. Type annotations must be meta-annotated
+with \code{ElementType.TYPE\_USE} and/or \code{ElementType.TYPE\_PARAMETER}.
+These meta-annotations are described in more detail in the JSR 308
+specification~\cite{JSR308}.
+
+The previous rules have used two productions for annotation uses in an
+annotation file: \bnfnt{decl-annotation} and \bnfnt{type-annotation}.
+The \bnfnt{decl-annotation} and \bnfnt{type-annotation} productions use the same
+syntax to specify an annotation. These two different rules exist only to show
+which type of annotation is valid in a given location. A declaration annotation
+must be used where the \bnfnt{decl-annotation} production is used and a type
+annotation must be used where the \bnfnt{type-annotation} production is used.
+
+The syntax for an annotation is the same as in a Java source file.
+
+\begin{tabbing}
+\qquad \= \kill
+\bnfnt{decl-annotation} ::= \\
+\qquad    \bnfcmt \bnfnt{annotation} must be a declaration annotation. \\
+\qquad    \bnfnt{annotation} \\
+\\
+\bnfnt{type-annotation} ::= \\
+\qquad    \bnfcmt \bnfnt{annotation} must be a type annotation. \\
+\qquad    \bnfnt{annotation} \\
+\\
+\bnfnt{annotation} ::= \\
+\qquad    \bnfcmt The name may be the annotation's simple name, unless the file \\
+\qquad    \bnfcmt contains definitions for two annotations with the same simple name. \\
+\qquad    \bnfcmt In this case, the fully-qualified name of the annotation name is required. \\
+% TODO:
+% Perhaps we could add that if a class is in the same package
+% as an annotation it may always use the simple name (even if there's another
+% annotation with the same simple name in another package)? - MP 06/28
+\qquad    \bnflit{@}\bnfnt{name} [ \bnflit{(} \bnfnt{annotation-field} [ \bnflit{,} \bnfnt{annotation-field} ]+ \bnflit{)} ] \\
+\\
+\bnfnt{annotation-field} ::= \\
+\qquad    \bnfcmt In Java, if a single-field annotation has a field named \\
+\qquad    \bnfcmt ``\code{value}'', then that field name may be elided in uses of the\\
+\qquad    \bnfcmt annotation:   ``\code{@A(12)}'' rather than ``\code{@A(value=12)}''. \\
+\qquad    \bnfcmt The same convention holds in an annotation file. \\
+\qquad    \bnfnt{name} \bnflit{=} \bnfnt{value}
+\end{tabbing}
+
+\noindent
+Certain Java elements allow both declaration and type annotations (for example,
+formal method parameters). For these elements, the \bnfnt{type-annotations}
+rule is used to differentiate between the declaration annotations and the type
+annotations.
+
+\begin{tabbing}
+\qquad \= \kill
+\bnfnt{type-annotations} ::= \\
+\qquad    \bnfcmt holds the type annotations, as opposed to the declaration annotations. \\
+\qquad        \bnflit{type:} \bnfnt{type-annotation}* \lineend \\
+\qquad        \bnfnt{compound-type-definition}*
+\end{tabbing}
+
+
+\subsubsection{Compound type annotations\label{compound-type-annotations}}
+
+A compound type is a parameterized, wildcard, array, or nested type. Annotations
+may be on any type in a compound type. In order to specify the location of an
+annotation within a compound type we use a ``type path''. A
+type path is composed one or more pairs of type kind and type argument index.
+
+\begin{tabbing}
+\qquad \= \kill
+\bnfnt{type-kind} ::= \\
+\qquad    \bnflit{0} \bnfcmt annotation is deeper in this array type \\
+\qquad    \bnfor{} \bnflit{1} \bnfcmt annotation is deeper in this nested type \\
+\qquad    \bnfor{} \bnflit{2} \bnfcmt annotation is on the bound of this wildcard type argument \\
+\qquad    \bnfor{} \bnflit{3} \bnfcmt annotation is on the i'th type argument of this parameterized type \\
+\\
+\bnfnt{type-path} ::= \\
+\qquad    \bnfcmt The \bnfnt{integer} is the type argument index. \\
+\qquad    \bnfnt{type-kind} \bnflit{,} \bnfnt{integer} [ \bnflit{,} \bnfnt{type-kind} \bnflit{,} \bnfnt{integer} ]* \\
+\\
+\bnfnt{compound-type-definition} ::= \\
+\qquad    \bnflit{inner-type} \bnfnt{type-path} \bnflit{:} \bnfnt{annotation}* \lineend
+\end{tabbing}
+
+\noindent
+The type argument index used in the \bnfnt{type-path} rule must be \bnflit{0} unless the \bnfnt{type-kind} is
+\bnflit{3}. In this case, the type argument index selects which type argument
+of a parameterized type to use.
+
+Type paths are explained in more detail, with many examples to ease
+understanding, in Section 3.4 of the JSR 308 Specification.\footnotemark
+\footnotetext{\url{http://types.cs.washington.edu/jsr308/specification/java-annotation-design.html#class-file:ext:type_path}}
+
 
 \section{Example\label{example}}
 
