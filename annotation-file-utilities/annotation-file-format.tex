@@ -52,7 +52,7 @@
 \section{Purpose:  External storage of annotations\label{purpose}}
 
 Java annotations are meta-data about Java program elements, as in
-``\code{@Deprecated class Date \{ ... \}}''.
+``\code{@Deprecated class Date \{ \ldots\ \}}''.
 Ordinarily, Java annotations are written in the source code of a
 \code{.java} Java source file.  When \code{javac} compiles the source code,
 it inserts the annotations in the resulting \code{.class} file (as
@@ -171,7 +171,7 @@ The Kleene qualifiers ``*'' (zero or more), ``?'' (zero or one), and ``+''
 %
 A vertical bar (``\bnfor'') separates alternatives.
 Parentheses (``()'') denote grouping, and square brackets (``[]'')
-denote optional syntax, which is equivalent to ``( ... ) ?'' but more concise.
+denote optional syntax, which is equivalent to ``( \ldots\ ) ?''\ but more concise.
 We use the hash/pound/octothorpe symbol (``\#'') for comments within the grammar. 
 
 In the annotation file,
@@ -186,7 +186,7 @@ Comments can be written throughout the annotation file using the double-slash
 syntax employed by Java for single-line comments: anything following
 two adjacent slashes (``//'') until the first newline is a comment.
 This is omitted from the grammar for simplicity.
-Block comments (``/* ... */'') are not allowed.
+Block comments (``/* \ldots\ */'') are not allowed.
 
 The line end symbol \lineend{} is used for all the different line end
 conventions, that is, Windows- and Unix-style newlines are supported.
