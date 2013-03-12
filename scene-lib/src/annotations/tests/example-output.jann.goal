@@ -1,0 +1,23 @@
+package :
+annotation @ReadOnly: @java.lang.annotation.Retention(value=RUNTIME)
+
+package checkers.nullness.quals:
+annotation @NonNull: @java.lang.annotation.Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+
+package :
+annotation @NonNull: @java.lang.annotation.Retention(value=RUNTIME)
+
+package foo:
+class Bar:
+
+    method getSomething(Ljava/lang/StringBuffer;)V:
+        return:
+        receiver: @ReadOnly
+        parameter #0:
+            type: @checkers.nullness.quals.NonNull
+
+    method setSomething(Ljava/lang/String;)V:
+        return:
+        parameter #0: @NonNull
+            type: @checkers.nullness.quals.NonNull
+
