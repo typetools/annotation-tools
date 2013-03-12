@@ -171,7 +171,7 @@ The Kleene qualifiers ``*'' (zero or more), ``?'' (zero or one), and ``+''
 %
 A vertical bar (``\bnfor'') separates alternatives.
 Parentheses (``()'') denote grouping, and square brackets (``[]'')
-denote optional syntax, which is equivalent to ``( \ldots\ ) ?''\ but more concise.
+denote optional syntax, which is equivalent to ``( \ldots\ )\ ?''\ but more concise.
 We use the hash/pound/octothorpe symbol (``\#'') for comments within the grammar. 
 
 In the annotation file,
@@ -305,7 +305,7 @@ type variable declaration, such as on \code{Number} and \code{Date} in
 \begin{verbatim}
 public class Class<K extends Number> {
     public <T extends Date> void m() {
-        ....
+        ...
     }
 }
 \end{verbatim}
