@@ -352,6 +352,12 @@
     <delete file="annotation-file-format.log"/>
     <delete file="annotation-file-format.pdf"/>
     <delete file="annotation-file-format.toc"/>
+    <exec executable="make">
+      <arg value="-C"/>
+      <arg value="figures"/>
+      <arg value="clean"/>
+    </exec>
+    <delete file="scene-lib-type-hierarchy.png"/>
   </target>
 
   <!--
@@ -360,6 +366,10 @@
     the document, perhaps.  -->
   <target name="annotation-file-format"
           description="Make documentation: annotation-file-format.{html,pdf}">
+    <exec executable="make">
+      <arg value="-C"/>
+      <arg value="figures"/>
+    </exec>
     <exec executable="latex">
       <arg value="annotation-file-format.tex"/>
     </exec>
