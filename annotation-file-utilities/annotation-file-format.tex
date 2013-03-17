@@ -6,6 +6,7 @@
 \usepackage{url}
 \usepackage{hevea}
 \usepackage[shortcuts]{extdash}
+\usepackage{textcomp}
 % \usepackage{verbdef}
 
 \def\topfraction{.9}
@@ -240,7 +241,7 @@ as well fields and methods of the class. It is organized according to
 the hierarchy of fields and methods in the class.
 Note that we use \bnfnt{class-definition} also for interfaces, enums, and
 annotation types (to specify annotations in an existing annotation type, not to
-be confused with \bnfnt{annotation-definitions} described in
+be confused with \bnfnt{annotation-definition}s described in
 Section~\ref{annotation-definitions}, which defines annotations to be used
 throughout an annotation file); for syntactic simplicity, we use \bnflit{class}
 for
@@ -264,9 +265,9 @@ class names for a class is to compile the class and look at the filenames of the
 % TODO: is the order really important? eg. can fields and methods not
 % be mixed?
 \qquad        \bnfnt{typeparam-definition}* \\
-\qquad        \bnfnt{bound-definition}* \\
-\qquad        \bnfnt{extends-definition}* \\
-\qquad        \bnfnt{implements-definition}* \\
+\qquad        \bnfnt{typeparam-bound}* \\
+\qquad        \bnfnt{extends}* \\
+\qquad        \bnfnt{implements}* \\
 \qquad        \bnfnt{field-definition}*  \\
 \qquad        \bnfnt{method-definition}*
 \end{tabbing}
@@ -297,9 +298,9 @@ public class Class<K> {
 \end{tabbing}
 
 
-\paragraph{Bound definitions}
+\paragraph{Type Parameter Bounds}
 
-The \bnfnt{bound-definition} production defines annotations on a bound of a
+The \bnfnt{typeparam-bound} production defines annotations on a bound of a
 type variable declaration, such as on \code{Number} and \code{Date} in
 
 \begin{verbatim}
@@ -312,31 +313,31 @@ public class Class<K extends Number> {
 
 \begin{tabbing}
 \qquad \= \kill
-\bnfnt{bound-definition} ::= \\
+\bnfnt{typeparam-bound} ::= \\
 % The bound should really be a sub-element of the typeparam!
 \qquad    \bnfcmt The integers are respectively the parameter and bound indexes of \\
 \qquad    \bnfcmt the type parameter bound~\cite{JSR308-webpage-201110}. \\
 \qquad    \bnflit{bound} \bnfnt{integer} \bnflit{\&} \bnfnt{integer} \bnflit{:} \bnfnt{type-annotation}* \lineend \\
-\qquad    \bnfnt{compound-type-definition}*
+\qquad    \bnfnt{compound-type}*
 \end{tabbing}
 
 
-\paragraph{Implements and extends definitions}
+\paragraph{Implements and extends}
 
-The \bnfnt{extends-definition} and \bnfnt{implements-definition} productions
+The \bnfnt{extends} and \bnfnt{implements} productions
 define annotations on the names of classes a class \code{extends} or
 \code{implements}.
 
 \begin{tabbing}
 \qquad \= \kill
-\bnfnt{extends-definition} ::= \\
+\bnfnt{extends} ::= \\
 \qquad    \bnflit{extends} \bnflit{:} \bnfnt{type-annotation}* \lineend  \\
-\qquad        \bnfnt{compound-type-definition}* \\
+\qquad        \bnfnt{compound-type}* \\
 \\
-\bnfnt{implements-definition} ::= \\
+\bnfnt{implements} ::= \\
 \qquad    \bnfcmt The integer is the zero-based index of the implemented interface. \\
 \qquad    \bnflit{implements} \bnfnt{integer} \bnflit{:} \bnfnt{type-annotation}* \lineend  \\
-\qquad        \bnfnt{compound-type-definition}*
+\qquad        \bnfnt{compound-type}*
 \end{tabbing}
 
 
@@ -376,8 +377,8 @@ method header (return type, parameters, etc.), as well as the method body.
 \bnfnt{method-definition} ::= \\
 \qquad    \bnflit{method} \bnfnt{method-key} \bnflit{:} \bnfnt{decl-annotation}* \lineend \\
 \qquad        \bnfnt{typeparam-definition}* \\
-\qquad        \bnfnt{bound-definition}* \\
-\qquad        \bnfnt{return-definition}? \\
+\qquad        \bnfnt{typeparam-bound}* \\
+\qquad        \bnfnt{return-type}? \\
 \qquad        \bnfnt{receiver-definition}? \\
 \qquad        \bnfnt{parameter-definition}* \\
 % TODO: method throws
@@ -415,16 +416,16 @@ initialization methods.
 % TODO: type arguments in constructor and method calls
 
 
-\paragraph{Return definition}
+\paragraph{Return type}
 
-A return definition defines the annotations on the return type of a method
+A return type defines the annotations on the return type of a method
 declaration.
 
 \begin{tabbing}
 \qquad \= \kill
-\bnfnt{return-definition} ::=  \\
+\bnfnt{return-type} ::=  \\
 \qquad    \bnflit{return:} \bnfnt{type-annotation}* \lineend \\
-\qquad        \bnfnt{compound-type-definition}*
+\qquad        \bnfnt{compound-type}*
 \end{tabbing}
 
 
@@ -439,7 +440,7 @@ the receiver parameter will be inserted if it does not already exist.
 \qquad \= \kill
 \bnfnt{receiver-definition} ::=  \\
 \qquad    \bnflit{receiver:} \bnfnt{type-annotation}* \lineend \\
-\qquad    \bnfnt{compound-type-definition}*
+\qquad    \bnfnt{compound-type}*
 \end{tabbing}
 
 
@@ -463,7 +464,7 @@ first formal parameter. The receiver parameter is not index 0. Use the
 \bnfnt{receiver-definition} production to annotate the receiver parameter.
 
 
-\subsubsection{Code annotations\label{code-annotations}}
+\subsection{Code Locations\label{code-locations}}
 
 Certain elements in the body of a method or the initialization expression of a
 field can be annotated. The \bnfnt{expression-annotations} rule describes the
@@ -473,54 +474,53 @@ expression:
 \begin{tabbing}
 \qquad \= \kill
 \bnfnt{expression-annotations} ::= \\
-\qquad    \bnfnt{typecast-definition}* \\
-\qquad    \bnfnt{instanceof-definition}* \\
-\qquad    \bnfnt{new-definition}* \\
-\qquad    \bnfnt{source-insert-typecast-definition}*
+\qquad    \bnfnt{typecast}* \\
+\qquad    \bnfnt{instanceof}* \\
+\qquad    \bnfnt{new}* \\
+\qquad    \bnfnt{source-insert-typecast}*
 \end{tabbing}
 
 \noindent
 Additionally, a variable declaration in a method body can be annotated with the
-\bnfnt{variable-declaration} rule.
+\bnfnt{variable-definition} rule, which appears below.
 
 Because of the differences between Java source code and \code{.class} files,
-the syntax for specifying these annotations is different for \code{.class} files
+the syntax for specifying code locations is different for \code{.class} files
 and source code. For \code{.class} files we use a syntax called ``bytecode
 offsets''. For source code we use a different syntax called ``source code
 indexes''. These are both described below.
 
-In order to insert annotations in both \code{.class} files and source
-code, locations must be redundantly specified as bytecode offsets and source
-code indexes. This can be done in a single \code{.jaif} file or two separate
-\code{.jaif} files. However, since bytecode offsets and source code indexes
-are not used to add annotations to signatures, it is not necessary to include
+If you wish to be able to insert a given code annotation in both a \code{.class} file and a source
+code file, the annotation file must redundantly specify the annotation's bytecode offset and source
+code index. This can be done in a single \code{.jaif} file or two separate
+\code{.jaif} files. It is not necessary to include
 redundant information to insert annotations on signatures in both \code{.class}
 files and source code.
 
-Additionally, a typecast with annotations (rather than an annotation added to an
+Additionally, a new typecast with annotations (rather than an annotation added to an
 existing typecast) can be inserted into source code. This uses a third
 syntax that is described below under ``AST paths''.
 
 
-\paragraph{Bytecode offsets}
+\subsubsection{Bytecode offsets\label{bytecode-offsets}}
 
-For annotations in bytecode the
+For locations in bytecode, the
 annotation file uses offsets into the bytecode array of the class file to
 indicate the specific expression to which the annotation refers.  Because
 different compilation strategies yield different \code{.class} files, a
 tool that maps such annotations from an annotation file into source code must
 have access to the specific \code{.class} file that was used to generate
-the annotation file.  For non-expression annotations such as those on methods,
-fields, classes, etc., the \code{.class} file is not necessary. The
+the annotation file.   The
 \code{javap -v} command is an effective technique to discover bytecode
-offsets.
+offsets.  Non-expression annotations such as those on methods,
+fields, classes, etc., do not use a bytecode offset.
 
 
-\paragraph{Source code indexes}
+\subsubsection{Source code indexes\label{source-code-indexes}}
 
-For annotations in source code the annotation file uses indexes to select the
-correct expression. The index is a zero-based occurrence number of the
-expression type in the method. For example,
+For locations in source code, the annotation file indicates the kind of
+expression, plus a zero-based index to indicate which occurence of that kind of
+expression. For example,
 
 \begin{verbatim}
 public void method() {
@@ -542,13 +542,13 @@ occurrences in nested classes are not included. Use a new
 insertions in a nested class.
 
 
-\paragraph{Code annotations grammar}
+\subsubsection{Code locations grammar\label{code-grammar}}
 
-For each kind of code annotation a separate location rule has been broken
-out. This location rule contains the bytecode offset syntax followed by the
+For each kind of expresion, the grammar contains a separate location rule.
+This location rule contains the bytecode offset syntax followed by the
 source code index syntax.
 
-We use \bnflit{\#} for bytecode offsets and \bnflit{*} for source code indexes.
+The grammar uses \bnflit{\#} for bytecode offsets and \bnflit{*} for source code indexes.
 
 \begin{tabbing}
 \qquad \= \kill
@@ -578,9 +578,9 @@ We use \bnflit{\#} for bytecode offsets and \bnflit{*} for source code indexes.
 \qquad    \bnfcmt intersection type~\cite{JSR308-webpage-201110}. The type index defaults to zero if not specified. \\
 \qquad    \bnfor{} (\bnflit{*} \bnfnt{integer} [ \bnflit{,} \bnfnt{integer} ]) \\
 \\
-\bnfnt{typecast-definition} ::= \\
+\bnfnt{typecast} ::= \\
 \qquad    \bnflit{typecast} \bnfnt{typecast-location} \bnflit{:} \bnfnt{type-annotation}* \lineend \\
-\qquad    \bnfnt{compound-type-definition}* \\
+\qquad    \bnfnt{compound-type}* \\
 \\
 \bnfnt{instanceof-location} ::= \\
 \qquad    \bnfcmt Bytecode offset: the integer is the offset field of the annotation~\cite{JSR308-webpage-201110}. \\
@@ -588,9 +588,9 @@ We use \bnflit{\#} for bytecode offsets and \bnflit{*} for source code indexes.
 \qquad    \bnfcmt Source code index: the integer is the zero-based index of the \code{instanceof} within the method. \\
 \qquad    \bnfor{} (\bnflit{*} \bnfnt{integer}) \\
 \\
-\bnfnt{instanceof-definition} ::= \\
+\bnfnt{instanceof} ::= \\
 \qquad    \bnflit{instanceof} \bnfnt{instanceof-location} \bnflit{:} \bnfnt{type-annotation}* \lineend \\
-\qquad    \bnfnt{compound-type-definition}* \\
+\qquad    \bnfnt{compound-type}* \\
 \\
 \bnfnt{new-location} ::= \\
 \qquad    \bnfcmt Bytecode offset: the integer is the offset field of the annotation~\cite{JSR308-webpage-201110}. \\
@@ -599,23 +599,23 @@ We use \bnflit{\#} for bytecode offsets and \bnflit{*} for source code indexes.
 \qquad    \bnfcmt creation within the method. \\
 \qquad    \bnfor{} (\bnflit{*} \bnfnt{integer}) \\
 \\
-\bnfnt{new-definition} ::= \\
+\bnfnt{new} ::= \\
 \qquad    \bnflit{new} \bnfnt{new-location} \bnflit{:} \bnfnt{type-annotation}* \lineend  \\
-\qquad    \bnfnt{compound-type-definition}*
+\qquad    \bnfnt{compound-type}*
 \end{tabbing}
 
 
-\paragraph{AST paths}
+\subsubsection{AST paths\label{ast-paths}}
 
-Additionally, an annotation file supports using a path through the AST (abstract
-syntax tree) to specify an arbitrary expression in source code to modify.
+A path through the AST (abstract
+syntax tree) specifies an arbitrary expression in source code to modify.
 Currently, AST paths can only be used to specify a location to insert a cast.
 
-For a cast insertion the type to cast to must be specified in the \code{.jaif}
-file. The annotations on the \bnflit{insert-typecast} line will be inserted on
+For a cast insertion, the \code{.jaif} file specifies the type to cast to.
+The annotations on the \bnflit{insert-typecast} line will be inserted on
 the outermost type of the type to cast to. If the type to cast to is a compound
 type then annotations on parts of the compound type are specified with the
-\bnfnt{compound-type-definition} rule. If there are no annotations on
+\bnfnt{compound-type} rule. If there are no annotations on
 the \bnflit{insert-typecast} line then a cast with no annotations will be
 inserted or, if compound type annotations are specified, a cast with annotations
 only on the compound types will be inserted.
@@ -625,16 +625,16 @@ any qualified type names. For example, use \code{Entry<String, Object>} instead
 of \code{Map.Entry<java.lang.String, java.lang.Object>}.
 
 \begin{tabbing}
-\bnfnt{source-insert-typecast-definition} ::= \\
+\bnfnt{source-insert-typecast} ::= \\
 \qquad    \bnfcmt \bnfnt{ast-path} is described below. \\
 \qquad    \bnfcmt \bnfnt{type} is the un-annotated type to cast to. \\
 \qquad    \bnflit{insert-typecast} \bnfnt{ast-path}\bnflit{:} \bnfnt{type-annotation}* \bnfnt{type} \lineend \\
-\qquad        \bnfnt{compound-type-definition}*
+\qquad        \bnfnt{compound-type}*
 \end{tabbing}
 
-An AST path represents a traversal through the AST nodes. AST paths are
-restricted for use in \bnfnt{field-definition}s and \bnfnt{method-definition}s.
-An AST path starts with the first element under the definition type. For
+An AST path represents a traversal through the AST. AST paths can only be
+used in \bnfnt{field-definition}s and \bnfnt{method-definition}s.
+An AST path starts with the first element under the definition. For
 methods this is \code{Block} and for fields this is \code{Variable}.
 
 An AST path is composed of one or more AST entries, separated by commas. Each
@@ -741,18 +741,8 @@ public class ASTPathExample {
 }
 \end{verbatim}
 
-Note that two additional sets of parentheses are always added for each cast
-insertion: one set around the expression to be cast, and the other set around the
-cast and the expression. For example, a cast insertion looks like this:
-
-\begin{Verbatim}[commandchars=\\\{\}]
-((\textit{cast type}) (\textit{original expression}))
-\end{Verbatim}
-
-This is to limit the cast to the entire expression, but
-nothing more. These parentheses may be unnecessary and can be removed by the
-programmer afterward. Also note that a cast can be inserted on any expression, not
-just the lowest expression in the AST. For example, a cast could be inserted on
+Note that a cast can be inserted on any expression, not
+just the deepest expression in the AST. For example, a cast could be inserted on
 the expression \code{i + j}, the identifier \code{i}, and/or the identifier \code{j}.
 
 To help create correct AST paths it may be useful to view the AST of a class.
@@ -943,7 +933,7 @@ must be defined before use.
 annotation file, an annotation that is meta-annotated with itself.)
 The two exceptions to this rule are the \code{@java.lang.annotation.Target} and
 \code{@java.lang.annotation.Retention} meta-annotations. These meta-annotations
-are often used in annotation definitions so for ease of use are not required to
+are often used in annotation definitions so for ease of use are they not required to
 be defined themselves.
 In the annotation file, the annotation definition appears within the
 package that defines the annotation.  The annotation may be applied to
@@ -1040,7 +1030,7 @@ annotations.
 \bnfnt{type-annotations} ::= \\
 \qquad    \bnfcmt holds the type annotations, as opposed to the declaration annotations. \\
 \qquad        \bnflit{type:} \bnfnt{type-annotation}* \lineend \\
-\qquad        \bnfnt{compound-type-definition}*
+\qquad        \bnfnt{compound-type}*
 \end{tabbing}
 
 
@@ -1063,7 +1053,7 @@ type path is composed one or more pairs of type kind and type argument index.
 \qquad    \bnfcmt The \bnfnt{integer} is the type argument index. \\
 \qquad    \bnfnt{type-kind} \bnflit{,} \bnfnt{integer} [ \bnflit{,} \bnfnt{type-kind} \bnflit{,} \bnfnt{integer} ]* \\
 \\
-\bnfnt{compound-type-definition} ::= \\
+\bnfnt{compound-type} ::= \\
 \qquad    \bnflit{inner-type} \bnfnt{type-path} \bnflit{:} \bnfnt{annotation}* \lineend
 \end{tabbing}
 
@@ -1074,7 +1064,7 @@ of a parameterized type to use.
 
 Type paths are explained in more detail, with many examples to ease
 understanding, in Section 3.4 of the JSR 308 Specification.\footnotemark
-\footnotetext{\url{http://types.cs.washington.edu/jsr308/specification/java-annotation-design.html\#class-file:ext:type_path}}
+\footnotetext{\url{http://types.cs.washington.edu/jsr308/specification/java-annotation-design.html#class-file:ext:type_path}}
 
 
 \section{Example\label{example}}
@@ -1312,15 +1302,11 @@ described in this document primarily for method bodies.
 
 \section{Design and Implementation Details\label{design-and-implementation-details}}
 
-This section describes some high level design and implementation details of the
-Annotation Files Utilities', including the different components of the
+This section describes some high level-design and implementation details of the
+Annotation Files Utilities, including the different components of the
 Annotation File Utilities and how they fit together. It is intended for someone
 who is beginning work on the Annotation File Utilities or is curious about how
 the Annotation File Utilities work.
-
-This section will not provided line-by-line descriptions of the code, but it
-does link back to specific files and methods with the intention that the reader
-will follow along in the code while reading this section.
 
 The Annotation File Utilities is composed of three sub-projects:
 \code{scene-lib}, \code{asmx}, and \code{annotation\-/file\-/utilities}. The
@@ -1386,7 +1372,7 @@ version of ASM.
 
 Annotations can be inserted into bytecode by executing the
 annotation-file-utilities/scripts/insert-annotations script. This script takes
-one or more class name and \code{.jaif} file pairs as arguments. The annotations
+one or more \textlangle class name, \code{.jaif} file\textrangle\ pairs as arguments. The annotations
 specified in the \code{.jaif} file are inserted into the classfile directly
 before the \code{.jaif} file in the argument list.
 
