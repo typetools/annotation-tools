@@ -1049,8 +1049,10 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       // If the message has multiple lines, indent them so it's easier to read.
       System.err.println("\tError: " + e.getMessage().replace("\n", "\n\t\t"));
     }
-    if (debug) {
+    if (debug || Main.print_error_stack) {
       e.printStackTrace();
+    } else {
+      System.err.println("\tRun with --print_error_stack to see the stack trace.");
     }
     System.err.println("\tThis insertion will be skipped.");
   }
