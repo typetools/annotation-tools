@@ -224,7 +224,13 @@ public class IsSigMethodCriterion implements Criterion {
           String importSimpleType =
             someImport.substring(someImport.lastIndexOf(".") + 1);
 
-          if (!simpleType.equals(importSimpleType)) {
+          // Remove array brackets from simpleType if it has them
+          int arrayBracket = simpleType.indexOf('[');
+          String simpleBaseType = simpleType;
+          if (arrayBracket > -1) {
+            simpleBaseType = simpleType.substring(0, arrayBracket);
+          }
+          if (!simpleBaseType.equals(importSimpleType)) {
             continue;
           }
 
