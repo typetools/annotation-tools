@@ -92,6 +92,9 @@ public class Main {
   @Option("Debug (print debug information)")
   public static boolean debug = false;
 
+  @Option("Print error stack")
+  public static boolean print_error_stack = false;
+
   // Implementation details:
   //  1. The annotator partially compiles source
   //     files using the compiler API (JSR-199), obtaining an AST.
