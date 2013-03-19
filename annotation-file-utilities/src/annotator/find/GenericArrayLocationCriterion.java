@@ -145,7 +145,8 @@ public class GenericArrayLocationCriterion implements Criterion {
         }
       } else {
         JCExpression exp = fieldAccess.getExpression();
-        if (exp.getKind() == Tree.Kind.MEMBER_SELECT && exp.type.getKind() == TypeKind.PACKAGE) {
+        if (exp.getKind() == Tree.Kind.MEMBER_SELECT && exp.type != null
+            && exp.type.getKind() == TypeKind.PACKAGE) {
           if (location.isEmpty()) {
             return true;
           } // else, keep going to make sure we're in the right part of the
