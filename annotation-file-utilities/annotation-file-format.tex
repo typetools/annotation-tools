@@ -1266,7 +1266,7 @@ class Foo: @p1.ClassInfo(
 
 \section{Alternative formats\label{alternative-formats}}
 
-We mention two alternatives to the format described in this document.
+We mention multiple alternatives to the format described in this document.
 Each of them has its own merits.
 In the future, the other formats could be implemented, along with tools for
 converting among them.
@@ -1298,6 +1298,39 @@ Because it does not permit complete specification of a class's annotations
 certain tools, such as type inference tools.  However, it might be desirable
 to adopt such a format for public members, and to use the format
 described in this document primarily for method bodies.
+
+
+The Checker Framework~\cite{DietlDEMS2011,CF} uses two additional formats for
+annotations. The first format is called ``stub files.'' A stub file is similar
+to the \code{.spec}/\code{.jml} files described in the previous paragraph. It
+uses Java syntax, only allows annotations on method headers and does not require
+method bodies. A stub file is used to add annotations to method headers of
+existing Java classes. For example, the Checker Framework uses stub files to add
+annotations to method headers of libraries (such as the JDK) without modifying
+the source code or bytecode of the library. A single stub file can contain
+multiple packages and classes. This format only allows annotations on method
+headers, not class headers, fields, and method bodies like in a \code{.jaif}
+file. Further, stub files are only used by the Checker Framework at runtime,
+they cannot be used to insert annotations into a source or classfile.
+
+
+The Checker Framework also uses a format called an ``annotated JDK.'' The
+annotated JDK is a \code{.jar} file containing the JDK with annotations. It is
+created with the Annotation File Utilities, but the annotations are stored in a
+format similar to a stub file, instead of in a \code{.jaif} file. The annotated
+JDK starts with a source file for each file in the JDK to be annotated. Like a
+stub file, each source file only contains method headers with annotations. The
+annotated JDK also supports annotations in the class header. To build the
+annotated JDK \code{.jar} file, the source files are compiled, then the
+\code{extract-annotations} script is run on them to generate a \code{.jaif} file
+for each source file. The \code{insert-annotations} script then inserts the
+annotations contained in each \code{.jaif} file into the corresponding JDK class
+file. These are then packaged up into a single \code{.jar} file. Like a stub
+files, the annotated JDK is easier to read and write since it uses Java syntax.
+However, the annotated JDK requires a different file for each original Java
+source file. It does not allow annotations on fields and in method bodies. The
+annotated JDK also only contains annotations in the JDK and not other Java
+files.
 
 
 \section{Design and Implementation Details\label{design-and-implementation-details}}
