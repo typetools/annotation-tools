@@ -22,7 +22,7 @@ public abstract class VivifyingMap<K, V> extends WrapperMap<K, V> {
      * can provide a new map of your favorite class ({@link HashMap},
      * {@link LinkedHashMap}, etc.).
      */
-    public VivifyingMap(/*>>> @PolyRead VivifyingMap<K, V> this, */ /*@PolyRead*/ Map<K, V> back) {
+    public /*@PolyRead*/ VivifyingMap(/*@PolyRead*/ Map<K, V> back) {
         super(back);
     }
 
