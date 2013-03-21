@@ -23,7 +23,7 @@ public class WrapperMap<K, V> implements Map<K, V> {
     /**
      * Constructs a new {@link WrapperMap} with the given backing map.
      */
-    protected WrapperMap(/*>>> @PolyRead WrapperMap<K, V> this, */ /*@PolyRead*/ Map<K, V> back) {
+    protected /*@PolyRead*/ WrapperMap(/*@PolyRead*/ Map<K, V> back) {
         this.back = back;
     }
 
