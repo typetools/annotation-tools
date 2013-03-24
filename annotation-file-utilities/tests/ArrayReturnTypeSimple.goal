@@ -1,0 +1,7 @@
+package annotator.tests;
+
+public class ArrayReturnTypeSimple {
+  private @java.lang.Mutable Object[] foo() {
+    return null;
+  }
+}
