@@ -297,6 +297,22 @@ You can insert annotations on class/field/method declarations and
 signatures without the class on your classpath.
 </p>
 
+<p>
+Your source code needs to contain the locations that your
+<code>.jaif</code> file references.  In particular, if the
+<code>.jaif</code> file contains annotations for a type parameter, but the
+source code uses a raw type, then you will get an error such as
+</p>
+<pre>
+Found class Edge, but unable to insert @checkers.nullness.quals.Nullable:
+  @checkers.nullness.quals.Nullable (nl=true) @ [GenericArrayLocationCriterion at ( [TYPE_ARGUMENT(0)] ), ...
+</pre>
+<p>
+In this case, you should add type arguments, such as changing
+</p>
+<pre>  public void pushNonezeroRing(Stack stack, Hashtable seen) {</pre>
+<p>to</p>
+<pre>  public void pushNonezeroRing(Stack&lt;Edge&gt; stack, Hashtable&lt;Edge, ?&gt; seen) {</pre>
 
 
 <hr />
@@ -334,19 +350,6 @@ Last revised: <!-- afu-date -->March 9, 2013<!-- /afu-date-->
 
 </body>
 </html>
-
-<!--
-  This makes Emacs update the "Last revised" paragraph above every time
-  you save the file.
--->
-<!--
-Local Variables:
-time-stamp-start: "^Last revised: "
-time-stamp-end: "\\.?$"
-time-stamp-format: "%:b %:d, %:y"
-time-stamp-line-limit: -30
-End:
--->
 
 <!--  LocalWords:  utils bashrc tcsh tcshrc cshrc classpath
  -->
