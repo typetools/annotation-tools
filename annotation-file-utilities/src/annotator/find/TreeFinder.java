@@ -930,7 +930,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
           MethodTree method = (MethodTree) node;
 
           if (method.getReceiverParameter() == null) {
-            makeReceiver(path, receiver, method);
+            addReceiverType(path, receiver, method);
           }
         }
 
@@ -1025,15 +1025,17 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
   }
 
   /**
-   * Creates a method declaration receiver parameter and inserts the receiver
-   * annotation in the correct place. This is for receiver insertions where a
-   * receiver does not already exist.
+   * Modifies the given receiver insertion so that it contains the type
+   * information necessary to insert a full method declaration receiver
+   * parameter. This is for receiver insertions where a receiver does not
+   * already exist in the source code. This will also add the annotations to be
+   * inserted to the correct part of the receiver type.
    *
    * @param path The location in the AST to insert the receiver.
    * @param receiver Details of the receiver to insert.
    * @param method The method the receiver is being inserted into.
    */
-  private void makeReceiver(TreePath path, ReceiverInsertion receiver,
+  private void addReceiverType(TreePath path, ReceiverInsertion receiver,
       MethodTree method) {
     // Find the name of the class
     // with type parameters to create the receiver. Walk up the tree and
