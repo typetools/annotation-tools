@@ -825,6 +825,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       }
     }
 
+    insertions:
     for (Iterator<Insertion> it = p.iterator(); it.hasNext(); ) {
       Insertion i = it.next();
       if (i.getInserted()) {
@@ -919,7 +920,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
             if (ann.equals(iann) || ann.equals(iannNoPackage)) {
               debug("Already present, not reinserting: %s%n", ann);
               it.remove();
-              return super.scan(node, p);
+              continue insertions;
             }
           }
         }
