@@ -825,7 +825,6 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       }
     }
 
-    insertions:
     for (Iterator<Insertion> it = p.iterator(); it.hasNext(); ) {
       Insertion i = it.next();
       if (i.getInserted()) {
@@ -861,68 +860,11 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
           continue;
         }
 
-        // Don't insert a duplicate if this particular annotation is already
-        // present at this location.
-        List<? extends AnnotationTree> alreadyPresent = null;
-        if (path != null) {
-          for (Tree n : path) {
-            if (n.getKind() == Tree.Kind.CLASS) { // ClassTree
-              alreadyPresent = ((ClassTree) n).getModifiers().getAnnotations();
-              break;
-            } else if (n.getKind() == Tree.Kind.METHOD) { // MethodTree
-              alreadyPresent = ((MethodTree) n).getModifiers().getAnnotations();
-              break;
-            } else if (n.getKind() == Tree.Kind.VARIABLE) { // VariableTree
-              alreadyPresent = ((VariableTree) n).getModifiers().getAnnotations();
-              break;
-            } else if (n.getKind() == Tree.Kind.TYPE_CAST) { // TypeCastTree
-              Tree type = ((TypeCastTree) n).getType();
-              if (type.getKind() == Tree.Kind.ANNOTATED_TYPE) { // AnnotatedTypeTree
-                alreadyPresent = ((AnnotatedTypeTree) type).getAnnotations();
-              }
-              break;
-            } else if (n.getKind() == Tree.Kind.INSTANCE_OF) { // InstanceOfTree
-              Tree type = ((InstanceOfTree) n).getType();
-              if (type.getKind() == Tree.Kind.ANNOTATED_TYPE) { // AnnotatedTypeTree
-                alreadyPresent = ((AnnotatedTypeTree) type).getAnnotations();
-              }
-              break;
-            } else if (n.getKind() == Tree.Kind.NEW_CLASS) { // NewClassTree
-              JCNewClass nc = (JCNewClass) n;
-              if (nc.clazz.getKind() == Tree.Kind.ANNOTATED_TYPE) { // AnnotatedTypeTree
-                alreadyPresent = ((AnnotatedTypeTree) nc.clazz).getAnnotations();
-              }
-              break;
-            } else if (n.getKind() == Tree.Kind.PARAMETERIZED_TYPE) { // ParameterizedTypeTree
-                // If we pass through a parameterized type, stop, otherwise we
-                // mix up annotations on the outer type.
-                // TODO: is something similar needed for Arrays?
-                break;
-            }
-            // TODO: don't add cast insertion if it's already present.
-          }
-        }
-        // System.out.printf("alreadyPresent = %s for %s of kind %s%n", alreadyPresent, node, node.getKind());
-        // printPath(path);
-        if (alreadyPresent != null) {
-          for (AnnotationTree at : alreadyPresent) {
-            // Compare the to-be-inserted annotation to the existing
-            // annotation, ignoring its arguments (duplicate annotations are
-            // never allowed even if they differ in arguments).  If we did
-            // have to compare our arguments, we'd have to deal with enum
-            // arguments potentially being fully qualified or not:
-            // @Retention(java.lang.annotation.RetentionPolicy.CLASS) vs
-            // @Retention(RetentionPolicy.CLASS)
-            String ann = at.getAnnotationType().toString();
-            String iann = Main.removeArgs(i.getText()).a.substring(1); // strip off the leading @
-            String iannNoPackage = Insertion.removePackage(iann).b;
-            // System.out.printf("Comparing: %s %s %s%n", ann, iann, iannNoPackage);
-            if (ann.equals(iann) || ann.equals(iannNoPackage)) {
-              debug("Already present, not reinserting: %s%n", ann);
-              it.remove();
-              continue insertions;
-            }
-          }
+        if (alreadyPresent(path, i)) {
+          // Don't insert a duplicate if this particular annotation is already
+          // present at this location.
+          it.remove();
+          continue;
         }
 
         if (i.getKind() == Insertion.Kind.RECEIVER && node.getKind() == Tree.Kind.METHOD) {
@@ -1002,6 +944,79 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     }
 
     return super.scan(node, p);
+  }
+
+  /**
+   * Determines if the annotation in the given insertion is already present
+   * at the given location in the AST.
+   *
+   * @param path The location in the AST to check for the annotation.
+   * @param ins The annotation to check for.
+   * @return {@code true} if the given annotation is already at the given
+   *         location in the AST, {@code false} otherwise.
+   */
+  private boolean alreadyPresent(TreePath path, Insertion ins) {
+    List<? extends AnnotationTree> alreadyPresent = null;
+    if (path != null) {
+      for (Tree n : path) {
+        if (n.getKind() == Tree.Kind.CLASS) {
+          alreadyPresent = ((ClassTree) n).getModifiers().getAnnotations();
+          break;
+        } else if (n.getKind() == Tree.Kind.METHOD) {
+          alreadyPresent = ((MethodTree) n).getModifiers().getAnnotations();
+          break;
+        } else if (n.getKind() == Tree.Kind.VARIABLE) {
+          alreadyPresent = ((VariableTree) n).getModifiers().getAnnotations();
+          break;
+        } else if (n.getKind() == Tree.Kind.TYPE_CAST) {
+          Tree type = ((TypeCastTree) n).getType();
+          if (type.getKind() == Tree.Kind.ANNOTATED_TYPE) {
+            alreadyPresent = ((AnnotatedTypeTree) type).getAnnotations();
+          }
+          break;
+        } else if (n.getKind() == Tree.Kind.INSTANCE_OF) {
+          Tree type = ((InstanceOfTree) n).getType();
+          if (type.getKind() == Tree.Kind.ANNOTATED_TYPE) {
+            alreadyPresent = ((AnnotatedTypeTree) type).getAnnotations();
+          }
+          break;
+        } else if (n.getKind() == Tree.Kind.NEW_CLASS) {
+          JCNewClass nc = (JCNewClass) n;
+          if (nc.clazz.getKind() == Tree.Kind.ANNOTATED_TYPE) {
+            alreadyPresent = ((AnnotatedTypeTree) nc.clazz).getAnnotations();
+          }
+          break;
+        } else if (n.getKind() == Tree.Kind.PARAMETERIZED_TYPE) {
+          // If we pass through a parameterized type, stop, otherwise we
+          // mix up annotations on the outer type.
+          // TODO: is something similar needed for Arrays?
+          break;
+        }
+        // TODO: don't add cast insertion if it's already present.
+      }
+    }
+    // System.out.printf("alreadyPresent = %s for %s of kind %s%n", alreadyPresent, node, node.getKind());
+    // printPath(path);
+    if (alreadyPresent != null) {
+      for (AnnotationTree at : alreadyPresent) {
+        // Compare the to-be-inserted annotation to the existing
+        // annotation, ignoring its arguments (duplicate annotations are
+        // never allowed even if they differ in arguments).  If we did
+        // have to compare our arguments, we'd have to deal with enum
+        // arguments potentially being fully qualified or not:
+        // @Retention(java.lang.annotation.RetentionPolicy.CLASS) vs
+        // @Retention(RetentionPolicy.CLASS)
+        String ann = at.getAnnotationType().toString();
+        String iann = Main.removeArgs(ins.getText()).a.substring(1); // strip off the leading @
+        String iannNoPackage = Insertion.removePackage(iann).b;
+        // System.out.printf("Comparing: %s %s %s%n", ann, iann, iannNoPackage);
+        if (ann.equals(iann) || ann.equals(iannNoPackage)) {
+          debug("Already present, not reinserting: %s%n", ann);
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   /**
