@@ -18,4 +18,10 @@ public class DuplicateAnnotation {
 
   @java.lang.SuppressWarnings("E")
   void m5() { }
+
+  void m6() {
+    @SuppressWarnings("F")
+    @java.lang.Deprecated
+    Object o = new Object();
+  }
 }

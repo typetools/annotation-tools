@@ -17,4 +17,9 @@ public class DuplicateAnnotation {
   void m4() { }
 
   void m5() { }
+
+  void m6() {
+    @SuppressWarnings("F")
+    Object o = new Object();
+  }
 }
