@@ -1,6 +1,7 @@
 package java.lang:
 annotation @SuppressWarnings:
     String value
+annotation @Deprecated:
 
 package annotator.tests:
 class DuplicateAnnotation:
@@ -10,3 +11,5 @@ class DuplicateAnnotation:
     method m3()V: @java.lang.SuppressWarnings("C")
     method m4()V: @java.lang.SuppressWarnings("D")
     method m5()V: @java.lang.SuppressWarnings("E")
+    method m6()V:
+        local o: @java.lang.SuppressWarnings("F") @java.lang.Deprecated
