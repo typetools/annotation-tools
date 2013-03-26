@@ -340,36 +340,14 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     @Override
     public Integer visitPrimitiveType(PrimitiveTypeTree node, Insertion ins) {
       debug("TypePositionFinder.visitPrimitiveType(%s)", node);
-      // want exact same logistics as with visitIdentifier
-      Tree parent = parent(node);
-      Integer i = null;
-      if (parent.getKind() == Tree.Kind.ARRAY_TYPE) { // ArrayTypeTree
-        // ArrayTypeTree att = (ArrayTypeTree) parent;
-        JCTree jcid = (JCTree) node;
-        i = jcid.pos;
-      } else {
-        i = ((JCTree) node).pos;
-      }
-      //          JCPrimitiveTypeTree pt = (JCPrimitiveTypeTree) node;
-      // JCTree jt = (JCTree) node;
-      return i;
+      return ((JCTree) node).pos;
     }
 
     @Override
       public Integer visitParameterizedType(ParameterizedTypeTree node, Insertion ins) {
       Tree parent = parent(node);
       debug("TypePositionFinder.visitParameterizedType %s parent=%s%n", node, parent);
-      Integer i = null;
-      if (parent.getKind() == Tree.Kind.ARRAY_TYPE) { // ArrayTypeTree
-        // want to annotate the first level of this array
-        ArrayTypeTree att = (ArrayTypeTree) parent;
-        Tree baseType = att.getType();
-        i = leftmostIdentifier(((JCTypeApply) node).getType()).pos;
-        debug("BASE TYPE: " + baseType.toString());
-      } else {
-        i = leftmostIdentifier(((JCTypeApply)node).getType()).pos;
-      }
-      return i;
+      return leftmostIdentifier(((JCTypeApply) node).getType()).pos;
     }
 
 //     @Override
@@ -731,15 +709,12 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       if (cd.mods != null
           && (cd.mods.flags != 0 || cd.mods.annotations.size() > 0)) {
         result = cd.mods.getPreferredPosition();
-        assert result >= 0
-          : String.format("%d %d %d%n", cd.getStartPosition(),
-                          cd.getPreferredPosition(), cd.pos);
       } else {
         result = cd.getPreferredPosition();
-        assert result >= 0
-          : String.format("%d %d %d%n", cd.getStartPosition(),
-                          cd.getPreferredPosition(), cd.pos);
       }
+      assert result >= 0
+        : String.format("%d %d %d%n", cd.getStartPosition(),
+                        cd.getPreferredPosition(), cd.pos);
       return result;
     }
 
@@ -971,27 +946,18 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
           pos = tpf.scan(((MethodTree)node).getReturnType(), i);
           assert handled(node);
           debug("pos = %d at return type node: %s%n", pos, ((JCMethodDecl)node).getReturnType().getClass());
-        } else if ((node.getKind() == Tree.Kind.TYPE_PARAMETER) // TypeParameterTree
-                   && (i.getCriteria().onBoundZero())
-                   && ((TypeParameterTree) node).getBounds().isEmpty()) {
+        } else if (((node.getKind() == Tree.Kind.TYPE_PARAMETER)
+                    && (i.getCriteria().onBoundZero())
+                    && ((TypeParameterTree) node).getBounds().isEmpty())
+                || ((node instanceof WildcardTree)
+                    && ((WildcardTree) node).getBound() == null
+                    && wildcardLast(i.getCriteria().getGenericArrayLocation().getLocation()))) {
             pos = tpf.scan(node, i);
 
             Integer nextpos1 = getFirstInstanceAfter(',', pos+1, tree);
             Integer nextpos2 = getFirstInstanceAfter('>', pos+1, tree);
             pos = (nextpos1!=-1 && nextpos1 < nextpos2) ? nextpos1 : nextpos2;
 
-            // need to add "extends ... Object" around the type annotation
-            i = new TypeBoundExtendsInsertion(i.getText(), i.getCriteria(), i.getSeparateLine());
-        } else if ((node instanceof WildcardTree) // Easier than listing three tree kinds. Correct?
-                 && ((WildcardTree)node).getBound()==null
-                 && wildcardLast(i.getCriteria().getGenericArrayLocation().getLocation())) {
-            pos = tpf.scan(node, i);
-
-            Integer nextpos1 = getFirstInstanceAfter(',', pos+1, tree);
-            Integer nextpos2 = getFirstInstanceAfter('>', pos+1, tree);
-            pos = (nextpos1!=-1 && nextpos1 < nextpos2) ? nextpos1 : nextpos2;
-
-            // need to add "extends ... Object" around the type annotation
             i = new TypeBoundExtendsInsertion(i.getText(), i.getCriteria(), i.getSeparateLine());
         } else if (i.getKind() == Insertion.Kind.CAST) {
             JCTree jcTree = (JCTree) node;
