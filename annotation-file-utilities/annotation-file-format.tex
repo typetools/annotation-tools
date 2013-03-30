@@ -1336,17 +1336,17 @@ files.
 \section{Design and Implementation Details\label{design-and-implementation-details}}
 
 This section describes some high level-design and implementation details of the
-Annotation Files Utilities, including the different components of the
+Annotation File Utilities, including the different components of the
 Annotation File Utilities and how they fit together. It is intended for someone
 who is beginning work on the Annotation File Utilities or is curious about how
 the Annotation File Utilities work.
 
 The Annotation File Utilities is composed of three sub-projects:
 \code{scene-lib}, \code{asmx}, and \code{annotation\-/file\-/utilities}. The
-\code{scene-lib} sub-project is a representation of a \code{.jaif} file. The
-\code{asmx} sub-project does the insertion and extraction of annotations to and
-from bytecode. The \code{annotation-file-utilities} sub-project does the
-insertion of annotations into source code.
+\code{scene-lib} sub-project represents a \code{.jaif} file. The
+\code{asmx} sub-project inserts and extracts annotations to/from
+bytecode. The \code{annotation-file-utilities} sub-project
+inserts annotations into source code.
 
 \subsection{\code{scene-lib}\label{scene-lib}}
 
@@ -1366,8 +1366,8 @@ scene-lib/src/annotations/el/AScene.java class. The \code{AScene} class (or
 ``annotated scene'') roughly parallels the root of an abstract syntax tree. An
 \code{AScene} has a number of classes (\code{AClass}) as children. Each class
 has a number of methods (\code{AMethod}), fields (\code{AElement}), etc. as
-children. All of these classes are related in a type hierarchy. This type
-hierarchy is shown in Figure~\ref{fig:scene-lib-type-hierarchy}. Note that this
+children. All of these classes are related in a type hierarchy
+(Figure~\ref{fig:scene-lib-type-hierarchy}). Note that this
 type hierarchy does not have a traditional ``is-a'' relationship between its
 classes. For example, it is not valid to say that a method is-a block, as the
 type hierarchy implies. In fact, it makes more sense to view the type hierarchy
@@ -1384,21 +1384,21 @@ their respective fields, see the documentation for each file in
 scene-lib/src/annotations/el/.
 
 An \code{AScene} instance can be created in two ways. An empty \code{AScene} can
-be created by calling the \code{AScene} constructor or an \code{AScene} can be
+be created by calling the \code{AScene} constructor, or an \code{AScene} can be
 created by parsing an existing \code{.jaif} file. Once an \code{AScene} is
-created annotations can be added to it by adding them to the correct fields of
+created, annotations can be added to it by adding them to the correct fields of
 the children. An \code{AScene} can also be output to create a new \code{.jaif}
 file.
 
 \subsection{\code{asmx}\label{asmx}}
 
 The \code{asmx} sub-project is used to insert and extract annotations from
-bytecode. \code{asmx} is based off of an old version (2.2.2) of the ASM
+bytecode. \code{asmx} is based on an old version (2.2.2) of the ASM
 Framework~\cite{ASM}. It has been modified to allow it to read and write
 JSR 308~\cite{JSR308-webpage-201110} annotations in bytecode. However, it is far behind the
 current ASM version (4.1). Experimental support for type annotations has been
-added to ASM for a future ASM 5 release. The goal is to replace the custom
-\code{asmx} in the Annotation File Utilities with the official, supported
+added to ASM for a future ASM 5 release. When ASM 5 is released, we should discard the custom
+\code{asmx} in the Annotation File Utilities and adapt the Annotation File Utilities to use the official, supported
 version of ASM.
 
 \subsubsection{Bytecode Insertion\label{bytecode-insertion}}
@@ -1409,14 +1409,14 @@ one or more \textlangle class name, \code{.jaif} file\textrangle\ pairs as argum
 specified in the \code{.jaif} file are inserted into the classfile directly
 before the \code{.jaif} file in the argument list.
 
-First, the \code{.jaif} files is parsed into an \code{AScene} (as described in
+First, each \code{.jaif} file is parsed into an \code{AScene} (as described in
 Section~\ref{scene-lib}). Then,
 asmx/\-src/\-org/\-objectweb/\-asm/\-Class\-Read\-er.java parses the classfile.
 As it is parsing the classfile, it passes the parsed bytecode off to the
 scene-lib/src/annotations/io/classfile/ClassAnnotationSceneWriter.java
 class. This class has a reference to the \code{AScene} parsed from the
-\code{.jaif} file. As this class receives the parsed bytecode it inserts the
-annotations from the \code{AScene} in the correct place in the bytecode and then
+\code{.jaif} file. As this class receives the parsed bytecode it inserts the relevant
+annotations from the \code{AScene} in the bytecode and then
 writes the bytecode back out.
 
 \subsubsection{Bytecode Extraction\label{bytecode-extraction}}
@@ -1445,18 +1445,24 @@ files are inserted into the \code{.java} source files.
 
 First, an instance of
 annotation-file-utilities/src/annotator/specification/IndexFileSpecification.java
-is created. The \code{parse} method is called, which parses the \code{.jaif}
-file into an \code{AScene} (as described in Section~\ref{scene-lib}). After
-this, the \code{parse} method then calls the \code{parseScene} method, which
+is created. Its \code{parse} method parses the \code{.jaif}
+file into an \code{AScene} (as described in Section~\ref{scene-lib}).
+The \code{parse} method calls the \code{parseScene} method, which
 traverses through the \code{AScene} and creates an
 annotation-file-utilities/src/annotator/specification/CriterionList.java.
-The \code{CriterionList} class contains objects that implement the
-annotation-file-utilities/src/annotator/find/Criterion.java interface.
+A \code{CriterionList} identifies a unique AST node that is the location of an
+insertion. It contains objects that implement the
+annotation-file-utilities/\-src/\-annotator/\-find/\-Criterion.java interface.
+Each \code{Criterion} has an \code{isSatisifiedBy} method --- a predicate that
+takes an AST node and returns \code{true} if the AST node satisifies the
+\code{Criterion} and \code{false} otherwise. To determine if a given node
+matches a \code{CriterionList}, the node is passed to all of the
+\code{Criterion}s in the \code{CriteriaList}. If every \code{Criterion} returns
+\code{true} then it is match. If one or more \code{Criterion}s return
+\code{false} then it is not a match.
 The various \code{Criterion} classes are in the
-annotation-file-utilities/src/annotator/find/ directory. Each \code{Criterion}
-implementation has an \code{isSatisifiedBy} method. This method takes a location
-in the abstract syntax tree and returns \code{true} if meets the
-\code{Criterion} and \code{false} otherwise. For example, take the following
+annotation-file-utilities/src/annotator/find/ directory.
+For example, take the following
 source code:
 
 \begin{verbatim}
@@ -1469,7 +1475,9 @@ public class Test {
 }
 \end{verbatim}
 
-The \code{Criterion}s needed for the location of the \code{i} parameter are:
+\noindent
+The \code{CriterionList} to specify the location of the \code{i} parameter
+contains the following \code{Criterion}s:
 
 \begin{itemize}
   \item \code{InPackageCriterion("afu.example")}
