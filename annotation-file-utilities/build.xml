@@ -335,11 +335,15 @@
     <copy file="changelog.html"
       todir="${deploy-dir}"/>
 
-    <echo message="Copying annotation-file-format.{html,pdf"/>
+    <echo message="Copying annotation-file-format.{html,pdf}"/>
     <copy file="annotation-file-format.html"
       todir="${deploy-dir}"/>
     <copy file="annotation-file-format.pdf"
       todir="${deploy-dir}"/>
+
+    <symlink overwrite="true"
+             link="${deploy-dir}/index.html"
+             resource="${deploy-dir}/annotation-file-utilities.html"/>
   </target>
 
   <target name="annotation-file-format-clean"
