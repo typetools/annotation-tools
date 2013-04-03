@@ -339,9 +339,9 @@
     <copy file="annotation-file-format.html"
       todir="${deploy-dir}"/>
     <copy file="annotation-file-format.pdf"
-      todir="${{deploy-dir}"/>
+      todir="${deploy-dir}"/>
 
-    <copy todir="${dest.dir}/figures" flatten="true">
+    <copy todir="${deploy.dir}/figures" flatten="true">
       <fileset dir="figures">
           <include name="*.png"/>
           <include name="*.gif"/>
