@@ -23,6 +23,17 @@ build.xml, src/, lib/, tests/,
 
 ===========================================================================
 
+Notes
+
+To build annotation-file-format.{html,pdf} your BIBINPUTS environment
+variable must be set like so:
+
+export BIBINPUTS=.:/path/to/plume/bib
+
+plume-bib is available at https://code.google.com/p/plume-bib/ .
+
+===========================================================================
+
 Making a release
 
 To make a release (a distribution):
