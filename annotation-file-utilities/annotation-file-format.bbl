@@ -1,4 +1,5 @@
-\begin{thebibliography}{ASM}
+\newcommand{\etalchar}[1]{$^{#1}$}
+\begin{thebibliography}{DDE{\etalchar{+}}11}
 
 \bibitem[ASM]{ASM}
 {ASM} website.
@@ -7,5 +8,24 @@
 \bibitem[Che]{CF}
 {Checker Framework} website.
 \newblock \url{http://types.cs.washington.edu/checker-framework/}.
+
+\bibitem[DDE{\etalchar{+}}11]{DietlDEMS2011}
+Werner Dietl, Stephanie Dietzel, Michael~D. Ernst, K{\i}van{\c{c}} Mu{\c{s}}lu,
+  and Todd Schiller.
+\newblock Building and using pluggable type-checkers.
+\newblock In {\em ICSE'11, Proceedings of the 33rd International Conference on
+  Software Engineering}, pages 681--690, Waikiki, Hawaii, USA, May~25--27,
+  2011.
+
+\bibitem[Ern11]{JSR308-webpage-201110}
+Michael~D. Ernst.
+\newblock {Type Annotations} specification ({JSR} 308).
+\newblock \url{http://types.cs.washington.edu/jsr308/}, October 2011.
+
+\bibitem[LBR06]{LeavensBR2006:JML}
+Gary~T. Leavens, Albert~L. Baker, and Clyde Ruby.
+\newblock Preliminary design of {JML}: A behavioral interface specification
+  language for {Java}.
+\newblock {\em ACM SIGSOFT Software Engineering Notes}, 31(3), March 2006.
 
 \end{thebibliography}
