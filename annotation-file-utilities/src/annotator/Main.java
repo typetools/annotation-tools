@@ -74,9 +74,6 @@ public class Main {
   @Option("-i Overwrite original source files")
   public static boolean in_place = false;
 
-  @Option("-h Print usage information and exit")
-  public static boolean help = false;
-
   @Option("-a Abbreviate annotation names")
   public static boolean abbreviate = true;
 
@@ -85,6 +82,9 @@ public class Main {
 
   @Option("-o Omit given annotation")
   public static String omit_annotation;
+
+  @Option("-h Print usage information and exit")
+  public static boolean help = false;
 
   @Option("-v Verbose (print progress information)")
   public static boolean verbose;
