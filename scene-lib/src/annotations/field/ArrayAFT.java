@@ -14,7 +14,7 @@ public final /*@ReadOnly*/ class ArrayAFT extends AnnotationFieldType {
 
     /**
      * The element type of the array, or <code>null</code> if it is unknown
-     * (see {@link AnnotationBuilder#addEmptyArrayField}).
+     * (see {@link annotations.AnnotationBuilder#addEmptyArrayField}).
      */
     public final ScalarAFT elementType;
 
@@ -22,7 +22,7 @@ public final /*@ReadOnly*/ class ArrayAFT extends AnnotationFieldType {
      * Constructs a new {@link ArrayAFT} representing an array type with
      * the given element type.  <code>elementType</code> may be
      * <code>null</code> to indicate that the element type is unknown
-     * (see {@link AnnotationBuilder#addEmptyArrayField}).
+     * (see {@link annotations.AnnotationBuilder#addEmptyArrayField}).
      */
     public ArrayAFT(ScalarAFT elementType) {
         assert elementType != null;

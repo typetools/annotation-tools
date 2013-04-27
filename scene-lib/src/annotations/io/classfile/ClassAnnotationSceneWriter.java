@@ -225,7 +225,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
 
   /**
    * @inheritDoc
-   * @see org.objectweb.asm.ClassAdapter#visitTypeAnnotation(java.lang.String, boolean)
+   * @see org.objectweb.asm.ClassAdapter#visitTypeAnnotation(java.lang.String, boolean, boolean)
    */
   @Override
   public TypeAnnotationVisitor visitTypeAnnotation(String desc, boolean visible, boolean inCode) {

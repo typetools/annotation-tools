@@ -354,7 +354,7 @@ public final class IndexFileWriter {
      * reading it back in produces a different scene.  Consider a scene
      * containing two annotations of type Foo, each with an array field bar.
      * In one annotation, bar is empty and of unknown element type (see
-     * {@link AnnotationBuilder#addEmptyArrayField}); in the other, bar is
+     * {@link annotations.AnnotationBuilder#addEmptyArrayField}); in the other, bar is
      * of known element type.  This method will
      * {@linkplain AnnotationDef#unify unify} the two definitions of Foo by
      * writing a single definition with known element type.  When the index
