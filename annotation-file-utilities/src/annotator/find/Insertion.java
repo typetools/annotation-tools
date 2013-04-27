@@ -85,7 +85,7 @@ public abstract class Insertion {
      * @param abbreviate
      *            if true, the package name will be removed from the annotations.
      *            The package name can be retrieved again by calling the
-     *            {@link #getPackageName()} method.
+     *            {@link #getPackageNames()} method.
      * @param gotSeparateLine
      *            {@code true} if this insertion is actually added on a separate
      *            line.
@@ -117,7 +117,7 @@ public abstract class Insertion {
      * @param abbreviate
      *            if true, the package name will be removed from the annotations.
      *            The package name can be retrieved again by calling the
-     *            {@link #getPackageName()} method.
+     *            {@link #getPackageNames()} method.
      * @return the text to insert
      */
     protected abstract String getText(boolean comments, boolean abbreviate);

@@ -277,6 +277,7 @@
         <javadoc sourcepathref="javadoc-sourcepath" 
 		classpathref="libpath"
 		packagenames="*"
+		excludepackagenames="annotations.tests.*"
 		Overview="overview.html"
 		destdir="javadoc" 
 		access="public"

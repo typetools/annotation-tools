@@ -17,8 +17,9 @@ public class AnnotationInsertion extends Insertion {
      *
      * @param annotation the annotation to insert
      * @param criteria where to insert the annotation
-     * @param seperateLine whether to insert the annotation on its own
+     * @param separateLine whether to insert the annotation on its own
      */
+
     public AnnotationInsertion(String annotation, Criteria criteria, boolean separateLine) {
         super(criteria, separateLine);
         this.annotation = annotation;

@@ -74,7 +74,7 @@ public class ReceiverInsertion extends Insertion {
     /**
      * If {@code true} a comma will be added at the end of the receiver. This
      * will only happen if a receiver is inserted (see
-     * {@link #ReceiverInsertion(DeclaredType, Criteria)} for a description of
+     * {@link #ReceiverInsertion(DeclaredType, Criteria, List<Insertion>)} for a description of
      * when a receiver is inserted). This is useful if the method already has
      * one or more parameters.
      */
