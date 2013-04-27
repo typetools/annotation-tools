@@ -19,8 +19,8 @@ public abstract class VivifyingMap<K, V> extends WrapperMap<K, V> {
      * map.  However, since the {@link VivifyingMap} generally provides a
      * superset of the functionality of the backing map, it is rarely useful to
      * access the backing map directly; the parameter is given mainly so you
-     * can provide a new map of your favorite class ({@link HashMap},
-     * {@link LinkedHashMap}, etc.).
+     * can provide a new map of your favorite class ({@link java.util.HashMap},
+     * {@link java.util.LinkedHashMap}, etc.).
      */
     public /*@PolyRead*/ VivifyingMap(/*@PolyRead*/ Map<K, V> back) {
         super(back);

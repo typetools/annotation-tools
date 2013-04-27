@@ -113,7 +113,7 @@ extends EmptyVisitor {
   }
 
   /**
-   * @see org.objectweb.asm.commons.EmptyVisitor#visitTypeAnnotation(java.lang.String, boolean)
+   * @see org.objectweb.asm.commons.EmptyVisitor#visitTypeAnnotation(java.lang.String, boolean, boolean)
    */
   @Override
   public TypeAnnotationVisitor visitTypeAnnotation(String desc, boolean visible, boolean inCode) {
