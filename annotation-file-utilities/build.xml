@@ -452,10 +452,13 @@
     </fileset>
     <pathconvert property="cmdTxts" refid="javacSrc" pathsep=" " />
 
-      <!-- We are required to put jsr308's javac.jar on the bootclasspath so
-           that those javac classes are found before the stock javac classes
-           that the Mac OS includes on the bootclasspath (other platforms do
-           not make such inclusions) Use java rather than javac for Windows sake-->
+      <!-- 
+        Hack for Mac OS: put jsr308's javac.jar on the bootclasspath so
+        that those javac classes are found before the stock javac classes
+        (other platforms do not make such bootclasspath inclusions).
+        Hack for Windows:  use "java com.sun.tools.javac.Main" rather than
+	"javac".
+      -->
       <java fork="true"
             failonerror="true"
             classpathref="libpath"
