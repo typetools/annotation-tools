@@ -419,7 +419,7 @@ initialization methods.
 \paragraph{Return type}
 
 A return type defines the annotations on the return type of a method
-declaration.
+declaration.  It is also used for the result of a constructor.
 
 \begin{tabbing}
 \qquad \= \kill
@@ -432,9 +432,13 @@ declaration.
 \paragraph{Receiver definition}
 
 A receiver definition defines the annotations on the type of the receiver
-parameter in a method declaration. A method receiver is the implicit formal
-parameter, \code{this}, used in non-static methods. For source code insertion,
+parameter in a method declaration.  A method receiver is the implicit formal
+parameter, \code{this}, used in non-static methods.  For source code insertion,
 the receiver parameter will be inserted if it does not already exist.
+
+Only inner classes have a receiver.  A top-level constructor does not have
+a receiver, though it does have a result.  The type of a constructor result
+is represented as a return type.
 
 \begin{tabbing}
 \qquad \= \kill
