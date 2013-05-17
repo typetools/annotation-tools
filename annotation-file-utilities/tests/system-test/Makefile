@@ -34,7 +34,7 @@ out2.diff: out2.jann
 	diff -u expected-annos.jann out2.jann > out2.diff
 
 .PHONY: check-out2
-# Fail if out2.diff is empty
+# Fail if out2.diff is non-empty
 check-out2: out2.diff
 	[ ! -s out2.diff ] || (cat out2.diff && false)
 
@@ -60,6 +60,6 @@ out5.diff: out5.jann
 	diff -u expected-annos.jann out5.jann > out5.diff
 
 .PHONY: check-out5
-# Fail if out5.diff is empty
+# Fail if out5.diff is non-empty
 check-out5: out5.diff
 	[ ! -s out5.diff ] || (cat out5.diff && false)
