@@ -53,7 +53,7 @@ public class AExpression extends AElement {
                 && instanceofs.equals(o.instanceofs)
                 && news.equals(o.news)
                 && insertTypecasts.equals(o.insertTypecasts);
-	}
+        }
 
     /**
      * {@inheritDoc}

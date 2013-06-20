@@ -34,7 +34,7 @@ public class ABlock extends AExpression {
     }
 
     protected boolean equalsBlock(/*>>> @ReadOnly ABlock this,*/ /*@ReadOnly*/ ABlock o) {
-    	return locals.equals(o.locals) && super.equalsExpression(o);
+        return locals.equals(o.locals) && super.equalsExpression(o);
     }
 
     /**
@@ -42,7 +42,7 @@ public class ABlock extends AExpression {
      */
     @Override
     public int hashCode(/*>>> @ReadOnly ABlock this*/) {
-    	return super.hashCode() + locals.hashCode();
+        return super.hashCode() + locals.hashCode();
     }
 
     /**
