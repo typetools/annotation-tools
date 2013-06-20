@@ -224,7 +224,7 @@ public class IndexFileSpecification implements Specification {
     // the method name argument is not used for static initializers, which are only used
     // in source specifications. Same for field initializers.
     // the empty () are there to prevent the whole string to be removed in later parsing.
-  	parseBlock(clist, "static init number " + blockID + "()", block);
+        parseBlock(clist, "static init number " + blockID + "()", block);
   }
 
   // keep the descriptive strings for field initializers and static inits consistent

@@ -20,7 +20,7 @@
 
     <target name="compile-asmx">
         <ant dir="${asmx}" target="compile">
-	     <property name="product.noshrink" value="true"/>
+            <property name="product.noshrink" value="true"/>
         </ant>
     </target>
 
