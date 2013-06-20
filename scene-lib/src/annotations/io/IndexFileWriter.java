@@ -183,7 +183,7 @@ public final class IndexFileWriter {
      * {@code tag, arg}, where tag and arg are both integers.
      */
     private String typePathEntryToString(TypePathEntry t) {
-    	return t.tag.tag + ", " + t.arg;
+        return t.tag.tag + ", " + t.arg;
     }
 
     private void printNumberedAmbigiousElements(String indentation,
