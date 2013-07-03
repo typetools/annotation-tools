@@ -58,7 +58,7 @@ bin/annotator/tests/%.class: %.java
 
 # Actually runs the annotator to create the annotated java file.
 # We are required to put annotation-file-utilities.jar (and ../bin) on the
-# bootclasspath so that the jsr308 javac classes bundled therein are found
+# bootclasspath so that the JSR 308 javac classes bundled therein are found
 # before the stock javac classes that the Mac OS includes on the bootclasspath
 # (other platforms do not make such inclusions)
 .PRECIOUS: %.output
