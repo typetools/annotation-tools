@@ -1,5 +1,9 @@
 # System test of annotation tools
 
+# This test runs most of the AFU tools, on a single program
+# source-ann/AnnotationTest.java that contains an annotation in every
+# possible location.
+
 ANNCAT ?= ../../../scene-lib/anncat
 XJAVAC ?= ../../../../jsr308-langtools/dist/bin/javac -g
 
