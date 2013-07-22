@@ -30,6 +30,7 @@ import com.google.common.collect.SetMultimap;
 import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
+import com.sun.tools.javac.main.CommandLine;
 
 /**
  * This is the main class for the annotator, which inserts annotations in
@@ -110,7 +111,7 @@ public class Main {
    * Runs the annotator, parsing the source and spec files and applying
    * the annotations.
    */
-  public static void main(String[] args) {
+  public static void main(String[] args) throws IOException {
 
     if (verbose) {
       System.out.printf("insert-annotations-to-source (%s)",
@@ -118,7 +119,7 @@ public class Main {
     }
 
     Options options = new Options("Main [options] ann-file... java-file...", Main.class);
-    String[] file_args = options.parse_or_usage (args);
+    String[] file_args = options.parse_or_usage(CommandLine.parse(args));
 
     if (debug) {
       TreeFinder.debug = true;
