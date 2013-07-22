@@ -6,6 +6,8 @@ import checkers.nullness.quals.*;
 
 import java.io.*;
 
+import com.sun.tools.javac.main.CommandLine;
+
 import org.objectweb.asm.ClassReader;
 
 import plume.Option;
@@ -60,8 +62,7 @@ public class ClassFileWriter {
    */
   public static void main(String[] args) throws IOException {
     Options options = new Options(usage, ClassFileWriter.class);
-
-    args = options.parse_or_usage(args);
+    args = options.parse_or_usage(CommandLine.parse(args));
     if (version) {
       System.out.printf("insert-annotations (%s)",
                         ClassFileReader.INDEX_UTILS_VERSION);
