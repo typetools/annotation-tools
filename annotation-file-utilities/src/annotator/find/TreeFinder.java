@@ -113,7 +113,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
             return j;
           }
         }
-      } catch(Exception e) {
+      } catch (IOException e) {
         throw new RuntimeException(e);
       }
 
@@ -433,6 +433,31 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       return ((JCTree) node).getPreferredPosition();
     }
 
+    private int arrayInsertPos(Tree node) {
+      // Return the first occurrence of '[' or "..." in the node's code,
+      // whichever comes first.
+      try {
+        CharSequence s = tree.getSourceFile().getCharContent(true);
+        int start = arrayStartPos(node) + 1;
+        int end = s.length();
+        int k = 0;  // dot counter
+        for (int j = start; j < end; j++) {
+          switch (s.charAt(j)) {
+          case '[':
+            return j;
+          case '.':
+            if (++k < 3) { continue; }
+            return j-2;  // else "..." found
+          default:
+            k = 0;
+          }
+        }
+        return -1;
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+    }
+
     @Override
     public Integer visitArrayType(ArrayTypeTree node, Insertion ins) {
       debug("TypePositionFinder.visitArrayType(%s)", node);
@@ -446,7 +471,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       assert arrayStartPos(node) == pos;
       int largestLevels = arrayLevels(largest);
       int levels = arrayLevels(node);
-      pos = getFirstInstanceAfter('[', pos+1, tree);
+      pos = arrayInsertPos(node);
       debug("  levels=%d largestLevels=%d%n", levels, largestLevels);
       for (int i=levels; i<largestLevels; i++) {
         pos = getFirstInstanceAfter('[', pos+1, tree);
