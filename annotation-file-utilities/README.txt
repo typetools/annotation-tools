@@ -38,7 +38,13 @@ Making a release
 
 To make a release (a distribution):
 
-Be sure to run these instructions in an account that uses JDK 6, not JDK 7.
+Be sure to run these instructions in an account that uses JDK 7, not JDK 8.
+
+Write a description of the most significant changes in:
+    changelog.html
+It may be helpful to examine the changes since the last release:
+  hg log -r 3.5.3:.
+  hg diff -r 3.5.3
 
 Manually update the version number and date in the following places:
     annotation-file-utilities.html  (in "Installation" section)
@@ -53,7 +59,7 @@ Run
 and if there are any problems, re-make the distribution.
 
 Tag the release, for example:
-  hg tag 3.1
+  hg tag 3.5.3
 
 Send email to: checker-framework-discuss@googlegroups.com
 
