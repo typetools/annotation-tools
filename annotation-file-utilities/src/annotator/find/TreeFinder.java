@@ -1090,6 +1090,9 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     // This holds the inner types as they're being read in.
     DeclaredType innerTypes = null;
     DeclaredType staticType = null;
+    // For an inner class constructor, the receiver comes from the
+    // superclass, so skip past the first type definition.
+    boolean skip = ((MethodTree) parent.getLeaf()).getReturnType() == null;
     while (parent.getLeaf().getKind() != Tree.Kind.COMPILATION_UNIT
         && parent.getLeaf().getKind() != Tree.Kind.NEW_CLASS) {
       Tree leaf = parent.getLeaf();
@@ -1099,6 +1102,14 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
         ClassTree clazz = (ClassTree) leaf;
         String className = clazz.getSimpleName().toString();
         boolean isStatic = clazz.getModifiers().getFlags().contains(Modifier.STATIC);
+        if (skip) {
+          skip = false;
+          if (!isStatic) {
+            receiver.setQualifyThis(true);
+            parent = parent.getParentPath();
+            continue;
+          }
+        }
         // className will be empty for the CLASS node directly inside an
         // anonymous inner class NEW_CLASS node.
         if (!className.isEmpty()) {
