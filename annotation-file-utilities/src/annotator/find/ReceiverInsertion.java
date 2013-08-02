@@ -38,6 +38,12 @@ public class ReceiverInsertion extends Insertion {
     private boolean addComma;
 
     /**
+     * If true, {@code this} will be qualified with the name of the
+     * superclass.
+     */
+    private boolean qualifyThis;
+
+    /**
      * The inner types to go on this receiver. See {@link ReceiverInsertion} for
      * more details.
      */
@@ -68,18 +74,31 @@ public class ReceiverInsertion extends Insertion {
         super(criteria, false);
         this.type = type;
         addComma = false;
+        qualifyThis = false;
         this.innerTypeInsertions = innerTypeInsertions;
     }
 
     /**
-     * If {@code true} a comma will be added at the end of the receiver. This
-     * will only happen if a receiver is inserted (see
+     * If {@code true} a comma will be added at the end of the receiver.
+     * This will only happen if a receiver is inserted (see
      * {@link #ReceiverInsertion(DeclaredType, Criteria, List<Insertion>)} for a description of
      * when a receiver is inserted). This is useful if the method already has
      * one or more parameters.
      */
     public void setAddComma(boolean addComma) {
         this.addComma = addComma;
+    }
+
+    /**
+     * If {@code true}, qualify {@code this} with the name of the superclass.
+     * This will only happen if a receiver is inserted (see
+     * {@link #ReceiverInsertion(DeclaredType, Criteria, List<Insertion>)}
+     * for a description of when a receiver is inserted). This is useful
+     * for inner class constructors.
+     * @param qualifyThis indicates whether {@code this} should be qualified
+     */
+    public void setQualifyThis(boolean qualifyThis) {
+        this.qualifyThis = qualifyThis;
     }
 
     /**
@@ -105,7 +124,13 @@ public class ReceiverInsertion extends Insertion {
         boolean commentAnnotation = (comments && type.getName().isEmpty());
         String result = typeToString(type, commentAnnotation, abbreviate);
         if (!type.getName().isEmpty()) {
-            result += " this";
+            result += " ";
+            if (qualifyThis) {
+                for (DeclaredType t = type; t != null; t = t.getInnerType()) {
+                    result += t.getName() + ".";
+                }
+            }
+            result += "this";
             if (addComma) {
                 result += ",";
             }
