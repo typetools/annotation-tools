@@ -209,6 +209,13 @@ public class IsSigMethodCriterion implements Criterion {
       }
     }
 
+    /*
+     * From Java 7 language definition 6.5.5.2 (Qualified Types):
+     * If a type name is of the form Q.Id, then Q must be either a type
+     * name or a package name.  If Id names exactly one accessible type
+     * that is a member of the type or package denoted by Q, then the
+     * qualified type name denotes that type.
+     */
     if (!matchable) {
       // match with any of the imports
       for (String someImport : context.imports) {
@@ -230,7 +237,7 @@ public class IsSigMethodCriterion implements Criterion {
           if (arrayBracket > -1) {
             simpleBaseType = simpleType.substring(0, arrayBracket);
           }
-          if (!simpleBaseType.equals(importSimpleType)) {
+          if (!simpleBaseType.startsWith(importSimpleType)) {
             continue;
           }
 
