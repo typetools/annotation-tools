@@ -523,7 +523,7 @@ fields, classes, etc., do not use a bytecode offset.
 \subsubsection{Source code indexes\label{source-code-indexes}}
 
 For locations in source code, the annotation file indicates the kind of
-expression, plus a zero-based index to indicate which occurence of that kind of
+expression, plus a zero-based index to indicate which occurrence of that kind of
 expression. For example,
 
 \begin{verbatim}
@@ -548,7 +548,7 @@ insertions in a nested class.
 
 \subsubsection{Code locations grammar\label{code-grammar}}
 
-For each kind of expresion, the grammar contains a separate location rule.
+For each kind of expression, the grammar contains a separate location rule.
 This location rule contains the bytecode offset syntax followed by the
 source code index syntax.
 
@@ -1315,7 +1315,7 @@ annotations to method headers of libraries (such as the JDK) without modifying
 the source code or bytecode of the library. A single stub file can contain
 multiple packages and classes. This format only allows annotations on method
 headers, not class headers, fields, and method bodies like in a \code{.jaif}
-file. Further, stub files are only used by the Checker Framework at runtime,
+file. Further, stub files are only used by the Checker Framework at run time,
 they cannot be used to insert annotations into a source or classfile.
 
 
@@ -1459,7 +1459,7 @@ A \code{CriterionList} identifies a unique AST node that is the location of an
 insertion. It contains objects that implement the
 annotation-file-utilities/\-src/\-annotator/\-find/\-Criterion.java interface.
 Each \code{Criterion} has an \code{isSatisifiedBy} method --- a predicate that
-takes an AST node and returns \code{true} if the AST node satisifies the
+takes an AST node and returns \code{true} if the AST node satisfies the
 \code{Criterion} and \code{false} otherwise. To determine if a given node
 matches a \code{CriterionList}, the node is passed to all of the
 \code{Criterion}s in the \code{CriteriaList}. If every \code{Criterion} returns
@@ -1527,4 +1527,18 @@ abstract syntax tree then an error message is displayed.
 
 % LocalWords:  java javac OuterClass InnerClass TODO Kleene MP subannotations
 % LocalWords:  enum arr quined int pt instanceof RUNTIME JVML ILjava boolean
-% LocalWords:  programmatically jml ernst jaif whitespace
+% LocalWords:  programmatically jml ernst jaif whitespace 0pt decl enums '
+%  LocalWords:  filenames typeparam javap init clinit ast un lowercased io
+%  LocalWords:  ExpressionStatement AnnotatedType underlyingType ArrayType
+%  LocalWords:  ArrayAccess leftOperand rightOperand CompoundAssignment
+%  LocalWords:  ConditionalExpression trueExpression falseExpression 'A'
+%  LocalWords:  DoWhileLoop EnhancedForLoop ForLoop thenStatement NewArray
+%  LocalWords:  elseStatement InstanceOf LabeledStatement LambdaExpression
+%  LocalWords:  MemberReference qualifierExpression typeArgument NewClass
+%  LocalWords:  MemberSelect MethodInvocation methodSelect classBody 5cm
+%  LocalWords:  enclosingExpression ParameterizedType finallyBlock AScene
+%  LocalWords:  TypeCast UnionType typeAlternative WhileLoop ElementType
+%  LocalWords:  AClass AMethod AElement objectweb anno tations parseScene
+%  LocalWords:  CriterionList isSatisifiedBy CriteriaList afu getPositions
+%  LocalWords:  InPackageCriterion InClassCriterion InMethodCriterion
+%  LocalWords:  ParamCriterion
