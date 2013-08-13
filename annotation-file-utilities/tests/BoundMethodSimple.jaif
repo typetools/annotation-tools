@@ -7,5 +7,5 @@ class BoundMethodSimple:
     method <init>()V:
 
     method foo(Lannotator/tests/Date;)V:
-        bound 0 &0: @java.lang.ReadOnly
+        bound 0 & 0: @java.lang.ReadOnly
 

@@ -7,4 +7,3 @@ public class ExtImpl {
 
   class C2 implements Iface<String, Object>, Iface2<Object, Float> {}
 }
-  
