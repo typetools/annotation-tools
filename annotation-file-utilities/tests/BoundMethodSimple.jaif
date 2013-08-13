@@ -9,3 +9,5 @@ class BoundMethodSimple:
     method foo(Lannotator/tests/Date;)V:
         bound 0 & 0: @java.lang.ReadOnly
 
+    method foo2(Ljava/lang/Object;)V:
+        bound 0 & 0: @java.lang.ReadOnly
