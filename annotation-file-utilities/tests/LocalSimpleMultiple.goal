@@ -10,7 +10,7 @@ public class LocalSimpleMultiple {
     bar(list);
     bar(o);
   }
-  
+
   public void bar(Object o) {
     @java.lang.ReadOnly LocalSimpleMultiple second = null;
     bar(second);

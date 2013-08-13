@@ -2,15 +2,15 @@ package annotator.tests;
 
 public class IntCell {
   private int i;
-  
+
   public IntCell(int in) {
     this.i = in;
   }
-  
+
   public void set(@java.lang.Mutable IntCell this, int in) /* mutable */ {
     this.i = in;
   }
-  
+
   public int get(@java.lang.ReadOnly IntCell this) /* readonly */ {
     return i;
   }

@@ -11,7 +11,7 @@ public class InnerClassAnonymous {
 
   public Serializable foo() {
     return new Serializable() {
-      public  final Object serialVersionUID = null;
+      public final Object serialVersionUID = null;
     };
   }
 

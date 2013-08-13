@@ -4,7 +4,7 @@ public class MethodMultiple {
   public String foo() {
     return null;
   }
-  
+
   public @java.lang.Mutable String foo(String s) {
     return null;
   }
