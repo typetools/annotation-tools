@@ -8,4 +8,8 @@ public class BoundMethodSimple {
   public <T extends Date> void foo(T t) {
     System.out.println(t);
   }
+
+  public <T> void foo2(T t) {
+    System.out.println(t);
+  }
 }
