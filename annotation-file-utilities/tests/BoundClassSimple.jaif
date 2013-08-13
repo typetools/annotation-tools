@@ -6,7 +6,7 @@ class BoundClassSimple:
     bound 0 & 0: @java.lang.ReadOnly
 
     field field:
-    field misleadingField: 
+    field misleadingField:
 
     method <init>()V:
 

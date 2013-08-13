@@ -7,6 +7,6 @@ public class ConstructorParamMultiple {
       /* @ReadOnly*/ Object a,
       /* @ReadOnly*/ List</* @Mutable*/ Integer> b,
       /* @ReadOnly*/ int c) {
-    
+
   }
 }

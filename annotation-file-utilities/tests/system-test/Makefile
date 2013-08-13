@@ -48,7 +48,7 @@ out3:
 	${XJAVAC} -d out3 source-plain/AnnotationTest.java || (\rm -rf out3 && false)
 
 # Step 4: Insert annotations into the class file.
-# Can debug with:  javap -v out4.class 
+# Can debug with:  javap -v out4.class
 out4.class: out3
 	CLASSPATH=`pwd`/out1 ${ANNCAT} --index expected-annos.jann --out --class out3/annotations/tests/AnnotationTest.class --to out4.class
 
