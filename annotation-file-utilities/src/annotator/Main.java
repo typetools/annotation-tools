@@ -31,6 +31,7 @@ import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
 import com.sun.tools.javac.main.CommandLine;
+import com.sun.tools.javac.tree.JCTree;
 
 /**
  * This is the main class for the annotator, which inserts annotations in
@@ -271,7 +272,8 @@ public class Main {
 
       int num_insertions = 0;
 
-      for (CompilationUnitTree tree : src.parse()) {
+      for (CompilationUnitTree cut : src.parse()) {
+        JCTree.JCCompilationUnit tree = (JCTree.JCCompilationUnit) cut;
 
         // Create a finder, and use it to get positions.
         TreeFinder finder = new TreeFinder(tree);
