@@ -237,7 +237,8 @@ public class IsSigMethodCriterion implements Criterion {
           if (arrayBracket > -1) {
             simpleBaseType = simpleType.substring(0, arrayBracket);
           }
-          if (!simpleBaseType.startsWith(importSimpleType)) {
+          if (!(simpleBaseType.equals(importSimpleType)
+              || simpleBaseType.startsWith(importSimpleType + "."))) {
             continue;
           }
 
