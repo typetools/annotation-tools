@@ -5,7 +5,10 @@ import checkers.nullness.quals.*;
 */
 
 import java.io.*;
+
 import plume.*;
+
+import com.sun.tools.javac.main.CommandLine;
 
 import org.objectweb.asm.ClassReader;
 
@@ -19,7 +22,7 @@ import annotations.io.IndexFileWriter;
 public class ClassFileReader {
 
   public static final String INDEX_UTILS_VERSION
-    = "Annotation File Utilities v3.5.3";
+    = "Annotation File Utilities v3.5.4";
 
   @Option("-h print usage information and exit")
   public static boolean help = false;
@@ -55,7 +58,7 @@ public class ClassFileReader {
    */
   public static void main(String[] args) throws IOException {
     Options options = new Options(usage, ClassFileReader.class);
-    args = options.parse_or_usage(args);
+    args = options.parse_or_usage(CommandLine.parse(args));
     if (version) {
       System.out.printf("extract-annotations (%s)", INDEX_UTILS_VERSION);
     }

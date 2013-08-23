@@ -7,7 +7,7 @@ import java.util.Set;
 public class LocalMultipleManyMethods {
   public void foo(Object o) {
     List myList = null;
-    
+
     if(myList.size() != 0) {
       @java.lang.C Set localVar = null;
       myList.add(localVar);
@@ -17,10 +17,10 @@ public class LocalMultipleManyMethods {
     }
     foo(o);
   }
-  
+
   public void foo(Object[] o) {
     List myList = null;
-    
+
     if(myList.size() != 0) {
       @java.lang.A Set localVar = null;
       myList.add(localVar);

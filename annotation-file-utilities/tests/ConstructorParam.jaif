@@ -5,7 +5,7 @@ package annotator.tests:
 class ConstructorParam:
 
     method <init>(I)V:
-        parameter #0: 
+        parameter #0:
           type: @java.lang.Mutable
 
 

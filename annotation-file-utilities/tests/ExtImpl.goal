@@ -7,4 +7,3 @@ public class ExtImpl {
 
   class C2 implements @A Iface<@B String, @C Object>, @D Iface2<@E Object, @F Float> {}
 }
-  
