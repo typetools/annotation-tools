@@ -41,8 +41,10 @@ public class JavariOutputSpecification implements Specification {
         int c;
         while ((c = in.read()) != -1)
             bytes.write(c);
+        in.close();
 
         this.spec = bytes.toByteArray();
+        bytes.close();
     }
 
     /**
