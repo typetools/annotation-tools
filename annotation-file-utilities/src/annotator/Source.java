@@ -78,7 +78,9 @@ public final class Source {
         int c;
         while ((c = in.read()) != -1)
             bytes.write(c);
+        in.close();
         source.append(bytes.toString());
+        bytes.close();
     }
 
     /**
