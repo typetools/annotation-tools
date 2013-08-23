@@ -11,7 +11,7 @@ public class InstanceOfMultiple {
         }
       }
     }
-    
+
     if(o instanceof @java.lang.Mutable List) {
       System.out.println(o);
     }

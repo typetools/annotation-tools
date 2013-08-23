@@ -1,6 +1,6 @@
 package annotations.tests;
 
-import java.util.*; 
+import java.util.*;
 
 @interface AClass {}
 @interface A00 {}
@@ -42,9 +42,9 @@ import java.util.*;
 @interface C13 {}
 
 public @AClass /*@CClass*/ class AnnotationTest<Foo extends @A10 /*@C10*/ Comparable<@A11 /*@C11*/ Integer>> {
-    
+
     @A0E /*@C0E*/ Iterable<@A0F /*@C0F*/ String> field;
-    
+
     <Bar extends @A12 /*@C12*/ Comparable<@A13 /*@C13*/ Integer>> @A0A /*@C0A*/ HashSet<@A0B /*@C0B*/ Integer>
         doSomething(@A06 AnnotationTest this, @A0C /*@C0C*/ Set<@A0D /*@C0D*/ Integer> param) /*@C06*/ {
         @A08 /*@C08*/ HashSet<@A09 /*@C09*/ Integer> local;
