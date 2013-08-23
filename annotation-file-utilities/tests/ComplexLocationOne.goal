@@ -1,0 +1,8 @@
+package annotator.tests;
+
+import java.util.List;
+import java.util.Map;
+
+public class ComplexLocationOne {
+  public @java.lang.A List< @java.lang.B Map<@java.lang.C Integer, @java.lang.D String @java.lang.E []>> field;
+}
