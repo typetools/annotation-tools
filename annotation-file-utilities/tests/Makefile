@@ -28,6 +28,7 @@ DIFFS := $(patsubst %.goal, %.diff, $(FILTERED))
 DEBUG :=
 # Use this to enable some debugging.
 # DEBUG := --debug
+DEBUG := --verbose --debug
 
 default : all
 
