@@ -255,8 +255,14 @@ public class IsSigMethodCriterion implements Criterion {
     return matchable;
   }
 
-  // simpleType can be in JVML format ??  Is that really possible?
   private boolean matchWithPrefix(String fullType, String simpleType, String prefix) {
+    return matchWithPrefixOneWay(fullType, simpleType, prefix)
+        || matchWithPrefixOneWay(simpleType, fullType, prefix);
+  }
+
+  // simpleType can be in JVML format ??  Is that really possible?
+  private boolean matchWithPrefixOneWay(String fullType, String simpleType,
+      String prefix) {
 
     // maybe simpleType is in JVML format
     String simpleType2 = simpleType.replace("/", ".");
