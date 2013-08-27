@@ -49,7 +49,6 @@ import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.JCTree.JCAnnotatedType;
 import com.sun.tools.javac.tree.JCTree.JCAnnotation;
 import com.sun.tools.javac.tree.JCTree.JCArrayTypeTree;
-import com.sun.tools.javac.tree.JCTree.JCBlock;
 import com.sun.tools.javac.tree.JCTree.JCClassDecl;
 import com.sun.tools.javac.tree.JCTree.JCCompilationUnit;
 import com.sun.tools.javac.tree.JCTree.JCExpression;
@@ -325,41 +324,17 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
         return ((JCTree) node.getReceiverParameter()).getStartPosition();
       } else if (!node.getParameters().isEmpty()) {
         return ((JCTree) node.getParameters().get(0)).getStartPosition();
-      }
-
-      // no parameters; find last identifier in declaration before block
-      // or ';', then find the next (uncommented) '('
-      try {
-        CharSequence s = tree.getSourceFile().getCharContent(true);
-        JCBlock body = jcnode.getBody();
-        List<JCExpression> thrws = jcnode.getThrows();
-        int start = jcnode.getStartPosition();
-        int end = !thrws.isEmpty() ? thrws.get(0).getStartPosition()
-            : body != null ? body.getStartPosition()
-            : jcnode.getEndPosition(tree.endPositions) - 1;  // - 1 for ';'
-
-        // The sole capturing group covers whatever is between the
-        // parentheses indicating the empty parameter list (typically a
-        // zero-length match, but only the start position is of
-        // interest).  Matching the full range ensures that the correct
-        // parentheses get matched.
-        String sym = jcnode.sym.toString();
-        String regex = "(?:" + unit + "*?\\b)*"
-            + sym.substring(0, sym.indexOf('(')) + "\\b" + whitespace
-            + "\\((" + whitespace + ")\\)" + whitespace
-            + (thrws.isEmpty() ? "" : "\\bthrows\\b" + whitespace);
-        Pattern p = Pattern.compile(regex, Pattern.MULTILINE);
-        Matcher m = p.matcher(s).region(start, end);
-
-        if (m.matches()) {
-          int pos = m.start(1);
-          if (pos >= 0) { return pos; }
+      } else {
+        // no parameters; find first (uncommented) '(' after method name
+        int pos = findMethodName(tree, jcnode);
+        if (pos >= 0) {
+          pos = getFirstInstanceAfter('(', pos, tree);
+          if (pos >= 0) { return pos + 1; }
         }
-      	throw new RuntimeException("Couldn't find param opening paren for: "
-      	    + node);
-      } catch (IOException e) {
-        throw new RuntimeException(e);
       }
+
+      throw new RuntimeException("Couldn't find param opening paren for: "
+          + jcnode);
     }
 
     static Map<Pair<CompilationUnitTree,Tree>,TreePath> getPathCache1 = new HashMap<Pair<CompilationUnitTree,Tree>,TreePath>();
@@ -982,10 +957,19 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
         debug("TreeFinder.scan: node=%s%n  critera=%s%n", node, i.getCriteria());
 
         if ((node.getKind() == Tree.Kind.METHOD) && (i.getCriteria().isOnReturnType())) {
-          // looking for the return type
-          pos = tpf.scan(((MethodTree)node).getReturnType(), i);
-          assert handled(node);
-          debug("pos = %d at return type node: %s%n", pos, ((JCMethodDecl)node).getReturnType().getClass());
+          JCMethodDecl jcnode = (JCMethodDecl) node;
+          Tree returnType = jcnode.getReturnType();
+          if (returnType == null) {
+            // find constructor name instead
+            pos = findMethodName(tree, jcnode);
+            debug("pos = %d at constructor name: %s%n", pos,
+                jcnode.sym.toString());
+          } else {
+            pos = tpf.scan(returnType, i);
+            assert handled(node);
+            debug("pos = %d at return type node: %s%n", pos,
+                returnType.getClass());
+          }
         } else if (((node.getKind() == Tree.Kind.TYPE_PARAMETER)
                     && (i.getCriteria().onBoundZero())
                     && ((TypeParameterTree) node).getBounds().isEmpty())
@@ -1041,6 +1025,36 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     }
 
     return super.scan(node, p);
+  }
+
+  /**
+   * Returns the start position of the method's name.  In particular,
+   * works properly for constructors, for which the name field in the
+   * AST is always "<init>" instead of the name from the source.
+   * 
+   * @param node AST node of method declaration
+   * @return position of method name (from {@link JCMethodDecl#sym}) in source
+   */
+  private static int findMethodName(JCCompilationUnit tree, JCMethodDecl node) {
+    String sym = node.sym.toString();
+    String name = sym.substring(0, sym.indexOf('('));
+    JCModifiers mods = node.getModifiers();
+    int start = mods.getStartPosition() < 0
+        ? node.getStartPosition()
+        : mods.getEndPosition(tree.endPositions);
+    int end = node.body == null
+        ? node.getEndPosition(tree.endPositions) - 1
+        : node.body.getStartPosition();
+
+    try {
+      CharSequence s = tree.getSourceFile().getCharContent(true);
+      String regex = "\\b" + Pattern.quote(name) + "\\b";  // sufficient?
+      Pattern pat = Pattern.compile(regex, Pattern.MULTILINE);
+      Matcher mat = pat.matcher(s).region(start, end);
+      return mat.find() ? mat.start() : Position.NOPOS;
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   /**
