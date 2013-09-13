@@ -27,6 +27,10 @@ public class AExpression extends AElement {
     public final VivifyingMap<RelativeLocation, ATypeElement> news =
             ATypeElement.<RelativeLocation>newVivifyingLHMap_ATE();
 
+    /** The method's insert-annotation invocations; map key is the AST path to the insertion place */
+    public final VivifyingMap<ASTPath, ATypeElement> insertAnnotations =
+            ATypeElement.<ASTPath>newVivifyingLHMap_ATE();
+
     /** The method's annotated insert-typecast invocations; map key is the AST path to the insertion place */
     public final VivifyingMap<ASTPath, ATypeElementWithType> insertTypecasts =
             ATypeElementWithType.<ASTPath>newVivifyingLHMap_ATEWT();
@@ -52,6 +56,7 @@ public class AExpression extends AElement {
         return typecasts.equals(o.typecasts)
                 && instanceofs.equals(o.instanceofs)
                 && news.equals(o.news)
+                && insertAnnotations.equals(o.insertAnnotations)
                 && insertTypecasts.equals(o.insertTypecasts);
         }
 
@@ -61,7 +66,7 @@ public class AExpression extends AElement {
     @Override
     public int hashCode(/*>>> @ReadOnly AExpression this*/) {
         return super.hashCode() + typecasts.hashCode() + instanceofs.hashCode()
-                + news.hashCode() + insertTypecasts.hashCode();
+                + news.hashCode() + insertAnnotations.hashCode() + insertTypecasts.hashCode();
     }
 
     /**
@@ -70,7 +75,7 @@ public class AExpression extends AElement {
     @Override
     public boolean prune() {
         return super.prune() & typecasts.prune() & instanceofs.prune()
-                & news.prune() & insertTypecasts.prune();
+                & news.prune() & insertAnnotations.prune() & insertTypecasts.prune();
     }
 
     @Override
@@ -99,6 +104,15 @@ public class AExpression extends AElement {
         for (Map.Entry<RelativeLocation, ATypeElement> em : news.entrySet()) {
             sb.append("new: ");
             RelativeLocation loc = em.getKey();
+            sb.append(loc);
+            sb.append(": ");
+            AElement ae = em.getValue();
+            sb.append(ae.toString());
+            sb.append(' ');
+        }
+        for (Map.Entry<ASTPath, ATypeElement> em : insertAnnotations.entrySet()) {
+            sb.append("insert-annotation: ");
+            ASTPath loc = em.getKey();
             sb.append(loc);
             sb.append(": ");
             AElement ae = em.getValue();
