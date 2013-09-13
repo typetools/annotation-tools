@@ -15,6 +15,7 @@ import java.io.LineNumberReader;
 import java.io.Reader;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
+import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -25,7 +26,6 @@ import java.util.Map;
 import java.util.Set;
 
 import plume.ArraysMDE;
-import plume.Assert.AssertionException;
 import plume.FileIOException;
 import type.ArrayType;
 import type.BoundedType;
@@ -75,6 +75,9 @@ import com.sun.tools.javac.code.TypeAnnotationPosition;
  * FileIOException externally.
  */
 public final class IndexFileParser {
+
+  private static final String[] typeSelectors = { "bound", "identifier",
+    "type", "typeAlternative", "typeArgument", "underlyingType" };
 
     // The input
     private final StreamTokenizer st;
@@ -923,6 +926,24 @@ public final class IndexFileParser {
                 parseAnnotations(n);
                 parseInnerTypes(n);
             }
+            while (checkKeyword("insert-annotation")) {
+                matchKeyword("insert-annotation");
+                matched = true;
+                evermatched = true;
+                ASTPath astPath = parseASTPath();
+                expectChar(':');
+                // if path doesn't indicate a type, a cast must be generated
+                if (selectsType(astPath)) {
+                    ATypeElement i = exp.insertAnnotations.vivify(astPath);
+                    parseAnnotations(i);
+                    parseInnerTypes(i);
+                } else {
+                    ATypeElementWithType i = exp.insertTypecasts.vivify(astPath);
+                    parseAnnotations(i);
+                    i.setType(new DeclaredType());
+                    parseInnerTypes(i);
+                }  // TODO: refactor
+            }
             while (checkKeyword("insert-typecast")) {
                 matchKeyword("insert-typecast");
                 matched = true;
@@ -937,6 +958,13 @@ public final class IndexFileParser {
             }
         }
         return evermatched;
+    }
+
+    private static boolean selectsType(ASTPath astPath) {
+      int n = astPath.size();
+      return n > 0 && Arrays.<String>binarySearch(typeSelectors,
+              astPath.get(n-1).getChildSelector(),
+              Collator.getInstance()) >= 0;
     }
 
     /**

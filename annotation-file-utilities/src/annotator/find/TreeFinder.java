@@ -11,6 +11,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.lang.model.element.Modifier;
+import javax.lang.model.type.NullType;
 
 import plume.Pair;
 import type.DeclaredType;
@@ -822,6 +823,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
   }
 
   boolean handled(Tree node) {
+    // FIXME: shouldn't use instanceof
     boolean res = (node instanceof CompilationUnitTree
             || node instanceof ClassTree
             || node instanceof MethodTree
@@ -984,8 +986,17 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
 
             i = new TypeBoundExtendsInsertion(i.getText(), i.getCriteria(), i.getSeparateLine());
         } else if (i.getKind() == Insertion.Kind.CAST) {
+            Type t = ((CastInsertion) i).getType();
             JCTree jcTree = (JCTree) node;
             pos = jcTree.getStartPosition();
+            if (t.getKind() == Type.Kind.DECLARED) {
+                DeclaredType dt = (DeclaredType) t;
+                if (dt.getName().isEmpty()) {
+                    dt.setName(jcTree.type instanceof NullType
+                            ? "Object"
+                            : jcTree.type.toString());
+                }
+            }
         } else if (i.getKind() == Insertion.Kind.CLOSE_PARENTHESIS) {
             JCTree jcTree = (JCTree) node;
             pos = jcTree.getStartPosition() + jcTree.toString().length();

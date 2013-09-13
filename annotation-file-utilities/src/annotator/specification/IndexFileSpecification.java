@@ -517,6 +517,14 @@ public class IndexFileSpecification implements Specification {
       parseInnerAndOuterElements(instanceOfClist, instanceOf);
     }
 
+    // parse insert annotations of method
+    for (Entry<ASTPath, ATypeElement> entry : exp.insertAnnotations.entrySet()) {
+      ASTPath astPath = entry.getKey();
+      ATypeElement insertAnnotation = entry.getValue();
+      CriterionList insertAnnotationClist = clist.add(Criteria.astPath(astPath));
+      parseInnerAndOuterElements(insertAnnotationClist, insertAnnotation, true);
+    }
+
     // parse insert typecasts of method
     for (Entry<ASTPath, ATypeElementWithType> entry : exp.insertTypecasts.entrySet()) {
       ASTPath astPath = entry.getKey();
