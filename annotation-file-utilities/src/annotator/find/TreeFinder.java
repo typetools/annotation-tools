@@ -1,9 +1,6 @@
 package annotator.find;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -1049,6 +1046,8 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     int end = node.body == null
         ? node.getEndPosition(tree.endPositions) - 1
         : node.body.getStartPosition();
+    int angle = name.lastIndexOf('>');  // check for type params
+    if (angle >= 0) { name = name.substring(angle + 1); }
 
     try {
       CharSequence s = tree.getSourceFile().getCharContent(true);
@@ -1310,28 +1309,4 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     System.out.printf("-----end path.%n");
   }
   */
-
-  public static void main(String[] args) throws IOException {
-    String regex = "(?:"
-        + "(?:[^\\[/'\"]|"  // not c or delimiter
-        + "'(?:\\[^']*|[^\\\\'])\'"
-        + "\"(?:\\[^\\\\]|[^\\\\\"])*\""
-        + "/(/.*$|\\*[^*]*\\*+(?:[^*/][^*]*\\*+)*/))"
-        + ")*\\[";
-    Pattern pat = Pattern.compile(regex);
-    List<String> lines =
-        Files.readAllLines(FileSystems.getDefault().getPath(args[0]),
-            Charset.defaultCharset());
-    StringBuffer buf = new StringBuffer();
-    for (String line : lines) { buf.append(line); }
-    String contents = buf.toString();
-    int n = contents.length();
-    for (int i = 0; i < n; i++) {
-      try {
-        pat.matcher(contents.subSequence(0, i)).find();
-      } catch (RuntimeException e) {
-        System.err.println(i);
-      }
-    }
-  }
 }
