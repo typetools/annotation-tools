@@ -482,6 +482,7 @@ expression:
 \qquad    \bnfnt{instanceof}* \\
 \qquad    \bnfnt{new}* \\
 \qquad    \bnfnt{source-insert-typecast}*
+\qquad    \bnfnt{source-insert-annotation}*
 \end{tabbing}
 
 \noindent
@@ -504,6 +505,10 @@ files and source code.
 Additionally, a new typecast with annotations (rather than an annotation added to an
 existing typecast) can be inserted into source code. This uses a third
 syntax that is described below under ``AST paths''.
+A second way to insert a typecast is by specifying just an annotation, not
+a full typecast (\code{insert-annotation} instead of
+\code{insert-typecast}).  In this case, the source annotation insertion
+tool generates a full typecast if Java syntax requires one.
 
 
 \subsubsection{Bytecode offsets\label{bytecode-offsets}}
@@ -744,6 +749,12 @@ public class ASTPathExample {
     }
 }
 \end{verbatim}
+
+Using \code{insert-annotation} instead of \code{insert-typecast} yields
+almost the same result --- it also inserts a cast.  The sole difference
+is the inability to specify the type in the cast expression.  If you use
+\code{insert-annotation}, then the annotation inserter infers the type,
+which is \code{int} in this case.
 
 Note that a cast can be inserted on any expression, not
 just the deepest expression in the AST. For example, a cast could be inserted on
@@ -1530,7 +1541,7 @@ abstract syntax tree then an error message is displayed.
 % LocalWords:  programmatically jml ernst jaif whitespace 0pt decl enums '
 %  LocalWords:  filenames typeparam javap init clinit ast un lowercased io
 %  LocalWords:  ExpressionStatement AnnotatedType underlyingType ArrayType
-%  LocalWords:  ArrayAccess leftOperand rightOperand CompoundAssignment
+%  LocalWords:  ArrayAccess leftOperand rightOperand CompoundAssignment '
 %  LocalWords:  ConditionalExpression trueExpression falseExpression 'A'
 %  LocalWords:  DoWhileLoop EnhancedForLoop ForLoop thenStatement NewArray
 %  LocalWords:  elseStatement InstanceOf LabeledStatement LambdaExpression
@@ -1540,5 +1551,5 @@ abstract syntax tree then an error message is displayed.
 %  LocalWords:  TypeCast UnionType typeAlternative WhileLoop ElementType
 %  LocalWords:  AClass AMethod AElement objectweb anno tations parseScene
 %  LocalWords:  CriterionList isSatisifiedBy CriteriaList afu getPositions
-%  LocalWords:  InPackageCriterion InClassCriterion InMethodCriterion
-%  LocalWords:  ParamCriterion
+%  LocalWords:  InPackageCriterion InClassCriterion InMethodCriterion 0pt
+%  LocalWords:  ParamCriterion inserter 'A' RUNNABLE asmx 5cm ASM src asm
