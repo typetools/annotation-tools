@@ -1,6 +1,9 @@
 package annotator.find;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -116,7 +119,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
    * Regular expression matching a character or string literal.
    */
   private final static String literal =
-      "'(?:\\\\(?:'|[^']*)|[^\\\\'])'|\"(?:\\\\.|[^\\\\\"])*\"";
+      "'(?:(?:\\\\(?:'|[^']*))|[^\\\\'])'|\"(?:\\\\.|[^\\\\\"])*\"";
 
   /**
    * Regular expression matching a sequence consisting only of
@@ -188,18 +191,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
    */
   private static int getFirstInstanceAfter(char c, int i,
       JCCompilationUnit tree) {
-    return getNthInstanceBetween(c, i, Integer.MAX_VALUE, 1, tree);
-  }
-
-  /**
-   * Returns the position of the last (non-commented) bracket at or
-   * before the given position.
-   *
-   * {@see #getNthInstanceBetween(char, int, int, int, CompilationUnitTree)}
-   */
-  private static int getLastInstanceBefore(char c, int i,
-      JCCompilationUnit tree) {
-    return getNthInstanceBetween(c, 0, i, 0, tree);
+    return getNthInstanceInRange(c, i, Integer.MAX_VALUE, 1, tree);
   }
 
   /**
@@ -215,7 +207,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
    * @return position of match in {@code tree}, or
    *          {@link Position.NOPOS} if match not found
    */
-  private static int getNthInstanceBetween(char c, int start, int end,
+  private static int getNthInstanceInRange(char c, int start, int end,
       int n, JCCompilationUnit tree) {
     if (end < 0) {
       throw new IllegalArgumentException("negative end position");
@@ -550,7 +542,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     private int arrayInsertPos(int start, int end) {
       try {
         CharSequence s = tree.getSourceFile().getCharContent(true);
-        int pos = getNthInstanceBetween('[', start, end, 1, tree);
+        int pos = getNthInstanceInRange('[', start, end, 1, tree);
 
         if (pos < 0) {
           // no "[", so check for "..."
@@ -667,8 +659,9 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
         return na.elemtype.getStartPosition();
       }
       if (na.dims.size() != 0) {
+        int startPos = na.getStartPosition();
         int argPos = na.dims.get(dim).getPreferredPosition();
-        return getLastInstanceBefore('[', argPos, tree);
+        return getNthInstanceInRange('[', startPos, argPos, 0, tree);
       }
       // In a situation like
       //   node=new String[][][][][]{{{}}}
@@ -1317,4 +1310,28 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     System.out.printf("-----end path.%n");
   }
   */
+
+  public static void main(String[] args) throws IOException {
+    String regex = "(?:"
+        + "(?:[^\\[/'\"]|"  // not c or delimiter
+        + "'(?:\\[^']*|[^\\\\'])\'"
+        + "\"(?:\\[^\\\\]|[^\\\\\"])*\""
+        + "/(/.*$|\\*[^*]*\\*+(?:[^*/][^*]*\\*+)*/))"
+        + ")*\\[";
+    Pattern pat = Pattern.compile(regex);
+    List<String> lines =
+        Files.readAllLines(FileSystems.getDefault().getPath(args[0]),
+            Charset.defaultCharset());
+    StringBuffer buf = new StringBuffer();
+    for (String line : lines) { buf.append(line); }
+    String contents = buf.toString();
+    int n = contents.length();
+    for (int i = 0; i < n; i++) {
+      try {
+        pat.matcher(contents.subSequence(0, i)).find();
+      } catch (RuntimeException e) {
+        System.err.println(i);
+      }
+    }
+  }
 }
