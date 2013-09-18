@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -288,7 +289,13 @@ public class Main {
         }
 
         Set<Integer> positionKeysUnsorted = positions.keySet();
-        Set<Integer> positionKeysSorted = new TreeSet<Integer>(new TreeFinder.ReverseIntegerComparator());
+        Set<Integer> positionKeysSorted =
+          new TreeSet<Integer>(new Comparator<Integer>() {
+            @Override
+            public int compare(Integer o1, Integer o2) {
+              return o1.compareTo(o2) * -1;
+            }
+          });
         positionKeysSorted.addAll(positionKeysUnsorted);
         for (Integer pos : positionKeysSorted) {
           List<Insertion> toInsertList = new ArrayList<Insertion>(positions.get(pos));
