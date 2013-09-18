@@ -1,7 +1,6 @@
 package annotator.find;
 
 import java.io.IOException;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -186,9 +185,8 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
    *
    * {@see #getNthInstanceBetween(char, int, int, int, CompilationUnitTree)}
    */
-  private static int getFirstInstanceAfter(char c, int i,
-      JCCompilationUnit tree) {
-    return getNthInstanceInRange(c, i, Integer.MAX_VALUE, 1, tree);
+  private int getFirstInstanceAfter(char c, int i) {
+    return getNthInstanceInRange(c, i, Integer.MAX_VALUE, 1);
   }
 
   /**
@@ -204,8 +202,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
    * @return position of match in {@code tree}, or
    *          {@link Position.NOPOS} if match not found
    */
-  private static int getNthInstanceInRange(char c, int start, int end,
-      int n, JCCompilationUnit tree) {
+  private int getNthInstanceInRange(char c, int start, int end, int n) {
     if (end < 0) {
       throw new IllegalArgumentException("negative end position");
     }
@@ -242,14 +239,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
    * elements.  For instance, type annotations for a declaration should be
    * placed before the type rather than the variable name.
    */
-  private static class TypePositionFinder extends TreeScanner<Integer, Insertion> {
-
-    private final JCCompilationUnit tree;
-
-    public TypePositionFinder(JCCompilationUnit tree) {
-      super();
-      this.tree = tree;
-    }
+  private class TypePositionFinder extends TreeScanner<Integer, Insertion> {
 
     /** @param t an expression for a type */
     private JCTree leftmostIdentifier(JCTree t) {
@@ -316,9 +306,9 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
         return ((JCTree) node.getParameters().get(0)).getStartPosition();
       } else {
         // no parameters; find first (uncommented) '(' after method name
-        int pos = findMethodName(tree, jcnode);
+        int pos = findMethodName(jcnode);
         if (pos >= 0) {
-          pos = getFirstInstanceAfter('(', pos, tree);
+          pos = getFirstInstanceAfter('(', pos);
           if (pos >= 0) { return pos + 1; }
         }
       }
@@ -327,13 +317,14 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
           + jcnode);
     }
 
-    static Map<Pair<CompilationUnitTree,Tree>,TreePath> getPathCache1 = new HashMap<Pair<CompilationUnitTree,Tree>,TreePath>();
+    Map<Pair<CompilationUnitTree,Tree>,TreePath> getPathCache1 =
+        new HashMap<Pair<CompilationUnitTree,Tree>,TreePath>();
 
     /**
      * An alternative to TreePath.getPath(CompilationUnitTree,Tree) that
      * caches its results.
      */
-    public static TreePath getPath(CompilationUnitTree unit, Tree target) {
+    public TreePath getPath(CompilationUnitTree unit, Tree target) {
       Pair<CompilationUnitTree,Tree> args = Pair.of(unit, target);
       if (getPathCache1.containsKey(args)) {
         return getPathCache1.get(args);
@@ -522,7 +513,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
 
       debug("  levels=%d largestLevels=%d%n", levels, largestLevels);
       for (int i=levels; i<largestLevels; i++) {
-        pos = getFirstInstanceAfter('[', pos+1, tree);
+        pos = getFirstInstanceAfter('[', pos+1);
         debug("  pos %d at i=%d%n", pos, i);
       }
       return pos;
@@ -539,7 +530,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     private int arrayInsertPos(int start, int end) {
       try {
         CharSequence s = tree.getSourceFile().getCharContent(true);
-        int pos = getNthInstanceInRange('[', start, end, 1, tree);
+        int pos = getNthInstanceInRange('[', start, end, 1);
 
         if (pos < 0) {
           // no "[", so check for "..."
@@ -658,7 +649,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       if (na.dims.size() != 0) {
         int startPos = na.getStartPosition();
         int argPos = na.dims.get(dim).getPreferredPosition();
-        return getNthInstanceInRange('[', startPos, argPos, 0, tree);
+        return getNthInstanceInRange('[', startPos, argPos, 0);
       }
       // In a situation like
       //   node=new String[][][][][]{{{}}}
@@ -667,7 +658,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
         // na.elemtype.getPreferredPosition(); seems to be at the end, after the brackets.
         // na.elemtype.getStartPosition(); is before the type name itself
         int startPos = na.elemtype.getStartPosition();
-        return getFirstInstanceAfter('[', startPos+1, tree);
+        return getFirstInstanceAfter('[', startPos+1);
       }
       JCArrayTypeTree jcatt = (JCArrayTypeTree) na.elemtype;
       for (int i=1; i<dim; i++) {
@@ -715,14 +706,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
    * various elements.  For instance, method declaration annotations should
    * be placed before all the other modifiers and annotations.
    */
-  private static class DeclarationPositionFinder extends TreeScanner<Integer, Void> {
-
-    //private final CompilationUnitTree tree;
-
-    public DeclarationPositionFinder(CompilationUnitTree tree) {
-      super();
-      //this.tree = tree;
-    }
+  private class DeclarationPositionFinder extends TreeScanner<Integer, Void> {
 
     // When a method is visited, it is visited for the declaration itself.
     @Override
@@ -783,16 +767,6 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
 
   }
 
-  /**
-   * A comparator for sorting integers in reverse
-   */
-  public static class ReverseIntegerComparator implements Comparator<Integer> {
-    @Override
-    public int compare(Integer o1, Integer o2) {
-      return o1.compareTo(o2) * -1;
-    }
-  }
-
   private final Map<Tree, TreePath> paths;
   private final TypePositionFinder tpf;
   private final DeclarationPositionFinder dpf;
@@ -807,8 +781,8 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
   public TreeFinder(JCCompilationUnit tree) {
     this.tree = tree;
     this.positions = LinkedHashMultimap.create();
-    this.tpf = new TypePositionFinder(tree);
-    this.dpf = new DeclarationPositionFinder(tree);
+    this.tpf = new TypePositionFinder();
+    this.dpf = new DeclarationPositionFinder();
     this.paths = new HashMap<Tree, TreePath>();
   }
 
@@ -953,7 +927,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
           Tree returnType = jcnode.getReturnType();
           if (returnType == null) {
             // find constructor name instead
-            pos = findMethodName(tree, jcnode);
+            pos = findMethodName(jcnode);
             debug("pos = %d at constructor name: %s%n", pos,
                 jcnode.sym.toString());
           } else {
@@ -970,8 +944,8 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
                     && wildcardLast(i.getCriteria().getGenericArrayLocation().getLocation()))) {
             pos = tpf.scan(node, i);
 
-            Integer nextpos1 = getFirstInstanceAfter(',', pos+1, tree);
-            Integer nextpos2 = getFirstInstanceAfter('>', pos+1, tree);
+            Integer nextpos1 = getFirstInstanceAfter(',', pos+1);
+            Integer nextpos2 = getFirstInstanceAfter('>', pos+1);
             pos = (nextpos1 != Position.NOPOS && nextpos1 < nextpos2) ? nextpos1 : nextpos2;
 
             i = new TypeBoundExtendsInsertion(i.getText(), i.getCriteria(), i.getSeparateLine());
@@ -1036,7 +1010,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
    * @param node AST node of method declaration
    * @return position of method name (from {@link JCMethodDecl#sym}) in source
    */
-  private static int findMethodName(JCCompilationUnit tree, JCMethodDecl node) {
+  private int findMethodName(JCMethodDecl node) {
     String sym = node.sym.toString();
     String name = sym.substring(0, sym.indexOf('('));
     JCModifiers mods = node.getModifiers();
