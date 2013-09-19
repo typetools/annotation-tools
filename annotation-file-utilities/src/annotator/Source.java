@@ -22,6 +22,7 @@ public final class Source {
     private JavacTask task;
     private StringBuilder source;
     private DiagnosticCollector<JavaFileObject> diagnostics;
+    private String path;
 
     /**
      * Signifies that a problem has occurred with the compiler that produces
@@ -74,6 +75,7 @@ public final class Source {
         this.task = (JavacTask)cTask;
 
         // Read the source file into a buffer.
+        path = src;
         source = new StringBuilder();
         FileInputStream in = new FileInputStream(src);
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
@@ -100,7 +102,14 @@ public final class Source {
                 compUnits.add(tree);
 
             // Add type information to the AST.
-            task.analyze();
+            try {
+              task.analyze();
+            } catch (Exception e) {
+              System.err.println("WARNING: " + path
+                  + ": type analysis failed; skipping");
+              System.err.println("(incomplete CLASSPATH?)");
+              return Collections.<CompilationUnitTree>emptySet();
+            }
 
             List<Diagnostic<? extends JavaFileObject>> errors = diagnostics.getDiagnostics();
             if (!diagnostics.getDiagnostics().isEmpty()) {
