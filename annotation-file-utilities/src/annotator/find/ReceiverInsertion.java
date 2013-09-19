@@ -38,6 +38,11 @@ public class ReceiverInsertion extends Insertion {
     private boolean addComma;
 
     /**
+     * If true only the annotations from {@link type} will be inserted.
+     */
+    private boolean annotationsOnly;
+
+    /**
      * If true, {@code this} will be qualified with the name of the
      * superclass.
      */
@@ -74,6 +79,7 @@ public class ReceiverInsertion extends Insertion {
         super(criteria, false);
         this.type = type;
         addComma = false;
+        annotationsOnly = false;
         qualifyThis = false;
         this.innerTypeInsertions = innerTypeInsertions;
     }
@@ -90,12 +96,19 @@ public class ReceiverInsertion extends Insertion {
     }
 
     /**
+     * If {@code true} only the annotations on {@link type} will be inserted.
+     * This is useful when the receiver parameter has already been inserted.
+     */
+    public void setAnnotationsOnly(boolean annotationsOnly) {
+        this.annotationsOnly = annotationsOnly;
+    }
+
+    /**
      * If {@code true}, qualify {@code this} with the name of the superclass.
      * This will only happen if a receiver is inserted (see
      * {@link #ReceiverInsertion(DeclaredType, Criteria, List<Insertion>)}
      * for a description of when a receiver is inserted). This is useful
      * for inner class constructors.
-     * @param qualifyThis indicates whether {@code this} should be qualified
      */
     public void setQualifyThis(boolean qualifyThis) {
         this.qualifyThis = qualifyThis;
@@ -121,6 +134,15 @@ public class ReceiverInsertion extends Insertion {
     /** {@inheritDoc} */
     @Override
     protected String getText(boolean comments, boolean abbreviate) {
+      if (annotationsOnly) {
+        StringBuilder b = new StringBuilder();
+        for (String a : type.getAnnotations()) {
+            b.append(a);
+            b.append(' ');
+        }
+        return new AnnotationInsertion(b.toString(), getCriteria(),
+                getSeparateLine()).getText(comments, abbreviate);
+      } else {
         boolean commentAnnotation = (comments && type.getName().isEmpty());
         String result = typeToString(type, commentAnnotation, abbreviate);
         if (!type.getName().isEmpty()) {
@@ -134,11 +156,12 @@ public class ReceiverInsertion extends Insertion {
             if (addComma) {
                 result += ",";
             }
-        }
-        if (comments && !commentAnnotation) {
-            result = "/*>>> " + result + " */";
+            if (comments) {
+                result = "/*>>> " + result + " */";
+            }
         }
         return result;
+      }
     }
 
     /** {@inheritDoc} */
