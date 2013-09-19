@@ -655,6 +655,9 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       //   node=new String[][][][][]{{{}}}
       // Also see Pretty.printBrackets.
       if (dim == 0) {
+        if (na.elemtype == null) {
+          return na.getStartPosition();
+        }
         // na.elemtype.getPreferredPosition(); seems to be at the end, after the brackets.
         // na.elemtype.getStartPosition(); is before the type name itself
         int startPos = na.elemtype.getStartPosition();
