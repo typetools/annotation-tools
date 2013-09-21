@@ -136,7 +136,9 @@ public class ReceiverInsertion extends Insertion {
     protected String getText(boolean comments, boolean abbreviate) {
       if (annotationsOnly) {
         StringBuilder b = new StringBuilder();
-        for (String a : type.getAnnotations()) {
+        List<String> annotations = type.getAnnotations();
+        if (annotations.isEmpty()) { return ""; }
+        for (String a : annotations) {
             b.append(a);
             b.append(' ');
         }
