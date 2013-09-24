@@ -762,7 +762,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       } else {
         result = cd.getPreferredPosition();
       }
-      assert result >= 0
+      assert result >= 0 || cd.name.isEmpty()
         : String.format("%d %d %d%n", cd.getStartPosition(),
                         cd.getPreferredPosition(), cd.pos);
       return result;
@@ -1164,7 +1164,8 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       Tree leaf = parent.getLeaf();
       if (leaf.getKind() == Tree.Kind.CLASS
           || leaf.getKind() == Tree.Kind.INTERFACE
-          || leaf.getKind() == Tree.Kind.ENUM) {
+          || leaf.getKind() == Tree.Kind.ENUM
+          || leaf.getKind() == Tree.Kind.ANNOTATION_TYPE) {
         ClassTree clazz = (ClassTree) leaf;
         String className = clazz.getSimpleName().toString();
         boolean isStatic = clazz.getModifiers().getFlags().contains(Modifier.STATIC);
