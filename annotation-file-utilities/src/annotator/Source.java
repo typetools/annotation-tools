@@ -113,13 +113,16 @@ public final class Source {
 
             List<Diagnostic<? extends JavaFileObject>> errors = diagnostics.getDiagnostics();
             if (!diagnostics.getDiagnostics().isEmpty()) {
+                int numErrors = 0;
                 for (Diagnostic<? extends JavaFileObject> d : errors) {
                     System.err.println(d);
+                    if (d.getKind() == Diagnostic.Kind.ERROR) { ++numErrors; }
                 }
-                int size = errors.size();
-                System.err.println(size + " error" + (size != 1 ? "s" : ""));
-                System.err.println("WARNING: Error processing input source files. Please fix and try again.");
-                System.exit(1);
+                if (numErrors > 0) {
+                    System.err.println(numErrors + " error" + (numErrors != 1 ? "s" : ""));
+                    System.err.println("WARNING: Error processing input source files. Please fix and try again.");
+                    System.exit(1);
+                }
             }
 
             return compUnits;
