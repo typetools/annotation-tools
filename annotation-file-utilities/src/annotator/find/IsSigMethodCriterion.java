@@ -130,11 +130,13 @@ public class IsSigMethodCriterion implements Criterion {
 
     boolean haveMatch = matchSimpleType(goalType, simpleType, context);
     if (!haveMatch) {
-      if (typeToClassMap.containsKey(simpleType)) {
-        simpleType = typeToClassMap.get(simpleType);
-        haveMatch = matchSimpleType(goalType, simpleType, context);
-        if (!haveMatch) {
-          if (Criteria.debug) debug(String.format("matchTypeParams() => false:%n  type = %s%n  simpleType = %s%n  goalType = %s%n", type, simpleType, goalType));
+      if (!typeToClassMap.isEmpty()) {
+        for (Map.Entry<String, String> p : typeToClassMap.entrySet()) {
+          simpleType = simpleType.replaceAll("\\b" + p.getKey() + "\\b",
+              p.getValue());
+          haveMatch = matchSimpleType(goalType, simpleType, context);
+          if (Criteria.debug && !haveMatch)
+            debug(String.format("matchTypeParams() => false:%n  type = %s%n  simpleType = %s%n  goalType = %s%n", type, simpleType, goalType));
         }
       }
     }
