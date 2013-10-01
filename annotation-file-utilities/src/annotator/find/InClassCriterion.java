@@ -87,6 +87,7 @@ final class InClassCriterion implements Criterion {
     }
     Collections.reverse(trees);
 
+    boolean insideMatch = false;
     for (int i = 0; i < trees.size(); i++) {
       Tree tree = trees.get(i);
       boolean checkAnon = false;
@@ -161,9 +162,20 @@ final class InClassCriterion implements Criterion {
         // should not use the anonymous class name.  But when matching
         // within the braces, we should.
         debug("InClassCriterion.isSatisfiedBy:%n  cname=%s%n  tree=%s%n", cname, tree);
-        if (! cname.equals("")) {
+        if (cname.equals("")) {
+          insideMatch = true;
+        } else {
           NewClassTree nc = (NewClassTree) tree;
           checkAnon = nc.getClassBody() != null;
+        }
+        break;
+      case METHOD:
+      case VARIABLE:
+        // Avoid searching inside inner classes of the matching class,
+        // lest a homographic inner class lead to a spurious match.
+        if (insideMatch) {
+          debug("false InClassCriterion.isSatisfiedBy:%n  cname=%s%n  tree=%s%n", cname, tree);
+          return false;
         }
         break;
       default:
