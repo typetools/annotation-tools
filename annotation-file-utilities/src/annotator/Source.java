@@ -101,16 +101,6 @@ public final class Source {
             for (CompilationUnitTree tree : task.parse())
                 compUnits.add(tree);
 
-            // Add type information to the AST.
-            try {
-              task.analyze();
-            } catch (Exception e) {
-              System.err.println("WARNING: " + path
-                  + ": type analysis failed; skipping");
-              System.err.println("(incomplete CLASSPATH?)");
-              return Collections.<CompilationUnitTree>emptySet();
-            }
-
             List<Diagnostic<? extends JavaFileObject>> errors = diagnostics.getDiagnostics();
             if (!diagnostics.getDiagnostics().isEmpty()) {
                 int numErrors = 0;
@@ -123,6 +113,16 @@ public final class Source {
                     System.err.println("WARNING: Error processing input source files. Please fix and try again.");
                     System.exit(1);
                 }
+            }
+
+            // Add type information to the AST.
+            try {
+              task.analyze();
+            } catch (Exception e) {
+              System.err.println("WARNING: " + path
+                  + ": type analysis failed; skipping");
+              System.err.println("(incomplete CLASSPATH?)");
+              return Collections.<CompilationUnitTree>emptySet();
             }
 
             return compUnits;
