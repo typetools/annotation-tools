@@ -41,10 +41,14 @@ import com.sun.source.tree.TypeCastTree;
 import com.sun.source.tree.TypeParameterTree;
 import com.sun.source.tree.VariableTree;
 import com.sun.source.tree.WildcardTree;
+//import com.sun.source.util.SimpleTreeVisitor;
 import com.sun.source.util.TreePath;
 import com.sun.source.util.TreeScanner;
+import com.sun.tools.javac.code.Type.ArrayType;
+import com.sun.tools.javac.code.Type.AnnotatedType;
 import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
 import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntryKind;
+import com.sun.tools.javac.code.Types;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.JCTree.JCAnnotatedType;
 import com.sun.tools.javac.tree.JCTree.JCAnnotation;
@@ -468,10 +472,30 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
 //       return afterParamList;
 //     }
 
+    private com.sun.tools.javac.code.Type.Visitor<Integer, Integer>
+    arrayTypeVisitor = new Types.SimpleVisitor<Integer, Integer>() {
+      @Override
+      public Integer visitArrayType(ArrayType t, Integer i) {
+        return t.elemtype.accept(this, i+1);
+      }
+      @Override
+      public Integer visitAnnotatedType(AnnotatedType t, Integer i) {
+        return t.unannotatedType().accept(this, i);
+      }
+      @Override
+      public Integer visitType(com.sun.tools.javac.code.Type t, Integer i) {
+        return i;
+      }
+    };
+
     /**
      * Returns the number of array levels that are in the given array type tree,
      * or 0 if the given node is not an array type tree.
      */
+    private int arrayLevels(com.sun.tools.javac.code.Type t) {
+      return t.accept(arrayTypeVisitor, 0);
+    }
+
     private int arrayLevels(Tree node) {
       int result = 0;
       while (node.getKind() == Tree.Kind.ARRAY_TYPE) {
@@ -597,7 +621,8 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       if (tree instanceof JCNewArray) {
         JCNewArray na = (JCNewArray) tree;
         if (na.dims.size() != 0) {
-          return na.dims.size();
+          // when not all dims are given, na.dims.size() gives wrong answer
+          return arrayLevels(na.type);
         }
         if (na.elemtype != null) {
           return getDimsSize(na.elemtype) + 1;
@@ -648,8 +673,8 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       }
       if (na.dims.size() != 0) {
         int startPos = na.getStartPosition();
-        int argPos = na.dims.get(dim).getPreferredPosition();
-        return getNthInstanceInRange('[', startPos, argPos, 0);
+        int endPos = na.getEndPosition(tree.endPositions);
+        return getNthInstanceInRange('[', startPos, endPos, dim + 1);
       }
       // In a situation like
       //   node=new String[][][][][]{{{}}}
