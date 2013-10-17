@@ -246,15 +246,16 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
   private class TypePositionFinder extends TreeScanner<Integer, Insertion> {
 
     /** @param t an expression for a type */
-    private JCTree leftmostIdentifier(JCTree t) {
+    private int getBaseTypePosition(JCTree t) {
       while (true) {
         switch (t.getKind()) {
         case IDENTIFIER:
         case PRIMITIVE_TYPE:
-          return t;
+          return t.pos;
         case MEMBER_SELECT:
-          t = ((JCFieldAccess) t).getExpression();
-          break;
+          t = ((JCFieldAccess) t).getExpression();  // pkg name
+          return getFirstInstanceAfter('.',
+              t.getEndPosition(tree.endPositions)) + 1;
         case ARRAY_TYPE:
           t = ((JCArrayTypeTree) t).elemtype;
           break;
@@ -269,7 +270,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
           // This is "?" as in "List<?>".  ((JCWildcard) t).inner is null.
           // There is nowhere to attach the annotation, so for now return
           // the "?" tree itself.
-          return t;
+          return t.pos;
         case ANNOTATED_TYPE:
           // If this type already has annotations on it, get the underlying
           // type, without annotations.
@@ -289,8 +290,8 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
         JCTypeApply vt = (JCTypeApply) jt;
         return vt.clazz.pos;
       }
-      JCExpression type = (JCExpression) (((JCVariableDecl)node).getType());
-      return leftmostIdentifier(type).pos;
+      JCExpression type = (JCExpression) jt;
+      return getBaseTypePosition(type);
     }
 
     // When a method is visited, it is visited for the receiver, not the
@@ -414,7 +415,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     public Integer visitParameterizedType(ParameterizedTypeTree node, Insertion ins) {
       Tree parent = parent(node);
       debug("TypePositionFinder.visitParameterizedType %s parent=%s%n", node, parent);
-      return leftmostIdentifier(((JCTypeApply) node).getType()).pos;
+      return getBaseTypePosition(((JCTypeApply) node).getType());
     }
 
 //     @Override
