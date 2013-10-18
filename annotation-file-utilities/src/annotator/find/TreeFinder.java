@@ -1177,6 +1177,8 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     // iterations of the loop are inside of the classes we get to at later
     // iterations.
     TreePath parent = path;
+    Tree leaf = parent.getLeaf();
+    Kind kind = leaf.getKind();
     // This is the outermost type, currently containing only the
     // annotation to add to the receiver.
     DeclaredType outerType = receiver.getType();
@@ -1186,10 +1188,8 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     // For an inner class constructor, the receiver comes from the
     // superclass, so skip past the first type definition.
     boolean skip = ((MethodTree) parent.getLeaf()).getReturnType() == null;
-    while (parent.getLeaf().getKind() != Tree.Kind.COMPILATION_UNIT
-        && parent.getLeaf().getKind() != Tree.Kind.NEW_CLASS) {
-      Tree leaf = parent.getLeaf();
-      Kind kind = leaf.getKind();
+    while (kind != Tree.Kind.COMPILATION_UNIT
+        && kind != Tree.Kind.NEW_CLASS) {
       if (kind == Tree.Kind.CLASS
           || kind == Tree.Kind.INTERFACE
           || kind == Tree.Kind.ENUM
@@ -1197,18 +1197,14 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
         ClassTree clazz = (ClassTree) leaf;
         String className = clazz.getSimpleName().toString();
         boolean isStatic = kind == Tree.Kind.INTERFACE
-                || clazz.getModifiers().getFlags().contains(Modifier.STATIC);
+            || clazz.getModifiers().getFlags().contains(Modifier.STATIC);
+        skip &= !isStatic;
         if (skip) {
           skip = false;
-          if (!isStatic) {
-            receiver.setQualifyThis(true);
-            parent = parent.getParentPath();
-            continue;
-          }
-        }
-        // className will be empty for the CLASS node directly inside an
-        // anonymous inner class NEW_CLASS node.
-        if (!className.isEmpty()) {
+          receiver.setQualifyThis(true);
+        } else if (!className.isEmpty()) {
+          // className will be empty for the CLASS node directly inside an
+          // anonymous inner class NEW_CLASS node.
           DeclaredType inner = new DeclaredType(className);
           if (staticType == null) {
             // Only include type parameters on the classes to the right of and
@@ -1236,6 +1232,8 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
         }
       }
       parent = parent.getParentPath();
+      leaf = parent.getLeaf();
+      kind = leaf.getKind();
     }
 
     // Merge innerTypes into outerType: outerType only has the annotations
