@@ -37,6 +37,7 @@ import com.sun.source.tree.NewClassTree;
 import com.sun.source.tree.ParameterizedTypeTree;
 import com.sun.source.tree.PrimitiveTypeTree;
 import com.sun.source.tree.Tree;
+import com.sun.source.tree.Tree.Kind;
 import com.sun.source.tree.TypeCastTree;
 import com.sun.source.tree.TypeParameterTree;
 import com.sun.source.tree.VariableTree;
@@ -1188,13 +1189,15 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     while (parent.getLeaf().getKind() != Tree.Kind.COMPILATION_UNIT
         && parent.getLeaf().getKind() != Tree.Kind.NEW_CLASS) {
       Tree leaf = parent.getLeaf();
-      if (leaf.getKind() == Tree.Kind.CLASS
-          || leaf.getKind() == Tree.Kind.INTERFACE
-          || leaf.getKind() == Tree.Kind.ENUM
-          || leaf.getKind() == Tree.Kind.ANNOTATION_TYPE) {
+      Kind kind = leaf.getKind();
+      if (kind == Tree.Kind.CLASS
+          || kind == Tree.Kind.INTERFACE
+          || kind == Tree.Kind.ENUM
+          || kind == Tree.Kind.ANNOTATION_TYPE) {
         ClassTree clazz = (ClassTree) leaf;
         String className = clazz.getSimpleName().toString();
-        boolean isStatic = clazz.getModifiers().getFlags().contains(Modifier.STATIC);
+        boolean isStatic = kind == Tree.Kind.INTERFACE
+                || clazz.getModifiers().getFlags().contains(Modifier.STATIC);
         if (skip) {
           skip = false;
           if (!isStatic) {
