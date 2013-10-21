@@ -5,4 +5,5 @@ import java.util.Map;
 
 public class ComplexLocationOne {
   public @java.lang.A List< @java.lang.B Map<@java.lang.C Integer, @java.lang.D String @java.lang.E []>> field;
+  public List< Map.Entry<@java.lang.A Integer, String[]>> entries;
 }
