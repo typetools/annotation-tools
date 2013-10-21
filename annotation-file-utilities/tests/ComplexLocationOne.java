@@ -5,4 +5,5 @@ import java.util.Map;
 
 public class ComplexLocationOne {
   public List< Map<Integer, String[]>> field;
+  public List< Map.Entry<Integer, String[]>> entries;
 }
