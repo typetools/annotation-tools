@@ -12,6 +12,7 @@ import annotator.Main;
 
 import com.sun.source.tree.AnnotatedTypeTree;
 import com.sun.source.tree.ArrayTypeTree;
+import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.NewArrayTree;
 import com.sun.source.tree.NewClassTree;
 import com.sun.source.tree.ParameterizedTypeTree;
@@ -237,6 +238,19 @@ public class GenericArrayLocationCriterion implements Criterion {
         }
         locationRemaining.remove(locationRemaining.size() - 1);
       } else if (parent.getKind() == Tree.Kind.PARAMETERIZED_TYPE) {
+        if (loc.tag == TypePathEntryKind.INNER_TYPE) {
+          Tree type = ((ParameterizedTypeTree) leaf).getType();
+          do {
+            if (type.getKind() == Tree.Kind.ANNOTATED_TYPE) {
+              type = ((AnnotatedTypeTree) type).getUnderlyingType();
+            }
+            if (type.getKind() != Tree.Kind.MEMBER_SELECT) { return false; }
+            locationRemaining.remove(locationRemaining.size()-1);
+            if (locationRemaining.isEmpty()) { return true; }
+            loc = locationRemaining.get(locationRemaining.size()-1);
+            type = ((MemberSelectTree) type).getExpression();
+          } while (loc.tag == TypePathEntryKind.INNER_TYPE);
+        }
         if (loc.tag != TypePathEntryKind.TYPE_ARGUMENT) {
           return false;
         }
