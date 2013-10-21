@@ -1197,6 +1197,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
         ClassTree clazz = (ClassTree) leaf;
         String className = clazz.getSimpleName().toString();
         boolean isStatic = kind == Tree.Kind.INTERFACE
+            || kind == Tree.Kind.ENUM
             || clazz.getModifiers().getFlags().contains(Modifier.STATIC);
         skip &= !isStatic;
         if (skip) {
