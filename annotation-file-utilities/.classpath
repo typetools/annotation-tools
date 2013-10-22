@@ -5,7 +5,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/asmx"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/scene-lib"/>
-	<classpathentry kind="lib" path="lib/google-collect-1.0-rc3.jar"/>
+	<classpathentry kind="lib" path="lib/guava-15.0.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/plume-lib"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
