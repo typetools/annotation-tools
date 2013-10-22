@@ -15,7 +15,7 @@ This is the changelog for the
 <ul>
 
   <li>
-    Version 3.5.6 (released Oct 9, 2013):
+    Version 3.5.6 (released Oct 22, 2013):
     <ul>
         <li>
           Adds "insert-annotation" to JAIF format, allowing the use of AST paths to specify source locations for annotation insertion (which previously was possible only for typecast insertions).
@@ -24,13 +24,16 @@ This is the changelog for the
           For consistency with <code>extract-annotations</code>, <code>insert-annotations-to-source</code> now matches generic method types in the source with JAIF specifications for their least upper bounds.
         </li>
         <li>
-          Fixes various bugs involving source insertions of receiver annotations.
+          Allows annotations on inner type declarations of parameterized types.
         </li>
         <li>
           Avoids spurious code location matches on anonymous inner subclasses of an outer class.
         </li>
         <li>
           Works around Java regex bug that on some input causes an infinite loop in the Matcher.
+        </li>
+        <li>
+          Fixes many other bugs, most involving receiver insertions.
         </li>
         <li>
           No longer aborts on (non-fatal) warnings found during the <code>javac</code> type-checking phase of <code>.
