@@ -82,7 +82,7 @@
       -->
       <pathelement location="${annotations-compiler}/dist/lib/javac.jar"/>
       <pathelement location="${annotation-tools}/annotation-file-utilities/lib/plume.jar"/>
-      <pathelement location="${annotation-tools}/annotation-file-utilities/lib/google-collect-1.0-rc3.jar"/>
+      <pathelement location="${annotation-tools}/annotation-file-utilities/lib/guava-15.0.jar"/>
       <pathelement location="${scene-lib}/bin"/>
       <pathelement location="${asmx}/bin"/>
       <!-- additional for distribution:
@@ -126,7 +126,7 @@
 	<srcfiles dir="${annotations-compiler}/build/classes" />
       </uptodate>
       <uptodate property="plume.uptodate" targetfile="annotation-file-utilities.jar" srcfile="lib/plume.jar"/>
-      <uptodate property="google-collect.uptodate" targetfile="annotation-file-utilities.jar" srcfile="lib/google-collect-1.0-rc3.jar"/>
+      <uptodate property="google-collect.uptodate" targetfile="annotation-file-utilities.jar" srcfile="lib/guava-15.0.jar"/>
 
       <condition property="jarfile.uptodate">
 	<and>
@@ -172,7 +172,7 @@
         <exclude name="META-INF/" />
       </patternset>
     </unjar>
-    <unjar src="lib/google-collect-1.0-rc3.jar" dest="${temp-jarfile}">
+    <unjar src="lib/guava-15.0.jar" dest="${temp-jarfile}">
       <patternset>
         <include name="**/*.class"/>
         <exclude name="META-INF/" />
