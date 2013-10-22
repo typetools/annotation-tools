@@ -1,0 +1,11 @@
+package:
+annotation @A:
+package:
+annotation @B:
+
+class ExplicitUpper:
+bound 0 & 0: @A
+
+class ImplicitUpper:
+bound 0 & 0: @B
+

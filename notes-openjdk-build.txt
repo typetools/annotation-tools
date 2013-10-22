@@ -1,0 +1,97 @@
+This file contains some notes about the process of building the full
+OpenJDK distribution in RedHat Enterprise Linux 4 (Oracle's recommended
+environment) in VMWare.  It also contains some of Matt's recommendations as
+to when and how OpenJDK builds should be made.
+
+===========================================================================
+
+Notes on OpenJDK build process:
+
+Sun's "official" build environment (per /README-builds.html#MBE in the
+source distribution) is RHEL 4.
+
+Obtain RHEL 4 via MIT - IS&T offers it to students and faculty via
+https://web.mit.edu/rhlinux/rhel-4.0.
+
+There are three varieties of RHEL 4 - AS, ES, and WS. I used WS, which I
+believe is for workstations (the others are intended for servers).  This
+requires downloading the WS disc 1 and the AS discs 2 - 4.
+
+A single disk of size 8.0 GB was created in VMWare; VMWare's option for
+using .iso files as optical drives was also used (i.e., didn't need to
+mount loopback on the host). In retrospect, perhaps a larger disk should be
+used, as only ~500 MB remains after the JDK build.
+
+Default options were chosen for RHEL setup (including automatic
+partitioning and default packages). In the future, SELinux should be
+disabled in the installer (it can also be done later, but this will save a
+step).
+
+It seems that RHEL 4 doesn't have yum for package management, and that the
+"up2date" command should be used instead. up2date doesn't seem to have some
+way to search packages, though, so I had to google for some of the package
+names below. Before using up2date, I registered with IS&T (not Red Hat!),
+which was basically just a certificate check and running a script that they
+provide.
+
+I acquired the following packages:
+- JDK 6 (Linux x86 RPM version; for bootstrapping) --
+   http://java.sun.com/javase/downloads/index.jsp
+- SVN -- "up2date subversion"
+- JDK 7 -- "svn checkout https://openjdk.dev.java.net/svn/openjdk/jdk/trunk
+ openjdk --username guest" (hit enter for blank password)
+- JDK 7 binary plugs -- http://download.java.net/openjdk/jdk7/
+- ALSA headers -- "up2date alsa-lib-devel"
+- CUPS headers -- "up2date cups-devel"
+
+I installed the JDK 6 package via "rpm -Uvh [package]", and then did
+"/usr/sbin/alternatives" (apparently the RedHat version of Debian's
+update-alternatives) to install "java" and "javac" links. JDK 7 was a
+simple checkout (though it took a while) and the binary plugs were a "java
+-jar [package]".
+
+
+I set the following environment variables (having checked out the JDK 7
+sources into my home directory):
+
+export ALT_BOOTDIR=/usr/java/jdk1.6.0_01
+export ALT_CLOSED_JDK_IMPORT_PATH=~/openjdk/binary-plugs/jdk1.7.0
+export LANG=C # to suppress a sanity check warning
+
+
+I then did the sanity check and build per the /README-build.html
+instructions. The sanity check took a second or two, and the full build
+took about 40 minutes.
+
+The /control/build/linux-i586 folder contains j2sdk-image, which seems
+suitable as a binary distribution. I don't think there's a way to create
+the Oracle version, however (the .bin file that, when executed, prompts you to
+accept their license and then extracts files).
+
+There also doesn't seem to be a way to extract out just the compiler
+sources. In binary form, the compiler is in j2sdk-image/lib/tools.jar.
+
+If "make" is run after a successful build (even if no changes have been
+made), it takes ~17 minutes to complete.
+
+===========================================================================
+
+Matt's Recommendations:
+
+The build procedure (in Linux, at least) should not prevent us from
+releasing a binary JSR 308 OpenJDK package. We may have to figure out how
+to produce the Oracle package (with the license prompt and executable format)
+if a .zip is not a sufficient means of distribution. We may need some
+additional tools and setup for building in Windows.
+
+However, the build procedure takes too long (at least 17 minutes per build,
+vs around 5 seconds for the current compiler-only setup) for doing
+day-to-day development in this environment. I propose continuing to work
+with the compiler the way we have it in SVN (which mirrors Oracle's
+compiler-only distribution) and creating two scripts: one for updating the
+OpenJDK checkout with our compiler modifications and one for updating our
+compiler repository with vendor OpenJDK changes. We'd only use the former
+when doing a JSR 308 release, and only use the latter when Oracle does a
+release. In this way, we don't have to make any serious modifications (only
+a couple of additions) to our repositories or build scripts and can keep
+small build times for daily development.
