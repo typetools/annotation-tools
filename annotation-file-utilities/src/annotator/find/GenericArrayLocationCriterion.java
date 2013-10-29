@@ -12,7 +12,6 @@ import annotator.Main;
 
 import com.sun.source.tree.AnnotatedTypeTree;
 import com.sun.source.tree.ArrayTypeTree;
-import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.NewArrayTree;
 import com.sun.source.tree.NewClassTree;
 import com.sun.source.tree.ParameterizedTypeTree;
@@ -153,7 +152,11 @@ public class GenericArrayLocationCriterion implements Criterion {
           } // else, keep going to make sure we're in the right part of the
             // compound type
         } else {
-          return false;
+          if (!location.isEmpty()
+              && location.get(location.size()-1).tag
+                  != TypePathEntryKind.INNER_TYPE) {
+            return false;
+          }
         }
       }
     }
@@ -230,7 +233,22 @@ public class GenericArrayLocationCriterion implements Criterion {
       }
 
       TypePathEntry loc = locationRemaining.get(locationRemaining.size()-1);
-      if (loc.tag == TypePathEntryKind.WILDCARD && leaf.getKind() == Tree.Kind.UNBOUNDED_WILDCARD) {
+      if (loc.tag == TypePathEntryKind.INNER_TYPE) {
+        Tree.Kind kind = leaf.getKind();
+        if (kind == Tree.Kind.MEMBER_SELECT) {
+          JCFieldAccess fieldAccess = (JCFieldAccess) leaf;
+          if (fieldAccess.type != null
+              && fieldAccess.type.getKind() == TypeKind.DECLARED
+              && fieldAccess.type.tsym.isStatic()) {
+            return false;
+          }
+        } else if (kind != Tree.Kind.PARAMETERIZED_TYPE) {
+          return false;
+        }
+        locationRemaining.remove(locationRemaining.size()-1);
+        pathRemaining = TreePath.getPath(path.getCompilationUnit(), leaf);
+      } else if (loc.tag == TypePathEntryKind.WILDCARD
+          && leaf.getKind() == Tree.Kind.UNBOUNDED_WILDCARD) {
         // Check if the leaf is an unbounded wildcard instead of the parent, since unbounded
         // wildcard has no members so it can't be the parent of anything.
         if (locationRemaining.size() == 0) {
@@ -238,19 +256,6 @@ public class GenericArrayLocationCriterion implements Criterion {
         }
         locationRemaining.remove(locationRemaining.size() - 1);
       } else if (parent.getKind() == Tree.Kind.PARAMETERIZED_TYPE) {
-        if (loc.tag == TypePathEntryKind.INNER_TYPE) {
-          Tree type = ((ParameterizedTypeTree) leaf).getType();
-          do {
-            if (type.getKind() == Tree.Kind.ANNOTATED_TYPE) {
-              type = ((AnnotatedTypeTree) type).getUnderlyingType();
-            }
-            if (type.getKind() != Tree.Kind.MEMBER_SELECT) { return false; }
-            locationRemaining.remove(locationRemaining.size()-1);
-            if (locationRemaining.isEmpty()) { return true; }
-            loc = locationRemaining.get(locationRemaining.size()-1);
-            type = ((MemberSelectTree) type).getExpression();
-          } while (loc.tag == TypePathEntryKind.INNER_TYPE);
-        }
         if (loc.tag != TypePathEntryKind.TYPE_ARGUMENT) {
           return false;
         }
