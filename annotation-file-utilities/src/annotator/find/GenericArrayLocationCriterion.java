@@ -262,6 +262,17 @@ public class GenericArrayLocationCriterion implements Criterion {
         if (locationRemaining.size() == 0) {
           return false;
         }
+        // The following check is necessary because Oracle has decided that
+        //   x instanceof Class<? extends Object>
+        // will remain illegal even though it means the same thing as
+        //   x instanceof Class<?>.
+        TreePath grandparentPath = parentPath.getParentPath();
+        if (grandparentPath != null
+            && grandparentPath.getLeaf().getKind() == Tree.Kind.INSTANCE_OF) {
+          System.err.println("WARNING: wildcard bounds not allowed in "
+              + "'instanceof' expression; skipping insertion");
+          return false;
+        }
         locationRemaining.remove(locationRemaining.size() - 1);
       } else if (parent.getKind() == Tree.Kind.PARAMETERIZED_TYPE) {
         if (loc.tag != TypePathEntryKind.TYPE_ARGUMENT) {
