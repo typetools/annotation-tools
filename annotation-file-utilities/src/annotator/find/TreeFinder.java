@@ -668,7 +668,9 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       // System.out.printf("visitNewArray: dim=%d (arrayLocationInParent=%s), node=%s, elemtype=%s%s, dimsSize=%d, dims=%s (size=%d), elems=%s, annotations=%s (size=%d), dimAnnotations=%s (size=%d)%n", dim, arrayLocationInParent, na, na.elemtype, (na.elemtype == null ? "" : String.format(" (class: %s)", na.elemtype.getClass())), dimsSize, na.dims, na.dims.size(), na.elems, na.annotations, na.annotations.size(), na.dimAnnotations, na.dimAnnotations.size());
       if (dim == dimsSize) {
         if (na.elemtype == null) {
-          throw new Error("Bad .jaif file: specifies non-existent location because array initializer has no explicit type: " + node);
+          System.err.println("WARNING: array initializer " + node +
+              " has no explicit type; skipping insertion " + ins);
+          return null;
         }
         // return na.elemtype.getPreferredPosition();
         return na.elemtype.getStartPosition();
