@@ -23,6 +23,7 @@ import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
 import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntryKind;
 import com.sun.tools.javac.tree.JCTree.JCExpression;
 import com.sun.tools.javac.tree.JCTree.JCFieldAccess;
+import com.sun.tools.javac.tree.JCTree.JCTypeApply;
 
 /**
  * GenericArrayLocationCriterion represents the criterion specifying the location
@@ -121,7 +122,13 @@ public class GenericArrayLocationCriterion implements Criterion {
       child = ((NewArrayTree) leaf).getType();
     }
     if (child != null && child.getKind() == Tree.Kind.MEMBER_SELECT) {
-      return false;
+      JCExpression exp = ((JCFieldAccess) child).getExpression();
+      if (exp.type != null && exp.type.getKind() == TypeKind.PACKAGE
+          || location.isEmpty()
+          || (location.get(location.size()-1)).tag
+              != TypePathEntryKind.INNER_TYPE) {
+          return false;
+      }
     }
 
     if (leaf.getKind() == Tree.Kind.MEMBER_SELECT) {
@@ -234,19 +241,20 @@ public class GenericArrayLocationCriterion implements Criterion {
 
       TypePathEntry loc = locationRemaining.get(locationRemaining.size()-1);
       if (loc.tag == TypePathEntryKind.INNER_TYPE) {
-        Tree.Kind kind = leaf.getKind();
-        if (kind == Tree.Kind.MEMBER_SELECT) {
-          JCFieldAccess fieldAccess = (JCFieldAccess) leaf;
-          if (fieldAccess.type != null
-              && fieldAccess.type.getKind() == TypeKind.DECLARED
-              && fieldAccess.type.tsym.isStatic()) {
-            return false;
-          }
-        } else if (kind != Tree.Kind.PARAMETERIZED_TYPE) {
+        if (leaf.getKind() == Tree.Kind.PARAMETERIZED_TYPE) {
+          leaf = ((JCTypeApply) leaf).clazz;
+        }
+        if (leaf.getKind() != Tree.Kind.MEMBER_SELECT) { return false; }
+        JCFieldAccess fieldAccess = (JCFieldAccess) leaf;
+        if (fieldAccess.type != null
+            && fieldAccess.type.getKind() == TypeKind.DECLARED
+            && fieldAccess.type.tsym.isStatic()) {
           return false;
         }
         locationRemaining.remove(locationRemaining.size()-1);
-        pathRemaining = TreePath.getPath(path.getCompilationUnit(), leaf);
+        leaf = fieldAccess.selected;
+        pathRemaining =
+            TreePath.getPath(pathRemaining.getCompilationUnit(), leaf);
       } else if (loc.tag == TypePathEntryKind.WILDCARD
           && leaf.getKind() == Tree.Kind.UNBOUNDED_WILDCARD) {
         // Check if the leaf is an unbounded wildcard instead of the parent, since unbounded
