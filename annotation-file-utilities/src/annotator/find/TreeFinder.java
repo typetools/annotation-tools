@@ -1,6 +1,7 @@
 package annotator.find;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -67,6 +68,7 @@ import com.sun.tools.javac.tree.JCTree.JCTypeApply;
 import com.sun.tools.javac.tree.JCTree.JCTypeParameter;
 import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
 import com.sun.tools.javac.tree.JCTree.JCWildcard;
+import com.sun.tools.javac.util.Name;
 import com.sun.tools.javac.util.Position;
 
 /**
@@ -1322,6 +1324,19 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     }
     debug("getPositions => %d positions%n", positions.size());
     return Multimaps.unmodifiableSetMultimap(positions);
+  }
+
+  public SetMultimap<Integer, Insertion> getPositions(JCCompilationUnit node,
+      Insertions insertions) {
+    List<Insertion> list = new ArrayList<Insertion>();
+    list.addAll(insertions.forClass(""));
+    for (JCTree decl : node.getTypeDecls()) {
+      if (decl.getTag() == JCTree.Tag.CLASSDEF) {
+        Name name = ((JCClassDecl) decl).getSimpleName();
+        list.addAll(insertions.forClass(name.toString()));
+      }
+    }
+    return getPositions(node, list);
   }
 
   /*
