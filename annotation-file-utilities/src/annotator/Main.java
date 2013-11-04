@@ -23,6 +23,7 @@ import plume.UtilMDE;
 import annotator.Source.CompilerException;
 import annotator.find.Criteria;
 import annotator.find.Insertion;
+import annotator.find.Insertions;
 import annotator.find.ReceiverInsertion;
 import annotator.find.TreeFinder;
 import annotator.specification.IndexFileSpecification;
@@ -145,7 +146,7 @@ public class Main {
     }
 
     // The insertions specified by the annotation files.
-    List<Insertion> insertions = new ArrayList<Insertion>();
+    Insertions insertions = new Insertions();
     // The Java files into which to insert.
     List<String> javafiles = new ArrayList<String>();
 
