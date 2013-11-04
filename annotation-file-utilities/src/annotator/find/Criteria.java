@@ -139,6 +139,19 @@ public final class Criteria {
   }
 
   /**
+   * Determines whether this is the criteria on the RHS of an occurrence
+   * of 'instanceof'.
+   */
+  public boolean isOnInstanceof() {
+    for (Criterion c : criteria) {
+      if (c.getKind() == Criterion.Kind.INSTANCE_OF) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
    * Returns true if this Criteria is on the given method.
    */
   public boolean isOnMethod(String methodname) {

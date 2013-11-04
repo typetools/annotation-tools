@@ -203,7 +203,6 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
    * @param start position at which the search starts (inclusive)
    * @param end position at which the search ends (exclusive)
    * @param n number of repetitions, or 0 for last occurrence
-   * @param tree compilation unit containing {@code node}
    * @return position of match in {@code tree}, or
    *          {@link Position.NOPOS} if match not found
    */
@@ -667,6 +666,25 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
 
       // System.out.printf("visitNewArray: dim=%d (arrayLocationInParent=%s), node=%s, elemtype=%s%s, dimsSize=%d, dims=%s (size=%d), elems=%s, annotations=%s (size=%d), dimAnnotations=%s (size=%d)%n", dim, arrayLocationInParent, na, na.elemtype, (na.elemtype == null ? "" : String.format(" (class: %s)", na.elemtype.getClass())), dimsSize, na.dims, na.dims.size(), na.elems, na.annotations, na.annotations.size(), na.dimAnnotations, na.dimAnnotations.size());
       if (dim == dimsSize) {
+        if (na.toString().startsWith("{")) {
+          if (ins.getKind() == Insertion.Kind.ANNOTATION) {
+            TreePath parentPath = TreePath.getPath(tree, na).getParentPath();
+            if (parentPath != null) {
+              Tree parent = parentPath.getLeaf();
+              if (parent.getKind() == Tree.Kind.VARIABLE) {
+                try {
+                  CharSequence s = tree.getSourceFile().getCharContent(true);
+                  AnnotationInsertion ai = (AnnotationInsertion) ins;
+                  JCTree typeTree = ((JCVariableDecl) parent).getType();
+                  int start = typeTree.getStartPosition();
+                  int end = typeTree.getEndPosition(tree.endPositions);
+                  ai.setType(s.subSequence(start, end).toString());
+                  return na.getStartPosition();
+                } catch (IOException e) {}
+              }
+            }
+          }
+        }
         if (na.elemtype == null) {
           System.err.println("WARNING: array initializer " + node +
               " has no explicit type; skipping insertion " + ins);

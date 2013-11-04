@@ -11,6 +11,7 @@ public class AnnotationInsertion extends Insertion {
      * The annotation to insert.
      */
     private final String annotation;
+    private String type;
 
     /**
      * Creates a new insertion.
@@ -23,6 +24,7 @@ public class AnnotationInsertion extends Insertion {
     public AnnotationInsertion(String annotation, Criteria criteria, boolean separateLine) {
         super(criteria, separateLine);
         this.annotation = annotation;
+        type = null;
     }
 
     /**
@@ -59,6 +61,7 @@ public class AnnotationInsertion extends Insertion {
         if (!result.startsWith("@")) {
             throw new Error("Illegal insertion, must start with @: " + result);
         }
+        if (type != null) { result = "new " + result + " " + type; }
         if (comments) {
             return "/*" + result + "*/";
         }
@@ -89,5 +92,9 @@ public class AnnotationInsertion extends Insertion {
 
     public String toString() {
         return annotation + " " + super.toString();
+    }
+
+    public void setType(String s) {
+      this.type = s;
     }
 }
