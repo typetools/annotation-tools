@@ -96,7 +96,7 @@ public class ReceiverInsertion extends Insertion {
     }
 
     /**
-     * If {@code true} only the annotations on {@link type} will be inserted.
+     * If {@code true} only the annotations on {@code type} will be inserted.
      * This is useful when the receiver parameter has already been inserted.
      */
     public void setAnnotationsOnly(boolean annotationsOnly) {
