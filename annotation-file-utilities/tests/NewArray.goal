@@ -2,7 +2,7 @@ public class NewArray {
 
      String[] names01 = new @X String[12];
 
-     // String[] names02 = { "Alice", "Bob"};
+     String[] names02 = new @X String[] { "Alice", "Bob"};
 
      String[] names03 = new @X String[] { "Alice", "Bob"};
 
