@@ -266,12 +266,22 @@ public class GenericArrayLocationCriterion implements Criterion {
         //   x instanceof Class<? extends Object>
         // will remain illegal even though it means the same thing as
         //   x instanceof Class<?>.
-        TreePath grandparentPath = parentPath.getParentPath();
-        if (grandparentPath != null
-            && grandparentPath.getLeaf().getKind() == Tree.Kind.INSTANCE_OF) {
-          System.err.println("WARNING: wildcard bounds not allowed in "
-              + "'instanceof' expression; skipping insertion");
-          return false;
+        TreePath gpath = parentPath.getParentPath();
+        if (gpath != null) {  // TODO: skip over existing annotations?
+          Tree gparent = gpath.getLeaf();
+          if (gparent.getKind() == Tree.Kind.INSTANCE_OF) {
+            System.err.println("WARNING: wildcard bounds not allowed in "
+                + "'instanceof' expression; skipping insertion");
+            return false;
+          } else if (gparent.getKind() == Tree.Kind.PARAMETERIZED_TYPE) {
+            gpath = gpath.getParentPath();
+            if (gpath != null
+                && gpath.getLeaf().getKind() == Tree.Kind.ARRAY_TYPE) {
+              System.err.println("WARNING: wildcard bounds not allowed in "
+                  + "generic array type; skipping insertion");
+              return false;
+            }
+          }
         }
         locationRemaining.remove(locationRemaining.size() - 1);
       } else if (parent.getKind() == Tree.Kind.PARAMETERIZED_TYPE) {
