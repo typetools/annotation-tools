@@ -116,13 +116,13 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
    * this complication.
    */
   private final static String comment =
-      "//.*$|/\\*[^*]*\\*+(?:[^*/][^*]*\\*+)*/";
+      "//.*$|/\\*[^*]*+\\*++(?:[^*/][^*]*+\\*++)*+/";
 
   /**
    * Regular expression matching a character or string literal.
    */
   private final static String literal =
-      "'(?:(?:\\\\(?:'|[^']*))|[^\\\\'])'|\"(?:\\\\.|[^\\\\\"])*\"";
+      "'(?:(?:\\\\(?:'|[^']*+))|[^\\\\'])'|\"(?:\\\\.|[^\\\\\"])*\"";
 
   /**
    * Regular expression matching a sequence consisting only of
