@@ -2,9 +2,14 @@ package annotator.find;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 import javax.lang.model.type.TypeKind;
+
+import type.Type;
 
 import annotations.el.InnerTypeLocation;
 //only used for debugging
@@ -12,6 +17,7 @@ import annotator.Main;
 
 import com.sun.source.tree.AnnotatedTypeTree;
 import com.sun.source.tree.ArrayTypeTree;
+import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.NewArrayTree;
 import com.sun.source.tree.NewClassTree;
 import com.sun.source.tree.ParameterizedTypeTree;
@@ -23,7 +29,6 @@ import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
 import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntryKind;
 import com.sun.tools.javac.tree.JCTree.JCExpression;
 import com.sun.tools.javac.tree.JCTree.JCFieldAccess;
-import com.sun.tools.javac.tree.JCTree.JCTypeApply;
 
 /**
  * GenericArrayLocationCriterion represents the criterion specifying the location
@@ -133,8 +138,7 @@ public class GenericArrayLocationCriterion implements Criterion {
 
     if (leaf.getKind() == Tree.Kind.MEMBER_SELECT) {
       JCFieldAccess fieldAccess = (JCFieldAccess) leaf;
-      if (fieldAccess.type != null && fieldAccess.type.getKind() == TypeKind.DECLARED
-          && fieldAccess.type.tsym.isStatic()) {
+      if (isStatic(fieldAccess)) {
         // If this MEMBER_SELECT is for a static class...
         if (location.isEmpty()) {
           // ...and it does not go on a compound type, this is the right place.
@@ -242,19 +246,20 @@ public class GenericArrayLocationCriterion implements Criterion {
       TypePathEntry loc = locationRemaining.get(locationRemaining.size()-1);
       if (loc.tag == TypePathEntryKind.INNER_TYPE) {
         if (leaf.getKind() == Tree.Kind.PARAMETERIZED_TYPE) {
-          leaf = ((JCTypeApply) leaf).clazz;
+          leaf = parent;
+          parentPath = parentPath.getParentPath();
+          parent = parentPath.getLeaf();
         }
         if (leaf.getKind() != Tree.Kind.MEMBER_SELECT) { return false; }
+
         JCFieldAccess fieldAccess = (JCFieldAccess) leaf;
-        if (fieldAccess.type != null
-            && fieldAccess.type.getKind() == TypeKind.DECLARED
-            && fieldAccess.type.tsym.isStatic()) {
+        if (isStatic(fieldAccess)) {
           return false;
         }
         locationRemaining.remove(locationRemaining.size()-1);
         leaf = fieldAccess.selected;
-        pathRemaining =
-            TreePath.getPath(pathRemaining.getCompilationUnit(), leaf);
+        pathRemaining = parentPath;
+            //TreePath.getPath(pathRemaining.getCompilationUnit(), leaf);
       } else if (loc.tag == TypePathEntryKind.WILDCARD
           && leaf.getKind() == Tree.Kind.UNBOUNDED_WILDCARD) {
         // Check if the leaf is an unbounded wildcard instead of the parent, since unbounded
@@ -262,6 +267,7 @@ public class GenericArrayLocationCriterion implements Criterion {
         if (locationRemaining.size() == 0) {
           return false;
         }
+
         // The following check is necessary because Oracle has decided that
         //   x instanceof Class<? extends Object>
         // will remain illegal even though it means the same thing as
@@ -288,20 +294,60 @@ public class GenericArrayLocationCriterion implements Criterion {
         if (loc.tag != TypePathEntryKind.TYPE_ARGUMENT) {
           return false;
         }
+
+        // Find the outermost type in the AST; if it has parameters,
+        // pop the stack once for each inner type on the end of the type
+        // path and check the parameter.
+        Tree inner = ((ParameterizedTypeTree) parent).getType();
+        int i = locationRemaining.size() - 1;  // last valid type path index
+        locationRemaining.remove(i--);
+        while (inner.getKind() == Tree.Kind.MEMBER_SELECT
+            && !isStatic((JCFieldAccess) inner)) {
+          //fieldAccess.type != null && fieldAccess.type.getKind() == TypeKind.DECLARED
+          //&& fieldAccess.type.tsym.isStatic()
+          if (i < 0 || locationRemaining.get(i).tag !=
+              TypePathEntryKind.INNER_TYPE) {
+            return false;
+          }
+          locationRemaining.remove(i--);
+          inner = ((MemberSelectTree) inner).getExpression();
+          if (inner.getKind() == Tree.Kind.ANNOTATED_TYPE) {
+            inner = ((AnnotatedTypeTree) inner).getUnderlyingType();
+          }
+          if (inner.getKind() == Tree.Kind.PARAMETERIZED_TYPE) {
+            inner = ((ParameterizedTypeTree) inner).getType();
+          }
+        }
+        if (i >= 0 && locationRemaining.get(i).tag ==
+            TypePathEntryKind.INNER_TYPE) {
+          return false;
+        }
+
         // annotating List<@A Integer>
         // System.out.printf("parent instanceof ParameterizedTypeTree: %s loc=%d%n",
         //                   Main.treeToString(parent), loc);
-        ParameterizedTypeTree ptt = (ParameterizedTypeTree) parent;
-        List<? extends Tree> childTrees = ptt.getTypeArguments();
+        List<? extends Tree> childTrees =
+            ((ParameterizedTypeTree) parent).getTypeArguments();
         boolean found = false;
-        if (childTrees.size() > loc.arg ) {
+        if (childTrees.size() > loc.arg) {
           Tree childi = childTrees.get(loc.arg);
-
           if (childi.getKind() == Tree.Kind.ANNOTATED_TYPE) {
-              childi = ((AnnotatedTypeTree) childi).getUnderlyingType();
+            childi = ((AnnotatedTypeTree) childi).getUnderlyingType();
           }
-          if (childi.equals(leaf)) { 
-            locationRemaining.remove(locationRemaining.size()-1);
+          if (childi == leaf) {
+            for (TreePath outerPath = parentPath.getParentPath();
+                outerPath.getLeaf().getKind() == Tree.Kind.MEMBER_SELECT
+                    && !isStatic((JCFieldAccess) outerPath.getLeaf());
+                outerPath = outerPath.getParentPath()) {
+              outerPath = outerPath.getParentPath();
+              if (outerPath.getLeaf().getKind() == Tree.Kind.ANNOTATED_TYPE) {
+                outerPath = outerPath.getParentPath();
+              }
+              if (outerPath.getLeaf().getKind() != Tree.Kind.PARAMETERIZED_TYPE) {
+                break;
+              }
+              parentPath = outerPath;
+            }
             pathRemaining = parentPath;
             found = true;
           }
@@ -414,6 +460,16 @@ public class GenericArrayLocationCriterion implements Criterion {
     }
 
     return ! isGenericOrArray(parent);
+  }
+
+  /**
+   * @param fieldAccess
+   * @return
+   */
+  private boolean isStatic(JCFieldAccess fieldAccess) {
+    return fieldAccess.type != null
+        && fieldAccess.type.getKind() == TypeKind.DECLARED
+        && fieldAccess.type.tsym.isStatic();
   }
 
   private boolean isGenericOrArray(Tree t) {
