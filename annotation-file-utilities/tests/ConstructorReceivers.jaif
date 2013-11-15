@@ -103,8 +103,8 @@ class ConstructorReceivers$P0$C7:
     method <init>(Lannotator/tests/ConstructorReceivers$P0;)V:
         return:
         receiver: @ReadOnly
-            inner-type 3, 0: @Inner(0)
-            inner-type 3, 1: @Inner(1)
+            inner-type 1, 0, 3, 0: @Inner(0)
+            inner-type 1, 0, 3, 1: @Inner(1)
 
 class ConstructorReceivers$P0:
 
@@ -130,8 +130,8 @@ class ConstructorReceivers$P1$C9:
     method <init>()V:
         return:
         receiver: @ReadOnly
-            inner-type 3, 0: @Inner(0)
-            inner-type 3, 1: @Inner(1)
+            inner-type 1, 0, 3, 0: @Inner(0)
+            inner-type 1, 0, 3, 1: @Inner(1)
 
 class ConstructorReceivers$P1:
 
