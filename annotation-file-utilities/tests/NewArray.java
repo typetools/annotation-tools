@@ -2,7 +2,8 @@ public class NewArray {
 
      String[] names01 = new String[12];
 
-     String[] names02 = { "Alice", "Bob"};
+     // temporarily disabled due to bug
+     // String[] names02 = { "Alice", "Bob"};
 
      String[] names03 = new String[] { "Alice", "Bob"};
 
