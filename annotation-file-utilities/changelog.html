@@ -15,6 +15,26 @@ This is the changelog for the
 <ul>
 
   <li>
+    Version 3.5.7 (released Nov 15, 2013):
+    <ul>
+        <li>
+          Handles type paths with INNER_TYPE.
+        </li>
+        <li>
+          Disallows annotations on generic array type bounds and on wildcard bounds in "instanceof" expressions, since Java 8 prohibits type bounds in those locations.
+        </li>
+        <li>
+          Vastly improves performance when index file covers numerous source files, by filtering out irrelevant insertions at an earlier stage.
+        </li>
+        <li>
+          Avoids stack overflow during regex matching.
+        </li>
+        <li>
+          Adds new type specification when annotation is inserted on bare array literal, as Java 8 syntax requires.  (Experimental; bugs recently identified.)
+        </li>
+    </ul>
+  </li>
+  <li>
     Version 3.5.6 (released Oct 23, 2013):
     <ul>
         <li>
@@ -36,7 +56,7 @@ This is the changelog for the
           Fixes many other bugs, most involving receiver insertions.
         </li>
         <li>
-          No longer aborts on (non-fatal) warnings found during the <code>javac</code> type-checking phase of <code>.
+          No longer aborts on (non-fatal) warnings found during the <code>javac</code> type-checking phase of <code>insert-annotations-to-source</code>.
         </li>
     </ul>
   </li>
