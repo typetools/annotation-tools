@@ -2,6 +2,7 @@ package annotator.tests;
 
 import java.util.Date;
 
+@skip-test
 public class InnerClassSimple {
   public Integer field;
 
