@@ -61,8 +61,7 @@ public class AnnotationInsertion extends Insertion {
         if (!result.startsWith("@")) {
             throw new Error("Illegal insertion, must start with @: " + result);
         }
-        // FIXME: line below disabled for release due to bug
-        //if (type != null) { result = "new " + result + " " + type; }
+        if (type != null) { result = "new " + result + " " + type; }
         if (comments) {
             return "/*" + result + "*/";
         }

@@ -14,6 +14,7 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.type.NullType;
 
 import plume.Pair;
+import type.ArrayType;
 import type.DeclaredType;
 import type.Type;
 import annotator.Main;
@@ -30,6 +31,7 @@ import com.sun.source.tree.ExpressionStatementTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.IdentifierTree;
 import com.sun.source.tree.InstanceOfTree;
+import com.sun.source.tree.IntersectionTypeTree;
 import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.ModifiersTree;
@@ -39,14 +41,15 @@ import com.sun.source.tree.ParameterizedTypeTree;
 import com.sun.source.tree.PrimitiveTypeTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.tree.Tree.Kind;
+import com.sun.source.tree.TreeVisitor;
 import com.sun.source.tree.TypeCastTree;
 import com.sun.source.tree.TypeParameterTree;
+import com.sun.source.tree.UnionTypeTree;
 import com.sun.source.tree.VariableTree;
 import com.sun.source.tree.WildcardTree;
-//import com.sun.source.util.SimpleTreeVisitor;
+import com.sun.source.util.SimpleTreeVisitor;
 import com.sun.source.util.TreePath;
 import com.sun.source.util.TreeScanner;
-import com.sun.tools.javac.code.Type.ArrayType;
 import com.sun.tools.javac.code.Type.AnnotatedType;
 import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
 import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntryKind;
@@ -478,7 +481,8 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     private com.sun.tools.javac.code.Type.Visitor<Integer, Integer>
     arrayTypeVisitor = new Types.SimpleVisitor<Integer, Integer>() {
       @Override
-      public Integer visitArrayType(ArrayType t, Integer i) {
+      public Integer visitArrayType(com.sun.tools.javac.code.Type.ArrayType t,
+          Integer i) {
         return t.elemtype.accept(this, i+1);
       }
       @Override
@@ -667,28 +671,24 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       int dimsSize = getDimsSize(na);
 
       // System.out.printf("visitNewArray: dim=%d (arrayLocationInParent=%s), node=%s, elemtype=%s%s, dimsSize=%d, dims=%s (size=%d), elems=%s, annotations=%s (size=%d), dimAnnotations=%s (size=%d)%n", dim, arrayLocationInParent, na, na.elemtype, (na.elemtype == null ? "" : String.format(" (class: %s)", na.elemtype.getClass())), dimsSize, na.dims, na.dims.size(), na.elems, na.annotations, na.annotations.size(), na.dimAnnotations, na.dimAnnotations.size());
-      if (na.toString().startsWith("{")) {
-      // FIXME: commented-out lines below disabled for release due to bug
-      //  if (ins.getKind() == Insertion.Kind.ANNOTATION) {
-      //    TreePath parentPath = TreePath.getPath(tree, na).getParentPath();
-      //    if (parentPath != null) {
-      //      Tree parent = parentPath.getLeaf();
-      //      if (parent.getKind() == Tree.Kind.VARIABLE) {
-      //        try {
-      //          CharSequence s = tree.getSourceFile().getCharContent(true);
-      //          AnnotationInsertion ai = (AnnotationInsertion) ins;
-      //          JCTree typeTree = ((JCVariableDecl) parent).getType();
-      //          int start = typeTree.getStartPosition();
-      //          int end = typeTree.getEndPosition(tree.endPositions);
-      //          ai.setType(s.subSequence(start, end).toString());
-      //          return na.getStartPosition();
-      //        } catch (IOException e) {}
-      //      }
-      //    }
-      //  }
+      if (na.toString().startsWith("{")
+          && ins.getKind() == Insertion.Kind.ANNOTATION) {
+        TreePath parentPath = TreePath.getPath(tree, na).getParentPath();
+        if (parentPath != null) {
+          Tree parent = parentPath.getLeaf();
+          if (parent.getKind() == Tree.Kind.VARIABLE) {
+            AnnotationInsertion ai = (AnnotationInsertion) ins;
+            JCTree typeTree = ((JCVariableDecl) parent).getType();
+            ai.setType(typeTree.toString());
+            return na.getStartPosition();
+          }
+        }
         System.err.println("WARNING: array initializer " + node +
             " has no explicit type; skipping insertion " + ins);
         return null;
+      }
+      if (na.toString().startsWith("{")) {
+        return na.getStartPosition();
       }
       if (dim == dimsSize) {
         if (na.elemtype == null) {
@@ -970,6 +970,15 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
           }
         }
 
+        if (i.getKind() == Insertion.Kind.NEW && node.getKind() == Tree.Kind.NEW_ARRAY) {
+          NewInsertion neu = (NewInsertion) i;
+          NewArrayTree newArray = (NewArrayTree) node;
+
+          if (newArray.toString().startsWith("{")) {
+            addNewType(path, neu, newArray);
+          }
+        }
+
         // If this is a method, then it might have been selected because of
         // the receiver, or because of the return value.  Distinguish those.
         // One way would be to set a global variable here.  Another would be
@@ -1151,7 +1160,8 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
         // @Retention(java.lang.annotation.RetentionPolicy.CLASS) vs
         // @Retention(RetentionPolicy.CLASS)
         String ann = at.getAnnotationType().toString();
-        String iann = Main.removeArgs(ins.getText()).a.substring(1); // strip off the leading @
+        // strip off leading @ along w/any leading or trailing whitespace
+        String iann = Main.removeArgs(ins.getText()).a.trim().substring(1);
         String iannNoPackage = Insertion.removePackage(iann).b;
         // System.out.printf("Comparing: %s %s %s%n", ann, iann, iannNoPackage);
         if (ann.equals(iann) || ann.equals(iannNoPackage)) {
@@ -1207,7 +1217,8 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     Kind kind = leaf.getKind();
     // This is the outermost type, currently containing only the
     // annotation to add to the receiver.
-    DeclaredType outerType = receiver.getType();
+    Type outerType = receiver.getType();
+    DeclaredType baseType = receiver.getBaseType();
     // This holds the inner types as they're being read in.
     DeclaredType innerTypes = null;
     DeclaredType staticType = null;
@@ -1228,7 +1239,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
         skip &= !isStatic;
         if (skip) {
           skip = false;
-          receiver.setQualifyThis(true);
+          receiver.setQualifyType(true);
         } else if (!className.isEmpty()) {
           // className will be empty for the CLASS node directly inside an
           // anonymous inner class NEW_CLASS node.
@@ -1266,19 +1277,85 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     // Merge innerTypes into outerType: outerType only has the annotations
     // on the receiver, while innerTypes has everything else. innerTypes can
     // have the annotations if it is a static class.
-    outerType.setName(innerTypes.getName());
-    outerType.setTypeParameters(innerTypes.getTypeParameters());
-    outerType.setInnerType(innerTypes.getInnerType());
+    baseType.setName(innerTypes.getName());
+    baseType.setTypeParameters(innerTypes.getTypeParameters());
+    baseType.setInnerType(innerTypes.getInnerType());
     if (staticType != null && !innerTypes.getAnnotations().isEmpty()) {
       outerType.setAnnotations(innerTypes.getAnnotations());
     }
 
-    Type type = (staticType == null) ? outerType : staticType;
+    Type type = (staticType == null) ? baseType : staticType;
     Insertion.decorateType(receiver.getInnerTypeInsertions(), type);
 
     // If the method doesn't have parameters, don't add a comma.
     receiver.setAddComma(method.getParameters().size() > 0);
   }
+
+  private void addNewType(TreePath path, NewInsertion neu,
+      NewArrayTree newArray) {
+    DeclaredType baseType = neu.getBaseType();
+    if (baseType.getName().isEmpty()) {
+      Tree t = path.getParentPath().getLeaf();
+      if (t.getKind() == Tree.Kind.VARIABLE) {
+        List<String> annotations = baseType.getAnnotations();
+        Tree varType = ((VariableTree) t).getType();
+        Type newType = varType.accept(treeToTypeVisitor, null);
+        neu.setType(newType);
+        for (String ann : annotations) {
+          newType.addAnnotation(ann);
+        }
+      }
+    }
+    Insertion.decorateType(neu.getInnerTypeInsertions(), neu.getType());
+  }
+
+  private static TreeVisitor<Type, Void> treeToTypeVisitor =
+      new SimpleTreeVisitor<Type, Void>() {
+    @Override
+    public Type visitIdentifier(IdentifierTree node, Void v) {
+      return new DeclaredType(node.toString());
+    }
+    @Override
+    public Type visitPrimitiveType(PrimitiveTypeTree node, Void v) {
+      return new DeclaredType(node.toString());
+    }
+    @Override
+    public Type visitArrayType(ArrayTypeTree node, Void v) {
+      Type t = node.getType().accept(treeToTypeVisitor, v);
+      int n = 1;  // getArrayDims
+      while (--n >= 0) { t = new ArrayType(t); }
+      return t;
+    }
+    @Override
+    public Type visitParameterizedType(ParameterizedTypeTree node, Void v) {
+      List<? extends Tree> args = node.getTypeArguments();
+      List<Type> ts = new ArrayList<Type>(args.size());
+      DeclaredType t = (DeclaredType) node.getType().accept(this, v);
+      for (Tree arg : args) { ts.add(arg.accept(this, v)); }
+      t.setTypeParameters(ts);
+      return t;
+    }
+    @Override
+    public Type visitUnionType(UnionTypeTree node, Void v) {
+      return defaultAction(node, v);  // TODO
+    }
+    @Override
+    public Type visitIntersectionType(IntersectionTypeTree node, Void v) {
+      return defaultAction(node, v);  // TODO
+    }
+    public Type visitAnnotatedType(AnnotatedTypeTree node, Void v) {
+      Type t = node.getUnderlyingType().accept(this, v);
+      for (AnnotationTree ann : node.getAnnotations()) {
+        t.addAnnotation(ann.toString());
+      }
+      return t;
+    }
+    @Override
+    protected Type defaultAction(Tree node, Void v) {
+      throw new RuntimeException("treeToType: unexpected "
+          + node.getKind() + " in type tree");
+    }
+  };
 
   /**
    * Scans the given tree with the given insertion list and returns the

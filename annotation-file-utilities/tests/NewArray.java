@@ -2,10 +2,12 @@ public class NewArray {
 
      String[] names01 = new String[12];
 
-     // temporarily disabled due to bug
-     // String[] names02 = { "Alice", "Bob"};
+     String[] names02 = { "Alice", "Bob"};
 
      String[] names03 = new String[] { "Alice", "Bob"};
+
+     static final int[] table1 = {0, 1};
+     static final int table2[] = {0, 1};
 
      String[][][][][] names0 = new String[11][12][13][14][15];
      String[][][][][] names1 = new String[11][12][13][14][15];
