@@ -1,6 +1,5 @@
 package annotator.find;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import type.DeclaredType;
@@ -24,13 +23,7 @@ import type.DeclaredType;
  * "inserted" (with {@link Insertion#setInserted(boolean)}) so they are not
  * inserted as the rest of the insertions list is processed.
  */
-public class ReceiverInsertion extends Insertion {
-
-    /**
-     * The type to use when inserting the receiver.
-     */
-    private DeclaredType type;
-
+public class ReceiverInsertion extends TypedInsertion {
     /**
      * If true a comma will be added at the end of the insertion (only if also
      * inserting the receiver).
@@ -38,21 +31,10 @@ public class ReceiverInsertion extends Insertion {
     private boolean addComma;
 
     /**
-     * If true only the annotations from {@link type} will be inserted.
-     */
-    private boolean annotationsOnly;
-
-    /**
      * If true, {@code this} will be qualified with the name of the
      * superclass.
      */
     private boolean qualifyThis;
-
-    /**
-     * The inner types to go on this receiver. See {@link ReceiverInsertion} for
-     * more details.
-     */
-    private List<Insertion> innerTypeInsertions;
 
     /**
      * Construct a ReceiverInsertion.
@@ -76,12 +58,9 @@ public class ReceiverInsertion extends Insertion {
      *         {@link ReceiverInsertion} for more details.
      */
     public ReceiverInsertion(DeclaredType type, Criteria criteria, List<Insertion> innerTypeInsertions) {
-        super(criteria, false);
-        this.type = type;
+        super(type, criteria, innerTypeInsertions);
         addComma = false;
-        annotationsOnly = false;
         qualifyThis = false;
-        this.innerTypeInsertions = innerTypeInsertions;
     }
 
     /**
@@ -96,39 +75,14 @@ public class ReceiverInsertion extends Insertion {
     }
 
     /**
-     * If {@code true} only the annotations on {@code type} will be inserted.
-     * This is useful when the receiver parameter has already been inserted.
-     */
-    public void setAnnotationsOnly(boolean annotationsOnly) {
-        this.annotationsOnly = annotationsOnly;
-    }
-
-    /**
      * If {@code true}, qualify {@code this} with the name of the superclass.
      * This will only happen if a receiver is inserted (see
      * {@link #ReceiverInsertion(DeclaredType, Criteria, List<Insertion>)}
      * for a description of when a receiver is inserted). This is useful
      * for inner class constructors.
      */
-    public void setQualifyThis(boolean qualifyThis) {
+    public void setQualifyType(boolean qualifyThis) {
         this.qualifyThis = qualifyThis;
-    }
-
-    /**
-     * Gets the type. It is assumed that the returned value will be modified
-     * to update the type to be inserted.
-     */
-    public DeclaredType getType() {
-        return type;
-    }
-
-    /**
-     * Gets a copy of the inner types to go on this receiver. See
-     * {@link ReceiverInsertion} for more details.
-     * @return a copy of the inner types.
-     */
-    public List<Insertion> getInnerTypeInsertions() {
-        return new ArrayList<Insertion>(innerTypeInsertions);
     }
 
     /** {@inheritDoc} */
@@ -145,12 +99,14 @@ public class ReceiverInsertion extends Insertion {
         return new AnnotationInsertion(b.toString(), getCriteria(),
                 getSeparateLine()).getText(comments, abbreviate);
       } else {
-        boolean commentAnnotation = (comments && type.getName().isEmpty());
+        DeclaredType baseType = getBaseType();
+        boolean commentAnnotation = (comments && baseType.getName().isEmpty());
         String result = typeToString(type, commentAnnotation, abbreviate);
-        if (!type.getName().isEmpty()) {
+        if (!baseType.getName().isEmpty()) {
             result += " ";
             if (qualifyThis) {
-                for (DeclaredType t = type; t != null; t = t.getInnerType()) {
+                for (DeclaredType t = baseType; t != null;
+                        t = t.getInnerType()) {
                     result += t.getName() + ".";
                 }
             }
@@ -170,7 +126,7 @@ public class ReceiverInsertion extends Insertion {
     @Override
     protected boolean addLeadingSpace(boolean gotSeparateLine, int pos,
             char precedingChar) {
-        if (precedingChar == '.' && type.getName().isEmpty()) {
+        if (precedingChar == '.' && getBaseType().getName().isEmpty()) {
             // If only the annotation is being inserted then don't insert a
             // space if it's immediately after a '.'
             return false;
@@ -183,7 +139,7 @@ public class ReceiverInsertion extends Insertion {
     protected boolean addTrailingSpace(boolean gotSeparateLine) {
         // If the type is not already in the source and the receiver is the only
         // parameter, don't add a trailing space.
-        if (!type.getName().isEmpty() && !addComma) {
+        if (!getBaseType().getName().isEmpty() && !addComma) {
             return false;
         }
         return super.addTrailingSpace(gotSeparateLine);

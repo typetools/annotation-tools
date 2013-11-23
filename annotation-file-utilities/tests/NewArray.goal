@@ -2,10 +2,12 @@ public class NewArray {
 
      String[] names01 = new @X String[12];
 
-     // temporarily disabled due to bug
-     // String[] names02 = { "Alice", "Bob"};
+     String[] names02 = new @X String[] { "Alice", "Bob"};
 
      String[] names03 = new @X String[] { "Alice", "Bob"};
+
+     static final int[] table1 = new @A int @B [] {0, 1};
+     static final int table2[] = new @A int @B [] {0, 1};
 
      String[][][][][] names0 = new String @Z [11][12][13][14][15];
      String[][][][][] names1 = new String[11] @A [12][13][14][15];

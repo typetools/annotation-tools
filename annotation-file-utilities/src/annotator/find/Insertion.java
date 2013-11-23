@@ -21,6 +21,7 @@ public abstract class Insertion {
     public enum Kind {
         ANNOTATION,
         CAST,
+        NEW,
         RECEIVER,
         CLOSE_PARENTHESIS
     }

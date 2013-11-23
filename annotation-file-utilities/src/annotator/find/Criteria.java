@@ -152,6 +152,18 @@ public final class Criteria {
   }
 
   /**
+   * Determines whether this is the criteria on an object initializer.
+   */
+  public boolean isOnNew() {
+    for (Criterion c : criteria) {
+      if (c.getKind() == Criterion.Kind.NEW) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
    * Returns true if this Criteria is on the given method.
    */
   public boolean isOnMethod(String methodname) {

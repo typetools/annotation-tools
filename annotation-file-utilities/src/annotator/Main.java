@@ -24,6 +24,7 @@ import annotator.Source.CompilerException;
 import annotator.find.Criteria;
 import annotator.find.Insertion;
 import annotator.find.Insertions;
+import annotator.find.NewInsertion;
 import annotator.find.ReceiverInsertion;
 import annotator.find.TreeFinder;
 import annotator.specification.IndexFileSpecification;
@@ -301,6 +302,7 @@ public class Main {
         positionKeysSorted.addAll(positionKeysUnsorted);
         for (Integer pos : positionKeysSorted) {
           boolean receiverInserted = false;
+          boolean newInserted = false;
           List<Insertion> toInsertList = new ArrayList<Insertion>(positions.get(pos));
           Collections.reverse(toInsertList);
           if (debug) {
@@ -344,6 +346,10 @@ public class Main {
               ReceiverInsertion ri = (ReceiverInsertion) iToInsert;
               ri.setAnnotationsOnly(receiverInserted);
               receiverInserted = true;
+            } else if (iToInsert.getKind() == Insertion.Kind.NEW) {
+              NewInsertion ni = (NewInsertion) iToInsert;
+              ni.setAnnotationsOnly(newInserted);
+              newInserted = true;
             }
 
             String toInsert = iToInsert.getText(comments, abbreviate,
@@ -375,6 +381,10 @@ public class Main {
               }
             }
 
+            // TODO: Neither the above hack nor this check should be
+            // necessary.  Find out why re-insertions still occur and
+            // fix properly.
+            if (iToInsert.getInserted()) { continue; }
             src.insert(pos, toInsert);
             if (verbose) {
               System.out.print(".");
