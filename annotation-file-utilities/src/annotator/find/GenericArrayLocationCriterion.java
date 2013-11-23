@@ -2,14 +2,8 @@ package annotator.find;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Deque;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
-
 import javax.lang.model.type.TypeKind;
-
-import type.Type;
 
 import annotations.el.InnerTypeLocation;
 //only used for debugging
