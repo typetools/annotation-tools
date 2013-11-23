@@ -38,6 +38,7 @@ import annotator.find.CastInsertion;
 import annotator.find.CloseParenthesisInsertion;
 import annotator.find.Criteria;
 import annotator.find.Insertion;
+import annotator.find.NewInsertion;
 import annotator.find.ReceiverInsertion;
 import annotator.scanner.MethodOffsetClassVisitor;
 
@@ -276,8 +277,8 @@ public class IndexFileSpecification implements Specification {
    * @param clist The criteria specifying the location of the insertions.
    * @param element Holds the annotations to be inserted.
    * @param innerTypeInsertions The insertions on the inner type of this
-   *         element. This is only used for receiver insertions. See
-   *         {@link ReceiverInsertion} for more details.
+   *         element. This is only used for receiver and "new" insertions.
+   *         See {@link ReceiverInsertion} for more details.
    * @param isCastInsertion {@code true} if this for a cast insertion, {@code false}
    *          otherwise.
    * @return A list of the {@link AnnotationInsertion}s that are created.
@@ -287,6 +288,7 @@ public class IndexFileSpecification implements Specification {
     // Use at most one receiver and one cast insertion and add all of the
     // annotations to the one insertion.
     ReceiverInsertion receiver = null;
+    NewInsertion neu = null;
     CastInsertion cast = null;
     CloseParenthesisInsertion closeParen = null;
     List<Insertion> annotationInsertions = new ArrayList<Insertion>();
@@ -313,6 +315,14 @@ public class IndexFileSpecification implements Specification {
         } else {
           receiver.getType().addAnnotation(annotationString);
         }
+      } else if (criteria.isOnNew() && criteria.getGenericArrayLocation().getLocation().isEmpty()) {
+        if (neu == null) {
+          DeclaredType type = new DeclaredType();
+          type.addAnnotation(annotationString);
+          neu = new NewInsertion(type, criteria, innerTypeInsertions);
+        } else {
+          neu.getType().addAnnotation(annotationString);
+        }
       } else if (element instanceof ATypeElementWithType) {
         if (cast == null) {
           Pair<CastInsertion, CloseParenthesisInsertion> insertions = createCastInsertion(
@@ -337,6 +347,9 @@ public class IndexFileSpecification implements Specification {
     }
     if (receiver != null) {
         this.insertions.add(receiver);
+    }
+    if (neu != null) {
+        this.insertions.add(neu);
     }
     if (cast != null) {
         this.insertions.add(cast);

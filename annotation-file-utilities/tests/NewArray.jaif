@@ -13,14 +13,21 @@ field names01:
 new *0:
 inner-type 0, 0: @X
 
-// temporarily disabled due to bug
-// field names02:
-// new *0:
-// inner-type 0, 0: @X
+field names02:
+new *0:
+inner-type 0, 0: @X
 
 field names03:
 new *0:
 inner-type 0, 0: @X
+
+field table1:
+new *0: @B
+inner-type 0, 0: @A
+
+field table2:
+new *0: @B
+inner-type 0, 0: @A
 
 field names0:
 new *0: @Z
