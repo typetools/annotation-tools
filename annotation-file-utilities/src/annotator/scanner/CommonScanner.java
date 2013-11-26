@@ -12,6 +12,18 @@ import com.sun.source.util.TreePathScanner;
 public class CommonScanner extends TreePathScanner<Void, Void> {
 
     /**
+     * @param kind
+     * @return
+     */
+    private static boolean hasClassKind(Tree tree) {
+        Tree.Kind kind = tree.getKind();
+        return kind == Tree.Kind.CLASS
+                || kind == Tree.Kind.INTERFACE
+                || kind == Tree.Kind.ENUM
+                || kind == Tree.Kind.ANNOTATION_TYPE;
+    }
+
+    /**
      * The counting context for new, typecast, instanceof, and locals.
      * This is a path to a method or a field/static initializer.
      */
@@ -30,7 +42,7 @@ public class CommonScanner extends TreePathScanner<Void, Void> {
     // classes
 
     public static TreePath findEnclosingClass(TreePath path) {
-        while (path.getLeaf().getKind() != Tree.Kind.CLASS) {
+        while (!hasClassKind(path.getLeaf())) {
             path = path.getParentPath();
             if (path == null) {
                 return null;
@@ -56,7 +68,7 @@ public class CommonScanner extends TreePathScanner<Void, Void> {
     public static boolean isFieldInit(TreePath path) {
         return path.getLeaf().getKind() == Tree.Kind.VARIABLE
                 && path.getParentPath() != null
-                && path.getParentPath().getLeaf().getKind() == Tree.Kind.CLASS;
+                && hasClassKind(path.getParentPath().getLeaf());
     }
 
     public static TreePath findEnclosingFieldInit(TreePath path) {
@@ -73,7 +85,7 @@ public class CommonScanner extends TreePathScanner<Void, Void> {
 
     public static boolean isStaticInit(TreePath path) {
         return path.getParentPath() != null
-                && path.getParentPath().getLeaf().getKind() == Tree.Kind.CLASS
+                && hasClassKind(path.getParentPath().getLeaf())
                 && path.getLeaf().getKind() == Tree.Kind.BLOCK;
     }
 
