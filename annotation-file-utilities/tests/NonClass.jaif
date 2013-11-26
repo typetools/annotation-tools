@@ -16,3 +16,20 @@ class NonClass$C:
 method value()Ljava/lang/String;:
 return: @X
 
+annotation @V:
+  int value
+
+class NonClass$E:
+field D:
+typecast *0: @V(1)
+
+package:
+class NonClass$E:
+field D:
+new *0: @V(2)
+
+package:
+class NonClass$E:
+field D:
+type: @V(3)
+
