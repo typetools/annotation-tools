@@ -349,7 +349,11 @@ public final class Criteria {
   }
 
   public final static Criterion inStaticInit(int blockID) {
-    return new InStaticInitCriterion(blockID);
+    return new InInitBlockCriterion(blockID, true);
+  }
+
+  public final static Criterion inInstanceInit(int blockID) {
+    return new InInitBlockCriterion(blockID, false);
   }
 
   public final static Criterion inFieldInit(String varName) {

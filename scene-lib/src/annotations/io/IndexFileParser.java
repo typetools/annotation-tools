@@ -739,6 +739,17 @@ public final class IndexFileParser {
         parseBlock(staticinit);
     }
 
+    private void parseInstanceInit(AClass c) throws IOException,
+            ParseException {
+        expectKeyword("instanceinit");
+        expectChar('*');
+        int blockIndex = expectNonNegative(matchNNInteger());
+        expectChar(':');
+
+        ABlock instanceinit = c.instanceInits.vivify(blockIndex);
+        parseBlock(instanceinit);
+    }
+
     private void parseMethod(AClass c) throws IOException,
             ParseException {
         expectKeyword("method");
@@ -1227,6 +1238,8 @@ public final class IndexFileParser {
             parseField(c);
         while (checkKeyword("staticinit"))
             parseStaticInit(c);
+        while (checkKeyword("instanceinit"))
+            parseInstanceInit(c);
         while (checkKeyword("method"))
             parseMethod(c);
         c.methods.prune();

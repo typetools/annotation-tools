@@ -203,6 +203,9 @@ public class IndexFileSpecification implements Specification {
     for (Map.Entry<Integer, ABlock> entry : clazz.staticInits.entrySet()) {
       parseStaticInit(clist, entry.getKey(), entry.getValue());
     }
+    for (Map.Entry<Integer, ABlock> entry : clazz.instanceInits.entrySet()) {
+      parseInstanceInit(clist, entry.getKey(), entry.getValue());
+    }
     for (Map.Entry<String, AExpression> entry : clazz.fieldInits.entrySet()) {
       parseFieldInit(clist, entry.getKey(), entry.getValue());
     }
@@ -223,9 +226,14 @@ public class IndexFileSpecification implements Specification {
   private void parseStaticInit(CriterionList clist, int blockID, ABlock block) {
     clist = clist.add(Criteria.inStaticInit(blockID));
     // the method name argument is not used for static initializers, which are only used
-    // in source specifications. Same for field initializers.
+    // in source specifications. Same for instance and field initializers.
     // the empty () are there to prevent the whole string to be removed in later parsing.
-        parseBlock(clist, "static init number " + blockID + "()", block);
+    parseBlock(clist, "static init number " + blockID + "()", block);
+  }
+
+  private void parseInstanceInit(CriterionList clist, int blockID, ABlock block) {
+    clist = clist.add(Criteria.inInstanceInit(blockID));
+    parseBlock(clist, "instance init number " + blockID + "()", block);
   }
 
   // keep the descriptive strings for field initializers and static inits consistent
