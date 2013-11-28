@@ -269,6 +269,8 @@ class names for a class is to compile the class and look at the filenames of the
 \qquad        \bnfnt{extends}* \\
 \qquad        \bnfnt{implements}* \\
 \qquad        \bnfnt{field-definition}*  \\
+\qquad        \bnfnt{staticinit}* \\
+\qquad        \bnfnt{instanceinit}* \\
 \qquad        \bnfnt{method-definition}*
 \end{tabbing}
 
@@ -337,6 +339,25 @@ define annotations on the names of classes a class \code{extends} or
 \bnfnt{implements} ::= \\
 \qquad    \bnfcmt The integer is the zero-based index of the implemented interface. \\
 \qquad    \bnflit{implements} \bnfnt{integer} \bnflit{:} \bnfnt{type-annotation}* \lineend  \\
+\qquad        \bnfnt{compound-type}*
+\end{tabbing}
+
+
+\paragraph{Static and instance initializers}
+
+The \bnfnt{staticinit} and \bnfnt{instanceinit} productions
+define annotations on code within static or instance initializer blocks.
+
+\begin{tabbing}
+\qquad \= \kill
+\bnfnt{staticinit} ::= \\
+\qquad    \bnfcmt The integer is the zero-based index of the implemented interface. \\
+\qquad    \bnflit{staticinit} \bnflit{*} \bnfnt{integer} \bnflit{:} \lineend  \\
+\qquad        \bnfnt{compound-type}*
+\\
+\bnfnt{instanceinit} ::= \\
+\qquad    \bnfcmt The integer is the zero-based index of the implemented interface. \\
+\qquad    \bnflit{instanceinit} \bnflit{*} \bnfnt{integer} \bnflit{:} \lineend  \\
 \qquad        \bnfnt{compound-type}*
 \end{tabbing}
 
@@ -481,7 +502,7 @@ expression:
 \qquad    \bnfnt{typecast}* \\
 \qquad    \bnfnt{instanceof}* \\
 \qquad    \bnfnt{new}* \\
-\qquad    \bnfnt{source-insert-typecast}*
+\qquad    \bnfnt{source-insert-typecast}* \\
 \qquad    \bnfnt{source-insert-annotation}*
 \end{tabbing}
 
