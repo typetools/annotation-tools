@@ -1,21 +1,24 @@
 package annotator.find;
 
 import annotator.scanner.CommonScanner;
-import annotator.scanner.StaticInitScanner;
+import annotator.scanner.InitBlockScanner;
 
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
 
 /**
- * Criterion for being within a specific static initializer.
+ * Criterion for being within a specific initializer.
+ * 
+ * @author dbro
  */
-public class InStaticInitCriterion implements Criterion {
-
+public class InInitBlockCriterion implements Criterion {
   public final int blockID;
+  public final boolean isStatic;
   public final Criterion notInMethodCriterion;
 
-  public InStaticInitCriterion(int blockID) {
+  public InInitBlockCriterion(int blockID, boolean isStatic) {
     this.blockID = blockID;
+    this.isStatic = isStatic;
     this.notInMethodCriterion = Criteria.notInMethod();
   }
 
@@ -30,8 +33,8 @@ public class InStaticInitCriterion implements Criterion {
   @Override
   public boolean isSatisfiedBy(TreePath path) {
     while (path != null) {
-      if (CommonScanner.isStaticInit(path)) {
-        int indexInSource = StaticInitScanner.indexOfStaticInitTree(path);
+      if (CommonScanner.isInitBlock(path, isStatic)) {
+        int indexInSource = InitBlockScanner.indexOfInitTree(path, isStatic);
         return indexInSource == blockID;
       }
       path = path.getParentPath();
@@ -41,11 +44,12 @@ public class InStaticInitCriterion implements Criterion {
 
   @Override
   public Kind getKind() {
-    return Kind.IN_STATIC_INIT;
+    return isStatic ? Kind.IN_STATIC_INIT : Kind.IN_INSTANCE_INIT;
   }
 
   @Override
   public String toString() {
-    return "In static initializer with index " + blockID;
+    return "In " + (isStatic ? "static" : "instance")
+        + " initializer with index " + blockID;
   }
 }

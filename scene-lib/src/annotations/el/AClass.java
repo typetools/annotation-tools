@@ -34,7 +34,7 @@ public final class AClass extends AElement {
         };
     }
 
-    private static VivifyingMap<Integer, ABlock> createStaticInitMap() {
+    private static VivifyingMap<Integer, ABlock> createInitBlockMap() {
         return new VivifyingMap<Integer, ABlock>(
                 new LinkedHashMap<Integer, ABlock>()) {
             @Override
@@ -77,7 +77,10 @@ public final class AClass extends AElement {
         createMethodMap();
 
     public final VivifyingMap<Integer, ABlock> staticInits =
-        createStaticInitMap();
+        createInitBlockMap();
+
+    public final VivifyingMap<Integer, ABlock> instanceInits =
+        createInitBlockMap();
 
     /** The class's annotated fields; map key is field name */
     public final VivifyingMap<String, AElement> fields =
@@ -111,6 +114,8 @@ public final class AClass extends AElement {
     boolean equalsClass(/*>>> @ReadOnly AClass this,*/ /*@ReadOnly*/ AClass o) {
         return equalsElement(o) && bounds.equals(o.bounds)
             && methods.equals(o.methods) && fields.equals(o.fields)
+            && staticInits.equals(o.staticInits)
+            && instanceInits.equals(o.instanceInits)
             && extendsImplements.equals(o.extendsImplements);
     }
 
@@ -121,6 +126,7 @@ public final class AClass extends AElement {
     public int hashCode(/*>>> @ReadOnly AClass this*/) {
         return super.hashCode() + bounds.hashCode()
             + methods.hashCode() + fields.hashCode()
+            + staticInits.hashCode() + instanceInits.hashCode()
             + extendsImplements.hashCode();
     }
 
@@ -131,6 +137,7 @@ public final class AClass extends AElement {
     public boolean prune() {
         return super.prune() & bounds.prune()
             & methods.prune() & fields.prune()
+            & staticInits.prune() & instanceInits.prune()
             & extendsImplements.prune();
     }
 
@@ -169,6 +176,9 @@ public final class AClass extends AElement {
         sb.append(linePrefix);
         sb.append("Static Initializers:\n");
         plume.UtilMDE.mapToString(sb, staticInits, linePrefix + "  ");
+        sb.append(linePrefix);
+        sb.append("Instance Initializers:\n");
+        plume.UtilMDE.mapToString(sb, instanceInits, linePrefix + "  ");
         sb.append(linePrefix);
         sb.append("Methods:\n");
         plume.UtilMDE.mapToString(sb, methods, linePrefix + "  ");
