@@ -20,7 +20,8 @@ public class NewCriterion implements Criterion {
     this.methodName = methodName.substring(0, methodName.lastIndexOf(")") + 1);
 
     if (!(methodName.startsWith("init for field") ||
-            methodName.startsWith("static init number"))) {
+            methodName.startsWith("static init number")
+            || methodName.startsWith("instance init number"))) {
       // keep strings consistent with text used in IndexFileSpecification
       this.inMethodCriterion = Criteria.inMethod(methodName);
     } else {

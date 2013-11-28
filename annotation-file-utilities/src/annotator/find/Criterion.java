@@ -42,6 +42,7 @@ public interface Criterion {
         IN_PACKAGE,
         AST_PATH,
         IN_STATIC_INIT,
+        IN_INSTANCE_INIT,
         /*
          * This constant is never used. What is the difference to IN_CLASS?
          * Is one for anywhere within a class and this one only for the
