@@ -83,7 +83,7 @@ bin/annotator/tests/%.class: %.java
 	$*.jaif \
 	$*.java \
 	2>&1 | tee $*.log
-	mv $*-output/$*.java $*.output
+	find "$*-output" -name '*.java' -print | xargs cat > "$*.output"
 	rm -rf $*-output
 
 # Compare the output of the annotator and the goal file.
