@@ -32,6 +32,7 @@ import annotator.specification.Specification;
 
 import com.google.common.collect.SetMultimap;
 import com.sun.source.tree.CompilationUnitTree;
+import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
 import com.sun.tools.javac.main.CommandLine;
@@ -225,8 +226,6 @@ public class Main {
       }
 
       File javafile = new File(javafilename);
-
-      File outfile;
       File unannotated = new File(javafilename + ".unannotated");
       if (in_place) {
         // It doesn't make sense to check timestamps;
@@ -243,19 +242,11 @@ public class Main {
                                           unannotated, javafile));
           }
         }
-        outfile = javafile;
-      } else {
-        String baseName;
-        if (javafile.isAbsolute()) {
-          baseName = javafile.getName();
-        } else {
-          baseName = javafile.getPath();
-        }
-        outfile = new File(outdir, baseName);
       }
 
       Set<String> imports = new LinkedHashSet<String>();
 
+      String fileSep = System.getProperty("file.separator");
       String fileLineSep = System.getProperty("line.separator");
       Source src;
       // Get the source file, and use it to obtain parse trees.
@@ -275,9 +266,12 @@ public class Main {
       }
 
       int num_insertions = 0;
+      String pkg = "";
 
       for (CompilationUnitTree cut : src.parse()) {
         JCTree.JCCompilationUnit tree = (JCTree.JCCompilationUnit) cut;
+        ExpressionTree pkgExp = cut.getPackageName();
+        pkg = pkgExp == null ? "" : pkgExp.toString();
 
         // Create a finder, and use it to get positions.
         TreeFinder finder = new TreeFinder(tree);
@@ -438,8 +432,10 @@ public class Main {
       }
 
       // Write the source file.
+      File outfile = null;
       try {
         if (in_place) {
+          outfile = javafile;
           if (verbose) {
             System.out.printf("Renaming %s to %s%n", javafile, unannotated);
           }
@@ -449,6 +445,16 @@ public class Main {
                                           javafile, unannotated));
           }
         } else {
+          if (pkg.isEmpty()) {
+            outfile = new File(outdir, javafile.getName());
+          } else {
+            String[] pkgPath = pkg.split("\\.");
+            StringBuilder sb = new StringBuilder(outdir);
+            for (int i = 0 ; i < pkgPath.length ; i++) {
+              sb.append(fileSep).append(pkgPath[i]);
+            }
+            outfile = new File(sb.toString(), javafile.getName());
+          }
           outfile.getParentFile().mkdirs();
         }
         OutputStream output = new FileOutputStream(outfile);
