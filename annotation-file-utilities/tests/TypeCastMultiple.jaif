@@ -12,4 +12,5 @@ class TypeCastMultiple:
     method foo(Ljava/lang/Object;)V:
         typecast #1: @java.lang.Mutable
         typecast #6: @java.lang.ReadOnly
-
+        //typecast #11: @java.lang.ReadOnly  // inserts in wrong place!
+        typecast *3: @java.lang.ReadOnly
