@@ -52,8 +52,9 @@ public class CastScanner extends CommonScanner {
     }
     if (tree == node) {
       done = true;
+      return p;
     }
-    return p;
+    return super.visitTypeCast(node, p);
   }
 
   // Map from name of a method a list of bytecode offsets of all
