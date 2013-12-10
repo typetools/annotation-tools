@@ -46,15 +46,10 @@ final class InMethodCriterion implements Criterion {
     }
 
     do {
-//      Tree tree = path.getLeaf();
-//      if (tree.getKind() == Tree.Kind.METHOD) {
-//        MethodTree m = (MethodTree)tree;
-//        if (this.name.equals(m.getName().toString()))
-//          return true;
-//      }
-      if (sigMethodCriterion.isSatisfiedBy(path)) {
-        debug("InMethodCriterion.isSatisfiedBy => true");
-        return true;
+      if (path.getLeaf().getKind() == Tree.Kind.METHOD) {
+        boolean b = sigMethodCriterion.isSatisfiedBy(path);
+        debug("InMethodCriterion.isSatisfiedBy => b");
+        return b;
       }
       path = path.getParentPath();
     } while (path != null && path.getLeaf() != null);
