@@ -198,7 +198,7 @@ public class IndexFileSpecification implements Specification {
       parseField(clist, entry.getKey(), entry.getValue());
     }
     for (Map.Entry<String, AMethod> entry : clazz.methods.entrySet()) {
-      parseMethod(clist, entry.getKey(), entry.getValue());
+      parseMethod(clist, className, entry.getKey(), entry.getValue());
     }
     for (Map.Entry<Integer, ABlock> entry : clazz.staticInits.entrySet()) {
       parseStaticInit(clist, entry.getKey(), entry.getValue());
@@ -460,7 +460,7 @@ public class IndexFileSpecification implements Specification {
     return fieldType.format(a.fieldValues.get(field));
   }
 
-  private void parseMethod(CriterionList clist, String methodName, AMethod method) {
+  private void parseMethod(CriterionList clist, String className, String methodName, AMethod method) {
     // Being "in" a method refers to being somewhere in the
     // method's tree, which includes return types, parameters, receiver, and
     // elements inside the method body.
@@ -474,7 +474,7 @@ public class IndexFileSpecification implements Specification {
     parseInnerAndOuterElements(receiverClist, method.receiver);
 
     // parse return type
-    CriterionList returnClist = clist.add(Criteria.returnType(methodName));
+    CriterionList returnClist = clist.add(Criteria.returnType(className, methodName));
     parseInnerAndOuterElements(returnClist, method.returnType);
 
     // parse bounds of method

@@ -364,8 +364,8 @@ public final class Criteria {
     return new ReceiverCriterion(methodName);
   }
 
-  public final static Criterion returnType(String methodName) {
-    return new ReturnTypeCriterion(methodName);
+  public final static Criterion returnType(String className, String methodName) {
+    return new ReturnTypeCriterion(className, methodName);
   }
 
   public final static Criterion isSigMethod(String methodName) {
