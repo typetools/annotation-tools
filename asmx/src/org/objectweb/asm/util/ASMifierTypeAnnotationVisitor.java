@@ -192,6 +192,14 @@ public class ASMifierTypeAnnotationVisitor extends AbstractVisitor
         text.add(buf.toString());
     }
 
+    public void visitXExceptionIndex(int exception_index) {
+        buf.setLength(0);
+        buf.append("xav").append(id).append(".visitXExceptionIndex(");
+        appendConstant(buf, exception_index);
+        buf.append(");\n");
+        text.add(buf.toString());
+    }
+
     public void visitXNameAndArgsSize() {
     }
 }
