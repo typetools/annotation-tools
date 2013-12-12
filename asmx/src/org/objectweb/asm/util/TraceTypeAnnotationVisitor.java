@@ -40,6 +40,7 @@ public class TraceTypeAnnotationVisitor extends TraceAnnotationVisitor
     private int xindex;
     private int xparam_index;
     private int xbound_index;
+    private int xexception_index;
     private int xtype_index;
 
     /**
@@ -271,6 +272,13 @@ public class TraceTypeAnnotationVisitor extends TraceAnnotationVisitor
       this.xtype_index = type_index;
       if(xav != null) {
         xav.visitXTypeIndex(type_index);
+      }
+    }
+
+    public void visitXExceptionIndex(int exception_index) {
+      this.xexception_index = exception_index;
+      if(xav != null) {
+        xav.visitXExceptionIndex(exception_index);
       }
     }
 
