@@ -342,6 +342,7 @@ public class AnnotationVerifier {
     private List<Integer> xTargetTypeArgs;
     private List<Integer> xParamIndexArgs;
     private List<Integer> xBoundIndexArgs;
+    private List<Integer> xExceptionIndexArgs;
     private List<Integer> xTypeIndexArgs;
 
     public AnnotationRecorder(String description) {
@@ -369,6 +370,7 @@ public class AnnotationVerifier {
       xTargetTypeArgs = new ArrayList<Integer>();
       xParamIndexArgs = new ArrayList<Integer>();
       xBoundIndexArgs = new ArrayList<Integer>();
+      xExceptionIndexArgs = new ArrayList<Integer>();
       xTypeIndexArgs = new ArrayList<Integer>();
     }
 
@@ -410,6 +412,10 @@ public class AnnotationVerifier {
     public void visitXBoundIndex(int bound_index) {
       if (bound_index != -1)
         xBoundIndexArgs.add(bound_index);
+    }
+
+    public void visitXExceptionIndex(int except_index) {
+      xExceptionIndexArgs.add(except_index);
     }
 
     public void visitXTypeIndex(int type_index) {
@@ -487,6 +493,7 @@ public class AnnotationVerifier {
       verifyList(sb, "visitXTargetType()", 1, this.xTargetTypeArgs, ar.xTargetTypeArgs);
       verifyList(sb, "visitXParamIndex()", 1, this.xParamIndexArgs, ar.xParamIndexArgs);
       verifyList(sb, "visitXBoundIndex()", 1, this.xBoundIndexArgs, ar.xBoundIndexArgs);
+      verifyList(sb, "visitXExceptionIndex()", 1, this.xExceptionIndexArgs, ar.xExceptionIndexArgs);
       verifyList(sb, "visitXTypeIndex()", 1, this.xTypeIndexArgs, ar.xTypeIndexArgs);
 
       verifyInnerAnnotationRecorder(sb, this.innerAnnotationMap, ar.innerAnnotationMap);
