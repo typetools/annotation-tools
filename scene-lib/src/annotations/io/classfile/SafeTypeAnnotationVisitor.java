@@ -215,15 +215,14 @@ implements TypeAnnotationVisitor {
   }
 
   @Override
-  public void visitXExceptionIndex(int exception_index) {
-    xTypeIndexArgs.add(exception_index);
-    xav.visitXTypeIndex(exception_index);
-  }
-
-  @Override
   public void visitXTypeIndex(int type_index) {
     xTypeIndexArgs.add(type_index);
     xav.visitXTypeIndex(type_index);
+  }
+
+  @Override
+  public void visitXExceptionIndex(int except_index) {
+    // TODO
   }
 
   @Override
