@@ -391,6 +391,10 @@ final class TypeAnnotationWriter implements TypeAnnotationVisitor {
         bv.putByte(type_index);
     }
 
+    public void visitXExceptionIndex(int exception_index) {
+        bv.putByte(exception_index);
+    }
+
     public void visitXNameAndArgsSize() {
         bv.putShort(cw.newUTF8(desc));
         // Placeholder for size

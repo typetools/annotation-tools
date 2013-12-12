@@ -97,6 +97,10 @@ public class TypeAnnotationConstantsCollector
         xav.visitXTypeIndex(type_index);
     }
 
+    public void visitXExceptionIndex(int exception_index) {
+        xav.visitXExceptionIndex(exception_index);
+    }
+
     public void visitXNameAndArgsSize() {
         xav.visitXNameAndArgsSize();
     }

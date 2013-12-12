@@ -250,6 +250,8 @@ public class EmptyVisitor implements
     public void visitXTypeIndex(int type_index) {
     }
     //end jaime
+    public void visitXExceptionIndex(int exception_index) {
+    }
     public void visitXNameAndArgsSize() {
     }
 }

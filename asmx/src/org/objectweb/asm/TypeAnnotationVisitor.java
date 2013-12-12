@@ -107,6 +107,12 @@ public interface TypeAnnotationVisitor extends AnnotationVisitor {
   public void visitXTypeIndex(int type_index);
 
   /**
+   * Visits the exception_index specified by the extended annotation.
+   * @param exception_index
+   */
+  public void visitXExceptionIndex(int exception_index);
+
+  /**
    * Visits the annotation name and arguments size.
    */
   public void visitXNameAndArgsSize();
