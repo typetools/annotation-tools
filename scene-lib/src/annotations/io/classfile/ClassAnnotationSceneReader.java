@@ -215,6 +215,7 @@ extends EmptyVisitor {
     private final List<Integer> xStartPcArgs;
     private final List<Integer> xParamIndexArgs;
     private final List<Integer> xBoundIndexArgs;
+    private final List<Integer> xExceptionIndexArgs;
     private final List<Integer> xTypeIndexArgs;
 
     // private AnnotationDef getAnnotationDef(Object o) {
@@ -279,6 +280,7 @@ extends EmptyVisitor {
       this.xLocationsArgs = new ArrayList<TypePathEntry>();
       this.xParamIndexArgs = new ArrayList<Integer>(1);
       this.xBoundIndexArgs = new ArrayList<Integer>(1);
+      this.xExceptionIndexArgs = new ArrayList<Integer>(1);
       this.xTypeIndexArgs = new ArrayList<Integer>(1);
     }
 
@@ -493,8 +495,8 @@ extends EmptyVisitor {
     }
 
     @Override
-    public void visitXExceptionIndex(int except_index) {
-      // TODO
+    public void visitXExceptionIndex(int exception_index) {
+      xExceptionIndexArgs.add(exception_index);
     }
 
     @Override
@@ -694,6 +696,8 @@ extends EmptyVisitor {
     private TypeIndexLocation makeTypeIndexLocation() {
       return new TypeIndexLocation(xTypeIndexArgs.get(0));
     }
+
+    // TODO: makeExceptionIndexLocation?
 
     /*
      * Creates the inner annotation on aElement.innerTypes.

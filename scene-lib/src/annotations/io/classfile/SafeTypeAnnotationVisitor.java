@@ -221,7 +221,7 @@ implements TypeAnnotationVisitor {
   }
 
   @Override
-  public void visitXExceptionIndex(int except_index) {
+  public void visitXExceptionIndex(int exception_index) {
     // TODO
   }
 
