@@ -86,7 +86,7 @@ public class AnonymousClassScanner extends TreePathScanner<Void, Integer> {
 
   @Override
   public Void visitNewClass(NewClassTree node, Integer level) {
-    if (level < 2) {
+    //if (level < 2) {
       if (!found && anonclass.getKind() == Tree.Kind.NEW_CLASS) {
         if (anonclass == node) {
           found = true;
@@ -94,10 +94,12 @@ public class AnonymousClassScanner extends TreePathScanner<Void, Integer> {
           // Need to make sure you actually are creating anonymous inner class,
           // not just object creation.
           index++;
+        } else {
+          return null;
         }
       }
       super.visitNewClass(node, level + 1);
-    }
+    //}
     return null;
   }
 }
