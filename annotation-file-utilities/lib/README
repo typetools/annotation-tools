@@ -1,0 +1,30 @@
+Notice a long dependency chain for the Checker Framework qualifiers.
+File
+  annotation-tools/annotation-file-utilities/annotation-file-utilities.jar
+includes the files from
+  annotation-tools/annotation-file-utilities/lib/
+in particular, the plume.jar there.
+That plume.jar includes the Checker Framework qualifiers, because
+the file
+  plume-lib/java/plume.jar
+includes the files in
+  plume-lib/java/lib/
+in particular, the checkers-quals.jar there.
+
+Therefore, follow these steps:
+ 1. Build the Checker Framework
+ 2. Put checkers-quals.jar into plume-lib/java/lib
+ 3. Rebuild plume-lib
+ 4. Rebuild annotation-tools.
+
+Also note the lovely dependency: the Checker Framework build needs the
+annotation-tools to build the annotated JDK.
+Therefore, when adding the new NonNull Checker, which is used in
+the annotated JDK, a temporary step using "ant bindist-nojdk" was
+required.
+
+Remember to rebuild all projects with JDK 6 to allow more general
+use.
+
+TODO: how can we make this dependency between projects easier to
+manage and update?

@@ -1,0 +1,11 @@
+package annotator.tests;
+
+import java.io.Serializable;
+import java.util.Date;
+import java.util.List;
+
+public class BoundClassMultiple<
+  T extends @java.lang.A Date,
+  U extends @java.lang.B List & @java.lang.C Serializable,
+  V extends @java.lang.D Serializable> {
+}

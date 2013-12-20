@@ -1,0 +1,11 @@
+package annotator.tests;
+
+import java.util.*;
+
+public class InnerTypeResolution {
+    @java.lang.Deprecated
+    Map.Entry method01(@java.lang.ReadOnly Map m){
+        return null;
+    }
+}
+
