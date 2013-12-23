@@ -2,13 +2,22 @@
 
 # Extract annotations from a class file and write them to an annotation file.
 # For usage information, run: extract-annotations --help
-# See the annotation file utilities documentation for more information.
+# See the Annotation File Utilities documentation for more information.
 
-ANNOTATION_FILE_UTILS=$(dirname $0)/../bin:$(dirname $0)/../../scene-lib/bin:$(dirname $0)/../../asmx/bin:$(dirname $0)/../annotation-file-utilities.jar
+# If the very first argument is "-d", debug this script (but don't pass the
+# -d to the underlying program).
+DEBUG=0
+if [ "$1" = "-d" ]; then
+  DEBUG=1
+  shift 1
+fi
+
+AFU=${AFU:-$(dirname $0)/..}
+ANNOTATION_FILE_UTILS=${AFU}/bin:${AFU}/../scene-lib/bin:${AFU}/../asmx/bin:${AFU}/annotation-file-utilities.jar
 # Contains new version of java.lang.annotation.ElementType.
-LANGTOOLS=${LANGTOOLS:-$(dirname $0)/../../../jsr308-langtools}
+LANGTOOLS=${LANGTOOLS:-${AFU}/../../jsr308-langtools}
 JAVAC_JAR=${JAVAC_JAR:-${LANGTOOLS}/dist/lib/javac.jar}
-CHECKERS=${CHECKERS:-$(dirname $0)/../../../checker-framework/checkers}
+CHECKERS=${CHECKERS:-${AFU}/../../checker-framework/checkers}
 CHECKERS_JAR=${CHECKERS_JAR:-${CHECKERS}/binary/checkers.jar}
 
 # AFU seems to bundle checkers.qualifiers in the
@@ -18,6 +27,11 @@ CHECKERS_JAR=${CHECKERS_JAR:-${CHECKERS}/binary/checkers.jar}
 # bundled in the jar file, and bootclasspath classes cannot reference
 # classes found in CLASSPATH, so it cannot load the class
 # AnnotatedPrimitiveType causing the following bit of exception:
+
+if [ "$DEBUG" = "1" ]; then
+  echo "--- start of extract-annotations debugging output" 
+  echo "--- end of extract-annotations debugging output" 
+fi
 
 # Needs CLASSPATH to find user files
 java -Xbootclasspath/p:${JAVAC_JAR} -ea -cp ${CHECKERS_JAR}:${ANNOTATION_FILE_UTILS}:${CLASSPATH} annotations.io.classfile.ClassFileReader "$@"
