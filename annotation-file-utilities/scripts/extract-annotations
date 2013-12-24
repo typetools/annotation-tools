@@ -30,6 +30,14 @@ CHECKERS_JAR=${CHECKERS_JAR:-${CHECKERS}/binary/checkers.jar}
 
 if [ "$DEBUG" = "1" ]; then
   echo "--- start of extract-annotations debugging output" 
+  echo "AFU=${AFU}"
+  echo "ANNOTATION_FILE_UTILS=${ANNOTATION_FILE_UTILS}"
+  echo "LANGTOOLS=${LANGTOOLS}"
+  echo "JAVAC_JAR=${JAVAC_JAR}"
+  echo "CHECKERS=${CHECKERS}"
+  echo "CHECKERS_JAR=${CHECKERS_JAR}"
+  # Keep this in sync with the actual command below.
+  echo java -Xbootclasspath/p:${JAVAC_JAR} -ea -cp ${CHECKERS_JAR}:${ANNOTATION_FILE_UTILS}:${CLASSPATH} annotations.io.classfile.ClassFileReader "$@"
   echo "--- end of extract-annotations debugging output" 
 fi
 
