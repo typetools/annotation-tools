@@ -20,8 +20,14 @@ JAVAC_JAR=${JAVAC_JAR:-${LANGTOOLS}/dist/lib/javac.jar}
 
 if [ "$DEBUG" = "1" ]; then
   echo "--- start of insert-annotations debugging output" 
+  echo "AFU=${AFU}"
+  echo "ANNOTATION_FILE_UTILS=${ANNOTATION_FILE_UTILS}"
+  echo "LANGTOOLS=${LANGTOOLS}"
+  echo "JAVAC_JAR=${JAVAC_JAR}"
+  # Keep this in sync with the actual command below.
+  echo "java -ea -Xbootclasspath/p:${ANNOTATION_FILE_UTILS}:${JAVAC_JAR} -cp ${ANNOTATION_FILE_UTILS}:$CLASSPATH annotations.io.classfile.ClassFileWriter $@"
   echo "--- end of insert-annotations debugging output" 
 fi
 
 # Needs CLASSPATH to find user files
-java -ea -Xbootclasspath/p:${ANNOTATION_FILE_UTILS}:${JAVAC_JAR} -cp ${ANNOTATION_FILE_UTILS}:$CLASSPATH annotations.io.classfile.ClassFileWriter $@
+java -ea -Xbootclasspath/p:${ANNOTATION_FILE_UTILS}:${JAVAC_JAR} -cp ${ANNOTATION_FILE_UTILS}:$CLASSPATH annotations.io.classfile.ClassFileWriter "$@"
