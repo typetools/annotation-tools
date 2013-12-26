@@ -1224,7 +1224,9 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     DeclaredType staticType = null;
     // For an inner class constructor, the receiver comes from the
     // superclass, so skip past the first type definition.
-    boolean skip = ((MethodTree) parent.getLeaf()).getReturnType() == null;
+    boolean isCon = ((MethodTree) parent.getLeaf()).getReturnType() == null;
+    boolean skip = isCon;
+
     while (kind != Tree.Kind.COMPILATION_UNIT
         && kind != Tree.Kind.NEW_CLASS) {
       if (kind == Tree.Kind.CLASS
@@ -1272,6 +1274,10 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       parent = parent.getParentPath();
       leaf = parent.getLeaf();
       kind = leaf.getKind();
+    }
+    if (isCon && innerTypes == null) {
+      throw new IllegalArgumentException(
+          "can't annotate (non-existent) receiver of non-inner constructor");
     }
 
     // Merge innerTypes into outerType: outerType only has the annotations
