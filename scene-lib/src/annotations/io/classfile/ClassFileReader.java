@@ -39,7 +39,11 @@ public class ClassFileReader {
     + linesep
     + "a/b/C.class.  Extracts the annotations from each such argument and prints"
     + linesep
-    + "them in index-file format to a.b.C.jaif .  Options:";
+    + "them in index-file format to a.b.C.jaif .  Arguments beginning with a"
+    + linesep
+    + "single '@' are interpreted as argument files to be read and expanded into"
+    + linesep
+    + "the command line.  Options:";
 
   /**
    * From the command line, read annotations from a class file and write
@@ -58,6 +62,17 @@ public class ClassFileReader {
    */
   public static void main(String[] args) throws IOException {
     Options options = new Options(usage, ClassFileReader.class);
+    String[] file_args = null;
+    try {
+      String[] cl_args = CommandLine.parse(args);
+      file_args = options.parse_or_usage(cl_args);
+    } catch (IOException ex) {
+      System.err.println(ex);
+      System.err.println("(For non-argfile beginning with \"@\", use \"@@\" for initial \"@\".");
+      System.err.println("Alternative for filenames: indicate directory, e.g. as './@file'.");
+      System.err.println("Alternative for flags: use '=', as in '-o=@Deprecated'.)");
+      System.exit(1);
+    }
     args = options.parse_or_usage(CommandLine.parse(args));
     if (version) {
       System.out.printf("extract-annotations (%s)", INDEX_UTILS_VERSION);

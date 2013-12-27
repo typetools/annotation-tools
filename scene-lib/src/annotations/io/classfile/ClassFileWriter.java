@@ -44,7 +44,9 @@ public class ClassFileWriter {
     + linesep
     + "or a path to a .class file, such as e.g. /.../path/to/a/b/C.class ."
     + linesep
-    + "Options:";
+    + "Arguments beginning with a single '@' are interpreted as argument files to"
+    + linesep
+    + "be read and expanded into the command line.  Options:";
 
   /**
    * Main method meant to a a convenient way to write annotations from an index
