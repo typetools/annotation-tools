@@ -222,6 +222,17 @@ example, Windows users would execute <code>insert-annotations.bat</code>
 instead of <code>insert-annotations</code>).
 </p>
 
+<p>
+For all the tools, arguments starting with a single
+&lsquo;<code>@</code>&rsquo; are recognized as argument files
+(<code>argfiles</code>), the contents of which get expanded into the
+command line.  (Initial <code>@@</code> represents a literal
+<code>@</code> in the argument text.)  For additional details of argfile
+processing, refer to Oracle's
+<a href=http://docs.oracle.com/javase/7/docs/technotes/tools/windows/javac.html"><code>javac</code></a>
+documentation.
+</p>
+
 <h3 id="insert-annotations"> Insert-annotations </h3>
 
 <p>

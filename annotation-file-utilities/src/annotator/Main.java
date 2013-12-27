@@ -124,14 +124,17 @@ public class Main {
                         annotations.io.classfile.ClassFileReader.INDEX_UTILS_VERSION);
     }
 
-    Options options = new Options("Main [options] ann-file... java-file...", Main.class);
+    Options options = new Options(
+        "Main [options] { ann-file | java-file | @arg-file } ...\n"
+            + "(Contents of argfiles are expanded into the argument list.)",
+        Main.class);
     String[] file_args = null;
     try {
       String[] cl_args = CommandLine.parse(args);
       file_args = options.parse_or_usage(cl_args);
     } catch (IOException ex) {
       System.err.println(ex);
-      System.err.println("(For argument beginning with \"@\", use \"@@\" for initial \"@\".");
+      System.err.println("(For non-argfile beginning with \"@\", use \"@@\" for initial \"@\".");
       System.err.println("Alternative for filenames: indicate directory, e.g. as './@file'.");
       System.err.println("Alternative for flags: use '=', as in '-o=@Deprecated'.)");
       System.exit(1);
