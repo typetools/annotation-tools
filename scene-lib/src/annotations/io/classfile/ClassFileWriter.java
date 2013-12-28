@@ -64,7 +64,19 @@ public class ClassFileWriter {
    */
   public static void main(String[] args) throws IOException {
     Options options = new Options(usage, ClassFileWriter.class);
-    args = options.parse_or_usage(CommandLine.parse(args));
+    String[] file_args = null;
+
+    try {
+      String[] cl_args = CommandLine.parse(args);
+      file_args = options.parse_or_usage(cl_args);
+    } catch (IOException ex) {
+      System.err.println(ex);
+      System.err.println("(For non-argfile beginning with \"@\", use \"@@\" for initial \"@\".");
+      System.err.println("Alternative for filenames: indicate directory, e.g. as './@file'.");
+      System.err.println("Alternative for flags: use '=', as in '-o=@Deprecated'.)");
+      System.exit(1);
+    }
+
     if (version) {
       System.out.printf("insert-annotations (%s)",
                         ClassFileReader.INDEX_UTILS_VERSION);
@@ -76,32 +88,32 @@ public class ClassFileWriter {
       System.exit(-1);
     }
 
-    if (args.length == 0) {
+    if (file_args.length == 0) {
       options.print_usage("No arguments given.");
       System.exit(-1);
     }
-    if (args.length % 2 == 1) {
+    if (file_args.length % 2 == 1) {
       options.print_usage("Must supply an even number of arguments.");
       System.exit(-1);
     }
 
     // check args for well-formed names
-    for (int i = 0; i < args.length; i += 2) {
-      if (!ClassFileReader.checkClass(args[i])) {
+    for (int i = 0; i < file_args.length; i += 2) {
+      if (!ClassFileReader.checkClass(file_args[i])) {
         System.exit(-1);
       }
     }
 
-    for (int i = 0; i < args.length; i++) {
+    for (int i = 0; i < file_args.length; i++) {
 
-     String className = args[i];
+     String className = file_args[i];
      i++;
-     if (i >= args.length) {
+     if (i >= file_args.length) {
        System.out.println("Error: incorrect number of arguments");
        System.out.println("Run insert-annotations --help for usage information");
        return;
      }
-     String indexFileName = args[i];
+     String indexFileName = file_args[i];
 
      AScene scene = new AScene();
 

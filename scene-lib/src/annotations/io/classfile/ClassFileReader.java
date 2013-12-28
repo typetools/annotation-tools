@@ -63,6 +63,7 @@ public class ClassFileReader {
   public static void main(String[] args) throws IOException {
     Options options = new Options(usage, ClassFileReader.class);
     String[] file_args = null;
+
     try {
       String[] cl_args = CommandLine.parse(args);
       file_args = options.parse_or_usage(cl_args);
@@ -73,7 +74,7 @@ public class ClassFileReader {
       System.err.println("Alternative for flags: use '=', as in '-o=@Deprecated'.)");
       System.exit(1);
     }
-    args = options.parse_or_usage(CommandLine.parse(args));
+
     if (version) {
       System.out.printf("extract-annotations (%s)", INDEX_UTILS_VERSION);
     }
@@ -84,19 +85,19 @@ public class ClassFileReader {
       System.exit(-1);
     }
 
-    if (args.length == 0) {
+    if (file_args.length == 0) {
       options.print_usage("No arguments given.");
       System.exit(-1);
     }
 
     // check args for well-formed names
-    for (String arg : args) {
+    for (String arg : file_args) {
       if (!checkClass(arg)) {
         System.exit(-1);
       }
     }
 
-    for (String origName : args) {
+    for (String origName : file_args) {
       System.out.println("reading: " + origName);
       String className = origName;
       if (origName.endsWith(".class")) {
