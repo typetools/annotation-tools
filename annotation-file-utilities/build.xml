@@ -317,7 +317,7 @@
   <target name="web-no-checks" depends="clean,zipfile"
           description="export the zipfile, etc. to its website">
 
-    <fail unless="deploy-dir" message="You must specify a deploy-dir, the live site deploy-dir=/cse/www2/types/annotation-file-utilities"/>
+    <fail unless="deploy-dir" message="You must specify a deploy-dir, the live site deploy-dir=/cse/www2/types/annotation-file-utilities/releases/_version num_"/>
 
     <echo message="Export location: ${deploy-dir}"/>
     <echo message="Copying annotation-tools.zip"/>
