@@ -64,7 +64,7 @@ public class ClassFileWriter {
    */
   public static void main(String[] args) throws IOException {
     Options options = new Options(usage, ClassFileWriter.class);
-    String[] file_args = null;
+    String[] file_args;
 
     try {
       String[] cl_args = CommandLine.parse(args);
@@ -74,6 +74,7 @@ public class ClassFileWriter {
       System.err.println("(For non-argfile beginning with \"@\", use \"@@\" for initial \"@\".");
       System.err.println("Alternative for filenames: indicate directory, e.g. as './@file'.");
       System.err.println("Alternative for flags: use '=', as in '-o=@Deprecated'.)");
+      file_args = null;  // Eclipse compiler issue workaround
       System.exit(1);
     }
 

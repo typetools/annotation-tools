@@ -128,7 +128,7 @@ public class Main {
         "Main [options] { ann-file | java-file | @arg-file } ...\n"
             + "(Contents of argfiles are expanded into the argument list.)",
         Main.class);
-    String[] file_args = null;
+    String[] file_args;
     try {
       String[] cl_args = CommandLine.parse(args);
       file_args = options.parse_or_usage(cl_args);
@@ -137,6 +137,7 @@ public class Main {
       System.err.println("(For non-argfile beginning with \"@\", use \"@@\" for initial \"@\".");
       System.err.println("Alternative for filenames: indicate directory, e.g. as './@file'.");
       System.err.println("Alternative for flags: use '=', as in '-o=@Deprecated'.)");
+      file_args = null;  // Eclipse compiler issue workaround
       System.exit(1);
     }
 
