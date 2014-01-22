@@ -62,7 +62,7 @@ public class ClassFileReader {
    */
   public static void main(String[] args) throws IOException {
     Options options = new Options(usage, ClassFileReader.class);
-    String[] file_arg;
+    String[] file_args;
 
     try {
       String[] cl_args = CommandLine.parse(args);
