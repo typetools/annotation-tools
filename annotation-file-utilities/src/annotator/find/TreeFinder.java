@@ -265,8 +265,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
           t = ((JCArrayTypeTree) t).elemtype;
           break;
         case PARAMETERIZED_TYPE:
-          t = ((JCTypeApply) t).getTypeArguments().get(0);
-          break;
+          return t.getStartPosition();
         case EXTENDS_WILDCARD:
         case SUPER_WILDCARD:
           t = ((JCWildcard) t).inner;
