@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.sun.source.tree.AnnotatedTypeTree;
+import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.ArrayAccessTree;
 import com.sun.source.tree.ArrayTypeTree;
 import com.sun.source.tree.AssertTree;
@@ -30,6 +31,7 @@ import com.sun.source.tree.ExpressionStatementTree;
 import com.sun.source.tree.ForLoopTree;
 import com.sun.source.tree.IfTree;
 import com.sun.source.tree.InstanceOfTree;
+import com.sun.source.tree.IntersectionTypeTree;
 import com.sun.source.tree.LabeledStatementTree;
 import com.sun.source.tree.LambdaExpressionTree;
 import com.sun.source.tree.MemberReferenceTree;
@@ -48,6 +50,7 @@ import com.sun.source.tree.Tree;
 import com.sun.source.tree.Tree.Kind;
 import com.sun.source.tree.TryTree;
 import com.sun.source.tree.TypeCastTree;
+import com.sun.source.tree.TypeParameterTree;
 import com.sun.source.tree.UnaryTree;
 import com.sun.source.tree.UnionTypeTree;
 import com.sun.source.tree.VariableTree;
@@ -140,15 +143,14 @@ public class ASTIndex extends AbstractMap<Tree, ASTPath> {
         return defaultAction(node, entry);
       }
 
-      // TODO: not defined in grammar; oversight?
-          //@Override
-      //public Void visitAnnotation(AnnotationTree node,
-      //    ASTPath.ASTEntry entry) {
-      //  Kind kind = node.getKind();
-      //  save(node.getAnnotationType(), kind, ASTPath.TYPE);
-      //  saveAll(node.getArguments(), kind, ASTPath.ARGUMENT);
-      //  return defaultAction(node, entry);
-      //}
+      @Override
+      public Void visitAnnotation(AnnotationTree node,
+          ASTPath.ASTEntry entry) {
+        Kind kind = node.getKind();
+        save(node.getAnnotationType(), kind, ASTPath.TYPE);
+        saveAll(node.getArguments(), kind, ASTPath.ARGUMENT);
+        return defaultAction(node, entry);
+      }
 
       @Override
       public Void visitMethodInvocation(MethodInvocationTree node,
@@ -472,13 +474,12 @@ public class ASTIndex extends AbstractMap<Tree, ASTPath> {
         return defaultAction(node, entry);
       }
 
-      // TODO: not defined in grammar; oversight?
-          //@Override
-          //public Void visitIntersectionType(IntersectionTypeTree node,
-      //    ASTPath.ASTEntry entry) {
-      //  saveAll(node.getBounds(), node.getKind(), ASTPath.BOUND);
-      //  return defaultAction(node, entry);
-      //}
+      @Override
+      public Void visitIntersectionType(IntersectionTypeTree node,
+          ASTPath.ASTEntry entry) {
+        saveAll(node.getBounds(), node.getKind(), ASTPath.BOUND);
+        return defaultAction(node, entry);
+      }
 
       @Override
       public Void visitArrayType(ArrayTypeTree node, ASTPath.ASTEntry entry) {
@@ -500,13 +501,12 @@ public class ASTIndex extends AbstractMap<Tree, ASTPath> {
       //  return defaultAction(node, entry);
       //}
 
-      // TODO: not defined in grammar; oversight?
-      //@Override
-      //public Void visitTypeParameter(TypeParameterTree node,
-      //    ASTPath.ASTEntry entry) {
-      //  saveAll(node.getBounds(), node.getKind(), ASTPath.BOUND);
-      //  return defaultAction(node, entry);
-      //}
+      @Override
+      public Void visitTypeParameter(TypeParameterTree node,
+          ASTPath.ASTEntry entry) {
+        saveAll(node.getBounds(), node.getKind(), ASTPath.BOUND);
+        return defaultAction(node, entry);
+      }
 
       @Override
       public Void visitInstanceOf(InstanceOfTree node, ASTPath.ASTEntry entry) {
