@@ -639,7 +639,9 @@ The grammar uses \bnflit{\#} for bytecode offsets and \bnflit{*} for source code
 
 A path through the AST (abstract
 syntax tree) specifies an arbitrary expression in source code to modify.
-Currently, AST paths can only be used to specify a location to insert a cast.
+AST paths can be used in the \code{.jaif} file to specify a location to
+insert either a bare annotation (\bnflit{insert-annotation}) or a cast
+(\bnflit{insert-typecast}).
 
 For a cast insertion, the \code{.jaif} file specifies the type to cast to.
 The annotations on the \bnflit{insert-typecast} line will be inserted on
@@ -798,6 +800,7 @@ The following is the grammar for AST paths.
 \\
 \bnfnt{ast-entry} ::= \\
 \qquad    \bnfnt{annotated-type} \\
+\qquad    \bnfor{} \bnfnt{annotation} \\
 \qquad    \bnfor{} \bnfnt{array-access} \\
 \qquad    \bnfor{} \bnfnt{array-type} \\
 \qquad    \bnfor{} \bnfnt{assert} \\
@@ -814,6 +817,7 @@ The following is the grammar for AST paths.
 \qquad    \bnfor{} \bnfnt{for-loop} \\
 \qquad    \bnfor{} \bnfnt{if} \\
 \qquad    \bnfor{} \bnfnt{instance-of} \\
+\qquad    \bnfor{} \bnfnt{intersection-type} \\
 \qquad    \bnfor{} \bnfnt{labeled-statement} \\
 \qquad    \bnfor{} \bnfnt{lambda-expression} \\
 \qquad    \bnfor{} \bnfnt{member-reference} \\
@@ -829,6 +833,7 @@ The following is the grammar for AST paths.
 \qquad    \bnfor{} \bnfnt{throw} \\
 \qquad    \bnfor{} \bnfnt{try} \\
 \qquad    \bnfor{} \bnfnt{type-cast} \\
+\qquad    \bnfor{} \bnfnt{type-parameter} \\
 \qquad    \bnfor{} \bnfnt{unary} \\
 \qquad    \bnfor{} \bnfnt{union-type} \\
 \qquad    \bnfor{} \bnfnt{variable-type} \\
@@ -837,6 +842,9 @@ The following is the grammar for AST paths.
 \\
 \bnfnt{annotated-type} :: = \\
 \qquad    \bnflit{AnnotatedType} \bnflit{.} ( ( \bnflit{annotation} \bnfnt{integer} ) \bnfor{} \bnflit{underlyingType} ) \\
+\\
+\bnfnt{annotation} ::= \\
+\qquad    \bnflit{Annotation} \bnflit{.} ( \bnflit{type} \bnfor{} \bnflit{argument} \bnfnt{integer} ) \\
 \\
 \bnfnt{array-access} ::= \\
 \qquad    \bnflit{ArrayAccess} \bnflit{.} ( \bnflit{expression} \bnfor{} \bnflit{index} ) \\
@@ -886,6 +894,9 @@ The following is the grammar for AST paths.
 \bnfnt{instance-of} ::= \\
 \qquad    \bnflit{InstanceOf} \bnflit{.} ( \bnflit{expression} \bnfor{} \bnflit{type} ) \\
 \\
+\bnfnt{intersection-type} ::= \\
+\qquad    \bnflit{IntersectionType} \bnflit{.} \bnflit{bound} \bnfnt{integer} \\
+\\
 \bnfnt{labeled-statement} ::= \\
 \qquad    \bnflit{LabeledStatement} \bnflit{.} \bnflit{statement} \\
 \\
@@ -932,6 +943,9 @@ The following is the grammar for AST paths.
 \\
 \bnfnt{type-cast} ::= \\
 \qquad    \bnflit{TypeCast} \bnflit{.} ( \bnflit{type} \bnfor{} \bnflit{expression} ) \\
+\\
+\bnfnt{type-parameter} ::= \\
+\qquad    \bnflit{TypeParameter} \bnflit{.} \bnflit{bound} \bnfnt{integer} \\
 \\
 \bnfnt{unary} ::= \\
 \qquad    \bnflit{Unary} \bnflit{.} \bnflit{expression} \\
