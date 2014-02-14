@@ -123,8 +123,10 @@ public class ASTIndex extends AbstractMap<Tree, ASTPath> {
       private void saveAll(Iterable<? extends Tree> nodes,
           Kind kind, String sel) {
         int i = 0;
-        for (Tree node : nodes) {
-          save(node, kind, sel, ++i);
+        if (nodes != null) {
+          for (Tree node : nodes) {
+            save(node, kind, sel, ++i);
+          }
         }
       }
 
@@ -573,10 +575,12 @@ public class ASTIndex extends AbstractMap<Tree, ASTPath> {
 
   @Override
   public ASTPath get(Object key) {
+    Tree node = (Tree) key;
+    if (!ASTPath.isHandled(node.getKind())) { return null; }
     ASTPath path = makePath();
     Deque<Tree> deque = new ArrayDeque<Tree>();
-    for (Tree tree : TreePath.getPath(cut, (Tree) key)) {
-      deque.push(tree);
+    for (Tree tree : TreePath.getPath(cut, node)) {
+      if (ASTPath.isHandled(tree.getKind())) { deque.push(tree); }
     }
     while (!deque.isEmpty()) {
       ASTPath.ASTEntry entry = astEntries.get(deque.pop());
