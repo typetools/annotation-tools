@@ -5,7 +5,9 @@ import java.io.StreamTokenizer;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import plume.ArraysMDE;
 
@@ -19,6 +21,7 @@ import com.sun.source.tree.BinaryTree;
 import com.sun.source.tree.BlockTree;
 import com.sun.source.tree.CaseTree;
 import com.sun.source.tree.CatchTree;
+import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.tree.CompoundAssignmentTree;
 import com.sun.source.tree.ConditionalExpressionTree;
 import com.sun.source.tree.DoWhileLoopTree;
@@ -56,7 +59,7 @@ import com.sun.source.util.TreePath;
 /**
  * A path through the AST.
  */
-public class ASTPath {
+public final class ASTPath implements Iterable<ASTPath.ASTEntry> {
 
     // Constants for the various child selectors.
     public static final String ANNOTATION = "annotation";
@@ -210,6 +213,11 @@ public class ASTPath {
         path = new ArrayList<ASTEntry>();
     }
 
+    @Override
+    public Iterator<ASTEntry> iterator() {
+      return path.iterator();
+    }
+
     /**
      * Appends the given AST entry to the end of this path.
      */
@@ -239,19 +247,35 @@ public class ASTPath {
         return path.isEmpty();
     }
 
-    /** {@inheritDoc} */
+    @Override
+    public boolean equals(Object o) {
+        return o instanceof ASTPath && this.equals((ASTPath) o);
+    }
+
+    public boolean equals(ASTPath astPath) {
+        if (size() != astPath.size()) { return false; }
+        int i = 0;
+        for (ASTEntry entry : path) {
+            if (!entry.equals(astPath.get(i++))) { return false; }
+        }
+        return true;
+    }
+
     @Override
     public String toString() {
-        return "ASTPath: " + path.toString();
+        return path.toString();
     }
 
     public static ASTPath parse(final String s) throws ParseException {
         return new Parser(s).parseASTPath();
     }
 
-    public boolean matches(TreePath currentPath) {
-        // TODO Auto-generated method stub
-        return false;
+    public boolean matches(TreePath treePath) {
+        CompilationUnitTree cut = treePath.getCompilationUnit();
+        Map<Tree, ASTPath> index = ASTIndex.getIndex(cut);
+        Tree leaf = treePath.getLeaf();
+        ASTPath astPath = index.get(leaf);
+        return this.equals(astPath);
     }
 
     static class Parser {
@@ -1139,5 +1163,32 @@ public class ASTPath {
             || kind == Tree.Kind.EXTENDS_WILDCARD
             || kind == Tree.Kind.SUPER_WILDCARD;
       }
+    }
+
+    /**
+     * Determines if the given kind is a declaration.
+     *
+     * @param kind
+     *            The kind to test.
+     * @return true if the given kind is a declaration.
+     */
+    private static boolean isDeclaration(Tree.Kind kind) {
+      return kind == Tree.Kind.ANNOTATION
+          || kind == Tree.Kind.CLASS
+          || kind == Tree.Kind.METHOD
+          || kind == Tree.Kind.VARIABLE;
+    }
+
+    private static boolean isOmitted(Kind kind) {
+        return kind == Kind.BREAK
+            || kind == Kind.COMPILATION_UNIT
+            || kind == Kind.CONTINUE
+            || kind == Kind.IMPORT
+            || kind == Kind.LAMBDA_EXPRESSION  // TODO
+            || kind == Kind.MODIFIERS;
+    }
+
+    public static boolean isHandled(Kind kind) {
+        return !(isDeclaration(kind) || isOmitted(kind));
     }
 }
