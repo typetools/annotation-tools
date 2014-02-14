@@ -7,6 +7,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/scene-lib"/>
 	<classpathentry kind="lib" path="lib/guava-15.0.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/plume-lib"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
