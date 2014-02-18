@@ -266,10 +266,20 @@ public final class ASTPath implements Iterable<ASTPath.ASTEntry> {
         return path.toString();
     }
 
+    /**
+     * Create a new {@code ASTPath} from a formatted string description.
+     * 
+     * @param s formatted string as in JAIF {@code insert-\{cast,annotation\}}
+     * @return the corresponding {@code ASTPath}
+     * @throws ParseException
+     */
     public static ASTPath parse(final String s) throws ParseException {
         return new Parser(s).parseASTPath();
     }
 
+    /**
+     * Determine whether this {@code ASTPath} matches a given {@code TreePath}.
+     */
     public boolean matches(TreePath treePath) {
         CompilationUnitTree cut = treePath.getCompilationUnit();
         Map<Tree, ASTPath> index = ASTIndex.getIndex(cut);
@@ -545,11 +555,9 @@ public final class ASTPath implements Iterable<ASTPath.ASTEntry> {
       }
     }
 
-    /**
-     * Determines whether a {@code TreePath} matches a path through the AST.
-     */
     static class Matcher {
-      // TODO: refactor switch statement into TreeVisitor
+      // adapted from IndexFileParser.parseASTPath et al.
+      // TODO: refactor switch statement into TreeVisitor?
       public static boolean debug = false;
       private ASTPath astPath;
 
@@ -1179,16 +1187,21 @@ public final class ASTPath implements Iterable<ASTPath.ASTEntry> {
           || kind == Tree.Kind.VARIABLE;
     }
 
-    private static boolean isOmitted(Kind kind) {
-        return kind == Kind.BREAK
+    /**
+     * Determines whether an {@code ASTPath} can identify nodes of the
+     *  given kind.
+     *
+     * @param kind
+     *            The kind to test.
+     * @return true if the given kind can be identified by an {@code ASTPath}.
+     */
+    public static boolean isHandled(Kind kind) {
+        return !(isDeclaration(kind)
+            || kind == Kind.BREAK
             || kind == Kind.COMPILATION_UNIT
             || kind == Kind.CONTINUE
             || kind == Kind.IMPORT
             || kind == Kind.LAMBDA_EXPRESSION  // TODO
-            || kind == Kind.MODIFIERS;
-    }
-
-    public static boolean isHandled(Kind kind) {
-        return !(isDeclaration(kind) || isOmitted(kind));
+            || kind == Kind.MODIFIERS);
     }
 }
