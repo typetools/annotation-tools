@@ -60,8 +60,9 @@ import com.sun.source.util.SimpleTreeVisitor;
 import com.sun.source.util.TreePath;
 
 /**
- * @author dbro
+ * Cache of {@code ASTPath} data for the nodes of a compilation unit tree.
  *
+ * @author dbro
  */
 public class ASTIndex extends AbstractMap<Tree, ASTPath> {
   private static final Map<CompilationUnitTree, Map<Tree, ASTPath>>
@@ -69,23 +70,6 @@ public class ASTIndex extends AbstractMap<Tree, ASTPath> {
 
   private final CompilationUnitTree cut;
   private final Map<Tree, ASTPath.ASTEntry> astEntries;
-
-  public static ASTPath.ASTEntry makeEntry(Tree.Kind kind, String selector) {
-    return makeEntry(kind, selector, -1);
-  }
-
-  public static ASTPath.ASTEntry makeEntry(Tree.Kind kind,
-      String selector, int arg) {
-    return new ASTPath.ASTEntry(kind, selector, arg);
-  }
-
-  public static ASTPath makePath() {
-    return new ASTPath();
-  }
-
-  public static ASTPath makePath(CompilationUnitTree cut, Tree node) {
-    return getIndex(cut).get(node);
-  }
 
   /**
    * Maps source trees in compilation unit to corresponding AST paths.
@@ -102,11 +86,25 @@ public class ASTIndex extends AbstractMap<Tree, ASTPath> {
     return index;
   }
 
-  public ASTIndex(CompilationUnitTree cut) {
+  // The constructor walks the entire tree and creates an ASTEntry for
+  // each node of a valid type (i.e., excluding declarations and
+  // terminal nodes that cannot be annotated), so ASTPaths can be
+  // assembled from these entries on demand.  Thus the traversal
+  // happens only once, and the space requirement is kept relatively
+  // low.
+  private ASTIndex(CompilationUnitTree cut) {
     this.cut = cut;
     this.astEntries = new HashMap<Tree, ASTPath.ASTEntry>();
     if (cut == null) { return; }
 
+    // The visitor implementation is slightly complicated by the
+    // inclusion of information from both parent and child nodes in each
+    // ASTEntry.  The pattern for most node types is to call save() and
+    // saveAll() as needed to handle the node's descendants and finally
+    // to invoke defaultAction() to save the entry for the current node.
+    // (If the JVM could take advantage of tail recursion, it would be
+    // better to save the current node's entry first, at a small cost to
+    // the clarity of the code.)
     cut.accept(new SimpleTreeVisitor<Void, ASTPath.ASTEntry>() {
       private void save(Tree node, Kind kind, String sel) {
         if (node != null) {
@@ -203,11 +201,6 @@ public class ASTIndex extends AbstractMap<Tree, ASTPath> {
         return defaultAction(node, entry);
       }
 
-      //@Override
-      //public Void visitBreak(BreakTree node, ASTPath.ASTEntry entry) {
-      //  return defaultAction(node, entry);
-      //}
-
       @Override
       public Void visitCase(CaseTree node, ASTPath.ASTEntry entry) {
         Kind kind = node.getKind();
@@ -243,11 +236,6 @@ public class ASTIndex extends AbstractMap<Tree, ASTPath> {
         return defaultAction(node, entry);
       }
 
-      //@Override
-      //public Void visitContinue(ContinueTree node, ASTPath.ASTEntry entry) {
-      //  return defaultAction(node, entry);
-      //}
-
       @Override
       public Void visitDoWhileLoop(DoWhileLoopTree node,
           ASTPath.ASTEntry entry) {
@@ -256,11 +244,6 @@ public class ASTIndex extends AbstractMap<Tree, ASTPath> {
         save(node.getStatement(), kind, ASTPath.STATEMENT);
         return defaultAction(node, entry);
       }
-
-      //@Override
-      //public Void visitErroneous(ErroneousTree node, ASTPath.ASTEntry entry) {
-      //  return defaultAction(node, entry);
-      //}
 
       @Override
       public Void visitExpressionStatement(ExpressionStatementTree node,
@@ -289,12 +272,6 @@ public class ASTIndex extends AbstractMap<Tree, ASTPath> {
         return defaultAction(node, entry);
       }
 
-      //@Override
-      //public Void visitIdentifier(IdentifierTree node,
-      //    ASTPath.ASTEntry entry) {
-      //  return defaultAction(node, entry);
-      //}
-
       @Override
       public Void visitIf(IfTree node, ASTPath.ASTEntry entry) {
         Kind kind = node.getKind();
@@ -303,11 +280,6 @@ public class ASTIndex extends AbstractMap<Tree, ASTPath> {
         save(node.getElseStatement(), kind, ASTPath.ELSE_STATEMENT);
         return defaultAction(node, entry);
       }
-
-      //@Override
-      //public Void visitImport(ImportTree node, ASTPath.ASTEntry entry) {
-      //  return defaultAction(node, entry);
-      //}
 
       @Override
       public Void visitArrayAccess(ArrayAccessTree node,
@@ -325,11 +297,6 @@ public class ASTIndex extends AbstractMap<Tree, ASTPath> {
         return defaultAction(node, entry);
       }
 
-      //@Override
-      //public Void visitLiteral(LiteralTree node, ASTPath.ASTEntry entry) {
-      //  return defaultAction(node, entry);
-      //}
-
       @Override
       public Void visitMethod(MethodTree node, ASTPath.ASTEntry entry) {
         Kind kind = node.getKind();
@@ -341,11 +308,6 @@ public class ASTIndex extends AbstractMap<Tree, ASTPath> {
         return null;
       }
 
-      //@Override
-      //public Void visitModifiers(ModifiersTree node, ASTPath.ASTEntry entry) {
-      //  return defaultAction(node, entry);
-      //}
-
       @Override
       public Void visitNewArray(NewArrayTree node, ASTPath.ASTEntry entry) {
         Kind kind = node.getKind();
@@ -354,14 +316,6 @@ public class ASTIndex extends AbstractMap<Tree, ASTPath> {
         saveAll(node.getInitializers(), kind, ASTPath.INITIALIZER);
         return defaultAction(node, entry);
       }
-
-      /*
-        Tree getType();
-        List<? extends ExpressionTree> getDimensions();
-        List<? extends ExpressionTree> getInitializers();
-        List<? extends AnnotationTree> getAnnotations();
-        List<? extends List<? extends AnnotationTree>> getDimAnnotations();
-       */
 
       @Override
       public Void visitNewClass(NewClassTree node, ASTPath.ASTEntry entry) {
@@ -411,12 +365,6 @@ public class ASTIndex extends AbstractMap<Tree, ASTPath> {
             ASTPath.QUALIFIER_EXPRESSION);
         return defaultAction(node, entry);
       }
-
-      //@Override
-      //public Void visitEmptyStatement(EmptyStatementTree node,
-      //    ASTPath.ASTEntry entry) {
-      //  return defaultAction(node, entry);
-      //}
 
       @Override
       public Void visitSwitch(SwitchTree node, ASTPath.ASTEntry entry) {
@@ -497,12 +445,6 @@ public class ASTIndex extends AbstractMap<Tree, ASTPath> {
         return defaultAction(node, entry);
       }
 
-      //@Override
-      //public Void visitPrimitiveType(PrimitiveTypeTree node,
-      //    ASTPath.ASTEntry entry) {
-      //  return defaultAction(node, entry);
-      //}
-
       @Override
       public Void visitTypeParameter(TypeParameterTree node,
           ASTPath.ASTEntry entry) {
@@ -545,13 +487,10 @@ public class ASTIndex extends AbstractMap<Tree, ASTPath> {
         save(node.getBound(), node.getKind(), ASTPath.BOUND);
         return defaultAction(node, entry);
       }
-
-      //@Override
-      //public Void visitOther(Tree node, ASTPath.ASTEntry entry) {
-      //  return defaultAction(node, entry);
-      //}
     }, null);
   }
+
+  // Map instance methods
 
   @Override
   public int size() {
@@ -575,9 +514,10 @@ public class ASTIndex extends AbstractMap<Tree, ASTPath> {
 
   @Override
   public ASTPath get(Object key) {
+    // build ASTPath on demand from cached ASTEntries
     Tree node = (Tree) key;
     if (!ASTPath.isHandled(node.getKind())) { return null; }
-    ASTPath path = makePath();
+    ASTPath path = new ASTPath();
     Deque<Tree> deque = new ArrayDeque<Tree>();
     for (Tree tree : TreePath.getPath(cut, node)) {
       if (ASTPath.isHandled(tree.getKind())) { deque.push(tree); }
@@ -656,39 +596,3 @@ public class ASTIndex extends AbstractMap<Tree, ASTPath> {
     };
   }
 }
-
-/*
-abstract class DynamicValueMap<K, I, V> extends AbstractMap<K, V> {
-  private Map<K, I> backingMap;
-
-  public abstract V valueFor(I backingValue);
-
-  @Override
-  public Set<Map.Entry<K, V>> entrySet() {
-    return new AbstractSet<Map.Entry<K, V>>() {
-      @Override
-      public int size() { return backingMap.size(); }
-
-      @Override
-      public Iterator<Map.Entry<K, V>> iterator() {
-        return new Iterator<Map.Entry<K, V>>() {
-          Iterator<K> iter = backingMap.keySet().iterator();
-
-          @Override
-          public boolean hasNext() {
-            return iter.hasNext();
-          }
-
-          @Override
-          public Map.Entry<K, V> next() {
-            K key = iter.next();
-            I ival = backingMap.get(key);
-            return new AbstractMap.SimpleImmutableEntry<K, V>(key,
-                valueFor(ival));
-          }
-        };
-      }
-    };
-  }
-}
-*/
