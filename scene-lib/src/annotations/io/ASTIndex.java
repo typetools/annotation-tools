@@ -64,9 +64,104 @@ import com.sun.source.util.TreePath;
  *
  * @author dbro
  */
-public class ASTIndex extends AbstractMap<Tree, ASTPath> {
-  private static final Map<CompilationUnitTree, Map<Tree, ASTPath>>
-      cache = new HashMap<CompilationUnitTree, Map<Tree, ASTPath>>();
+public class ASTIndex extends AbstractMap<Tree, ASTIndex.ASTRecord> {
+  /**
+   * Structure bundling an {@link ASTPath} with information about its
+   *  starting point. Necessary because the {@link ASTPath} structure
+   *  does not include the declaration from which it originates.
+   *
+   * @author dbro
+   */
+  public static class ASTRecord {
+    /**
+     * Name of the enclosing class declaration.
+     */
+    public final String className;
+
+    /**
+     * Name of the enclosing member declaration, or null if there is none.
+     */
+    public final String otherName;
+
+    /**
+     * Kind of immediately enclosing declaration: METHOD, VARIABLE, or a
+     *  class type (CLASS, INTERFACE, ENUM, or ANNOTATION_TYPE).
+     */
+    public final Tree.Kind declKind;
+    public final ASTPath astPath;
+
+    ASTRecord(String className, String otherName,
+        Tree.Kind declKind, ASTPath astPath) {
+      this.className = className;
+      this.otherName = otherName;
+      this.declKind = declKind;
+      this.astPath = astPath;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      return o instanceof ASTRecord && equals((ASTRecord) o);
+    }
+
+    public boolean equals(ASTRecord astRecord) {
+      return declKind == astRecord.declKind
+          && className.equals(astRecord.className)
+          && otherName == null ? astRecord.otherName == null
+              : otherName.equals(astRecord.otherName)
+          && astPath.equals(astRecord.astPath);
+    }
+
+    // top-down test for confirmation
+    /**
+     * Indicates whether this record identifies the given {@link TreePath}.
+     */
+    public boolean matches(TreePath treePath) {
+      String clazz = null;
+      String other = null;
+      Tree.Kind kind = null;
+      boolean matchVars = false;  // members only!
+      Deque<Tree> stack = new ArrayDeque<Tree>();
+      for (Tree tree : treePath) { stack.push(tree); }
+      while (!stack.isEmpty()) {
+        Tree tree = stack.pop();
+        switch (tree.getKind()) {
+        case CLASS:
+        case INTERFACE:
+        case ENUM:
+        case ANNOTATION_TYPE:
+          clazz = ((ClassTree) tree).getSimpleName().toString();
+          kind = tree.getKind();
+          other = null;
+          matchVars = true;
+          break;
+        case METHOD:
+          assert other == null;
+          other = ((MethodTree) tree).getName().toString();
+          kind = Tree.Kind.METHOD;
+          matchVars = false;
+          break;
+        case VARIABLE:
+          if (matchVars) {
+            assert other == null;
+            other = ((VariableTree) tree).getName().toString();
+            kind = Tree.Kind.VARIABLE;
+            matchVars = false;
+          }
+          break;
+        default:
+          matchVars = false;
+          continue;
+        }
+      }
+      return className.equals(clazz)
+          && (otherName == null ? other == null : otherName.equals(other))
+          && declKind == kind
+          && astPath.matches(treePath);
+    }
+  }
+
+  private static final Map<CompilationUnitTree, Map<Tree, ASTRecord>>
+      cache = new HashMap<CompilationUnitTree, Map<Tree, ASTRecord>>();
 
   private final CompilationUnitTree cut;
   private final Map<Tree, ASTPath.ASTEntry> astEntries;
@@ -77,13 +172,48 @@ public class ASTIndex extends AbstractMap<Tree, ASTPath> {
    * @param cut compilation unit to be indexed
    * @return map of trees in compilation unit to AST paths
    */
-  public static Map<Tree, ASTPath> getIndex(CompilationUnitTree cut) {
-    Map<Tree, ASTPath> index = cache.get(cut);
+  public static Map<Tree, ASTRecord> indexOf(CompilationUnitTree cut) {
+    Map<Tree, ASTRecord> index = cache.get(cut);
     if (index == null) {
       index = new ASTIndex(cut);
       cache.put(cut, index);
     }
     return index;
+  }
+
+  private static ASTRecord makeASTRecord(TreePath treePath,
+      ASTPath astPath) {
+    Tree found = null;
+    for (Tree node : treePath) {
+      Tree.Kind kind = node.getKind();
+      switch (kind) {
+      case CLASS:
+      case INTERFACE:
+      case ENUM:
+      case ANNOTATION_TYPE:
+        return assemble(astPath, node, found);
+      case METHOD:
+      case VARIABLE:
+        found = node;
+        continue;
+      default:
+        found = null;
+      }
+    }
+    return null;
+  }
+
+  private static ASTRecord assemble(ASTPath astPath,
+      Tree classNode, Tree otherNode) {
+    String className = ((ClassTree) classNode).getSimpleName().toString();
+    if (otherNode == null) {
+      return new ASTRecord(className, null, classNode.getKind(), astPath);
+    }
+    Tree.Kind kind = otherNode.getKind();
+    String otherName = kind == Tree.Kind.METHOD
+        ? ((MethodTree) otherNode).getName().toString()
+        : ((VariableTree) otherNode).getName().toString();
+    return new ASTRecord(className, otherName, kind, astPath);
   }
 
   // The constructor walks the entire tree and creates an ASTEntry for
@@ -513,20 +643,21 @@ public class ASTIndex extends AbstractMap<Tree, ASTPath> {
   }
 
   @Override
-  public ASTPath get(Object key) {
+  public ASTRecord get(Object key) {
     // build ASTPath on demand from cached ASTEntries
     Tree node = (Tree) key;
     if (!ASTPath.isHandled(node.getKind())) { return null; }
-    ASTPath path = new ASTPath();
+    TreePath treePath = TreePath.getPath(cut, node);
+    ASTPath astPath = new ASTPath();
     Deque<Tree> deque = new ArrayDeque<Tree>();
-    for (Tree tree : TreePath.getPath(cut, node)) {
+    for (Tree tree : treePath) {
       if (ASTPath.isHandled(tree.getKind())) { deque.push(tree); }
     }
     while (!deque.isEmpty()) {
       ASTPath.ASTEntry entry = astEntries.get(deque.pop());
-      if (entry != null) { path.add(entry); }
+      if (entry != null) { astPath.add(entry); }
     }
-    return path;
+    return makeASTRecord(treePath, astPath);
   }
 
   @Override
@@ -535,14 +666,14 @@ public class ASTIndex extends AbstractMap<Tree, ASTPath> {
   }
 
   @Override
-  public Collection<ASTPath> values() {
-    return new AbstractCollection<ASTPath>() {
+  public Collection<ASTRecord> values() {
+    return new AbstractCollection<ASTRecord>() {
       @Override
       public int size() { return astEntries.size(); }
 
       @Override
-      public Iterator<ASTPath> iterator() {
-        return new Iterator<ASTPath>() {
+      public Iterator<ASTRecord> iterator() {
+        return new Iterator<ASTRecord>() {
           Iterator<Tree> iter = astEntries.keySet().iterator();
 
           @Override
@@ -551,7 +682,7 @@ public class ASTIndex extends AbstractMap<Tree, ASTPath> {
           }
 
           @Override
-          public ASTPath next() {
+          public ASTRecord next() {
             return ASTIndex.this.get(iter.next());
           }
 
@@ -565,14 +696,14 @@ public class ASTIndex extends AbstractMap<Tree, ASTPath> {
   }
 
   @Override
-  public Set<Map.Entry<Tree, ASTPath>> entrySet() {
-    return new AbstractSet<Map.Entry<Tree, ASTPath>>() {
+  public Set<Map.Entry<Tree, ASTRecord>> entrySet() {
+    return new AbstractSet<Map.Entry<Tree, ASTRecord>>() {
       @Override
       public int size() { return astEntries.size(); }
 
       @Override
-      public Iterator<Map.Entry<Tree, ASTPath>> iterator() {
-        return new Iterator<Map.Entry<Tree, ASTPath>>() {
+      public Iterator<Map.Entry<Tree, ASTRecord>> iterator() {
+        return new Iterator<Map.Entry<Tree, ASTRecord>>() {
           Iterator<Tree> iter = astEntries.keySet().iterator();
 
           @Override
@@ -581,9 +712,9 @@ public class ASTIndex extends AbstractMap<Tree, ASTPath> {
           }
 
           @Override
-          public Map.Entry<Tree, ASTPath> next() {
+          public Map.Entry<Tree, ASTRecord> next() {
             Tree node = iter.next();
-            return new AbstractMap.SimpleImmutableEntry<Tree, ASTPath>(node,
+            return new AbstractMap.SimpleImmutableEntry<Tree, ASTRecord>(node,
                 ASTIndex.this.get(node));
           }
 
