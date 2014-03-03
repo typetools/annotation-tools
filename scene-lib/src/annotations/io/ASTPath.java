@@ -282,9 +282,9 @@ public final class ASTPath implements Iterable<ASTPath.ASTEntry> {
      */
     public boolean matches(TreePath treePath) {
         CompilationUnitTree cut = treePath.getCompilationUnit();
-        Map<Tree, ASTPath> index = ASTIndex.getIndex(cut);
+        Map<Tree, ASTIndex.ASTRecord> index = ASTIndex.indexOf(cut);
         Tree leaf = treePath.getLeaf();
-        ASTPath astPath = index.get(leaf);
+        ASTPath astPath = index.get(leaf).astPath;
         return this.equals(astPath);
     }
 
@@ -565,6 +565,20 @@ public final class ASTPath implements Iterable<ASTPath.ASTEntry> {
         this.astPath = astPath;
       }
 
+      private boolean nonDecl(TreePath path) {
+        switch (path.getLeaf().getKind()) {
+        case CLASS:
+        case METHOD:
+          return false;
+        case VARIABLE:
+          TreePath parentPath = path.getParentPath();
+          return parentPath != null
+              && parentPath.getLeaf().getKind() != Kind.CLASS;
+        default:
+          return true;
+        }
+      }
+
       public boolean matches(TreePath path) {
         if (path == null) {
           return false;
@@ -577,8 +591,7 @@ public final class ASTPath implements Iterable<ASTPath.ASTEntry> {
         // within a method) or class node (this gets only the part of the path
         // within a field).
         List<Tree> actualPath = new ArrayList<Tree>();
-        while (path != null && path.getLeaf().getKind() != Tree.Kind.METHOD
-            && path.getLeaf().getKind() != Tree.Kind.CLASS) {
+        while (path != null && nonDecl(path)) {
           actualPath.add(0, path.getLeaf());
           path = path.getParentPath();
         }
