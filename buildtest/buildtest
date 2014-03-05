@@ -1,0 +1,42 @@
+#!/bin/bash
+
+# Simple shell file that runs the regression tests and displays output only 
+# if tests fail.  You can run the entire test yourself by executing this file:
+#   ./buildtest
+# This takes a long time to run.
+
+# Note: To only run tests on the annotations projects and not Javarifier,
+# instead of executing this script, run:
+#     ant test-all-annotations
+# This will create a new directory, build-current-<today's date>, in the
+# present directory, and will checkout, build and test all the annotations
+# projects in that directory.  To run those tests locally, pass in your
+# working directory to Ant as follows:
+#     ant -Dbuilddir=$HOME/research/types test-all-annotations
+
+
+# Remove last night's results.
+rm -rf reports
+rm -rf build-current*
+mkdir reports
+
+ant checkout-all 2>&1 > checkout-all.log
+ant build-all 2>&1 > build-all.log
+
+# Each of the following four commands places the results in the reports folder,
+# The TestWrapper reads them and outputs any that have errors.
+ant test-asmx 2>&1 > test-asmx.log
+ant test-annotation-scene-lib 2>&1 > test-annotation-scene-lib.log
+ant test-annotator 2>&1 > test-annotator.log
+ant test-javarifier 2>&1 > test-javarifier.log
+
+# TestWrapper examines all reports and only displays those files that contain
+# failing test cases.
+# This effectively makes cron send email, since cron sends email only if
+# the script produces output.
+javac TestWrapper.java  
+java TestWrapper reports/*
+
+# The .log files aren't part of the tests, so don't put them in reports
+# until all the tests have been analyzed.
+mv *.log reports

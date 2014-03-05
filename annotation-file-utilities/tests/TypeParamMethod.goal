@@ -1,0 +1,24 @@
+package annotator.tests;
+
+import java.util.Date;
+
+public class TypeParamMethod {
+
+  public <@java.lang.ReadOnly T> void foo(T t) {
+    System.out.println(t);
+  }
+
+  public <@java.lang.ReadOnly T extends Date> void foo2(T t) {
+    System.out.println(t);
+  }
+
+  public <T, @java.lang.ReadOnly U> void foo(T t, U u) {
+    System.out.println(t);
+    System.out.println(u);
+  }
+
+  public <T extends Date, @java.lang.ReadOnly U extends Date> void foo2(T t, U u) {
+    System.out.println(t);
+    System.out.println(u);
+  }
+}
