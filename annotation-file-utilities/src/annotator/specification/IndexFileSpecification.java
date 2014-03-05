@@ -19,6 +19,7 @@ import annotations.el.ABlock;
 import annotations.el.AClass;
 import annotations.el.AElement;
 import annotations.el.AExpression;
+import annotations.el.AField;
 import annotations.el.AMethod;
 import annotations.el.AScene;
 import annotations.el.ATypeElement;
@@ -193,7 +194,7 @@ public class IndexFileSpecification implements Specification {
       parseElement(outerClist, ei);
     }
 
-    for (Map.Entry<String, AElement> entry : clazz.fields.entrySet()) {
+    for (Map.Entry<String, AField> entry : clazz.fields.entrySet()) {
 //      clist = clist.add(Criteria.notInMethod()); // TODO: necessary? what is in class but not in method?
       parseField(clist, entry.getKey(), entry.getValue());
     }
@@ -210,17 +211,20 @@ public class IndexFileSpecification implements Specification {
       parseFieldInit(clist, entry.getKey(), entry.getValue());
     }
 
+    parseASTInsertions(clist, clazz.insertAnnotations, clazz.insertTypecasts);
+
     debug("parseClass(" + className + "):  done");
   }
 
   /** Fill in this.insertions with insertion pairs. */
-  private void parseField(CriterionList clist, String fieldName, AElement field) {
+  private void parseField(CriterionList clist, String fieldName, AField field) {
     clist = clist.add(Criteria.field(fieldName));
 
     // parse declaration annotations
     parseElement(clist, field);
 
     parseInnerAndOuterElements(clist, field.type);
+    parseASTInsertions(clist, field.insertAnnotations, field.insertTypecasts);
   }
 
   private void parseStaticInit(CriterionList clist, int blockID, ABlock block) {
@@ -495,7 +499,9 @@ public class IndexFileSpecification implements Specification {
       parseInnerAndOuterElements(paramClist, param.type);
     }
 
-    parseBlock(clist, methodName, method);
+    // parse insert annotations/typecasts of method
+    parseASTInsertions(clist, method.insertAnnotations, method.insertTypecasts);
+    parseBlock(clist, methodName, method.body);
   }
 
   private void parseBlock(CriterionList clist, String methodName, ABlock block) {
@@ -537,17 +543,22 @@ public class IndexFileSpecification implements Specification {
       CriterionList instanceOfClist = clist.add(Criteria.instanceOf(methodName, loc));
       parseInnerAndOuterElements(instanceOfClist, instanceOf);
     }
+  }
 
-    // parse insert annotations of method
-    for (Entry<ASTPath, ATypeElement> entry : exp.insertAnnotations.entrySet()) {
+  private void parseASTInsertions(CriterionList clist,
+      VivifyingMap<ASTPath, ATypeElement> insertAnnotations,
+      VivifyingMap<ASTPath, ATypeElementWithType> insertTypecasts) {
+    for (Entry<ASTPath, ATypeElement> entry : insertAnnotations.entrySet()) {
       ASTPath astPath = entry.getKey();
       ATypeElement insertAnnotation = entry.getValue();
-      CriterionList insertAnnotationClist = clist.add(Criteria.astPath(astPath));
-      parseInnerAndOuterElements(insertAnnotationClist, insertAnnotation, true);
+      CriterionList insertAnnotationClist =
+          clist.add(Criteria.astPath(astPath));
+      if (insertAnnotation instanceof ATypeElement) {
+        parseInnerAndOuterElements(insertAnnotationClist,
+            insertAnnotation, true);
+      }
     }
-
-    // parse insert typecasts of method
-    for (Entry<ASTPath, ATypeElementWithType> entry : exp.insertTypecasts.entrySet()) {
+    for (Entry<ASTPath, ATypeElementWithType> entry : insertTypecasts.entrySet()) {
       ASTPath astPath = entry.getKey();
       ATypeElementWithType insertTypecast = entry.getValue();
       CriterionList insertTypecastClist = clist.add(Criteria.astPath(astPath));
