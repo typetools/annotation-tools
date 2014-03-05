@@ -268,6 +268,27 @@ public final class IndexFileWriter {
         }
     }
 
+    private void printASTInsertions(String indentation,
+            /*@ReadOnly*/
+            Map<ASTPath, ? extends /*@ReadOnly*/ AElement> insertAnnotations,
+            /*@ReadOnly*/
+            Map<ASTPath, /*@ReadOnly*/ ATypeElementWithType> insertTypecasts) {
+        for (Map. /*@ReadOnly*/ Entry<ASTPath,
+                    ? extends /*@ReadOnly*/ AElement> e :
+                insertAnnotations.entrySet()) {
+            pw.print(indentation + "insert-annotation " + e.getKey() + ":");
+            printAnnotations(e.getValue());
+            pw.println();
+        }
+        for (Map. /*@ReadOnly*/ Entry<ASTPath,
+                    /*@ReadOnly*/ ATypeElementWithType> e :
+                insertTypecasts.entrySet()) {
+            pw.print(indentation + "insert-typecast " + e.getKey() + ":");
+            printAnnotations(e.getValue());
+            pw.println();
+        }
+    }
+
     private void write() throws DefException {
         // First the annotation definitions...
         OurDefCollector odc = new OurDefCollector();
@@ -287,14 +308,17 @@ public final class IndexFileWriter {
 
             printBounds(INDENT, c.bounds);
             printExtImpls(INDENT, c.extendsImplements);
+            printASTInsertions(INDENT, c.insertAnnotations, c.insertTypecasts);
 
-            for (Map. /*@ReadOnly*/ Entry<String, /*@ReadOnly*/ AElement> fe
+            for (Map. /*@ReadOnly*/ Entry<String, /*@ReadOnly*/ AField> fe
                     : c.fields.entrySet()) {
                 String fname = fe.getKey();
-                /*@ReadOnly*/ AElement f = fe.getValue();
+                /*@ReadOnly*/ AField f = fe.getValue();
                 pw.println();
                 printElement(INDENT, "field " + fname, f);
                 printTypeElementAndInnerTypes(INDENT + INDENT, "type", f.type);
+                printASTInsertions(INDENT + INDENT,
+                        c.insertAnnotations, c.insertTypecasts);
             }
             for (Map. /*@ReadOnly*/ Entry<String, /*@ReadOnly*/ AMethod> me
                     : c.methods.entrySet()) {
@@ -311,7 +335,7 @@ public final class IndexFileWriter {
                 }
                 printNumberedAmbigiousElements(INDENT + INDENT, "parameter", m.parameters);
                 for (Map. /*@ReadOnly*/ Entry<LocalLocation, /*@ReadOnly*/ AElement> le
-                        : m.locals.entrySet()) {
+                        : m.body.locals.entrySet()) {
                     LocalLocation loc = le.getKey();
                     /*@ReadOnly*/ AElement l = le.getValue();
                     printElement(INDENT + INDENT,
@@ -320,10 +344,14 @@ public final class IndexFileWriter {
                     printTypeElementAndInnerTypes(INDENT + INDENT + INDENT,
                             "type", l.type);
                 }
-                printRelativeElements(INDENT + INDENT, "typecast", m.typecasts);
-                printRelativeElements(INDENT + INDENT, "instanceof", m.instanceofs);
-                printRelativeElements(INDENT + INDENT, "new", m.news);
+                printRelativeElements(INDENT + INDENT, "typecast",
+                        m.body.typecasts);
+                printRelativeElements(INDENT + INDENT, "instanceof",
+                        m.body.instanceofs);
+                printRelativeElements(INDENT + INDENT, "new", m.body.news);
                 // throwsException field is not processed.  Why?
+                printASTInsertions(INDENT + INDENT,
+                        c.insertAnnotations, c.insertTypecasts);
             }
             pw.println();
         }

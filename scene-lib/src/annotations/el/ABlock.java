@@ -33,8 +33,10 @@ public class ABlock extends AExpression {
             ((/*@ReadOnly*/ ABlock) o).equalsBlock(this);
     }
 
-    protected boolean equalsBlock(/*>>> @ReadOnly ABlock this,*/ /*@ReadOnly*/ ABlock o) {
-        return locals.equals(o.locals) && super.equalsExpression(o);
+    protected boolean equalsBlock(/*>>> @ReadOnly ABlock this,*/
+            /*@ReadOnly*/ ABlock o) {
+        return super.equalsExpression(o)
+                && o.locals.equals(locals);
     }
 
     /**
@@ -68,5 +70,10 @@ public class ABlock extends AExpression {
         }
         sb.append(super.toString());
         return sb.toString();
+    }
+
+    @Override
+    public <R, T> R accept(ElementVisitor<R, T> v, T t) {
+        return v.visitBlock(this, t);
     }
 }

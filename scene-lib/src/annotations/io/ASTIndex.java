@@ -620,6 +620,10 @@ public class ASTIndex extends AbstractMap<Tree, ASTIndex.ASTRecord> {
     }, null);
   }
 
+  public ASTRecord getPath(CompilationUnitTree cut, Tree node) {
+    return indexOf(cut).get(node);
+  }
+
   // Map instance methods
 
   @Override

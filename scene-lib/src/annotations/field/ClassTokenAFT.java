@@ -58,4 +58,9 @@ public final /*@ReadOnly*/ class ClassTokenAFT extends ScalarAFT {
         return ((java.lang.Class<?>)o).getName() + ".class";
     }
 
+
+    @Override
+    public <R, T> R accept(AFTVisitor<R, T> v, T arg) {
+        return v.visitClassTokenAFT(this, arg);
+    }
 }

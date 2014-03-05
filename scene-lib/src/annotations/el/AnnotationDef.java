@@ -148,9 +148,10 @@ public final /*@ReadOnly*/ class AnnotationDef extends AElement {
      * name with the same field names and types.
      */
     @Override
-    public boolean equals(/*>>> @ReadOnly AnnotationDef this, */ /*@ReadOnly*/ Object o) {
+    public boolean equals(/*>>> @ReadOnly AnnotationDef this, */
+            /*@ReadOnly*/ Object o) {
         return o instanceof AnnotationDef
-                && equals((AnnotationDef) o);
+            && ((AnnotationDef) o).equals(this);
     }
 
     /**

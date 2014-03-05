@@ -70,17 +70,17 @@ public class ATypeElementWithType extends ATypeElement {
 
     @Override
     public boolean equals(Object o) {
-      if (o instanceof ATypeElementWithType) {
-          ATypeElementWithType other = (ATypeElementWithType) o;
-        return super.equals(other) && this.type.equals(other.type);
-      } else {
-        return false;
-      }
+        return o instanceof ATypeElementWithType
+            && ((ATypeElementWithType) o).equals(this);
+    }
+
+    public boolean equalsTypeElementWithType(ATypeElementWithType o) {
+        return super.equals(o) && o.type.equals(type);
     }
 
     @Override
     public int hashCode() {
-      return super.hashCode() + type.hashCode();
+        return super.hashCode() + type.hashCode();
     }
 
     @Override
@@ -102,5 +102,10 @@ public class ATypeElementWithType extends ATypeElement {
         sb.append(super.toString());
         sb.append("type: " + type);
         return sb.toString();
+    }
+
+    @Override
+    public <R, T> R accept(ElementVisitor<R, T> v, T t) {
+        return v.visitTypeElementWithType(this, t);
     }
 }

@@ -1216,5 +1216,5 @@ public final class ASTPath implements Iterable<ASTPath.ASTEntry> {
             || kind == Kind.IMPORT
             || kind == Kind.LAMBDA_EXPRESSION  // TODO
             || kind == Kind.MODIFIERS);
-    }
+    }  // TODO: need "isType"?
 }

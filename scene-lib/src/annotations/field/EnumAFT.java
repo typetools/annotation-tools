@@ -50,4 +50,9 @@ public final /*@ReadOnly*/ class EnumAFT extends ScalarAFT {
         return typeName + "." + o.toString();
     }
 
+
+    @Override
+    public <R, T> R accept(AFTVisitor<R, T> v, T arg) {
+        return v.visitEnumAFT(this, arg);
+    }
 }
