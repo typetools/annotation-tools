@@ -76,4 +76,8 @@ public final /*@ReadOnly*/ class ArrayAFT extends AnnotationFieldType {
         return result.toString();
     }
 
+    @Override
+    public <R, T> R accept(AFTVisitor<R, T> v, T arg) {
+        return v.visitArrayAFT(this, arg);
+    }
 }

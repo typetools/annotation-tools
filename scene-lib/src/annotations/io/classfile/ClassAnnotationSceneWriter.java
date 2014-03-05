@@ -830,7 +830,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
      */
     private void ensureVisitLocalVariablesAnnotations() {
       for (Map.Entry<LocalLocation, AElement> entry :
-        aMethod.locals.entrySet()) {
+          aMethod.body.locals.entrySet()) {
         LocalLocation localLocation = entry.getKey();
         AElement aLocation = entry.getValue();
 
@@ -872,7 +872,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
      */
     private void ensureVisitObjectCreationAnnotations() {
       for (Map.Entry<RelativeLocation, ATypeElement> entry :
-        aMethod.news.entrySet()) {
+          aMethod.body.news.entrySet()) {
         if(!entry.getKey().isBytecodeOffset()) {
           // if the RelativeLocation is a source index, we cannot insert it
           // into bytecode
@@ -1004,7 +1004,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
      */
     private void ensureVisitTypecastAnnotations() {
       for (Map.Entry<RelativeLocation, ATypeElement> entry :
-        aMethod.typecasts.entrySet()) {
+          aMethod.body.typecasts.entrySet()) {
         if(!entry.getKey().isBytecodeOffset()) {
           // if the RelativeLocation is a source index, we cannot insert it
           // into bytecode
@@ -1053,8 +1053,8 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
      */
     private void ensureVisitTypeTestAnnotations() {
       for (Map.Entry<RelativeLocation, ATypeElement> entry :
-        aMethod.instanceofs.entrySet()) {
-        if(!entry.getKey().isBytecodeOffset()) {
+        aMethod.body.instanceofs.entrySet()) {
+        if (!entry.getKey().isBytecodeOffset()) {
           // if the RelativeLocation is a source index, we cannot insert it
           // into bytecode
           // TODO: output a warning or translate

@@ -745,11 +745,12 @@ extends EmptyVisitor {
      */
     private void handleMethodLocalVariable(AMethod aMethod) {
       if (xLocationsArgs.isEmpty()) {
-        aMethod.locals.vivify(makeLocalLocation()).tlAnnotationsHere.add(
-            makeAnnotation());
+        aMethod.body.locals.vivify(makeLocalLocation())
+            .tlAnnotationsHere.add(makeAnnotation());
       } else {
-        aMethod.locals.vivify(makeLocalLocation()).type.innerTypes.
-            vivify(makeInnerTypeLocation()).tlAnnotationsHere.add(makeAnnotation());
+        aMethod.body.locals.vivify(makeLocalLocation())
+            .type.innerTypes.vivify(makeInnerTypeLocation())
+            .tlAnnotationsHere.add(makeAnnotation());
       }
     }
 
@@ -758,10 +759,12 @@ extends EmptyVisitor {
      */
     private void handleMethodObjectCreation(AMethod aMethod) {
       if (xLocationsArgs.isEmpty()) {
-        aMethod.news.vivify(makeOffset(false)).tlAnnotationsHere.add(makeAnnotation());
+        aMethod.body.news.vivify(makeOffset(false))
+            .tlAnnotationsHere.add(makeAnnotation());
       } else {
-        aMethod.news.vivify(makeOffset(false)).innerTypes.vivify(
-            makeInnerTypeLocation()).tlAnnotationsHere.add(makeAnnotation());
+        aMethod.body.news.vivify(makeOffset(false))
+            .innerTypes.vivify(makeInnerTypeLocation())
+            .tlAnnotationsHere.add(makeAnnotation());
       }
     }
 
@@ -786,11 +789,12 @@ extends EmptyVisitor {
      */
     private void handleMethodTypecast(AMethod aMethod) {
       if (xLocationsArgs.isEmpty()) {
-        aMethod.typecasts.vivify(makeOffset(true)).tlAnnotationsHere.add(
-            makeAnnotation());
+        aMethod.body.typecasts.vivify(makeOffset(true))
+            .tlAnnotationsHere.add(makeAnnotation());
       } else {
-        aMethod.typecasts.vivify(makeOffset(true)).innerTypes.vivify(
-            makeInnerTypeLocation()).tlAnnotationsHere.add(makeAnnotation());
+        aMethod.body.typecasts.vivify(makeOffset(true))
+            .innerTypes.vivify(makeInnerTypeLocation())
+            .tlAnnotationsHere.add(makeAnnotation());
       }
     }
 
@@ -813,11 +817,12 @@ extends EmptyVisitor {
      */
     private void handleMethodInstanceOf(AMethod aMethod) {
       if (xLocationsArgs.isEmpty()) {
-        aMethod.instanceofs.vivify(makeOffset(false)).tlAnnotationsHere.add(
-            makeAnnotation());
+        aMethod.body.instanceofs.vivify(makeOffset(false))
+            .tlAnnotationsHere.add(makeAnnotation());
       } else {
-        aMethod.typecasts.vivify(makeOffset(false)).innerTypes.vivify(
-            makeInnerTypeLocation()).tlAnnotationsHere.add(makeAnnotation());
+        aMethod.body.typecasts.vivify(makeOffset(false))
+            .innerTypes.vivify(makeInnerTypeLocation())
+            .tlAnnotationsHere.add(makeAnnotation());
       }
     }
 

@@ -228,25 +228,25 @@ public final class JavapParser {
                 LocalLocation ll =
                     new LocalLocation(index, scopeStart, scopeLength);
                 nextLine();
-                subOuterType = ((AMethod) member).locals.vivify(ll).type;
+                subOuterType = ((AMethod) member).body.locals.vivify(ll).type;
                 break;
             case CAST:
             {
                 int offset = parseOffset();
                 int typeIndex = parseTypeIndex();
-                subOuterType = ((AMethod) member).typecasts.vivify(RelativeLocation.createOffset(offset, typeIndex));
+                subOuterType = ((AMethod) member).body.typecasts.vivify(RelativeLocation.createOffset(offset, typeIndex));
                 break;
             }
             case INSTANCEOF:
             {
                 int offset = parseOffset();
-                subOuterType = ((AMethod) member).instanceofs.vivify(RelativeLocation.createOffset(offset, 0));
+                subOuterType = ((AMethod) member).body.instanceofs.vivify(RelativeLocation.createOffset(offset, 0));
                 break;
             }
             case NEW:
             {
                 int offset = parseOffset();
-                subOuterType = ((AMethod) member).news.vivify(RelativeLocation.createOffset(offset, 0));
+                subOuterType = ((AMethod) member).body.news.vivify(RelativeLocation.createOffset(offset, 0));
                 break;
             }
             // TEMP

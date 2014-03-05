@@ -55,4 +55,8 @@ public final /*@ReadOnly*/ class AnnotationAFT extends ScalarAFT {
         return o.toString();
     }
 
+    @Override
+    public <R, T> R accept(AFTVisitor<R, T> v, T arg) {
+        return v.visitAnnotationAFT(this, arg);
+    }
 }
