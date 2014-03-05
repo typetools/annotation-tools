@@ -83,9 +83,10 @@ public final class AScene {
      * also apply to {@link AScene#equals(Object)}.
      */
     @Override
-    public boolean equals(/*>>> @ReadOnly AScene this, */ /*@ReadOnly*/ Object o) {
+    public boolean equals(/*>>> @ReadOnly AScene this, */
+            /*@ReadOnly*/ Object o) {
         return o instanceof AScene
-                && equals((/*@ReadOnly*/ AScene) o);
+            && ((/*@ReadOnly*/ AScene) o).equals(this);
     }
 
     /**
@@ -93,8 +94,9 @@ public final class AScene {
      * slightly faster variant of {@link #equals(Object)} for when the argument
      * is statically known to be another nonnull {@link AScene}.
      */
-    public boolean equals(/*>>> @ReadOnly AScene this, */ /*@ReadOnly*/ AScene o) {
-        return classes.equals(o.classes) && packages.equals(o.packages);
+    public boolean equals(/*>>> @ReadOnly AScene this, */
+            /*@ReadOnly*/ AScene o) {
+        return o.classes.equals(classes) && o.packages.equals(packages);
     }
 
     /**

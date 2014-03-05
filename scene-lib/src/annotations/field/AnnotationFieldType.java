@@ -87,4 +87,6 @@ public abstract /*@ReadOnly*/ class AnnotationFieldType extends EqualByStringRep
         } else
             return null;
     }
+
+    public abstract <R, T> R accept(AFTVisitor<R, T> v, T arg);
 }

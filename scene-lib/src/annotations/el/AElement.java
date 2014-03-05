@@ -106,8 +106,8 @@ public class AElement {
     @Override
     // Was final.  Removed that so that AnnotationDef can redefine.
     public boolean equals(/*>>> @ReadOnly AElement this, */ /*@ReadOnly*/ Object o) {
-        return o instanceof AElement &&
-            equals((/*@ReadOnly*/ AElement) o);
+        return o instanceof AElement
+            && ((/*@ReadOnly*/ AElement) o).equals(this);
     }
 
     /**
@@ -122,12 +122,14 @@ public class AElement {
      * it shall call ((S) y).equalsS(x), which checks that x is a T and then
      * compares fields.
      */
-    public boolean equals(/*>>> @ReadOnly AElement this, */ /*@ReadOnly*/ AElement o) {
+    public boolean equals(/*>>> @ReadOnly AElement this, */
+            /*@ReadOnly*/ AElement o) {
         return o.equalsElement(this);
     }
 
-    final boolean equalsElement(/*>>> @ReadOnly AElement this, */ /*@ReadOnly*/ AElement o) {
-        return tlAnnotationsHere.equals(o.tlAnnotationsHere);
+    final boolean equalsElement(/*>>> @ReadOnly AElement this, */
+            /*@ReadOnly*/ AElement o) {
+        return o.tlAnnotationsHere.equals(tlAnnotationsHere);
     }
 
     /**
@@ -175,4 +177,7 @@ public class AElement {
         }
     }
 
+    public <R, T> R accept(ElementVisitor<R, T> v, T t) {
+        return v.visitElement(this, t);
+    }
 }

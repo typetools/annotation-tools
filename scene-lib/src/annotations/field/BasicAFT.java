@@ -97,4 +97,8 @@ public final /*@ReadOnly*/ class BasicAFT extends ScalarAFT {
         }
     }
 
+    @Override
+    public <R, T> R accept(AFTVisitor<R, T> v, T arg) {
+        return v.visitBasicAFT(this, arg);
+    }
 }

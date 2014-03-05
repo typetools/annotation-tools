@@ -6,7 +6,6 @@ import checkers.javari.quals.ReadOnly;
 
 import java.util.Map;
 
-import annotations.io.ASTPath;
 import annotations.util.coll.VivifyingMap;
 
 /**
@@ -27,14 +26,6 @@ public class AExpression extends AElement {
     public final VivifyingMap<RelativeLocation, ATypeElement> news =
             ATypeElement.<RelativeLocation>newVivifyingLHMap_ATE();
 
-    /** The method's insert-annotation invocations; map key is the AST path to the insertion place */
-    public final VivifyingMap<ASTPath, ATypeElement> insertAnnotations =
-            ATypeElement.<ASTPath>newVivifyingLHMap_ATE();
-
-    /** The method's annotated insert-typecast invocations; map key is the AST path to the insertion place */
-    public final VivifyingMap<ASTPath, ATypeElementWithType> insertTypecasts =
-            ATypeElementWithType.<ASTPath>newVivifyingLHMap_ATEWT();
-
     protected Object id;
 
     AExpression(Object id) {
@@ -53,11 +44,10 @@ public class AExpression extends AElement {
     }
 
     protected boolean equalsExpression(/*>>> @ReadOnly AExpression this, */ /*@ReadOnly*/ AExpression o) {
-        return typecasts.equals(o.typecasts)
+        return super.equals(o)
+                && typecasts.equals(o.typecasts)
                 && instanceofs.equals(o.instanceofs)
-                && news.equals(o.news)
-                && insertAnnotations.equals(o.insertAnnotations)
-                && insertTypecasts.equals(o.insertTypecasts);
+                && news.equals(o.news);
         }
 
     /**
@@ -66,7 +56,7 @@ public class AExpression extends AElement {
     @Override
     public int hashCode(/*>>> @ReadOnly AExpression this*/) {
         return super.hashCode() + typecasts.hashCode() + instanceofs.hashCode()
-                + news.hashCode() + insertAnnotations.hashCode() + insertTypecasts.hashCode();
+                + news.hashCode();
     }
 
     /**
@@ -75,7 +65,7 @@ public class AExpression extends AElement {
     @Override
     public boolean prune() {
         return super.prune() & typecasts.prune() & instanceofs.prune()
-                & news.prune() & insertAnnotations.prune() & insertTypecasts.prune();
+                & news.prune();
     }
 
     @Override
@@ -110,24 +100,11 @@ public class AExpression extends AElement {
             sb.append(ae.toString());
             sb.append(' ');
         }
-        for (Map.Entry<ASTPath, ATypeElement> em : insertAnnotations.entrySet()) {
-            sb.append("insert-annotation: ");
-            ASTPath loc = em.getKey();
-            sb.append(loc);
-            sb.append(": ");
-            AElement ae = em.getValue();
-            sb.append(ae.toString());
-            sb.append(' ');
-        }
-        for (Map.Entry<ASTPath, ATypeElementWithType> em : insertTypecasts.entrySet()) {
-            sb.append("insert-typecast: ");
-            ASTPath loc = em.getKey();
-            sb.append(loc);
-            sb.append(": ");
-            AElement ae = em.getValue();
-            sb.append(ae.toString());
-            sb.append(' ');
-        }
         return sb.toString();
+    }
+
+    @Override
+    public <R, T> R accept(ElementVisitor<R, T> v, T t) {
+        return v.visitExpression(this, t);
     }
 }

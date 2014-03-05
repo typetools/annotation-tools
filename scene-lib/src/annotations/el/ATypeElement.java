@@ -56,17 +56,17 @@ public class ATypeElement extends AElement {
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(/*>>> @ReadOnly ATypeElement this, */ /*@ReadOnly*/ AElement o) {
-        if (!(o instanceof ATypeElement))
-            return false;
-        /*@ReadOnly*/ ATypeElement o2 = (/*@ReadOnly*/ ATypeElement) o;
-        return o2.equalsTypeElement(this);
+    public boolean equals(/*>>> @ReadOnly ATypeElement this, */
+            /*@ReadOnly*/ AElement o) {
+        return o instanceof ATypeElement
+            && ((/*@ReadOnly*/ ATypeElement) o).equalsTypeElement(this);
     }
 
     // note:  does not call super.equals, so does not check name
-    final boolean equalsTypeElement(/*>>> @ReadOnly ATypeElement this, */ /*@ReadOnly*/ ATypeElement o) {
-        return equalsElement(o) && innerTypes.equals(o.innerTypes)
-            && (type == null ? o.type == null : type.equals(o.type));
+    final boolean equalsTypeElement(/*>>> @ReadOnly ATypeElement this, */
+            /*@ReadOnly*/ ATypeElement o) {
+        return equalsElement(o) && o.innerTypes.equals(innerTypes)
+            && (type == null ? o.type == null : o.type.equals(type));
     }
 
     /**
@@ -110,5 +110,10 @@ public class ATypeElement extends AElement {
         }
         sb.append("}");
         return sb.toString();
+    }
+
+    @Override
+    public <R, T> R accept(ElementVisitor<R, T> v, T t) {
+        return v.visitTypeElement(this, t);
     }
 }

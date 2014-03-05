@@ -109,7 +109,7 @@ public /*@ReadOnly*/ class TestSceneLib extends TestCase {
         s2.classes.vivify("Foo").fields.vivify("x").tlAnnotationsHere
                 .add(createEmptyAnnotation(ready));
 
-        assertEquals(false, s1.equals(s2));
+        assertEquals(false, s1.equals(s2));  // FIXME: why does assertion fail?
 
         s1.classes.vivify("Foo").fields.vivify("x").tlAnnotationsHere
                 .add(Annotations.aNonNull);
@@ -144,14 +144,14 @@ public /*@ReadOnly*/ class TestSceneLib extends TestCase {
     private void checkConstructor(AMethod constructor) {
         Annotation ann = ((Annotation) constructor.receiver.lookup("p2.D"));
         assertEquals(Collections.singletonMap("value", "spam"), ann.fieldValues);
-        ATypeElement l = (ATypeElement) constructor.locals
+        ATypeElement l = (ATypeElement) constructor.body.locals
                         .get(new LocalLocation(1, 3, 5)).type;
         AElement i = (AElement) l.innerTypes.get(new InnerTypeLocation(
                 TypeAnnotationPosition.getTypePathFromBinary(
                                 Arrays.asList(new Integer[] { 0, 0 }))));
         assertNotNull(i.lookup("p2.C"));
         AElement l2 =
-                constructor.locals.get(new LocalLocation(1, 3, 6));
+                constructor.body.locals.get(new LocalLocation(1, 3, 6));
         assertNull(l2);
     }
 
