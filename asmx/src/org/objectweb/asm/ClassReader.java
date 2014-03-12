@@ -123,6 +123,7 @@ public class ClassReader {
                 case ClassWriter.INT:
                 case ClassWriter.FLOAT:
                 case ClassWriter.NAME_TYPE:
+                case ClassWriter.INDY:
                     size = 5;
                     break;
                 case ClassWriter.LONG:
@@ -135,6 +136,9 @@ public class ClassReader {
                     if (size > max) {
                         max = size;
                     }
+                    break;
+                case ClassWriter.HANDLE:
+                    size = 4;
                     break;
                 // case ClassWriter.CLASS:
                 // case ClassWriter.STR:

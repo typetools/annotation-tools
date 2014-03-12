@@ -186,6 +186,56 @@ public class ClassWriter implements ClassVisitor {
     final static int UTF8 = 1;
 
     /**
+     * The type of CONSTANT_MethodType constant pool items.
+     */
+    final static int MTYPE = 16;
+
+    /**
+     * The type of CONSTANT_MethodHandle constant pool items.
+     */
+    final static int HANDLE = 15;
+
+    /**
+     * The type of CONSTANT_InvokeDynamic constant pool items.
+     */
+    final static int INDY = 18;
+
+    /**
+     * The base value for all CONSTANT_MethodHandle constant pool items.
+     * Internally, ASM store the 9 variations of CONSTANT_MethodHandle into 9
+     * different items.
+     */
+    final static int HANDLE_BASE = 20;
+
+    /**
+     * Normal type Item stored in the ClassWriter {@link ClassWriter#typeTable},
+     * instead of the constant pool, in order to avoid clashes with normal
+     * constant pool items in the ClassWriter constant pool's hash table.
+     */
+    final static int TYPE_NORMAL = 30;
+
+    /**
+     * Uninitialized type Item stored in the ClassWriter
+     * {@link ClassWriter#typeTable}, instead of the constant pool, in order to
+     * avoid clashes with normal constant pool items in the ClassWriter constant
+     * pool's hash table.
+     */
+    final static int TYPE_UNINIT = 31;
+
+    /**
+     * Merged type Item stored in the ClassWriter {@link ClassWriter#typeTable},
+     * instead of the constant pool, in order to avoid clashes with normal
+     * constant pool items in the ClassWriter constant pool's hash table.
+     */
+    final static int TYPE_MERGED = 32;
+
+    /**
+     * The type of BootstrapMethods items. These items are stored in a special
+     * class attribute named BootstrapMethods and not in the constant pool.
+     */
+    final static int BSM = 33;
+
+    /**
      * The class reader from which this class writer was constructed, if any.
      */
     ClassReader cr;
