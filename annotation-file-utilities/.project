@@ -3,10 +3,6 @@
 	<name>annotation-file-utilities</name>
 	<comment></comment>
 	<projects>
-		<project>asmx</project>
-		<project>jsr308-langtools</project>
-		<project>plume-lib</project>
-		<project>scene-lib</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

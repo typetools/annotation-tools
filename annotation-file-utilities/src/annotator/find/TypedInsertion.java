@@ -29,14 +29,8 @@ public abstract class TypedInsertion extends Insertion {
    */
   protected List<Insertion> innerTypeInsertions;
 
-  public TypedInsertion(Type type, Criteria criteria,
-      List<Insertion> innerTypeInsertions) {
-    this(type, criteria, false, innerTypeInsertions);
-  }
-
-  public TypedInsertion(Type type, Criteria criteria,
-          boolean separateLine, List<Insertion> innerTypeInsertions) {
-      super(criteria, separateLine);
+  public TypedInsertion(Type type, Criteria criteria, List<Insertion> innerTypeInsertions) {
+      super(criteria, false);
       this.type = type;
       this.innerTypeInsertions = innerTypeInsertions;
       annotationsOnly = false;
@@ -44,7 +38,7 @@ public abstract class TypedInsertion extends Insertion {
 
   /**
    * If {@code true} only the annotations on {@code type} will be inserted.
-   * This is useful when the un-annotated code has already been inserted.
+   * This is useful when the "new" has already been inserted.
    */
   public void setAnnotationsOnly(boolean annotationsOnly) {
       this.annotationsOnly = annotationsOnly;

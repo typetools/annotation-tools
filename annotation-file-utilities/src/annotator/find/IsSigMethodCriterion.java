@@ -304,11 +304,10 @@ public class IsSigMethodCriterion implements Criterion {
     if (leaf.getKind() != Tree.Kind.METHOD) {
       if (Criteria.debug) debug("IsSigMethodCriterion.isSatisfiedBy(" + Main.pathToString(path) + ") => false: not a METHOD tree");
       return false;
+    } else if ((((JCMethodDecl) leaf).mods.flags & Flags.GENERATEDCONSTR) != 0) {
+      if (Criteria.debug) debug("IsSigMethodCriterion.isSatisfiedBy(" + Main.pathToString(path) + ") => false: generated constructor");
+      return false;
     }
-    //else if ((((JCMethodDecl) leaf).mods.flags & Flags.GENERATEDCONSTR) != 0) {
-    //  if (Criteria.debug) debug("IsSigMethodCriterion.isSatisfiedBy(" + Main.pathToString(path) + ") => false: generated constructor");
-    //  return false;
-    //}
 
     MethodTree mt = (MethodTree) leaf;
 

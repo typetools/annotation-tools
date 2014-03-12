@@ -37,7 +37,6 @@ import annotations.util.coll.VivifyingMap;
 import annotator.find.AnnotationInsertion;
 import annotator.find.CastInsertion;
 import annotator.find.CloseParenthesisInsertion;
-import annotator.find.ConstructorInsertion;
 import annotator.find.Criteria;
 import annotator.find.Insertion;
 import annotator.find.NewInsertion;
@@ -301,7 +300,6 @@ public class IndexFileSpecification implements Specification {
     // Use at most one receiver and one cast insertion and add all of the
     // annotations to the one insertion.
     ReceiverInsertion receiver = null;
-    ConstructorInsertion cons = null;
     NewInsertion neu = null;
     CastInsertion cast = null;
     CloseParenthesisInsertion closeParen = null;
@@ -337,14 +335,6 @@ public class IndexFileSpecification implements Specification {
         } else {
           neu.getType().addAnnotation(annotationString);
         }
-      } else if (criteria.isOnMethod("<init>()V")) {
-        if (cons == null) {
-          DeclaredType type = new DeclaredType();
-          type.addAnnotation(annotationString);
-          cons = new ConstructorInsertion(type, criteria, innerTypeInsertions);
-        } else {
-          cons.getType().addAnnotation(annotationString);
-        }
       } else if (element instanceof ATypeElementWithType) {
         if (cast == null) {
           Pair<CastInsertion, CloseParenthesisInsertion> insertions = createCastInsertion(
@@ -366,12 +356,6 @@ public class IndexFileSpecification implements Specification {
         }
         annotationInsertions.add(ins);
       }
-    }
-    if (cons != null) {
-        this.insertions.add(cons);
-        if (receiver != null) {
-            cons.getInnerTypeInsertions().add(receiver);
-        }
     }
     if (receiver != null) {
         this.insertions.add(receiver);
