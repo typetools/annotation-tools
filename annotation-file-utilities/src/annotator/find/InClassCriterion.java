@@ -30,7 +30,7 @@ import com.sun.source.util.TreePath;
  * Represents the criterion that a program element is in a class with a
  * particular name.
  */
-public final class InClassCriterion implements Criterion {
+final class InClassCriterion implements Criterion {
 
   static boolean debug = false;
 

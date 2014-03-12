@@ -34,6 +34,7 @@ import com.sun.source.tree.InstanceOfTree;
 import com.sun.source.tree.IntersectionTypeTree;
 import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.MethodTree;
+import com.sun.source.tree.ModifiersTree;
 import com.sun.source.tree.NewArrayTree;
 import com.sun.source.tree.NewClassTree;
 import com.sun.source.tree.ParameterizedTypeTree;
@@ -49,7 +50,6 @@ import com.sun.source.tree.WildcardTree;
 import com.sun.source.util.SimpleTreeVisitor;
 import com.sun.source.util.TreePath;
 import com.sun.source.util.TreeScanner;
-import com.sun.tools.javac.code.Flags;
 import com.sun.tools.javac.code.Type.AnnotatedType;
 import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
 import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntryKind;
@@ -242,44 +242,6 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     }
   }
 
-  private Map<Pair<CompilationUnitTree,Tree>,TreePath> getPathCache =
-      new HashMap<Pair<CompilationUnitTree,Tree>,TreePath>();
-
-  /**
-   * An alternative to TreePath.getPath(CompilationUnitTree,Tree) that
-   * caches its results.
-   */
-  public TreePath getPath(CompilationUnitTree unit, Tree target) {
-    Pair<CompilationUnitTree,Tree> args = Pair.of(unit, target);
-    if (getPathCache.containsKey(args)) {
-      return getPathCache.get(args);
-    }
-    TreePath result = TreePath.getPath(unit, target);
-    getPathCache.put(args, result);
-    return result;
-  }
-
-  // private static Map<Pair<TreePath,Tree>,TreePath> getPathCache2 =
-  //   new HashMap<Pair<TreePath,Tree>,TreePath>();
-  //
-  // /**
-  //  * An alternative to TreePath.getPath(TreePath,Tree) that
-  //  * caches its results.
-  //  */
-  // public static TreePath getPath(TreePath path, Tree target) {
-  //   Pair<TreePath,Tree> args = Pair.of(path, target);
-  //   if (getPathCache2.containsKey(args)) {
-  //     return getPathCache2.get(args);
-  //   }
-  //   TreePath result = TreePath.getPath(path, target);
-  //   getPathCache2.put(args, result);
-  //   return result;
-  // }
-  
-  private Tree parent(Tree node) {
-    return getPath(tree, node).getParentPath().getLeaf();
-  }
-
 
   /**
    * Determines the insertion position for type annotations on various
@@ -362,6 +324,45 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
 
       throw new RuntimeException("Couldn't find param opening paren for: "
           + jcnode);
+    }
+
+    Map<Pair<CompilationUnitTree,Tree>,TreePath> getPathCache1 =
+        new HashMap<Pair<CompilationUnitTree,Tree>,TreePath>();
+
+    /**
+     * An alternative to TreePath.getPath(CompilationUnitTree,Tree) that
+     * caches its results.
+     */
+    public TreePath getPath(CompilationUnitTree unit, Tree target) {
+      Pair<CompilationUnitTree,Tree> args = Pair.of(unit, target);
+      if (getPathCache1.containsKey(args)) {
+        return getPathCache1.get(args);
+      }
+      TreePath result = TreePath.getPath(unit, target);
+      getPathCache1.put(args, result);
+      return result;
+    }
+
+    // private static Map<Pair<TreePath,Tree>,TreePath> getPathCache2 = new HashMap<Pair<TreePath,Tree>,TreePath>();
+
+    /**
+     * An alternative to TreePath.getPath(TreePath,Tree) that
+     * caches its results.
+     */
+    /*
+    public static TreePath getPath(TreePath path, Tree target) {
+      Pair<TreePath,Tree> args = Pair.of(path, target);
+      if (getPathCache2.containsKey(args)) {
+        return getPathCache2.get(args);
+      }
+      TreePath result = TreePath.getPath(path, target);
+      getPathCache2.put(args, result);
+      return result;
+    }
+    */
+
+    private Tree parent(Tree node) {
+      return getPath(tree, node).getParentPath().getLeaf();
     }
 
     @Override
@@ -769,16 +770,11 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
 
       // System.out.printf("DeclarationPositionFinder.visitMethod()%n");
 
-      JCModifiers mt = (JCModifiers) node.getModifiers();
-
-      if ((mt.flags & Flags.GENERATEDCONSTR) != 0) {
-        // add default constructor at end of declaration
-        JCClassDecl classNode = (JCClassDecl) parent(node);
-        return classNode.getEndPosition(tree.endPositions) - 1;
-      }
+      ModifiersTree mt = node.getModifiers();
 
       // actually List<JCAnnotation>.
       List<? extends AnnotationTree> annos = mt.getAnnotations();
+      // Set<Modifier> flags = mt.getFlags();
 
       JCTree before;
       if (annos.size() > 1) {
@@ -794,7 +790,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
 
       // There is no source code location information for Modifiers, so
       // cannot iterate through the modifiers.  But we don't have to.
-      int modsPos = mt.pos().getStartPosition();
+      int modsPos = ((JCModifiers)mt).pos().getStartPosition();
       if (modsPos != Position.NOPOS) {
         declPos = Math.min(declPos, modsPos);
       }
@@ -982,36 +978,6 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
           }
         }
 
-        if (i.getKind() == Insertion.Kind.CONSTRUCTOR
-            && node.getKind() == Tree.Kind.METHOD) {
-          ConstructorInsertion cons = (ConstructorInsertion) i;
-          JCMethodDecl method = (JCMethodDecl) node;
-
-          // may need to do this earlier...
-          if ((method.mods.flags & Flags.GENERATEDCONSTR) != 0) {
-            addConstructor(path, cons, method);
-          } else {
-            cons.setInserted(true);
-          }
-        }
-        /*
-        @Decl Mods @Type Con(@Recv) { @Expr super(); }
-
-            declAnnos + mods + ' ' annotatedType + '(' + receiver + ') {'
-                + annotatedExpr + '; }'
-
-        ANNOTATED_TYPE
-        ARRAY_TYPE
-        PARAMETERIZED_TYPE
-        PRIMITIVE_TYPE
-        INTERSECTION_TYPE
-        UNION_TYPE
-        EXTENDS_WILDCARD
-        SUPER_WILDCARD
-        UNBOUNDED_WILDCARD
-        IDENTIFIER!
-        */
-
         // If this is a method, then it might have been selected because of
         // the receiver, or because of the return value.  Distinguish those.
         // One way would be to set a global variable here.  Another would be
@@ -1023,15 +989,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
         if ((node.getKind() == Tree.Kind.METHOD) && (i.getCriteria().isOnReturnType())) {
           JCMethodDecl jcnode = (JCMethodDecl) node;
           Tree returnType = jcnode.getReturnType();
-          if ((jcnode.mods.flags & Flags.GENERATEDCONSTR) != 0) {
-            // Weirdly, in this case, getStartPosition() returns the
-            // position of the keyword "class" in the immediately
-            // enclosing class declaration.  The simplest solution
-            // is to add the generated constructor at the end of the
-            // declaration.
-            JCClassDecl jcclass = (JCClassDecl) parent(jcnode);
-            pos = jcclass.getEndPosition(tree.endPositions) - 1;
-          } else if (returnType == null) {
+          if (returnType == null) {
             // find constructor name instead
             pos = findMethodName(jcnode);
             debug("pos = %d at constructor name: %s%n", pos,
@@ -1234,57 +1192,56 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     System.err.println("\tThis insertion will be skipped.");
   }
 
-  private boolean isStaticClass(ClassTree clazz) {
-    switch (tree.getKind()) {
-    case ENUM:
-    case INTERFACE:
-      return true;
-    default:
-      return clazz.getModifiers().getFlags().contains(Modifier.STATIC);
-    }
-  }
-
-  private TreePath findEnclosingClass(TreePath path) {
-    TreePath parent = path;
-    Tree leaf = parent.getLeaf();
-    Kind kind = leaf.getKind();
-    while (kind != Tree.Kind.COMPILATION_UNIT
-        && kind != Tree.Kind.NEW_CLASS) {
-      if (Criteria.isClassEquiv(leaf)) { return parent; }
-      parent = parent.getParentPath();
-      leaf = parent.getLeaf();
-      kind = leaf.getKind();
-    }
-    return null;
-  }
-
   /**
-   * Inserts annotations and declarations specified for local types.
-   * (Insertion locations depend on outer context.) 
-   * 
-   * @param path
-   * @param outerType
-   * @param baseType
-   * @param innerTypeInsertions
+   * Modifies the given receiver insertion so that it contains the type
+   * information necessary to insert a full method declaration receiver
+   * parameter. This is for receiver insertions where a receiver does not
+   * already exist in the source code. This will also add the annotations to be
+   * inserted to the correct part of the receiver type.
+   *
+   * @param path The location in the AST to insert the receiver.
+   * @param receiver Details of the receiver to insert.
+   * @param method The method the receiver is being inserted into.
    */
-  private void annotateAndDecorate(TreePath path, Type outerType,
-      DeclaredType baseType, List<Insertion> innerTypeInsertions) {
+  private void addReceiverType(TreePath path, ReceiverInsertion receiver,
+      MethodTree method) {
+    // Find the name of the class
+    // with type parameters to create the receiver. Walk up the tree and
+    // pick up class names to add to the receiver type. Since we're
+    // starting from the innermost class, the classes we get to at earlier
+    // iterations of the loop are inside of the classes we get to at later
+    // iterations.
     TreePath parent = path;
     Tree leaf = parent.getLeaf();
     Kind kind = leaf.getKind();
+    // This is the outermost type, currently containing only the
+    // annotation to add to the receiver.
+    Type outerType = receiver.getType();
+    DeclaredType baseType = receiver.getBaseType();
     // This holds the inner types as they're being read in.
     DeclaredType innerTypes = null;
     DeclaredType staticType = null;
+    // For an inner class constructor, the receiver comes from the
+    // superclass, so skip past the first type definition.
+    boolean isCon = ((MethodTree) parent.getLeaf()).getReturnType() == null;
+    boolean skip = isCon;
 
-    for (parent = path, leaf = parent.getLeaf(), kind = leaf.getKind()
-        ; kind != Tree.Kind.COMPILATION_UNIT && kind != Tree.Kind.NEW_CLASS
-        ; parent = parent.getParentPath(),
-            leaf = parent.getLeaf(), kind = parent.getLeaf().getKind()) {
-      if (Criteria.isClassEquiv(leaf)) {
+    while (kind != Tree.Kind.COMPILATION_UNIT
+        && kind != Tree.Kind.NEW_CLASS) {
+      if (kind == Tree.Kind.CLASS
+          || kind == Tree.Kind.INTERFACE
+          || kind == Tree.Kind.ENUM
+          || kind == Tree.Kind.ANNOTATION_TYPE) {
         ClassTree clazz = (ClassTree) leaf;
         String className = clazz.getSimpleName().toString();
-        boolean isStatic = isStaticClass(clazz);
-        if (!className.isEmpty()) {
+        boolean isStatic = kind == Tree.Kind.INTERFACE
+            || kind == Tree.Kind.ENUM
+            || clazz.getModifiers().getFlags().contains(Modifier.STATIC);
+        skip &= !isStatic;
+        if (skip) {
+          skip = false;
+          receiver.setQualifyType(true);
+        } else if (!className.isEmpty()) {
           // className will be empty for the CLASS node directly inside an
           // anonymous inner class NEW_CLASS node.
           DeclaredType inner = new DeclaredType(className);
@@ -1313,66 +1270,30 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
           }
         }
       }
+      parent = parent.getParentPath();
+      leaf = parent.getLeaf();
+      kind = leaf.getKind();
     }
-
-    if (innerTypes != null) {
-      // Merge innerTypes into outerType: outerType only has the annotations
-      // on the receiver, while innerTypes has everything else. innerTypes can
-      // have the annotations if it is a static class.
-      baseType.setName(innerTypes.getName());
-      baseType.setTypeParameters(innerTypes.getTypeParameters());
-      baseType.setInnerType(innerTypes.getInnerType());
-      if (staticType != null && !innerTypes.getAnnotations().isEmpty()) {
-        outerType.setAnnotations(innerTypes.getAnnotations());
-      }
-    }
-    Insertion.decorateType(innerTypeInsertions,
-        staticType == null ? baseType : staticType);
-  }
-
-  /**
-   * Modifies the given receiver insertion so that it contains the type
-   * information necessary to insert a full method declaration receiver
-   * parameter. This is for receiver insertions where a receiver does not
-   * already exist in the source code. This will also add the annotations to be
-   * inserted to the correct part of the receiver type.
-   *
-   * @param path The location in the AST to insert the receiver.
-   * @param receiver Details of the receiver to insert.
-   * @param method The method the receiver is being inserted into.
-   */
-  private void addReceiverType(TreePath path, ReceiverInsertion receiver,
-      MethodTree method) {
-    // This is the outermost type, currently containing only the
-    // annotation to add to the receiver.
-    Type outerType = receiver.getType();
-    DeclaredType baseType = receiver.getBaseType();
-    boolean isCon = ((MethodTree) path.getLeaf()).getReturnType() == null;
-    boolean isTopLevel = false;
-
-    // For an inner class constructor, the receiver comes from the
-    // superclass, so skip past the first type definition.
-    if (isCon) {
-      TreePath classPath = findEnclosingClass(path);
-      if (classPath != null
-          && !isStaticClass((ClassTree) classPath.getLeaf())) {
-        TreePath parentPath = classPath.getParentPath();
-        isTopLevel = findEnclosingClass(parentPath) == null;
-        path = classPath;
-        receiver.setQualifyType(true);
-      }
-    }
-
-    annotateAndDecorate(path, outerType, baseType,
-        receiver.getInnerTypeInsertions());
-
-    // If the method doesn't have parameters, don't add a comma.
-    receiver.setAddComma(method.getParameters().size() > 0);
-
-    if (isTopLevel) {
+    if (isCon && innerTypes == null) {
       throw new IllegalArgumentException(
           "can't annotate (non-existent) receiver of non-inner constructor");
     }
+
+    // Merge innerTypes into outerType: outerType only has the annotations
+    // on the receiver, while innerTypes has everything else. innerTypes can
+    // have the annotations if it is a static class.
+    baseType.setName(innerTypes.getName());
+    baseType.setTypeParameters(innerTypes.getTypeParameters());
+    baseType.setInnerType(innerTypes.getInnerType());
+    if (staticType != null && !innerTypes.getAnnotations().isEmpty()) {
+      outerType.setAnnotations(innerTypes.getAnnotations());
+    }
+
+    Type type = (staticType == null) ? baseType : staticType;
+    Insertion.decorateType(receiver.getInnerTypeInsertions(), type);
+
+    // If the method doesn't have parameters, don't add a comma.
+    receiver.setAddComma(method.getParameters().size() > 0);
   }
 
   private void addNewType(TreePath path, NewInsertion neu,
@@ -1391,24 +1312,6 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       }
     }
     Insertion.decorateType(neu.getInnerTypeInsertions(), neu.getType());
-  }
-
-  private void addConstructor(TreePath path, ConstructorInsertion cons,
-      JCMethodDecl method) {
-    DeclaredType baseType = cons.getBaseType();
-    if (baseType.getName().isEmpty()) {
-      Tree t = path.getParentPath().getLeaf();
-      if (t.getKind() == Tree.Kind.CLASS) {
-        Type type = cons.getType();
-        List<String> annotations = baseType.getAnnotations();
-        String className = ((ClassTree) t).getSimpleName().toString();
-        baseType.setName(className);
-        for (String ann : annotations) {
-          type.addAnnotation(ann);
-        }
-      }
-    }
-    Insertion.decorateType(cons.getInnerTypeInsertions(), cons.getType());
   }
 
   private static TreeVisitor<Type, Void> treeToTypeVisitor =
