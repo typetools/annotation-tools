@@ -20,7 +20,9 @@ import plume.Option;
 import plume.Options;
 import plume.Pair;
 import plume.UtilMDE;
+
 import annotator.Source.CompilerException;
+import annotator.find.ConstructorInsertion;
 import annotator.find.Criteria;
 import annotator.find.Insertion;
 import annotator.find.Insertions;
@@ -311,6 +313,7 @@ public class Main {
         for (Integer pos : positionKeysSorted) {
           boolean receiverInserted = false;
           boolean newInserted = false;
+          boolean constructorInserted = false;
           List<Insertion> toInsertList = new ArrayList<Insertion>(positions.get(pos));
           Collections.reverse(toInsertList);
           if (debug) {
@@ -358,6 +361,10 @@ public class Main {
               NewInsertion ni = (NewInsertion) iToInsert;
               ni.setAnnotationsOnly(newInserted);
               newInserted = true;
+            } else if (iToInsert.getKind() == Insertion.Kind.CONSTRUCTOR) {
+              ConstructorInsertion ci = (ConstructorInsertion) iToInsert;
+              ci.setAnnotationsOnly(constructorInserted);
+              constructorInserted = true;
             }
 
             String toInsert = iToInsert.getText(comments, abbreviate,

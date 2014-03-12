@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry excluding="annotations/tests/classfile/foo/|annotations/tests/classfile/" kind="src" path="src"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="junit.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/asmx"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/plume-lib"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jsr308-langtools"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="junit.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
