@@ -1,7 +1,7 @@
 package annotations.io;
 
 /*>>>
-import checkers.nullness.quals.*;
+import org.checkerframework.checker.nullness.qual.*;
 */
 
 // Not package-private because it is used from the Scene Library.

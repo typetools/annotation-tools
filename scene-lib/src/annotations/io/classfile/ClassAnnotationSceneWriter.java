@@ -5,7 +5,7 @@
 package annotations.io.classfile;
 
 /*>>>
-import checkers.nullness.quals.*;
+import org.checkerframework.checker.nullness.qual.*;
 */
 
 import java.util.ArrayList;

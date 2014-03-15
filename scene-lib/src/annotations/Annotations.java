@@ -1,14 +1,23 @@
 package annotations;
 
-import java.lang.annotation.RetentionPolicy;
-import java.util.*;
-
 import annotations.el.AnnotationDef;
-import annotations.field.*;
+import annotations.field.AnnotationAFT;
+import annotations.field.AnnotationFieldType;
+import annotations.field.ArrayAFT;
+import annotations.field.EnumAFT;
+import annotations.field.ScalarAFT;
+
+import java.lang.annotation.RetentionPolicy;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /*>>>
-import checkers.nullness.quals.*;
-import checkers.javari.quals.*;
+import org.checkerframework.checker.nullness.qual.*;
+import org.checkerframework.checker.javari.qual.*;
 */
 
 /**
@@ -129,7 +138,7 @@ public abstract class Annotations {
                                       noFieldTypes);
         aNonNull = new Annotation(adNonNull, noFieldValues);
 
-        adTypeQualifier = new AnnotationDef("checkers.quals.TypeQualifier",
+        adTypeQualifier = new AnnotationDef("org.checkerframework.framework.qual.TypeQualifier",
                                             asRetentionRuntime,
                                             noFieldTypes);
         aTypeQualifier = new Annotation(adTypeQualifier, noFieldValues);

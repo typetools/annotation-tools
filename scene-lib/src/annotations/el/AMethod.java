@@ -1,8 +1,8 @@
 package annotations.el;
 
 /*>>>
-import checkers.nullness.quals.Nullable;
-import checkers.javari.quals.ReadOnly;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.javari.qual.ReadOnly;
 */
 
 import java.util.Map;

@@ -1,6 +1,8 @@
 package annotations.tests.classfile;
 
-import checkers.nullness.quals.*;
+/*>>>
+import org.checkerframework.checker.nullness.qual.*;
+*/
 
 import java.io.File;
 import java.io.FileInputStream;

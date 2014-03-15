@@ -8,8 +8,8 @@ import annotations.Annotation;
 import annotations.util.coll.VivifyingMap;
 
 /*>>>
-import checkers.nullness.quals.Nullable;
-import checkers.javari.quals.ReadOnly;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.javari.qual.ReadOnly;
 */
 
 /**
