@@ -5,8 +5,8 @@ import java.util.Map;
 import java.util.Set;
 
 /*>>>
-import checkers.nullness.quals.Nullable;
-import checkers.javari.quals.*;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.javari.qual.*;
 */
 
 /**
