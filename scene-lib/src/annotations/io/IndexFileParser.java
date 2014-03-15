@@ -1,8 +1,8 @@
 package annotations.io;
 
 /*>>>
-import checkers.nullness.quals.*;
-import checkers.javari.quals.*;
+import org.checkerframework.checker.nullness.qual.*;
+import org.checkerframework.checker.javari.qual.*;
 */
 
 import static java.io.StreamTokenizer.TT_EOF;

@@ -1,8 +1,8 @@
 package annotations.tests;
 
 /*>>>
-import checkers.nullness.quals.*;
-import checkers.javari.quals.ReadOnly;
+import org.checkerframework.checker.nullness.qual.*;
+import org.checkerframework.checker.javari.qual.ReadOnly;
 */
 
 import java.io.*;

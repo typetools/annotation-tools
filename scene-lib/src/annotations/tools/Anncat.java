@@ -1,7 +1,7 @@
 package annotations.tools;
 
 /*>>>
-import checkers.nullness.quals.*;
+import org.checkerframework.checker.nullness.qual.*;
 */
 
 import java.io.*;

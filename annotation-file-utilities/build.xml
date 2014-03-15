@@ -464,6 +464,10 @@
           <arg line="-d bin"/>
           <arg line="${cmdTxts}"/>
           <arg line="-version"/>
+          <!-- To prevent a cyclic dependency with the Checker
+               Framework, ignore type annotations in comments here.
+               Separate targets exist to check the qualifiers. -->
+          <arg line="-XDTA:noannotationsincomments"/>
       </java>
 
   </target>
@@ -477,10 +481,10 @@
     <os family="windows" />
   </condition>
   <target name="init-jsr308javac-unix" if="isUnix">
-    <property name="jsr308javac" value="${env.CHECKERS}/binary/javac" />
+    <property name="jsr308javac" value="${env.CHECKERS}/bin/javac" />
   </target>
   <target name="init-jsr308javac-windows" if="isWindows">
-    <property name="jsr308javac" value="${env.CHECKERS}/binary/javac.bat" />
+    <property name="jsr308javac" value="${env.CHECKERS}/bin/javac.bat" />
   </target>
 
   <target name="check-nullness"
@@ -492,13 +496,13 @@
            executable="${jsr308javac}">
       <compilerarg value="-version"/>
       <compilerarg line="-target 5"/>
-      <compilerarg line="-processor checkers.nonnull.NonNullFbcChecker"/>
+      <compilerarg line="-processor org.checkerframework.checker.nonnull.NonNullFbcChecker"/>
       <compilerarg line="-Xbootclasspath/p:${env.CHECKERS}/jdk/jdk.jar"/>
       <compilerarg value="-implicit:class"/>
       <compilerarg line="-Awarns -Xmaxwarns 10000"/>
       <classpath>
         <path refid="libpath"/>
-        <pathelement location="${env.annotations}/checkers/binary/checkers.jar"/>
+        <pathelement location="${env.annotations}/checker/dist/checker.jar"/>
       </classpath>
     </javac>
   </target>

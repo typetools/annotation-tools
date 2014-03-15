@@ -1,7 +1,7 @@
 package annotations.field;
 
 /*>>>
-import checkers.javari.quals.*;
+import org.checkerframework.checker.javari.qual.*;
 */
 
 /**

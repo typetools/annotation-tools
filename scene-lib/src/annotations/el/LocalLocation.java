@@ -3,8 +3,8 @@ package annotations.el;
 import annotations.util.Hasher;
 
 /*>>>
-import checkers.nullness.quals.*;
-import checkers.javari.quals.*;
+import org.checkerframework.checker.nullness.qual.*;
+import org.checkerframework.checker.javari.qual.*;
 */
 
 /**

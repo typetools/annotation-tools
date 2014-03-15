@@ -113,7 +113,7 @@
             <!-- remainder only for repository version -->
             <pathelement location="${annotations-compiler}/dist/lib/javac.jar"/>
             <pathelement location="${annotations-compiler}/dist/lib/javap.jar"/>
-            <pathelement location="${checkers}/binary/checkers.jar"/>
+            <pathelement location="${checkers}/dist/checker.jar"/>
             <pathelement location="bin"/>
         </path>
     </target>
@@ -175,6 +175,11 @@
                executable="${annotations-compiler}/dist/bin/javac">
             <src refid="sourcepath"/>
             <compilerarg value="-Xbootclasspath/p:${toString:libpath}"/>
+            <!-- To prevent a cyclic dependency with the Checker
+                 Framework, ignore type annotations in comments here.
+                 A separate target could be added to check the qualifiers
+                 and have them in the generated code. -->
+            <compilerarg value="-XDTA:noannotationsincomments"/>
             <classpath refid="libpath"/>
         </javac> 
 <!--

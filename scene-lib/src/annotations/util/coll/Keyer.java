@@ -1,7 +1,7 @@
 package annotations.util.coll;
 
 /*>>>
-import checkers.javari.quals.ReadOnly;
+import org.checkerframework.checker.javari.qual.ReadOnly;
 */
 
 /**

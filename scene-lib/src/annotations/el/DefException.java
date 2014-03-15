@@ -1,7 +1,7 @@
 package annotations.el;
 
 /*>>>
-import checkers.nullness.quals.*;
+import org.checkerframework.checker.nullness.qual.*;
 */
 
 /**

@@ -1,8 +1,8 @@
 package annotations;
 
 /*>>>
-import checkers.nullness.quals.Nullable;
-import checkers.javari.quals.ReadOnly;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.javari.qual.ReadOnly;
 */
 
 import annotations.el.AnnotationDef;
@@ -239,9 +239,9 @@ public final /*@ReadOnly*/ class Annotation {
 
 // package annotations;
 //
-// import checkers.nullness.quals.Nullable;
-// import checkers.javari.quals.*;
-// import checkers.javari.quals.ReadOnly;
+// import org.checkerframework.checker.nullness.qual.Nullable;
+// import org.checkerframework.checker.javari.qual.*;
+// import org.checkerframework.checker.javari.qual.ReadOnly;
 //
 // import annotations.el.*;
 // import annotations.util.coll.Keyer;
