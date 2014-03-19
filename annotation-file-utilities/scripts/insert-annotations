@@ -1,0 +1,36 @@
+#!/bin/sh
+
+# Insert annotations (from an annotation file) into a class file.
+# For usage information, run: insert-annotations --help 
+# See the Annotation File Utilities documentation for more information.
+
+# If the very first argument is "-d", debug this script (but don't pass the
+# -d to the underlying program; use "-d --debug" for that).
+DEBUG=0
+if [ "$1" = "-d" ]; then
+  DEBUG=1
+  shift 1
+fi
+
+AFU=${AFU:-$(dirname $0)/..}
+ANNOTATION_FILE_UTILS=${AFU}/bin:${AFU}/../scene-lib/bin:${AFU}/../asmx/bin:${AFU}/annotation-file-utilities.jar
+# Contains new version of java.lang.annotation.ElementType.
+LANGTOOLS=${LANGTOOLS:-${AFU}/../../jsr308-langtools}
+JAVAC_JAR=${JAVAC_JAR:-${LANGTOOLS}/dist/lib/javac.jar}
+
+if [ "$DEBUG" = "1" ]; then
+  echo "--- start of insert-annotations debugging output" 
+  echo "AFU=${AFU}"
+  echo "ANNOTATION_FILE_UTILS=${ANNOTATION_FILE_UTILS}"
+  echo "LANGTOOLS=${LANGTOOLS}"
+  echo "JAVAC_JAR=${JAVAC_JAR}"
+  # Keep this in sync with the actual command below.
+  echo "java -ea -Xbootclasspath/p:${ANNOTATION_FILE_UTILS}:${JAVAC_JAR}:${CLASSPATH} -cp ${ANNOTATION_FILE_UTILS}:${CLASSPATH} annotations.io.classfile.ClassFileWriter $@"
+  echo "--- end of insert-annotations debugging output" 
+fi
+
+# Needs CLASSPATH to find user files
+# TODO: It is not nice that the CLASSPATH has to be on the bootclasspath!
+# Without it, e.g. building the Checker Framework annotated JDK does
+# not work.
+java -ea -Xbootclasspath/p:${ANNOTATION_FILE_UTILS}:${JAVAC_JAR}:${CLASSPATH} -cp ${ANNOTATION_FILE_UTILS}:${CLASSPATH} annotations.io.classfile.ClassFileWriter "$@"

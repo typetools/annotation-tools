@@ -1,0 +1,9 @@
+package java.lang:
+annotation @ReadOnly: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+annotation @DoesNotExist: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+
+package annotator.tests:
+class ClassSimple: @java.lang.ReadOnly
+
+package:
+class ClassSimple: @java.lang.DoesNotExist
