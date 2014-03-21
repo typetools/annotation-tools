@@ -25,9 +25,9 @@ if [ "$DEBUG" = "1" ]; then
   echo "LANGTOOLS=${LANGTOOLS}"
   echo "JAVAC_JAR=${JAVAC_JAR}"
   # Keep this in sync with the actual command below.
-  echo java -Xbootclasspath/p:${JAVAC_JAR} -ea -cp ${ANNOTATION_FILE_UTILS}:${CLASSPATH} annotations.io.classfile.ClassFileReader "$@"
+  echo java -Xbootclasspath/p:${JAVAC_JAR} -ea -cp ${AFU}/lib/plume.jar:${ANNOTATION_FILE_UTILS}:${CLASSPATH} annotations.io.classfile.ClassFileReader "$@"
   echo "--- end of extract-annotations debugging output" 
 fi
 
 # Needs CLASSPATH to find user files
-java -Xbootclasspath/p:${JAVAC_JAR} -ea -cp ${ANNOTATION_FILE_UTILS}:${CLASSPATH} annotations.io.classfile.ClassFileReader "$@"
+java -Xbootclasspath/p:${JAVAC_JAR} -ea -cp ${AFU}/lib/plume.jar:${ANNOTATION_FILE_UTILS}:${CLASSPATH} annotations.io.classfile.ClassFileReader "$@"

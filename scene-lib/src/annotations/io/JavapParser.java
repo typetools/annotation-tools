@@ -208,7 +208,7 @@ public final class JavapParser {
                 subOuterType = (ATypeElement) member;
                 break;
             case METHOD_RECEIVER:
-                subOuterType = ((AMethod) member).receiver;
+                subOuterType = ((AMethod) member).receiver.type;
                 break;
             case METHOD_FORMAL_PARAMETER:
                 int paramIdx = Integer.parseInt(

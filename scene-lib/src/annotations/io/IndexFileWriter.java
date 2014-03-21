@@ -142,14 +142,15 @@ public final class IndexFileWriter {
         pw.println();
     }
 
-    /*
     private void printElementAndInnerTypes(String indentation,
-            String desc,
-            @ReadOnly AElement e) {
-        printElement(indentation, desc, e);
-        printTypeElementAndInnerTypes(indentation + INDENT, desc, e.type);
+            String desc, /*@ReadOnly*/ AElement e) {
+        if (e.type != null) {
+            printElement(indentation, desc, e.type);
+            if (!e.type.innerTypes.isEmpty()) {
+                printInnerTypes(indentation + INDENT, e.type);
+            }
+        }
     }
-    */
 
     private void printTypeElementAndInnerTypes(String indentation,
             String desc,
@@ -158,24 +159,28 @@ public final class IndexFileWriter {
             return;
         }
         printElement(indentation, desc, e);
-        for (Map. /*@ReadOnly*/ Entry<InnerTypeLocation, /*@ReadOnly*/ ATypeElement> ite
-                : e.innerTypes.entrySet()) {
-            InnerTypeLocation loc = ite.getKey();
-            /*@ReadOnly*/ AElement it = ite.getValue();
-            pw.print(indentation + INDENT + "inner-type");
-            boolean first = true;
-            for (TypePathEntry l : loc.location) {
-                if (first)
-                    pw.print(' ');
-                else
-                    pw.print(',');
-                pw.print(typePathEntryToString(l));
-                first = false;
-            }
-            pw.print(':');
-            printAnnotations(it);
-            pw.println();
-        }
+        printInnerTypes(indentation + INDENT, e);
+    }
+
+    private void printInnerTypes(String indentation, ATypeElement e) {
+      for (Map. /*@ReadOnly*/ Entry<InnerTypeLocation,
+              /*@ReadOnly*/ ATypeElement> ite : e.innerTypes.entrySet()) {
+          InnerTypeLocation loc = ite.getKey();
+          /*@ReadOnly*/ AElement it = ite.getValue();
+          pw.print(indentation + "inner-type");
+          boolean first = true;
+          for (TypePathEntry l : loc.location) {
+              if (first)
+                  pw.print(' ');
+              else
+                  pw.print(',');
+              pw.print(typePathEntryToString(l));
+              first = false;
+          }
+          pw.print(':');
+          printAnnotations(it);
+          pw.println();
+      }
     }
 
     /**
@@ -188,9 +193,9 @@ public final class IndexFileWriter {
 
     private void printNumberedAmbigiousElements(String indentation,
             String desc,
-            /*@ReadOnly*/ Map<Integer, /*@ReadOnly*/ AElement> nels) {
-        for (Map. /*@ReadOnly*/ Entry<Integer, /*@ReadOnly*/ AElement> te
-                : nels.entrySet()) {
+            /*@ReadOnly*/ Map<Integer, ? extends /*@ReadOnly*/ AElement> nels) {
+        for (Map. /*@ReadOnly*/ Entry<Integer,
+        				? extends /*@ReadOnly*/ AElement> te : nels.entrySet()) {
             /*@ReadOnly*/ AElement t = te.getValue();
             printAmbElementAndInnerTypes(indentation,
                     desc + " #" + te.getKey(), t);
@@ -328,10 +333,10 @@ public final class IndexFileWriter {
                 printElement(INDENT, "method " + mkey, m);
                 printBounds(INDENT + INDENT, m.bounds);
                 printTypeElementAndInnerTypes(INDENT + INDENT, "return", m.returnType);
-                if (!m.receiver.tlAnnotationsHere.isEmpty() || !m.receiver.innerTypes.isEmpty()) {
+                if (!m.receiver.type.tlAnnotationsHere.isEmpty() || !m.receiver.type.innerTypes.isEmpty()) {
                     // Only output the receiver if there is something to say. This is a bit
                     // inconsistent with the return type, but so be it.
-                    printTypeElementAndInnerTypes(INDENT + INDENT, "receiver", m.receiver);
+                    printElementAndInnerTypes(INDENT + INDENT, "receiver", m.receiver);
                 }
                 printNumberedAmbigiousElements(INDENT + INDENT, "parameter", m.parameters);
                 for (Map. /*@ReadOnly*/ Entry<LocalLocation, /*@ReadOnly*/ AElement> le
