@@ -191,6 +191,15 @@ public final class ASTPath implements Iterable<ASTPath.ASTEntry> {
             return argument;
         }
 
+        /**
+         * Checks that this Entry has an argument.
+         *
+         * @return if this entry has an argument
+         */
+        public boolean hasArgument() {
+            return argument >= 0;
+        }
+
         @Override
         public String toString() {
             String result = treeKind + "." + childSelector;

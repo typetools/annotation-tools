@@ -58,6 +58,9 @@ import com.sun.source.tree.WhileLoopTree;
 import com.sun.source.tree.WildcardTree;
 import com.sun.source.util.SimpleTreeVisitor;
 import com.sun.source.util.TreePath;
+import com.sun.tools.javac.tree.JCTree.JCClassDecl;
+
+import annotations.util.JVMNames;
 
 /**
  * Cache of {@code ASTPath} data for the nodes of a compilation unit tree.
@@ -205,13 +208,13 @@ public class ASTIndex extends AbstractMap<Tree, ASTIndex.ASTRecord> {
 
   private static ASTRecord assemble(ASTPath astPath,
       Tree classNode, Tree otherNode) {
-    String className = ((ClassTree) classNode).getSimpleName().toString();
+    String className = ((JCClassDecl) classNode).sym.flatname.toString();
     if (otherNode == null) {
       return new ASTRecord(className, null, classNode.getKind(), astPath);
     }
     Tree.Kind kind = otherNode.getKind();
     String otherName = kind == Tree.Kind.METHOD
-        ? ((MethodTree) otherNode).getName().toString()
+        ? JVMNames.getJVMMethodName(((MethodTree) otherNode))
         : ((VariableTree) otherNode).getName().toString();
     return new ASTRecord(className, otherName, kind, astPath);
   }
