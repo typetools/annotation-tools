@@ -1160,7 +1160,9 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
         // @Retention(RetentionPolicy.CLASS)
         String ann = at.getAnnotationType().toString();
         // strip off leading @ along w/any leading or trailing whitespace
-        String iann = Main.removeArgs(ins.getText()).a.trim().substring(1);
+        String text = ins.getText();
+        String iann = Main.removeArgs(text).a.trim()
+            .substring(text.startsWith("@") ? 1 : 0);
         String iannNoPackage = Insertion.removePackage(iann).b;
         // System.out.printf("Comparing: %s %s %s%n", ann, iann, iannNoPackage);
         if (ann.equals(iann) || ann.equals(iannNoPackage)) {
