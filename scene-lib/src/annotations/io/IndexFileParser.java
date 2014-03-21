@@ -800,7 +800,7 @@ public final class IndexFileParser {
                     matchChar('#');
                 }
                 int idx = expectNonNegative(matchNNInteger());
-                AElement p = m.parameters.vivify(idx);
+                AField p = m.parameters.vivify(idx);
                 expectChar(':');
                 parseAnnotations(p);
                 if (checkKeyword("type") && matchKeyword("type")) {
@@ -810,8 +810,8 @@ public final class IndexFileParser {
                 }
             } else if (matchKeyword("receiver")) {
                 expectChar(':');
-                parseAnnotations(m.receiver);
-                parseInnerTypes(m.receiver);
+                parseAnnotations(m.receiver.type);
+                parseInnerTypes(m.receiver.type);
             } else {
                 throw new Error("This can't happen");
             }

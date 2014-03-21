@@ -475,7 +475,7 @@ public class IndexFileSpecification implements Specification {
 
     // parse receiver
     CriterionList receiverClist = clist.add(Criteria.receiver(methodName));
-    parseInnerAndOuterElements(receiverClist, method.receiver);
+    parseInnerAndOuterElements(receiverClist, method.receiver.type);
 
     // parse return type
     CriterionList returnClist = clist.add(Criteria.returnType(className, methodName));
@@ -490,12 +490,12 @@ public class IndexFileSpecification implements Specification {
     }
 
     // parse parameters of method
-    for (Entry<Integer, AElement> entry : method.parameters.entrySet()) {
+    for (Entry<Integer, AField> entry : method.parameters.entrySet()) {
       Integer index = entry.getKey();
-      AElement param = entry.getValue();
+      AField param = entry.getValue();
       CriterionList paramClist = clist.add(Criteria.param(methodName, index));
       // parse declaration annotations
-      parseElement(paramClist, param);
+      parseField(paramClist, index.toString(), param);
       parseInnerAndOuterElements(paramClist, param.type);
     }
 
@@ -512,7 +512,7 @@ public class IndexFileSpecification implements Specification {
       AElement var = entry.getValue();
       CriterionList varClist = clist.add(Criteria.local(methodName, loc));
       // parse declaration annotations
-      parseElement(varClist, var);
+      parseElement(varClist, var);  // TODO: _?_
       parseInnerAndOuterElements(varClist, var.type);
     }
 

@@ -53,7 +53,7 @@ public class Example {
     for (Map.Entry<String, AMethod> me : clazz.methods.entrySet()) {
       AMethod method = me.getValue();
 
-      Annotation rro = method.receiver.lookup("ReadOnly");
+      Annotation rro = method.receiver.type.lookup("ReadOnly");
       if (rro == null)
         System.out.println("Method " + me.getKey()
             + " might modify the receiver");
