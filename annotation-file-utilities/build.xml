@@ -8,7 +8,7 @@
 
   <property environment="env"/>
 
-  <property name="java-version" value="7"/>
+  <property name="java-version" value="8"/>
 
   <!-- Avoid conflicts between multiple users on the same computer. -->
   <property name="tmpdir" location="${java.io.tmpdir}/${user.name}" />
