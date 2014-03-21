@@ -917,9 +917,9 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
      * Has this visit the parameter annotations on this method.
      */
     private void ensureVisitParameterAnnotations() {
-      for (Map.Entry<Integer, AElement> entry :
-        aMethod.parameters.entrySet()) {
-        AElement aParameter = entry.getValue();
+      for (Map.Entry<Integer, AField> entry :
+          aMethod.parameters.entrySet()) {
+        AField aParameter = entry.getValue();
         int index = entry.getKey();
         // First visit declaration annotations on the parameter
         for (Annotation tla : aParameter.tlAnnotationsHere) {
@@ -969,8 +969,19 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
      * Has this visit the receiver annotations on this method.
      */
     private void ensureVisitReceiverAnnotations() {
-      ATypeElement aReceiver = aMethod.receiver;
-      for (Annotation tla : aReceiver.tlAnnotationsHere) {
+      AField aReceiver = aMethod.receiver;
+
+      //for (Annotation tla : aReceiver.tlAnnotationsHere) {
+      //  if (shouldSkip(tla)) continue;
+      //
+      //  AnnotationVisitor av = visitTypeAnnotation(tla, false);  // FIXME
+      //  visitTargetType(av, TargetType.METHOD_RECEIVER);
+      //  visitLocations(av, InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION);
+      //  visitFields(av, tla);
+      //  av.visitEnd();
+      //}
+
+      for (Annotation tla : aReceiver.type.tlAnnotationsHere) {
         if (shouldSkip(tla)) continue;
 
         TypeAnnotationVisitor xav = visitTypeAnnotation(tla, false);
@@ -982,7 +993,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
 
       // now do inner annotations of aReceiver
       for (Map.Entry<InnerTypeLocation, ATypeElement> e :
-        aReceiver.innerTypes.entrySet()) {
+          aReceiver.type.innerTypes.entrySet()) {
         InnerTypeLocation aReceiverLocation = e.getKey();
         ATypeElement aInnerType = e.getValue();
         for (Annotation tla : aInnerType.tlAnnotationsHere) {

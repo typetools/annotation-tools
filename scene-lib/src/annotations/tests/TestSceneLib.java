@@ -142,7 +142,7 @@ public /*@ReadOnly*/ class TestSceneLib extends TestCase {
     }
 
     private void checkConstructor(AMethod constructor) {
-        Annotation ann = ((Annotation) constructor.receiver.lookup("p2.D"));
+        Annotation ann = ((Annotation) constructor.receiver.type.lookup("p2.D"));
         assertEquals(Collections.singletonMap("value", "spam"), ann.fieldValues);
         ATypeElement l = (ATypeElement) constructor.body.locals
                         .get(new LocalLocation(1, 3, 5)).type;

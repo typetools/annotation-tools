@@ -21,11 +21,11 @@ public final class AMethod extends ADeclaration {
     public final ATypeElement returnType; // initialized in constructor
 
     /** The method's annotated receiver parameter type */
-    public final ATypeElement receiver; // initialized in constructor
+    public final AField receiver; // initialized in constructor
 
     /** The method's annotated parameters; map key is parameter index */
-    public final VivifyingMap<Integer, AElement> parameters =
-            AElement.<Integer>newVivifyingLHMap_AET();
+    public final VivifyingMap<Integer, AField> parameters =
+            AField.<Integer>newVivifyingLHMap_AF();
 
     public final VivifyingMap<TypeIndexLocation, ATypeElement> throwsException =
         ATypeElement.<TypeIndexLocation>newVivifyingLHMap_ATE();
@@ -38,7 +38,7 @@ public final class AMethod extends ADeclaration {
       this.methodName = methodName;
       this.body = new ABlock(methodName);
       returnType = new ATypeElement("return type of " + methodName);
-      receiver = new ATypeElement("receiver parameter type of " + methodName);
+      receiver = new AField("receiver parameter type of " + methodName);
     }
 
     /**
@@ -93,7 +93,7 @@ public final class AMethod extends ADeclaration {
         sb.append(" -1:");
         sb.append(receiver.toString());
         // int size = parameters.size();
-        for (Map.Entry<Integer, AElement> em : parameters.entrySet()) {
+        for (Map.Entry<Integer, AField> em : parameters.entrySet()) {
             Integer i = em.getKey();
             sb.append(" ");
             sb.append(i);

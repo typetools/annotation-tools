@@ -733,10 +733,12 @@ extends EmptyVisitor {
      */
     private void handleMethodReceiver(AMethod aMethod) {
       if (xLocationsArgs.isEmpty()) {
-        aMethod.receiver.tlAnnotationsHere.add(makeAnnotation());
+        aMethod.receiver.type
+            .tlAnnotationsHere.add(makeAnnotation());
       } else {
-        aMethod.receiver.innerTypes.vivify(makeInnerTypeLocation()).
-            tlAnnotationsHere.add(makeAnnotation());
+        aMethod.receiver.type
+            .innerTypes.vivify(makeInnerTypeLocation())
+            .tlAnnotationsHere.add(makeAnnotation());
       }
     }
 
