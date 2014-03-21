@@ -113,7 +113,7 @@
             <!-- remainder only for repository version -->
             <pathelement location="${annotations-compiler}/dist/lib/javac.jar"/>
             <pathelement location="${annotations-compiler}/dist/lib/javap.jar"/>
-            <pathelement location="${checkers}/dist/checker.jar"/>
+            <pathelement location="${checkerframework}/checker/dist/checker.jar"/>
             <pathelement location="bin"/>
         </path>
     </target>
