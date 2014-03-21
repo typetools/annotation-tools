@@ -265,9 +265,17 @@ public abstract class Insertion {
 
         switch (type.getKind()) {
         case DECLARED:
-            writeAnnotations(type, result, comments, abbreviate);
             DeclaredType declaredType = (DeclaredType) type;
-            result.append(declaredType.getName());
+            String typeName = declaredType.getName();
+            int sep = typeName.lastIndexOf('.') + 1;
+            if (abbreviate) {
+                typeName = typeName.substring(sep);
+            } else if (sep > 0) {
+                result.append(typeName.substring(0, sep));
+                typeName = typeName.substring(sep);
+            }
+            writeAnnotations(type, result, comments, abbreviate);
+            result.append(typeName);
             if (!declaredType.isWildcard()) {
                 List<Type> typeArguments = declaredType.getTypeParameters();
                 if (!typeArguments.isEmpty()) {
