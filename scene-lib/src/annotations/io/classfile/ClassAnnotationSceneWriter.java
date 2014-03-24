@@ -829,7 +829,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
      * Has this visit the annotations on local variables in this method.
      */
     private void ensureVisitLocalVariablesAnnotations() {
-      for (Map.Entry<LocalLocation, AElement> entry :
+      for (Map.Entry<LocalLocation, AField> entry :
           aMethod.body.locals.entrySet()) {
         LocalLocation localLocation = entry.getKey();
         AElement aLocation = entry.getValue();

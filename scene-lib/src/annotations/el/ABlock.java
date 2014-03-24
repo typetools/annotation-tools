@@ -17,8 +17,8 @@ public class ABlock extends AExpression {
     // Currently we don't validate the local locations (e.g., that no two
     // distinct ranges for the same index overlap).
     /** The method's annotated local variables; map key contains local variable location numbers */
-    public final VivifyingMap<LocalLocation, AElement> locals =
-            AElement.<LocalLocation>newVivifyingLHMap_AET();
+    public final VivifyingMap<LocalLocation, AField> locals =
+            AField.<LocalLocation>newVivifyingLHMap_AF();
 
     ABlock(Object id) {
         super(id);
@@ -60,7 +60,7 @@ public class ABlock extends AExpression {
         StringBuilder sb = new StringBuilder();
         // sb.append("ABlock ");
         // sb.append(id);
-        for (Map.Entry<LocalLocation, AElement> em : locals.entrySet()) {
+        for (Map.Entry<LocalLocation, AField> em : locals.entrySet()) {
             LocalLocation loc = em.getKey();
             sb.append(loc);
             sb.append(": ");
