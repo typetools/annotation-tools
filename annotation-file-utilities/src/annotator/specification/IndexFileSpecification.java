@@ -507,7 +507,7 @@ public class IndexFileSpecification implements Specification {
   private void parseBlock(CriterionList clist, String methodName, ABlock block) {
 
     // parse locals of method
-    for (Entry<LocalLocation, AElement> entry : block.locals.entrySet()) {
+    for (Entry<LocalLocation, AField> entry : block.locals.entrySet()) {
       LocalLocation loc = entry.getKey();
       AElement var = entry.getValue();
       CriterionList varClist = clist.add(Criteria.local(methodName, loc));

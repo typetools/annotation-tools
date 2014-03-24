@@ -135,7 +135,7 @@ public abstract class DefCollector {
         collect(m.receiver);
         for (AElement p : m.parameters.values())
             collect(p);
-        for (AElement l : m.body.locals.values())
+        for (AField l : m.body.locals.values())
             collect(l);
         for (ATypeElement tc : m.body.typecasts.values())
             collect(tc);
