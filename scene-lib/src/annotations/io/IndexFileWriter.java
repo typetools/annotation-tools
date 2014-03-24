@@ -339,7 +339,7 @@ public final class IndexFileWriter {
                     printElementAndInnerTypes(INDENT + INDENT, "receiver", m.receiver);
                 }
                 printNumberedAmbigiousElements(INDENT + INDENT, "parameter", m.parameters);
-                for (Map. /*@ReadOnly*/ Entry<LocalLocation, /*@ReadOnly*/ AElement> le
+                for (Map. /*@ReadOnly*/ Entry<LocalLocation, /*@ReadOnly*/ AField> le
                         : m.body.locals.entrySet()) {
                     LocalLocation loc = le.getKey();
                     /*@ReadOnly*/ AElement l = le.getValue();

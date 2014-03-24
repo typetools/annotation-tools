@@ -150,7 +150,7 @@ public /*@ReadOnly*/ class TestSceneLib extends TestCase {
                 TypeAnnotationPosition.getTypePathFromBinary(
                                 Arrays.asList(new Integer[] { 0, 0 }))));
         assertNotNull(i.lookup("p2.C"));
-        AElement l2 =
+        AField l2 =
                 constructor.body.locals.get(new LocalLocation(1, 3, 6));
         assertNull(l2);
     }

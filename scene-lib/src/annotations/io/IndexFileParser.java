@@ -853,7 +853,7 @@ public final class IndexFileParser {
                     }
                     loc = new LocalLocation(lvar, varIndex);
                 }
-                AElement l = bl.locals.vivify(loc);
+                AField l = bl.locals.vivify(loc);
                 expectChar(':');
                 parseAnnotations(l);
                 if (checkKeyword("type") && matchKeyword("type")) {
