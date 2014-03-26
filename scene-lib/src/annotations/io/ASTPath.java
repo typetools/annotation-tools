@@ -1202,7 +1202,7 @@ public final class ASTPath implements Iterable<ASTPath.ASTEntry> {
      *            The kind to test.
      * @return true if the given kind is a declaration.
      */
-    private static boolean isDeclaration(Tree.Kind kind) {
+    static boolean isDeclaration(Tree.Kind kind) {
       return kind == Tree.Kind.ANNOTATION
           || kind == Tree.Kind.CLASS
           || kind == Tree.Kind.METHOD
@@ -1217,7 +1217,7 @@ public final class ASTPath implements Iterable<ASTPath.ASTEntry> {
      *            The kind to test.
      * @return true if the given kind can be identified by an {@code ASTPath}.
      */
-    public static boolean isHandled(Kind kind) {
+    static boolean isHandled(Kind kind) {
         return !(isDeclaration(kind)
             || kind == Kind.BREAK
             || kind == Kind.COMPILATION_UNIT

@@ -82,22 +82,30 @@ public class ASTIndex extends AbstractMap<Tree, ASTIndex.ASTRecord> {
     public final String className;
 
     /**
-     * Name of the enclosing member declaration, or null if there is none.
+     * Name of the enclosing method declaration, or null if there is none.
      */
-    public final String otherName;
+    public final String methodName;
+
+    /**
+     * Name of the enclosing variable declaration, or null if there is none.
+     */
+    public final String varName;
 
     /**
      * Kind of immediately enclosing declaration: METHOD, VARIABLE, or a
      *  class type (CLASS, INTERFACE, ENUM, or ANNOTATION_TYPE).
      */
-    public final Tree.Kind declKind;
     public final ASTPath astPath;
 
-    ASTRecord(String className, String otherName,
-        Tree.Kind declKind, ASTPath astPath) {
+    // TODO: stubs to preserve checker-framework-inference compilation; REMOVE
+    public final String otherName = null;
+    public final Tree.Kind declKind = null;
+
+    ASTRecord(String className, String methodName, String varName,
+        ASTPath astPath) {
       this.className = className;
-      this.otherName = otherName;
-      this.declKind = declKind;
+      this.methodName = methodName;
+      this.varName = varName;
       this.astPath = astPath;
     }
 
@@ -107,10 +115,11 @@ public class ASTIndex extends AbstractMap<Tree, ASTIndex.ASTRecord> {
     }
 
     public boolean equals(ASTRecord astRecord) {
-      return declKind == astRecord.declKind
-          && className.equals(astRecord.className)
-          && otherName == null ? astRecord.otherName == null
-              : otherName.equals(astRecord.otherName)
+      return className.equals(astRecord.className)
+          && methodName == null ? astRecord.methodName == null
+              : methodName.equals(astRecord.methodName)
+          && varName == null ? astRecord.varName == null
+              : varName.equals(astRecord.varName)
           && astPath.equals(astRecord.astPath);
     }
 
@@ -120,8 +129,8 @@ public class ASTIndex extends AbstractMap<Tree, ASTIndex.ASTRecord> {
      */
     public boolean matches(TreePath treePath) {
       String clazz = null;
-      String other = null;
-      Tree.Kind kind = null;
+      String meth = null;
+      String var = null;
       boolean matchVars = false;  // members only!
       Deque<Tree> stack = new ArrayDeque<Tree>();
       for (Tree tree : treePath) { stack.push(tree); }
@@ -133,21 +142,19 @@ public class ASTIndex extends AbstractMap<Tree, ASTIndex.ASTRecord> {
         case ENUM:
         case ANNOTATION_TYPE:
           clazz = ((ClassTree) tree).getSimpleName().toString();
-          kind = tree.getKind();
-          other = null;
+          meth = null;
+          var = null;
           matchVars = true;
           break;
         case METHOD:
-          assert other == null;
-          other = ((MethodTree) tree).getName().toString();
-          kind = Tree.Kind.METHOD;
+          assert meth == null;
+          meth = ((MethodTree) tree).getName().toString();
           matchVars = false;
           break;
         case VARIABLE:
           if (matchVars) {
-            assert other == null;
-            other = ((VariableTree) tree).getName().toString();
-            kind = Tree.Kind.VARIABLE;
+            assert var == null;
+            var = ((VariableTree) tree).getName().toString();
             matchVars = false;
           }
           break;
@@ -157,8 +164,8 @@ public class ASTIndex extends AbstractMap<Tree, ASTIndex.ASTRecord> {
         }
       }
       return className.equals(clazz)
-          && (otherName == null ? other == null : otherName.equals(other))
-          && declKind == kind
+          && (methodName == null ? meth == null : methodName.equals(meth))
+          && (varName == null ? var == null : varName.equals(var))
           && astPath.matches(treePath);
     }
   }
@@ -186,7 +193,8 @@ public class ASTIndex extends AbstractMap<Tree, ASTIndex.ASTRecord> {
 
   private static ASTRecord makeASTRecord(TreePath treePath,
       ASTPath astPath) {
-    Tree found = null;
+    MethodTree method = null;
+    VariableTree field = null;
     for (Tree node : treePath) {
       Tree.Kind kind = node.getKind();
       switch (kind) {
@@ -194,29 +202,46 @@ public class ASTIndex extends AbstractMap<Tree, ASTIndex.ASTRecord> {
       case INTERFACE:
       case ENUM:
       case ANNOTATION_TYPE:
-        return assemble(astPath, node, found);
+        return assemble(astPath, (ClassTree) node, method, field);
       case METHOD:
+        method = (MethodTree) node;
+        continue;
       case VARIABLE:
-        found = node;
+        field = (VariableTree) node;
         continue;
       default:
-        found = null;
+        method = null;
+        field = null;
       }
     }
     return null;
   }
 
   private static ASTRecord assemble(ASTPath astPath,
-      Tree classNode, Tree otherNode) {
+      ClassTree classNode, MethodTree methodNode, VariableTree fieldNode) {
     String className = ((JCClassDecl) classNode).sym.flatname.toString();
-    if (otherNode == null) {
-      return new ASTRecord(className, null, classNode.getKind(), astPath);
+    String fieldName = fieldNode == null ? null
+        : fieldNode.getName().toString();
+    if (methodNode == null) {
+      return new ASTRecord(className, null, fieldName, astPath);
+    } else {
+      String methodName = JVMNames.getJVMMethodName(methodNode);
+      VariableTree recv = methodNode.getReceiverParameter();
+      if (recv != null && recv.getName().toString().equals(fieldName)) {
+        return new ASTRecord(className, methodName, Integer.toString(-1),
+            astPath);
+      } else {
+        int i = 0;
+        for (VariableTree param : methodNode.getParameters()) {
+          if (param.getName().toString().equals(fieldName)) {
+            return new ASTRecord(className, methodName, Integer.toString(i),
+                astPath);
+          }
+          i++;
+        }
+        return null;
+      }
     }
-    Tree.Kind kind = otherNode.getKind();
-    String otherName = kind == Tree.Kind.METHOD
-        ? JVMNames.getJVMMethodName(((MethodTree) otherNode))
-        : ((VariableTree) otherNode).getName().toString();
-    return new ASTRecord(className, otherName, kind, astPath);
   }
 
   // The constructor walks the entire tree and creates an ASTEntry for
@@ -256,7 +281,7 @@ public class ASTIndex extends AbstractMap<Tree, ASTIndex.ASTRecord> {
         int i = 0;
         if (nodes != null) {
           for (Tree node : nodes) {
-            save(node, kind, sel, ++i);
+            save(node, kind, sel, i++);
           }
         }
       }
@@ -658,6 +683,7 @@ public class ASTIndex extends AbstractMap<Tree, ASTIndex.ASTRecord> {
     ASTPath astPath = new ASTPath();
     Deque<Tree> deque = new ArrayDeque<Tree>();
     for (Tree tree : treePath) {
+      if (ASTPath.isDeclaration(tree.getKind())) { break; }
       if (ASTPath.isHandled(tree.getKind())) { deque.push(tree); }
     }
     while (!deque.isEmpty()) {
