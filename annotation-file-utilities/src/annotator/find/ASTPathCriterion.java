@@ -16,6 +16,7 @@ import com.sun.source.tree.BinaryTree;
 import com.sun.source.tree.BlockTree;
 import com.sun.source.tree.CaseTree;
 import com.sun.source.tree.CatchTree;
+import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.CompoundAssignmentTree;
 import com.sun.source.tree.ConditionalExpressionTree;
 import com.sun.source.tree.DoWhileLoopTree;
@@ -30,6 +31,7 @@ import com.sun.source.tree.LambdaExpressionTree;
 import com.sun.source.tree.MemberReferenceTree;
 import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.MethodInvocationTree;
+import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.NewArrayTree;
 import com.sun.source.tree.NewClassTree;
 import com.sun.source.tree.ParameterizedTypeTree;
@@ -95,10 +97,27 @@ public class ASTPathCriterion implements Criterion {
         // within a method) or class node (this gets only the part of the path
         // within a field).
         List<Tree> actualPath = new ArrayList<Tree>();
-        while (path != null && path.getLeaf().getKind() != Tree.Kind.METHOD
-                && path.getLeaf().getKind() != Tree.Kind.CLASS) {
+        Tree leaf = path.getLeaf();
+        Tree.Kind kind = leaf.getKind();
+        while (path != null
+                && kind != Tree.Kind.METHOD && kind != Tree.Kind.CLASS) {
             actualPath.add(0, path.getLeaf());
             path = path.getParentPath();
+            if (path == null) { break; }
+            leaf = path.getLeaf();
+            kind = leaf.getKind();
+        }
+
+        // If astPath starts with Method.body, include the MethodTree on
+        // actualPath.
+        if (!astPath.isEmpty()) {
+            ASTPath.ASTEntry entry = astPath.get(0);
+            if (entry.getTreeKind() == Tree.Kind.METHOD
+                    && entry.childSelectorIs(ASTPath.BODY)) {
+                if (path != null && kind == Tree.Kind.METHOD) {
+                    actualPath.add(0, path.getLeaf());
+                }
+            }
         }
 
         if (debug) {
@@ -212,6 +231,18 @@ public class ASTPathCriterion implements Criterion {
                     next = cach.getBlock();
                 }
                 break;
+            }
+            case CLASS: {  // TODO
+                ClassTree clazz = (ClassTree) actualNode;
+                int arg = astNode.getArgument();
+                if (astNode.childSelectorIs(ASTPath.TYPE_PARAMETER)) {
+                    next = clazz.getTypeParameters().get(arg);
+                } else if (astNode.childSelectorIs(ASTPath.BOUND)) {
+                    next = arg < 0 ? clazz.getExtendsClause()
+                            : clazz.getImplementsClause().get(arg);
+                } else {
+                    next = actualPath.get(i + 1);  // ???
+                }
             }
             case CONDITIONAL_EXPRESSION: {
                 ConditionalExpressionTree conditionalExpression = (ConditionalExpressionTree) actualNode;
@@ -328,6 +359,22 @@ public class ASTPathCriterion implements Criterion {
             case MEMBER_SELECT: {
                 MemberSelectTree memberSelect = (MemberSelectTree) actualNode;
                 next = memberSelect.getExpression();
+                break;
+            }
+            case METHOD: {
+                MethodTree method = (MethodTree) actualNode;
+                if (astNode.childSelectorIs(ASTPath.TYPE)) {
+                    next = method.getReturnType();
+                } else if (astNode.childSelectorIs(ASTPath.PARAMETER)) {
+                    int arg = astNode.getArgument();
+                    next = arg < 0 ? method.getReceiverParameter()
+                            : method.getParameters().get(arg);
+                } else if (astNode.childSelectorIs(ASTPath.TYPE_PARAMETER)) {
+                    int arg = astNode.getArgument();
+                    next = method.getTypeParameters().get(arg);
+                } else {  // BODY
+                    next = method.getBody();
+                }
                 break;
             }
             case METHOD_INVOCATION: {
