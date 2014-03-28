@@ -93,6 +93,7 @@ public final class ASTPath implements Iterable<ASTPath.ASTEntry> {
     public static final String TYPE = "type";
     public static final String TYPE_ALTERNATIVE = "typeAlternative";
     public static final String TYPE_ARGUMENT = "typeArgument";
+    public static final String TYPE_PARAMETER = "typeParameter";
     public static final String UNDERLYING_TYPE = "underlyingType";
     public static final String UPDATE = "update";
     public static final String VARIABLE = "variable";
@@ -588,6 +589,20 @@ public final class ASTPath implements Iterable<ASTPath.ASTEntry> {
         }
       }
 
+      private static boolean isDecl(TreePath path) {
+        switch (path.getLeaf().getKind()) {
+        case CLASS:
+        case METHOD:
+          return true;
+        case VARIABLE:
+          TreePath parentPath = path.getParentPath();
+          return parentPath == null
+              || parentPath.getLeaf().getKind() == Kind.CLASS;
+        default:
+          return false;
+        }
+      }
+
       public boolean matches(TreePath path) {
         if (path == null) {
           return false;
@@ -600,7 +615,7 @@ public final class ASTPath implements Iterable<ASTPath.ASTEntry> {
         // within a method) or class node (this gets only the part of the path
         // within a field).
         List<Tree> actualPath = new ArrayList<Tree>();
-        while (path != null && nonDecl(path)) {
+        while (path != null && !isDecl(path)) {
           actualPath.add(0, path.getLeaf());
           path = path.getParentPath();
         }
