@@ -15,6 +15,23 @@ This is the changelog for the
 <ul>
 
   <li>
+    Version 3.6.3 (released Apr 1, 2014):
+    <ul>
+        <li>
+          Eliminates insert-annotation problems with handling Java 8 class files.
+        </li>
+        <li>
+          Corrects annotation placement within a qualified type name.
+        </li>
+        <li>
+          Fills in gaps in AST Path API.  All (Java 7) non-declaration nodes can now be identified by a path from an enclosing declaration.
+        </li>
+        <li>
+          Expands scene-lib API with visitor framework and new class <code>APIIndex</code>, which provides a cache that maps Java abstract syntax tree nodes to AST paths as defined in the annotation file format specification.
+        </li>
+    </ul>
+  </li>
+  <li>
     Version 3.6.2 (released Mar 5, 2014):
     <ul>
         <li>
@@ -22,7 +39,6 @@ This is the changelog for the
         </li>
     </ul>
   </li>
-  <li>
   <li>
     Version 3.6.1 (released Feb 19, 2014):
     <ul>
