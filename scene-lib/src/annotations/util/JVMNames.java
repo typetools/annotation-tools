@@ -5,7 +5,6 @@ import javax.lang.model.element.VariableElement;
 
 import plume.UtilMDE;
 
-import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.tools.javac.code.Symbol.VarSymbol;
 import com.sun.tools.javac.tree.JCTree.JCMethodDecl;
@@ -14,9 +13,6 @@ import com.sun.tools.javac.tree.JCTree.JCMethodDecl;
  * @author mcarthur
  */
 public class JVMNames {
-    public static String getJVMClassName(ClassTree classTree) {
-        return null;  // TODO
-    }
 
     public static String getJVMMethodName(MethodTree methodTree) {
         ExecutableElement methodElement = ((JCMethodDecl) methodTree).sym;
@@ -24,7 +20,7 @@ public class JVMNames {
         builder.append(methodTree.getName());
         builder.append("(");
         for (VariableElement ve : methodElement.getParameters()) {
-            builder.append(UtilMDE.binaryNameToFieldDescriptor(((VarSymbol) ve).asType().toString()));
+            builder.append(UtilMDE.binaryNameToFieldDescriptor(((VarSymbol) ve).asType().unannotatedType().toString()));
         }
         builder.append(")");
 
