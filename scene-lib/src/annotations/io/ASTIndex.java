@@ -220,28 +220,35 @@ public class ASTIndex extends AbstractMap<Tree, ASTIndex.ASTRecord> {
   private static ASTRecord assemble(ASTPath astPath,
       ClassTree classNode, MethodTree methodNode, VariableTree fieldNode) {
     String className = ((JCClassDecl) classNode).sym.flatname.toString();
-    String fieldName = fieldNode == null ? null
-        : fieldNode.getName().toString();
     if (methodNode == null) {
-      return new ASTRecord(className, null, fieldName, astPath);
-    } else {
-      String methodName = JVMNames.getJVMMethodName(methodNode);
-      VariableTree recv = methodNode.getReceiverParameter();
-      if (recv != null && recv.getName().toString().equals(fieldName)) {
-        return new ASTRecord(className, methodName, Integer.toString(-1),
-            astPath);
-      } else {
-        int i = 0;
-        for (VariableTree param : methodNode.getParameters()) {
-          if (param.getName().toString().equals(fieldName)) {
-            return new ASTRecord(className, methodName, Integer.toString(i),
-                astPath);
-          }
-          i++;
-        }
-        return null;
+      if (fieldNode != null) {
+        return new ASTRecord(className, null,
+            fieldNode.getName().toString(), astPath);
       }
+      return new ASTRecord(className, null, null, astPath);
     }
+
+    String methodName = JVMNames.getJVMMethodName(methodNode);
+    if (fieldNode == null) {
+      return new ASTRecord(className, methodName, null, astPath);
+    }
+
+    String fieldName = fieldNode.getName().toString();
+    VariableTree recv = methodNode.getReceiverParameter();
+    if (recv != null && recv.getName().toString().equals(fieldName)) {
+      return new ASTRecord(className, methodName,
+          Integer.toString(-1), astPath);
+    }
+
+    int i = 0;
+    for (VariableTree param : methodNode.getParameters()) {
+      if (param.getName().toString().equals(fieldName)) {
+        return new ASTRecord(className, methodName, Integer.toString(i),
+            astPath);
+      }
+      i++;
+    }
+    return null;
   }
 
   // The constructor walks the entire tree and creates an ASTEntry for

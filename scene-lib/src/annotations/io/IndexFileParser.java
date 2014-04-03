@@ -79,7 +79,8 @@ import com.sun.tools.javac.code.TypeAnnotationPosition;
 public final class IndexFileParser {
 
   private static final String[] typeSelectors = { "bound", "identifier",
-    "type", "typeAlternative", "typeArgument", "underlyingType" };
+    "type", "typeAlternative", "typeArgument", "typeParameter",
+    "underlyingType" };
 
     // The input
     private final StreamTokenizer st;
@@ -1035,6 +1036,9 @@ public final class IndexFileParser {
                     new String[] {ASTPath.STATEMENT});
         } else if (matchKeyword("Catch")) {
             entry = newASTEntry(Kind.CATCH, new String[] {ASTPath.PARAMETER, ASTPath.BLOCK});
+        } else if (matchKeyword("Class")) {
+            entry = newASTEntry(Kind.CLASS, new String[] {ASTPath.BOUND, ASTPath.TYPE_PARAMETER},
+                    new String[] {ASTPath.BOUND, ASTPath.TYPE_PARAMETER});
         } else if (matchKeyword("CompoundAssignment")) {
             // Always use Kind.PLUS_ASSIGNMENT for CompoundAssignment
             entry = newASTEntry(Kind.PLUS_ASSIGNMENT, new String[] {ASTPath.VARIABLE, ASTPath.EXPRESSION});
@@ -1060,10 +1064,13 @@ public final class IndexFileParser {
             entry = newASTEntry(Kind.LAMBDA_EXPRESSION, new String[] {ASTPath.PARAMETER, ASTPath.BODY},
                     new String[] {ASTPath.PARAMETER});
         } else if (matchKeyword("MemberReference")) {
-            entry = newASTEntry(Kind.MEMBER_REFERENCE,new String[] {ASTPath.QUALIFIER_EXPRESSION, ASTPath.TYPE_ARGUMENT},
+            entry = newASTEntry(Kind.MEMBER_REFERENCE, new String[] {ASTPath.QUALIFIER_EXPRESSION, ASTPath.TYPE_ARGUMENT},
                     new String[] {ASTPath.TYPE_ARGUMENT});
         } else if (matchKeyword("MemberSelect")) {
             entry = newASTEntry(Kind.MEMBER_SELECT, new String[] {ASTPath.EXPRESSION});
+        } else if (matchKeyword("Method")) {
+            entry = newASTEntry(Kind.METHOD, new String[] {ASTPath.BODY, ASTPath.TYPE, ASTPath.PARAMETER, ASTPath.TYPE_PARAMETER},
+                    new String[] {ASTPath.PARAMETER, ASTPath.TYPE_PARAMETER});
         } else if (matchKeyword("MethodInvocation")) {
             entry = newASTEntry(Kind.METHOD_INVOCATION, new String[] {ASTPath.TYPE_ARGUMENT, ASTPath.METHOD_SELECT, ASTPath.ARGUMENT},
                     new String[] {ASTPath.TYPE_ARGUMENT, ASTPath.ARGUMENT});

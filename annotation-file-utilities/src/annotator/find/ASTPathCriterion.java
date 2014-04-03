@@ -108,16 +108,11 @@ public class ASTPathCriterion implements Criterion {
             kind = leaf.getKind();
         }
 
-        // If astPath starts with Method.body, include the MethodTree on
+        // If astPath starts with Method.*, include the MethodTree on
         // actualPath.
-        if (!astPath.isEmpty()) {
-            ASTPath.ASTEntry entry = astPath.get(0);
-            if (entry.getTreeKind() == Tree.Kind.METHOD
-                    && entry.childSelectorIs(ASTPath.BODY)) {
-                if (path != null && kind == Tree.Kind.METHOD) {
-                    actualPath.add(0, path.getLeaf());
-                }
-            }
+        if (path != null && kind == Tree.Kind.METHOD && !astPath.isEmpty()
+                && astPath.get(0).getTreeKind() == Tree.Kind.METHOD) {
+            actualPath.add(0, leaf);
         }
 
         if (debug) {
