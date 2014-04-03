@@ -808,7 +808,6 @@ The following is the grammar for AST paths.
 \qquad    \bnfor{} \bnfnt{binary} \\
 \qquad    \bnfor{} \bnfnt{block} \\
 \qquad    \bnfor{} \bnfnt{case} \\
-\qquad    \bnfor{} \bnfnt{class-declaration} \\
 \qquad    \bnfor{} \bnfnt{catch} \\
 \qquad    \bnfor{} \bnfnt{compound-assignment} \\
 \qquad    \bnfor{} \bnfnt{conditional-expression} \\
@@ -823,7 +822,6 @@ The following is the grammar for AST paths.
 \qquad    \bnfor{} \bnfnt{lambda-expression} \\
 \qquad    \bnfor{} \bnfnt{member-reference} \\
 \qquad    \bnfor{} \bnfnt{member-select} \\
-\qquad    \bnfor{} \bnfnt{method-declaration} \\
 \qquad    \bnfor{} \bnfnt{method-invocation} \\
 \qquad    \bnfor{} \bnfnt{new-array} \\
 \qquad    \bnfor{} \bnfnt{new-class} \\
@@ -846,7 +844,7 @@ The following is the grammar for AST paths.
 \qquad    \bnflit{AnnotatedType} \bnflit{.} ( ( \bnflit{annotation} \bnfnt{integer} ) \bnfor{} \bnflit{underlyingType} ) \\
 \\
 \bnfnt{annotation} ::= \\
-\qquad    \bnflit{Annotation} \bnflit{.} ( \bnflit{type} \bnfor{} ( \bnflit{argument} \bnfnt{integer} ) ) \\
+\qquad    \bnflit{Annotation} \bnflit{.} ( \bnflit{type} \bnfor{} \bnflit{argument} \bnfnt{integer} ) \\
 \\
 \bnfnt{array-access} ::= \\
 \qquad    \bnflit{ArrayAccess} \bnflit{.} ( \bnflit{expression} \bnfor{} \bnflit{index} ) \\
@@ -871,9 +869,6 @@ The following is the grammar for AST paths.
 \\
 \bnfnt{catch} ::= \\
 \qquad    \bnflit{Catch} \bnflit{.} ( \bnflit{parameter} \bnfor{} \bnflit{block} ) \\
-\\
-\bnfnt{class-declaration} ::= \\
-\qquad    \bnflit{Class} \bnflit{.} ( ( \bnflit{bound} \bnfnt{integer} ) \bnfor{} ( \bnflit{typeParameter} \bnfnt{integer} ) ) \\
 \\
 \bnfnt{compound-assignment} ::= \\
 \qquad    \bnflit{CompoundAssignment} \bnflit{.} ( \bnflit{variable} \bnfor{} \bnflit{expression} ) \\
@@ -913,9 +908,6 @@ The following is the grammar for AST paths.
 \\
 \bnfnt{member-select} ::= \\
 \qquad    \bnflit{MemberSelect} \bnflit{.} \bnflit{expression} \\
-\\
-\bnfnt{method-declaration} ::= \\
-\qquad    \bnflit{Method} \bnflit{.} ( \bnflit{body} \bnfor{} ( \bnflit{parameter} \bnfnt{integer} ) \bnfor{} \bnflit{type} \bnfor{} ( \bnflit{typeParameter} \bnfnt{integer} ) ) \\
 \\
 \bnfnt{method-invocation} ::= \\
 \qquad    \bnflit{MethodInvocation} \bnflit{.} ( ( \bnflit{typeArgument} \bnfnt{integer} ) \bnfor{} \bnflit{methodSelect} \\
