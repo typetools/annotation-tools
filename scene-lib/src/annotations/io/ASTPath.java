@@ -390,6 +390,10 @@ public final class ASTPath implements Iterable<ASTPath.ASTEntry> {
         } else if (s.equals("Catch")) {
           return newASTEntry(Kind.CATCH,
               new String[] {ASTPath.PARAMETER, ASTPath.BLOCK});
+        } else if (s.equals("Class")) {
+          return newASTEntry(Kind.CLASS,
+              new String[] {ASTPath.BOUND, ASTPath.TYPE_PARAMETER},
+              new String[] {ASTPath.BOUND, ASTPath.TYPE_PARAMETER});
         } else if (s.equals("CompoundAssignment")) {
           // Always use Kind.PLUS_ASSIGNMENT for CompoundAssignment
           return newASTEntry(Kind.PLUS_ASSIGNMENT,
@@ -435,6 +439,11 @@ public final class ASTPath implements Iterable<ASTPath.ASTEntry> {
               new String[] {ASTPath.TYPE_ARGUMENT});
         } else if (s.equals("MemberSelect")) {
           return newASTEntry(Kind.MEMBER_SELECT, new String[] {ASTPath.EXPRESSION});
+        } else if (s.equals("Method")) {
+          return newASTEntry(Kind.METHOD,
+              new String[] {ASTPath.BODY, ASTPath.PARAMETER,
+              ASTPath.TYPE, ASTPath.TYPE_PARAMETER},
+              new String[] {ASTPath.PARAMETER, ASTPath.TYPE_PARAMETER});
         } else if (s.equals("MethodInvocation")) {
           return newASTEntry(Kind.METHOD_INVOCATION,
               new String[] {ASTPath.TYPE_ARGUMENT,
@@ -589,20 +598,6 @@ public final class ASTPath implements Iterable<ASTPath.ASTEntry> {
         }
       }
 
-      private static boolean isDecl(TreePath path) {
-        switch (path.getLeaf().getKind()) {
-        case CLASS:
-        case METHOD:
-          return true;
-        case VARIABLE:
-          TreePath parentPath = path.getParentPath();
-          return parentPath == null
-              || parentPath.getLeaf().getKind() == Kind.CLASS;
-        default:
-          return false;
-        }
-      }
-
       public boolean matches(TreePath path) {
         if (path == null) {
           return false;
@@ -615,7 +610,7 @@ public final class ASTPath implements Iterable<ASTPath.ASTEntry> {
         // within a method) or class node (this gets only the part of the path
         // within a field).
         List<Tree> actualPath = new ArrayList<Tree>();
-        while (path != null && !isDecl(path)) {
+        while (path != null && nonDecl(path)) {
           actualPath.add(0, path.getLeaf());
           path = path.getParentPath();
         }
