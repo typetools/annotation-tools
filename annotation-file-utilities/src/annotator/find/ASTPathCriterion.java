@@ -362,8 +362,11 @@ public class ASTPathCriterion implements Criterion {
                     next = method.getReturnType();
                 } else if (astNode.childSelectorIs(ASTPath.PARAMETER)) {
                     int arg = astNode.getArgument();
+                    List<? extends VariableTree> params =
+                        method.getParameters();
                     next = arg < 0 ? method.getReceiverParameter()
-                            : method.getParameters().get(arg);
+                            : arg < params.size() ? params.get(arg)
+                            : null;
                 } else if (astNode.childSelectorIs(ASTPath.TYPE_PARAMETER)) {
                     int arg = astNode.getArgument();
                     next = method.getTypeParameters().get(arg);
