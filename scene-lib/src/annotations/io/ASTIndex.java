@@ -689,9 +689,37 @@ public class ASTIndex extends AbstractMap<Tree, ASTIndex.ASTRecord> {
     TreePath treePath = TreePath.getPath(cut, node);
     ASTPath astPath = new ASTPath();
     Deque<Tree> deque = new ArrayDeque<Tree>();
+    Deque<Tree> backup = null;
+loop:
     for (Tree tree : treePath) {
-      if (ASTPath.isDeclaration(tree.getKind())) { break; }
-      if (ASTPath.isHandled(tree.getKind())) { deque.push(tree); }
+      Kind kind = tree.getKind();
+      switch (kind) {
+      case VARIABLE:
+        backup = deque;  // keep going iff local; not yet known, so save state
+        deque.push(tree);
+        break;
+      case METHOD:
+        deque.push(tree);
+        // fall through
+      case ANNOTATION:
+      case CLASS:
+      case ENUM:
+      case INTERFACE:
+        if (backup != null) { deque = backup; }
+        break loop;
+      case BREAK:
+      case COMPILATION_UNIT:
+      case CONTINUE:
+      case IMPORT:
+      case LAMBDA_EXPRESSION: // TODO
+      case MODIFIERS:
+        break;
+      case BLOCK:
+        backup = null;  // any previously seen var was local
+        // fall through
+      default:
+        deque.push(tree);
+      }
     }
     while (!deque.isEmpty()) {
       ASTPath.ASTEntry entry = astEntries.get(deque.pop());
