@@ -108,10 +108,11 @@ public class ASTPathCriterion implements Criterion {
             kind = leaf.getKind();
         }
 
-        // If astPath starts with Method.*, include the MethodTree on
-        // actualPath.
-        if (path != null && kind == Tree.Kind.METHOD && !astPath.isEmpty()
-                && astPath.get(0).getTreeKind() == Tree.Kind.METHOD) {
+        // If astPath starts with Method.* or Class.*, include the
+        // MethodTree or ClassTree on actualPath.
+        if (path != null && !astPath.isEmpty()
+                && astPath.get(0).getTreeKind() == kind
+                && (kind == Tree.Kind.METHOD || kind == Tree.Kind.CLASS)) {
             actualPath.add(0, leaf);
         }
 
@@ -238,6 +239,7 @@ public class ASTPathCriterion implements Criterion {
                 } else {
                     next = actualPath.get(i + 1);  // ???
                 }
+                break;
             }
             case CONDITIONAL_EXPRESSION: {
                 ConditionalExpressionTree conditionalExpression = (ConditionalExpressionTree) actualNode;
