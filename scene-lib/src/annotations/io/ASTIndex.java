@@ -387,7 +387,7 @@ public class ASTIndex extends AbstractMap<Tree, ASTIndex.ASTRecord> {
         Kind kind = node.getKind();
         save(node.getExtendsClause(), kind, ASTPath.BOUND);
         saveAll(node.getImplementsClause(), kind, ASTPath.BOUND);
-        saveAll(node.getTypeParameters(), kind, ASTPath.TYPE_ARGUMENT);
+        saveAll(node.getTypeParameters(), kind, ASTPath.TYPE_PARAMETER);
         return visit(node.getMembers(), null);
       }
 
@@ -466,7 +466,7 @@ public class ASTIndex extends AbstractMap<Tree, ASTIndex.ASTRecord> {
       public Void visitMethod(MethodTree node, ASTPath.ASTEntry entry) {
         Kind kind = node.getKind();
         save(node.getReturnType(), kind, ASTPath.TYPE);
-        saveAll(node.getTypeParameters(), kind, ASTPath.TYPE_ARGUMENT);
+        saveAll(node.getTypeParameters(), kind, ASTPath.TYPE_PARAMETER);
         save(node.getReceiverParameter(), kind, ASTPath.PARAMETER);
         saveAll(node.getParameters(), kind, ASTPath.PARAMETER);
         save(node.getBody(), kind, ASTPath.BODY);
