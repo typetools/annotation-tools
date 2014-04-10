@@ -44,6 +44,7 @@ import com.sun.source.tree.ThrowTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.tree.TryTree;
 import com.sun.source.tree.TypeCastTree;
+import com.sun.source.tree.TypeParameterTree;
 import com.sun.source.tree.UnaryTree;
 import com.sun.source.tree.UnionTypeTree;
 import com.sun.source.tree.VariableTree;
@@ -526,6 +527,13 @@ public class ASTPathCriterion implements Criterion {
                 } else {
                     next = typeCast.getExpression();
                 }
+                break;
+            }
+            case TYPE_PARAMETER: {
+                TypeParameterTree typeParam = (TypeParameterTree) actualNode;
+                List<? extends Tree> bounds = typeParam.getBounds();
+                int arg = astNode.getArgument();
+                next = bounds.get(arg);
                 break;
             }
             case UNION_TYPE: {

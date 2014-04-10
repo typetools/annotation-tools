@@ -1099,6 +1099,9 @@ public final class IndexFileParser {
                     new String[] {ASTPath.CATCH});
         } else if (matchKeyword("TypeCast")) {
             entry = newASTEntry(Kind.TYPE_CAST, new String[] {ASTPath.TYPE, ASTPath.EXPRESSION});
+        } else if (matchKeyword("TypeParameter")) {
+            entry = newASTEntry(Kind.TYPE_PARAMETER, new String[] {ASTPath.BOUND},
+                    new String[] {ASTPath.BOUND});
         } else if (matchKeyword("Unary")) {
             // Always use Kind.UNARY_PLUS for Unary
             entry = newASTEntry(Kind.UNARY_PLUS, new String[] {ASTPath.EXPRESSION});
