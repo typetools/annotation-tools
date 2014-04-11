@@ -25,6 +25,11 @@ public class CastInsertion extends Insertion {
   private Type type;
 
   /**
+   * Whether insertion is to take place on a bare array literal. 
+   */
+  public boolean onArrayLiteral = false;
+
+  /**
    * Creates a new CastInsertion.
    *
    * @param criteria where to insert the text
@@ -47,7 +52,9 @@ public class CastInsertion extends Insertion {
   /** {@inheritDoc} */
   @Override
   protected String getText(boolean comments, boolean abbreviate) {
-    String result = "((" + typeToString(type, comments, abbreviate) + ") (";
+    String result = onArrayLiteral
+        ? "((new " + typeToString(type, comments, abbreviate) + " "
+        : "((" + typeToString(type, comments, abbreviate) + ") (";
     return result;
   }
 
@@ -65,6 +72,14 @@ public class CastInsertion extends Insertion {
   protected boolean addTrailingSpace(boolean gotSeparateLine) {
     // Never add a trailing space after the first part of a cast insertion.
     return false;
+  }
+
+  public boolean isOnArrayLiteral() {
+    return onArrayLiteral;
+  }
+
+  public void setOnArrayLiteral(boolean onArrayLiteral) {
+    this.onArrayLiteral = onArrayLiteral;
   }
 
   /** {@inheritDoc} */

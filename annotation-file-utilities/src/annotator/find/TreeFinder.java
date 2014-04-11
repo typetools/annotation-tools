@@ -629,6 +629,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
         if (na.dims.size() != 0) {
           // when not all dims are given, na.dims.size() gives wrong answer
           return arrayLevels(na.type);
+          
         }
         if (na.elemtype != null) {
           return getDimsSize(na.elemtype) + 1;
@@ -1027,7 +1028,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
             }
         } else if (i.getKind() == Insertion.Kind.CLOSE_PARENTHESIS) {
             JCTree jcTree = (JCTree) node;
-            pos = jcTree.getStartPosition() + jcTree.toString().length();
+            pos = jcTree.getEndPosition(tree.endPositions);
         } else {
           boolean typeScan = true;
           if (node.getKind() == Tree.Kind.METHOD) { // MethodTree

@@ -21,6 +21,7 @@ import plume.Options;
 import plume.Pair;
 import plume.UtilMDE;
 import annotator.Source.CompilerException;
+import annotator.find.CastInsertion;
 import annotator.find.Criteria;
 import annotator.find.Insertion;
 import annotator.find.Insertions;
@@ -348,6 +349,10 @@ public class Main {
               precedingChar = src.charAt(pos - 1);
             } else {
               precedingChar = '\0';
+            }
+            if (iToInsert.getKind() == Insertion.Kind.CAST) {
+                ((CastInsertion) iToInsert)
+                        .setOnArrayLiteral(src.charAt(pos) == '{');
             }
 
             if (iToInsert.getKind() == Insertion.Kind.RECEIVER) {

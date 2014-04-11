@@ -182,14 +182,14 @@ public final class Criteria {
    *
    * @return true iff this is the criteria on an AST path.
    */
-  public boolean isASTPath() {
+  public ASTPath getASTPath() {
     for (Criterion c : criteria) {
       if (c.getKind() == Criterion.Kind.AST_PATH) {
-        return true;
+        return ((ASTPathCriterion) c).astPath;
       }
     }
 
-    return false;
+    return null;
   }
 
 

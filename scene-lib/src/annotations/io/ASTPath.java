@@ -236,10 +236,11 @@ public final class ASTPath implements Iterable<ASTPath.ASTEntry> {
     }
 
     /**
+     * @param index of node in path OR negative offset from end of list
      * @return the AST entry at the given index.
      */
     public ASTEntry get(int index) {
-        return path.get(index);
+        return path.get(index < 0 ? path.size() + index : index);
     }
 
     /**
