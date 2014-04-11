@@ -62,7 +62,7 @@ public class ASTPathCriterion implements Criterion {
     /**
      * The path through the AST to match.
      */
-    private ASTPath astPath;
+    ASTPath astPath;
 
     /**
      * Constructs a new ASTPathCriterion to match the given AST path.
