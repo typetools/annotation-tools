@@ -664,7 +664,8 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     public Integer visitNewArray(NewArrayTree node, Insertion ins) {
       debug("TypePositionFinder.visitNewArray");
       JCNewArray na = (JCNewArray) node;
-      int dim = ins.getCriteria().getGenericArrayLocation().getLocation().size();
+      GenericArrayLocationCriterion galc = ins.getCriteria().getGenericArrayLocation();
+      int dim = galc == null ? 0 : galc.getLocation().size();
       // Invariant:  na.dims.size() == 0  or  na.elems == null  (but not both)
       // If na.dims.size() != 0, na.elemtype is non-null.
       // If na.dims.size() == 0, na.elemtype may be null or non-null.
