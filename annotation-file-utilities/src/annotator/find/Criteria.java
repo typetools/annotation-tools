@@ -192,6 +192,20 @@ public final class Criteria {
     return null;
   }
 
+  /**
+   * Returns the name of the class specified in the Criteria, if any.
+   *
+   * @return class name from {@link InClassCriterion}, or null if none present
+   */
+  public String getClassName() {
+    for (Criterion c : criteria) {
+      if (c.getKind() == Criterion.Kind.IN_CLASS) {
+        return ((InClassCriterion) c).className;
+      }
+    }
+
+    return null;
+  }
 
   /**
    * @return a GenericArrayLocationCriterion if this has one, else null

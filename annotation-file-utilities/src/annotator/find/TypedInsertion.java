@@ -29,8 +29,14 @@ public abstract class TypedInsertion extends Insertion {
    */
   protected List<Insertion> innerTypeInsertions;
 
-  public TypedInsertion(Type type, Criteria criteria, List<Insertion> innerTypeInsertions) {
-      super(criteria, false);
+  public TypedInsertion(Type type, Criteria criteria,
+          List<Insertion> innerTypeInsertions) {
+      this(type, criteria, false, innerTypeInsertions);
+  }
+
+  public TypedInsertion(Type type, Criteria criteria, boolean b,
+          List<Insertion> innerTypeInsertions) {
+      super(criteria, b);
       this.type = type;
       this.innerTypeInsertions = innerTypeInsertions;
       annotationsOnly = false;
