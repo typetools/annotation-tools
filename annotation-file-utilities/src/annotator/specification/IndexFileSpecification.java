@@ -36,8 +36,10 @@ import annotations.io.IndexFileParser;
 import annotations.util.coll.VivifyingMap;
 import annotator.find.AnnotationInsertion;
 import annotator.find.CastInsertion;
+import annotator.find.ConstructorInsertion;
 import annotator.find.CloseParenthesisInsertion;
 import annotator.find.Criteria;
+import annotator.find.GenericArrayLocationCriterion;
 import annotator.find.Insertion;
 import annotator.find.NewInsertion;
 import annotator.find.ReceiverInsertion;
@@ -56,6 +58,8 @@ public class IndexFileSpecification implements Specification {
   public static boolean noAsm = false;
 
   private static boolean debug = false;
+
+  private ConstructorInsertion cons = null;
 
   public IndexFileSpecification(String indexFileName) {
     this.indexFileName = indexFileName;
@@ -128,7 +132,7 @@ public class IndexFileSpecification implements Specification {
    * @param className is fully qualified
    */
   private void parseClass(CriterionList clist, String className, AClass clazz) {
-
+    cons = null;  // 0 or 1 per class
     if (! noAsm) {
       //  load extra info using asm
       debug("parseClass(" + className + ")");
@@ -315,23 +319,30 @@ public class IndexFileSpecification implements Specification {
       cast = insertions.a;
       closeParen = insertions.b;
     }
+
     for (Pair<String,Boolean> p : elementAnnotations) {
+      List<Insertion> elementInsertions = new ArrayList<Insertion>();
       String annotationString = p.a;
       Boolean isDeclarationAnnotation = p.b;
       Criteria criteria = clist.criteria();
-      if (criteria.isOnReceiver() && criteria.getGenericArrayLocation().getLocation().isEmpty()) {
+      GenericArrayLocationCriterion galc = criteria.getGenericArrayLocation();
+      if (criteria.isOnReceiver() && galc != null
+          && galc.getLocation().isEmpty()) {
         if (receiver == null) {
           DeclaredType type = new DeclaredType();
           type.addAnnotation(annotationString);
           receiver = new ReceiverInsertion(type, criteria, innerTypeInsertions);
+          elementInsertions.add(receiver);
         } else {
           receiver.getType().addAnnotation(annotationString);
         }
-      } else if (criteria.isOnNew() && criteria.getGenericArrayLocation().getLocation().isEmpty()) {
+      } else if (criteria.isOnNew() && galc != null
+          && galc.getLocation().isEmpty()) {
         if (neu == null) {
           DeclaredType type = new DeclaredType();
           type.addAnnotation(annotationString);
           neu = new NewInsertion(type, criteria, innerTypeInsertions);
+          elementInsertions.add(neu);
         } else {
           neu.getType().addAnnotation(annotationString);
         }
@@ -342,6 +353,8 @@ public class IndexFileSpecification implements Specification {
               innerTypeInsertions, criteria);
           cast = insertions.a;
           closeParen = insertions.b;
+          elementInsertions.add(cast);
+          elementInsertions.add(closeParen);
         } else {
           cast.getType().addAnnotation(annotationString);
         }
@@ -352,10 +365,41 @@ public class IndexFileSpecification implements Specification {
         if (!isCastInsertion) {
             // Annotations on compound types of a cast insertion will be
             // inserted directly on the cast insertion.
-            this.insertions.add(ins);
+            //this.insertions.add(ins);
+        		elementInsertions.add(ins);
         }
         annotationInsertions.add(ins);
       }
+      this.insertions.addAll(elementInsertions);
+
+      // exclude expression annotations 
+      if (criteria.isOnMethod("<init>()V") && !criteria.isOnNew()
+          && (galc == null || galc.getLocation().isEmpty())
+          && criteria.getASTPath() == null) {  // TODO: equivalent for ASTPath
+        if (cons == null) {
+          DeclaredType type = new DeclaredType(criteria.getClassName());
+          cons = new ConstructorInsertion(type, criteria,
+              new ArrayList<Insertion>());
+          this.insertions.add(cons);
+        }
+        for (Insertion i : elementInsertions) {
+          if (i.getKind() == Insertion.Kind.RECEIVER) {
+            cons.addReceiverInsertion((ReceiverInsertion) i);
+          } else if (criteria.isOnReturnType()) {
+            ((DeclaredType) cons.getType()).addAnnotation(annotationString);
+          } else if (isDeclarationAnnotation) {
+            cons.addDeclarationInsertion(i);
+            i.setInserted(true);
+          } else {
+            if (galc == null || galc.getLocation().isEmpty()) {
+              annotationInsertions.add(i);
+            } else {
+              cons.getInnerTypeInsertions().add(i);
+            }
+          }
+        }
+      }
+      elementInsertions.clear();
     }
     if (receiver != null) {
         this.insertions.add(receiver);

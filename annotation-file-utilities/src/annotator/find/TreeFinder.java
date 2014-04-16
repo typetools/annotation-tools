@@ -53,6 +53,7 @@ import com.sun.source.util.TreeScanner;
 import com.sun.tools.javac.code.Type.AnnotatedType;
 import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
 import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntryKind;
+import com.sun.tools.javac.code.Flags;
 import com.sun.tools.javac.code.Types;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.JCTree.JCAnnotatedType;
@@ -242,6 +243,45 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     }
   }
 
+  /**
+   * An alternative to TreePath.getPath(TreePath,Tree) that
+   * caches its results.
+   */
+  /*
+  public static TreePath getPath(TreePath path, Tree target) {
+    Pair<TreePath,Tree> args = Pair.of(path, target);
+    if (getPathCache2.containsKey(args)) {
+      return getPathCache2.get(args);
+    }
+    TreePath result = TreePath.getPath(path, target);
+    getPathCache2.put(args, result);
+    return result;
+  }
+  */
+  
+  private Tree parent(Tree node) {
+    return getPath(tree, node).getParentPath().getLeaf();
+  }
+
+  // private static Map<Pair<TreePath,Tree>,TreePath> getPathCache2 = new HashMap<Pair<TreePath,Tree>,TreePath>();
+  
+  /**
+   * An alternative to TreePath.getPath(CompilationUnitTree,Tree) that
+   * caches its results.
+   */
+  public TreePath getPath(CompilationUnitTree unit, Tree target) {
+    Pair<CompilationUnitTree,Tree> args = Pair.of(unit, target);
+    if (getPathCache1.containsKey(args)) {
+      return getPathCache1.get(args);
+    }
+    TreePath result = TreePath.getPath(unit, target);
+    getPathCache1.put(args, result);
+    return result;
+  }
+
+
+  Map<Pair<CompilationUnitTree,Tree>,TreePath> getPathCache1 =
+  new HashMap<Pair<CompilationUnitTree,Tree>,TreePath>();
 
   /**
    * Determines the insertion position for type annotations on various
@@ -326,44 +366,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
           + jcnode);
     }
 
-    Map<Pair<CompilationUnitTree,Tree>,TreePath> getPathCache1 =
-        new HashMap<Pair<CompilationUnitTree,Tree>,TreePath>();
-
-    /**
-     * An alternative to TreePath.getPath(CompilationUnitTree,Tree) that
-     * caches its results.
-     */
-    public TreePath getPath(CompilationUnitTree unit, Tree target) {
-      Pair<CompilationUnitTree,Tree> args = Pair.of(unit, target);
-      if (getPathCache1.containsKey(args)) {
-        return getPathCache1.get(args);
-      }
-      TreePath result = TreePath.getPath(unit, target);
-      getPathCache1.put(args, result);
-      return result;
-    }
-
     // private static Map<Pair<TreePath,Tree>,TreePath> getPathCache2 = new HashMap<Pair<TreePath,Tree>,TreePath>();
-
-    /**
-     * An alternative to TreePath.getPath(TreePath,Tree) that
-     * caches its results.
-     */
-    /*
-    public static TreePath getPath(TreePath path, Tree target) {
-      Pair<TreePath,Tree> args = Pair.of(path, target);
-      if (getPathCache2.containsKey(args)) {
-        return getPathCache2.get(args);
-      }
-      TreePath result = TreePath.getPath(path, target);
-      getPathCache2.put(args, result);
-      return result;
-    }
-    */
-
-    private Tree parent(Tree node) {
-      return getPath(tree, node).getParentPath().getLeaf();
-    }
 
     @Override
     public Integer visitIdentifier(IdentifierTree node, Insertion ins) {
@@ -962,6 +965,24 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
           continue;
         }
 
+        if (i.getKind() == Insertion.Kind.CONSTRUCTOR) {
+          ConstructorInsertion cons = (ConstructorInsertion) i;
+
+          if (node.getKind() == Tree.Kind.METHOD) {
+            JCMethodDecl method = (JCMethodDecl) node;
+            if ((method.mods.flags & Flags.GENERATEDCONSTR) != 0) {
+              addConstructor(path, cons, method);
+            } else {
+              cons.setAnnotationsOnly(true);
+              cons.setInserted(true);
+              i = cons.getReceiverInsertion();
+              if (i == null) { continue; }
+            }
+          } else {
+            cons.setAnnotationsOnly(true);
+          }
+        }
+
         if (i.getKind() == Insertion.Kind.RECEIVER && node.getKind() == Tree.Kind.METHOD) {
           ReceiverInsertion receiver = (ReceiverInsertion) i;
           MethodTree method = (MethodTree) node;
@@ -994,6 +1015,10 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
           if (returnType == null) {
             // find constructor name instead
             pos = findMethodName(jcnode);
+            if (pos < 0) {  // skip -- inserted w/generated constructor
+              it.remove();
+              continue;
+            }
             debug("pos = %d at constructor name: %s%n", pos,
                 jcnode.sym.toString());
           } else {
@@ -1044,6 +1069,11 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
             pos = tpf.scan(node, i);
             assert handled(node);
             debug("pos = %d at type: %s (%s)%n", pos, node.toString(), node.getClass());
+          } else if (node.getKind() == Tree.Kind.METHOD
+              && i.getKind() == Insertion.Kind.CONSTRUCTOR
+              && (((JCMethodDecl) node).mods.flags & Flags.GENERATEDCONSTR) != 0) {
+            Tree parent = path.getParentPath().getLeaf();
+            pos = ((JCClassDecl) parent).getEndPosition(tree.endPositions) - 1;
           } else {
             // looking for the declaration
             pos = dpf.scan(node, null);
@@ -1080,12 +1110,10 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     String sym = node.sym.toString();
     String name = sym.substring(0, sym.indexOf('('));
     JCModifiers mods = node.getModifiers();
-    int start = mods.getStartPosition() < 0
-        ? node.getStartPosition()
-        : mods.getEndPosition(tree.endPositions);
-    int end = node.body == null
-        ? node.getEndPosition(tree.endPositions) - 1
-        : node.body.getStartPosition();
+    if ((mods.flags & Flags.GENERATEDCONSTR) != 0) { return Position.NOPOS; }
+    int start = node.getStartPosition() + mods.toString().length();
+    int end = start + node.toString().length()
+        - (node.body == null ? 1 : node.body.toString().length());
     int angle = name.lastIndexOf('>');  // check for type params
     if (angle >= 0) { name = name.substring(angle + 1); }
 
@@ -1316,6 +1344,37 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       }
     }
     Insertion.decorateType(neu.getInnerTypeInsertions(), neu.getType());
+  }
+
+  private void addConstructor(TreePath path, ConstructorInsertion cons,
+      MethodTree method) {
+    ReceiverInsertion recv = cons.getReceiverInsertion();
+    MethodTree leaf = (MethodTree) path.getLeaf();
+    ClassTree parent = (ClassTree) path.getParentPath().getLeaf();
+    DeclaredType baseType = cons.getBaseType();
+    if (baseType.getName().isEmpty()) {
+      List<String> annotations = baseType.getAnnotations();
+      String className = parent.getSimpleName().toString();
+      Type newType = new DeclaredType(className);
+      cons.setType(newType);
+      for (String ann : annotations) {
+        newType.addAnnotation(ann);
+      }
+    }
+    if (recv != null) {
+      Iterator<Insertion> iter = cons.getInnerTypeInsertions().iterator();
+      List<Insertion> recvInner = new ArrayList<Insertion>();
+      addReceiverType(path, recv, leaf);
+      while (iter.hasNext()) {
+        Insertion i = iter.next();
+        if (i.getCriteria().isOnReceiver()) {
+          recvInner.add(i);
+          iter.remove();
+        }
+      }
+      Insertion.decorateType(recvInner, recv.getType());
+    }
+    Insertion.decorateType(cons.getInnerTypeInsertions(), cons.getType());
   }
 
   private static TreeVisitor<Type, Void> treeToTypeVisitor =
