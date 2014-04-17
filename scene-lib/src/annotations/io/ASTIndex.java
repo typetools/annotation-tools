@@ -385,7 +385,7 @@ public class ASTIndex extends AbstractMap<Tree, ASTIndex.ASTRecord> {
       @Override
       public Void visitClass(ClassTree node, ASTPath.ASTEntry entry) {
         Kind kind = node.getKind();
-        save(node.getExtendsClause(), kind, ASTPath.BOUND);
+        save(node.getExtendsClause(), kind, ASTPath.BOUND, -1);
         saveAll(node.getImplementsClause(), kind, ASTPath.BOUND);
         saveAll(node.getTypeParameters(), kind, ASTPath.TYPE_PARAMETER);
         return visit(node.getMembers(), null);
