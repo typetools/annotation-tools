@@ -21,6 +21,7 @@ import com.sun.source.tree.BinaryTree;
 import com.sun.source.tree.BlockTree;
 import com.sun.source.tree.CaseTree;
 import com.sun.source.tree.CatchTree;
+import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.tree.CompoundAssignmentTree;
 import com.sun.source.tree.ConditionalExpressionTree;
@@ -36,6 +37,7 @@ import com.sun.source.tree.LambdaExpressionTree;
 import com.sun.source.tree.MemberReferenceTree;
 import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.MethodInvocationTree;
+import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.NewArrayTree;
 import com.sun.source.tree.NewClassTree;
 import com.sun.source.tree.ParameterizedTypeTree;
@@ -104,7 +106,7 @@ public final class ASTPath implements Iterable<ASTPath.ASTEntry> {
     public static class ASTEntry {
         private Kind treeKind;
         private String childSelector;
-        private int argument;
+        private Integer argument;
 
         /**
          * Constructs a new AST entry. For example, in the entry:
@@ -119,7 +121,7 @@ public final class ASTPath implements Iterable<ASTPath.ASTEntry> {
          * @param childSelector The child selector to this AST entry.
          * @param argument The argument.
          */
-        public ASTEntry(Kind treeKind, String childSelector, int argument) {
+        public ASTEntry(Kind treeKind, String childSelector, Integer argument) {
             this.treeKind = treeKind;
             this.childSelector = childSelector;
             this.argument = argument;
@@ -128,13 +130,13 @@ public final class ASTPath implements Iterable<ASTPath.ASTEntry> {
         /**
          * Constructs a new AST entry, without an argument.
          *
-         * See {@link #ASTEntry(Kind, String, int)} for an example of the parameters.
+         * See {@link #ASTEntry(Kind, String, Integer)} for an example of the parameters.
          *
          * @param treeKind The kind of this AST entry.
          * @param childSelector The child selector to this AST entry.
          */
         public ASTEntry(Kind treeKind, String childSelector) {
-            this(treeKind, childSelector, -1);
+            this(treeKind, childSelector, null);
         }
 
         /**
@@ -203,11 +205,10 @@ public final class ASTPath implements Iterable<ASTPath.ASTEntry> {
 
         @Override
         public String toString() {
-            String result = treeKind + "." + childSelector;
-            if (argument >= 0) {
-                result += " " + argument;
-            }
-            return result;
+            StringBuilder b = new StringBuilder();
+            b.append(treeKind).append(".").append(childSelector);
+            if (argument != null) { b.append(" ").append(argument); }
+            return b.toString();
         }
     }
 
@@ -321,14 +322,14 @@ public final class ASTPath implements Iterable<ASTPath.ASTEntry> {
         return st.ttype == t;
       }
 
-      private int natVal() throws ParseException {
+      private int intVal() throws ParseException {
         if (gotType(StreamTokenizer.TT_NUMBER)) {
           int n = (int) st.nval;
-          if (n >= 0 && n == st.nval) {
+          if (n == st.nval) {
             return n;
           }
         }
-        throw new ParseException("expected non-negative integer, got " + st);
+        throw new ParseException("expected integer, got " + st);
       }
 
       private String strVal() throws ParseException {
@@ -562,7 +563,7 @@ public final class ASTPath implements Iterable<ASTPath.ASTEntry> {
             if (argumentChildSelectors != null
                 && ArraysMDE.indexOf(argumentChildSelectors, arg) >= 0) {
               getTok();
-              return new ASTEntry(kind, arg, natVal());
+              return new ASTEntry(kind, arg, intVal());
             } else {
               return new ASTEntry(kind, arg);
             }
@@ -727,6 +728,17 @@ public final class ASTPath implements Iterable<ASTPath.ASTEntry> {
             }
             break;
           }
+          case CLASS: {
+            ClassTree clazz = (ClassTree) actualNode;
+            int arg = astNode.getArgument();
+            if (astNode.childSelectorIs(ASTPath.BOUND)) {
+              next = arg == -1 ? next = clazz.getExtendsClause()
+                  : clazz.getImplementsClause().get(arg);
+            } else {
+              next = clazz.getTypeParameters().get(arg);
+            }
+            break;
+          }
           case CONDITIONAL_EXPRESSION: {
             ConditionalExpressionTree conditionalExpression =
                 (ConditionalExpressionTree) actualNode;
@@ -848,6 +860,21 @@ public final class ASTPath implements Iterable<ASTPath.ASTEntry> {
           case MEMBER_SELECT: {
             MemberSelectTree memberSelect = (MemberSelectTree) actualNode;
             next = memberSelect.getExpression();
+            break;
+          }
+          case METHOD: {
+            // TODO
+            MethodTree method = (MethodTree) actualNode;
+            int arg = astNode.getArgument();
+            if (astNode.childSelectorIs(ASTPath.TYPE)) {
+              next = method.getReturnType();
+            } else if (astNode.childSelectorIs(ASTPath.PARAMETER)) {
+              next = method.getParameters().get(arg);
+            } else if (astNode.childSelectorIs(ASTPath.TYPE_PARAMETER)) {
+              next = method.getTypeParameters().get(arg);
+            } else {
+              next = method.getBody();
+            }
             break;
           }
           case METHOD_INVOCATION: {
