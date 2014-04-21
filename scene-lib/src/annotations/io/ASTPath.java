@@ -212,7 +212,68 @@ public final class ASTPath implements Iterable<ASTPath.ASTEntry> {
         @Override
         public String toString() {
             StringBuilder b = new StringBuilder();
-            b.append(treeKind).append(".").append(childSelector);
+            switch (treeKind) {
+            case CLASS:
+            case ENUM:
+            case INTERFACE:
+              b.append("Class");
+              break;
+            case AND:
+            case CONDITIONAL_AND:
+            case CONDITIONAL_OR:
+            case DIVIDE:
+            case EQUAL_TO:
+            case GREATER_THAN:
+            case GREATER_THAN_EQUAL:
+            case LEFT_SHIFT:
+            case LESS_THAN:
+            case LESS_THAN_EQUAL:
+            case MINUS:
+            case MULTIPLY:
+            case NOT_EQUAL_TO:
+            case OR:
+            case PLUS:
+            case REMAINDER:
+            case RIGHT_SHIFT:
+            case XOR:
+              b.append("Binary");
+            case LOGICAL_COMPLEMENT:
+            case POSTFIX_DECREMENT:
+            case POSTFIX_INCREMENT:
+            case PREFIX_DECREMENT:
+            case PREFIX_INCREMENT:
+            case UNARY_MINUS:
+            case UNARY_PLUS:
+            case UNSIGNED_RIGHT_SHIFT:
+              b.append("Unary");
+              break;
+            case AND_ASSIGNMENT:
+            case DIVIDE_ASSIGNMENT:
+            case LEFT_SHIFT_ASSIGNMENT:
+            case MINUS_ASSIGNMENT:
+            case MULTIPLY_ASSIGNMENT:
+            case OR_ASSIGNMENT:
+            case PLUS_ASSIGNMENT:
+            case REMAINDER_ASSIGNMENT:
+            case RIGHT_SHIFT_ASSIGNMENT:
+            case UNSIGNED_RIGHT_SHIFT_ASSIGNMENT:
+            case XOR_ASSIGNMENT:
+              b.append("CompoundAssignment");
+            case EXTENDS_WILDCARD:
+            case SUPER_WILDCARD:
+            case UNBOUNDED_WILDCARD:
+              b.append("Wildcard");
+
+            case ANNOTATION:
+            case TYPE_ANNOTATION:
+                b.append("Annotation");
+            default:
+              String kind = treeKind.toString();
+              b.append(kind.charAt(0))
+                  .append(kind.substring(1).toLowerCase());
+              break;
+            }
+            b.append(".").append(childSelector);
             if (argument != null) { b.append(" ").append(argument); }
             return b.toString();
         }
