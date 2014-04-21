@@ -188,7 +188,10 @@ public final class ASTPath implements Iterable<ASTPath.ASTEntry> {
          * @throws IllegalStateException if this AST entry does not have an argument.
          */
         public int getArgument() {
-            if (argument < 0) {
+            if (argument < -1
+                    || argument == -1
+                        && !(treeKind == Tree.Kind.CLASS
+                                && childSelectorIs(ASTPath.BOUND))) {
                 throw new IllegalStateException("Value not set.");
             }
             return argument;
