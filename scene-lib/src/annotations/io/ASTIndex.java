@@ -109,6 +109,11 @@ public class ASTIndex extends AbstractMap<Tree, ASTIndex.ASTRecord> {
       this.astPath = astPath;
     }
 
+    public ASTRecord newArrayLevel(int depth) {
+      return new ASTRecord(className, methodName, varName,
+          astPath.newArrayLevel(depth));
+    }
+
     @Override
     public boolean equals(Object o) {
       return o instanceof ASTRecord && equals((ASTRecord) o);
