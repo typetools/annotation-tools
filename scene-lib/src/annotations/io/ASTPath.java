@@ -200,7 +200,10 @@ public final class ASTPath implements Iterable<ASTPath.ASTEntry> {
          * @return if this entry has an argument
          */
         public boolean hasArgument() {
-            return argument >= 0;
+            if (argument < -1) { return false; }
+            if (argument >= 0) { return true; }
+            return treeKind == Tree.Kind.CLASS
+                && childSelectorIs(ASTPath.BOUND);
         }
 
         @Override
