@@ -221,7 +221,30 @@ public final class ASTPath implements Iterable<ASTPath.ASTEntry> {
      * Constructs an empty AST path.
      */
     public ASTPath() {
-        path = new ArrayList<ASTEntry>();
+        this(new ArrayList<ASTEntry>());
+    }
+
+    /**
+     * Constructs an AST path from an array of path entries.
+     */
+    private ASTPath(List<ASTEntry> entries) {
+        path = entries;
+    }
+
+    /**
+     * Creates a new AST path extended from this one to pick out an inner array
+     * of a new array initializer.
+     * 
+     * @param depth number of array levels to drill down into the top level type
+     * @return an augmented AST path to the indicated array level
+     */
+    public ASTPath newArrayLevel(int depth) {
+        ASTPath astPath = new ASTPath();
+        for (ASTEntry entry : path) {
+          astPath.add(entry);
+        }
+        astPath.add(new ASTEntry(Tree.Kind.NEW_ARRAY, ASTPath.TYPE, depth));
+        return astPath;
     }
 
     @Override
@@ -454,7 +477,7 @@ public final class ASTPath implements Iterable<ASTPath.ASTEntry> {
         } else if (s.equals("NewArray")) {
           return newASTEntry(Kind.NEW_ARRAY,
               new String[] {ASTPath.TYPE, ASTPath.DIMENSION, ASTPath.INITIALIZER},
-              new String[] {ASTPath.DIMENSION, ASTPath.INITIALIZER});
+              new String[] {ASTPath.TYPE, ASTPath.DIMENSION, ASTPath.INITIALIZER});
         } else if (s.equals("NewClass")) {
           return newASTEntry(Kind.NEW_CLASS,
               new String[] {ASTPath.ENCLOSING_EXPRESSION,
@@ -601,6 +624,10 @@ public final class ASTPath implements Iterable<ASTPath.ASTEntry> {
       }
 
       public boolean matches(TreePath path) {
+        return matches(path, -1);
+      }
+
+      public boolean matches(TreePath path, int depth) {
         if (path == null) {
           return false;
         }
@@ -902,7 +929,12 @@ public final class ASTPath implements Iterable<ASTPath.ASTEntry> {
           case NEW_ARRAY: {
             NewArrayTree newArray = (NewArrayTree) actualNode;
             if (astNode.childSelectorIs(ASTPath.TYPE)) {
-              next = newArray.getType();
+              int arg = astNode.getArgument();
+              if (arg < 0) {
+                next = newArray.getType();
+              } else {
+                return arg == depth; 
+              }
             } else if (astNode.childSelectorIs(ASTPath.DIMENSION)) {
               int arg = astNode.getArgument();
               List<? extends ExpressionTree> dims = newArray.getDimensions();
