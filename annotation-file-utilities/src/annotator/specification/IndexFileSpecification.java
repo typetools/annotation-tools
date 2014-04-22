@@ -198,6 +198,8 @@ public class IndexFileSpecification implements Specification {
       parseElement(outerClist, ei);
     }
 
+    parseASTInsertions(clist, clazz.insertAnnotations, clazz.insertTypecasts);
+
     for (Map.Entry<String, AField> entry : clazz.fields.entrySet()) {
 //      clist = clist.add(Criteria.notInMethod()); // TODO: necessary? what is in class but not in method?
       parseField(clist, entry.getKey(), entry.getValue());
@@ -214,8 +216,6 @@ public class IndexFileSpecification implements Specification {
     for (Map.Entry<String, AExpression> entry : clazz.fieldInits.entrySet()) {
       parseFieldInit(clist, entry.getKey(), entry.getValue());
     }
-
-    parseASTInsertions(clist, clazz.insertAnnotations, clazz.insertTypecasts);
 
     debug("parseClass(" + className + "):  done");
   }
