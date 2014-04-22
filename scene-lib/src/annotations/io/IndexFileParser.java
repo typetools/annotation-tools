@@ -252,7 +252,7 @@ public final class IndexFileParser {
     private int checkNNInteger(/*>>> @ReadOnly IndexFileParser this*/) {
         if (st.ttype == TT_NUMBER) {
             int x = (int) st.nval;
-            if (x == st.nval && x >= 0) // shouldn't give us a huge number
+            if (x == st.nval && x >= -1) // shouldn't give us a huge number
                 return x;
         }
         return -1;
@@ -260,7 +260,7 @@ public final class IndexFileParser {
 
     private int matchNNInteger() throws IOException {
         int x = checkNNInteger();
-        if (x >= 0) {
+        if (x >= -1) {
             st.nextToken();
             return x;
         } else
