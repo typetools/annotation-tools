@@ -1163,7 +1163,7 @@ public final class IndexFileParser {
         for (String arg : legalChildSelectors) {
             if (matchKeyword(arg)) {
                 if (argumentChildSelectors != null && ArraysMDE.indexOf(argumentChildSelectors, arg) >= 0) {
-                    int index = expectNonNegative(matchNNInteger());
+                    int index = matchNNInteger();
                     return new ASTPath.ASTEntry(kind, arg, index);
                 } else {
                     return new ASTPath.ASTEntry(kind, arg);
