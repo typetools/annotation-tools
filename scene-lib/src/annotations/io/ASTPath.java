@@ -203,8 +203,9 @@ public final class ASTPath implements Iterable<ASTPath.ASTEntry> {
          * @return if this entry has an argument
          */
         public boolean hasArgument() {
-            if (argument < -1) { return false; }
-            if (argument >= 0) { return true; }
+            if (argument == null) { return false; }
+            if (argument < -1)    { return false; }
+            if (argument >= 0)    { return true; }
             return treeKind == Tree.Kind.CLASS
                 && childSelectorIs(ASTPath.BOUND);
         }
