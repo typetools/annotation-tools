@@ -86,6 +86,10 @@ public class IndexFileSpecification implements Specification {
     return this.insertions;
   }
 
+  public Map<String, Set<String>> annotationImports() {
+    return scene.imports;
+  }
+
   private static void debug(String s) {
     if (debug) {
       System.out.println(s);

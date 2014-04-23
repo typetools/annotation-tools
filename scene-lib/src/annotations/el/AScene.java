@@ -2,6 +2,7 @@ package annotations.el;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 import annotations.util.coll.VivifyingMap;
 
@@ -49,11 +50,19 @@ import org.checkerframework.checker.javari.qual.ReadOnly;
  * </pre>
  */
 public final class AScene {
-  public static boolean debugFoundMap = false;
+    public static boolean debugFoundMap = false;
 
     /** This scene's annotated packages; map key is package name */
     public final VivifyingMap<String, AElement> packages =
             AElement.<String>newVivifyingLHMap_AE();
+
+    /**
+     * Contains for each annotation type a set of imports to be added to
+     *  the source if the annotation is inserted with the "abbreviate"
+     *  option on.
+     */
+    public final Map<String, Set<String>> imports =
+        new LinkedHashMap<String, Set<String>>();
 
     /** This scene's annotated classes; map key is class name */
     public final VivifyingMap<String, AClass> classes =

@@ -24,6 +24,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import plume.ArraysMDE;
 import plume.FileIOException;
@@ -53,6 +54,7 @@ import annotations.el.InnerTypeLocation;
 import annotations.el.LocalLocation;
 import annotations.el.RelativeLocation;
 import annotations.el.TypeIndexLocation;
+//import annotations.field.AFTVisitor;
 import annotations.field.AnnotationAFT;
 import annotations.field.AnnotationFieldType;
 import annotations.field.ArrayAFT;
@@ -78,9 +80,11 @@ import com.sun.tools.javac.code.TypeAnnotationPosition;
  */
 public final class IndexFileParser {
 
-  private static final String[] typeSelectors = { "bound", "identifier",
-    "type", "typeAlternative", "typeArgument", "typeParameter",
-    "underlyingType" };
+    private static final String[] typeSelectors = { "bound", "identifier",
+        "type", "typeAlternative", "typeArgument", "typeParameter",
+        "underlyingType" };
+
+    private static boolean abbreviate = true;
 
     // The input
     private final StreamTokenizer st;
@@ -96,6 +100,10 @@ public final class IndexFileParser {
      * unqualified name.  If the unqualified name is not unique, it maps
      * to null and the qualified name should be used instead. */
     private final HashMap<String, AnnotationDef> defs;
+
+    public static void setAbbreviate(boolean b) {
+      abbreviate = b;
+    }
 
     private int expectNonNegative(int i) throws ParseException {
         if (i >= 0)
@@ -546,6 +554,26 @@ public final class IndexFileParser {
             return ClassTokenAFT.ctaft/* dumpParameterization() */;
         } else if (matchKeyword("enum")) {
             String name = expectQualifiedName();
+            if (abbreviate) {
+            int i = name.lastIndexOf('.');
+            if (i >= 0) {
+              String qualifier = name.substring(0, i);
+              String baseName = name.substring(i+1);
+              Set<String> set1 = scene.imports.get(name);
+              Set<String> set2 = scene.imports.get(baseName);
+              if (set1 == null) {
+                set1 = new TreeSet<String>();
+                scene.imports.put(name, set1);
+              }
+              if (set2 == null) {
+                set2 = new TreeSet<String>();
+                scene.imports.put(name, set2);
+              }
+              set1.add(qualifier);
+              set2.add(qualifier);
+              name = baseName;
+            }
+            }
             return new EnumAFT(name);
         } else if (matchKeyword("annotation-field")) {
             String name = expectQualifiedName();
@@ -1308,6 +1336,57 @@ public final class IndexFileParser {
                             + st.sval + "', ttype:" + st.ttype);
             }
         }
+
+/*
+        for (Map.Entry<String, AnnotationDef> entry : defs.entrySet()) {
+            final String annotationType = entry.getKey();
+            AnnotationDef def = entry.getValue();
+            for (AnnotationFieldType aft : def.fieldTypes.values()) {
+                aft.accept(new AFTVisitor<Void, Void>() {
+                    @Override
+                    public Void visitAnnotationAFT(AnnotationAFT aft,
+                            Void arg) {
+                        for (AnnotationFieldType t : aft.annotationDef.fieldTypes.values()) {
+                            t.accept(this, arg);
+                        }
+                        return null;
+                    }
+
+                    @Override
+                    public Void visitArrayAFT(ArrayAFT aft, Void arg) {
+                      return aft.elementType == null ? null
+                          : aft.elementType.accept(this, arg);
+                    }
+
+                    @Override
+                    public Void visitBasicAFT(BasicAFT aft, Void arg) {
+                      return null;
+                    }
+
+                    @Override
+                    public Void visitClassTokenAFT(ClassTokenAFT aft, Void arg) {
+                      return null;
+                    }
+
+                    @Override
+                    public Void visitEnumAFT(EnumAFT aft, Void arg) {
+                        importSet(annotationType, aft).add(aft.typeName);
+                        return null;
+                    }
+
+                    private Set<String> importSet(final String annotationType,
+                        AnnotationFieldType aft) {
+                      Set<String> imps = scene.imports.get(annotationType);
+                      if (imps == null) {
+                          imps = new TreeSet<String>();
+                          scene.imports.put(annotationType, imps);
+                      }
+                      return imps;
+                    }
+                }, null);
+            }
+        }
+*/
     }
 
     private IndexFileParser(Reader in, AScene scene) {
