@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
@@ -20,6 +21,7 @@ import plume.Option;
 import plume.Options;
 import plume.Pair;
 import plume.UtilMDE;
+import annotations.io.IndexFileParser;
 import annotator.Source.CompilerException;
 import annotator.find.CastInsertion;
 import annotator.find.ConstructorInsertion;
@@ -168,6 +170,9 @@ public class Main {
     // The Java files into which to insert.
     List<String> javafiles = new ArrayList<String>();
 
+    Set<String> imports = new LinkedHashSet<String>();
+
+    IndexFileParser.setAbbreviate(abbreviate);
     for (String arg : file_args) {
       if (arg.endsWith(".java")) {
         javafiles.add(arg);
@@ -176,6 +181,13 @@ public class Main {
         try {
           Specification spec = new IndexFileSpecification(arg);
           List<Insertion> parsedSpec = spec.parse();
+          if (abbreviate) {
+            Map<String, Set<String>> annotationImports =
+                ((IndexFileSpecification) spec).annotationImports();
+            for (Set<String> set : annotationImports.values()) {
+              imports.addAll(set);
+            }
+          }
           if (verbose || debug) {
             System.out.printf("Read %d annotations from %s%n",
                               parsedSpec.size(), arg);
@@ -259,8 +271,6 @@ public class Main {
           }
         }
       }
-
-      Set<String> imports = new LinkedHashSet<String>();
 
       String fileSep = System.getProperty("file.separator");
       String fileLineSep = System.getProperty("line.separator");
