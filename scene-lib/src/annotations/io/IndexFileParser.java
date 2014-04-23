@@ -555,24 +555,23 @@ public final class IndexFileParser {
         } else if (matchKeyword("enum")) {
             String name = expectQualifiedName();
             if (abbreviate) {
-            int i = name.lastIndexOf('.');
-            if (i >= 0) {
-              String qualifier = name.substring(0, i);
-              String baseName = name.substring(i+1);
-              Set<String> set1 = scene.imports.get(name);
-              Set<String> set2 = scene.imports.get(baseName);
-              if (set1 == null) {
-                set1 = new TreeSet<String>();
-                scene.imports.put(name, set1);
+              int i = name.lastIndexOf('.');
+              if (i >= 0) {
+                String baseName = name.substring(i+1);
+                Set<String> set1 = scene.imports.get(name);
+                Set<String> set2 = scene.imports.get(baseName);
+                if (set1 == null) {
+                  set1 = new TreeSet<String>();
+                  scene.imports.put(name, set1);
+                }
+                if (set2 == null) {
+                  set2 = new TreeSet<String>();
+                  scene.imports.put(name, set2);
+                }
+                set1.add(name);
+                set2.add(name);
+                name = baseName;
               }
-              if (set2 == null) {
-                set2 = new TreeSet<String>();
-                scene.imports.put(name, set2);
-              }
-              set1.add(qualifier);
-              set2.add(qualifier);
-              name = baseName;
-            }
             }
             return new EnumAFT(name);
         } else if (matchKeyword("annotation-field")) {
