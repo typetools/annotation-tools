@@ -272,9 +272,19 @@ public final class ASTPath implements Iterable<ASTPath.ASTEntry> {
                 b.append("Annotation");
                 break;
             default:
-                String kind = treeKind.toString();
-                b.append(kind.charAt(0))
-                    .append(kind.substring(1).toLowerCase());
+                String s = treeKind.toString();
+                int n = s.length();
+                boolean cap = true;  // capitalize next character
+                for (int i = 0; i < n; i++) {
+                    char c = s.charAt(i);
+                    if (c == '_') {
+                        cap = true;
+                    } else {
+                        b.append(cap ? Character.toUpperCase(c)
+                            : Character.toLowerCase(c));
+                        cap = false;
+                    }
+                }
             }
             b.append(".").append(childSelector);
             if (argument != null) { b.append(" ").append(argument); }
@@ -368,7 +378,15 @@ public final class ASTPath implements Iterable<ASTPath.ASTEntry> {
 
     @Override
     public String toString() {
-        return path.toString();
+        StringBuffer b = new StringBuffer();
+        Iterator<ASTEntry> iter = path.iterator();
+        if (iter.hasNext()) {
+            b.append(iter.next().toString());
+            while (iter.hasNext()) {
+                b.append(", ").append(iter.next().toString());
+            }
+        }
+        return b.toString();
     }
 
     /**
