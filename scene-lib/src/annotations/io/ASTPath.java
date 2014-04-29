@@ -204,8 +204,8 @@ public final class ASTPath implements Iterable<ASTPath.ASTEntry> {
          */
         public boolean hasArgument() {
             if (argument == null) { return false; }
-            if (argument < -1)    { return false; }
             if (argument >= 0)    { return true; }
+            // argument < 0 valid for one case
             return treeKind == Tree.Kind.CLASS
                 && childSelectorIs(ASTPath.BOUND);
         }
@@ -217,8 +217,8 @@ public final class ASTPath implements Iterable<ASTPath.ASTEntry> {
             case CLASS:
             case ENUM:
             case INTERFACE:
-              b.append("Class");
-              break;
+                b.append("Class");
+                break;
             case AND:
             case CONDITIONAL_AND:
             case CONDITIONAL_OR:
@@ -237,7 +237,8 @@ public final class ASTPath implements Iterable<ASTPath.ASTEntry> {
             case REMAINDER:
             case RIGHT_SHIFT:
             case XOR:
-              b.append("Binary");
+                b.append("Binary");
+                break;
             case LOGICAL_COMPLEMENT:
             case POSTFIX_DECREMENT:
             case POSTFIX_INCREMENT:
@@ -246,8 +247,8 @@ public final class ASTPath implements Iterable<ASTPath.ASTEntry> {
             case UNARY_MINUS:
             case UNARY_PLUS:
             case UNSIGNED_RIGHT_SHIFT:
-              b.append("Unary");
-              break;
+                b.append("Unary");
+                break;
             case AND_ASSIGNMENT:
             case DIVIDE_ASSIGNMENT:
             case LEFT_SHIFT_ASSIGNMENT:
@@ -259,20 +260,21 @@ public final class ASTPath implements Iterable<ASTPath.ASTEntry> {
             case RIGHT_SHIFT_ASSIGNMENT:
             case UNSIGNED_RIGHT_SHIFT_ASSIGNMENT:
             case XOR_ASSIGNMENT:
-              b.append("CompoundAssignment");
+                b.append("CompoundAssignment");
+                break;
             case EXTENDS_WILDCARD:
             case SUPER_WILDCARD:
             case UNBOUNDED_WILDCARD:
-              b.append("Wildcard");
-
+                b.append("Wildcard");
+                break;
             case ANNOTATION:
             case TYPE_ANNOTATION:
                 b.append("Annotation");
+                break;
             default:
-              String kind = treeKind.toString();
-              b.append(kind.charAt(0))
-                  .append(kind.substring(1).toLowerCase());
-              break;
+                String kind = treeKind.toString();
+                b.append(kind.charAt(0))
+                    .append(kind.substring(1).toLowerCase());
             }
             b.append(".").append(childSelector);
             if (argument != null) { b.append(" ").append(argument); }
@@ -309,7 +311,7 @@ public final class ASTPath implements Iterable<ASTPath.ASTEntry> {
     public ASTPath newArrayLevel(int depth) {
         ASTPath astPath = new ASTPath();
         for (ASTEntry entry : path) {
-          astPath.add(entry);
+            astPath.add(entry);
         }
         astPath.add(new ASTEntry(Tree.Kind.NEW_ARRAY, ASTPath.TYPE, depth));
         return astPath;
