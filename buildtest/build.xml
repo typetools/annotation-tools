@@ -1,0 +1,152 @@
+<project name="buildtest" default="test-all">
+
+    <!-- 
+        Initial target to setup the build directory.
+    -->
+    <target name="init">
+        <tstamp/>
+        
+        <property name="builddir" location="build-current-${DSTAMP}" />
+        <mkdir dir="${builddir}"/>
+
+        <property name="asmx" location="${builddir}/annotations/asmx" />
+        <property name="scene-lib" location="${builddir}/annotations/scene-lib" />
+        <property name="annotations-compiler" location="${builddir}/jsr308-langtools/src/share/opensource/javac" />
+        <property name="annotations-disassembler" location="${builddir}/annotations/disassembler" />
+        <property name="annotator" location="${builddir}/annotations/annotator" />
+        <property name="annotated-jdk" location="${builddir}/qualifiers/annotated-jdk" />
+        <property name="javarifier" location="${builddir}/javari/javarifier" />
+
+    </target>
+    
+    <!--
+        Targets to checkout all the projects.
+    -->
+
+    <target name="checkout-jsr308-langtools" depends="init">
+        <exec dir="${builddir}" executable="hg">
+            <arg value="clone"/>
+            <arg value="https://code.google.com/p/jsr308-langtools/"/>
+            <arg value="jsr308-langtools"/>
+        </exec>
+    </target>
+    
+    <target name="checkout-annotation-tools" depends="init">
+        <exec dir="${builddir}" executable="hg">
+            <arg value="clone"/>
+            <arg value="https://code.google.com/p/annotation-tools/"/>
+            <arg value="annotation-tools"/>
+        </exec>
+    </target>
+    
+    <target name="checkout-checker-framework" depends="init">
+        <exec dir="${builddir}" executable="hg">
+            <arg value="clone"/>
+            <arg value="https://code.google.com/p/checker-framework/"/>
+            <arg value="checker-framework"/>
+        </exec>
+    </target>
+    
+    <target name="checkout-javarifier" depends="init">
+        <exec dir="${builddir}" executable="hg">
+            <arg value="clone"/>
+            <arg value="https://code.google.com/p/javarifier/"/>
+            <arg value="javarifier"/>
+        </exec>
+    </target>
+    
+    <target name="checkout-all" depends="checkout-jsr308-langtools, checkout-annotation-tools, checkout-checker-framework, checkout-javarifier"/>
+    
+    <!-- 
+        Targets to build all the projects.
+    -->
+    <target name="build-asmx" depends="checkout-annotations">
+        <ant dir="${asmx}" inheritAll="false" target="bin"/>
+    </target>
+    
+    <target name="build-scene-lib" depends="checkout-annotations">
+        <ant dir="${scene-lib}" inheritAll="false" target="bin"/>
+    </target>
+    
+    <target name="build-annotations-compiler" depends="checkout-annotations">
+        <ant dir="${annotations-compiler}" inheritAll="false" target="build"/>
+    </target>
+    
+    <target name="build-annotations-disassembler" depends="checkout-annotations">
+        <ant dir="${annotations-disassembler}" inheritAll="false" target="bin"/>
+    </target>
+    
+    <target name="build-annotated-jdk" depends="checkout-qualifiers">
+        <ant dir="${annotated-jdk}" inheritAll="false" target="bin"/>
+    </target>
+    
+    <target name="build-javarifier" depends="checkout-javari">
+        <ant dir="${javarifier}" inheritAll="false" target="bin"/>
+        <!--        
+        <ant dir="${javarifier}" inheritAll="false" target="tests-compile"/> 
+        -->
+    </target>
+    
+    <target name="build-annotator" depends="checkout-annotations">
+        <ant dir="${annotator}" inheritAll="false" target="bin"/>
+    </target>
+    <target name="build-all" depends="build-asmx,
+        build-scene-lib, build-annotations-compiler, 
+        build-annotated-jdk, build-annotator, build-javarifier">
+    </target>
+    
+    <!--
+        Targets to actually run the tests.
+    -->
+    <!-- Runs the tests on the extensions to ASM. -->
+    <target name="test-asmx" depends="build-asmx">
+        <ant dir="${asmx}" inheritAll="false" target="test">
+            <property name="test.group" value="conform/xannotation"/>
+        </ant>
+        <copy todir="./reports">
+            <fileset dir="${asmx}/output/test/reports" includes="**/*"/>
+        </copy>
+    </target>
+    
+    <!-- Runs the tests on the annotation scene library, and also
+        on the classfile to index file and vice versa part of the 
+        annotation file utilities. -->
+    <target name="test-scene-lib" depends="build-scene-lib">
+        <ant dir="${scene-lib}" inheritAll="false" target="test-scene-lib"/>
+        <ant dir="${scene-lib}" inheritAll="false" target="test-classfile"/>
+        <copy todir="./reports">
+            <fileset dir="${scene-lib}/reports" includes="**/*"/>
+        </copy>
+    </target>
+
+    <!-- Runs the tests on the annotator - the index file to source code tool
+        of the annotation file utilities. -->
+    <target name="test-annotator" depends="build-annotator">
+        <exec dir="${annotator}/tests" executable="make"
+            output="./reports/test-annotator.result">
+            <arg value="all"/>
+        </exec>
+    </target>
+    
+    <!-- Runs the tests on the javarifier, including the unit tests, jolden
+         and the annotation scene library. -->
+    <target name="test-javarifier" depends="build-javarifier">
+        <exec dir="${javarifier}/tests" executable="make"
+            output="./reports/test-javarifier.result">
+            <arg value="all"/>
+        </exec>
+    </target>
+
+    <target name="test-all-annotations" depends="test-asmx, test-scene-lib, test-annotator"/> 
+
+    <target name="test-all" depends="test-all-annotations, test-javarifier"/>
+    
+    <target name="help">
+        <echo message="Buildfile for the Extended Annotations/Javari project"/>
+        <echo message="Targets: "/>
+        <echo message="checkout-all: Checkout all known projects from cvs or svn." />
+        <echo message="build-all: Build all projects." />
+        <echo message="test-all: Run all known tests." />
+    </target>
+
+</project>
