@@ -61,8 +61,8 @@ import com.sun.source.util.TreePath;
 /**
  * A path through the AST.
  */
-public final class ASTPath implements Iterable<ASTPath.ASTEntry> {
-
+public final class ASTPath
+implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
     // Constants for the various child selectors.
     public static final String ANNOTATION = "annotation";
     public static final String ARGUMENT = "argument";
@@ -103,7 +103,7 @@ public final class ASTPath implements Iterable<ASTPath.ASTEntry> {
     /**
      * A single entry in an AST path.
      */
-    public static class ASTEntry {
+    public static class ASTEntry implements Comparable<ASTEntry> {
         private Kind treeKind;
         private String childSelector;
         private Integer argument;
@@ -188,13 +188,10 @@ public final class ASTPath implements Iterable<ASTPath.ASTEntry> {
          * @throws IllegalStateException if this AST entry does not have an argument.
          */
         public int getArgument() {
-            if (argument < -1
-                    || argument == -1
-                        && !(treeKind == Tree.Kind.CLASS
-                                && childSelectorIs(ASTPath.BOUND))) {
-                throw new IllegalStateException("Value not set.");
+            if (argument >= (negativeAllowed() ? -1 : 0)) {
+                return argument;
             }
-            return argument;
+            throw new IllegalStateException("Value not set.");
         }
 
         /**
@@ -203,11 +200,36 @@ public final class ASTPath implements Iterable<ASTPath.ASTEntry> {
          * @return if this entry has an argument
          */
         public boolean hasArgument() {
-            if (argument == null) { return false; }
-            if (argument >= 0)    { return true; }
-            // argument < 0 valid for one case
+            return argument == null ? false
+                : argument >= 0 ? true
+                : negativeAllowed();
+        }
+
+        // argument < 0 valid for one case
+        private boolean negativeAllowed() {
             return treeKind == Tree.Kind.CLASS
                 && childSelectorIs(ASTPath.BOUND);
+        }
+
+        @Override
+        public int compareTo(ASTEntry o) {
+            if (o == null) {
+                return 1;
+            } else if (o.childSelector == null) {
+                if (childSelector != null) { return 1; }
+            } else if (childSelector == null) {
+                return -1;
+            }
+            int c = treeKind.compareTo(o.treeKind);
+            if (c != 0) { return c; }
+            c = childSelector.compareTo(o.childSelector);
+            if (c != 0) { return c; }
+            if (o.argument == null) {
+                if (argument != null) { return 1; }
+            } else if (argument == null) {
+                return -1;
+            }
+            return argument.compareTo(o.argument);
         }
 
         @Override
@@ -1384,4 +1406,16 @@ public final class ASTPath implements Iterable<ASTPath.ASTEntry> {
             || kind == Kind.LAMBDA_EXPRESSION  // TODO
             || kind == Kind.MODIFIERS);
     }  // TODO: need "isType"?
+
+    @Override
+    public int compareTo(ASTPath o) {
+      Iterator<ASTEntry> i0 = iterator();
+      Iterator<ASTEntry> i1 = o.iterator();
+      while (i0.hasNext()) {
+        if (!i1.hasNext()) { return -1; }
+        int c = i0.next().compareTo(i1.next());
+        if (c != 0) { return c; }
+      }
+      return i1.hasNext() ? 1 : 0;
+    }
 }
