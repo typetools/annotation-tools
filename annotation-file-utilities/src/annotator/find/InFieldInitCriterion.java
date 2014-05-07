@@ -12,12 +12,10 @@ public class InFieldInitCriterion implements Criterion {
 
   public final String varName;
   public final Criterion varCriterion;
-  public final Criterion notInMethodCriterion;
 
   public InFieldInitCriterion(String varName) {
     this.varName = varName;
     this.varCriterion = Criteria.is(Tree.Kind.VARIABLE, varName);
-    this.notInMethodCriterion = Criteria.notInMethod();
   }
 
   /** {@inheritDoc} */

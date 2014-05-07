@@ -61,6 +61,13 @@ public class AnnotationInsertion extends Insertion {
         if (!result.startsWith("@")) {
             throw new Error("Illegal insertion, must start with @: " + result);
         }
+        
+        // We insert a "new " when annotating a variable initializer that is a
+        // bare array expression (e.g., as in "int[] a = {0, 1};")  Since the
+        // syntax doesn't permit adding the type annotation in front of the
+        // expression, we generate the explicit "new"
+        // (as in "int[] a = new int[] {0, 1}") to provide a legal insertion site.
+        
         if (type != null) { result = "new " + result + " " + type; }
         if (comments) {
             return "/*" + result + "*/";

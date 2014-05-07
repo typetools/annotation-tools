@@ -441,7 +441,7 @@ public class ASTPathCriterion implements Criterion {
                     }
                     next = args.get(arg);
                 } else {
-                    next = newClass.getClassBody();
+                    next = newClass.getClassBody(); // For anonymous classes
                 }
                 break;
             }
@@ -548,6 +548,11 @@ public class ASTPathCriterion implements Criterion {
             }
             case VARIABLE: {
                 VariableTree var = (VariableTree) actualNode;
+                
+                // A VariableTree can have modifiers, but we only look at
+                // the initializer and type because modifiers can't be
+                // annotated. Any annotations on the LHS must be on the type.
+                
                 if (astNode.childSelectorIs(ASTPath.INITIALIZER)) {
                     next = var.getInitializer();
                 } else {
