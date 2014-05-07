@@ -1103,7 +1103,7 @@ public final class IndexFileParser {
                     new String[] {ASTPath.TYPE_ARGUMENT, ASTPath.ARGUMENT});
         } else if (matchKeyword("NewArray")) {
             entry = newASTEntry(Kind.NEW_ARRAY, new String[] {ASTPath.TYPE, ASTPath.DIMENSION, ASTPath.INITIALIZER},
-                    new String[] {ASTPath.DIMENSION, ASTPath.INITIALIZER});
+                    new String[] {ASTPath.TYPE, ASTPath.DIMENSION, ASTPath.INITIALIZER});
         } else if (matchKeyword("NewClass")) {
             entry = newASTEntry(Kind.NEW_CLASS, new String[] {ASTPath.ENCLOSING_EXPRESSION, ASTPath.TYPE_ARGUMENT, ASTPath.IDENTIFIER, ASTPath.ARGUMENT, ASTPath.CLASS_BODY},
                     new String[] {ASTPath.TYPE_ARGUMENT, ASTPath.ARGUMENT});

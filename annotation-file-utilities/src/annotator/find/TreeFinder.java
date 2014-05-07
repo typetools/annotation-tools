@@ -18,6 +18,7 @@ import type.ArrayType;
 import type.DeclaredType;
 import type.Type;
 import annotator.Main;
+import annotations.io.ASTPath;
 
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimaps;
@@ -668,11 +669,25 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       debug("TypePositionFinder.visitNewArray");
       JCNewArray na = (JCNewArray) node;
       GenericArrayLocationCriterion galc = ins.getCriteria().getGenericArrayLocation();
-      int dim = galc == null ? 0 : galc.getLocation().size();
       // Invariant:  na.dims.size() == 0  or  na.elems == null  (but not both)
       // If na.dims.size() != 0, na.elemtype is non-null.
       // If na.dims.size() == 0, na.elemtype may be null or non-null.
       int dimsSize = getDimsSize(na);
+      int dim = 0;
+
+      if (galc == null) {
+        ASTPath astPath = ins.getCriteria().getASTPath();
+        if (astPath != null) {
+          ASTPath.ASTEntry astNode = astPath.get(astPath.size() - 1);
+          if (astNode.getTreeKind() == Tree.Kind.NEW_ARRAY) {
+              dim = astNode.hasArgument()
+                  ? astNode.getArgument()
+                  : node.getDimensions().size();
+          }
+        }
+      } else {
+        dim = galc.getLocation().size();
+      }
 
       // System.out.printf("visitNewArray: dim=%d (arrayLocationInParent=%s), node=%s, elemtype=%s%s, dimsSize=%d, dims=%s (size=%d), elems=%s, annotations=%s (size=%d), dimAnnotations=%s (size=%d)%n", dim, arrayLocationInParent, na, na.elemtype, (na.elemtype == null ? "" : String.format(" (class: %s)", na.elemtype.getClass())), dimsSize, na.dims, na.dims.size(), na.elems, na.annotations, na.annotations.size(), na.dimAnnotations, na.dimAnnotations.size());
       if (na.toString().startsWith("{")
