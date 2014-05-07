@@ -66,6 +66,9 @@ public class ReturnTypeCriterion implements Criterion {
 
   private static boolean hasClassKind(Tree tree) {
     Tree.Kind kind = tree.getKind();
+
+    // Tree.Kind.NEW_CLASS is excluded here because there is no
+    // type name to be annotated on an anonymous inner class.
     return kind == Tree.Kind.CLASS
             || kind == Tree.Kind.INTERFACE
             || kind == Tree.Kind.ENUM

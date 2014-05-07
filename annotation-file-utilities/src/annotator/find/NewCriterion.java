@@ -48,6 +48,9 @@ public class NewCriterion implements Criterion {
     Tree leaf = path.getLeaf();
 
     if (inMethodCriterion!=null && !inMethodCriterion.isSatisfiedBy(path)) {
+      // If we're not in the method now, the parent path may still be in the method.
+      // For example, the current leaf could be inside a method inside of an
+      // anonymous inner class defined in another method.    	
       return this.isSatisfiedBy(path.getParentPath());
     }
     if (leaf.getKind() == Tree.Kind.NEW_CLASS
