@@ -12,11 +12,16 @@ import java.util.Set;
 /**
  * @author dbro
  *
+ * The motivation for this class was to avoid wasting time going through an entire scene
+ * (which could involve many different classes) for every class. This makes an immense
+ * difference when a JAIF covers every class in a large codebase such as Hadoop.
+ *
  */
 public class Insertions implements Iterable<Insertion> {
   private static final Set<Insertion> EMPTY_SET =
       Collections.<Insertion>emptySet();
-  private Map<String, Set<Insertion>> store;
+  private Map<String, Set<Insertion>> store; // Map of class name to insertions
+  
   private int size;
 
   public Insertions() {
