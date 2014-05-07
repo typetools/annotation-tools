@@ -219,8 +219,8 @@ public final class Criteria {
     return null;
   }
 
-  // Returns the last one.  Should really return the outermost one, but I
-  // think that works for now.
+  // Returns the last one. Should really return the outermost one.
+  // However, there should not be more than one unless all are equivalent.
   /**
    * @return an InClassCriterion if this has one, else null
    */
