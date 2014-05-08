@@ -1,10 +1,12 @@
 package annotator.find;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -26,6 +28,7 @@ public class Insertions implements Iterable<Insertion> {
 
   public Insertions() {
     store = new HashMap<String, Set<Insertion>>();
+    size = 0;
   }
 
   public Set<Insertion> forClass(String cls) {
@@ -41,11 +44,15 @@ public class Insertions implements Iterable<Insertion> {
       i = key.indexOf('$');
       if (i > 0) { key = key.substring(0, i); }
     }
-    if (!store.containsKey(key)) {
-      store.put(key, new HashSet<Insertion>());
+
+    Set<Insertion> val = store.get(key);
+    if (val == null) {
+      val = new HashSet<Insertion>();
+      store.put(key, val);
     }
-    store.get(key).add(ins);
-    ++size;
+    size -= val.size();
+    val.add(ins);
+    size += val.size();;
   }
 
   public void addAll(Collection<? extends Insertion> c) {
@@ -87,5 +94,13 @@ public class Insertions implements Iterable<Insertion> {
         throw new UnsupportedOperationException();
       }
     };
+  }
+
+  public List<Insertion> toList() {
+    List<Insertion> list = new ArrayList<Insertion>(size);
+    for (Set<Insertion> insertions : store.values()) {
+      list.addAll(insertions);
+    }
+    return null;
   }
 }
