@@ -109,6 +109,21 @@ public final class Criteria {
   }
 
   /**
+   * Determines whether this is the criteria on a package.
+   *
+   * @return true iff this is the criteria on a package
+   */
+  public boolean isOnPackage() {
+    for (Criterion c : criteria) {
+      if (c.getKind() == Criterion.Kind.PACKAGE) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
    * Determines whether this is the criteria on a return type.
    *
    * @return true iff this is the criteria on a return type
