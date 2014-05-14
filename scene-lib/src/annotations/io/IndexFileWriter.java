@@ -299,6 +299,17 @@ public final class IndexFileWriter {
         OurDefCollector odc = new OurDefCollector();
         odc.visit();
 
+        // Then any package annotations...
+        for (Map. /*@ReadOnly*/ Entry<String, /*@ReadOnly*/ AElement> pe
+            : scene.packages.entrySet()) {
+            AElement elem = pe.getValue();
+            if (elem != null && !elem.tlAnnotationsHere.isEmpty()) {
+                pw.print("package " + pe.getKey() + ":");
+                printAnnotations(elem);
+                pw.println();
+            }
+        }
+
         // And then the annotated classes
         for (Map. /*@ReadOnly*/ Entry<String, /*@ReadOnly*/ AClass> ce
                 : scene.classes.entrySet()) {
