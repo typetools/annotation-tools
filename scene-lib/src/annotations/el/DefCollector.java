@@ -126,11 +126,20 @@ public abstract class DefCollector {
             collect(it);
     }
 
+    private void collect(/*@ReadOnly*/ ADeclaration d)
+            throws DefException {
+        collect((/*@ReadOnly*/ AElement) d);
+        for (ATypeElement ia : d.insertAnnotations.values())
+            collect(ia);
+        for (ATypeElementWithType ic : d.insertTypecasts.values())
+            collect(ic);
+    }
+
     private void collect(/*@ReadOnly*/ AMethod m)
             throws DefException {
         for (ATypeElement b : m.bounds.values())
             collect(b);
-        collect((/*@ReadOnly*/ AElement) m);
+        collect((/*@ReadOnly*/ ADeclaration) m);
         collect((/*@ReadOnly*/ ATypeElement) m.returnType);
         collect(m.receiver);
         for (AElement p : m.parameters.values())
@@ -147,7 +156,7 @@ public abstract class DefCollector {
 
     private void collect(/*@ReadOnly*/ AClass c)
             throws DefException {
-        collect((/*@ReadOnly*/ AElement) c);
+        collect((/*@ReadOnly*/ ADeclaration) c);
         for (ATypeElement b : c.bounds.values())
             collect(b);
         for (ATypeElement ei : c.extendsImplements.values())
