@@ -620,7 +620,7 @@ public class ASTPathCriterion implements Criterion {
             if (debug) {
                 System.out.println("next: " + next);
             }
-            if (next != actualPath.get(i + 1)) {
+            if (i+1 < actualPath.size() && next != actualPath.get(i+1)) {
                 if (debug) {
                     System.out.println("no next match");
                 }

@@ -374,9 +374,27 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       // for arrays, need to indent inside array, not right before type
       Tree parent = parent(node);
       Integer i = null;
+      JCIdent jcnode = (JCIdent) node;
       if (parent.getKind() == Tree.Kind.NEW_ARRAY) { // NewArrayTree)
         debug("TypePositionFinder.visitIdentifier: recognized array");
-        i = ((JCIdent) node).getEndPosition(tree.endPositions);
+        ASTPath astPath = ins.getCriteria().getASTPath();
+        // invariant: astPath ends with NewArray if not null
+        if (astPath != null) {
+          ASTPath.ASTEntry entry = astPath.get(astPath.size() - 1);
+          // ASTPathEntry.type _n_ is a special case because it does not
+          // correspond to a node in the AST.
+          if (entry.childSelectorIs(ASTPath.TYPE)) {
+            int n = entry.getArgument();
+            i = jcnode.getStartPosition();
+            if (n < getDimsSize((JCExpression) parent)) {  // else n == #dims
+              i = getNthInstanceInRange('[', i,
+                  ((JCNewArray) parent).getEndPosition(tree.endPositions), n+1);
+            }
+          }
+        }
+        if (i == null) {
+          i = jcnode.getEndPosition(tree.endPositions);
+        }
       } else if (parent.getKind() == Tree.Kind.NEW_CLASS) { // NewClassTree)
         debug("TypePositionFinder.visitIdentifier: recognized class");
         JCNewClass nc = (JCNewClass) parent;
