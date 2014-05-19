@@ -472,7 +472,7 @@ public class ASTIndex extends AbstractMap<Tree, ASTIndex.ASTRecord> {
         Kind kind = node.getKind();
         save(node.getReturnType(), kind, ASTPath.TYPE);
         saveAll(node.getTypeParameters(), kind, ASTPath.TYPE_PARAMETER);
-        save(node.getReceiverParameter(), kind, ASTPath.PARAMETER);
+        save(node.getReceiverParameter(), kind, ASTPath.PARAMETER, -1);
         saveAll(node.getParameters(), kind, ASTPath.PARAMETER);
         save(node.getBody(), kind, ASTPath.BODY);
         return null;
@@ -481,7 +481,16 @@ public class ASTIndex extends AbstractMap<Tree, ASTIndex.ASTRecord> {
       @Override
       public Void visitNewArray(NewArrayTree node, ASTPath.ASTEntry entry) {
         Kind kind = node.getKind();
-        save(node.getType(), kind, ASTPath.TYPE);
+        Tree type = node.getType();
+        int n = node.getDimensions().size();
+        do {
+          save(type, kind, ASTPath.TYPE, n);  // ???
+        } while (--n > 0);
+        //int i = 0;
+        //do {
+        //  NewArrayTree nat = (NewArrayTree) t;
+        //  save(nat.getType(), kind, ASTPath.TYPE, i++);
+        //} while (false);
         saveAll(node.getDimensions(), kind, ASTPath.DIMENSION);
         saveAll(node.getInitializers(), kind, ASTPath.INITIALIZER);
         return defaultAction(node, entry);
@@ -690,7 +699,7 @@ public class ASTIndex extends AbstractMap<Tree, ASTIndex.ASTRecord> {
   public ASTRecord get(Object key) {
     // build ASTPath on demand from cached ASTEntries
     Tree node = (Tree) key;
-    if (!ASTPath.isHandled(node.getKind())) { return null; }
+    //if (!ASTPath.isHandled(node.getKind())) { return null; }
     TreePath treePath = TreePath.getPath(cut, node);
     ASTPath astPath = new ASTPath();
     Deque<Tree> deque = new ArrayDeque<Tree>();
