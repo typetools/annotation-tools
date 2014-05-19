@@ -193,9 +193,9 @@ public final class Criteria {
   }
 
   /**
-   * Determines whether this is the criteria on an AST path.
+   * Gives the AST path specified in the criteria, if any.
    *
-   * @return true iff this is the criteria on an AST path.
+   * @return AST path from {@link ASTPathCriterion}, or null if none present
    */
   public ASTPath getASTPath() {
     for (Criterion c : criteria) {
