@@ -205,10 +205,16 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
                 : negativeAllowed();
         }
 
-        // argument < 0 valid for one case
+        // argument < 0 valid for two cases
         private boolean negativeAllowed() {
-            return treeKind == Tree.Kind.CLASS
-                && childSelectorIs(ASTPath.BOUND);
+            switch (treeKind) {
+            case CLASS:
+                return childSelectorIs(ASTPath.BOUND);
+            case METHOD:
+                return childSelectorIs(ASTPath.PARAMETER);
+            default:
+                return false;
+            }
         }
 
         @Override
@@ -869,7 +875,7 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
             ClassTree clazz = (ClassTree) actualNode;
             int arg = astNode.getArgument();
             if (astNode.childSelectorIs(ASTPath.BOUND)) {
-              next = arg == -1 ? next = clazz.getExtendsClause()
+              next = arg == -1 ? clazz.getExtendsClause()
                   : clazz.getImplementsClause().get(arg);
             } else {
               next = clazz.getTypeParameters().get(arg);
@@ -1006,7 +1012,8 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
             if (astNode.childSelectorIs(ASTPath.TYPE)) {
               next = method.getReturnType();
             } else if (astNode.childSelectorIs(ASTPath.PARAMETER)) {
-              next = method.getParameters().get(arg);
+              next = arg == -1 ? method.getReceiverParameter()
+                  : method.getParameters().get(arg);
             } else if (astNode.childSelectorIs(ASTPath.TYPE_PARAMETER)) {
               next = method.getTypeParameters().get(arg);
             } else {
