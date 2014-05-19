@@ -51,7 +51,6 @@ import com.sun.source.tree.WildcardTree;
 import com.sun.source.util.SimpleTreeVisitor;
 import com.sun.source.util.TreePath;
 import com.sun.source.util.TreeScanner;
-import com.sun.tools.javac.code.Type.AnnotatedType;
 import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
 import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntryKind;
 import com.sun.tools.javac.code.Flags;
@@ -487,10 +486,6 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       public Integer visitArrayType(com.sun.tools.javac.code.Type.ArrayType t,
           Integer i) {
         return t.elemtype.accept(this, i+1);
-      }
-      @Override
-      public Integer visitAnnotatedType(AnnotatedType t, Integer i) {
-        return t.unannotatedType().accept(this, i);
       }
       @Override
       public Integer visitType(com.sun.tools.javac.code.Type t, Integer i) {
