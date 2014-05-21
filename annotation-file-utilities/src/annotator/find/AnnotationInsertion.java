@@ -12,6 +12,7 @@ public class AnnotationInsertion extends Insertion {
      */
     private final String annotation;
     private String type;
+    private boolean generateExtends;
 
     /**
      * Creates a new insertion.
@@ -25,6 +26,7 @@ public class AnnotationInsertion extends Insertion {
         super(criteria, separateLine);
         this.annotation = annotation;
         type = null;
+        generateExtends = false;
     }
 
     /**
@@ -35,6 +37,14 @@ public class AnnotationInsertion extends Insertion {
      */
     public AnnotationInsertion(String annotation) {
         this(annotation, new Criteria(), false);
+    }
+
+    protected boolean isGenerateExtends() {
+      return generateExtends;
+    }
+
+    protected void setGenerateExtends(boolean generateExtends) {
+      this.generateExtends = generateExtends;
     }
 
     /**
@@ -68,11 +78,12 @@ public class AnnotationInsertion extends Insertion {
         // expression, we generate the explicit "new"
         // (as in "int[] a = new int[] {0, 1}") to provide a legal insertion site.
         
-        if (type != null) { result = "new " + result + " " + type; }
-        if (comments) {
-            return "/*" + result + "*/";
+        if (type != null) {
+            result = "new " + result + " " + type;
+        } else if (generateExtends) {
+            result = "extends java.lang." + result + " Object";
         }
-        return result;
+        return comments ? "/*" + result + "*/" : result;
     }
 
     /**
@@ -90,6 +101,15 @@ public class AnnotationInsertion extends Insertion {
             return false;
         }
         return super.addLeadingSpace(gotSeparateLine, pos, precedingChar);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected boolean addTrailingSpace(boolean gotSeparateLine) {
+        // Never add a trailing space for an extends insertion.
+        return !generateExtends && super.addTrailingSpace(gotSeparateLine);
     }
 
     /** {@inheritDoc} */
