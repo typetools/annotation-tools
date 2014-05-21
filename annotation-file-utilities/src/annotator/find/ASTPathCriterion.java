@@ -63,6 +63,7 @@ public class ASTPathCriterion implements Criterion {
      * The path through the AST to match.
      */
     ASTPath astPath;
+    boolean isOnNewArrayType;
 
     /**
      * Constructs a new ASTPathCriterion to match the given AST path.
@@ -75,6 +76,14 @@ public class ASTPathCriterion implements Criterion {
      */
     public ASTPathCriterion(ASTPath astPath) {
         this.astPath = astPath;
+        int n = astPath.size();
+        if (n > 0) {
+            ASTPath.ASTEntry lastEntry = astPath.get(n-1);
+            isOnNewArrayType = lastEntry.getTreeKind() == Tree.Kind.NEW_ARRAY
+                    && lastEntry.childSelectorIs(ASTPath.TYPE);
+        } else {
+            isOnNewArrayType = false;
+        }
     }
 
     /** {@inheritDoc} */
@@ -100,8 +109,7 @@ public class ASTPathCriterion implements Criterion {
         List<Tree> actualPath = new ArrayList<Tree>();
         Tree leaf = path.getLeaf();
         Tree.Kind kind = leaf.getKind();
-        while (path != null
-                && kind != Tree.Kind.METHOD && kind != Tree.Kind.CLASS) {
+        while (kind != Tree.Kind.METHOD && kind != Tree.Kind.CLASS) {
             actualPath.add(0, path.getLeaf());
             path = path.getParentPath();
             if (path == null) { break; }
@@ -126,12 +134,14 @@ public class ASTPathCriterion implements Criterion {
             }
         }
 
+        int astPathLen = astPath.size();
+        int actualPathLen = actualPath.size();
         if (astPath.isEmpty() || actualPath.isEmpty()
-                || actualPath.size() != astPath.size() + 1) {
+                || actualPathLen != astPathLen + (isOnNewArrayType ? 0 : 1)) {
             return false;
         }
 
-        for (int i = 0; i < astPath.size() && i < actualPath.size(); i++) {
+        for (int i = 0; i < astPathLen; i++) {
             ASTPath.ASTEntry astNode = astPath.get(i);
             Tree actualNode = actualPath.get(i);
 
@@ -149,6 +159,7 @@ public class ASTPathCriterion implements Criterion {
                 return false;
             }
 
+            try {
             switch (actualNode.getKind()) {
             case ANNOTATED_TYPE: {
                 AnnotatedTypeTree annotatedType = (AnnotatedTypeTree) actualNode;
@@ -616,11 +627,12 @@ public class ASTPathCriterion implements Criterion {
                 break;
             }
             }
+            } catch (RuntimeException ex) { return false; }
 
             if (debug) {
                 System.out.println("next: " + next);
             }
-            if (i+1 < actualPath.size() && next != actualPath.get(i+1)) {
+            if (i+1 < actualPathLen && next != actualPath.get(i+1)) {
                 if (debug) {
                     System.out.println("no next match");
                 }
