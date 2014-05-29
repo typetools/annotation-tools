@@ -11,9 +11,11 @@ import com.sun.source.util.TreePathScanner;
  * methods.
  */
 public class CommonScanner extends TreePathScanner<Void, Void> {
-
-    private static boolean hasClassKind(Tree tree) {
+    public static boolean hasClassKind(Tree tree) {
         Tree.Kind kind = tree.getKind();
+        // Tree.Kind.NEW_CLASS is excluded here because 1) there is no
+        // type name to be annotated on an anonymous inner class, and
+        // consequently 2) NEW_CLASS insertions are handled separately. 
         return kind == Tree.Kind.CLASS
                 || kind == Tree.Kind.INTERFACE
                 || kind == Tree.Kind.ENUM
