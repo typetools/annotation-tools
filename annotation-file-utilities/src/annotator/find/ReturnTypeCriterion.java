@@ -1,6 +1,7 @@
 package annotator.find;
 
 import annotator.Main;
+import annotator.scanner.CommonScanner;
 
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
@@ -37,7 +38,7 @@ public class ReturnTypeCriterion implements Criterion {
         if (sigMethodCriterion.isSatisfiedBy(path)) {
           path = path.getParentPath();
           while (path != null && path.getLeaf() != null) {
-            if (hasClassKind(path.getLeaf())) {
+            if (CommonScanner.hasClassKind(path.getLeaf())) {
               if (!inClassCriterion.isSatisfiedBy(path)) { break; }
               debug("ReturnTypeCriterion.isSatisfiedBy => true");
               return true;
@@ -62,17 +63,6 @@ public class ReturnTypeCriterion implements Criterion {
   @Override
   public String toString() {
     return "ReturnTypeCriterion for method: " + methodName;
-  }
-
-  private static boolean hasClassKind(Tree tree) {
-    Tree.Kind kind = tree.getKind();
-
-    // Tree.Kind.NEW_CLASS is excluded here because there is no
-    // type name to be annotated on an anonymous inner class.
-    return kind == Tree.Kind.CLASS
-            || kind == Tree.Kind.INTERFACE
-            || kind == Tree.Kind.ENUM
-            || kind == Tree.Kind.ANNOTATION_TYPE;
   }
 
   private static void debug(String s) {
