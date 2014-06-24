@@ -28,6 +28,7 @@ import java.util.TreeSet;
 
 import plume.ArraysMDE;
 import plume.FileIOException;
+import plume.Pair;
 import type.ArrayType;
 import type.BoundedType;
 import type.BoundedType.BoundKind;
@@ -995,6 +996,13 @@ public final class IndexFileParser {
             matched = true;
             matchKeyword("insert-annotation");
             ASTPath astPath = parseASTPath();
+            Pair<ASTPath, InnerTypeLocation> pair =
+                splitNewArrayType(astPath);  // handle special case
+            InnerTypeLocation loc = null;
+            if (pair != null) {
+              loc = pair.b;
+              astPath = pair.a;
+            }
             expectChar(':');
             // if path doesn't indicate a type, a cast must be generated
             if (selectsExpression(astPath)) {
@@ -1004,6 +1012,7 @@ public final class IndexFileParser {
                 parseInnerTypes(i);
             } else {
                 ATypeElement i = decl.insertAnnotations.vivify(astPath);
+                if (loc != null) { i = i.innerTypes.vivify(loc); }
                 parseAnnotations(i);
                 parseInnerTypes(i);
             }
@@ -1020,6 +1029,34 @@ public final class IndexFileParser {
             parseInnerTypes(i);
         }
         return matched;
+    }
+
+    // Due to the unfortunate representation of new array expressions,
+    // ASTPaths to their inner array types break the usual rule that
+    // an ASTPath corresponds to an AST node.  This method restores the
+    // invariant by separating out the inner type information.
+    private Pair<ASTPath, InnerTypeLocation> splitNewArrayType(ASTPath astPath) {
+      ASTPath outerPath = astPath;
+      InnerTypeLocation loc = null;
+      int last = astPath.size()-1;
+      
+      if (last > 0) {
+        ASTPath.ASTEntry entry = astPath.get(last);
+        if (entry.getTreeKind() == Kind.NEW_ARRAY
+            && entry.childSelectorIs(ASTPath.TYPE)) {
+          int a = entry.getArgument();
+          if (a > 0) {
+            outerPath = new ASTPath();
+            for (int i = 0 ; i < last ; i++) { outerPath.add(astPath.get(i)); }
+            outerPath.add(
+                new ASTPath.ASTEntry(Kind.NEW_ARRAY, ASTPath.TYPE, 0));
+            loc = new InnerTypeLocation(TypeAnnotationPosition
+                .getTypePathFromBinary(Collections.nCopies(2*a, 0)));
+          }
+        }
+      }
+      
+      return Pair.of(outerPath, loc);
     }
 
     /**
