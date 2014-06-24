@@ -330,8 +330,7 @@ public class IndexFileSpecification implements Specification {
       Boolean isDeclarationAnnotation = p.b;
       Criteria criteria = clist.criteria();
       GenericArrayLocationCriterion galc = criteria.getGenericArrayLocation();
-      if (criteria.isOnReceiver() && galc != null
-          && galc.getLocation().isEmpty()) {
+      if (isOnReceiver(criteria)) {
         if (receiver == null) {
           DeclaredType type = new DeclaredType();
           type.addAnnotation(annotationString);
@@ -340,8 +339,7 @@ public class IndexFileSpecification implements Specification {
         } else {
           receiver.getType().addAnnotation(annotationString);
         }
-      } else if (criteria.isOnNew() && galc != null
-          && galc.getLocation().isEmpty()) {
+      } else if (isOnNew(criteria)) {
         if (neu == null) {
           DeclaredType type = new DeclaredType();
           type.addAnnotation(annotationString);
@@ -378,8 +376,8 @@ public class IndexFileSpecification implements Specification {
 
       // exclude expression annotations 
       if (criteria.isOnMethod("<init>()V") && !criteria.isOnNew()
-          && (galc == null || galc.getLocation().isEmpty())
-          && criteria.getASTPath() == null) {  // TODO: equivalent for ASTPath
+          && (galc == null || galc.getLocation().isEmpty())) {
+          // TODO: equivalent criteria for ASTPath?
         if (cons == null) {
           DeclaredType type = new DeclaredType(criteria.getClassName());
           cons = new ConstructorInsertion(type, criteria,
@@ -395,11 +393,7 @@ public class IndexFileSpecification implements Specification {
             cons.addDeclarationInsertion(i);
             i.setInserted(true);
           } else {
-            if (galc == null || galc.getLocation().isEmpty()) {
-              annotationInsertions.add(i);
-            } else {
-              cons.getInnerTypeInsertions().add(i);
-            }
+            annotationInsertions.add(i);
           }
         }
       }
@@ -416,6 +410,40 @@ public class IndexFileSpecification implements Specification {
         this.insertions.add(closeParen);
     }
     return annotationInsertions;
+  }
+
+  private boolean isOnReceiver(Criteria criteria) {
+      GenericArrayLocationCriterion galc = criteria.getGenericArrayLocation();
+      if (galc == null || galc.getLocation().isEmpty()) {
+          ASTPath astPath = criteria.getASTPath();
+          if (astPath == null) {
+              return criteria.isOnReceiver();
+          } else {
+              ASTPath.ASTEntry entry = astPath.get(-1);
+              return entry.childSelectorIs(ASTPath.ARGUMENT)
+                  && entry.getArgument() < 0;
+          }
+      }
+      return false;
+  }
+
+  private boolean isOnNew(Criteria criteria) {
+      GenericArrayLocationCriterion galc =
+          criteria.getGenericArrayLocation();
+      if (galc == null || galc.getLocation().isEmpty()) {
+          ASTPath astPath = criteria.getASTPath();
+          if (astPath == null || astPath.isEmpty()) {
+              return criteria.isOnNew();
+          } else {
+              ASTPath.ASTEntry entry = astPath.get(-1);
+              Tree.Kind kind = entry.getTreeKind();
+              return (kind == Tree.Kind.NEW_ARRAY
+                          || kind == Tree.Kind.NEW_CLASS)
+                      && entry.childSelectorIs(ASTPath.TYPE)
+                      && entry.getArgument() == 0;
+          }
+      }
+      return false;
   }
 
   /**
