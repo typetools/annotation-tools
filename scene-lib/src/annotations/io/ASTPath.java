@@ -5,11 +5,14 @@ import java.io.StreamTokenizer;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import plume.ArraysMDE;
+import plume.Pair;
+import annotations.el.InnerTypeLocation;
 
 import com.sun.source.tree.AnnotatedTypeTree;
 import com.sun.source.tree.AnnotationTree;
@@ -57,6 +60,7 @@ import com.sun.source.tree.WhileLoopTree;
 import com.sun.source.tree.WildcardTree;
 import com.sun.source.tree.Tree.Kind;
 import com.sun.source.util.TreePath;
+import com.sun.tools.javac.code.TypeAnnotationPosition;
 
 /**
  * A path through the AST.
@@ -230,12 +234,14 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
             if (c != 0) { return c; }
             c = childSelector.compareTo(o.childSelector);
             if (c != 0) { return c; }
-            if (o.argument == null) {
-                if (argument != null) { return 1; }
-            } else if (argument == null) {
-                return -1;
-            }
-            return argument.compareTo(o.argument);
+            return o.argument == null
+                ? argument == null ? 0 : 1
+                : argument == null ? -1 : argument.compareTo(o.argument);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            return o instanceof ASTEntry && compareTo((ASTEntry) o) == 0;
         }
 
         @Override
@@ -365,6 +371,18 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
      */
     public void add(ASTEntry entry) {
         path.add(entry);
+    }
+
+    public ASTPath getParentPath() {
+      ASTPath astPath = null;
+      int n = size() - 1;
+      if (n >= 0) {
+        astPath = new ASTPath();
+        for (int i = 0; i < n; i++) {
+          astPath.add(get(i));
+        }
+      }
+      return astPath;
     }
 
     /**
