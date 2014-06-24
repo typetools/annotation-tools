@@ -27,6 +27,12 @@ class ASTInsert:
         insert-annotation Variable.initializer, Binary.rightOperand, MethodInvocation.methodSelect, MemberSelect.expression: @Nullable
         insert-annotation Variable.initializer, Binary.rightOperand, MethodInvocation.argument 0: @Nullable
 
+    field sa:
+        insert-annotation Variable.initializer, NewArray.type 0: @Bla
+        insert-annotation Variable.type, ArrayType.type: @Bla
+        insert-annotation Variable.type: @Bla
+        insert-annotation Variable.initializer, NewArray.type 1: @Bla
+
     method m(Ljava/lang/String;[Ljava/lang/String;I)I:
         insert-annotation Block.statement 0, Variable.initializer: @Nullable
         insert-annotation Block.statement 2, ExpressionStatement.expression, Assignment.expression: @Nullable
