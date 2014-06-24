@@ -1,6 +1,7 @@
 package annotations.el;
 
 import java.util.Map;
+import java.util.TreeMap;
 
 import annotations.io.ASTPath;
 import annotations.util.coll.VivifyingMap;
@@ -19,11 +20,33 @@ import org.checkerframework.checker.javari.qual.ReadOnly;
 public abstract class ADeclaration extends AElement {
   /** The element's insert-annotation invocations; map key is the AST path to the insertion place */
   public final VivifyingMap<ASTPath, ATypeElement> insertAnnotations =
-          ATypeElement.<ASTPath>newVivifyingLHMap_ATE();
+          new VivifyingMap<ASTPath, ATypeElement>(
+                  new TreeMap<ASTPath, ATypeElement>()) {
+      @Override
+      public  ATypeElement createValueFor(ASTPath k) {
+          return new ATypeElement(k);
+      }
+
+      @Override
+      public boolean subPrune(ATypeElement v) {
+          return v.prune();
+      }
+  };
 
   /** The element's annotated insert-typecast invocations; map key is the AST path to the insertion place */
   public final VivifyingMap<ASTPath, ATypeElementWithType> insertTypecasts =
-          ATypeElementWithType.<ASTPath>newVivifyingLHMap_ATEWT();
+          new VivifyingMap<ASTPath, ATypeElementWithType>(
+                new TreeMap<ASTPath, ATypeElementWithType>()) {
+      @Override
+      public ATypeElementWithType createValueFor(ASTPath k) {
+          return new ATypeElementWithType(k);
+      }
+
+      @Override
+      public boolean subPrune(ATypeElementWithType v) {
+          return v.prune();
+      }
+  };
 
   protected ADeclaration(Object description) {
     super(description, true);
