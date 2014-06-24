@@ -12,9 +12,6 @@ import type.Type;
  *
  */
 public class NewInsertion extends TypedInsertion {
-  private final static String whitespace =
-      "(?:\\s|//.*+$|/\\*[^*]*++\\*++(?:[^*/][^*]*+\\*++)*++/)*+";
-  private final static Pattern parenthesis = Pattern.compile("[()]");
   private final static Pattern qualifiers = Pattern.compile("(?:\\w++\\.)*+");
 
   /**
@@ -39,7 +36,7 @@ public class NewInsertion extends TypedInsertion {
    * @param innerTypeInsertions the inner types to go on this receiver. See
    *         {@link ReceiverInsertion} for more details.
    */
-  public NewInsertion(DeclaredType type, Criteria criteria,
+  public NewInsertion(Type type, Criteria criteria,
       List<Insertion> innerTypeInsertions) {
     super(type, criteria, innerTypeInsertions);
     annotationsOnly = false;
@@ -87,49 +84,6 @@ public class NewInsertion extends TypedInsertion {
       }
       return result;
     }
-  }
-
-  /**
-   * @param baseType
-   * @param result
-   * @return
-   */
-  private String fixTypeString(String result, String typeName) {
-    String[] temp = result.substring(typeName.length()).split(whitespace);
-    // assert result.startsWith(typeName);
-    StringBuilder b = new StringBuilder(typeName);
-    int parCount = -1;  // count only within annotation body
-    for (int i = 0; i < temp.length; i++) {
-      switch (temp[i].charAt(0)) {
-      case '@':
-        parCount = Math.max(parCount, 0);
-        // fall through
-      case '[':
-        b.append(' ').append(temp[i]);
-        break;
-      default:
-        if (parCount > 0) {
-          Matcher matcher = parenthesis.matcher(temp[i]);
-          while (matcher.find()) {
-            if (temp[i].charAt(matcher.start()) == '(') {
-              ++parCount;
-            } else {
-              --parCount;
-            }
-          }
-          b.append(' ').append(temp[i]);
-        } else {
-          int pos = temp[i].indexOf('[');
-          if (pos >= 0) {
-            b.append(' ').append(temp[i].substring(pos));
-          }
-          if (parCount == 0) {
-            parCount = -1;  // done matching parens
-          }
-        }
-      }
-    }
-    return b.toString();
   }
 
   /**
