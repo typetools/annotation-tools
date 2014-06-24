@@ -9,6 +9,7 @@ public class ASTInsert {
     PrintStream out;
     private int c = ((@checkers.nullness.quals.Nullable int) (((@checkers.nullness.quals.Nullable int) (12)) + ((@checkers.nullness.quals.Nullable int) (13))));
     private String str = "this" + ((java.lang.@checkers.nullness.quals.Nullable String) ("is")).concat(((java.lang.@checkers.nullness.quals.Nullable String) ("string")));
+    private @Bla String @Bla [] sa = new @Bla String @Bla [] {};
 
     void m() {
         int i;

@@ -9,6 +9,7 @@ public class ASTInsert {
     PrintStream out;
     private int c = 12 + 13;
     private String str = "this" + "is".concat("string");
+    private String[] sa = {};
 
     void m() {
         int i;
