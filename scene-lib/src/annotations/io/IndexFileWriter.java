@@ -301,7 +301,7 @@ public final class IndexFileWriter {
 
         // Then any package annotations...
         for (Map. /*@ReadOnly*/ Entry<String, /*@ReadOnly*/ AElement> pe
-            : scene.packages.entrySet()) {
+                : scene.packages.entrySet()) {
             AElement elem = pe.getValue();
             if (elem != null && !elem.tlAnnotationsHere.isEmpty()) {
                 pw.print("package " + pe.getKey() + ":");
@@ -367,7 +367,7 @@ public final class IndexFileWriter {
                 printRelativeElements(INDENT + INDENT, "new", m.body.news);
                 // throwsException field is not processed.  Why?
                 printASTInsertions(INDENT + INDENT,
-                        c.insertAnnotations, c.insertTypecasts);
+                        m.insertAnnotations, m.insertTypecasts);
             }
             pw.println();
         }
