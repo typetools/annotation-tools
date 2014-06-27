@@ -334,7 +334,7 @@ public final class IndexFileWriter {
                 printElement(INDENT, "field " + fname, f);
                 printTypeElementAndInnerTypes(INDENT + INDENT, "type", f.type);
                 printASTInsertions(INDENT + INDENT,
-                        c.insertAnnotations, c.insertTypecasts);
+                        f.insertAnnotations, f.insertTypecasts);
             }
             for (Map. /*@ReadOnly*/ Entry<String, /*@ReadOnly*/ AMethod> me
                     : c.methods.entrySet()) {
