@@ -991,7 +991,7 @@ public final class IndexFileParser {
         while (checkKeyword("insert-annotation")) {
             matched = true;
             matchKeyword("insert-annotation");
-            InnerTypeLocation itloc = null;
+            InnerTypeLocation loc = null;
             ASTPath astPath = parseASTPath();
             Pair<ASTPath, InnerTypeLocation> pair =
                 splitNewArrayType(astPath);  // handle special case
