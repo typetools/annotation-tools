@@ -1,14 +1,13 @@
 package annotations.io;
 
-import java.util.AbstractCollection;
 import java.util.AbstractMap;
 import java.util.AbstractSet;
 import java.util.ArrayDeque;
-import java.util.Collection;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import com.sun.source.tree.AnnotatedTypeTree;
@@ -67,7 +66,8 @@ import annotations.util.JVMNames;
  *
  * @author dbro
  */
-public class ASTIndex extends AbstractMap<Tree, ASTIndex.ASTRecord> {
+public class ASTIndex extends AbstractMap<Tree, ASTIndex.ASTRecord>
+implements Map<Tree, ASTIndex.ASTRecord> {
   /**
    * Structure bundling an {@link ASTPath} with information about its
    *  starting point. Necessary because the {@link ASTPath} structure
@@ -112,6 +112,10 @@ public class ASTIndex extends AbstractMap<Tree, ASTIndex.ASTRecord> {
     public ASTRecord newArrayLevel(int depth) {
       return new ASTRecord(className, methodName, varName,
           astPath.newArrayLevel(depth));
+    }
+
+    public ASTRecord replacePath(ASTPath newPath) {
+      return new ASTRecord(className, methodName, varName, newPath);
     }
 
     @Override
@@ -172,6 +176,15 @@ public class ASTIndex extends AbstractMap<Tree, ASTIndex.ASTRecord> {
           && (methodName == null ? meth == null : methodName.equals(meth))
           && (varName == null ? var == null : varName.equals(var))
           && astPath.matches(treePath);
+    }
+
+    @Override
+    public String toString() {
+      return new StringBuilder()
+          .append(className == null ? "" : className).append(":")
+          .append(methodName == null ? "" : methodName).append(":")
+          .append(varName == null ? "" : varName).append(":")
+          .append(astPath).toString();
     }
   }
 
@@ -669,8 +682,26 @@ public class ASTIndex extends AbstractMap<Tree, ASTIndex.ASTRecord> {
     }, null);
   }
 
-  public ASTRecord getPath(CompilationUnitTree cut, Tree node) {
+  public static ASTRecord getASTPath(CompilationUnitTree cut, Tree node) {
     return indexOf(cut).get(node);
+  }
+
+  public static TreePath getTreePath(CompilationUnitTree cut, ASTRecord rec) {
+    Tree node = getNode(cut, rec);
+    return TreePath.getPath(cut, node);
+  }
+
+  public static Tree getNode(CompilationUnitTree cut, ASTRecord rec) {
+    // TODO: replace with non-stupid implementation!
+    Map<Tree, ASTRecord> index = indexOf(cut);
+    if (index.containsValue(rec)) {
+      for (Map.Entry<Tree, ASTRecord> entry : index.entrySet()) {
+        if (Objects.equals(rec, entry.getValue())) {
+          return entry.getKey();
+        }
+      }
+    }
+    return null;
   }
 
   // Map instance methods
@@ -748,8 +779,8 @@ loop:
   }
 
   @Override
-  public Collection<ASTRecord> values() {
-    return new AbstractCollection<ASTRecord>() {
+  public Set<ASTRecord> values() {
+    return new AbstractSet<ASTRecord>() {
       @Override
       public int size() { return astEntries.size(); }
 
