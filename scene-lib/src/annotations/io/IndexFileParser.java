@@ -485,13 +485,11 @@ public final class IndexFileParser {
         String name = expectQualifiedName();
         AnnotationDef d = defs.get(name);
         if (d == null) {
-            if (false) {
-                System.err.println("No definition for annotation type " + name);
-                System.err.printf("  defs contains %d entries%n", defs.size());
-                for (Map.Entry<String,AnnotationDef> entry : defs.entrySet()) {
-                    System.err.printf("    defs entry: %s => %s%n", entry.getKey(), entry.getValue());
-                }
-            }
+            //System.err.println("No definition for annotation type " + name);
+            //System.err.printf("  defs contains %d entries%n", defs.size());
+            //for (Map.Entry<String,AnnotationDef> entry : defs.entrySet()) {
+            //    System.err.printf("    defs entry: %s => %s%n", entry.getKey(), entry.getValue());
+            //}
             throw new ParseException("No definition for annotation type " + name);
         }
         return d;
@@ -988,17 +986,15 @@ public final class IndexFileParser {
     }
 
     private boolean parseASTInsertions(ADeclaration decl)
-            //(VivifyingMap<ASTPath, ? extends AElement> insertAnnotations,
-            //VivifyingMap<ASTPath, ATypeElementWithType> insertTypecasts)
-                      throws IOException, ParseException {
+            throws IOException, ParseException {
         boolean matched = false;
         while (checkKeyword("insert-annotation")) {
             matched = true;
             matchKeyword("insert-annotation");
+            InnerTypeLocation itloc = null;
             ASTPath astPath = parseASTPath();
             Pair<ASTPath, InnerTypeLocation> pair =
                 splitNewArrayType(astPath);  // handle special case
-            InnerTypeLocation loc = null;
             if (pair != null) {
               loc = pair.b;
               astPath = pair.a;
@@ -1046,8 +1042,7 @@ public final class IndexFileParser {
             && entry.childSelectorIs(ASTPath.TYPE)) {
           int a = entry.getArgument();
           if (a > 0) {
-            outerPath = new ASTPath();
-            for (int i = 0 ; i < last ; i++) { outerPath.add(astPath.get(i)); }
+            outerPath = astPath.getParentPath();
             outerPath.add(
                 new ASTPath.ASTEntry(Kind.NEW_ARRAY, ASTPath.TYPE, 0));
             loc = new InnerTypeLocation(TypeAnnotationPosition
