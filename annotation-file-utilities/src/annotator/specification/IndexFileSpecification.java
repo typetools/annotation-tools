@@ -2,6 +2,7 @@ package annotator.specification;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -48,7 +49,8 @@ import annotator.scanner.MethodOffsetClassVisitor;
 import com.sun.source.tree.Tree;
 
 public class IndexFileSpecification implements Specification {
-
+  private final Map<Insertion, Annotation> insertionSources =
+      new LinkedHashMap<Insertion, Annotation>();
   private final List<Insertion> insertions = new ArrayList<Insertion>();
   private final AScene scene;
   private final String indexFileName;
@@ -90,6 +92,14 @@ public class IndexFileSpecification implements Specification {
     return scene.imports;
   }
 
+  public Map<Insertion, Annotation> insertionSources() {
+    return insertionSources;
+  }
+
+  private void addInsertionSource(Insertion ins, Annotation anno) {
+    insertionSources.put(ins, anno);
+  }
+
   private static void debug(String s) {
     if (debug) {
       System.out.println(s);
@@ -103,6 +113,8 @@ public class IndexFileSpecification implements Specification {
     }
   }
   */
+
+  public AScene getScene() { return scene; }
 
   /** Fill in this.insertions with insertion pairs. */
   private void parseScene() {
@@ -312,7 +324,7 @@ public class IndexFileSpecification implements Specification {
     CastInsertion cast = null;
     CloseParenthesisInsertion closeParen = null;
     List<Insertion> annotationInsertions = new ArrayList<Insertion>();
-    Set<Pair<String, Boolean>> elementAnnotations = getElementAnnotation(element);
+    Set<Pair<String, Annotation>> elementAnnotations = getElementAnnotations(element);
     if (element instanceof ATypeElementWithType && elementAnnotations.isEmpty()) {
       // Still insert even if it's a cast insertion with no outer annotations to
       // just insert a cast, or insert a cast with annotations on the compound
@@ -324,12 +336,12 @@ public class IndexFileSpecification implements Specification {
       closeParen = insertions.b;
     }
 
-    for (Pair<String,Boolean> p : elementAnnotations) {
+    for (Pair<String, Annotation> p : elementAnnotations) {
       List<Insertion> elementInsertions = new ArrayList<Insertion>();
       String annotationString = p.a;
-      Boolean isDeclarationAnnotation = p.b;
+      Annotation annotation = p.b;
+      Boolean isDeclarationAnnotation = !annotation.def.isTypeAnnotation();
       Criteria criteria = clist.criteria();
-      GenericArrayLocationCriterion galc = criteria.getGenericArrayLocation();
       if (isOnReceiver(criteria)) {
         if (receiver == null) {
           DeclaredType type = new DeclaredType();
@@ -339,6 +351,7 @@ public class IndexFileSpecification implements Specification {
         } else {
           receiver.getType().addAnnotation(annotationString);
         }
+        addInsertionSource(receiver, annotation);
       } else if (isOnNew(criteria)) {
         if (neu == null) {
           DeclaredType type = new DeclaredType();
@@ -348,6 +361,7 @@ public class IndexFileSpecification implements Specification {
         } else {
           neu.getType().addAnnotation(annotationString);
         }
+        addInsertionSource(neu, annotation);
       } else if (element instanceof ATypeElementWithType) {
         if (cast == null) {
           Pair<CastInsertion, CloseParenthesisInsertion> insertions = createCastInsertion(
@@ -357,9 +371,11 @@ public class IndexFileSpecification implements Specification {
           closeParen = insertions.b;
           elementInsertions.add(cast);
           elementInsertions.add(closeParen);
+          // no addInsertionSource, as closeParen is not explicit in scene
         } else {
           cast.getType().addAnnotation(annotationString);
         }
+        addInsertionSource(cast, annotation);
       } else {
         Insertion ins = new AnnotationInsertion(annotationString, criteria,
                                       isDeclarationAnnotation);
@@ -371,19 +387,19 @@ public class IndexFileSpecification implements Specification {
         		elementInsertions.add(ins);
         }
         annotationInsertions.add(ins);
+        addInsertionSource(ins, annotation);
       }
       this.insertions.addAll(elementInsertions);
 
-      // exclude expression annotations 
-      if (criteria.isOnMethod("<init>()V") && !criteria.isOnNew()
-          && (galc == null || galc.getLocation().isEmpty())) {
-          // TODO: equivalent criteria for ASTPath?
+      // exclude expression annotations
+      if (isOnNullaryConstructor(criteria)) {
         if (cons == null) {
           DeclaredType type = new DeclaredType(criteria.getClassName());
           cons = new ConstructorInsertion(type, criteria,
               new ArrayList<Insertion>());
           this.insertions.add(cons);
         }
+        // no addInsertionSource, as cons is not explicit in scene  
         for (Insertion i : elementInsertions) {
           if (i.getKind() == Insertion.Kind.RECEIVER) {
             cons.addReceiverInsertion((ReceiverInsertion) i);
@@ -441,6 +457,24 @@ public class IndexFileSpecification implements Specification {
                           || kind == Tree.Kind.NEW_CLASS)
                       && entry.childSelectorIs(ASTPath.TYPE)
                       && entry.getArgument() == 0;
+          }
+      }
+      return false;
+  }
+
+  private boolean isOnNullaryConstructor(Criteria criteria) {
+      if (!criteria.isOnMethod("<init>()V")) { return false; }
+      GenericArrayLocationCriterion galc =
+          criteria.getGenericArrayLocation();
+      if (galc == null || galc.getLocation().isEmpty()) {
+          ASTPath astPath = criteria.getASTPath();
+          if (astPath == null || astPath.isEmpty()) {
+              return criteria.isOnMethod("<init>()V")
+                      && !criteria.isOnNew();  // exclude expression annotations
+          } else {
+              ASTPath.ASTEntry entry = astPath.get(0); 
+              return entry.getTreeKind() == Tree.Kind.METHOD
+                      && entry.childSelectorIs(ASTPath.TYPE);
           }
       }
       return false;
@@ -506,8 +540,11 @@ public class IndexFileSpecification implements Specification {
   }
 
   // Returns a string representation of the annotations at the element.
-  private Set<Pair<String,Boolean>> getElementAnnotation(AElement element) {
-    Set<Pair<String,Boolean>> result = new LinkedHashSet<Pair<String,Boolean>>(element.tlAnnotationsHere.size());
+  private Set<Pair<String, Annotation>>
+  getElementAnnotations(AElement element) {
+    Set<Pair<String, Annotation>> result =
+        new LinkedHashSet<Pair<String, Annotation>>(
+            element.tlAnnotationsHere.size());
     for (Annotation a : element.tlAnnotationsHere) {
       AnnotationDef adef = a.def;
       String annotationString = "@" + adef.name;
@@ -528,8 +565,7 @@ public class IndexFileSpecification implements Specification {
         annotationString += ")";
       }
       // annotationString += " ";
-      result.add(new Pair<String,Boolean>(annotationString,
-                                          ! adef.isTypeAnnotation()));
+      result.add(new Pair<String, Annotation>(annotationString, a));
     }
     return result;
   }
