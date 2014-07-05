@@ -135,6 +135,11 @@ public abstract class DefCollector {
             collect(ic);
     }
 
+    private void collect(/*@ReadOnly*/ AField f)
+            throws DefException {
+        collect((/*@ReadOnly*/ ADeclaration) f);
+    }
+
     private void collect(/*@ReadOnly*/ AMethod m)
             throws DefException {
         for (ATypeElement b : m.bounds.values())
@@ -163,7 +168,7 @@ public abstract class DefCollector {
             collect(ei);
         for (AMethod m : c.methods.values())
             collect(m);
-        for (AElement f : c.fields.values())
+        for (AField f : c.fields.values())
             collect(f);
     }
 
