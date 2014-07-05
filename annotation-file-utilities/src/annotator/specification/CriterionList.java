@@ -83,4 +83,13 @@ public class CriterionList {
     return criteria;
   }
 
+  @Override
+  public String toString() {
+    if (current == null) { return "[]"; }
+    StringBuilder sb = new StringBuilder("[").append(current);
+    for (CriterionList n = next; n.next != null ; n = n.next) {
+      sb.append(", ").append(n.current);
+    }
+    return sb.append("]").toString();
+  }
 }
