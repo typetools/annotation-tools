@@ -249,8 +249,6 @@ public final class JavapParser {
                 subOuterType = ((AMethod) member).body.news.vivify(RelativeLocation.createOffset(offset, 0));
                 break;
             }
-            // TEMP
-            case UNKNOWN:
             default:
                 throw new AssertionError();
             }
