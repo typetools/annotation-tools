@@ -123,8 +123,7 @@
 
   <target name="compile-debug" depends="init">
     <mkdir dir="${out.tmp}"/>
-    <!-- source="5" is for enums -->
-    <javac destdir="${out.tmp}" debug="on" source="5" includeantruntime="false">
+    <javac destdir="${out.tmp}" debug="on" includeantruntime="false">
       <classpath>
         <pathelement location="${out.tmp}"/>
         <pathelement path="${annotations-compiler}/dist/lib/javac.jar"/>
