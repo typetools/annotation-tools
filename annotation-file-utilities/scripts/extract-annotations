@@ -1,0 +1,33 @@
+#!/bin/sh
+
+# Extract annotations from a class file and write them to an annotation file.
+# For usage information, run: extract-annotations --help
+# See the Annotation File Utilities documentation for more information.
+
+# If the very first argument is "-d", debug this script (but don't pass the
+# -d to the underlying program; use "-d --debug" for that).
+DEBUG=0
+if [ "$1" = "-d" ]; then
+  DEBUG=1
+  shift 1
+fi
+
+AFU=${AFU:-$(dirname $0)/..}
+ANNOTATION_FILE_UTILS=${AFU}/bin:${AFU}/../scene-lib/bin:${AFU}/../asmx/bin:${AFU}/annotation-file-utilities.jar
+# Contains new version of java.lang.annotation.ElementType.
+LANGTOOLS=${LANGTOOLS:-${AFU}/../../jsr308-langtools}
+JAVAC_JAR=${JAVAC_JAR:-${LANGTOOLS}/dist/lib/javac.jar}
+
+if [ "$DEBUG" = "1" ]; then
+  echo "--- start of extract-annotations debugging output" 
+  echo "AFU=${AFU}"
+  echo "ANNOTATION_FILE_UTILS=${ANNOTATION_FILE_UTILS}"
+  echo "LANGTOOLS=${LANGTOOLS}"
+  echo "JAVAC_JAR=${JAVAC_JAR}"
+  # Keep this in sync with the actual command below.
+  echo java -Xbootclasspath/p:${JAVAC_JAR} -ea -cp ${AFU}/lib/plume.jar:${ANNOTATION_FILE_UTILS}:${CLASSPATH} annotations.io.classfile.ClassFileReader "$@"
+  echo "--- end of extract-annotations debugging output" 
+fi
+
+# Needs CLASSPATH to find user files
+java -Xbootclasspath/p:${JAVAC_JAR} -ea -cp ${AFU}/lib/plume.jar:${ANNOTATION_FILE_UTILS}:${CLASSPATH} annotations.io.classfile.ClassFileReader "$@"

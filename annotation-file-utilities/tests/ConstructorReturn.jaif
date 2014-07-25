@@ -1,0 +1,8 @@
+package java.lang:
+annotation @ReadOnly: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+
+package annotator.tests:
+class ConstructorReturn:
+    method <init>()V:
+return: @ReadOnly
+
