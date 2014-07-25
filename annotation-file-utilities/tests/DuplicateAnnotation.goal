@@ -2,6 +2,7 @@ package annotator.tests;
 
 // This test ensures that no annotation is re-inserted, if it already
 // existed in the original source code.
+@skip-test
 public class DuplicateAnnotation {
 
   @SuppressWarnings("A")
