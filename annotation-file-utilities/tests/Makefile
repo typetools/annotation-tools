@@ -40,7 +40,8 @@ source-extension:
 
 .PHONY: system-test
 system-test:
-	-${MAKE} -C system-test      #The minus(-) indicates that the process should continue if there is a failure
+	echo "system test temporarily disabled"
+#	-${MAKE} -C system-test      #The minus(-) indicates that the process should continue if there is a failure
 
 # Display results of all .diff files.
 .PHONY: results
