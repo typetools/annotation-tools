@@ -37,8 +37,8 @@ annotation-file-utilities/tests/*.output
 
 scene-lib/javadoc
 scene-lib/reports
-scene-lib/src/annotations/tests/example-stdout.jann
-scene-lib/src/annotations/tests/example-output.jann
+scene-lib/test/annotations/tests/executable/example-output.jann
+scene-lib/test/annotations/tests/executable/example-stdout.jann
 
 *.class-via-classfile-scene.txt
 *.class-correct-scene.txt
