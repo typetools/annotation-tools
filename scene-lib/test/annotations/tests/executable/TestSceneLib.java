@@ -1,4 +1,4 @@
-package annotations.tests;
+package annotations.tests.executable;
 
 /*>>>
 import org.checkerframework.checker.nullness.qual.*;
