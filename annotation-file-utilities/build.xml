@@ -100,43 +100,43 @@
   </target>
 
   <target name="javadoc" depends="javadoc-clean, init">
-      <javadoc sourcepathref="javadoc-sourcepath" 
-	      classpathref="libpath"
-	      packagenames="*"
-	      Overview="overview.html"
-	      destdir="javadoc" 
-	      access="public"
-	      />
+      <javadoc sourcepathref="javadoc-sourcepath"
+          classpathref="libpath"
+          packagenames="*"
+          Overview="overview.html"
+          destdir="javadoc" 
+          access="public"
+          />
 <!--
-	      noqualifier="annotations:annotations.el:annotations.field:annotations.io:annotations.io.classfile:annotations.util:annotations.util.coll:java.lang"
+      noqualifier="annotations:annotations.el:annotations.field:annotations.io:annotations.io.classfile:annotations.util:annotations.util.coll:java.lang"
 -->
   </target>
 
   <target name="jarfile.check.uptodate">
       <uptodate property="bin.uptodate" targetfile="annotation-file-utilities.jar">
-	<srcfiles dir="bin" />
+        <srcfiles dir="bin" />
       </uptodate>
       <uptodate property="asmx.bin.uptodate" targetfile="annotation-file-utilities.jar">
-	<srcfiles dir="${asmx}/bin" excludes="tmp/**"/>
+        <srcfiles dir="${asmx}/bin" excludes="tmp/**"/>
       </uptodate>
       <uptodate property="scene-lib.bin.uptodate" targetfile="annotation-file-utilities.jar">
-	<srcfiles dir="${scene-lib}/bin" />
+        <srcfiles dir="${scene-lib}/bin" />
       </uptodate>
       <uptodate property="build.classes.uptodate" targetfile="annotation-file-utilities.jar">
-	<srcfiles dir="${annotations-compiler}/build/classes" />
+        <srcfiles dir="${annotations-compiler}/build/classes" />
       </uptodate>
       <uptodate property="plume.uptodate" targetfile="annotation-file-utilities.jar" srcfile="lib/plume.jar"/>
       <uptodate property="google-collect.uptodate" targetfile="annotation-file-utilities.jar" srcfile="lib/guava-15.0.jar"/>
 
       <condition property="jarfile.uptodate">
-	<and>
-	  <isset property="bin.uptodate"/>
-	  <isset property="asmx.bin.uptodate"/>
-	  <isset property="scene-lib.bin.uptodate"/>
-	  <isset property="build.classes.uptodate"/>
-	  <isset property="plume.uptodate"/>
-	  <isset property="google-collect.uptodate"/>
-	</and>
+        <and>
+          <isset property="bin.uptodate"/>
+          <isset property="asmx.bin.uptodate"/>
+          <isset property="scene-lib.bin.uptodate"/>
+          <isset property="build.classes.uptodate"/>
+          <isset property="plume.uptodate"/>
+          <isset property="google-collect.uptodate"/>
+        </and>
       </condition>
 
       <echo message="bin.uptodate: ${bin.uptodate}"/>
@@ -151,7 +151,7 @@
 
   <target name="jarfile"
           depends="init,build,jarfile.check.uptodate"
-	  unless="jarfile.uptodate"
+          unless="jarfile.uptodate"
           description="create the class library annotation-file-utilities.jar">
 
     <echo message="Using temporary directory: ${temp-jarfile}"/>
@@ -193,7 +193,7 @@
 
   <target name="check-hg-status" depends="init-properties">
     <exec executable="hg"
-	  outputproperty="status.output">
+          outputproperty="status.output">
       <arg value="status" />
     </exec>
 
@@ -447,12 +447,12 @@
     </fileset>
     <pathconvert property="cmdTxts" refid="javacSrc" pathsep=" " />
 
-      <!-- 
+      <!--
         Hack for Mac OS: put jsr308's javac.jar on the bootclasspath so
         that those javac classes are found before the stock javac classes
         (other platforms do not make such bootclasspath inclusions).
         Hack for Windows:  use "java com.sun.tools.javac.Main" rather than
-	"javac".
+        "javac".
       -->
       <java fork="true"
             failonerror="true"
@@ -468,6 +468,11 @@
                Framework, ignore type annotations in comments here.
                Separate targets exist to check the qualifiers. -->
           <arg line="-XDTA:noannotationsincomments"/>
+          <!-- Make sure we only have Java 7 source code and generate Java 7 bytecode. -->
+          <arg value="-source"/>
+          <arg value="7"/>
+          <arg value="-target"/>
+          <arg value="7"/>
       </java>
 
   </target>
