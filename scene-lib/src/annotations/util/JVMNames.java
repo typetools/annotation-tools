@@ -3,7 +3,6 @@ package annotations.util;
 import com.sun.source.tree.MethodTree;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.tree.JCTree.JCMethodDecl;
-
 import plume.UtilMDE;
 
 import javax.lang.model.element.ExecutableElement;
@@ -63,9 +62,7 @@ public class JVMNames {
         if (type.getKind() == TypeKind.ARRAY) {
             return "[" + typeToJvmlString((Type) ((ArrayType) type).getComponentType());
         } else {
-            String typeString = type.tsym.flatName().toString();
-            return "void".equals(typeString) ? "V"  // UtilMDE doesn't handle
-                : UtilMDE.binaryNameToFieldDescriptor(typeString);
+            return UtilMDE.binaryNameToFieldDescriptor(type.tsym.flatName().toString());
         }
     }
 }
