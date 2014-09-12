@@ -1,6 +1,5 @@
 package annotator.find;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import type.ArrayType;
@@ -71,7 +70,7 @@ public abstract class TypedInsertion extends Insertion {
    * @return a copy of the inner types.
    */
   public List<Insertion> getInnerTypeInsertions() {
-      return new ArrayList<Insertion>(innerTypeInsertions);
+      return innerTypeInsertions;
   }
 
   public DeclaredType getBaseType() {
