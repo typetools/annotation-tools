@@ -1,0 +1,31 @@
+package annotations.tests.classfile.foo:
+annotation @A: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+
+annotation @B: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+	String value
+
+// annotation @C: @Retention(value=CLASS) @java.lang.annotation.Target(value={TYPE_USE})
+annotation @C: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+	int fieldA
+	String fieldB
+	
+package annotations.tests.classfile.cases:
+class TestObjectCreation:
+	
+  method test()V : 
+  	new # 1 : @annotations.tests.classfile.foo.B(value="first new")
+  	new # 12 : @annotations.tests.classfile.foo.B(value="a string")
+  	new # 23 : @annotations.tests.classfile.foo.A
+  	  	
+  method test2()V :
+  	new # 7 : @annotations.tests.classfile.foo.A
+  	new # 14 : @annotations.tests.classfile.foo.A
+  	
+  method test3()V :
+  	new # 1 : @annotations.tests.classfile.foo.B(value="new")
+		new # 12 : @annotations.tests.classfile.foo.A
+  	
+  method test4()V :
+  	new # 1 : @annotations.tests.classfile.foo.A
+  	new # 13 : @annotations.tests.classfile.foo.B(value="self test")
+  	  	

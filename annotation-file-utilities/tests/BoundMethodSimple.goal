@@ -1,0 +1,15 @@
+package annotator.tests;
+
+import java.util.List;
+import java.util.Date;
+import java.io.PrintStream;
+
+public class BoundMethodSimple {
+  public <T extends @java.lang.ReadOnly Date> void foo(T t) {
+    System.out.println(t);
+  }
+
+  public <T extends java.lang.@java.lang.ReadOnly Object> void foo2(T t) {
+    System.out.println(t);
+  }
+}
