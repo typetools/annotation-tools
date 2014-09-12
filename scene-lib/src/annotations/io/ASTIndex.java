@@ -125,10 +125,10 @@ implements Map<Tree, ASTIndex.ASTRecord> {
 
     public boolean equals(ASTRecord astRecord) {
       return className.equals(astRecord.className)
-          && methodName == null ? astRecord.methodName == null
-              : methodName.equals(astRecord.methodName)
-          && varName == null ? astRecord.varName == null
-              : varName.equals(astRecord.varName)
+          && (methodName == null ? astRecord.methodName == null
+              : methodName.equals(astRecord.methodName))
+          && (varName == null ? astRecord.varName == null
+              : varName.equals(astRecord.varName))
           && astPath.equals(astRecord.astPath);
     }
 
