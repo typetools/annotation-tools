@@ -3,6 +3,7 @@ package annotations.io;
 import java.io.IOException;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
+import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -67,6 +68,10 @@ import com.sun.tools.javac.code.TypeAnnotationPosition;
  */
 public final class ASTPath
 implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
+  private static final String[] typeSelectors =
+    { "bound", "identifier", "type", "typeAlternative", "typeArgument",
+    "typeParameter", "underlyingType" };
+
     // Constants for the various child selectors.
     public static final String ANNOTATION = "annotation";
     public static final String ARGUMENT = "argument";
@@ -410,17 +415,44 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
 
     @Override
     public boolean equals(Object o) {
-        return o instanceof ASTPath && this.equals((ASTPath) o);
+      return o instanceof ASTPath && equals((ASTPath) o);
     }
 
     public boolean equals(ASTPath astPath) {
-        if (size() != astPath.size()) { return false; }
-        int i = 0;
-        for (ASTEntry entry : path) {
-            if (!entry.equals(astPath.get(i++))) { return false; }
-        }
-        return true;
+      return compareTo(astPath) == 0;
     }
+
+    @Override
+    public int compareTo(ASTPath o) {
+      // hacky fix: remove {Method,Class}.body for comparison 
+      ASTPath p0 = declFree(this);
+      ASTPath p1 = declFree(o);
+      int n = p0.size();
+      int c = p1.size() - n;
+      int i = 0;
+      while (c == 0 && i < n) {
+        c = p0.get(i).compareTo(p1.get(i));
+        ++i;
+      }
+      return Integer.signum(c);
+    }
+
+  private static ASTPath declFree(ASTPath astPath) {
+    if (!astPath.isEmpty()) {
+      ASTEntry entry = astPath.get(0);
+      Tree.Kind kind = entry.getTreeKind();
+      if ((kind == Tree.Kind.METHOD || kind == Tree.Kind.CLASS)
+          && entry.childSelectorIs(ASTPath.BODY)) {
+        ASTPath newPath = new ASTPath();
+        int n = astPath.size();
+        for (int i = 1 ; i < n ; i++) {
+          newPath.add(astPath.get(i));
+        }
+        return newPath;
+      }
+    }
+    return astPath;
+  }
 
     @Override
     public String toString() {
@@ -1288,159 +1320,283 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
         return true;
       }
 
-      /**
-       * Determines if the given kinds match, false otherwise. Two kinds match if
-       * they're exactly the same or if the two kinds are both compound
-       * assignments, unary operators, binary operators or wildcards.
-       * <p>
-       * This is necessary because in the JAIF file these kinds are represented by
-       * their general types (i.e. BinaryOperator, CompoundOperator, etc.) rather
-       * than their kind (i.e. PLUS, MINUS, PLUS_ASSIGNMENT, XOR_ASSIGNMENT,
-       * etc.). Internally, a single kind is used to represent each general type
-       * (i.e. PLUS is used for BinaryOperator, PLUS_ASSIGNMENT is used for
-       * CompoundAssignment, etc.). Yet, the actual source nodes have the correct
-       * kind. So if an AST path entry has a PLUS kind, that really means it could
-       * be any BinaryOperator, resulting in PLUS matching any other
-       * BinaryOperator.
-       *
-       * @param kind1
-       *            The first kind to match.
-       * @param kind2
-       *            The second kind to match.
-       * @return {@code true} if the kinds match as described above, {@code false}
-       *         otherwise.
-       */
-      private static boolean kindsMatch(Tree.Kind kind1, Tree.Kind kind2) {
-        return kind1 == kind2
-            || (isCompoundAssignment(kind1) && isCompoundAssignment(kind2))
-            || (isUnaryOperator(kind1) && isUnaryOperator(kind2))
-            || (isBinaryOperator(kind1) && isBinaryOperator(kind2))
-            || (isWildcard(kind1) && isWildcard(kind2));
-      }
-
-      /**
-       * Determines if the given kind is a compound assignment.
-       *
-       * @param kind
-       *            The kind to test.
-       * @return true if the given kind is a compound assignment.
-       */
-      private static boolean isCompoundAssignment(Tree.Kind kind) {
-        return kind == Tree.Kind.PLUS_ASSIGNMENT
-            || kind == Tree.Kind.MINUS_ASSIGNMENT
-            || kind == Tree.Kind.MULTIPLY_ASSIGNMENT
-            || kind == Tree.Kind.DIVIDE_ASSIGNMENT
-            || kind == Tree.Kind.OR_ASSIGNMENT
-            || kind == Tree.Kind.AND_ASSIGNMENT
-            || kind == Tree.Kind.REMAINDER_ASSIGNMENT
-            || kind == Tree.Kind.LEFT_SHIFT_ASSIGNMENT
-            || kind == Tree.Kind.RIGHT_SHIFT
-            || kind == Tree.Kind.UNSIGNED_RIGHT_SHIFT_ASSIGNMENT
-            || kind == Tree.Kind.XOR_ASSIGNMENT;
-      }
-
-      /**
-       * Determines if the given kind is a unary operator.
-       *
-       * @param kind
-       *            The kind to test.
-       * @return true if the given kind is a unary operator.
-       */
-      private static boolean isUnaryOperator(Tree.Kind kind) {
-        return kind == Tree.Kind.POSTFIX_INCREMENT
-            || kind == Tree.Kind.POSTFIX_DECREMENT
-            || kind == Tree.Kind.PREFIX_INCREMENT
-            || kind == Tree.Kind.PREFIX_DECREMENT
-            || kind == Tree.Kind.UNARY_PLUS
-            || kind == Tree.Kind.UNARY_MINUS
-            || kind == Tree.Kind.BITWISE_COMPLEMENT
-            || kind == Tree.Kind.LOGICAL_COMPLEMENT;
-      }
-
-      /**
-       * Determines if the given kind is a binary operator.
-       *
-       * @param kind
-       *            The kind to test.
-       * @return true if the given kind is a binary operator.
-       */
-      private static boolean isBinaryOperator(Tree.Kind kind) {
-        return kind == Tree.Kind.MULTIPLY
-            || kind == Tree.Kind.DIVIDE
-            || kind == Tree.Kind.REMAINDER
-            || kind == Tree.Kind.PLUS
-            || kind == Tree.Kind.MINUS
-            || kind == Tree.Kind.LEFT_SHIFT
-            || kind == Tree.Kind.RIGHT_SHIFT
-            || kind == Tree.Kind.UNSIGNED_RIGHT_SHIFT
-            || kind == Tree.Kind.LESS_THAN
-            || kind == Tree.Kind.GREATER_THAN
-            || kind == Tree.Kind.LESS_THAN_EQUAL
-            || kind == Tree.Kind.GREATER_THAN_EQUAL
-            || kind == Tree.Kind.EQUAL_TO
-            || kind == Tree.Kind.NOT_EQUAL_TO
-            || kind == Tree.Kind.AND
-            || kind == Tree.Kind.XOR
-            || kind == Tree.Kind.OR
-            || kind == Tree.Kind.CONDITIONAL_AND
-            || kind == Tree.Kind.CONDITIONAL_OR;
-      }
-
-      /**
-       * Determines if the given kind is a wildcard.
-       *
-       * @param kind
-       *            The kind to test.
-       * @return true if the given kind is a wildcard.
-       */
-      private static boolean isWildcard(Tree.Kind kind) {
-        return kind == Tree.Kind.UNBOUNDED_WILDCARD
-            || kind == Tree.Kind.EXTENDS_WILDCARD
-            || kind == Tree.Kind.SUPER_WILDCARD;
-      }
+    /**
+     * Determines if the given kinds match, false otherwise. Two kinds match if
+     * they're exactly the same or if the two kinds are both compound
+     * assignments, unary operators, binary operators or wildcards.
+     * <p>
+     * This is necessary because in the JAIF file these kinds are represented by
+     * their general types (i.e. BinaryOperator, CompoundOperator, etc.) rather
+     * than their kind (i.e. PLUS, MINUS, PLUS_ASSIGNMENT, XOR_ASSIGNMENT,
+     * etc.). Internally, a single kind is used to represent each general type
+     * (i.e. PLUS is used for BinaryOperator, PLUS_ASSIGNMENT is used for
+     * CompoundAssignment, etc.). Yet, the actual source nodes have the correct
+     * kind. So if an AST path entry has a PLUS kind, that really means it could
+     * be any BinaryOperator, resulting in PLUS matching any other
+     * BinaryOperator.
+     *
+     * @param kind1
+     *            The first kind to match.
+     * @param kind2
+     *            The second kind to match.
+     * @return {@code true} if the kinds match as described above, {@code false}
+     *         otherwise.
+     */
+    private static boolean kindsMatch(Tree.Kind kind1, Tree.Kind kind2) {
+      return kind1 == kind2
+          || (isCompoundAssignment(kind1) && isCompoundAssignment(kind2))
+          || (isUnaryOperator(kind1) && isUnaryOperator(kind2))
+          || (isBinaryOperator(kind1) && isBinaryOperator(kind2))
+          || (isWildcard(kind1) && isWildcard(kind2));
     }
 
     /**
-     * Determines if the given kind is a declaration.
+     * Determines if the given kind is a compound assignment.
      *
      * @param kind
      *            The kind to test.
-     * @return true if the given kind is a declaration.
+     * @return true if the given kind is a compound assignment.
      */
-    static boolean isDeclaration(Tree.Kind kind) {
-      return kind == Tree.Kind.ANNOTATION
-          || kind == Tree.Kind.CLASS
-          || kind == Tree.Kind.METHOD
-          || kind == Tree.Kind.VARIABLE;
+    private static boolean isCompoundAssignment(Tree.Kind kind) {
+      return kind == Tree.Kind.PLUS_ASSIGNMENT
+          || kind == Tree.Kind.MINUS_ASSIGNMENT
+          || kind == Tree.Kind.MULTIPLY_ASSIGNMENT
+          || kind == Tree.Kind.DIVIDE_ASSIGNMENT
+          || kind == Tree.Kind.OR_ASSIGNMENT
+          || kind == Tree.Kind.AND_ASSIGNMENT
+          || kind == Tree.Kind.REMAINDER_ASSIGNMENT
+          || kind == Tree.Kind.LEFT_SHIFT_ASSIGNMENT
+          || kind == Tree.Kind.RIGHT_SHIFT
+          || kind == Tree.Kind.UNSIGNED_RIGHT_SHIFT_ASSIGNMENT
+          || kind == Tree.Kind.XOR_ASSIGNMENT;
     }
 
     /**
-     * Determines whether an {@code ASTPath} can identify nodes of the
-     *  given kind.
+     * Determines if the given kind is a unary operator.
      *
      * @param kind
      *            The kind to test.
-     * @return true if the given kind can be identified by an {@code ASTPath}.
+     * @return true if the given kind is a unary operator.
      */
-    static boolean isHandled(Kind kind) {
-        return !(isDeclaration(kind)
-            || kind == Kind.BREAK
-            || kind == Kind.COMPILATION_UNIT
-            || kind == Kind.CONTINUE
-            || kind == Kind.IMPORT
-            || kind == Kind.LAMBDA_EXPRESSION  // TODO
-            || kind == Kind.MODIFIERS);
-    }  // TODO: need "isType"?
-
-    @Override
-    public int compareTo(ASTPath o) {
-      Iterator<ASTEntry> i0 = iterator();
-      Iterator<ASTEntry> i1 = o.iterator();
-      while (i0.hasNext()) {
-        if (!i1.hasNext()) { return -1; }
-        int c = i0.next().compareTo(i1.next());
-        if (c != 0) { return c; }
-      }
-      return i1.hasNext() ? 1 : 0;
+    private static boolean isUnaryOperator(Tree.Kind kind) {
+      return kind == Tree.Kind.POSTFIX_INCREMENT
+          || kind == Tree.Kind.POSTFIX_DECREMENT
+          || kind == Tree.Kind.PREFIX_INCREMENT
+          || kind == Tree.Kind.PREFIX_DECREMENT
+          || kind == Tree.Kind.UNARY_PLUS
+          || kind == Tree.Kind.UNARY_MINUS
+          || kind == Tree.Kind.BITWISE_COMPLEMENT
+          || kind == Tree.Kind.LOGICAL_COMPLEMENT;
     }
+
+    /**
+     * Determines if the given kind is a binary operator.
+     *
+     * @param kind
+     *            The kind to test.
+     * @return true if the given kind is a binary operator.
+     */
+    private static boolean isBinaryOperator(Tree.Kind kind) {
+      return kind == Tree.Kind.MULTIPLY
+          || kind == Tree.Kind.DIVIDE
+          || kind == Tree.Kind.REMAINDER
+          || kind == Tree.Kind.PLUS
+          || kind == Tree.Kind.MINUS
+          || kind == Tree.Kind.LEFT_SHIFT
+          || kind == Tree.Kind.RIGHT_SHIFT
+          || kind == Tree.Kind.UNSIGNED_RIGHT_SHIFT
+          || kind == Tree.Kind.LESS_THAN
+          || kind == Tree.Kind.GREATER_THAN
+          || kind == Tree.Kind.LESS_THAN_EQUAL
+          || kind == Tree.Kind.GREATER_THAN_EQUAL
+          || kind == Tree.Kind.EQUAL_TO
+          || kind == Tree.Kind.NOT_EQUAL_TO
+          || kind == Tree.Kind.AND
+          || kind == Tree.Kind.XOR
+          || kind == Tree.Kind.OR
+          || kind == Tree.Kind.CONDITIONAL_AND
+          || kind == Tree.Kind.CONDITIONAL_OR;
+    }
+
+    /**
+     * Determines if the given kind is a wildcard.
+     *
+     * @param kind
+     *            The kind to test.
+     * @return true if the given kind is a wildcard.
+     */
+    private static boolean isWildcard(Tree.Kind kind) {
+      return kind == Tree.Kind.UNBOUNDED_WILDCARD
+          || kind == Tree.Kind.EXTENDS_WILDCARD
+          || kind == Tree.Kind.SUPER_WILDCARD;
+    }
+  }
+
+  public static boolean isTypeSelector(String selector) {
+    return Arrays.<String>binarySearch(typeSelectors,
+        selector, Collator.getInstance()) >= 0;
+  }
+
+  public static boolean isClassEquiv(Tree.Kind kind) {
+    switch (kind) {
+      case CLASS:
+      case INTERFACE:
+      case ENUM:
+      case ANNOTATION_TYPE:
+        return true;
+      default:
+        return false;
+    }
+  }
+
+  /**
+   * Determines if the given kind is a compound assignment.
+   *
+   * @param kind
+   *            The kind to test.
+   * @return true if the given kind is a compound assignment.
+   */
+  public static boolean isCompoundAssignment(Tree.Kind kind) {
+    return kind == Tree.Kind.PLUS_ASSIGNMENT
+        || kind == Tree.Kind.MINUS_ASSIGNMENT
+        || kind == Tree.Kind.MULTIPLY_ASSIGNMENT
+        || kind == Tree.Kind.DIVIDE_ASSIGNMENT
+        || kind == Tree.Kind.OR_ASSIGNMENT
+        || kind == Tree.Kind.AND_ASSIGNMENT
+        || kind == Tree.Kind.REMAINDER_ASSIGNMENT
+        || kind == Tree.Kind.LEFT_SHIFT_ASSIGNMENT
+        || kind == Tree.Kind.RIGHT_SHIFT_ASSIGNMENT
+        || kind == Tree.Kind.UNSIGNED_RIGHT_SHIFT_ASSIGNMENT
+        || kind == Tree.Kind.XOR_ASSIGNMENT;
+  }
+
+  /**
+   * Determines if the given kind is a unary operator.
+   *
+   * @param kind
+   *            The kind to test.
+   * @return true if the given kind is a unary operator.
+   */
+  public static boolean isUnaryOperator(Tree.Kind kind) {
+    return kind == Tree.Kind.POSTFIX_INCREMENT
+        || kind == Tree.Kind.POSTFIX_DECREMENT
+        || kind == Tree.Kind.PREFIX_INCREMENT
+        || kind == Tree.Kind.PREFIX_DECREMENT
+        || kind == Tree.Kind.UNARY_PLUS
+        || kind == Tree.Kind.UNARY_MINUS
+        || kind == Tree.Kind.BITWISE_COMPLEMENT
+        || kind == Tree.Kind.LOGICAL_COMPLEMENT;
+  }
+
+  /**
+   * Determines if the given kind is a binary operator.
+   *
+   * @param kind
+   *            The kind to test.
+   * @return true if the given kind is a binary operator.
+   */
+  public static boolean isBinaryOperator(Tree.Kind kind) {
+    return kind == Tree.Kind.MULTIPLY || kind == Tree.Kind.DIVIDE
+        || kind == Tree.Kind.REMAINDER || kind == Tree.Kind.PLUS
+        || kind == Tree.Kind.MINUS || kind == Tree.Kind.LEFT_SHIFT
+        || kind == Tree.Kind.RIGHT_SHIFT
+        || kind == Tree.Kind.UNSIGNED_RIGHT_SHIFT
+        || kind == Tree.Kind.LESS_THAN
+        || kind == Tree.Kind.GREATER_THAN
+        || kind == Tree.Kind.LESS_THAN_EQUAL
+        || kind == Tree.Kind.GREATER_THAN_EQUAL
+        || kind == Tree.Kind.EQUAL_TO || kind == Tree.Kind.NOT_EQUAL_TO
+        || kind == Tree.Kind.AND || kind == Tree.Kind.XOR
+        || kind == Tree.Kind.OR || kind == Tree.Kind.CONDITIONAL_AND
+        || kind == Tree.Kind.CONDITIONAL_OR;
+  }
+
+  public static boolean isLiteral(Tree.Kind kind) {
+    switch (kind) {
+    case INT_LITERAL:
+    case LONG_LITERAL:
+    case FLOAT_LITERAL:
+    case DOUBLE_LITERAL:
+    case BOOLEAN_LITERAL:
+    case CHAR_LITERAL:
+    case STRING_LITERAL:
+    case NULL_LITERAL:
+      return true;
+    default:
+      return false;
+    }
+  }
+
+  public static boolean isExpression(Tree.Kind kind) {
+    switch (kind) {
+    case ARRAY_ACCESS:
+    case ASSIGNMENT:
+    case CONDITIONAL_EXPRESSION:
+    case EXPRESSION_STATEMENT:
+    case MEMBER_SELECT:
+    case MEMBER_REFERENCE:
+    case IDENTIFIER:
+    case INSTANCE_OF:
+    case METHOD_INVOCATION:
+    case NEW_ARRAY:
+    case NEW_CLASS:
+    case LAMBDA_EXPRESSION:
+    case PARENTHESIZED:
+    case TYPE_CAST:
+      return true;
+    default:
+      return isUnaryOperator(kind) || isBinaryOperator(kind)
+          || isCompoundAssignment(kind) || isLiteral(kind);
+    }
+  }
+
+  /**
+   * Determines if the given kind is a wildcard.
+   *
+   * @param kind
+   *            The kind to test.
+   * @return true if the given kind is a wildcard.
+   */
+  public static boolean isWildcard(Tree.Kind kind) {
+    return kind == Tree.Kind.UNBOUNDED_WILDCARD
+        || kind == Tree.Kind.EXTENDS_WILDCARD
+        || kind == Tree.Kind.SUPER_WILDCARD;
+  }
+
+  /**
+   * Determines if the given kind is a declaration.
+   *
+   * @param kind
+   *            The kind to test.
+   * @return true if the given kind is a declaration.
+   */
+  public static boolean isDeclaration(Tree.Kind kind) {
+    return kind == Tree.Kind.ANNOTATION
+        || kind == Tree.Kind.CLASS
+        || kind == Tree.Kind.ENUM
+        || kind == Tree.Kind.INTERFACE
+        || kind == Tree.Kind.METHOD
+        || kind == Tree.Kind.VARIABLE;
+  }
+
+  /**
+   * Determines whether an {@code ASTPath} can identify nodes of the
+   *  given kind.
+   *
+   * @param kind
+   *            The kind to test.
+   * @return true if the given kind can be identified by an {@code ASTPath}.
+   */
+  public static boolean isHandled(Tree.Kind kind) {
+    switch (kind) {
+    case BREAK:
+    case COMPILATION_UNIT:
+    case CONTINUE:
+    case IMPORT:
+    case MODIFIERS:
+      return false;
+    default:
+      return !isDeclaration(kind);
+    }
+  }  // TODO: need "isType"?
 }
