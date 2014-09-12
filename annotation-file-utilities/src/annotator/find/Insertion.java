@@ -1,9 +1,13 @@
 package annotator.find;
 
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import annotations.io.ASTPath;
+
+import com.sun.source.tree.Tree;
 import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
 
 import plume.Pair;
@@ -361,7 +365,12 @@ public abstract class Insertion {
      *          non-empty list.
      * @param outerType The type to add the insertions to.
      */
-    public static void decorateType(List<Insertion> innerTypeInsertions, Type outerType) {
+    public static void decorateType(List<Insertion> innerTypeInsertions, final Type outerType) {
+        decorateType(innerTypeInsertions, outerType, null);
+    }
+
+    public static void decorateType(List<Insertion> innerTypeInsertions,
+            final Type outerType, ASTPath outerPath) {
         for (Insertion innerInsertion : innerTypeInsertions) {
             // Set each annotation as inserted (even if it doesn't actually get
             // inserted because of an error) to "disable" the insertion in the global
@@ -374,7 +383,14 @@ public abstract class Insertion {
                             + innerInsertion.getKind() + "'.");
                 }
                 GenericArrayLocationCriterion c = innerInsertion.getCriteria().getGenericArrayLocation();
+                String annos =
+                    ((AnnotationInsertion) innerInsertion).getAnnotation();
                 if (c == null) {
+                    ASTPath astPath = innerInsertion.getCriteria().getASTPath();
+                    if (outerPath != null && astPath != null) {
+                        decorateType(astPath, annos, outerType, outerPath);
+                        continue;
+                    }
                     throw new RuntimeException("Missing type path.");
                 }
 
@@ -420,8 +436,9 @@ public abstract class Insertion {
                     case TYPE_ARGUMENT:
                         if (type.getKind() == Type.Kind.DECLARED) {
                             DeclaredType declaredType = (DeclaredType) type;
-                            if (0 <= tpe.arg && tpe.arg < declaredType.getTypeParameters().size()) {
-                                type = ((DeclaredType) type).getTypeParameter(tpe.arg);
+                            if (0 <= tpe.arg && tpe.arg <
+                                    declaredType.getTypeParameters().size()) {
+                                type = declaredType.getTypeParameter(tpe.arg);
                             } else {
                                 throw new RuntimeException("Incorrect type argument index: " + tpe.arg);
                             }
@@ -437,10 +454,80 @@ public abstract class Insertion {
                     // Annotations aren't allowed directly on the BoundedType, see BoundedType
                     type = ((BoundedType) type).getType();
                 }
-                type.addAnnotation(((AnnotationInsertion) innerInsertion).getAnnotation());
+                type.addAnnotation(annos);
             } catch (Throwable e) {
                 TreeFinder.reportInsertionError(innerInsertion, e);
             }
         }
+    }
+
+    private static void decorateType(ASTPath astPath,
+            String annos, Type type, ASTPath outerPath) {
+        //type.addAnnotation(annos);  // TODO
+        Iterator<ASTPath.ASTEntry> ii = astPath.iterator();
+        Iterator<ASTPath.ASTEntry> oi = outerPath.iterator();
+
+        while (oi.hasNext()) {
+            if (!ii.hasNext() || !oi.next().equals(ii.next())) {
+                throw new RuntimeException("Incorrect AST path.");
+            }
+        }
+
+        while (ii.hasNext()) {
+            ASTPath.ASTEntry entry = ii.next();
+            Tree.Kind kind = entry.getTreeKind();
+            switch (kind) {
+            case ARRAY_TYPE:
+                if (type.getKind() == Type.Kind.ARRAY) {
+                    type = ((ArrayType) type).getComponentType();
+                } else {
+                    throw new RuntimeException("Incorrect type path.");
+                }
+                break;
+            case MEMBER_SELECT:
+                if (type.getKind() == Type.Kind.DECLARED) {
+                    DeclaredType declaredType = (DeclaredType) type;
+                    if (declaredType.getInnerType() == null) {
+                        throw new RuntimeException("Incorrect type path: "
+                            + "expected inner type but none exists.");
+                    }
+                    type = declaredType.getInnerType();
+                } else {
+                    throw new RuntimeException("Incorrect type path.");
+                }
+                break;
+            case PARAMETERIZED_TYPE:
+                if (type.getKind() == Type.Kind.DECLARED) {
+                    int arg = entry.getArgument();
+                    DeclaredType declaredType = (DeclaredType) type;
+                    if (0 <= arg && arg < declaredType.getTypeParameters().size()) {
+                        type = declaredType.getTypeParameter(arg);
+                    } else {
+                        throw new RuntimeException("Incorrect type argument index: " + arg);
+                    }
+                } else {
+                    throw new RuntimeException("Incorrect type path.");
+                }
+            case UNBOUNDED_WILDCARD:
+                if (type.getKind() == Type.Kind.BOUNDED) {
+                    BoundedType boundedType = (BoundedType) type;
+                    if (boundedType.getBound() == null) {
+                        throw new RuntimeException("Incorrect type path: "
+                            + "expected type bound but none exists.");
+                    }
+                    type = boundedType.getBound();
+                } else {
+                    throw new RuntimeException("Incorrect type path.");
+                }
+                break;
+            default:
+                throw new RuntimeException("Illegal TreeKind: " + kind);
+            }
+        }
+        if (type.getKind() == Type.Kind.BOUNDED) {
+            // Annotations aren't allowed directly on the BoundedType, see BoundedType
+            type = ((BoundedType) type).getType();
+        }
+        type.addAnnotation(annos);
     }
 }
