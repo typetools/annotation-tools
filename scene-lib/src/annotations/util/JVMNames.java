@@ -2,7 +2,11 @@ package annotations.util;
 
 import com.sun.source.tree.MethodTree;
 import com.sun.tools.javac.code.Type;
+import com.sun.tools.javac.code.TypeTag;
 import com.sun.tools.javac.tree.JCTree.JCMethodDecl;
+import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
+import com.sun.tools.javac.util.List;
+
 import plume.UtilMDE;
 
 import javax.lang.model.element.ExecutableElement;
@@ -32,7 +36,11 @@ public class JVMNames {
         builder.append("(");
 
         for (VariableElement ve : methodElement.getParameters()) {
-            builder.append(typeToJvmlString((Type) ve.asType()));
+            Type vt = (Type) ve.asType();
+            if (vt.getTag() == TypeTag.TYPEVAR) {
+                vt = vt.getUpperBound();
+            }
+            builder.append(typeToJvmlString(vt));
         }
 
         builder.append(")");
@@ -40,12 +48,7 @@ public class JVMNames {
         TypeMirror returnType = methodElement.getReturnType();
         String returnTypeStr = typeToJvmlString((Type)returnType);
 
-        // Special case void since UtilMDE doesn't handle it.
-        if ("void".equals(returnTypeStr)) {
-            builder.append("V");
-        } else {
-            builder.append(returnTypeStr);
-        }
+        builder.append(returnTypeStr);
         return builder.toString();
     }
 
@@ -61,9 +64,13 @@ public class JVMNames {
     private static String typeToJvmlString(Type type) {
         if (type.getKind() == TypeKind.ARRAY) {
             return "[" + typeToJvmlString((Type) ((ArrayType) type).getComponentType());
+        } else if (type.getKind() == TypeKind.INTERSECTION) {
+            // replace w/erasure (== erasure of 1st conjunct)
+            return typeToJvmlString(type.tsym.erasure_field);
+        } else if (type.getKind() == TypeKind.VOID) {
+            return "V";  // special case since UtilMDE doesn't handle void
         } else {
             return UtilMDE.binaryNameToFieldDescriptor(type.tsym.flatName().toString());
         }
     }
 }
-
