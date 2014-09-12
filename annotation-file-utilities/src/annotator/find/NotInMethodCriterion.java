@@ -1,5 +1,7 @@
 package annotator.find;
 
+import annotations.io.ASTPath;
+
 import com.sun.source.tree.*;
 import com.sun.source.util.TreePath;
 
@@ -28,10 +30,10 @@ final class NotInMethodCriterion implements Criterion {
   @Override
   public boolean isSatisfiedBy(TreePath path) {
     do {
-      Tree tree = path.getLeaf();
-      if (tree.getKind() == Tree.Kind.METHOD)
+      Tree.Kind kind = path.getLeaf().getKind();
+      if (kind == Tree.Kind.METHOD)
         return false;
-      if (Criteria.isClassEquiv(tree)) {
+      if (ASTPath.isClassEquiv(kind)) {
         return true;
       }
       path = path.getParentPath();
