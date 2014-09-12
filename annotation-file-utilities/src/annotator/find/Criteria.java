@@ -256,13 +256,25 @@ public final class Criteria {
   // bound (the "extends Object" that is customarily omitted).
   public boolean onBoundZero() {
     for (Criterion c : criteria) {
-      if ((c.getKind() == Criterion.Kind.CLASS_BOUND)
-          && ((ClassBoundCriterion) c).boundLoc.boundIndex == 0) {
+      switch (c.getKind()) {
+      case CLASS_BOUND:
+        if (((ClassBoundCriterion) c).boundLoc.boundIndex != 0) { break; }
         return true;
-      }
-      if ((c.getKind() == Criterion.Kind.METHOD_BOUND)
-          && ((MethodBoundCriterion) c).boundLoc.boundIndex == 0) {
+      case METHOD_BOUND:
+        if (((MethodBoundCriterion) c).boundLoc.boundIndex != 0) { break; }
         return true;
+      case AST_PATH:
+        ASTPath astPath = ((ASTPathCriterion) c).astPath;
+        if (!astPath.isEmpty()) {
+          ASTPath.ASTEntry entry = astPath.get(-1);
+          if (entry.childSelectorIs(ASTPath.BOUND)
+              && entry.getArgument() == 0) {
+            return true;
+          }
+        }
+        // fall through
+      default:
+        break;
       }
     }
     return false;
@@ -325,19 +337,6 @@ public final class Criteria {
    */
   public final static Criterion inClass(String name, boolean exact) {
     return new InClassCriterion(name, /*exactmatch=*/ true);
-  }
-
-  public final static boolean isClassEquiv(Tree tree) {
-    switch (tree.getKind()) {
-      case CLASS:
-      case NEW_CLASS:
-      case INTERFACE:
-      case ENUM:
-      case ANNOTATION_TYPE:
-        return true;
-      default:
-        return false;
-    }
   }
 
   /**
