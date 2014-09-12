@@ -168,19 +168,35 @@ public final class IndexFileWriter {
           InnerTypeLocation loc = ite.getKey();
           /*@ReadOnly*/ AElement it = ite.getValue();
           pw.print(indentation + "inner-type");
-          boolean first = true;
+          char sep = ' ';
           for (TypePathEntry l : loc.location) {
-              if (first)
-                  pw.print(' ');
-              else
-                  pw.print(',');
+              pw.print(sep);
               pw.print(typePathEntryToString(l));
-              first = false;
+              sep = ',';
           }
           pw.print(':');
           printAnnotations(it);
           pw.println();
       }
+    }
+
+    private void printInnerTypes(String indentation, ATypeElement e,
+            ASTPath path) {
+        for (Map. /*@ReadOnly*/ Entry<InnerTypeLocation,
+                /*@ReadOnly*/ ATypeElement> ite : e.innerTypes.entrySet()) {
+            InnerTypeLocation loc = ite.getKey();
+            /*@ReadOnly*/ AElement it = ite.getValue();
+            pw.print(indentation + "inner-type");
+            char sep = ' ';
+            for (TypePathEntry l : loc.location) {
+                pw.print(sep);
+                pw.print(typePathEntryToString(l));
+                sep = ',';
+            }
+            pw.print(':');
+            printAnnotations(it);
+            pw.println();
+        }
     }
 
     /**
@@ -274,23 +290,72 @@ public final class IndexFileWriter {
     }
 
     private void printASTInsertions(String indentation,
-            /*@ReadOnly*/
-            Map<ASTPath, ? extends /*@ReadOnly*/ AElement> insertAnnotations,
-            /*@ReadOnly*/
-            Map<ASTPath, /*@ReadOnly*/ ATypeElementWithType> insertTypecasts) {
-        for (Map. /*@ReadOnly*/ Entry<ASTPath,
-                    ? extends /*@ReadOnly*/ AElement> e :
+            /*@ReadOnly*/ Map<ASTPath, /*@ReadOnly*/ ATypeElement>
+            insertAnnotations,
+            /*@ReadOnly*/ Map<ASTPath, /*@ReadOnly*/ ATypeElementWithType>
+            insertTypecasts) {
+        for (Map. /*@ReadOnly*/ Entry<ASTPath, /*@ReadOnly*/ ATypeElement> e :
                 insertAnnotations.entrySet()) {
-            pw.print(indentation + "insert-annotation " + e.getKey() + ":");
-            printAnnotations(e.getValue());
+            ASTPath path = e.getKey();
+            ATypeElement el = e.getValue();
+            pw.print(indentation + "insert-annotation " + path + ":");
+            printAnnotations(el);
             pw.println();
+            printInnerTypes(INDENT, el, path);
         }
         for (Map. /*@ReadOnly*/ Entry<ASTPath,
                     /*@ReadOnly*/ ATypeElementWithType> e :
                 insertTypecasts.entrySet()) {
-            pw.print(indentation + "insert-typecast " + e.getKey() + ":");
-            printAnnotations(e.getValue());
+            ASTPath path = e.getKey();
+            ATypeElementWithType el = e.getValue();
+            pw.print(indentation + "insert-typecast " + path + ":");
+            printAnnotations(el);
+            pw.print(" ");
+            printType(el.getType());
             pw.println();
+            printInnerTypes(INDENT, el, path);
+        }
+    }
+
+    private void printType(type.Type type) {
+        switch (type.getKind()) {
+        case ARRAY:
+            type.ArrayType a = (type.ArrayType) type;
+            printType(a.getComponentType());
+            pw.print("[]");
+            break;
+        case BOUNDED:
+            type.BoundedType b = (type.BoundedType) type;
+            printType(b.getType());
+            pw.print(" ");
+            pw.print(b.getBoundKind());
+            pw.print(" ");
+            printType(b.getBound());
+            break;
+        case DECLARED:
+            type.DeclaredType d = (type.DeclaredType) type;
+            pw.print(d.getName());
+            if (!d.isWildcard()) {
+                type.DeclaredType inner = d.getInnerType();
+                Iterator<type.Type> iter = d.getTypeParameters().iterator();
+                //for (String s : d.getAnnotations()) {
+                //    pw.print(s + " ");
+                //}
+                if (iter.hasNext()) {
+                    pw.print("<");
+                    printType(iter.next());
+                    while (iter.hasNext()) {
+                        pw.print(", ");
+                        printType(iter.next());
+                    }
+                    pw.print(">");
+                }
+                if (inner != null) {
+                    pw.print(".");
+                    printType(inner);
+                }
+            }
+            break;
         }
     }
 
@@ -354,9 +419,12 @@ public final class IndexFileWriter {
                         : m.body.locals.entrySet()) {
                     LocalLocation loc = le.getKey();
                     /*@ReadOnly*/ AElement l = le.getValue();
-                    printElement(INDENT + INDENT,
-                            "local " + loc.index + " #"
-                            + loc.scopeStart + "+" + loc.scopeLength, l);
+                    StringBuilder sb = new StringBuilder("local ");
+                    sb.append(loc.varName == null
+                        ? loc.index
+                            + " #" + loc.scopeStart + "+" + loc.scopeLength
+                        : loc.varName);
+                    printElement(INDENT + INDENT, sb.toString(), l);
                     printTypeElementAndInnerTypes(INDENT + INDENT + INDENT,
                             "type", l.type);
                 }

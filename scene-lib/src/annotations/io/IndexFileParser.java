@@ -672,10 +672,15 @@ public final class IndexFileParser {
 
     private void parseInnerTypes(ATypeElement e)
             throws IOException, ParseException {
+        parseInnerTypes(e, 0);
+    }
+
+    private void parseInnerTypes(ATypeElement e, int offset)
+            throws IOException, ParseException {
         while (matchKeyword("inner-type")) {
             ArrayList<Integer> locNumbers =
                     new ArrayList<Integer>();
-            locNumbers.add(expectNonNegative(matchNNInteger()));
+            locNumbers.add(offset + expectNonNegative(matchNNInteger()));
             // TODO: currently, we simply read the binary representation.
             // Should we read a higher-level format?
             while (matchChar(','))
@@ -801,7 +806,7 @@ public final class IndexFileParser {
         key += '(';
         while (!matchChar(':')) {
             if (st.ttype >= 0)
-                key += (char) st.ttype;
+                key += st.ttype == 46 ? '/' :(char) st.ttype;
             else if (st.ttype == TT_WORD)
                 key += st.sval;
             else
@@ -978,9 +983,13 @@ public final class IndexFileParser {
 
     private static boolean selectsExpression(ASTPath astPath) {
         int n = astPath.size();
-        if (n > 0) {
-            String selector = astPath.get(n-1).getChildSelector();
-            if (!isTypeSelector(selector)) { return true; }
+        if (--n >= 0) {
+            ASTPath.ASTEntry entry = astPath.get(n);
+            while (--n >= 0 && entry.getTreeKind() == Kind.MEMBER_SELECT
+                    && entry.childSelectorIs(ASTPath.EXPRESSION)) {
+              entry = astPath.get(n);
+            }
+            return !isTypeSelector(entry.getChildSelector());
         }
         return false;
     }
@@ -991,14 +1000,7 @@ public final class IndexFileParser {
         while (checkKeyword("insert-annotation")) {
             matched = true;
             matchKeyword("insert-annotation");
-            InnerTypeLocation loc = null;
             ASTPath astPath = parseASTPath();
-            Pair<ASTPath, InnerTypeLocation> pair =
-                splitNewArrayType(astPath);  // handle special case
-            if (pair != null) {
-              loc = pair.b;
-              astPath = pair.a;
-            }
             expectChar(':');
             // if path doesn't indicate a type, a cast must be generated
             if (selectsExpression(astPath)) {
@@ -1007,10 +1009,29 @@ public final class IndexFileParser {
                 i.setType(new DeclaredType());
                 parseInnerTypes(i);
             } else {
-                ATypeElement i = decl.insertAnnotations.vivify(astPath);
-                if (loc != null) { i = i.innerTypes.vivify(loc); }
-                parseAnnotations(i);
-                parseInnerTypes(i);
+//              Pair<ASTPath, InnerTypeLocation> pair =
+//                      splitNewArrayType(astPath);  // handle special case
+//              ATypeElement i = decl.insertAnnotations.vivify(astPath);
+//              parseAnnotations(i);
+//              parseInnerTypes(i);
+//              if (pair != null) {
+//                i = decl.insertAnnotations.vivify(pair.a);
+//              }
+              int offset = 0;
+              Pair<ASTPath, InnerTypeLocation> pair =
+                  splitNewArrayType(astPath);  // handle special case
+              ATypeElement i;
+              if (pair == null) {
+                i = decl.insertAnnotations.vivify(astPath);
+              } else {
+                i = decl.insertAnnotations.vivify(pair.a);
+                if (pair.b != null) {
+                  i = i.innerTypes.vivify(pair.b);
+                  offset = pair.b.location.size();
+                }
+              }
+              parseAnnotations(i);
+              parseInnerTypes(i, offset);
             }
         }
         while (checkKeyword("insert-typecast")) {
@@ -1096,8 +1117,9 @@ public final class IndexFileParser {
         } else if (matchKeyword("Catch")) {
             entry = newASTEntry(Kind.CATCH, new String[] {ASTPath.PARAMETER, ASTPath.BLOCK});
         } else if (matchKeyword("Class")) {
-            entry = newASTEntry(Kind.CLASS, new String[] {ASTPath.BOUND, ASTPath.TYPE_PARAMETER},
-                    new String[] {ASTPath.BOUND, ASTPath.TYPE_PARAMETER});
+            entry = newASTEntry(Kind.CLASS,
+                    new String[] {ASTPath.BOUND, ASTPath.INITIALIZER, ASTPath.TYPE_PARAMETER},
+                    new String[] {ASTPath.BOUND, ASTPath.INITIALIZER, ASTPath.TYPE_PARAMETER});
         } else if (matchKeyword("CompoundAssignment")) {
             // Always use Kind.PLUS_ASSIGNMENT for CompoundAssignment
             entry = newASTEntry(Kind.PLUS_ASSIGNMENT, new String[] {ASTPath.VARIABLE, ASTPath.EXPRESSION});
