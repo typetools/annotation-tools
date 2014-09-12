@@ -2,7 +2,6 @@ package annotator.specification;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -46,11 +45,13 @@ import annotator.find.NewInsertion;
 import annotator.find.ReceiverInsertion;
 import annotator.scanner.MethodOffsetClassVisitor;
 
+import com.google.common.collect.LinkedHashMultimap;
+import com.google.common.collect.Multimap;
 import com.sun.source.tree.Tree;
 
 public class IndexFileSpecification implements Specification {
-  private final Map<Insertion, Annotation> insertionSources =
-      new LinkedHashMap<Insertion, Annotation>();
+  private final Multimap<Insertion, Annotation> insertionSources =
+      LinkedHashMultimap.<Insertion, Annotation>create();
   private final List<Insertion> insertions = new ArrayList<Insertion>();
   private final AScene scene;
   private final String indexFileName;
@@ -92,7 +93,7 @@ public class IndexFileSpecification implements Specification {
     return scene.imports;
   }
 
-  public Map<Insertion, Annotation> insertionSources() {
+  public Multimap<Insertion, Annotation> insertionSources() {
     return insertionSources;
   }
 
@@ -428,22 +429,22 @@ public class IndexFileSpecification implements Specification {
     return annotationInsertions;
   }
 
-  private boolean isOnReceiver(Criteria criteria) {
+  public static boolean isOnReceiver(Criteria criteria) {
       GenericArrayLocationCriterion galc = criteria.getGenericArrayLocation();
       if (galc == null || galc.getLocation().isEmpty()) {
           ASTPath astPath = criteria.getASTPath();
           if (astPath == null) {
               return criteria.isOnReceiver();
-          } else {
-              ASTPath.ASTEntry entry = astPath.get(-1);
-              return entry.childSelectorIs(ASTPath.ARGUMENT)
+          } else if (!astPath.isEmpty()) {
+              ASTPath.ASTEntry entry = astPath.get(-1);  // 0?
+              return entry.childSelectorIs(ASTPath.PARAMETER)
                   && entry.getArgument() < 0;
           }
       }
       return false;
   }
 
-  private boolean isOnNew(Criteria criteria) {
+  public static boolean isOnNew(Criteria criteria) {
       GenericArrayLocationCriterion galc =
           criteria.getGenericArrayLocation();
       if (galc == null || galc.getLocation().isEmpty()) {
@@ -499,7 +500,7 @@ public class IndexFileSpecification implements Specification {
     if (annotationString != null) {
       type.addAnnotation(annotationString);
     }
-    Insertion.decorateType(innerTypeInsertions, type);
+    Insertion.decorateType(innerTypeInsertions, type, criteria.getASTPath());
     CastInsertion cast = new CastInsertion(criteria, type);
     CloseParenthesisInsertion closeParen = new CloseParenthesisInsertion(
         criteria, cast.getSeparateLine());
