@@ -487,7 +487,7 @@ public class Main {
         try {
           List<Insertion> parsedSpec = spec.parse();
           AScene scene = spec.getScene();
-          parsedSpec.sort(new Comparator<Insertion>() {
+          Collections.sort(parsedSpec, new Comparator<Insertion>() {
             @Override
             public int compare(Insertion i1, Insertion i2) {
               ASTPath p1 = i1.getCriteria().getASTPath();
