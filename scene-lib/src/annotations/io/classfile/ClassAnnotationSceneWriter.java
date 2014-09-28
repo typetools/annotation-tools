@@ -147,7 +147,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @see org.objectweb.asm.ClassAdapter#visit(int, int, java.lang.String, java.lang.String, java.lang.String, java.lang.String[])
    */
   @Override
@@ -160,7 +160,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @see org.objectweb.asm.ClassAdapter#visitInnerClass(java.lang.String, java.lang.String, java.lang.String, int)
    */
   @Override
@@ -170,7 +170,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @see org.objectweb.asm.ClassAdapter#visitField(int, java.lang.String, java.lang.String, java.lang.String, java.lang.Object)
    */
   @Override
@@ -184,7 +184,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @see org.objectweb.asm.ClassAdapter#visitMethod(int, java.lang.String, java.lang.String, java.lang.String, java.lang.String[])
    */
   @Override
@@ -198,7 +198,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @see org.objectweb.asm.ClassAdapter#visitEnd()
    */
   @Override
@@ -208,7 +208,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @see org.objectweb.asm.ClassAdapter#visitAnnotation(java.lang.String, boolean)
    */
   @Override
@@ -224,7 +224,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @see org.objectweb.asm.ClassAdapter#visitTypeAnnotation(java.lang.String, boolean, boolean)
    */
   @Override
@@ -494,7 +494,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      * @see org.objectweb.asm.FieldVisitor#visitAnnotation(java.lang.String, boolean)
      */
     @Override
@@ -511,7 +511,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      * @see org.objectweb.asm.FieldVisitor#visitTypeAnnotation(java.lang.String, boolean)
      */
     @Override
@@ -528,7 +528,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
           fv.visitTypeAnnotation(desc, visible, inCode));
     }
 
-    /** @inheritDoc
+    /** {@inheritDoc}
      * @see org.objectweb.asm.FieldVisitor#visitAttribute(org.objectweb.asm.Attribute)
      */
     @Override
@@ -637,7 +637,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      * @see org.objectweb.asm.MethodAdapter#visitCode()
      */
     @Override
@@ -647,7 +647,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      * @see org.objectweb.asm.MethodAdapter#visitEnd()
      */
     @Override
@@ -657,7 +657,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      * @see org.objectweb.asm.MethodAdapter#visitAnnotation(java.lang.String, boolean)
      */
     @Override
@@ -673,7 +673,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      * @see org.objectweb.asm.MethodAdapter#visitTypeAnnotation(java.lang.String, boolean)
      */
     @Override
