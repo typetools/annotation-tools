@@ -70,7 +70,7 @@ implements ExtendedAnnotationVisitor {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @see org.objectweb.asm.AnnotationVisitor#visit(java.lang.String, java.lang.Object)
    */
   public void visit(String name, Object value) {
@@ -78,7 +78,7 @@ implements ExtendedAnnotationVisitor {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @see org.objectweb.asm.AnnotationVisitor#visitAnnotation(java.lang.String, java.lang.String)
    */
   public AnnotationVisitor visitAnnotation(String name, String desc) {
@@ -86,7 +86,7 @@ implements ExtendedAnnotationVisitor {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @see org.objectweb.asm.AnnotationVisitor#visitArray(java.lang.String)
    */
   public AnnotationVisitor visitArray(String name) {
@@ -94,7 +94,7 @@ implements ExtendedAnnotationVisitor {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @see org.objectweb.asm.AnnotationVisitor#visitEnum(java.lang.String, java.lang.String, java.lang.String)
    */
   public void visitEnum(String name, String desc, String value) {
@@ -102,7 +102,7 @@ implements ExtendedAnnotationVisitor {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @see org.objectweb.asm.ExtendedAnnotationVisitor#visitXIndex(int)
    */
   public void visitXIndex(int index) {
@@ -111,7 +111,7 @@ implements ExtendedAnnotationVisitor {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @see org.objectweb.asm.ExtendedAnnotationVisitor#visitXLength(int)
    */
   public void visitXLength(int length) {
@@ -120,7 +120,7 @@ implements ExtendedAnnotationVisitor {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @see org.objectweb.asm.ExtendedAnnotationVisitor#visitXLocation(int)
    */
   public void visitXLocation(int location) {
@@ -129,7 +129,7 @@ implements ExtendedAnnotationVisitor {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @see org.objectweb.asm.ExtendedAnnotationVisitor#visitXLocationLength(int)
    */
   public void visitXLocationLength(int location_length) {
@@ -138,7 +138,7 @@ implements ExtendedAnnotationVisitor {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @see org.objectweb.asm.ExtendedAnnotationVisitor#visitXOffset(int)
    */
   public void visitXOffset(int offset) {
@@ -147,7 +147,7 @@ implements ExtendedAnnotationVisitor {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @see org.objectweb.asm.ExtendedAnnotationVisitor#visitXStartPc(int)
    */
   public void visitXStartPc(int start_pc) {
@@ -156,7 +156,7 @@ implements ExtendedAnnotationVisitor {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @see org.objectweb.asm.ExtendedAnnotationVisitor#visitXTargetType(int)
    */
   public void visitXTargetType(int target_type) {
@@ -165,7 +165,7 @@ implements ExtendedAnnotationVisitor {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @see org.objectweb.asm.ExtendedAnnotationVisitor#visitXParamIndex(int)
    */
   public void visitXParamIndex(int param_index) {
@@ -174,7 +174,7 @@ implements ExtendedAnnotationVisitor {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @see org.objectweb.asm.ExtendedAnnotationVisitor#visitXBoundIndex(int)
    */
   public void visitXBoundIndex(int bound_index) {
@@ -188,7 +188,7 @@ implements ExtendedAnnotationVisitor {
    *  annotation.  If the information does not specify a legal annotation,
    *  throws an exception.
    *  
-   * @inheritDoc
+   * {@inheritDoc}
    * @throws InvalidExtendedAnnotationException if the information this
    *  has visited does not specify a legal extended annotation
    * @see org.objectweb.asm.AnnotationVisitor#visitEnd()

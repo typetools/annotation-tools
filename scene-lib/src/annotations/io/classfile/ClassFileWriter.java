@@ -52,13 +52,13 @@ public class ClassFileWriter {
    * Main method meant to a a convenient way to write annotations from an index
    * file to a class file.  For programmatic access to this
    * tool, one should probably use the insert() methods instead.
-   *
-   * Usage: java annotations.io.ClassFileWriter options [classfile indexfile] ...
-   *
-   * <options> include:
+   * <p>
+   * Usage: java annotations.io.ClassFileWriter <em>options</em> [classfile indexfile] ...
+   * <p>
+   * <em>options</em> include:<pre>
    *   -h, --help   print usage information and exit
    *   --version    print version information and exit
-   *
+   * </pre>
    * @param args options and classes and index files to analyze;
    * @throws IOException if a class file or index file cannot be opened/written
    */

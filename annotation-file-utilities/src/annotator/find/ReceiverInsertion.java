@@ -66,7 +66,7 @@ public class ReceiverInsertion extends TypedInsertion {
     /**
      * If {@code true} a comma will be added at the end of the receiver.
      * This will only happen if a receiver is inserted (see
-     * {@link #ReceiverInsertion(DeclaredType, Criteria, List<Insertion>)} for a description of
+     * {@link #ReceiverInsertion(DeclaredType, Criteria, List)} for a description of
      * when a receiver is inserted). This is useful if the method already has
      * one or more parameters.
      */
@@ -77,7 +77,7 @@ public class ReceiverInsertion extends TypedInsertion {
     /**
      * If {@code true}, qualify {@code this} with the name of the superclass.
      * This will only happen if a receiver is inserted (see
-     * {@link #ReceiverInsertion(DeclaredType, Criteria, List<Insertion>)}
+     * {@link #ReceiverInsertion(DeclaredType, Criteria, List)}
      * for a description of when a receiver is inserted). This is useful
      * for inner class constructors.
      */
