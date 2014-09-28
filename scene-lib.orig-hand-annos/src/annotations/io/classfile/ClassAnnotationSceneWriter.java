@@ -156,7 +156,7 @@ extends ClassAdapter {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @see org.objectweb.asm.ClassAdapter#visit(int, int, java.lang.String, java.lang.String, java.lang.String, java.lang.String[])
    */
   @Override
@@ -169,7 +169,7 @@ extends ClassAdapter {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @see org.objectweb.asm.ClassAdapter#visitInnerClass(java.lang.String, java.lang.String, java.lang.String, int)
    */
   @Override
@@ -180,7 +180,7 @@ extends ClassAdapter {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @see org.objectweb.asm.ClassAdapter#visitField(int, java.lang.String, java.lang.String, java.lang.String, java.lang.Object)
    */
   @Override
@@ -194,7 +194,7 @@ extends ClassAdapter {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @see org.objectweb.asm.ClassAdapter#visitMethod(int, java.lang.String, java.lang.String, java.lang.String, java.lang.String[])
    */
   @Override
@@ -208,7 +208,7 @@ extends ClassAdapter {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @see org.objectweb.asm.ClassAdapter#visitEnd()
    */
   @Override
@@ -218,7 +218,7 @@ extends ClassAdapter {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @see org.objectweb.asm.ClassAdapter#visitAnnotation(java.lang.String, boolean)
    */
   @Override
@@ -233,7 +233,7 @@ extends ClassAdapter {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @see org.objectweb.asm.ClassAdapter#visitExtendedAnnotation(java.lang.String, boolean)
    */
   @Override
@@ -484,7 +484,7 @@ extends ClassAdapter {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      * @see org.objectweb.asm.FieldVisitor#visitAnnotation(java.lang.String, boolean)
      */
     public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
@@ -499,7 +499,7 @@ extends ClassAdapter {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      * @see org.objectweb.asm.FieldVisitor#visitExtendedAnnotation(java.lang.String, boolean)
      */
     public ExtendedAnnotationVisitor visitExtendedAnnotation(
@@ -515,7 +515,7 @@ extends ClassAdapter {
           fv.visitExtendedAnnotation(desc, visible));
     }
 
-    /** @inheritDoc
+    /** {@inheritDoc}
      * @see org.objectweb.asm.FieldVisitor#visitAttribute(org.objectweb.asm.Attribute)
      */
     public void visitAttribute(Attribute attr) {
@@ -610,7 +610,7 @@ extends ClassAdapter {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      * @see org.objectweb.asm.MethodAdapter#visitCode()
      */
     @Override
@@ -620,7 +620,7 @@ extends ClassAdapter {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      * @see org.objectweb.asm.MethodAdapter#visitEnd()
      */
     @Override 
@@ -630,7 +630,7 @@ extends ClassAdapter {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      * @see org.objectweb.asm.MethodAdapter#visitAnnotation(java.lang.String, boolean)
      */
     @Override
@@ -646,7 +646,7 @@ extends ClassAdapter {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      * @see org.objectweb.asm.MethodAdapter#visitExtendedAnnotation(java.lang.String, boolean)
      */
     @Override
