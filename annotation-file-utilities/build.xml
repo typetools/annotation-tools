@@ -106,7 +106,6 @@
       <javadoc sourcepathref="javadoc-sourcepath"
           classpathref="libpath"
           packagenames="*"
-          Overview="overview.html"
           destdir="javadoc" 
           access="public"
           />
