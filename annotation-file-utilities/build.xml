@@ -105,6 +105,7 @@
   <target name="javadoc" depends="javadoc-clean, init">
       <javadoc sourcepathref="javadoc-sourcepath"
           classpathref="libpath"
+          failonerror="true"
           packagenames="*"
           destdir="javadoc" 
           access="public"
