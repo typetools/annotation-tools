@@ -666,10 +666,8 @@ public class IndexFileSpecification implements Specification {
       ATypeElement insertAnnotation = entry.getValue();
       CriterionList insertAnnotationClist =
           clist.add(Criteria.astPath(astPath));
-      if (insertAnnotation instanceof ATypeElement) {
-        parseInnerAndOuterElements(insertAnnotationClist,
-            insertAnnotation, true);
-      }
+      parseInnerAndOuterElements(insertAnnotationClist,
+          insertAnnotation, true);
     }
     for (Entry<ASTPath, ATypeElementWithType> entry : insertTypecasts.entrySet()) {
       ASTPath astPath = entry.getKey();

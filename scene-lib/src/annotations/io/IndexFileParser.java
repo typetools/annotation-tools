@@ -1056,22 +1056,21 @@ public final class IndexFileParser {
       ASTPath outerPath = astPath;
       InnerTypeLocation loc = null;
       int last = astPath.size()-1;
-      
+
       if (last > 0) {
         ASTPath.ASTEntry entry = astPath.get(last);
         if (entry.getTreeKind() == Kind.NEW_ARRAY
             && entry.childSelectorIs(ASTPath.TYPE)) {
           int a = entry.getArgument();
           if (a > 0) {
-            outerPath = astPath.getParentPath();
-            outerPath.add(
-                new ASTPath.ASTEntry(Kind.NEW_ARRAY, ASTPath.TYPE, 0));
+            outerPath = astPath.getParentPath()
+                .extend(new ASTPath.ASTEntry(Kind.NEW_ARRAY, ASTPath.TYPE, 0));
             loc = new InnerTypeLocation(TypeAnnotationPosition
                 .getTypePathFromBinary(Collections.nCopies(2*a, 0)));
           }
         }
       }
-      
+
       return Pair.of(outerPath, loc);
     }
 
@@ -1080,10 +1079,9 @@ public final class IndexFileParser {
      * @return the AST path.
      */
     private ASTPath parseASTPath() throws IOException, ParseException {
-        ASTPath astPath = new ASTPath();
-        astPath.add(parseASTEntry());
+        ASTPath astPath = ASTPath.empty().extend(parseASTEntry());
         while (matchChar(',')) {
-            astPath.add(parseASTEntry());
+            astPath = astPath.extend(parseASTEntry());
         }
         return astPath;
     }
