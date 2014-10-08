@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import plume.UtilMDE;
+
 import com.sun.source.tree.AnnotatedTypeTree;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.CompilationUnitTree;
@@ -19,10 +21,6 @@ import com.sun.source.tree.Tree;
 import com.sun.source.tree.TypeParameterTree;
 import com.sun.source.tree.VariableTree;
 import com.sun.source.util.TreePath;
-import com.sun.tools.javac.code.Flags;
-import com.sun.tools.javac.tree.JCTree.JCMethodDecl;
-
-import plume.UtilMDE;
 
 public class IsSigMethodCriterion implements Criterion {
 

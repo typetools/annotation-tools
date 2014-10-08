@@ -29,13 +29,12 @@
  */
 package org.objectweb.asm.util;
 
-import org.objectweb.asm.TypeAnnotationVisitor;
 import org.objectweb.asm.FieldVisitor;
 
 /**
  * A {@link FieldVisitor} that prints the ASM code that generates the fields it
  * visits.
- * 
+ *
  * @author Eric Bruneton
  */
 public class ASMifierFieldVisitor extends ASMifierAbstractVisitor implements
