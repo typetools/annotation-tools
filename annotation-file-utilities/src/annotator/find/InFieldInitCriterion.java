@@ -39,7 +39,7 @@ public class InFieldInitCriterion implements Criterion {
 
   @Override
   public Kind getKind() {
-    return Kind.FIELD;
+    return Kind.IN_FIELD_INIT;
   }
 
   @Override
