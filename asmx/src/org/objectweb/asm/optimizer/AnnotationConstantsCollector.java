@@ -30,20 +30,19 @@
 package org.objectweb.asm.optimizer;
 
 import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.TypeAnnotationVisitor;
 import org.objectweb.asm.Type;
 
 /**
  * An {@link AnnotationVisitor} that collects the {@link Constant}s of the
  * annotations it visits.
- * 
+ *
  * @author Eric Bruneton
  */
 public class AnnotationConstantsCollector implements AnnotationVisitor {
 
-    private AnnotationVisitor av;
+    private final AnnotationVisitor av;
 
-    private ConstantPool cp;
+    private final ConstantPool cp;
 
     public AnnotationConstantsCollector(
         final AnnotationVisitor av,
@@ -53,6 +52,7 @@ public class AnnotationConstantsCollector implements AnnotationVisitor {
         this.cp = cp;
     }
 
+    @Override
     public void visit(final String name, final Object value) {
         if (name != null) {
             cp.newUTF8(name);
@@ -113,6 +113,7 @@ public class AnnotationConstantsCollector implements AnnotationVisitor {
         av.visit(name, value);
     }
 
+    @Override
     public void visitEnum(
         final String name,
         final String desc,
@@ -126,6 +127,7 @@ public class AnnotationConstantsCollector implements AnnotationVisitor {
         av.visitEnum(name, desc, value);
     }
 
+    @Override
     public AnnotationVisitor visitAnnotation(
         final String name,
         final String desc)
@@ -138,6 +140,7 @@ public class AnnotationConstantsCollector implements AnnotationVisitor {
                 cp);
     }
 
+    @Override
     public AnnotationVisitor visitArray(final String name) {
         if (name != null) {
             cp.newUTF8(name);
@@ -145,6 +148,7 @@ public class AnnotationConstantsCollector implements AnnotationVisitor {
         return new AnnotationConstantsCollector(av.visitArray(name), cp);
     }
 
+    @Override
     public void visitEnd() {
         av.visitEnd();
     }
