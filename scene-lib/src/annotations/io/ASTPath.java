@@ -6,14 +6,11 @@ import java.io.StringReader;
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import plume.ArraysMDE;
-import plume.Pair;
-import annotations.el.InnerTypeLocation;
 
 import com.sun.source.tree.AnnotatedTypeTree;
 import com.sun.source.tree.AnnotationTree;
@@ -52,6 +49,7 @@ import com.sun.source.tree.SwitchTree;
 import com.sun.source.tree.SynchronizedTree;
 import com.sun.source.tree.ThrowTree;
 import com.sun.source.tree.Tree;
+import com.sun.source.tree.Tree.Kind;
 import com.sun.source.tree.TryTree;
 import com.sun.source.tree.TypeCastTree;
 import com.sun.source.tree.UnaryTree;
@@ -59,9 +57,7 @@ import com.sun.source.tree.UnionTypeTree;
 import com.sun.source.tree.VariableTree;
 import com.sun.source.tree.WhileLoopTree;
 import com.sun.source.tree.WildcardTree;
-import com.sun.source.tree.Tree.Kind;
 import com.sun.source.util.TreePath;
-import com.sun.tools.javac.code.TypeAnnotationPosition;
 
 /**
  * A path through the AST.
@@ -113,9 +109,9 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
      * A single entry in an AST path.
      */
     public static class ASTEntry implements Comparable<ASTEntry> {
-        private Kind treeKind;
-        private String childSelector;
-        private Integer argument;
+        private final Kind treeKind;
+        private final String childSelector;
+        private final Integer argument;
 
         /**
          * Constructs a new AST entry. For example, in the entry:
@@ -334,7 +330,7 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
     /**
      * Stores the AST entries in this AST path.
      */
-    private List<ASTEntry> path;
+    private final List<ASTEntry> path;
 
     /**
      * Constructs an empty AST path.
@@ -353,7 +349,7 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
     /**
      * Creates a new AST path extended from this one to pick out an inner array
      * of a new array initializer.
-     * 
+     *
      * @param depth number of array levels to drill down into the top level type
      * @return an augmented AST path to the indicated array level
      */
@@ -424,7 +420,7 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
 
     @Override
     public int compareTo(ASTPath o) {
-      // hacky fix: remove {Method,Class}.body for comparison 
+      // hacky fix: remove {Method,Class}.body for comparison
       ASTPath p0 = declFree(this);
       ASTPath p1 = declFree(o);
       int n = p0.size();
@@ -469,7 +465,7 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
 
     /**
      * Create a new {@code ASTPath} from a formatted string description.
-     * 
+     *
      * @param s formatted string as in JAIF {@code insert-\{cast,annotation\}}
      * @return the corresponding {@code ASTPath}
      * @throws ParseException
@@ -769,7 +765,7 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
       // adapted from IndexFileParser.parseASTPath et al.
       // TODO: refactor switch statement into TreeVisitor?
       public static boolean debug = false;
-      private ASTPath astPath;
+      private final ASTPath astPath;
 
       Matcher(ASTPath astPath) {
         this.astPath = astPath;
@@ -1100,7 +1096,7 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
               if (arg < 0) {
                 next = newArray.getType();
               } else {
-                return arg == depth; 
+                return arg == depth;
               }
             } else if (astNode.childSelectorIs(ASTPath.DIMENSION)) {
               int arg = astNode.getArgument();
