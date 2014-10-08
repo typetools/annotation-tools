@@ -1,19 +1,17 @@
 package annotations.util;
 
-import com.sun.source.tree.MethodTree;
-import com.sun.tools.javac.code.Type;
-import com.sun.tools.javac.code.TypeTag;
-import com.sun.tools.javac.tree.JCTree.JCMethodDecl;
-import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
-import com.sun.tools.javac.util.List;
-
-import plume.UtilMDE;
-
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.ArrayType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
+
+import plume.UtilMDE;
+
+import com.sun.source.tree.MethodTree;
+import com.sun.tools.javac.code.Type;
+import com.sun.tools.javac.code.TypeTag;
+import com.sun.tools.javac.tree.JCTree.JCMethodDecl;
 
 /**
  * Class to generate class formatted names from Trees.
