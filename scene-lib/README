@@ -1,0 +1,18 @@
+File overview.html in the current directory gives a very brief
+overview of this project.
+
+Test cases are split up over two directories:
+
+src/annotations/tests/classfile/cases/
+test/annotations/tests/classfile/cases/
+
+See file src/annotations/tests/classfile/AnnotationsTest.java for
+some documentation.
+
+TODO: there are currently two "golden" class files: the un-annoted file
+and the expected output after inserting annotations.
+Additionally, we could compare:
+Unannotated .java --> javac --> .class --> AFU insert into .class --> .class
+Unannotated .java --> AFU insert into .java --> javac --> .class
+that is, compare the result of inserting the annotations directly
+into the bytecode versus inserting into the source code and compiling.
