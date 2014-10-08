@@ -41,6 +41,7 @@ import annotations.el.ElementVisitor;
 import annotations.el.LocalLocation;
 import annotations.io.ASTIndex;
 import annotations.io.ASTPath;
+import annotations.io.ASTRecord;
 import annotations.io.IndexFileParser;
 import annotations.io.IndexFileWriter;
 import annotations.util.coll.VivifyingMap;
@@ -262,17 +263,22 @@ public class Main {
     return filtered;
   }
 
-  private static Map<String, TypeTag> primTags = new HashMap<String, TypeTag>();
-  {
-    primTags.put("byte", TypeTag.BYTE);
-    primTags.put("char", TypeTag.CHAR);
-    primTags.put("short", TypeTag.SHORT);
-    primTags.put("long", TypeTag.LONG);
-    primTags.put("float", TypeTag.FLOAT);
-    primTags.put("int", TypeTag.INT);
-    primTags.put("double", TypeTag.DOUBLE);
-    primTags.put("boolean", TypeTag.BOOLEAN);
-  }
+  //private static Set<AnnotationDef> annotationDefs(final AScene scene)
+  //    throws DefException {
+  //  if (annoCache.containsKey(scene)) { return annoCache.get(scene); }
+  //  final Set<AnnotationDef> defs = new HashSet<AnnotationDef>();
+  //  new DefCollector(scene) {
+  //    @Override
+  //    protected void visitAnnotationDef(AnnotationDef d) {
+  //      defs.add(d);
+  //    }
+  //  }.visit();
+  //  annoCache.put(scene, defs);
+  //  return defs;
+  //}
+
+  //private static Map<AScene, Set<AnnotationDef>> annoCache =
+  //    new HashMap<AScene, Set<AnnotationDef>>();
 
 /*
   private static Pair<ASTPath, Pair<TypeTree, TypePathEntry>>
@@ -360,7 +366,7 @@ public class Main {
 */
 
   private static ATypeElement findInnerTypeElement(Tree t,
-      ASTIndex.ASTRecord rec, ADeclaration decl, Type type, Insertion ins) {
+      ASTRecord rec, ADeclaration decl, Type type, Insertion ins) {
     ASTPath astPath = rec.astPath;
     GenericArrayLocationCriterion galc =
         ins.getCriteria().getGenericArrayLocation();
@@ -397,7 +403,7 @@ public class Main {
       default:
         throw new IllegalArgumentException("unknown type tag " + tpe.tag);
       }
-      astPath.add(entry);
+      astPath = astPath.extend(entry);
     }
 
     return decl.insertAnnotations.vivify(astPath);
@@ -470,8 +476,10 @@ public class Main {
     Insertions insertions = new Insertions();
     // The Java files into which to insert.
     List<String> javafiles = new ArrayList<String>();
-
+    // Imports required to resolve annotations (when abbreviate==true).
     Set<String> imports = new LinkedHashSet<String>();
+
+    // Indices to maintain insertion source traces. 
     Map<String, Multimap<Insertion, Annotation>> insertionIndex =
         new HashMap<String, Multimap<Insertion, Annotation>>();
     Map<Insertion, String> insertionOrigins = new HashMap<Insertion, String>();
@@ -633,11 +641,11 @@ public class Main {
         if (convert_jaifs) {
           // program used only for JAIF conversion; execute following
           // block and then skip remainder of loop 
-          Multimap<ASTIndex.ASTRecord, Insertion> astInsertions =
+          Multimap<ASTRecord, Insertion> astInsertions =
               finder.getPaths();
-          for (Map.Entry<ASTIndex.ASTRecord, Collection<Insertion>> entry :
+          for (Map.Entry<ASTRecord, Collection<Insertion>> entry :
               astInsertions.asMap().entrySet()) {
-            ASTIndex.ASTRecord rec = entry.getKey();
+            ASTRecord rec = entry.getKey();
             for (Insertion ins : entry.getValue()) {
               if (ins.getCriteria().getASTPath() != null) { continue; }
               String arg = insertionOrigins.get(ins);
@@ -650,9 +658,10 @@ public class Main {
               // TODO: adjust for missing end of path (?)
 
               if (insertionSources.containsKey(ins)) {
+                Collection<Annotation> annos = insertionSources.get(ins);
                 if (rec == null) {
                   if (ins.getCriteria().isOnPackage()) {
-                    for (Annotation anno : insertionSources.get(ins)) {
+                    for (Annotation anno : annos) {
                       scene.packages.get(pkg).tlAnnotationsHere.add(anno);
                     }
                   }
@@ -662,11 +671,11 @@ public class Main {
                   if (ins.getCriteria().onBoundZero()) {
                     int n = rec.astPath.size();
                     if (!rec.astPath.get(n-1).childSelectorIs(ASTPath.BOUND)) {
-                      ASTPath astPath = new ASTPath();
+                      ASTPath astPath = ASTPath.empty();
                       for (int i = 0; i < n; i++) {
-                        astPath.add(rec.astPath.get(i));
+                        astPath = astPath.extend(rec.astPath.get(i));
                       }
-                      astPath.add(
+                      astPath = astPath.extend(
                           new ASTPath.ASTEntry(Tree.Kind.TYPE_PARAMETER,
                               ASTPath.BOUND, 0));
                       rec = rec.replacePath(astPath);
@@ -744,26 +753,14 @@ loop:
                     } else {
                       el = decl.insertAnnotations.vivify(rec.astPath);
                     }
-                    for (Annotation anno : insertionSources.get(ins)) {
+                    for (Annotation anno : annos) {
                       el.tlAnnotationsHere.add(anno);
                     }
                     if (ins instanceof TypedInsertion) {
                       TypedInsertion ti = (TypedInsertion) ins;
-//                      Type type = ti.getType();
-//                      ASTPath astPath = rec.astPath;
-//                      if (!astPath.isEmpty()) {
-//                        ASTPath.ASTEntry lastEntry = astPath.get(-1);
-//                        if (lastEntry.getTreeKind() == Tree.Kind.METHOD
-//                            && lastEntry.childSelectorIs(ASTPath.PARAMETER)) {
-//                          astPath = astPath.add(
-//                              new ASTPath.ASTEntry(Tree.Kind.VARIABLE,
-//                                  ASTPath.TYPE));
-//                        }
-//                      }
-//                      VivifyingMap<ASTPath, ? extends ATypeElement> vm =
-//                          ti.getKind() == Insertion.Kind.CAST
-//                              ? decl.insertTypecasts
-//                              : decl.insertAnnotations;
+                      if (!rec.astPath.isEmpty()) {
+                        //addInnerTypePaths(decl, rec, ti, insertionSources);
+                      }
                       for (Insertion inner : ti.getInnerTypeInsertions()) {
                         Tree t = ASTIndex.getNode(cut, rec);
                         if (t != null) {
@@ -1007,9 +1004,69 @@ loop:
     }
   }
 
-  ///
-  /// Utility methods
-  ///
+/*
+  private static void addInnerTypePaths(ADeclaration decl,
+      ASTRecord astRecord, TypedInsertion ti,
+      Multimap<Insertion, Annotation> insertionSources) {
+    VivifyingMap<ASTPath, ? extends ATypeElement> vm =
+        ti.getKind() == Insertion.Kind.CAST
+            ? decl.insertTypecasts
+            : decl.insertAnnotations;
+    Map<String, Annotation> annoMap = new HashMap<String, Annotation>();
+    for (Annotation anno : insertionSources.get(ti)) {
+      String key = anno.toString();
+      Annotation a = annoMap.get(key);
+      annoMap.put(key, anno);
+      if (a != null && !a.equals(anno)) {
+        if (debug) {
+          System.err.println("WARNING: conflicting annotations");
+          System.err.println("old: " + a);
+          System.err.println("new: " + anno);
+        }
+      }
+    }
+    addInnerTypePaths(vm, astRecord, ti.getType(),
+        Collections.<String>emptyList(), annoMap);
+  }
+
+  private static void
+  addInnerTypePaths(VivifyingMap<ASTPath, ? extends ATypeElement> vm,
+      ASTRecord astRecord, Type type, List<String> ss,
+      Map<String, Annotation> annoMap) {
+    for (String s : ss) {
+      Annotation anno = annoMap.get(s);
+      if (anno != null) {
+        ATypeElement elem = vm.vivify(astRecord.astPath);
+        elem.tlAnnotationsHere.add(anno);
+      }
+    }
+    switch (type.getKind()) {
+    case ARRAY:
+      type = ((ArrayType) type).getComponentType();
+      astRecord = astRecord.extend(Tree.Kind.ARRAY_TYPE, ASTPath.TYPE);
+      break;
+    case BOUNDED:
+      type = ((BoundedType) type).getBound();
+      astRecord = astRecord.extend(Tree.Kind.TYPE_PARAMETER, ASTPath.BOUND);
+      break;
+    case DECLARED:
+      DeclaredType dt = (DeclaredType) type;
+      int i = 0;
+      for (Type t : dt.getTypeParameters()) {
+        ASTRecord r = astRecord.extend(Tree.Kind.PARAMETERIZED_TYPE,
+            ASTPath.TYPE_PARAMETER, i++);
+        addInnerTypePaths(vm, r, t, t.getAnnotations(), annoMap);
+      }
+      type = dt.getInnerType();
+      if (type == null) { return; }
+      astRecord = astRecord.extend(Tree.Kind.MEMBER_SELECT, ASTPath.EXPRESSION);
+      break;
+    default:
+      throw new RuntimeException("unknown type kind " + type.getKind());
+    }
+    addInnerTypePaths(vm, astRecord, type, type.getAnnotations(), annoMap);
+  }
+*/
 
   public static String pathToString(TreePath path) {
     if (path == null)

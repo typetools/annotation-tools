@@ -1,17 +1,19 @@
 package annotations.util;
 
+import com.sun.source.tree.MethodTree;
+import com.sun.tools.javac.code.Type;
+import com.sun.tools.javac.code.TypeTag;
+import com.sun.tools.javac.tree.JCTree.JCMethodDecl;
+import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
+import com.sun.tools.javac.util.List;
+
+import plume.UtilMDE;
+
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.ArrayType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
-
-import plume.UtilMDE;
-
-import com.sun.source.tree.MethodTree;
-import com.sun.tools.javac.code.Type;
-import com.sun.tools.javac.code.TypeTag;
-import com.sun.tools.javac.tree.JCTree.JCMethodDecl;
 
 /**
  * Class to generate class formatted names from Trees.
@@ -33,12 +35,23 @@ public class JVMNames {
         builder.append(methodTree.getName());
         builder.append("(");
 
-        for (VariableElement ve : methodElement.getParameters()) {
-            Type vt = (Type) ve.asType();
-            if (vt.getTag() == TypeTag.TYPEVAR) {
-                vt = vt.getUpperBound();
+        if (methodElement == null) {
+            // how to work around?
+            List<JCVariableDecl> params = ((JCMethodDecl) methodTree).params;
+            JCVariableDecl param = params.head;
+            while (param != null) {
+                //builder.append(typeToJvmlString(treeToType(param.vartype)));
+                params = params.tail;
+                param = params.head;
             }
-            builder.append(typeToJvmlString(vt));
+        } else {
+            for (VariableElement ve : methodElement.getParameters()) {
+                Type vt = (Type) ve.asType();
+                if (vt.getTag() == TypeTag.TYPEVAR) {
+                    vt = vt.getUpperBound();
+                }
+                builder.append(typeToJvmlString(vt));
+            }
         }
 
         builder.append(")");
