@@ -32,7 +32,6 @@ package org.objectweb.asm.util;
 import java.util.HashMap;
 
 import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.TypeAnnotationVisitor;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
@@ -40,7 +39,7 @@ import org.objectweb.asm.Opcodes;
 /**
  * A {@link MethodVisitor} that prints the ASM code that generates the methods
  * it visits.
- * 
+ *
  * @author Eric Bruneton
  * @author Eugene Kuleshov
  */
@@ -55,6 +54,7 @@ public class ASMifierMethodVisitor extends ASMifierAbstractVisitor implements
         this.labelNames = new HashMap();
     }
 
+    @Override
     public AnnotationVisitor visitAnnotationDefault() {
         buf.setLength(0);
         buf.append("{\n").append("av0 = mv.visitAnnotationDefault();\n");
@@ -65,6 +65,7 @@ public class ASMifierMethodVisitor extends ASMifierAbstractVisitor implements
         return av;
     }
 
+    @Override
     public AnnotationVisitor visitParameterAnnotation(
         final int parameter,
         final String desc,
@@ -84,16 +85,19 @@ public class ASMifierMethodVisitor extends ASMifierAbstractVisitor implements
         return av;
     }
 
+    @Override
     public void visitCode() {
         text.add("mv.visitCode();\n");
     }
 
+    @Override
     public void visitInsn(final int opcode) {
         buf.setLength(0);
         buf.append("mv.visitInsn(").append(OPCODES[opcode]).append(");\n");
         text.add(buf.toString());
     }
 
+    @Override
     public void visitIntInsn(final int opcode, final int operand) {
         buf.setLength(0);
         buf.append("mv.visitIntInsn(")
@@ -106,6 +110,7 @@ public class ASMifierMethodVisitor extends ASMifierAbstractVisitor implements
         text.add(buf.toString());
     }
 
+    @Override
     public void visitVarInsn(final int opcode, final int var) {
         buf.setLength(0);
         buf.append("mv.visitVarInsn(")
@@ -116,6 +121,7 @@ public class ASMifierMethodVisitor extends ASMifierAbstractVisitor implements
         text.add(buf.toString());
     }
 
+    @Override
     public void visitTypeInsn(final int opcode, final String desc) {
         buf.setLength(0);
         buf.append("mv.visitTypeInsn(").append(OPCODES[opcode]).append(", ");
@@ -124,6 +130,7 @@ public class ASMifierMethodVisitor extends ASMifierAbstractVisitor implements
         text.add(buf.toString());
     }
 
+    @Override
     public void visitFieldInsn(
         final int opcode,
         final String owner,
@@ -141,6 +148,7 @@ public class ASMifierMethodVisitor extends ASMifierAbstractVisitor implements
         text.add(buf.toString());
     }
 
+    @Override
     public void visitMethodInsn(
         final int opcode,
         final String owner,
@@ -158,6 +166,7 @@ public class ASMifierMethodVisitor extends ASMifierAbstractVisitor implements
         text.add(buf.toString());
     }
 
+    @Override
     public void visitJumpInsn(final int opcode, final Label label) {
         buf.setLength(0);
         declareLabel(label);
@@ -167,6 +176,7 @@ public class ASMifierMethodVisitor extends ASMifierAbstractVisitor implements
         text.add(buf.toString());
     }
 
+    @Override
     public void visitLabel(final Label label) {
         buf.setLength(0);
         declareLabel(label);
@@ -176,6 +186,7 @@ public class ASMifierMethodVisitor extends ASMifierAbstractVisitor implements
         text.add(buf.toString());
     }
 
+    @Override
     public void visitLdcInsn(final Object cst) {
         buf.setLength(0);
         buf.append("mv.visitLdcInsn(");
@@ -184,6 +195,7 @@ public class ASMifierMethodVisitor extends ASMifierAbstractVisitor implements
         text.add(buf.toString());
     }
 
+    @Override
     public void visitIincInsn(final int var, final int increment) {
         buf.setLength(0);
         buf.append("mv.visitIincInsn(")
@@ -194,6 +206,7 @@ public class ASMifierMethodVisitor extends ASMifierAbstractVisitor implements
         text.add(buf.toString());
     }
 
+    @Override
     public void visitTableSwitchInsn(
         final int min,
         final int max,
@@ -221,6 +234,7 @@ public class ASMifierMethodVisitor extends ASMifierAbstractVisitor implements
         text.add(buf.toString());
     }
 
+    @Override
     public void visitLookupSwitchInsn(
         final Label dflt,
         final int keys[],
@@ -247,6 +261,7 @@ public class ASMifierMethodVisitor extends ASMifierAbstractVisitor implements
         text.add(buf.toString());
     }
 
+    @Override
     public void visitMultiANewArrayInsn(final String desc, final int dims) {
         buf.setLength(0);
         buf.append("mv.visitMultiANewArrayInsn(");
@@ -255,6 +270,7 @@ public class ASMifierMethodVisitor extends ASMifierAbstractVisitor implements
         text.add(buf.toString());
     }
 
+    @Override
     public void visitTryCatchBlock(
         final Label start,
         final Label end,
@@ -277,6 +293,7 @@ public class ASMifierMethodVisitor extends ASMifierAbstractVisitor implements
         text.add(buf.toString());
     }
 
+    @Override
     public void visitLocalVariable(
         final String name,
         final String desc,
@@ -300,6 +317,7 @@ public class ASMifierMethodVisitor extends ASMifierAbstractVisitor implements
         text.add(buf.toString());
     }
 
+    @Override
     public void visitLineNumber(final int line, final Label start) {
         buf.setLength(0);
         buf.append("mv.visitLineNumber(").append(line).append(", ");
@@ -308,6 +326,7 @@ public class ASMifierMethodVisitor extends ASMifierAbstractVisitor implements
         text.add(buf.toString());
     }
 
+    @Override
     public void visitMaxs(final int maxStack, final int maxLocals) {
         buf.setLength(0);
         buf.append("mv.visitMaxs(")
@@ -322,7 +341,7 @@ public class ASMifierMethodVisitor extends ASMifierAbstractVisitor implements
      * Appends a declaration of the given label to {@link #buf buf}. This
      * declaration is of the form "Label lXXX = new Label();". Does nothing if
      * the given label has already been declared.
-     * 
+     *
      * @param l a label.
      */
     private void declareLabel(final Label l) {
@@ -338,7 +357,7 @@ public class ASMifierMethodVisitor extends ASMifierAbstractVisitor implements
      * Appends the name of the given label to {@link #buf buf}. The given label
      * <i>must</i> already have a name. One way to ensure this is to always
      * call {@link #declareLabel declared} before calling this method.
-     * 
+     *
      * @param l a label.
      */
     private void appendLabel(final Label l) {
