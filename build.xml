@@ -42,6 +42,10 @@
         <ant dir="${afu}" target="jarfile"/>
     </target>
 
+    <target name="javadoc-afu">
+        <ant dir="${afu}" target="javadoc"/>
+    </target>
+
     <target name="test-afu">
         <ant dir="${afu}" target="run-tests"/>
     </target>
