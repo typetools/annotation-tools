@@ -1841,11 +1841,11 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
   public SetMultimap<Integer, Insertion> getPositions(JCCompilationUnit node,
       Insertions insertions) {
     List<Insertion> list = new ArrayList<Insertion>();
-    list.addAll(insertions.forTopClass(node, ""));
+    list.addAll(insertions.forOuterClass(node, ""));
     for (JCTree decl : node.getTypeDecls()) {
       if (decl.getTag() == JCTree.Tag.CLASSDEF) {
         String name = ((JCClassDecl) decl).sym.className();
-        Collection<Insertion> forClass = insertions.forTopClass(node, name);
+        Collection<Insertion> forClass = insertions.forOuterClass(node, name);
         list.addAll(forClass);
       }
     }
