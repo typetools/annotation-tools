@@ -1,0 +1,136 @@
+package checkers.igj.quals:
+annotation @ReadOnly: @java.lang.annotation.Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+
+package annotation:
+annotation @Inner: @java.lang.annotation.Target(value={TYPE_USE})
+    int value
+
+package annotation:
+annotation @A:
+
+package annotation:
+annotation @B:
+
+package annotation:
+annotation @C:
+
+package annotator.tests:
+class Receivers:
+
+    method m()V:
+        return:
+        insert-annotation Method.parameter -1: @checkers.igj.quals.ReadOnly
+
+    method spaces()V:
+        return:
+        insert-annotation Method.parameter -1: @checkers.igj.quals.ReadOnly
+
+    method m(I)V:
+        return:
+        insert-annotation Method.parameter -1: @checkers.igj.quals.ReadOnly
+
+    method spaces(I)V:
+        return:
+        insert-annotation Method.parameter -1: @checkers.igj.quals.ReadOnly
+
+    method m(Ljava/lang/String;)V:
+        return:
+        insert-annotation Method.parameter -1: @checkers.igj.quals.ReadOnly
+
+package annotator.tests:
+class Receivers2:
+
+    method m()V:
+        return:
+        insert-annotation Method.parameter -1, Variable.type: @checkers.igj.quals.ReadOnly
+
+    method spaces()V:
+        return:
+        insert-annotation Method.parameter -1, Variable.type: @checkers.igj.quals.ReadOnly
+
+    method m(I)V:
+        return:
+        insert-annotation Method.parameter -1, Variable.type: @checkers.igj.quals.ReadOnly
+
+    method spaces(I)V:
+        return:
+        insert-annotation Method.parameter -1, Variable.type: @checkers.igj.quals.ReadOnly
+
+package annotator.tests:
+class Receivers3:
+
+    method m()V:
+        return:
+        insert-annotation Method.parameter -1, ParameterizedType.typeArgument 0: @annotation.Inner(value=0)
+        insert-annotation Method.parameter -1, ParameterizedType.typeArgument 1: @annotation.Inner(value=1)
+        insert-annotation Method.parameter -1: @checkers.igj.quals.ReadOnly
+
+    method m(I)V:
+        return:
+        insert-annotation Method.parameter -1, ParameterizedType.typeArgument 0: @annotation.Inner(value=0)
+        insert-annotation Method.parameter -1, ParameterizedType.typeArgument 1: @annotation.Inner(value=1)
+        insert-annotation Method.parameter -1: @checkers.igj.quals.ReadOnly
+
+package annotator.tests:
+class Receivers4:
+
+    method m()V:
+        return:
+        insert-annotation Method.parameter -1, Variable.type: @checkers.igj.quals.ReadOnly
+
+    method m(I)V:
+        return:
+        insert-annotation Method.parameter -1, Variable.type: @checkers.igj.quals.ReadOnly
+
+package annotator.tests:
+class Receivers5:
+
+    method m()V:
+        return:
+        insert-annotation Method.parameter -1: @checkers.igj.quals.ReadOnly
+
+package annotator.tests:
+class Receivers6:
+
+    method m()V:
+        return:
+        insert-annotation Method.parameter -1: @checkers.igj.quals.ReadOnly
+
+package annotator.tests:
+class Receivers7:
+
+    method m()V:
+        return:
+        insert-annotation Method.parameter -1, ParameterizedType.typeArgument 0: @annotation.Inner(value=0)
+        insert-annotation Method.parameter -1, ParameterizedType.typeArgument 1: @annotation.Inner(value=1)
+        insert-annotation Method.parameter -1: @checkers.igj.quals.ReadOnly
+
+package annotator.tests:
+class Receivers8:
+
+    method m()V:
+        return:
+        insert-annotation Method.parameter -1, Variable.type: @checkers.igj.quals.ReadOnly
+
+package annotator.tests:
+class Receivers9:
+
+    method m()V:
+        return:
+        insert-annotation Method.parameter -1: @checkers.igj.quals.ReadOnly @annotation.A @annotation.B @annotation.C
+
+package annotator.tests:
+class Receivers10:
+
+    method m()V:
+        return:
+        insert-annotation Method.parameter -1, Variable.type, ParameterizedType.typeArgument 0: @annotation.A
+        insert-annotation Method.parameter -1, Variable.type, ParameterizedType.typeArgument 1: @annotation.B
+        insert-annotation Method.parameter -1, Variable.type: @checkers.igj.quals.ReadOnly
+
+    method m(Lannotator/tests/Receivers10;)V:
+        return:
+        insert-annotation Method.parameter -1, Variable.type, ParameterizedType.typeArgument 0: @annotation.A
+        insert-annotation Method.parameter -1, Variable.type, ParameterizedType.typeArgument 1: @annotation.B
+        insert-annotation Method.parameter -1, Variable.type: @checkers.igj.quals.ReadOnly
+
