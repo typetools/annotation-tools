@@ -346,7 +346,7 @@ public class ASTIndex extends WrapperMap<Tree, ASTRecord> {
         int n = node.getDimensions().size();
         do {
           save(type, rec, kind, ASTPath.TYPE, n);
-        } while (--n > 0);
+        } while (--n >= 0);
         //int i = 0;
         //do {
         //  NewArrayTree nat = (NewArrayTree) t;
