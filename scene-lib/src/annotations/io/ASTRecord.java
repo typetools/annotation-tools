@@ -37,8 +37,7 @@ public class ASTRecord implements Comparable<ASTRecord> {
   public final String varName;
 
   /**
-   * Kind of immediately enclosing declaration: METHOD, VARIABLE, or a
-   *  class type (CLASS, INTERFACE, ENUM, or ANNOTATION_TYPE).
+   * Path through AST, from specified declaration to descendant node.
    */
   public final ASTPath astPath;
 
@@ -47,6 +46,19 @@ public class ASTRecord implements Comparable<ASTRecord> {
     this.className = className;
     this.methodName = methodName;
     this.varName = varName;
+    // FIXME: ensure path is canonical
+    if (varName != null) {
+      // TODO
+    } else if (methodName != null) {
+      int n = astPath.size();
+      if (n > 0 && astPath.get(0).getTreeKind() != Tree.Kind.METHOD
+          && astPath.get(0).getTreeKind() != Tree.Kind.VARIABLE) {
+        ASTPath bodyPath = ASTPath.empty().add(
+            new ASTPath.ASTEntry(Tree.Kind.METHOD, ASTPath.BODY));
+        for (int i = 0; i < n; i++) { bodyPath = bodyPath.add(astPath.get(i)); }
+        astPath = bodyPath;
+      }
+    }
     this.astPath = astPath;
   }
 
