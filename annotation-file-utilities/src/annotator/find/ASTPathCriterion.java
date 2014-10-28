@@ -431,8 +431,9 @@ public class ASTPathCriterion implements Criterion {
             case NEW_ARRAY: {
                 NewArrayTree newArray = (NewArrayTree) actualNode;
                 if (astNode.childSelectorIs(ASTPath.TYPE)) {
+                    int arg = astNode.getArgument();
                     Tree type = newArray.getType();
-                    return type;
+                    return arg == 0 ? type : null;
                 } else if (astNode.childSelectorIs(ASTPath.DIMENSION)) {
                     int arg = astNode.getArgument();
                     List<? extends ExpressionTree> dims = newArray.getDimensions();
