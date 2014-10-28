@@ -1009,25 +1009,25 @@ public final class IndexFileParser {
                 i.setType(new DeclaredType());
                 parseInnerTypes(i);
             } else {
-              astPath = fixNewArrayType(astPath);  // handle special case
-              ATypeElement i = decl.insertAnnotations.vivify(astPath);
-              parseAnnotations(i);
-              parseInnerTypes(i);
-              //int offset = 0;
-              //Pair<ASTPath, InnerTypeLocation> pair =
-              //    splitNewArrayType(astPath);  // handle special case
-              //ATypeElement i;
-              //if (pair == null) {
-              //  i = decl.insertAnnotations.vivify(astPath);
-              //} else {
-              //  i = decl.insertAnnotations.vivify(pair.a);
-              //  if (pair.b != null) {
-              //    i = i.innerTypes.vivify(pair.b);
-              //    offset = pair.b.location.size();
-              //  }
-              //}
-              //parseAnnotations(i);
-              //parseInnerTypes(i, offset);
+                //astPath = fixNewArrayType(astPath);  // handle special case
+                //ATypeElement i = decl.insertAnnotations.vivify(astPath);
+                //parseAnnotations(i);
+                //parseInnerTypes(i);
+                int offset = 0;
+                Pair<ASTPath, InnerTypeLocation> pair =
+                        splitNewArrayType(astPath);  // handle special case
+                ATypeElement i;
+                if (pair == null) {
+                    i = decl.insertAnnotations.vivify(astPath);
+                } else {
+                    i = decl.insertAnnotations.vivify(pair.a);
+                    if (pair.b != null) {
+                        i = i.innerTypes.vivify(pair.b);
+                        offset = pair.b.location.size();
+                    }
+                }
+                parseAnnotations(i);
+                parseInnerTypes(i, offset);
             }
         }
         while (checkKeyword("insert-typecast")) {
