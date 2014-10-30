@@ -1,0 +1,37 @@
+package annotations.tests.classfile.foo:
+annotation visible @A
+
+package annotations.tests.classfile.foo:
+annotation visible @B:
+	String value
+	
+
+package annotations.tests.classfile.foo:
+annotation visible @C:
+	int fieldA
+	String fieldB
+	
+package annotations.tests.classfile.foo:
+annotation visible @D:
+	int fieldA
+	String fieldB
+	int[] fieldC
+
+package annotations.tests.classfile.foo:
+annotation visible @E:
+	int fieldA
+	String fieldB
+
+package annotations.tests.classfile.foo:
+annotation visible @F:
+	int fieldA
+	String fieldB
+
+package annotations.tests.classfile.foo:
+annotation visible @G:
+	int fieldA
+	String fieldB
+	boolean[] fieldC
+	int fieldD
+	int fieldE
+	
