@@ -326,15 +326,26 @@ public class IndexFileSpecification implements Specification {
     CloseParenthesisInsertion closeParen = null;
     List<Insertion> annotationInsertions = new ArrayList<Insertion>();
     Set<Pair<String, Annotation>> elementAnnotations = getElementAnnotations(element);
-    if (element instanceof ATypeElementWithType && elementAnnotations.isEmpty()) {
-      // Still insert even if it's a cast insertion with no outer annotations to
-      // just insert a cast, or insert a cast with annotations on the compound
-      // types.
-      Pair<CastInsertion, CloseParenthesisInsertion> insertions = createCastInsertion(
-          ((ATypeElementWithType) element).getType(), null,
-          innerTypeInsertions, clist.criteria());
-      cast = insertions.a;
-      closeParen = insertions.b;
+    if (elementAnnotations.isEmpty()) {
+      Criteria criteria = clist.criteria();
+      if (element instanceof ATypeElementWithType) {
+        // Still insert even if it's a cast insertion with no outer
+        // annotations to just insert a cast, or insert a cast with
+        // annotations on the compound types.
+        Pair<CastInsertion, CloseParenthesisInsertion> pair =
+            createCastInsertion(((ATypeElementWithType) element).getType(),
+                null, innerTypeInsertions, criteria);
+        cast = pair.a;
+        closeParen = pair.b;
+      } else if (!innerTypeInsertions.isEmpty()) {
+        if (isOnReceiver(criteria)) {
+          receiver = new ReceiverInsertion(new DeclaredType(),
+              criteria, innerTypeInsertions);
+        } else if (isOnNew(criteria)) {
+          neu = new NewInsertion(new DeclaredType(),
+              criteria, innerTypeInsertions);
+        }
+      }
     }
 
     for (Pair<String, Annotation> p : elementAnnotations) {
@@ -343,7 +354,7 @@ public class IndexFileSpecification implements Specification {
       Annotation annotation = p.b;
       Boolean isDeclarationAnnotation = !annotation.def.isTypeAnnotation();
       Criteria criteria = clist.criteria();
-      if (isOnReceiver(criteria)) {
+      if (noTypePath(criteria) && isOnReceiver(criteria)) {
         if (receiver == null) {
           DeclaredType type = new DeclaredType();
           type.addAnnotation(annotationString);
@@ -353,7 +364,7 @@ public class IndexFileSpecification implements Specification {
           receiver.getType().addAnnotation(annotationString);
         }
         addInsertionSource(receiver, annotation);
-      } else if (isOnNew(criteria)) {
+      } else if (noTypePath(criteria) && isOnNew(criteria)) {
         if (neu == null) {
           DeclaredType type = new DeclaredType();
           type.addAnnotation(annotationString);
@@ -393,7 +404,7 @@ public class IndexFileSpecification implements Specification {
       this.insertions.addAll(elementInsertions);
 
       // exclude expression annotations
-      if (isOnNullaryConstructor(criteria)) {
+      if (noTypePath(criteria) && isOnNullaryConstructor(criteria)) {
         if (cons == null) {
           DeclaredType type = new DeclaredType(criteria.getClassName());
           cons = new ConstructorInsertion(type, criteria,
@@ -429,56 +440,41 @@ public class IndexFileSpecification implements Specification {
     return annotationInsertions;
   }
 
+  private boolean noTypePath(Criteria criteria) {
+    GenericArrayLocationCriterion galc =
+        criteria.getGenericArrayLocation();
+    return galc == null || galc.getLocation().isEmpty();
+  }
+
   public static boolean isOnReceiver(Criteria criteria) {
-      GenericArrayLocationCriterion galc = criteria.getGenericArrayLocation();
-      if (galc == null || galc.getLocation().isEmpty()) {
-          ASTPath astPath = criteria.getASTPath();
-          if (astPath == null) {
-              return criteria.isOnReceiver();
-          } else if (!astPath.isEmpty()) {
-              ASTPath.ASTEntry entry = astPath.get(-1);  // 0?
-              return entry.childSelectorIs(ASTPath.PARAMETER)
-                  && entry.getArgument() < 0;
-          }
-      }
-      return false;
+    ASTPath astPath = criteria.getASTPath();
+    if (astPath == null) { return criteria.isOnReceiver(); }
+    if (astPath.isEmpty()) { return false; }
+    ASTPath.ASTEntry entry = astPath.get(-1);
+    return entry.childSelectorIs(ASTPath.PARAMETER)
+        && entry.getArgument() < 0;
   }
 
   public static boolean isOnNew(Criteria criteria) {
-      GenericArrayLocationCriterion galc =
-          criteria.getGenericArrayLocation();
-      if (galc == null || galc.getLocation().isEmpty()) {
-          ASTPath astPath = criteria.getASTPath();
-          if (astPath == null || astPath.isEmpty()) {
-              return criteria.isOnNew();
-          } else {
-              ASTPath.ASTEntry entry = astPath.get(-1);
-              Tree.Kind kind = entry.getTreeKind();
-              return (kind == Tree.Kind.NEW_ARRAY
-                          || kind == Tree.Kind.NEW_CLASS)
-                      && entry.childSelectorIs(ASTPath.TYPE)
-                      && entry.getArgument() == 0;
-          }
-      }
-      return false;
+    ASTPath astPath = criteria.getASTPath();
+    if (astPath == null || astPath.isEmpty()) { return criteria.isOnNew(); }
+    ASTPath.ASTEntry entry = astPath.get(-1);
+    Tree.Kind kind = entry.getTreeKind();
+    return (kind == Tree.Kind.NEW_ARRAY || kind == Tree.Kind.NEW_CLASS)
+        && entry.childSelectorIs(ASTPath.TYPE) && entry.getArgument() == 0;
   }
 
-  private boolean isOnNullaryConstructor(Criteria criteria) {
-      if (!criteria.isOnMethod("<init>()V")) { return false; }
-      GenericArrayLocationCriterion galc =
-          criteria.getGenericArrayLocation();
-      if (galc == null || galc.getLocation().isEmpty()) {
-          ASTPath astPath = criteria.getASTPath();
-          if (astPath == null || astPath.isEmpty()) {
-              return criteria.isOnMethod("<init>()V")
-                      && !criteria.isOnNew();  // exclude expression annotations
-          } else {
-              ASTPath.ASTEntry entry = astPath.get(0); 
-              return entry.getTreeKind() == Tree.Kind.METHOD
-                      && entry.childSelectorIs(ASTPath.TYPE);
-          }
+  private static boolean isOnNullaryConstructor(Criteria criteria) {
+    if (criteria.isOnMethod("<init>()V")) {
+      ASTPath astPath = criteria.getASTPath();
+      if (astPath == null || astPath.isEmpty()) {
+        return !criteria.isOnNew();  // exclude expression annotations
       }
-      return false;
+      ASTPath.ASTEntry entry = astPath.get(0); 
+      return entry.getTreeKind() == Tree.Kind.METHOD
+          && entry.childSelectorIs(ASTPath.TYPE);
+    }
+    return false;
   }
 
   /**
@@ -618,7 +614,6 @@ public class IndexFileSpecification implements Specification {
   }
 
   private void parseBlock(CriterionList clist, String methodName, ABlock block) {
-
     // parse locals of method
     for (Entry<LocalLocation, AField> entry : block.locals.entrySet()) {
       LocalLocation loc = entry.getKey();
