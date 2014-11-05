@@ -106,11 +106,13 @@ public abstract class Insertion {
     public String getText(boolean comments, boolean abbreviate,
             boolean gotSeparateLine, int pos, char precedingChar) {
         String toInsert = getText(comments, abbreviate);
-        if (addLeadingSpace(gotSeparateLine, pos, precedingChar)) {
-            toInsert = " " + toInsert;
-        }
-        if (addTrailingSpace(gotSeparateLine)) {
-            toInsert = toInsert + " ";
+        if (!toInsert.isEmpty()) {
+            if (addLeadingSpace(gotSeparateLine, pos, precedingChar)) {
+                toInsert = " " + toInsert;
+            }
+            if (addTrailingSpace(gotSeparateLine)) {
+                toInsert = toInsert + " ";
+            }
         }
         return toInsert;
     }
