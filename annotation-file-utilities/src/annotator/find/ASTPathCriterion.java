@@ -165,6 +165,12 @@ public class ASTPathCriterion implements Criterion {
             if (next == null) {
                 return checkNull(TreePath.getPath(path, actualNode), i);
             }
+            if (!(next instanceof JCTree)) {
+                // converted from array type, not in source AST...
+                // need to extend actualPath with "artificial" node
+                actualPath.add(next);
+                ++actualPathLen;
+            }
             if (debug) {
                 System.out.println("next: " + next);
             }
@@ -432,8 +438,16 @@ public class ASTPathCriterion implements Criterion {
                 NewArrayTree newArray = (NewArrayTree) actualNode;
                 if (astNode.childSelectorIs(ASTPath.TYPE)) {
                     int arg = astNode.getArgument();
-                    Tree type = newArray.getType();
-                    return arg == 0 ? type : null;
+                    Type type = ((JCTree.JCNewArray) newArray).type;
+                    Tree typeTree = Insertions.TypeTree.fromType(type);
+                    while (arg > 0) {
+                      if (!(typeTree instanceof ArrayTypeTree)) { return null; }
+                      typeTree = ((ArrayTypeTree) typeTree).getType();
+                      --arg;
+                    }
+                    return typeTree;
+                    //Tree type = newArray.getType();
+                    //return arg == 0 ? typeTree : null;
                 } else if (astNode.childSelectorIs(ASTPath.DIMENSION)) {
                     int arg = astNode.getArgument();
                     List<? extends ExpressionTree> dims = newArray.getDimensions();
