@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -722,6 +721,8 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
         astPath = astRecord(node).astPath.extendNewArray(dim);
         childSelector = ASTPath.TYPE;
       } else {
+        // TODO: The visitor needs to keep track of the ASTPath, if any,
+        // in case there are multiple NewArray entries.
         ASTPath.ASTEntry lastEntry = astPath.get(astPath.size() - 1);
         assert lastEntry.getTreeKind() == Tree.Kind.NEW_ARRAY;
         childSelector = lastEntry.getChildSelector();
@@ -783,6 +784,9 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
         int startPos = na.elemtype.getStartPosition();
         return Pair.of(rec.replacePath(astPath),
             getFirstInstanceAfter('[', startPos+1));
+      } else if (dim == dimsSize) {
+        return Pair.of(rec.replacePath(astPath),
+            na.getType().pos().getStartPosition());
       } else {
         JCArrayTypeTree jcatt = (JCArrayTypeTree) na.elemtype;
         for (int i=1; i<dim; i++) {
@@ -1803,7 +1807,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
    * @return the source position to insertion text mapping
    */
   public SetMultimap<Integer, Insertion> getPositions(JCCompilationUnit node, List<Insertion> p) {
-    List<Insertion> uninserted = new LinkedList<Insertion>(p);
+    List<Insertion> uninserted = new ArrayList<Insertion>(p);
     this.scan(node, uninserted);
     // There may be many extra annotations in a .jaif file.  For instance,
     // the .jaif file may be for an entire library, but its compilation
