@@ -34,3 +34,15 @@ class NonClass$E:
         insert-annotation Variable.initializer, NewClass.identifier: @V(value=2)
         insert-annotation Variable.type: @V(value=3)
 
+package :
+class NonClass$E:
+
+    field a:
+        insert-annotation Variable.type: @X
+
+package :
+class NonClass$E:
+
+    method <init>(Ljava/lang/String;)V:
+        insert-annotation Method.body, Block.statement 1, ExpressionStatement.expression, Assignment.expression, NewClass.identifier: @V(value=0)
+

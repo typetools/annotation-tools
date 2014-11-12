@@ -33,3 +33,13 @@ class NonClass$E:
 field D:
 type: @V(3)
 
+package:
+class NonClass$E:
+field a:
+type: @X
+
+package:
+class NonClass$E:
+method <init>(Ljava/lang/String;)V:
+new *0: @V(0)
+
