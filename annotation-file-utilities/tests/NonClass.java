@@ -4,6 +4,7 @@ public class NonClass {
   @interface C { String value() default "Ha!"; }
   enum E {
     D((String) new String());
-    E(String s) { }
+    E(String s) { a = new A() { @Override public void m(Object p) {} }; }
+    final A a;
   }
 }
