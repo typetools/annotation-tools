@@ -1,8 +1,11 @@
 package annotations.util;
 
+import com.sun.source.tree.ArrayTypeTree;
 import com.sun.source.tree.MethodTree;
+import com.sun.source.tree.Tree;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.code.TypeTag;
+import com.sun.tools.javac.tree.JCTree.JCExpression;
 import com.sun.tools.javac.tree.JCTree.JCMethodDecl;
 import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
 import com.sun.tools.javac.util.List;
@@ -32,19 +35,24 @@ public class JVMNames {
     public static String getJVMMethodName(MethodTree methodTree) {
         ExecutableElement methodElement = ((JCMethodDecl) methodTree).sym;
         StringBuilder builder = new StringBuilder();
+        String returnTypeStr;
         builder.append(methodTree.getName());
         builder.append("(");
 
         if (methodElement == null) {
-            // how to work around?
+            // use source AST in lieu of symbol table
             List<JCVariableDecl> params = ((JCMethodDecl) methodTree).params;
             JCVariableDecl param = params.head;
+            JCExpression typeTree = ((JCMethodDecl) methodTree).restype;
+            returnTypeStr = treeToJVMLString(typeTree);
             while (param != null) {
-                //builder.append(typeToJvmlString(treeToType(param.vartype)));
+                builder.append(treeToJVMLString(param.vartype));
                 params = params.tail;
                 param = params.head;
             }
         } else {
+            TypeMirror returnType = methodElement.getReturnType();
+            returnTypeStr = typeToJvmlString((Type)returnType);
             for (VariableElement ve : methodElement.getParameters()) {
                 Type vt = (Type) ve.asType();
                 if (vt.getTag() == TypeTag.TYPEVAR) {
@@ -55,11 +63,8 @@ public class JVMNames {
         }
 
         builder.append(")");
-
-        TypeMirror returnType = methodElement.getReturnType();
-        String returnTypeStr = typeToJvmlString((Type)returnType);
-
         builder.append(returnTypeStr);
+//System.err.println("@"+methodTree.getName()+"("+methodTree.getParameters()+") "+methodTree.getReturnType()+" "+builder.toString());
         return builder.toString();
     }
 
@@ -82,6 +87,33 @@ public class JVMNames {
             return "V";  // special case since UtilMDE doesn't handle void
         } else {
             return UtilMDE.binaryNameToFieldDescriptor(type.tsym.flatName().toString());
+        }
+    }
+
+    /**
+     * Create a JVML string for an AST node representing a type.
+     *
+     * @param typeTree a Tree representing a type
+     * @return The JVML representation of type
+     */
+    private static String treeToJVMLString(Tree typeTree) {
+        StringBuilder builder = new StringBuilder();
+        treeToJVMLString(typeTree, builder);
+        return builder.toString();
+    }
+
+    private static void treeToJVMLString(Tree typeTree, StringBuilder builder) {
+        // FIXME: not robust in presence of comments
+        switch (typeTree.getKind()) {
+        case ARRAY_TYPE:
+            builder.append('[');
+            treeToJVMLString(((ArrayTypeTree) typeTree).getType(), builder);
+            break;
+        default:
+            String str = typeTree.toString();
+            builder.append("void".equals(str) ? "V"
+                : UtilMDE.binaryNameToFieldDescriptor(typeTree.toString()));
+            break;
         }
     }
 }

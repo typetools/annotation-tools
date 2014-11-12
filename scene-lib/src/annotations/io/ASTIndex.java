@@ -1,7 +1,12 @@
 package annotations.io;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import javax.lang.model.element.Name;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
@@ -53,6 +58,7 @@ import com.sun.source.tree.WhileLoopTree;
 import com.sun.source.tree.WildcardTree;
 import com.sun.source.util.SimpleTreeVisitor;
 import com.sun.source.util.TreePath;
+import com.sun.tools.javac.code.Symbol.ClassSymbol;
 import com.sun.tools.javac.tree.JCTree;
 
 import annotations.util.JVMNames;
@@ -98,6 +104,8 @@ public class ASTIndex extends WrapperMap<Tree, ASTRecord> {
     // better to save the current node's entry first, at a small cost to
     // the clarity of the code.)
     cut.accept(new SimpleTreeVisitor<Void, ASTRecord>() {
+      Deque<Integer> counters = new ArrayDeque<Integer>();
+
       private void save(Tree node, ASTRecord rec,
           Kind kind, String sel) {
         if (node != null) {
@@ -120,6 +128,15 @@ public class ASTIndex extends WrapperMap<Tree, ASTRecord> {
             save(node, rec, kind, sel, i++);
           }
         }
+      }
+
+      private void saveClass(ClassTree node) {
+        String className =
+            ((JCTree.JCClassDecl) node).sym.flatname.toString();
+        ASTRecord rec = new ASTRecord(className, null, null, ASTPath.empty());
+        counters.push(0);
+        node.accept(this, rec);
+        counters.pop();
       }
 
       @Override
@@ -200,7 +217,18 @@ public class ASTIndex extends WrapperMap<Tree, ASTRecord> {
 
       @Override
       public Void visitBlock(BlockTree node, ASTRecord rec) {
-        saveAll(node.getStatements(), rec, node.getKind(), ASTPath.STATEMENT);
+        Iterable<? extends Tree> nodes = node.getStatements();
+        if (nodes != null) {
+          int i = 0;
+          for (Tree stmt : nodes) {
+            if (ASTPath.isClassEquiv(stmt.getKind())) {
+              saveClass((ClassTree) stmt);
+            } else {
+              save(stmt, rec, node.getKind(), ASTPath.STATEMENT, i);
+            }
+            ++i;
+          }
+        }
         return defaultAction(node, rec);
       }
 
@@ -222,22 +250,8 @@ public class ASTIndex extends WrapperMap<Tree, ASTRecord> {
 
       @Override
       public Void visitClass(ClassTree node, ASTRecord rec) {
-        JCTree.JCClassDecl jcd = (JCTree.JCClassDecl) node;
-        Kind kind = node.getKind();
+        Kind kind = Tree.Kind.CLASS;  // use for all class-equivalent kinds
         int i = 0;
-        String className;
-        if (jcd.sym == null) {
-          Tree parent = TreePath.getPath(cut, node).getParentPath().getLeaf();
-          if (parent.getKind() == Tree.Kind.NEW_CLASS) {
-            className = ((NewClassTree) parent).getIdentifier().toString();
-          } else {
-            throw new RuntimeException("can't get class name for node\n"
-                + node.toString());
-          }
-        } else {
-          className = jcd.sym.flatname.toString();
-        }
-        rec = new ASTRecord(className, null, null, ASTPath.empty());
         if (node.getSimpleName().length() > 0) {
           // don't save exts/impls for anonymous inner class
           save(node.getExtendsClause(), rec, kind, ASTPath.BOUND, -1);
@@ -247,8 +261,13 @@ public class ASTIndex extends WrapperMap<Tree, ASTRecord> {
         for (Tree member : node.getMembers()) {
           if (member.getKind() == Tree.Kind.BLOCK) {
             save(member, rec, kind, ASTPath.INITIALIZER, i++);
+          } else if (ASTPath.isClassEquiv(member.getKind())) {
+            String className =
+                ((JCTree.JCClassDecl) member).sym.flatname.toString();
+            member.accept(this,
+                new ASTRecord(className, null, null, ASTPath.empty()));
           } else {
-            visit(member, rec);
+            member.accept(this, rec);
           }
         }
         return defaultAction(node, rec);
@@ -328,12 +347,29 @@ public class ASTIndex extends WrapperMap<Tree, ASTRecord> {
       @Override
       public Void visitMethod(MethodTree node, ASTRecord rec) {
         Kind kind = node.getKind();
-        rec = new ASTRecord(rec.className,
-            JVMNames.getJVMMethodName(node), null, ASTPath.empty());
+        String methodName = JVMNames.getJVMMethodName(node);
+        Tree rcvr = node.getReceiverParameter();
+        List<? extends Tree> params = node.getParameters();
+        if (rcvr != null) {
+          rec = new ASTRecord(rec.className, methodName, "this",
+              ASTPath.empty());
+          rcvr.accept(this, rec.extend(kind, ASTPath.PARAMETER, -1));
+        }
+        if (params != null) {
+          for (Tree param : params) {
+            if (param != null) {
+              String varName = ((VariableTree) param).getName().toString();
+              rec = new ASTRecord(rec.className, methodName, varName,
+                  ASTPath.empty());
+              param.accept(this, rec);
+            }
+          }
+        }
+        rec = new ASTRecord(rec.className, methodName, null, ASTPath.empty());
         save(node.getReturnType(), rec, kind, ASTPath.TYPE);
         saveAll(node.getTypeParameters(), rec, kind, ASTPath.TYPE_PARAMETER);
-        save(node.getReceiverParameter(), rec, kind, ASTPath.PARAMETER, -1);
-        saveAll(node.getParameters(), rec, kind, ASTPath.PARAMETER);
+        //save(node.getReceiverParameter(), rec, kind, ASTPath.PARAMETER, -1);
+        //saveAll(node.getParameters(), rec, kind, ASTPath.PARAMETER);
         saveAll(node.getThrows(), rec, kind, ASTPath.THROWS);
         save(node.getBody(), rec, kind, ASTPath.BODY);
         return defaultAction(node, rec);
@@ -354,14 +390,37 @@ public class ASTIndex extends WrapperMap<Tree, ASTRecord> {
 
       @Override
       public Void visitNewClass(NewClassTree node, ASTRecord rec) {
-        ClassTree classBody = node.getClassBody();
+        JCTree.JCClassDecl classBody =
+            (JCTree.JCClassDecl) node.getClassBody();
         Kind kind = node.getKind();
         save(node.getEnclosingExpression(), rec, kind,
             ASTPath.ENCLOSING_EXPRESSION);
         saveAll(node.getTypeArguments(), rec, kind, ASTPath.TYPE_ARGUMENT);
         save(node.getIdentifier(), rec, kind, ASTPath.IDENTIFIER);
         saveAll(node.getArguments(), rec, kind, ASTPath.ARGUMENT);
-        if (classBody != null) { visitClass(classBody, null); }
+        if (classBody != null) {
+          Name name = classBody.getSimpleName();
+          String className = null;
+          if (name == null) {
+            int i = counters.pop();
+            counters.push(++i);
+            className = rec.className + "$" + i;
+          } else {
+            ClassSymbol sym = ((JCTree.JCClassDecl) classBody).sym;
+            String s = sym == null ? "" : sym.toString();
+            if (s.startsWith("<anonymous ")) {
+              int i = counters.pop();
+              counters.push(++i);
+              className = s.substring(11, s.length()-1);
+            } else {
+              className = rec.className + "$" + name;
+            }
+          }
+          counters.push(0);
+          classBody.accept(this,
+              new ASTRecord(className, null, null, ASTPath.empty()));
+          counters.pop();
+        }
         return defaultAction(node, rec);
       }
 
@@ -429,7 +488,7 @@ public class ASTIndex extends WrapperMap<Tree, ASTRecord> {
       public Void visitCompilationUnit(CompilationUnitTree node,
           ASTRecord rec) {
         for (Tree tree : node.getTypeDecls()) {
-          tree.accept(this, null);
+          saveClass((ClassTree) tree);
         }
         return null;
       }
@@ -559,6 +618,6 @@ public class ASTIndex extends WrapperMap<Tree, ASTRecord> {
       sb.append(entry.getKey().toString().replaceAll("\\s+", " "))
         .append(" # ").append(entry.getValue()).append("\n");
     }
-    return sb.toString();  // TODO
+    return sb.toString();
   }
 }
