@@ -76,9 +76,9 @@ public class Insertions implements Iterable<Insertion> {
         public int compare(Insertion o1, Insertion o2) {
           Criteria c1 = o1.getCriteria();
           Criteria c2 = o2.getCriteria();
-          ASTRecord r1 = new ASTRecord(c1.getClassName(),
+          ASTRecord r1 = new ASTRecord(null, c1.getClassName(),
               c1.getMethodName(), c1.getFieldName(), c1.getASTPath());
-          ASTRecord r2 = new ASTRecord(c2.getClassName(),
+          ASTRecord r2 = new ASTRecord(null, c2.getClassName(),
               c2.getMethodName(), c2.getFieldName(), c2.getASTPath());
           return r1.compareTo(r2);
         }
@@ -285,7 +285,7 @@ public class Insertions implements Iterable<Insertion> {
           || ins instanceof CloseParenthesisInsertion) {
         organized.add(ins);
       } else {
-        ASTRecord rec = new ASTRecord(criteria.getClassName(),
+        ASTRecord rec = new ASTRecord(cut, criteria.getClassName(),
             criteria.getMethodName(), criteria.getFieldName(), p);
         ASTPath.ASTEntry entry = rec.astPath.get(-1);
         Tree node;
@@ -453,7 +453,7 @@ public class Insertions implements Iterable<Insertion> {
       do {
         ap0 = astack.pop();
         kind = ap0.get(-1).getTreeKind();
-        rec = new ASTRecord(className, methodName, fieldName, ap0);
+        rec = new ASTRecord(cut, className, methodName, fieldName, ap0);
       } while (!(astack.isEmpty() || map.containsKey(rec)));
 
       TypedInsertion tins = map.get(rec);
