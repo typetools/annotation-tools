@@ -1,6 +1,7 @@
 package annotations.io;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
@@ -75,6 +76,7 @@ public class ASTIndex extends WrapperMap<Tree, ASTRecord> {
   private static final int EXPECTED_SIZE = 128;
 
   private final CompilationUnitTree cut;
+  private final Map<String, Map<String, List<String>>> formals;
 
   /**
    * Maps source trees in compilation unit to corresponding AST paths.
@@ -94,6 +96,7 @@ public class ASTIndex extends WrapperMap<Tree, ASTRecord> {
   private ASTIndex(CompilationUnitTree root) {
     super(HashBiMap.<Tree, ASTRecord>create(EXPECTED_SIZE));
     cut = root;
+    formals = new HashMap<String, Map<String, List<String>>>();
 
     // The visitor implementation is slightly complicated by the
     // inclusion of information from both parent and child nodes in each
@@ -133,7 +136,8 @@ public class ASTIndex extends WrapperMap<Tree, ASTRecord> {
       private void saveClass(ClassTree node) {
         String className =
             ((JCTree.JCClassDecl) node).sym.flatname.toString();
-        ASTRecord rec = new ASTRecord(className, null, null, ASTPath.empty());
+        ASTRecord rec =
+            new ASTRecord(cut, className, null, null, ASTPath.empty());
         counters.push(0);
         node.accept(this, rec);
         counters.pop();
@@ -252,6 +256,7 @@ public class ASTIndex extends WrapperMap<Tree, ASTRecord> {
       public Void visitClass(ClassTree node, ASTRecord rec) {
         Kind kind = Tree.Kind.CLASS;  // use for all class-equivalent kinds
         int i = 0;
+        formals.put(rec.className, new HashMap<String, List<String>>());
         if (node.getSimpleName().length() > 0) {
           // don't save exts/impls for anonymous inner class
           save(node.getExtendsClause(), rec, kind, ASTPath.BOUND, -1);
@@ -265,7 +270,7 @@ public class ASTIndex extends WrapperMap<Tree, ASTRecord> {
             String className =
                 ((JCTree.JCClassDecl) member).sym.flatname.toString();
             member.accept(this,
-                new ASTRecord(className, null, null, ASTPath.empty()));
+                new ASTRecord(cut, className, null, null, ASTPath.empty()));
           } else {
             member.accept(this, rec);
           }
@@ -350,22 +355,27 @@ public class ASTIndex extends WrapperMap<Tree, ASTRecord> {
         String methodName = JVMNames.getJVMMethodName(node);
         Tree rcvr = node.getReceiverParameter();
         List<? extends Tree> params = node.getParameters();
-        if (rcvr != null) {
-          rec = new ASTRecord(rec.className, methodName, "this",
-              ASTPath.empty());
-          rcvr.accept(this, rec.extend(kind, ASTPath.PARAMETER, -1));
-        }
-        if (params != null) {
+        if (params != null && !params.isEmpty()) {
+          Map<String, List<String>> map = formals.get(rec.className);
+          List<String> names = new ArrayList<String>(params.size());
+          int i = 0;
+          map.put(methodName, names);
           for (Tree param : params) {
             if (param != null) {
-              String varName = ((VariableTree) param).getName().toString();
-              rec = new ASTRecord(rec.className, methodName, varName,
-                  ASTPath.empty());
-              param.accept(this, rec);
+              names.add(((VariableTree) param).getName().toString());
+              param.accept(this, new ASTRecord(cut, rec.className,
+                      methodName, null, ASTPath.empty())
+                  .extend(Tree.Kind.METHOD, ASTPath.PARAMETER, i++));
             }
           }
         }
-        rec = new ASTRecord(rec.className, methodName, null, ASTPath.empty());
+        if (rcvr != null) {
+          rec = new ASTRecord(cut, rec.className, methodName, null,
+              ASTPath.empty());
+          rcvr.accept(this, rec.extend(kind, ASTPath.PARAMETER, -1));
+        }
+        rec = new ASTRecord(cut, rec.className, methodName, null,
+            ASTPath.empty());
         save(node.getReturnType(), rec, kind, ASTPath.TYPE);
         saveAll(node.getTypeParameters(), rec, kind, ASTPath.TYPE_PARAMETER);
         //save(node.getReceiverParameter(), rec, kind, ASTPath.PARAMETER, -1);
@@ -401,7 +411,7 @@ public class ASTIndex extends WrapperMap<Tree, ASTRecord> {
         if (classBody != null) {
           Name name = classBody.getSimpleName();
           String className = null;
-          if (name == null) {
+          if (name == null || name.toString().isEmpty()) {
             int i = counters.pop();
             counters.push(++i);
             className = rec.className + "$" + i;
@@ -418,7 +428,7 @@ public class ASTIndex extends WrapperMap<Tree, ASTRecord> {
           }
           counters.push(0);
           classBody.accept(this,
-              new ASTRecord(className, null, null, ASTPath.empty()));
+              new ASTRecord(cut, className, null, null, ASTPath.empty()));
           counters.pop();
         }
         return defaultAction(node, rec);
@@ -565,7 +575,7 @@ public class ASTIndex extends WrapperMap<Tree, ASTRecord> {
       public Void visitVariable(VariableTree node, ASTRecord rec) {
         Kind kind = node.getKind();
         if (rec.methodName == null) {  // member field
-          rec = new ASTRecord(rec.className, rec.methodName,
+          rec = new ASTRecord(cut, rec.className, rec.methodName,
               ((VariableTree) node).getName().toString(), rec.astPath);
         }
         save(node.getType(), rec, kind, ASTPath.TYPE);
@@ -605,10 +615,44 @@ public class ASTIndex extends WrapperMap<Tree, ASTRecord> {
     ExpressionTree et = cut.getPackageName();
     String pkg = et == null ? "" : et.toString();
     if (!pkg.isEmpty() && rec.className.indexOf('.') < 0) {
-      rec = new ASTRecord(pkg + "." + rec.className,
+      rec = new ASTRecord(cut, pkg + "." + rec.className,
           rec.methodName, rec.varName, rec.astPath);
     }
     return revIndex.get(rec);
+  }
+
+  public static String getParameterName(CompilationUnitTree cut,
+      String className, String methodName, int index) {
+    try {
+      ASTIndex ai = (ASTIndex) ASTIndex.indexOf(cut);
+      return ai.formals.get(className).get(methodName).get(index);
+    } catch (NullPointerException ex) {
+      return null;
+    }
+  }
+
+  public static Integer getParameterIndex(CompilationUnitTree cut,
+      String className, String methodName, String varName) {
+    if (cut != null && className != null
+        && methodName != null && varName != null) {
+      // if it's already a number, return it
+      try {
+        return Integer.valueOf(varName);
+      } catch (NumberFormatException ex) {}
+      // otherwise, look through parameter list for string
+      try {
+        ASTIndex ai = (ASTIndex) ASTIndex.indexOf(cut);
+        List<String> names =
+            ai.formals.get(className).get(methodName);
+        int i = 0;
+        for (String name : names) {
+          if (varName.equals(name)) { return i; }
+          ++i;
+        }
+      } catch (NullPointerException ex) {}
+    }
+    // not found
+    return null;
   }
 
   @Override
