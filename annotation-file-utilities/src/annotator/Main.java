@@ -41,6 +41,7 @@ import annotations.el.ElementVisitor;
 import annotations.el.LocalLocation;
 import annotations.io.ASTIndex;
 import annotations.io.ASTPath;
+import annotations.io.ASTRecord;
 import annotations.io.IndexFileParser;
 import annotations.io.IndexFileWriter;
 import annotations.util.coll.VivifyingMap;
@@ -65,7 +66,6 @@ import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
 import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
-import com.sun.tools.javac.code.TypeTag;
 import com.sun.tools.javac.main.CommandLine;
 import com.sun.tools.javac.tree.JCTree;
 
@@ -262,17 +262,22 @@ public class Main {
     return filtered;
   }
 
-  private static Map<String, TypeTag> primTags = new HashMap<String, TypeTag>();
-  {
-    primTags.put("byte", TypeTag.BYTE);
-    primTags.put("char", TypeTag.CHAR);
-    primTags.put("short", TypeTag.SHORT);
-    primTags.put("long", TypeTag.LONG);
-    primTags.put("float", TypeTag.FLOAT);
-    primTags.put("int", TypeTag.INT);
-    primTags.put("double", TypeTag.DOUBLE);
-    primTags.put("boolean", TypeTag.BOOLEAN);
-  }
+  //private static Set<AnnotationDef> annotationDefs(final AScene scene)
+  //    throws DefException {
+  //  if (annoCache.containsKey(scene)) { return annoCache.get(scene); }
+  //  final Set<AnnotationDef> defs = new HashSet<AnnotationDef>();
+  //  new DefCollector(scene) {
+  //    @Override
+  //    protected void visitAnnotationDef(AnnotationDef d) {
+  //      defs.add(d);
+  //    }
+  //  }.visit();
+  //  annoCache.put(scene, defs);
+  //  return defs;
+  //}
+
+  //private static Map<AScene, Set<AnnotationDef>> annoCache =
+  //    new HashMap<AScene, Set<AnnotationDef>>();
 
 /*
   private static Pair<ASTPath, Pair<TypeTree, TypePathEntry>>
@@ -360,7 +365,7 @@ public class Main {
 */
 
   private static ATypeElement findInnerTypeElement(Tree t,
-      ASTIndex.ASTRecord rec, ADeclaration decl, Type type, Insertion ins) {
+      ASTRecord rec, ADeclaration decl, Type type, Insertion ins) {
     ASTPath astPath = rec.astPath;
     GenericArrayLocationCriterion galc =
         ins.getCriteria().getGenericArrayLocation();
@@ -397,11 +402,140 @@ public class Main {
       default:
         throw new IllegalArgumentException("unknown type tag " + tpe.tag);
       }
-      astPath.add(entry);
+      astPath = astPath.extend(entry);
     }
 
     return decl.insertAnnotations.vivify(astPath);
   }
+
+  private static void convertInsertion(String pkg,
+      JCTree.JCCompilationUnit tree, ASTRecord rec, Insertion ins,
+      AScene scene, Multimap<Insertion, Annotation> insertionSources) {
+    Collection<Annotation> annos = insertionSources.get(ins);
+    if (rec == null) {
+      if (ins.getCriteria().isOnPackage()) {
+        for (Annotation anno : annos) {
+          scene.packages.get(pkg).tlAnnotationsHere.add(anno);
+        }
+      }
+    } else if (scene != null && rec.className != null) {
+      AClass clazz = scene.classes.vivify(rec.className);
+      ADeclaration decl = null;  // insertion target
+      if (ins.getCriteria().onBoundZero()) {
+        int n = rec.astPath.size();
+        if (!rec.astPath.get(n-1).childSelectorIs(ASTPath.BOUND)) {
+          ASTPath astPath = ASTPath.empty();
+          for (int i = 0; i < n; i++) {
+            astPath = astPath.extend(rec.astPath.get(i));
+          }
+          astPath = astPath.extend(
+              new ASTPath.ASTEntry(Tree.Kind.TYPE_PARAMETER,
+                  ASTPath.BOUND, 0));
+          rec = rec.replacePath(astPath);
+        }
+      }
+      if (rec.methodName == null) {
+        decl = rec.varName == null ? clazz
+            : clazz.fields.vivify(rec.varName);
+      } else {
+        AMethod meth = clazz.methods.vivify(rec.methodName);
+        if (rec.varName == null) {
+          decl = meth;  // ?
+        } else {
+          try {
+            int i = Integer.parseInt(rec.varName);
+            decl = i < 0 ? meth.receiver
+                : meth.parameters.vivify(i);
+          } catch (NumberFormatException e) {
+            TreePath path = ASTIndex.getTreePath(tree, rec);
+            JCTree.JCVariableDecl varTree = null;
+            JCTree.JCMethodDecl methTree = null;
+            JCTree.JCClassDecl classTree = null;
+            loop:
+              while (path != null) {
+                Tree leaf = path.getLeaf();
+                switch (leaf.getKind()) {
+                case VARIABLE:
+                  varTree = (JCTree.JCVariableDecl) leaf;
+                  break;
+                case METHOD:
+                  methTree = (JCTree.JCMethodDecl) leaf;
+                  break;
+                case ANNOTATION:
+                case CLASS:
+                case ENUM:
+                case INTERFACE:
+                  break loop;
+                default:
+                  path = path.getParentPath();
+                }
+              }
+            while (path != null) {
+              Tree leaf = path.getLeaf();
+              Tree.Kind kind = leaf.getKind();
+              if (kind == Tree.Kind.METHOD) {
+                methTree = (JCTree.JCMethodDecl) leaf;
+                int i = LocalVariableScanner.indexOfVarTree(path,
+                    varTree, rec.varName);
+                int m = methTree.getStartPosition();
+                int a = varTree.getStartPosition();
+                int b = varTree.getEndPosition(tree.endPositions);
+                LocalLocation loc = new LocalLocation(i, a-m, b-a);
+                decl = meth.body.locals.vivify(loc);
+                break;
+              }
+              if (ASTPath.isClassEquiv(kind)) {
+                classTree = (JCTree.JCClassDecl) leaf;
+                // ???
+                    break;
+              }
+              path = path.getParentPath();
+            }
+          }
+        }
+      }
+      if (decl != null) {
+        AElement el;
+        if (rec.astPath.isEmpty()) {
+          el = decl;
+        } else if (ins.getKind() == Insertion.Kind.CAST) {
+          annotations.el.ATypeElementWithType elem =
+              decl.insertTypecasts.vivify(rec.astPath);
+          elem.setType(((CastInsertion) ins).getType());
+          el = elem;
+        } else {
+          el = decl.insertAnnotations.vivify(rec.astPath);
+        }
+        for (Annotation anno : annos) {
+          el.tlAnnotationsHere.add(anno);
+        }
+        if (ins instanceof TypedInsertion) {
+          TypedInsertion ti = (TypedInsertion) ins;
+          if (!rec.astPath.isEmpty()) {
+            //addInnerTypePaths(decl, rec, ti, insertionSources);
+          }
+          for (Insertion inner : ti.getInnerTypeInsertions()) {
+            Tree t = ASTIndex.getNode(tree, rec);
+            if (t != null) {
+              ATypeElement elem = findInnerTypeElement(t,
+                  rec, decl, ti.getType(), inner);
+              for (Annotation a : insertionSources.get(inner)) {
+                elem.tlAnnotationsHere.add(a);
+              }
+//              GenericArrayLocationCriterion galc =
+//                  inner.getCriteria().getGenericArrayLocation();
+//              ASTPath path =
+//                  innerASTPath(astPath, galc.getLocation(), type);
+//              ATypeElement elem = vm.vivify(path);
+//              for (Annotation a : insertionSources.get(inner)) {
+//                elem.tlAnnotationsHere.add(a);
+            }
+          }
+        }
+      }
+    }
+  }
+
 
   // Implementation details:
   //  1. The annotator partially compiles source
@@ -470,8 +604,10 @@ public class Main {
     Insertions insertions = new Insertions();
     // The Java files into which to insert.
     List<String> javafiles = new ArrayList<String>();
-
+    // Imports required to resolve annotations (when abbreviate==true).
     Set<String> imports = new LinkedHashSet<String>();
+
+    // Indices to maintain insertion source traces. 
     Map<String, Multimap<Insertion, Annotation>> insertionIndex =
         new HashMap<String, Multimap<Insertion, Annotation>>();
     Map<Insertion, String> insertionOrigins = new HashMap<Insertion, String>();
@@ -633,11 +769,11 @@ public class Main {
         if (convert_jaifs) {
           // program used only for JAIF conversion; execute following
           // block and then skip remainder of loop 
-          Multimap<ASTIndex.ASTRecord, Insertion> astInsertions =
+          Multimap<ASTRecord, Insertion> astInsertions =
               finder.getPaths();
-          for (Map.Entry<ASTIndex.ASTRecord, Collection<Insertion>> entry :
+          for (Map.Entry<ASTRecord, Collection<Insertion>> entry :
               astInsertions.asMap().entrySet()) {
-            ASTIndex.ASTRecord rec = entry.getKey();
+            ASTRecord rec = entry.getKey();
             for (Insertion ins : entry.getValue()) {
               if (ins.getCriteria().getASTPath() != null) { continue; }
               String arg = insertionOrigins.get(ins);
@@ -650,140 +786,7 @@ public class Main {
               // TODO: adjust for missing end of path (?)
 
               if (insertionSources.containsKey(ins)) {
-                if (rec == null) {
-                  if (ins.getCriteria().isOnPackage()) {
-                    for (Annotation anno : insertionSources.get(ins)) {
-                      scene.packages.get(pkg).tlAnnotationsHere.add(anno);
-                    }
-                  }
-                } else if (scene != null && rec.className != null) {
-                  AClass clazz = scene.classes.vivify(rec.className);
-                  ADeclaration decl = null;  // insertion target
-                  if (ins.getCriteria().onBoundZero()) {
-                    int n = rec.astPath.size();
-                    if (!rec.astPath.get(n-1).childSelectorIs(ASTPath.BOUND)) {
-                      ASTPath astPath = new ASTPath();
-                      for (int i = 0; i < n; i++) {
-                        astPath.add(rec.astPath.get(i));
-                      }
-                      astPath.add(
-                          new ASTPath.ASTEntry(Tree.Kind.TYPE_PARAMETER,
-                              ASTPath.BOUND, 0));
-                      rec = rec.replacePath(astPath);
-                    }
-                  }
-                  if (rec.methodName == null) {
-                    decl = rec.varName == null ? clazz
-                        : clazz.fields.vivify(rec.varName);
-                  } else {
-                    AMethod meth = clazz.methods.vivify(rec.methodName);
-                    if (rec.varName == null) {
-                      decl = meth;  // ?
-                    } else {
-                      try {
-                        int i = Integer.parseInt(rec.varName);
-                        decl = i < 0 ? meth.receiver
-                            : meth.parameters.vivify(i);
-                      } catch (NumberFormatException e) {
-                        TreePath path = ASTIndex.getTreePath(tree, rec);
-                        JCTree.JCVariableDecl varTree = null;
-                        JCTree.JCMethodDecl methTree = null;
-                        JCTree.JCClassDecl classTree = null;
-loop:
-                        while (path != null) {
-                          Tree leaf = path.getLeaf();
-                          switch (leaf.getKind()) {
-                          case VARIABLE:
-                            varTree = (JCTree.JCVariableDecl) leaf;
-                            break;
-                          case METHOD:
-                            methTree = (JCTree.JCMethodDecl) leaf;
-                            break;
-                          case ANNOTATION:
-                          case CLASS:
-                          case ENUM:
-                          case INTERFACE:
-                            break loop;
-                          default:
-                            path = path.getParentPath();
-                          }
-                        }
-                        while (path != null) {
-                          Tree leaf = path.getLeaf();
-                          Tree.Kind kind = leaf.getKind();
-                          if (kind == Tree.Kind.METHOD) {
-                            methTree = (JCTree.JCMethodDecl) leaf;
-                            int i = LocalVariableScanner.indexOfVarTree(path,
-                                varTree, rec.varName);
-                            int m = methTree.getStartPosition();
-                            int a = varTree.getStartPosition();
-                            int b = varTree.getEndPosition(tree.endPositions);
-                            LocalLocation loc = new LocalLocation(i, a-m, b-a);
-                            decl = meth.body.locals.vivify(loc);
-                            break;
-                          }
-                          if (ASTPath.isClassEquiv(kind)) {
-                            classTree = (JCTree.JCClassDecl) leaf;
-                            // ???
-                            break;
-                          }
-                          path = path.getParentPath();
-                        }
-                      }
-                    }
-                  }
-                  if (decl != null) {
-                    AElement el;
-                    if (rec.astPath.isEmpty()) {
-                      el = decl;
-                    } else if (ins.getKind() == Insertion.Kind.CAST) {
-                      annotations.el.ATypeElementWithType elem =
-                          decl.insertTypecasts.vivify(rec.astPath);
-                      elem.setType(((CastInsertion) ins).getType());
-                      el = elem;
-                    } else {
-                      el = decl.insertAnnotations.vivify(rec.astPath);
-                    }
-                    for (Annotation anno : insertionSources.get(ins)) {
-                      el.tlAnnotationsHere.add(anno);
-                    }
-                    if (ins instanceof TypedInsertion) {
-                      TypedInsertion ti = (TypedInsertion) ins;
-//                      Type type = ti.getType();
-//                      ASTPath astPath = rec.astPath;
-//                      if (!astPath.isEmpty()) {
-//                        ASTPath.ASTEntry lastEntry = astPath.get(-1);
-//                        if (lastEntry.getTreeKind() == Tree.Kind.METHOD
-//                            && lastEntry.childSelectorIs(ASTPath.PARAMETER)) {
-//                          astPath = astPath.add(
-//                              new ASTPath.ASTEntry(Tree.Kind.VARIABLE,
-//                                  ASTPath.TYPE));
-//                        }
-//                      }
-//                      VivifyingMap<ASTPath, ? extends ATypeElement> vm =
-//                          ti.getKind() == Insertion.Kind.CAST
-//                              ? decl.insertTypecasts
-//                              : decl.insertAnnotations;
-                      for (Insertion inner : ti.getInnerTypeInsertions()) {
-                        Tree t = ASTIndex.getNode(cut, rec);
-                        if (t != null) {
-                          ATypeElement elem = findInnerTypeElement(t,
-                              rec, decl, ti.getType(), inner);
-                          for (Annotation a : insertionSources.get(inner)) {
-                            elem.tlAnnotationsHere.add(a);
-                          }
-//                        GenericArrayLocationCriterion galc =
-//                            inner.getCriteria().getGenericArrayLocation();
-//                        ASTPath path =
-//                            innerASTPath(astPath, galc.getLocation(), type);
-//                        ATypeElement elem = vm.vivify(path);
-//                        for (Annotation a : insertionSources.get(inner)) {
-//                          elem.tlAnnotationsHere.add(a);
-                        }
-                      }
-                    }
-                  }
-                }
+                convertInsertion(pkg, tree, rec, ins, scene, insertionSources);
               }
             }
           }
@@ -1007,9 +1010,71 @@ loop:
     }
   }
 
-  ///
-  /// Utility methods
-  ///
+  
+
+/*
+  private static void addInnerTypePaths(ADeclaration decl,
+      ASTRecord astRecord, TypedInsertion ti,
+      Multimap<Insertion, Annotation> insertionSources) {
+    VivifyingMap<ASTPath, ? extends ATypeElement> vm =
+        ti.getKind() == Insertion.Kind.CAST
+            ? decl.insertTypecasts
+            : decl.insertAnnotations;
+    Map<String, Annotation> annoMap = new HashMap<String, Annotation>();
+    for (Annotation anno : insertionSources.get(ti)) {
+      String key = anno.toString();
+      Annotation a = annoMap.get(key);
+      annoMap.put(key, anno);
+      if (a != null && !a.equals(anno)) {
+        if (debug) {
+          System.err.println("WARNING: conflicting annotations");
+          System.err.println("old: " + a);
+          System.err.println("new: " + anno);
+        }
+      }
+    }
+    addInnerTypePaths(vm, astRecord, ti.getType(),
+        Collections.<String>emptyList(), annoMap);
+  }
+
+  private static void
+  addInnerTypePaths(VivifyingMap<ASTPath, ? extends ATypeElement> vm,
+      ASTRecord astRecord, Type type, List<String> ss,
+      Map<String, Annotation> annoMap) {
+    for (String s : ss) {
+      Annotation anno = annoMap.get(s);
+      if (anno != null) {
+        ATypeElement elem = vm.vivify(astRecord.astPath);
+        elem.tlAnnotationsHere.add(anno);
+      }
+    }
+    switch (type.getKind()) {
+    case ARRAY:
+      type = ((ArrayType) type).getComponentType();
+      astRecord = astRecord.extend(Tree.Kind.ARRAY_TYPE, ASTPath.TYPE);
+      break;
+    case BOUNDED:
+      type = ((BoundedType) type).getBound();
+      astRecord = astRecord.extend(Tree.Kind.TYPE_PARAMETER, ASTPath.BOUND);
+      break;
+    case DECLARED:
+      DeclaredType dt = (DeclaredType) type;
+      int i = 0;
+      for (Type t : dt.getTypeParameters()) {
+        ASTRecord r = astRecord.extend(Tree.Kind.PARAMETERIZED_TYPE,
+            ASTPath.TYPE_PARAMETER, i++);
+        addInnerTypePaths(vm, r, t, t.getAnnotations(), annoMap);
+      }
+      type = dt.getInnerType();
+      if (type == null) { return; }
+      astRecord = astRecord.extend(Tree.Kind.MEMBER_SELECT, ASTPath.EXPRESSION);
+      break;
+    default:
+      throw new RuntimeException("unknown type kind " + type.getKind());
+    }
+    addInnerTypePaths(vm, astRecord, type, type.getAnnotations(), annoMap);
+  }
+*/
 
   public static String pathToString(TreePath path) {
     if (path == null)
@@ -1050,302 +1115,4 @@ loop:
         Pair.of(s, (String)null) :
         Pair.of(s.substring(0, pidx), s.substring(pidx));
   }
-
-/*
-  private static abstract class TypeTree implements ExpressionTree {
-    static TypeTree fromType(final Type type) {
-      switch (type.getKind()) {
-      case ARRAY:
-        final ArrayType atype = (ArrayType) type;
-        final TypeTree componentType = fromType(atype.getComponentType());
-        return new ArrT(componentType);
-      case BOUNDED:
-        final BoundedType btype = (BoundedType) type;
-        final BoundedType.BoundKind bk = btype.getBoundKind();
-        final String bname = btype.getType().getName();
-        final TypeTree bound = fromType(btype.getBound());
-        return new Param(bname, bk, bound);
-      case DECLARED:
-        final DeclaredType dtype = (DeclaredType) type;
-        if (dtype.isWildcard()) {
-          return new WildT();
-        } else {
-          final String dname = dtype.getName();
-          TypeTag typeTag = primTags.get(dname);
-          if (typeTag == null) {
-            final TypeTree base = new IdenT(dname);
-            TypeTree ret = base;
-            List<Type> params = dtype.getTypeParameters();
-            DeclaredType inner = dtype.getInnerType();
-            if (!params.isEmpty()) {
-              final List<Tree> typeArgs = new ArrayList<Tree>(params.size());
-              for (Type t : params) { typeArgs.add(fromType(t)); }
-              ret = new ParT(base, typeArgs);
-            }
-            return inner == null ? ret : meld(fromType(inner), ret);
-          } else {
-            final TypeKind typeKind = typeTag.getPrimitiveTypeKind();
-            return new PrimT(typeKind);
-          }
-        }
-      default:
-        throw new RuntimeException("unknown type kind " + type.getKind());
-      }
-    }
-  
-    private static TypeTree meld(final TypeTree t0, final TypeTree t1) {
-      switch (t0.getKind()) {
-      case IDENTIFIER:
-        IdenT it = (IdenT) t0;
-        return new LocT(t1, it.getName());
-      case MEMBER_SELECT:
-        LocT lt = (LocT) t0;
-        return new LocT(meld(lt.getExpression(), t1), lt.getIdentifier());
-      case PARAMETERIZED_TYPE:
-        ParT pt = (ParT) t0;
-        return new ParT(meld(pt.getType(), t1), pt.getTypeArguments());
-      default:
-        throw new IllegalArgumentException("unexpected type " + t0);
-      }
-    }
-  
-    static final class ArrT extends TypeTree implements ArrayTypeTree {
-      private final TypeTree componentType;
-
-      ArrT(TypeTree componentType) {
-        this.componentType = componentType;
-      }
-
-      @Override
-      public Kind getKind() { return Kind.ARRAY_TYPE; }
-
-      @Override
-      public <R, D> R accept(TreeVisitor<R, D> visitor, D data) {
-        return visitor.visitArrayType(this, data);
-      }
-
-      @Override
-      public TypeTree getType() { return componentType; }
-
-      @Override
-      public String toString() { return componentType + "[]"; }
-    }
-
-    static final class LocT extends TypeTree implements MemberSelectTree {
-      private final TypeTree expr;
-      private final Name name;
-    
-      LocT(TypeTree expr, Name name) {
-        this.expr = expr;
-        this.name = name;
-      }
-    
-      @Override
-      public Kind getKind() { return Kind.MEMBER_SELECT; }
-    
-      @Override
-      public <R, D> R accept(TreeVisitor<R, D> visitor, D data) {
-        return visitor.visitMemberSelect(this, data);
-      }
-    
-      @Override
-      public TypeTree getExpression() { return expr; }
-    
-      @Override
-      public Name getIdentifier() { return name; }
-    
-      @Override
-      public String toString() { return expr + "." + name; }
-    }
-
-    static final class ParT extends TypeTree implements ParameterizedTypeTree {
-      private final TypeTree base;
-      private final List<? extends Tree> typeArgs;
-    
-      ParT(TypeTree base, List<? extends Tree> typeArgs) {
-        this.base = base;
-        this.typeArgs = typeArgs;
-      }
-    
-      @Override
-      public Kind getKind() { return Kind.PARAMETERIZED_TYPE; }
-    
-      @Override
-      public <R, D> R accept(TreeVisitor<R, D> visitor, D data) {
-        return visitor.visitParameterizedType(this, data);
-      }
-    
-      @Override
-      public TypeTree getType() { return base; }
-    
-      @Override
-      public List<? extends Tree> getTypeArguments() {
-        return typeArgs;
-      }
-    
-      @Override
-      public String toString() {
-        StringBuilder sb = new StringBuilder(base.toString());
-        String s = "<";
-        for (Tree t : typeArgs) {
-          sb.append(s);
-          sb.append(t.toString());
-          s = ", ";
-        }
-        sb.append('>');
-        return sb.toString();
-      }
-    }
-
-    static final class PrimT extends TypeTree implements PrimitiveTypeTree {
-      private final TypeKind typeKind;
-    
-      PrimT(TypeKind typeKind) {
-        this.typeKind = typeKind;
-      }
-    
-      @Override
-      public Kind getKind() { return Kind.PRIMITIVE_TYPE; }
-    
-      @Override
-      public <R, D> R accept(TreeVisitor<R, D> visitor, D data) {
-        return visitor.visitPrimitiveType(this, data);
-      }
-    
-      @Override
-      public TypeKind getPrimitiveTypeKind() { return typeKind; }
-
-      @Override
-      public String toString() {
-        switch (typeKind) {
-        case BOOLEAN: return "boolean";
-        case BYTE: return "byte";
-        case CHAR: return "char";
-        case DOUBLE: return "double";
-        case FLOAT: return "float";
-        case INT: return "int";
-        case LONG: return "long";
-        case SHORT: return "short";
-        //case VOID: return "void";
-        //case WILDCARD: return "?";
-        default:
-          throw new IllegalArgumentException("unexpected type kind "
-              + typeKind);
-        }
-      }
-    }
-
-    static final class IdenT extends TypeTree implements IdentifierTree {
-      private final String name;
-
-      IdenT(String dname) {
-        this.name = dname;
-      }
-
-      @Override
-      public Kind getKind() { return Kind.IDENTIFIER; }
-
-      @Override
-      public <R, D> R accept(TreeVisitor<R, D> visitor, D data) {
-        return visitor.visitIdentifier(this, data);
-      }
-
-      @Override
-      public Name getName() { return new TypeName(name); }
-
-      @Override
-      public String toString() { return name; }
-    }
-
-    static final class WildT extends TypeTree implements WildcardTree {
-      @Override
-      public Kind getKind() { return Kind.UNBOUNDED_WILDCARD; }
-
-      @Override
-      public <R, D> R accept(TreeVisitor<R, D> visitor, D data) {
-        return visitor.visitWildcard(this, data);
-      }
-
-      @Override
-      public Tree getBound() { return null; }
-
-      @Override
-      public String toString() { return "?"; }
-    }
-
-    static final class Param extends TypeTree implements TypeParameterTree {
-      private final String bname;
-      private final BoundKind bk;
-      private final Tree bound;
-    
-      Param(String bname, BoundKind bk, TypeTree bound) {
-        this.bname = bname;
-        this.bk = bk;
-        this.bound = bound;
-      }
-    
-      @Override
-      public Kind getKind() { return Kind.TYPE_PARAMETER; }
-    
-      @Override
-      public <R, D> R accept(TreeVisitor<R, D> visitor, D data) {
-        return visitor.visitTypeParameter(this, data);
-      }
-    
-      @Override
-      public Name getName() { return new TypeName(bname); }
-    
-      @Override
-      public List<? extends Tree> getBounds() {
-        return Collections.singletonList(bound);
-      }
-    
-      @Override
-      public List<? extends AnnotationTree> getAnnotations() {
-        return Collections.emptyList();
-      }
-    
-      @Override
-      public String toString() {
-        return bname + " " + bk.toString() + " " + bound.toString();
-      }
-    }
-
-    static final class TypeName implements Name {
-      private final String str;
-    
-      TypeName(String str) {
-        this.str = str;
-      }
-    
-      @Override
-      public int length() { return str.length(); }
-    
-      @Override
-      public char charAt(int index) { return str.charAt(index); }
-    
-      @Override
-      public CharSequence subSequence(int start, int end) {
-        return str.subSequence(start, end);
-      }
-    
-      @Override
-      public boolean contentEquals(CharSequence cs) {
-        if (cs != null) {
-          int n = length();
-          if (cs.length() == n) {
-            for (int i = 0; i < n; i++) {
-              if (charAt(i) != cs.charAt(i)) { return false; }
-            }
-            return true;
-          }
-        }
-        return false;
-      }
-    
-      @Override
-      public String toString() { return str; }
-    }
-  }
-*/
 }

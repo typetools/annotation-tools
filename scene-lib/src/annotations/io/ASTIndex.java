@@ -1,15 +1,16 @@
 package annotations.io;
 
-import java.util.AbstractMap;
-import java.util.AbstractSet;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
 
+import javax.lang.model.element.Name;
+
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import com.sun.source.tree.AnnotatedTypeTree;
 import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.ArrayAccessTree;
@@ -27,6 +28,7 @@ import com.sun.source.tree.ConditionalExpressionTree;
 import com.sun.source.tree.DoWhileLoopTree;
 import com.sun.source.tree.EnhancedForLoopTree;
 import com.sun.source.tree.ExpressionStatementTree;
+import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.ForLoopTree;
 import com.sun.source.tree.IfTree;
 import com.sun.source.tree.InstanceOfTree;
@@ -57,228 +59,44 @@ import com.sun.source.tree.WhileLoopTree;
 import com.sun.source.tree.WildcardTree;
 import com.sun.source.util.SimpleTreeVisitor;
 import com.sun.source.util.TreePath;
-import com.sun.tools.javac.tree.JCTree.JCClassDecl;
+import com.sun.tools.javac.code.Symbol.ClassSymbol;
+import com.sun.tools.javac.tree.JCTree;
 
 import annotations.util.JVMNames;
+import annotations.util.coll.WrapperMap;
 
 /**
  * Cache of {@code ASTPath} data for the nodes of a compilation unit tree.
  *
  * @author dbro
  */
-public class ASTIndex extends AbstractMap<Tree, ASTIndex.ASTRecord>
-implements Map<Tree, ASTIndex.ASTRecord> {
-  /**
-   * Structure bundling an {@link ASTPath} with information about its
-   *  starting point. Necessary because the {@link ASTPath} structure
-   *  does not include the declaration from which it originates.
-   *
-   * @author dbro
-   */
-  public static class ASTRecord {
-    /**
-     * Name of the enclosing class declaration.
-     */
-    public final String className;
-
-    /**
-     * Name of the enclosing method declaration, or null if there is none.
-     */
-    public final String methodName;
-
-    /**
-     * Name of the enclosing variable declaration, or null if there is none.
-     */
-    public final String varName;
-
-    /**
-     * Kind of immediately enclosing declaration: METHOD, VARIABLE, or a
-     *  class type (CLASS, INTERFACE, ENUM, or ANNOTATION_TYPE).
-     */
-    public final ASTPath astPath;
-
-    // TODO: stubs to preserve checker-framework-inference compilation; REMOVE
-    public final String otherName = null;
-    public final Tree.Kind declKind = null;
-
-    ASTRecord(String className, String methodName, String varName,
-        ASTPath astPath) {
-      this.className = className;
-      this.methodName = methodName;
-      this.varName = varName;
-      this.astPath = astPath;
-    }
-
-    public ASTRecord newArrayLevel(int depth) {
-      return new ASTRecord(className, methodName, varName,
-          astPath.newArrayLevel(depth));
-    }
-
-    public ASTRecord replacePath(ASTPath newPath) {
-      return new ASTRecord(className, methodName, varName, newPath);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-      return o instanceof ASTRecord && equals((ASTRecord) o);
-    }
-
-    public boolean equals(ASTRecord astRecord) {
-      return className.equals(astRecord.className)
-          && (methodName == null ? astRecord.methodName == null
-              : methodName.equals(astRecord.methodName))
-          && (varName == null ? astRecord.varName == null
-              : varName.equals(astRecord.varName))
-          && astPath.equals(astRecord.astPath);
-    }
-
-    // top-down test for confirmation
-    /**
-     * Indicates whether this record identifies the given {@link TreePath}.
-     */
-    public boolean matches(TreePath treePath) {
-      String clazz = null;
-      String meth = null;
-      String var = null;
-      boolean matchVars = false;  // members only!
-      Deque<Tree> stack = new ArrayDeque<Tree>();
-      for (Tree tree : treePath) { stack.push(tree); }
-      while (!stack.isEmpty()) {
-        Tree tree = stack.pop();
-        switch (tree.getKind()) {
-        case CLASS:
-        case INTERFACE:
-        case ENUM:
-        case ANNOTATION_TYPE:
-          clazz = ((ClassTree) tree).getSimpleName().toString();
-          meth = null;
-          var = null;
-          matchVars = true;
-          break;
-        case METHOD:
-          assert meth == null;
-          meth = ((MethodTree) tree).getName().toString();
-          matchVars = false;
-          break;
-        case VARIABLE:
-          if (matchVars) {
-            assert var == null;
-            var = ((VariableTree) tree).getName().toString();
-            matchVars = false;
-          }
-          break;
-        default:
-          matchVars = false;
-          continue;
-        }
-      }
-      return className.equals(clazz)
-          && (methodName == null ? meth == null : methodName.equals(meth))
-          && (varName == null ? var == null : varName.equals(var))
-          && astPath.matches(treePath);
-    }
-
-    @Override
-    public String toString() {
-      return new StringBuilder()
-          .append(className == null ? "" : className).append(":")
-          .append(methodName == null ? "" : methodName).append(":")
-          .append(varName == null ? "" : varName).append(":")
-          .append(astPath).toString();
-    }
-  }
-
+public class ASTIndex extends WrapperMap<Tree, ASTRecord> {
   private static final Map<CompilationUnitTree, Map<Tree, ASTRecord>>
       cache = new HashMap<CompilationUnitTree, Map<Tree, ASTRecord>>();
+  private static final int EXPECTED_SIZE = 128;
 
   private final CompilationUnitTree cut;
-  private final Map<Tree, ASTPath.ASTEntry> astEntries;
+  private final Map<String, Map<String, List<String>>> formals;
 
   /**
    * Maps source trees in compilation unit to corresponding AST paths.
    * 
-   * @param cut compilation unit to be indexed
+   * @param root compilation unit to be indexed
    * @return map of trees in compilation unit to AST paths
    */
-  public static Map<Tree, ASTRecord> indexOf(CompilationUnitTree cut) {
-    Map<Tree, ASTRecord> index = cache.get(cut);
+  public static Map<Tree, ASTRecord> indexOf(CompilationUnitTree root) {
+    Map<Tree, ASTRecord> index = cache.get(root);
     if (index == null) {
-      index = new ASTIndex(cut);
-      cache.put(cut, index);
+      index = new ASTIndex(root);
+      cache.put(root, index);
     }
     return index;
   }
 
-  private static ASTRecord makeASTRecord(TreePath treePath,
-      ASTPath astPath) {
-    MethodTree method = null;
-    VariableTree field = null;
-    for (Tree node : treePath) {
-      Tree.Kind kind = node.getKind();
-      switch (kind) {
-      case CLASS:
-      case INTERFACE:
-      case ENUM:
-      case ANNOTATION_TYPE:
-        return assemble(astPath, (ClassTree) node, method, field);
-      case METHOD:
-        method = (MethodTree) node;
-        continue;
-      case VARIABLE:
-        field = (VariableTree) node;
-        continue;
-      default:
-        method = null;
-        field = null;
-      }
-    }
-    return null;
-  }
-
-  private static ASTRecord assemble(ASTPath astPath,
-      ClassTree classNode, MethodTree methodNode, VariableTree fieldNode) {
-    String className = ((JCClassDecl) classNode).sym.flatname.toString();
-    if (methodNode == null) {
-      if (fieldNode != null) {
-        return new ASTRecord(className, null,
-            fieldNode.getName().toString(), astPath);
-      }
-      return new ASTRecord(className, null, null, astPath);
-    }
-
-    String methodName = JVMNames.getJVMMethodName(methodNode);
-    if (fieldNode == null) {
-      return new ASTRecord(className, methodName, null, astPath);
-    }
-
-    String fieldName = fieldNode.getName().toString();
-    VariableTree recv = methodNode.getReceiverParameter();
-    if (recv != null && recv.getName().toString().equals(fieldName)) {
-      return new ASTRecord(className, methodName,
-          Integer.toString(-1), astPath);
-    }
-
-    int i = 0;
-    for (VariableTree param : methodNode.getParameters()) {
-      if (param.getName().toString().equals(fieldName)) {
-        return new ASTRecord(className, methodName, Integer.toString(i),
-            astPath);
-      }
-      i++;
-    }
-    return null;
-  }
-
-  // The constructor walks the entire tree and creates an ASTEntry for
-  // each node of a valid type (i.e., excluding declarations and
-  // terminal nodes that cannot be annotated), so ASTPaths can be
-  // assembled from these entries on demand.  Thus the traversal
-  // happens only once, and the space requirement is kept relatively
-  // low.
-  private ASTIndex(CompilationUnitTree cut) {
-    this.cut = cut;
-    this.astEntries = new HashMap<Tree, ASTPath.ASTEntry>();
-    if (cut == null) { return; }
+  private ASTIndex(CompilationUnitTree root) {
+    super(HashBiMap.<Tree, ASTRecord>create(EXPECTED_SIZE));
+    cut = root;
+    formals = new HashMap<String, Map<String, List<String>>>();
 
     // The visitor implementation is slightly complicated by the
     // inclusion of information from both parent and child nodes in each
@@ -288,396 +106,495 @@ implements Map<Tree, ASTIndex.ASTRecord> {
     // (If the JVM could take advantage of tail recursion, it would be
     // better to save the current node's entry first, at a small cost to
     // the clarity of the code.)
-    cut.accept(new SimpleTreeVisitor<Void, ASTPath.ASTEntry>() {
-      private void save(Tree node, Kind kind, String sel) {
+    cut.accept(new SimpleTreeVisitor<Void, ASTRecord>() {
+      Deque<Integer> counters = new ArrayDeque<Integer>();
+
+      private void save(Tree node, ASTRecord rec,
+          Kind kind, String sel) {
         if (node != null) {
-          node.accept(this, new ASTPath.ASTEntry(kind, sel));
+          node.accept(this, rec.extend(kind, sel));
         }
       }
 
-      private void save(Tree node, Kind kind, String sel, int arg) {
+      private void save(Tree node, ASTRecord rec,
+          Kind kind, String sel, int arg) {
         if (node != null) {
-          node.accept(this, new ASTPath.ASTEntry(kind, sel, arg));
+          node.accept(this, rec.extend(kind, sel, arg));
         }
       }
 
       private void saveAll(Iterable<? extends Tree> nodes,
-          Kind kind, String sel) {
-        int i = 0;
+          ASTRecord rec, Kind kind, String sel) {
         if (nodes != null) {
+          int i = 0;
           for (Tree node : nodes) {
-            save(node, kind, sel, i++);
+            save(node, rec, kind, sel, i++);
           }
         }
       }
 
+      private void saveClass(ClassTree node) {
+        String className =
+            ((JCTree.JCClassDecl) node).sym.flatname.toString();
+        ASTRecord rec =
+            new ASTRecord(cut, className, null, null, ASTPath.empty());
+        counters.push(0);
+        node.accept(this, rec);
+        counters.pop();
+      }
+
       @Override
-      public Void defaultAction(Tree node, ASTPath.ASTEntry entry) {
-        if (entry != null) { astEntries.put(node, entry); }
+      public Void defaultAction(Tree node, ASTRecord rec) {
+        switch (node.getKind()) {
+        case BREAK:
+        case COMPILATION_UNIT:
+        case CONTINUE:
+        case IMPORT:
+        case MODIFIERS:
+          break;  // not handled
+        default:
+          put(node, rec);
+        }
         return null;
       }
 
       @Override
       public Void visitAnnotatedType(AnnotatedTypeTree node,
-          ASTPath.ASTEntry entry) {
+          ASTRecord rec) {
         Kind kind = node.getKind();
-        saveAll(node.getAnnotations(), kind, ASTPath.ANNOTATION);
-        save(node.getUnderlyingType(), kind, ASTPath.UNDERLYING_TYPE);
-        return defaultAction(node, entry);
+        saveAll(node.getAnnotations(), rec, kind, ASTPath.ANNOTATION);
+        save(node.getUnderlyingType(), rec, kind, ASTPath.UNDERLYING_TYPE);
+        return defaultAction(node, rec);
       }
 
       @Override
       public Void visitAnnotation(AnnotationTree node,
-          ASTPath.ASTEntry entry) {
+          ASTRecord rec) {
         Kind kind = node.getKind();
-        save(node.getAnnotationType(), kind, ASTPath.TYPE);
-        saveAll(node.getArguments(), kind, ASTPath.ARGUMENT);
-        return defaultAction(node, entry);
+        save(node.getAnnotationType(), rec, kind, ASTPath.TYPE);
+        saveAll(node.getArguments(), rec, kind, ASTPath.ARGUMENT);
+        return defaultAction(node, rec);
       }
 
       @Override
       public Void visitMethodInvocation(MethodInvocationTree node,
-          ASTPath.ASTEntry entry) {
+          ASTRecord rec) {
         Kind kind = node.getKind();
-        saveAll(node.getTypeArguments(), kind, ASTPath.TYPE_ARGUMENT);
-        save(node.getMethodSelect(), kind, ASTPath.METHOD_SELECT);
-        saveAll(node.getArguments(), kind, ASTPath.ARGUMENT);
-        return defaultAction(node, entry);
+        saveAll(node.getTypeArguments(), rec, kind, ASTPath.TYPE_ARGUMENT);
+        save(node.getMethodSelect(), rec, kind, ASTPath.METHOD_SELECT);
+        saveAll(node.getArguments(), rec, kind, ASTPath.ARGUMENT);
+        return defaultAction(node, rec);
       }
 
       @Override
-      public Void visitAssert(AssertTree node, ASTPath.ASTEntry entry) {
+      public Void visitAssert(AssertTree node, ASTRecord rec) {
         Kind kind = node.getKind();
-        save(node.getCondition(), kind, ASTPath.CONDITION);
-        save(node.getDetail(), kind, ASTPath.DETAIL);
-        return defaultAction(node, entry);
+        save(node.getCondition(), rec, kind, ASTPath.CONDITION);
+        save(node.getDetail(), rec, kind, ASTPath.DETAIL);
+        return defaultAction(node, rec);
       }
 
       @Override
-      public Void visitAssignment(AssignmentTree node, ASTPath.ASTEntry entry) {
+      public Void visitAssignment(AssignmentTree node, ASTRecord rec) {
         Kind kind = node.getKind();
-        save(node.getExpression(), kind, ASTPath.EXPRESSION);
-        save(node.getVariable(), kind, ASTPath.VARIABLE);
-        return defaultAction(node, entry);
+        save(node.getExpression(), rec, kind, ASTPath.EXPRESSION);
+        save(node.getVariable(), rec, kind, ASTPath.VARIABLE);
+        return defaultAction(node, rec);
       }
 
       @Override
       public Void visitCompoundAssignment(CompoundAssignmentTree node,
-          ASTPath.ASTEntry entry) {
+          ASTRecord rec) {
         Kind kind = node.getKind();
-        save(node.getExpression(), kind, ASTPath.EXPRESSION);
-        save(node.getVariable(), kind, ASTPath.VARIABLE);
-        return defaultAction(node, entry);
+        save(node.getExpression(), rec, kind, ASTPath.EXPRESSION);
+        save(node.getVariable(), rec, kind, ASTPath.VARIABLE);
+        return defaultAction(node, rec);
       }
 
       @Override
-      public Void visitBinary(BinaryTree node, ASTPath.ASTEntry entry) {
+      public Void visitBinary(BinaryTree node, ASTRecord rec) {
         Kind kind = node.getKind();
-        save(node.getLeftOperand(), kind, ASTPath.LEFT_OPERAND);
-        save(node.getRightOperand(), kind, ASTPath.RIGHT_OPERAND);
-        return defaultAction(node, entry);
+        save(node.getLeftOperand(), rec, kind, ASTPath.LEFT_OPERAND);
+        save(node.getRightOperand(), rec, kind, ASTPath.RIGHT_OPERAND);
+        return defaultAction(node, rec);
       }
 
       @Override
-      public Void visitBlock(BlockTree node, ASTPath.ASTEntry entry) {
-        saveAll(node.getStatements(), node.getKind(), ASTPath.STATEMENT);
-        return defaultAction(node, entry);
+      public Void visitBlock(BlockTree node, ASTRecord rec) {
+        Iterable<? extends Tree> nodes = node.getStatements();
+        if (nodes != null) {
+          int i = 0;
+          for (Tree stmt : nodes) {
+            if (ASTPath.isClassEquiv(stmt.getKind())) {
+              saveClass((ClassTree) stmt);
+            } else {
+              save(stmt, rec, node.getKind(), ASTPath.STATEMENT, i);
+            }
+            ++i;
+          }
+        }
+        return defaultAction(node, rec);
       }
 
       @Override
-      public Void visitCase(CaseTree node, ASTPath.ASTEntry entry) {
+      public Void visitCase(CaseTree node, ASTRecord rec) {
         Kind kind = node.getKind();
-        save(node.getExpression(), kind, ASTPath.EXPRESSION);
-        saveAll(node.getStatements(), kind, ASTPath.STATEMENT);
-        return defaultAction(node, entry);
+        save(node.getExpression(), rec, kind, ASTPath.EXPRESSION);
+        saveAll(node.getStatements(), rec, kind, ASTPath.STATEMENT);
+        return defaultAction(node, rec);
       }
 
       @Override
-      public Void visitCatch(CatchTree node, ASTPath.ASTEntry entry) {
+      public Void visitCatch(CatchTree node, ASTRecord rec) {
         Kind kind = node.getKind();
-        save(node.getBlock(), kind, ASTPath.BLOCK);
-        save(node.getParameter(), kind, ASTPath.PARAMETER);
-        return defaultAction(node, entry);
+        save(node.getBlock(), rec, kind, ASTPath.BLOCK);
+        save(node.getParameter(), rec, kind, ASTPath.PARAMETER);
+        return defaultAction(node, rec);
       }
 
       @Override
-      public Void visitClass(ClassTree node, ASTPath.ASTEntry entry) {
-        Kind kind = node.getKind();
-        save(node.getExtendsClause(), kind, ASTPath.BOUND, -1);
-        saveAll(node.getImplementsClause(), kind, ASTPath.BOUND);
-        saveAll(node.getTypeParameters(), kind, ASTPath.TYPE_PARAMETER);
-        return visit(node.getMembers(), null);
+      public Void visitClass(ClassTree node, ASTRecord rec) {
+        Kind kind = Tree.Kind.CLASS;  // use for all class-equivalent kinds
+        int i = 0;
+        formals.put(rec.className, new HashMap<String, List<String>>());
+        if (node.getSimpleName().length() > 0) {
+          // don't save exts/impls for anonymous inner class
+          save(node.getExtendsClause(), rec, kind, ASTPath.BOUND, -1);
+          saveAll(node.getImplementsClause(), rec, kind, ASTPath.BOUND);
+        }
+        saveAll(node.getTypeParameters(), rec, kind, ASTPath.TYPE_PARAMETER);
+        for (Tree member : node.getMembers()) {
+          if (member.getKind() == Tree.Kind.BLOCK) {
+            save(member, rec, kind, ASTPath.INITIALIZER, i++);
+          } else if (ASTPath.isClassEquiv(member.getKind())) {
+            String className =
+                ((JCTree.JCClassDecl) member).sym.flatname.toString();
+            member.accept(this,
+                new ASTRecord(cut, className, null, null, ASTPath.empty()));
+          } else {
+            member.accept(this, rec);
+          }
+        }
+        return defaultAction(node, rec);
       }
 
       @Override
       public Void visitConditionalExpression(ConditionalExpressionTree node,
-          ASTPath.ASTEntry entry) {
+          ASTRecord rec) {
         Kind kind = node.getKind();
-        save(node.getCondition(), kind, ASTPath.CONDITION);
-        save(node.getFalseExpression(), kind, ASTPath.FALSE_EXPRESSION);
-        save(node.getTrueExpression(), kind, ASTPath.TRUE_EXPRESSION);
-        return defaultAction(node, entry);
+        save(node.getCondition(), rec, kind, ASTPath.CONDITION);
+        save(node.getFalseExpression(), rec, kind, ASTPath.FALSE_EXPRESSION);
+        save(node.getTrueExpression(), rec, kind, ASTPath.TRUE_EXPRESSION);
+        return defaultAction(node, rec);
       }
 
       @Override
       public Void visitDoWhileLoop(DoWhileLoopTree node,
-          ASTPath.ASTEntry entry) {
+          ASTRecord rec) {
         Kind kind = node.getKind();
-        save(node.getCondition(), kind, ASTPath.CONDITION);
-        save(node.getStatement(), kind, ASTPath.STATEMENT);
-        return defaultAction(node, entry);
+        save(node.getCondition(), rec, kind, ASTPath.CONDITION);
+        save(node.getStatement(), rec, kind, ASTPath.STATEMENT);
+        return defaultAction(node, rec);
       }
 
       @Override
       public Void visitExpressionStatement(ExpressionStatementTree node,
-          ASTPath.ASTEntry entry) {
-        save(node.getExpression(), node.getKind(), ASTPath.EXPRESSION);
-        return defaultAction(node, entry);
+          ASTRecord rec) {
+        save(node.getExpression(), rec, node.getKind(), ASTPath.EXPRESSION);
+        return defaultAction(node, rec);
       }
 
       @Override
       public Void visitEnhancedForLoop(EnhancedForLoopTree node,
-          ASTPath.ASTEntry entry) {
+          ASTRecord rec) {
         Kind kind = node.getKind();
-        save(node.getVariable(), kind, ASTPath.VARIABLE);
-        save(node.getExpression(), kind, ASTPath.EXPRESSION);
-        save(node.getStatement(), kind, ASTPath.STATEMENT);
-        return defaultAction(node, entry);
+        save(node.getVariable(), rec, kind, ASTPath.VARIABLE);
+        save(node.getExpression(), rec, kind, ASTPath.EXPRESSION);
+        save(node.getStatement(), rec, kind, ASTPath.STATEMENT);
+        return defaultAction(node, rec);
       }
 
       @Override
-      public Void visitForLoop(ForLoopTree node, ASTPath.ASTEntry entry) {
+      public Void visitForLoop(ForLoopTree node, ASTRecord rec) {
         Kind kind = node.getKind();
-        saveAll(node.getInitializer(), kind, ASTPath.INITIALIZER);
-        save(node.getCondition(), kind, ASTPath.CONDITION);
-        save(node.getStatement(), kind, ASTPath.STATEMENT);
-        saveAll(node.getUpdate(), kind, ASTPath.UPDATE);
-        return defaultAction(node, entry);
+        saveAll(node.getInitializer(), rec, kind, ASTPath.INITIALIZER);
+        save(node.getCondition(), rec, kind, ASTPath.CONDITION);
+        save(node.getStatement(), rec, kind, ASTPath.STATEMENT);
+        saveAll(node.getUpdate(), rec, kind, ASTPath.UPDATE);
+        return defaultAction(node, rec);
       }
 
       @Override
-      public Void visitIf(IfTree node, ASTPath.ASTEntry entry) {
+      public Void visitIf(IfTree node, ASTRecord rec) {
         Kind kind = node.getKind();
-        save(node.getCondition(), kind, ASTPath.CONDITION);
-        save(node.getThenStatement(), kind, ASTPath.THEN_STATEMENT);
-        save(node.getElseStatement(), kind, ASTPath.ELSE_STATEMENT);
-        return defaultAction(node, entry);
+        save(node.getCondition(), rec, kind, ASTPath.CONDITION);
+        save(node.getThenStatement(), rec, kind, ASTPath.THEN_STATEMENT);
+        save(node.getElseStatement(), rec, kind, ASTPath.ELSE_STATEMENT);
+        return defaultAction(node, rec);
       }
 
       @Override
       public Void visitArrayAccess(ArrayAccessTree node,
-          ASTPath.ASTEntry entry) {
+          ASTRecord rec) {
         Kind kind = node.getKind();
-        save(node.getExpression(), kind, ASTPath.EXPRESSION);
-        save(node.getIndex(), kind, ASTPath.INDEX);
-        return defaultAction(node, entry);
+        save(node.getExpression(), rec, kind, ASTPath.EXPRESSION);
+        save(node.getIndex(), rec, kind, ASTPath.INDEX);
+        return defaultAction(node, rec);
       }
 
       @Override
       public Void visitLabeledStatement(LabeledStatementTree node,
-          ASTPath.ASTEntry entry) {
-        save(node.getStatement(), node.getKind(), ASTPath.STATEMENT);
-        return defaultAction(node, entry);
+          ASTRecord rec) {
+        save(node.getStatement(), rec, node.getKind(), ASTPath.STATEMENT);
+        return defaultAction(node, rec);
       }
 
       @Override
-      public Void visitMethod(MethodTree node, ASTPath.ASTEntry entry) {
+      public Void visitMethod(MethodTree node, ASTRecord rec) {
         Kind kind = node.getKind();
-        save(node.getReturnType(), kind, ASTPath.TYPE);
-        saveAll(node.getTypeParameters(), kind, ASTPath.TYPE_PARAMETER);
-        save(node.getReceiverParameter(), kind, ASTPath.PARAMETER, -1);
-        saveAll(node.getParameters(), kind, ASTPath.PARAMETER);
-        save(node.getBody(), kind, ASTPath.BODY);
-        return null;
+        String methodName = JVMNames.getJVMMethodName(node);
+        Tree rcvr = node.getReceiverParameter();
+        List<? extends Tree> params = node.getParameters();
+        if (params != null && !params.isEmpty()) {
+          Map<String, List<String>> map = formals.get(rec.className);
+          List<String> names = new ArrayList<String>(params.size());
+          int i = 0;
+          map.put(methodName, names);
+          for (Tree param : params) {
+            if (param != null) {
+              names.add(((VariableTree) param).getName().toString());
+              param.accept(this, new ASTRecord(cut, rec.className,
+                      methodName, null, ASTPath.empty())
+                  .extend(Tree.Kind.METHOD, ASTPath.PARAMETER, i++));
+            }
+          }
+        }
+        if (rcvr != null) {
+          rec = new ASTRecord(cut, rec.className, methodName, null,
+              ASTPath.empty());
+          rcvr.accept(this, rec.extend(kind, ASTPath.PARAMETER, -1));
+        }
+        rec = new ASTRecord(cut, rec.className, methodName, null,
+            ASTPath.empty());
+        save(node.getReturnType(), rec, kind, ASTPath.TYPE);
+        saveAll(node.getTypeParameters(), rec, kind, ASTPath.TYPE_PARAMETER);
+        //save(node.getReceiverParameter(), rec, kind, ASTPath.PARAMETER, -1);
+        //saveAll(node.getParameters(), rec, kind, ASTPath.PARAMETER);
+        saveAll(node.getThrows(), rec, kind, ASTPath.THROWS);
+        save(node.getBody(), rec, kind, ASTPath.BODY);
+        return defaultAction(node, rec);
       }
 
       @Override
-      public Void visitNewArray(NewArrayTree node, ASTPath.ASTEntry entry) {
+      public Void visitNewArray(NewArrayTree node, ASTRecord rec) {
         Kind kind = node.getKind();
         Tree type = node.getType();
         int n = node.getDimensions().size();
         do {
-          save(type, kind, ASTPath.TYPE, n);  // ???
+          save(type, rec, kind, ASTPath.TYPE, n);
         } while (--n > 0);
-        //int i = 0;
-        //do {
-        //  NewArrayTree nat = (NewArrayTree) t;
-        //  save(nat.getType(), kind, ASTPath.TYPE, i++);
-        //} while (false);
-        saveAll(node.getDimensions(), kind, ASTPath.DIMENSION);
-        saveAll(node.getInitializers(), kind, ASTPath.INITIALIZER);
-        return defaultAction(node, entry);
+        saveAll(node.getDimensions(), rec, kind, ASTPath.DIMENSION);
+        saveAll(node.getInitializers(), rec, kind, ASTPath.INITIALIZER);
+        return defaultAction(node, rec);
       }
 
       @Override
-      public Void visitNewClass(NewClassTree node, ASTPath.ASTEntry entry) {
+      public Void visitNewClass(NewClassTree node, ASTRecord rec) {
+        JCTree.JCClassDecl classBody =
+            (JCTree.JCClassDecl) node.getClassBody();
         Kind kind = node.getKind();
-        save(node.getEnclosingExpression(), kind,
+        save(node.getEnclosingExpression(), rec, kind,
             ASTPath.ENCLOSING_EXPRESSION);
-        saveAll(node.getTypeArguments(), kind, ASTPath.TYPE_ARGUMENT);
-        save(node.getIdentifier(), kind, ASTPath.IDENTIFIER);
-        saveAll(node.getArguments(), kind, ASTPath.ARGUMENT);
-        save(node.getClassBody(), kind, ASTPath.CLASS_BODY);
-        return defaultAction(node, entry);
+        saveAll(node.getTypeArguments(), rec, kind, ASTPath.TYPE_ARGUMENT);
+        save(node.getIdentifier(), rec, kind, ASTPath.IDENTIFIER);
+        saveAll(node.getArguments(), rec, kind, ASTPath.ARGUMENT);
+        if (classBody != null) {
+          Name name = classBody.getSimpleName();
+          String className = null;
+          if (name == null || name.toString().isEmpty()) {
+            int i = counters.pop();
+            counters.push(++i);
+            className = rec.className + "$" + i;
+          } else {
+            ClassSymbol sym = ((JCTree.JCClassDecl) classBody).sym;
+            String s = sym == null ? "" : sym.toString();
+            if (s.startsWith("<anonymous ")) {
+              int i = counters.pop();
+              counters.push(++i);
+              className = s.substring(11, s.length()-1);
+            } else {
+              className = rec.className + "$" + name;
+            }
+          }
+          counters.push(0);
+          classBody.accept(this,
+              new ASTRecord(cut, className, null, null, ASTPath.empty()));
+          counters.pop();
+        }
+        return defaultAction(node, rec);
       }
 
       @Override
       public Void visitLambdaExpression(LambdaExpressionTree node,
-          ASTPath.ASTEntry entry) {
+          ASTRecord rec) {
         Kind kind = node.getKind();
-        saveAll(node.getParameters(), kind, ASTPath.PARAMETER);
-        save(node.getBody(), kind, ASTPath.BODY);
-        return defaultAction(node, entry);
+        saveAll(node.getParameters(), rec, kind, ASTPath.PARAMETER);
+        save(node.getBody(), rec, kind, ASTPath.BODY);
+        return defaultAction(node, rec);
       }
 
       @Override
       public Void visitParenthesized(ParenthesizedTree node,
-          ASTPath.ASTEntry entry) {
-        save(node.getExpression(), node.getKind(), ASTPath.EXPRESSION);
-        return defaultAction(node, entry);
+          ASTRecord rec) {
+        save(node.getExpression(), rec, node.getKind(), ASTPath.EXPRESSION);
+        return defaultAction(node, rec);
       }
 
       @Override
-      public Void visitReturn(ReturnTree node, ASTPath.ASTEntry entry) {
-        save(node.getExpression(), node.getKind(), ASTPath.EXPRESSION);
-        return defaultAction(node, entry);
+      public Void visitReturn(ReturnTree node, ASTRecord rec) {
+        save(node.getExpression(), rec, node.getKind(), ASTPath.EXPRESSION);
+        return defaultAction(node, rec);
       }
 
       @Override
       public Void visitMemberSelect(MemberSelectTree node,
-          ASTPath.ASTEntry entry) {
-        save(node.getExpression(), node.getKind(), ASTPath.EXPRESSION);
-        return defaultAction(node, entry);
+          ASTRecord rec) {
+        save(node.getExpression(), rec, node.getKind(), ASTPath.EXPRESSION);
+        return defaultAction(node, rec);
       }
 
       @Override
       public Void visitMemberReference(MemberReferenceTree node,
-          ASTPath.ASTEntry entry) {
-        save(node.getQualifierExpression(), node.getKind(),
+          ASTRecord rec) {
+        save(node.getQualifierExpression(), rec, node.getKind(),
             ASTPath.QUALIFIER_EXPRESSION);
-        return defaultAction(node, entry);
+        return defaultAction(node, rec);
       }
 
       @Override
-      public Void visitSwitch(SwitchTree node, ASTPath.ASTEntry entry) {
+      public Void visitSwitch(SwitchTree node, ASTRecord rec) {
         Kind kind = node.getKind();
-        save(node.getExpression(), kind, ASTPath.EXPRESSION);
-        saveAll(node.getCases(), kind, ASTPath.CASE);
-        return defaultAction(node, entry);
+        save(node.getExpression(), rec, kind, ASTPath.EXPRESSION);
+        saveAll(node.getCases(), rec, kind, ASTPath.CASE);
+        return defaultAction(node, rec);
       }
 
       @Override
       public Void visitSynchronized(SynchronizedTree node,
-          ASTPath.ASTEntry entry) {
+          ASTRecord rec) {
         Kind kind = node.getKind();
-        save(node.getExpression(), kind, ASTPath.EXPRESSION);
-        save(node.getBlock(), kind, ASTPath.BLOCK);
-        return defaultAction(node, entry);
+        save(node.getExpression(), rec, kind, ASTPath.EXPRESSION);
+        save(node.getBlock(), rec, kind, ASTPath.BLOCK);
+        return defaultAction(node, rec);
       }
 
       @Override
-      public Void visitThrow(ThrowTree node, ASTPath.ASTEntry entry) {
-        save(node.getExpression(), node.getKind(), ASTPath.EXPRESSION);
-        return defaultAction(node, entry);
+      public Void visitThrow(ThrowTree node, ASTRecord rec) {
+        save(node.getExpression(), rec, node.getKind(), ASTPath.EXPRESSION);
+        return defaultAction(node, rec);
       }
 
       @Override
       public Void visitCompilationUnit(CompilationUnitTree node,
-          ASTPath.ASTEntry entry) {
+          ASTRecord rec) {
         for (Tree tree : node.getTypeDecls()) {
-          tree.accept(this, null);
+          saveClass((ClassTree) tree);
         }
         return null;
       }
 
       @Override
-      public Void visitTry(TryTree node, ASTPath.ASTEntry entry) {
+      public Void visitTry(TryTree node, ASTRecord rec) {
         Kind kind = node.getKind();
-        saveAll(node.getResources(), kind, ASTPath.RESOURCE);
-        save(node.getBlock(), kind, ASTPath.BLOCK);
-        saveAll(node.getCatches(), kind, ASTPath.CATCH);
-        save(node.getFinallyBlock(), kind, ASTPath.FINALLY_BLOCK);
-        return defaultAction(node, entry);
+        saveAll(node.getResources(), rec, kind, ASTPath.RESOURCE);
+        save(node.getBlock(), rec, kind, ASTPath.BLOCK);
+        saveAll(node.getCatches(), rec, kind, ASTPath.CATCH);
+        save(node.getFinallyBlock(), rec, kind, ASTPath.FINALLY_BLOCK);
+        return defaultAction(node, rec);
       }
 
       @Override
       public Void visitParameterizedType(ParameterizedTypeTree node,
-          ASTPath.ASTEntry entry) {
+          ASTRecord rec) {
         Kind kind = node.getKind();
-        save(node.getType(), kind, ASTPath.TYPE);
-        saveAll(node.getTypeArguments(), kind, ASTPath.TYPE_ARGUMENT);
-        return defaultAction(node, entry);
+        save(node.getType(), rec, kind, ASTPath.TYPE);
+        saveAll(node.getTypeArguments(), rec, kind, ASTPath.TYPE_ARGUMENT);
+        return defaultAction(node, rec);
       }
 
       @Override
-      public Void visitUnionType(UnionTypeTree node, ASTPath.ASTEntry entry) {
-        saveAll(node.getTypeAlternatives(), node.getKind(),
+      public Void visitUnionType(UnionTypeTree node, ASTRecord rec) {
+        saveAll(node.getTypeAlternatives(), rec, node.getKind(),
             ASTPath.TYPE_ALTERNATIVE);
-        return defaultAction(node, entry);
+        return defaultAction(node, rec);
       }
 
       @Override
       public Void visitIntersectionType(IntersectionTypeTree node,
-          ASTPath.ASTEntry entry) {
-        saveAll(node.getBounds(), node.getKind(), ASTPath.BOUND);
-        return defaultAction(node, entry);
+          ASTRecord rec) {
+        saveAll(node.getBounds(), rec, node.getKind(), ASTPath.BOUND);
+        return defaultAction(node, rec);
       }
 
       @Override
-      public Void visitArrayType(ArrayTypeTree node, ASTPath.ASTEntry entry) {
-        save(node.getType(), node.getKind(), ASTPath.TYPE);
-        return defaultAction(node, entry);
+      public Void visitArrayType(ArrayTypeTree node, ASTRecord rec) {
+        save(node.getType(), rec, node.getKind(), ASTPath.TYPE);
+        return defaultAction(node, rec);
       }
 
       @Override
-      public Void visitTypeCast(TypeCastTree node, ASTPath.ASTEntry entry) {
+      public Void visitTypeCast(TypeCastTree node, ASTRecord rec) {
         Kind kind = node.getKind();
-        save(node.getType(), kind, ASTPath.TYPE);
-        save(node.getExpression(), kind, ASTPath.EXPRESSION);
-        return defaultAction(node, entry);
+        save(node.getType(), rec, kind, ASTPath.TYPE);
+        save(node.getExpression(), rec, kind, ASTPath.EXPRESSION);
+        return defaultAction(node, rec);
       }
 
       @Override
       public Void visitTypeParameter(TypeParameterTree node,
-          ASTPath.ASTEntry entry) {
-        saveAll(node.getBounds(), node.getKind(), ASTPath.BOUND);
-        return defaultAction(node, entry);
+          ASTRecord rec) {
+        saveAll(node.getBounds(), rec, node.getKind(), ASTPath.BOUND);
+        return defaultAction(node, rec);
       }
 
       @Override
-      public Void visitInstanceOf(InstanceOfTree node, ASTPath.ASTEntry entry) {
+      public Void visitInstanceOf(InstanceOfTree node, ASTRecord rec) {
         Kind kind = node.getKind();
-        save(node.getExpression(), kind, ASTPath.EXPRESSION);
-        save(node.getType(), kind, ASTPath.TYPE);
-        return defaultAction(node, entry);
+        save(node.getExpression(), rec, kind, ASTPath.EXPRESSION);
+        save(node.getType(), rec, kind, ASTPath.TYPE);
+        return defaultAction(node, rec);
       }
 
       @Override
-      public Void visitUnary(UnaryTree node, ASTPath.ASTEntry entry) {
-        save(node.getExpression(), node.getKind(), ASTPath.EXPRESSION);
-        return defaultAction(node, entry);
+      public Void visitUnary(UnaryTree node, ASTRecord rec) {
+        save(node.getExpression(), rec, node.getKind(), ASTPath.EXPRESSION);
+        return defaultAction(node, rec);
       }
 
       @Override
-      public Void visitVariable(VariableTree node, ASTPath.ASTEntry entry) {
+      public Void visitVariable(VariableTree node, ASTRecord rec) {
         Kind kind = node.getKind();
-        save(node.getType(), kind, ASTPath.TYPE);
-        save(node.getInitializer(), kind, ASTPath.INITIALIZER);
-        return defaultAction(node, entry);
+        if (rec.methodName == null) {  // member field
+          rec = new ASTRecord(cut, rec.className, rec.methodName,
+              ((VariableTree) node).getName().toString(), rec.astPath);
+        }
+        save(node.getType(), rec, kind, ASTPath.TYPE);
+        save(node.getInitializer(), rec, kind, ASTPath.INITIALIZER);
+        return defaultAction(node, rec);
       }
 
       @Override
-      public Void visitWhileLoop(WhileLoopTree node, ASTPath.ASTEntry entry) {
+      public Void visitWhileLoop(WhileLoopTree node, ASTRecord rec) {
         Kind kind = node.getKind();
-        save(node.getCondition(), kind, ASTPath.CONDITION);
-        save(node.getStatement(), kind, ASTPath.STATEMENT);
-        return defaultAction(node, entry);
+        save(node.getCondition(), rec, kind, ASTPath.CONDITION);
+        save(node.getStatement(), rec, kind, ASTPath.STATEMENT);
+        return defaultAction(node, rec);
       }
 
       @Override
-      public Void visitWildcard(WildcardTree node, ASTPath.ASTEntry entry) {
-        save(node.getBound(), node.getKind(), ASTPath.BOUND);
-        return defaultAction(node, entry);
+      public Void visitWildcard(WildcardTree node, ASTRecord rec) {
+        save(node.getBound(), rec, node.getKind(), ASTPath.BOUND);
+        return defaultAction(node, rec);
       }
     }, null);
   }
@@ -688,155 +605,63 @@ implements Map<Tree, ASTIndex.ASTRecord> {
 
   public static TreePath getTreePath(CompilationUnitTree cut, ASTRecord rec) {
     Tree node = getNode(cut, rec);
-    return TreePath.getPath(cut, node);
+    return node == null ? null : TreePath.getPath(cut, node);
   }
 
   public static Tree getNode(CompilationUnitTree cut, ASTRecord rec) {
-    // TODO: replace with non-stupid implementation!
-    Map<Tree, ASTRecord> index = indexOf(cut);
-    if (index.containsValue(rec)) {
-      for (Map.Entry<Tree, ASTRecord> entry : index.entrySet()) {
-        if (Objects.equals(rec, entry.getValue())) {
-          return entry.getKey();
-        }
-      }
+    Map<Tree, ASTRecord> fwdIndex = ((ASTIndex) indexOf(cut)).back;
+    Map<ASTRecord, Tree> revIndex =
+        ((BiMap<Tree, ASTRecord>) fwdIndex).inverse();
+    ExpressionTree et = cut.getPackageName();
+    String pkg = et == null ? "" : et.toString();
+    if (!pkg.isEmpty() && rec.className.indexOf('.') < 0) {
+      rec = new ASTRecord(cut, pkg + "." + rec.className,
+          rec.methodName, rec.varName, rec.astPath);
     }
+    return revIndex.get(rec);
+  }
+
+  public static String getParameterName(CompilationUnitTree cut,
+      String className, String methodName, int index) {
+    try {
+      ASTIndex ai = (ASTIndex) ASTIndex.indexOf(cut);
+      return ai.formals.get(className).get(methodName).get(index);
+    } catch (NullPointerException ex) {
+      return null;
+    }
+  }
+
+  public static Integer getParameterIndex(CompilationUnitTree cut,
+      String className, String methodName, String varName) {
+    if (cut != null && className != null
+        && methodName != null && varName != null) {
+      // if it's already a number, return it
+      try {
+        return Integer.valueOf(varName);
+      } catch (NumberFormatException ex) {}
+      // otherwise, look through parameter list for string
+      try {
+        ASTIndex ai = (ASTIndex) ASTIndex.indexOf(cut);
+        List<String> names =
+            ai.formals.get(className).get(methodName);
+        int i = 0;
+        for (String name : names) {
+          if (varName.equals(name)) { return i; }
+          ++i;
+        }
+      } catch (NullPointerException ex) {}
+    }
+    // not found
     return null;
   }
 
-  // Map instance methods
-
   @Override
-  public int size() {
-    return astEntries.size();
-  }
-
-  @Override
-  public boolean isEmpty() {
-    return astEntries.isEmpty();
-  }
-
-  @Override
-  public boolean containsKey(Object key) {
-    return astEntries.containsKey(key);
-  }
-
-  @Override
-  public boolean containsValue(Object value) {
-    return values().contains(value);
-  }
-
-  @Override
-  public ASTRecord get(Object key) {
-    // build ASTPath on demand from cached ASTEntries
-    Tree node = (Tree) key;
-    //if (!ASTPath.isHandled(node.getKind())) { return null; }
-    TreePath treePath = TreePath.getPath(cut, node);
-    ASTPath astPath = new ASTPath();
-    Deque<Tree> deque = new ArrayDeque<Tree>();
-    Deque<Tree> backup = null;
-loop:
-    for (Tree tree : treePath) {
-      Kind kind = tree.getKind();
-      switch (kind) {
-      case VARIABLE:
-        backup = deque;  // keep going iff local; not yet known, so save state
-        deque.push(tree);
-        break;
-      case METHOD:
-        deque.push(tree);
-        // fall through
-      case ANNOTATION:
-      case CLASS:
-      case ENUM:
-      case INTERFACE:
-        if (backup != null) { deque = backup; }
-        break loop;
-      case BREAK:
-      case COMPILATION_UNIT:
-      case CONTINUE:
-      case IMPORT:
-      case LAMBDA_EXPRESSION: // TODO
-      case MODIFIERS:
-        break;
-      case BLOCK:
-        backup = null;  // any previously seen var was local
-        // fall through
-      default:
-        deque.push(tree);
-      }
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    for (Map.Entry<Tree, ASTRecord> entry : entrySet()) {
+      sb.append(entry.getKey().toString().replaceAll("\\s+", " "))
+        .append(" # ").append(entry.getValue()).append("\n");
     }
-    while (!deque.isEmpty()) {
-      ASTPath.ASTEntry entry = astEntries.get(deque.pop());
-      if (entry != null) { astPath.add(entry); }
-    }
-    return makeASTRecord(treePath, astPath);
-  }
-
-  @Override
-  public Set<Tree> keySet() {
-    return astEntries.keySet();
-  }
-
-  @Override
-  public Set<ASTRecord> values() {
-    return new AbstractSet<ASTRecord>() {
-      @Override
-      public int size() { return astEntries.size(); }
-
-      @Override
-      public Iterator<ASTRecord> iterator() {
-        return new Iterator<ASTRecord>() {
-          Iterator<Tree> iter = astEntries.keySet().iterator();
-
-          @Override
-          public boolean hasNext() {
-            return iter.hasNext();
-          }
-
-          @Override
-          public ASTRecord next() {
-            return ASTIndex.this.get(iter.next());
-          }
-
-          @Override
-          public void remove() {
-            throw new UnsupportedOperationException();
-          }
-        };
-      }
-    };
-  }
-
-  @Override
-  public Set<Map.Entry<Tree, ASTRecord>> entrySet() {
-    return new AbstractSet<Map.Entry<Tree, ASTRecord>>() {
-      @Override
-      public int size() { return astEntries.size(); }
-
-      @Override
-      public Iterator<Map.Entry<Tree, ASTRecord>> iterator() {
-        return new Iterator<Map.Entry<Tree, ASTRecord>>() {
-          Iterator<Tree> iter = astEntries.keySet().iterator();
-
-          @Override
-          public boolean hasNext() {
-            return iter.hasNext();
-          }
-
-          @Override
-          public Map.Entry<Tree, ASTRecord> next() {
-            Tree node = iter.next();
-            return new AbstractMap.SimpleImmutableEntry<Tree, ASTRecord>(node,
-                ASTIndex.this.get(node));
-          }
-
-          @Override
-          public void remove() {
-            throw new UnsupportedOperationException();
-          }
-        };
-      }
-    };
+    return sb.toString();
   }
 }

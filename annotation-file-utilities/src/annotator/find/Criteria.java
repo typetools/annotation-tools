@@ -1,7 +1,7 @@
 package annotator.find;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import annotations.el.BoundLocation;
 import annotations.el.InnerTypeLocation;
@@ -27,14 +27,14 @@ public final class Criteria {
   // Not final, to avoid tests against it being optimized away.
   public static boolean debug = false;
 
-  /** The set of criterion objects. */
-  private final Set<Criterion> criteria;
+  /** The set of criterion objects, indexed by kind. */
+  private final Map<Criterion.Kind, Criterion> criteria;
 
   /**
    * Creates a new {@code Criteria} without any {@code Criterion}.
    */
   public Criteria() {
-    this.criteria = new LinkedHashSet<Criterion>();
+    this.criteria = new LinkedHashMap<Criterion.Kind, Criterion>();
   }
 
   /**
@@ -43,7 +43,7 @@ public final class Criteria {
    * @param c the criterion to add
    */
   public void add(Criterion c) {
-    criteria.add(c);
+    criteria.put(c.getKind(), c);
   }
 
   /**
@@ -58,7 +58,7 @@ public final class Criteria {
    */
   public boolean isSatisfiedBy(TreePath path, Tree leaf) {
     assert path == null || path.getLeaf() == leaf;
-    for (Criterion c : criteria) {
+    for (Criterion c : criteria.values()) {
       if (! c.isSatisfiedBy(path, leaf)) {
         if (debug) {
           System.out.printf("UNsatisfied criterion:%n    %s%n    %s%n", c, Main.pathToString(path));
@@ -80,7 +80,7 @@ public final class Criteria {
    * false otherwise
    */
   public boolean isSatisfiedBy(TreePath path) {
-    for (Criterion c : criteria) {
+    for (Criterion c : criteria.values()) {
       if (! c.isSatisfiedBy(path)) {
         if (debug) {
           System.out.println("UNsatisfied criterion: " + c);
@@ -99,7 +99,7 @@ public final class Criteria {
    * @return true iff this is the criteria on a receiver
    */
   public boolean isOnReceiver() {
-    for (Criterion c : criteria) {
+    for (Criterion c : criteria.values()) {
       if (c.getKind() == Criterion.Kind.RECEIVER) {
         return true;
       }
@@ -114,7 +114,7 @@ public final class Criteria {
    * @return true iff this is the criteria on a package
    */
   public boolean isOnPackage() {
-    for (Criterion c : criteria) {
+    for (Criterion c : criteria.values()) {
       if (c.getKind() == Criterion.Kind.PACKAGE) {
         return true;
       }
@@ -129,7 +129,7 @@ public final class Criteria {
    * @return true iff this is the criteria on a return type
    */
   public boolean isOnReturnType() {
-    for (Criterion c : criteria) {
+    for (Criterion c : criteria.values()) {
       if (c.getKind() == Criterion.Kind.RETURN_TYPE) {
         return true;
       }
@@ -144,7 +144,7 @@ public final class Criteria {
    * @return true iff this is the criteria on a local variable
    */
   public boolean isOnLocalVariable() {
-    for (Criterion c : criteria) {
+    for (Criterion c : criteria.values()) {
       if (c.getKind() == Criterion.Kind.LOCAL_VARIABLE) {
         return true;
       }
@@ -158,7 +158,7 @@ public final class Criteria {
    * of 'instanceof'.
    */
   public boolean isOnInstanceof() {
-    for (Criterion c : criteria) {
+    for (Criterion c : criteria.values()) {
       if (c.getKind() == Criterion.Kind.INSTANCE_OF) {
         return true;
       }
@@ -170,7 +170,7 @@ public final class Criteria {
    * Determines whether this is the criteria on an object initializer.
    */
   public boolean isOnNew() {
-    for (Criterion c : criteria) {
+    for (Criterion c : criteria.values()) {
       if (c.getKind() == Criterion.Kind.NEW) {
         return true;
       }
@@ -182,7 +182,7 @@ public final class Criteria {
    * Returns true if this Criteria is on the given method.
    */
   public boolean isOnMethod(String methodname) {
-    for (Criterion c : criteria) {
+    for (Criterion c : criteria.values()) {
       if (c.getKind() == Criterion.Kind.IN_METHOD) {
         if (((InMethodCriterion) c).name.equals(methodname)) {
           return true;
@@ -198,7 +198,7 @@ public final class Criteria {
    * @return AST path from {@link ASTPathCriterion}, or null if none present
    */
   public ASTPath getASTPath() {
-    for (Criterion c : criteria) {
+    for (Criterion c : criteria.values()) {
       if (c.getKind() == Criterion.Kind.AST_PATH) {
         return ((ASTPathCriterion) c).astPath;
       }
@@ -213,9 +213,39 @@ public final class Criteria {
    * @return class name from {@link InClassCriterion}, or null if none present
    */
   public String getClassName() {
-    for (Criterion c : criteria) {
+    for (Criterion c : criteria.values()) {
       if (c.getKind() == Criterion.Kind.IN_CLASS) {
         return ((InClassCriterion) c).className;
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Returns the name of the method specified in the Criteria, if any.
+   *
+   * @return method name from {@link InMethodCriterion}, or null if none present
+   */
+  public String getMethodName() {
+    for (Criterion c : criteria.values()) {
+      if (c.getKind() == Criterion.Kind.IN_METHOD) {
+        return ((InMethodCriterion) c).name;
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Returns the name of the member field specified in the Criteria, if any.
+   *
+   * @return field name from {@link FieldCriterion}, or null if none present
+   */
+  public String getFieldName() {
+    for (Criterion c : criteria.values()) {
+      if (c.getKind() == Criterion.Kind.FIELD) {
+        return ((FieldCriterion) c).varName;
       }
     }
 
@@ -226,7 +256,7 @@ public final class Criteria {
    * @return a GenericArrayLocationCriterion if this has one, else null
    */
   public GenericArrayLocationCriterion getGenericArrayLocation() {
-    for (Criterion c : criteria) {
+    for (Criterion c : criteria.values()) {
       if (c.getKind() == Criterion.Kind.GENERIC_ARRAY_LOCATION) {
         return (GenericArrayLocationCriterion) c;
       }
@@ -241,7 +271,7 @@ public final class Criteria {
    */
   public InClassCriterion getInClass() {
     InClassCriterion result = null;
-    for (Criterion c : criteria) {
+    for (Criterion c : criteria.values()) {
       if (c.getKind() == Criterion.Kind.IN_CLASS) {
         result = (InClassCriterion) c;
       }
@@ -255,7 +285,7 @@ public final class Criteria {
   // Used when determining whether an annotation is on an implicit upper
   // bound (the "extends Object" that is customarily omitted).
   public boolean onBoundZero() {
-    for (Criterion c : criteria) {
+    for (Criterion c : criteria.values()) {
       switch (c.getKind()) {
       case CLASS_BOUND:
         if (((ClassBoundCriterion) c).boundLoc.boundIndex != 0) { break; }
