@@ -54,7 +54,7 @@ import com.sun.tools.javac.util.Pair;
  * @author dbro
  *
  * An indexed collection (though not {@link java.util.Collection}, only
- * {@link java.util.Iterable}) of {@link Insertion}s with methods to
+ * {@link java.lang.Iterable}) of {@link Insertion}s with methods to
  * select those specified for a given class or for an outer class along
  * with its local classes.  This class is especially useful when a
  * single JAIF stores annotations for many source files, as it reduces
@@ -135,7 +135,7 @@ public class Insertions implements Iterable<Insertion> {
    * local classes.
    *
    * @param cut the current compilation unit
-   * @param qualifiedClassName the fully qualified class name
+   * @param qualifiedOuterClassName the fully qualified outer class name
    * @return {@link java.util.Set} of {@link Insertion}s with an
    *          {@link InClassCriterion} for the given outer class or one
    *          of its local classes
@@ -1174,6 +1174,11 @@ loop:
                   throw new UnsupportedOperationException();
                 }
               };
+            }
+
+            @Override
+            public void remove() {
+              throw new UnsupportedOperationException();
             }
           };
         }
