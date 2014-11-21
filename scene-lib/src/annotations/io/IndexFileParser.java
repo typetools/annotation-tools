@@ -1009,29 +1009,25 @@ public final class IndexFileParser {
                 i.setType(new DeclaredType());
                 parseInnerTypes(i);
             } else {
-//              Pair<ASTPath, InnerTypeLocation> pair =
-//                      splitNewArrayType(astPath);  // handle special case
-//              ATypeElement i = decl.insertAnnotations.vivify(astPath);
-//              parseAnnotations(i);
-//              parseInnerTypes(i);
-//              if (pair != null) {
-//                i = decl.insertAnnotations.vivify(pair.a);
-//              }
-              int offset = 0;
-              Pair<ASTPath, InnerTypeLocation> pair =
-                  splitNewArrayType(astPath);  // handle special case
-              ATypeElement i;
-              if (pair == null) {
-                i = decl.insertAnnotations.vivify(astPath);
-              } else {
-                i = decl.insertAnnotations.vivify(pair.a);
-                if (pair.b != null) {
-                  i = i.innerTypes.vivify(pair.b);
-                  offset = pair.b.location.size();
+                //astPath = fixNewArrayType(astPath);  // handle special case
+                //ATypeElement i = decl.insertAnnotations.vivify(astPath);
+                //parseAnnotations(i);
+                //parseInnerTypes(i);
+                int offset = 0;
+                Pair<ASTPath, InnerTypeLocation> pair =
+                        splitNewArrayType(astPath);  // handle special case
+                ATypeElement i;
+                if (pair == null) {
+                    i = decl.insertAnnotations.vivify(astPath);
+                } else {
+                    i = decl.insertAnnotations.vivify(pair.a);
+                    if (pair.b != null) {
+                        i = i.innerTypes.vivify(pair.b);
+                        offset = pair.b.location.size();
+                    }
                 }
-              }
-              parseAnnotations(i);
-              parseInnerTypes(i, offset);
+                parseAnnotations(i);
+                parseInnerTypes(i, offset);
             }
         }
         while (checkKeyword("insert-typecast")) {
@@ -1056,23 +1052,43 @@ public final class IndexFileParser {
       ASTPath outerPath = astPath;
       InnerTypeLocation loc = null;
       int last = astPath.size()-1;
-      
+
       if (last > 0) {
         ASTPath.ASTEntry entry = astPath.get(last);
         if (entry.getTreeKind() == Kind.NEW_ARRAY
             && entry.childSelectorIs(ASTPath.TYPE)) {
           int a = entry.getArgument();
           if (a > 0) {
-            outerPath = astPath.getParentPath();
-            outerPath.add(
-                new ASTPath.ASTEntry(Kind.NEW_ARRAY, ASTPath.TYPE, 0));
+            outerPath = astPath.getParentPath()
+                .extend(new ASTPath.ASTEntry(Kind.NEW_ARRAY, ASTPath.TYPE, 0));
             loc = new InnerTypeLocation(TypeAnnotationPosition
                 .getTypePathFromBinary(Collections.nCopies(2*a, 0)));
           }
         }
       }
-      
+
       return Pair.of(outerPath, loc);
+    }
+
+    private ASTPath fixNewArrayType(ASTPath astPath) {
+      ASTPath outerPath = astPath;
+      int last = astPath.size()-1;
+
+      if (last > 0) {
+        ASTPath.ASTEntry entry = astPath.get(last);
+        if (entry.getTreeKind() == Kind.NEW_ARRAY
+            && entry.childSelectorIs(ASTPath.TYPE)) {
+          int a = entry.getArgument();
+          outerPath = astPath.getParentPath().extend(
+              new ASTPath.ASTEntry(Kind.NEW_ARRAY, ASTPath.TYPE, 0));
+          while (--a >= 0) {
+            outerPath = outerPath.extend(
+                new ASTPath.ASTEntry(Kind.ARRAY_TYPE, ASTPath.TYPE));
+          }
+        }
+      }
+
+      return outerPath;
     }
 
     /**
@@ -1080,10 +1096,9 @@ public final class IndexFileParser {
      * @return the AST path.
      */
     private ASTPath parseASTPath() throws IOException, ParseException {
-        ASTPath astPath = new ASTPath();
-        astPath.add(parseASTEntry());
+        ASTPath astPath = ASTPath.empty().extend(parseASTEntry());
         while (matchChar(',')) {
-            astPath.add(parseASTEntry());
+            astPath = astPath.extend(parseASTEntry());
         }
         return astPath;
     }
