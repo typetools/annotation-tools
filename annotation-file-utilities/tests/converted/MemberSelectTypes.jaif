@@ -100,7 +100,7 @@ class MemberSelectTypes:
         insert-annotation Method.body, Block.statement 10, ExpressionStatement.expression, Assignment.expression, InstanceOf.type, MemberSelect.expression: @S
         insert-annotation Method.body, Block.statement 4, ExpressionStatement.expression, Assignment.expression, NewClass.identifier, MemberSelect.expression: @P
         insert-annotation Method.body, Block.statement 7, Variable.type, ArrayType.type, MemberSelect.expression: @Q
-        insert-annotation Method.body, Block.statement 7, Variable.initializer, NewArray.type 1, MemberSelect.expression: @R
+        insert-annotation Method.body, Block.statement 7, Variable.initializer, NewArray.type 1: @R
         insert-annotation Method.body, Block.statement 1, Variable.initializer, TypeCast.type, MemberSelect.expression: @O
         insert-annotation Method.body, Block.statement 11, ExpressionStatement.expression, Assignment.expression, InstanceOf.type: @S
         insert-annotation Method.body, Block.statement 3, ExpressionStatement.expression, Assignment.expression, NewClass.identifier: @P
