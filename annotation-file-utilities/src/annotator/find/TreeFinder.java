@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.type.NullType;
 
@@ -41,6 +43,7 @@ import com.sun.source.tree.WildcardTree;
 import com.sun.source.util.SimpleTreeVisitor;
 import com.sun.source.util.TreePath;
 import com.sun.source.util.TreeScanner;
+import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
 import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntryKind;
 import com.sun.tools.javac.code.Flags;
@@ -309,7 +312,26 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
         case PRIMITIVE_TYPE:
           return pathAndPos(t);
         case MEMBER_SELECT:
-          t = ((JCFieldAccess) t).getExpression();  // pkg name
+          JCTree exp = t;
+          do {  // locate pkg name, if any
+            JCFieldAccess jfa = (JCFieldAccess) exp;
+            exp = jfa.getExpression();
+            if (jfa.sym.isStatic()) {
+              return pathAndPos(exp,
+                  getFirstInstanceAfter('.',
+                      exp.getEndPosition(tree.endPositions)) + 1);
+            }
+          } while (exp instanceof JCFieldAccess
+              && ((JCFieldAccess) exp).sym.getKind() != ElementKind.PACKAGE);
+          if (exp != null) {
+            if (exp.getKind() == Tree.Kind.IDENTIFIER) {
+              Symbol sym = ((JCIdent) exp).sym;
+              if (!(sym.isStatic() || sym.getKind() == ElementKind.PACKAGE)) {
+                return pathAndPos(t, t.getStartPosition());
+              }
+            }
+            t = exp;
+          }
           return pathAndPos(t,
               getFirstInstanceAfter('.',
                   t.getEndPosition(tree.endPositions)) + 1);
@@ -723,16 +745,26 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       } else {
         // TODO: The visitor needs to keep track of the ASTPath, if any,
         // in case there are multiple NewArray entries.
-        ASTPath.ASTEntry lastEntry = astPath.get(astPath.size() - 1);
-        assert lastEntry.getTreeKind() == Tree.Kind.NEW_ARRAY;
+        ASTPath.ASTEntry lastEntry = astPath.get(-1);
         childSelector = lastEntry.getChildSelector();
-        if (dim != 0 && ASTPath.TYPE.equals(childSelector)) {
-          dim += lastEntry.getArgument();
-          lastEntry = new ASTPath.ASTEntry(Tree.Kind.NEW_ARRAY,
-              ASTPath.TYPE, dim);
-          astPath = astPath.getParentPath().extend(lastEntry);
+        if (lastEntry.getTreeKind() == Tree.Kind.NEW_ARRAY) {
+          if (dim != 0 && ASTPath.TYPE.equals(childSelector)) {
+            dim += lastEntry.getArgument();
+            lastEntry = new ASTPath.ASTEntry(Tree.Kind.NEW_ARRAY,
+                ASTPath.TYPE, dim);
+            astPath = astPath.getParentPath().extend(lastEntry);
+          } else {
+            dim = lastEntry.getArgument();
+          }
         } else {
-          dim = lastEntry.getArgument();
+          if (dim == dimsSize) {
+            Tree t = node;
+            do {
+              t = ((JCTree.JCNewArray) t).elemtype;
+            } while (--dim > 0);
+            return t.accept(this, ins);
+          }
+          return null;
         }
       }
 
@@ -762,8 +794,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
               " has no explicit type; skipping insertion " + ins);
           return null;
         }
-        return Pair.of(rec.replacePath(astPath),
-            na.elemtype.getStartPosition());
+        return getBaseTypePosition(na.elemtype);
       }
       if (na.dims.size() != 0) {
         int startPos = na.getStartPosition();
