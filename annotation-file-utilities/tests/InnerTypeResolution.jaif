@@ -1,0 +1,15 @@
+package java.lang:
+annotation @Deprecated:
+annotation @ReadOnly:
+
+package annotator.tests:
+class InnerTypeResolution:
+
+    method <init>()V:
+        return:
+
+    method method01(Ljava/util/Map;)Ljava/util/Map$Entry;: @Deprecated
+        return:
+        parameter #0:
+            type: @ReadOnly
+
