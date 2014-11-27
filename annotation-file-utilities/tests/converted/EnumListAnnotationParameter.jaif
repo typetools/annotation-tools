@@ -1,6 +1,6 @@
 package java.lang:
 annotation @TestAnnotation:
-    enum TestEnum[] value
+    enum java.lang.TestEnum[] value
 
 package annotator.tests:
 class EnumListAnnotationParameter:
