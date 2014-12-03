@@ -28,54 +28,53 @@ public class InstanceOfCriterion implements Criterion {
   @Override
   public boolean isSatisfiedBy(TreePath path) {
     if (path == null) {
-      debug("return null");
+      Criteria.dbug.debug("return null");
       return false;
     }
 
     Tree leaf = path.getLeaf();
 
-    debug("");
-    debug(this.toString());
-    debug("InstanceOfCriterion.isSatisfiedBy: " + leaf);
-    debug("leaf: " + leaf);
-    debug("kind: " + leaf.getKind());
-    debug("class: " + leaf.getClass());
+    Criteria.dbug.debug("%n%s%n", this.toString());
+    Criteria.dbug.debug("InstanceOfCriterion.isSatisfiedBy: %s%n", leaf);
+    Criteria.dbug.debug("leaf: %s%n", leaf);
+    Criteria.dbug.debug("kind: %s%n", leaf.getKind());
+    Criteria.dbug.debug("class: %s%n", leaf.getClass());
 
     TreePath parentPath = path.getParentPath();
     if (parentPath == null) {
-      debug("return: parent path null");
+      Criteria.dbug.debug("return: parent path null%n");
       return false;
     }
 
     Tree parent = parentPath.getLeaf();
     if (parent == null) {
-      debug("return: parent null");
+      Criteria.dbug.debug("return: parent null%n");
       return false;
     }
 
     if (parent.getKind() == Tree.Kind.INSTANCE_OF) {
       InstanceOfTree instanceOfTree = (InstanceOfTree) parent;
       if (leaf != instanceOfTree.getType()) {
-        debug("return: not type part of instanceof");
+        Criteria.dbug.debug("return: not type part of instanceof%n");
         return false;
       }
 
       int indexInSource = InstanceOfScanner.indexOfInstanceOfTree(path, parent);
-      debug("return source: "+ indexInSource);
+      Criteria.dbug.debug("return source: %d%n", indexInSource);
       boolean b;
       if (loc.isBytecodeOffset()) {
         int indexInClass = InstanceOfScanner.getMethodInstanceOfIndex(methodName, loc.offset);
-        debug("return class: " + indexInClass);
+        Criteria.dbug.debug("return class: %d%n", indexInClass);
         b = (indexInSource == indexInClass);
       } else {
         b = (indexInSource == loc.index);
-        debug("return loc.index: " + loc.index);
+        Criteria.dbug.debug("return loc.index: %d%n", loc.index);
       }
-      debug("return new: " + b);
+      Criteria.dbug.debug("return new: %b" + b);
       return b;
     } else {
       boolean b = this.isSatisfiedBy(path.getParentPath());
-      debug("return parent: " + b);
+      Criteria.dbug.debug("return parent: %b" + b);
       return b;
     }
   }
@@ -83,12 +82,6 @@ public class InstanceOfCriterion implements Criterion {
   @Override
   public Kind getKind() {
     return Kind.INSTANCE_OF;
-  }
-
-  private static void debug(String s) {
-    if (Criteria.debug) {
-      System.out.println(s);
-    }
   }
 
   @Override

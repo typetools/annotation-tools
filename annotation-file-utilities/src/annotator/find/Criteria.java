@@ -9,6 +9,7 @@ import annotations.el.LocalLocation;
 import annotations.el.RelativeLocation;
 import annotations.el.TypeIndexLocation;
 import annotations.io.ASTPath;
+import annotations.io.DebugWriter;
 import annotator.Main;
 
 import com.sun.source.tree.Tree;
@@ -23,9 +24,7 @@ import com.sun.source.util.TreePath;
  * Criterion}.
  */
 public final class Criteria {
-
-  // Not final, to avoid tests against it being optimized away.
-  public static boolean debug = false;
+  public static DebugWriter dbug = new DebugWriter();
 
   /** The set of criterion objects, indexed by kind. */
   private final Map<Criterion.Kind, Criterion> criteria;
@@ -60,12 +59,12 @@ public final class Criteria {
     assert path == null || path.getLeaf() == leaf;
     for (Criterion c : criteria.values()) {
       if (! c.isSatisfiedBy(path, leaf)) {
-        if (debug) {
-          System.out.printf("UNsatisfied criterion:%n    %s%n    %s%n", c, Main.pathToString(path));
-        }
+        dbug.debug("UNsatisfied criterion:%n    %s%n    %s%n",
+            c, Main.pathToString(path));
         return false;
-      } else if (debug) {
-        System.out.printf("satisfied criterion:%n    %s%n    %s%n", c, Main.pathToString(path));
+      } else {
+        dbug.debug("satisfied criterion:%n    %s%n    %s%n",
+            c, Main.pathToString(path));
       }
     }
     return true;
@@ -82,12 +81,10 @@ public final class Criteria {
   public boolean isSatisfiedBy(TreePath path) {
     for (Criterion c : criteria.values()) {
       if (! c.isSatisfiedBy(path)) {
-        if (debug) {
-          System.out.println("UNsatisfied criterion: " + c);
-        }
+        dbug.debug("UNsatisfied criterion: %s%n", c);
         return false;
-      } else if (debug) {
-        System.out.println("satisfied criterion: " + c);
+      } else {
+        dbug.debug("satisfied criterion: %s%n", c);
       }
     }
     return true;
