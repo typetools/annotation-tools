@@ -20,8 +20,7 @@ public class ConstructorInsertion extends TypedInsertion {
    * 
    * @param type the type to use when inserting the constructor.
    * @param criteria where to insert the text.
-   * @param innerTypeInsertions the inner types to go on this constructor. See
-   *         {@link ReceiverInsertion} for more details.
+   * @param innerTypeInsertions the inner types to go on this constructor.
    */
   public ConstructorInsertion(Type type, Criteria criteria,
       List<Insertion> innerTypeInsertions) {

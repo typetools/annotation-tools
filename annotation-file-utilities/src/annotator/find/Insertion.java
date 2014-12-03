@@ -37,8 +37,7 @@ public abstract class Insertion {
     private final boolean separateLine;
 
     /**
-     * Whether this insertion has already been inserted into source code. See
-     * {@link ReceiverInsertion} for a better description of how this is used.
+     * Whether this insertion has already been inserted into source code.
      */
     private boolean inserted;
 
@@ -193,8 +192,6 @@ public abstract class Insertion {
 
     /**
      * Gets whether this insertion has already been inserted into source code.
-     * See {@link ReceiverInsertion} for a better description of how this is
-     * used.
      * @return {@code true} if this insertion has already been inserted,
      *         {@code false} otherwise.
      */
@@ -204,8 +201,6 @@ public abstract class Insertion {
 
     /**
      * Sets whether this insertion has already been inserted into source code.
-     * See {@link ReceiverInsertion} for a better description of how this is
-     * used.
      * @param inserted {@code true} if this insertion has already been inserted,
      *         {@code false} otherwise.
      */
