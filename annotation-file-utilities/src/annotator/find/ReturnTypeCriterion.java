@@ -13,7 +13,7 @@ public class ReturnTypeCriterion implements Criterion {
   private final Criterion sigMethodCriterion;
 
   public ReturnTypeCriterion(String className, String methodName) {
-    this.methodName = methodName; // substring(0, name.indexOf(")") + 1);
+    this.methodName = methodName;
     this.inClassCriterion = Criteria.inClass(className, false);
     this.sigMethodCriterion = Criteria.isSigMethod(methodName);
   }
@@ -36,6 +36,7 @@ public class ReturnTypeCriterion implements Criterion {
     do {
       if (path.getLeaf().getKind() == Tree.Kind.METHOD) {
         if (sigMethodCriterion.isSatisfiedBy(path)) {
+          // Method and return type verified; now check class.
           path = path.getParentPath();
           while (path != null && path.getLeaf() != null) {
             if (CommonScanner.hasClassKind(path.getLeaf())) {

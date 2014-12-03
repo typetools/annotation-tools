@@ -460,8 +460,11 @@ public class IndexFileSpecification implements Specification {
     if (astPath == null || astPath.isEmpty()) { return criteria.isOnNew(); }
     ASTPath.ASTEntry entry = astPath.get(-1);
     Tree.Kind kind = entry.getTreeKind();
-    return (kind == Tree.Kind.NEW_ARRAY || kind == Tree.Kind.NEW_CLASS)
-        && entry.childSelectorIs(ASTPath.TYPE) && entry.getArgument() == 0;
+    return kind == Tree.Kind.NEW_ARRAY
+            && entry.childSelectorIs(ASTPath.TYPE)
+            && entry.getArgument() == 0
+        || kind == Tree.Kind.NEW_CLASS
+            && entry.childSelectorIs(ASTPath.IDENTIFIER);
   }
 
   private static boolean isOnNullaryConstructor(Criteria criteria) {

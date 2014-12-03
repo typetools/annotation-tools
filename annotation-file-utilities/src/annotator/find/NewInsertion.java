@@ -33,8 +33,7 @@ public class NewInsertion extends TypedInsertion {
    * 
    * @param type the type to use when inserting the receiver.
    * @param criteria where to insert the text.
-   * @param innerTypeInsertions the inner types to go on this receiver. See
-   *         {@link ReceiverInsertion} for more details.
+   * @param innerTypeInsertions the inner types to go on this receiver.
    */
   public NewInsertion(Type type, Criteria criteria,
       List<Insertion> innerTypeInsertions) {
@@ -69,7 +68,6 @@ public class NewInsertion extends TypedInsertion {
         }
         // If the variable name preceded the array brackets in the
         // source, extract it from the result.
-        //result = fixTypeString(result, baseType.toString());
         if (qualifyType) {
           for (DeclaredType t = baseType; t != null; t = t.getInnerType()) {
             result += t.getName() + ".";
