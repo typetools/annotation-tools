@@ -30,8 +30,8 @@ public class ReturnTypeCriterion implements Criterion {
   public boolean isSatisfiedBy(TreePath path) {
     if (path == null) { return false; }
 
-    debug("ReturnTypeCriterion.isSatisfiedBy("
-        + Main.pathToString(path) + "); this=" + this);
+    Criteria.dbug.debug("ReturnTypeCriterion.isSatisfiedBy(%s); this=%n",
+        Main.pathToString(path), this.toString());
 
     do {
       if (path.getLeaf().getKind() == Tree.Kind.METHOD) {
@@ -41,7 +41,7 @@ public class ReturnTypeCriterion implements Criterion {
           while (path != null && path.getLeaf() != null) {
             if (CommonScanner.hasClassKind(path.getLeaf())) {
               if (!inClassCriterion.isSatisfiedBy(path)) { break; }
-              debug("ReturnTypeCriterion.isSatisfiedBy => true");
+              Criteria.dbug.debug("ReturnTypeCriterion.isSatisfiedBy => true%n");
               return true;
             }
             path = path.getParentPath();
@@ -52,7 +52,7 @@ public class ReturnTypeCriterion implements Criterion {
       path = path.getParentPath();
     } while (path != null && path.getLeaf() != null);
 
-    debug("ReturnTypeCriterion.isSatisfiedBy => false");
+    Criteria.dbug.debug("ReturnTypeCriterion.isSatisfiedBy => false%n");
     return false;
   }
 
@@ -64,11 +64,5 @@ public class ReturnTypeCriterion implements Criterion {
   @Override
   public String toString() {
     return "ReturnTypeCriterion for method: " + methodName;
-  }
-
-  private static void debug(String s) {
-    if (Criteria.debug) {
-      System.out.println(s);
-    }
   }
 }

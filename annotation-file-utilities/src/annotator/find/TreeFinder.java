@@ -70,6 +70,7 @@ import com.sun.tools.javac.util.Position;
 import annotations.io.ASTIndex;
 import annotations.io.ASTPath;
 import annotations.io.ASTRecord;
+import annotations.io.DebugWriter;
 import annotator.Main;
 import annotator.specification.IndexFileSpecification;
 import type.ArrayType;
@@ -85,21 +86,8 @@ import plume.Pair;
  */
 public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
   public static boolean convert_jaifs = false;
-  public static boolean debug = false;
-
-  private static void debug(String message) {
-    if (debug)
-      System.out.println(message);
-  }
-
-  private static void debug(String message, Object... args) {
-    if (debug) {
-      System.out.printf(message, args);
-      if (! message.endsWith("%n")) {
-        System.out.println();
-      }
-    }
-  }
+  public static final DebugWriter dbug = new DebugWriter();
+  public static final DebugWriter stak = new DebugWriter();
 
   /**
    * String representation of regular expression matching a comment in
@@ -363,7 +351,8 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     @Override
     public Pair<ASTRecord, Integer> visitVariable(VariableTree node, Insertion ins) {
       JCTree jt = ((JCVariableDecl) node).getType();
-      debug("visitVariable: %s %s%n", jt, jt.getClass());
+      Object[] args = { jt, jt.getClass() };
+      dbug.debug("visitVariable: %s %s%n", args);
       if (jt instanceof JCTypeApply) {
         JCTypeApply vt = (JCTypeApply) jt;
         JCExpression type = vt.clazz;
@@ -377,7 +366,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     // return value and not the declaration itself.
     @Override
     public Pair<ASTRecord, Integer> visitMethod(MethodTree node, Insertion ins) {
-      debug("TypePositionFinder.visitMethod");
+      dbug.debug("TypePositionFinder.visitMethod%n");
       super.visitMethod(node, ins);
       // System.out.println("node: " + node);
       // System.out.println("return: " + node.getReturnType());
@@ -408,7 +397,8 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
 
     @Override
     public Pair<ASTRecord, Integer> visitIdentifier(IdentifierTree node, Insertion ins) {
-      debug("TypePositionFinder.visitIdentifier(%s)", node);
+      Object[] args = { node };
+      dbug.debug("TypePositionFinder.visitIdentifier(%s)%n", args);
       // for arrays, need to indent inside array, not right before type
       ASTRecord rec = ASTIndex.indexOf(tree).get(node);
       ASTPath astPath = ins.getCriteria().getASTPath();
@@ -420,7 +410,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       // correspond to a node in the AST.
       if (parent.getKind() == Tree.Kind.NEW_ARRAY) { // NewArrayTree)
         ASTPath.ASTEntry entry;
-        debug("TypePositionFinder.visitIdentifier: recognized array");
+        dbug.debug("TypePositionFinder.visitIdentifier: recognized array%n");
         if (astPath == null) {
           entry = new ASTPath.ASTEntry(Tree.Kind.NEW_ARRAY, ASTPath.TYPE, 0);
           astPath = astRecord(parent).extend(entry).astPath;
@@ -439,12 +429,10 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
           i = jcnode.getEndPosition(tree.endPositions);
         }
       } else if (parent.getKind() == Tree.Kind.NEW_CLASS) { // NewClassTree)
-        debug("TypePositionFinder.visitIdentifier: recognized class");
+        dbug.debug("TypePositionFinder.visitIdentifier: recognized class%n");
         JCNewClass nc = (JCNewClass) parent;
-        debug("TypePositionFinder.visitIdentifier: clazz %s (%d) constructor %s",
-              nc.clazz,
-              nc.clazz.getPreferredPosition(),
-              nc.constructor);
+        Object[] args1 = { nc.clazz, nc.clazz.getPreferredPosition(), nc.constructor };
+        dbug.debug("TypePositionFinder.visitIdentifier: clazz %s (%d) constructor %s%n", args1);
         i = nc.clazz.getPreferredPosition();
         if (astPath == null) {
           astPath = astRecord(node).astPath;
@@ -454,14 +442,16 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
         astPath = astRecord.astPath;
         i = ((JCIdent) node).pos;
       }
+      Object[] args1 = { node, i, parent.getClass(), parent };
 
-      debug("visitIdentifier(%s) => %d where parent (%s) = %s%n", node, i, parent.getClass(), parent);
+      dbug.debug("visitIdentifier(%s) => %d where parent (%s) = %s%n", args1);
       return Pair.of(rec.replacePath(astPath), i);
     }
 
     @Override
     public Pair<ASTRecord, Integer> visitMemberSelect(MemberSelectTree node, Insertion ins) {
-        debug("TypePositionFinder.visitMemberSelect(%s)", node);
+        Object[] args = { node };
+        dbug.debug("TypePositionFinder.visitMemberSelect(%s)%n", args);
         JCFieldAccess raw = (JCFieldAccess) node;
         return Pair.of(astRecord(node),
             raw.getEndPosition(tree.endPositions) - raw.name.length());
@@ -481,14 +471,16 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
 
     @Override
     public Pair<ASTRecord, Integer> visitPrimitiveType(PrimitiveTypeTree node, Insertion ins) {
-      debug("TypePositionFinder.visitPrimitiveType(%s)", node);
+      Object[] args = { node };
+      dbug.debug("TypePositionFinder.visitPrimitiveType(%s)%n", args);
       return pathAndPos((JCTree) node);
     }
 
     @Override
     public Pair<ASTRecord, Integer> visitParameterizedType(ParameterizedTypeTree node, Insertion ins) {
       Tree parent = parent(node);
-      debug("TypePositionFinder.visitParameterizedType %s parent=%s%n", node, parent);
+      Object[] args = { node, parent };
+      dbug.debug("TypePositionFinder.visitParameterizedType %s parent=%s%n", args);
       Integer pos = getBaseTypePosition(((JCTypeApply) node).getType()).b;
       return Pair.of(astRecord(node), pos);
     }
@@ -595,9 +587,11 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
 
     @Override
     public Pair<ASTRecord, Integer> visitArrayType(ArrayTypeTree node, Insertion ins) {
-      debug("TypePositionFinder.visitArrayType(%s)", node);
+      Object[] args = { node };
+      dbug.debug("TypePositionFinder.visitArrayType(%s)%n", args);
       JCArrayTypeTree att = (JCArrayTypeTree) node;
-      debug("TypePositionFinder.visitArrayType(%s) preferred = %s%n", node, att.getPreferredPosition());
+      Object[] args1 = { node, att.getPreferredPosition() };
+      dbug.debug("TypePositionFinder.visitArrayType(%s) preferred = %s%n", args1);
       // If the code has a type like "String[][][]", then this gets called
       // three times:  for String[][][], String[][], and String[]
       // respectively.  For each of the three, call String[][][] "largest".
@@ -607,11 +601,13 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       int start = arrayContentType(att).getPreferredPosition() + 1;
       int end = att.getEndPosition(tree.endPositions);
       int pos = arrayInsertPos(start, end);
+      Object[] args2 = { levels, largestLevels };
 
-      debug("  levels=%d largestLevels=%d%n", levels, largestLevels);
+      dbug.debug("  levels=%d largestLevels=%d%n", args2);
       for (int i=levels; i<largestLevels; i++) {
         pos = getFirstInstanceAfter('[', pos+1);
-        debug("  pos %d at i=%d%n", pos, i);
+        Object[] args3 = { pos, i };
+        dbug.debug("  pos %d at i=%d%n", args3);
       }
       return Pair.of(astRecord(node), pos);
     }
@@ -651,14 +647,14 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
 
     @Override
     public Pair<ASTRecord, Integer> visitCompilationUnit(CompilationUnitTree node, Insertion ins) {
-      debug("TypePositionFinder.visitCompilationUnit");
+      dbug.debug("TypePositionFinder.visitCompilationUnit%n");
       JCCompilationUnit cu = (JCCompilationUnit) node;
       return Pair.of(astRecord(node), cu.getStartPosition());
     }
 
     @Override
     public Pair<ASTRecord, Integer> visitClass(ClassTree node, Insertion ins) {
-      debug("TypePositionFinder.visitClass");
+      dbug.debug("TypePositionFinder.visitClass%n");
       JCClassDecl cd = (JCClassDecl) node;
       JCTree t = cd.mods == null ? cd : cd.mods;
       return Pair.of(astRecord(cd), t.getPreferredPosition());
@@ -726,7 +722,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     //   { ... }            -- as in: String[] names2 = { "Alice", "Bob" };
     @Override
     public Pair<ASTRecord, Integer> visitNewArray(NewArrayTree node, Insertion ins) {
-      debug("TypePositionFinder.visitNewArray");
+      dbug.debug("TypePositionFinder.visitNewArray%n");
       JCNewArray na = (JCNewArray) node;
       GenericArrayLocationCriterion galc =
           ins.getCriteria().getGenericArrayLocation();
@@ -1007,9 +1003,9 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       return null;
     }
 
-    debug("SCANNING: %s %s%n", node.getKind(), node);
+    dbug.debug("SCANNING: %s %s%n", node.getKind(), node);
     if (! handled(node)) {
-      debug("Not handled, skipping (%s): %s%n", node.getClass(), node);
+      dbug.debug("Not handled, skipping (%s): %s%n", node.getClass(), node);
       // nothing to do
       return super.scan(node, p);
     }
@@ -1046,27 +1042,25 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
         it.remove();
         continue;
       }
-      if (debug) {
-        debug("Considering insertion at tree:");
-        debug("  Insertion: " + i);
-        debug("  First line of node: " + Main.firstLine(node.toString()));
-        debug("  Type of node: " + node.getClass());
-      }
+      dbug.debug("Considering insertion at tree:%n");
+      dbug.debug("  Insertion: %s%n", i);
+      dbug.debug("  First line of node: %s%n", Main.firstLine(node.toString()));
+      dbug.debug("  Type of node: %s%n", node.getClass());
       if (!i.getCriteria().isSatisfiedBy(path, node)) {
-        debug("  ... not satisfied");
+        dbug.debug("  ... not satisfied%n");
         continue;
       } else {
-        debug("  ... satisfied!");
-        debug("    First line of node: " + Main.firstLine(node.toString()));
-        debug("    Type of node: " + node.getClass());
+        dbug.debug("  ... satisfied!%n");
+        dbug.debug("    First line of node: %s%n", Main.firstLine(node.toString()));
+        dbug.debug("    Type of node: %s%n", node.getClass());
 
         ASTPath astPath = i.getCriteria().getASTPath();
         Integer pos = astPath == null ? findPosition(path, i)
             : convert_jaifs ? null  // already in correct form
             : findPositionByASTPath(astPath, path, i);
         if (pos != null) {
-          debug("  ... satisfied! at %d for node of type %s: %s",
-              pos, node.getClass(), Main.treeToString(node));
+          Object[] args1 = { pos, node.getClass(), Main.treeToString(node) };
+          dbug.debug("  ... satisfied! at %d for node of type %s: %s%n", args1);
           positions.put(pos, i);
         }
       }
@@ -1172,11 +1166,12 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
         // created) receiver.
         Map<Tree, ASTRecord> astIndex = ASTIndex.indexOf(tree);
         ASTRecord insertRecord = astIndex.get(node);
+        Object[] args = { node, i.getCriteria() };
 //        ASTPath insertPath = insertRecord == null
 //            ? ASTPath.empty()
 //            : insertRecord.astPath;
 
-        debug("TreeFinder.scan: node=%s%n  critera=%s%n", node, i.getCriteria());
+        dbug.debug("TreeFinder.scan: node=%s%n  critera=%s%n", args);
 
         if (node.getKind() == Tree.Kind.METHOD
                 && i.getCriteria().isOnReturnType()) {
@@ -1189,15 +1184,15 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
             if (pos < 0) {  // skip -- inserted w/generated constructor
               return null;
             }
-            debug("pos = %d at constructor name: %s%n", pos,
-                jcnode.sym.toString());
+            Object[] args1 = { pos, jcnode.sym.toString() };
+            dbug.debug("pos = %d at constructor name: %s%n", args1);
           } else {
             Pair<ASTRecord, Integer> pair = tpf.scan(returnType, i);
             insertRecord = pair.a;
             pos = pair.b;
             assert handled(node);
-            debug("pos = %d at return type node: %s%n", pos,
-                returnType.getClass());
+            Object[] args1 = { pos, returnType.getClass() };
+            dbug.debug("pos = %d at return type node: %s%n", args1);
           }
         } else if (((node.getKind() == Tree.Kind.TYPE_PARAMETER)
                     && (i.getCriteria().onBoundZero())
@@ -1252,12 +1247,14 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
           }
           if (typeScan) {
             // looking for the type
-            debug("Calling tpf.scan(%s: %s)%n", node.getClass(), node);
+            Object[] args1 = { node.getClass(), node };
+            dbug.debug("Calling tpf.scan(%s: %s)%n", args1);
             Pair<ASTRecord, Integer> pair = tpf.scan(node, i);
             insertRecord = pair.a;
             pos = pair.b;
             assert handled(node);
-            debug("pos = %d at type: %s (%s)%n", pos, node.toString(), node.getClass());
+            Object[] args2 = { pos, node.toString(), node.getClass() };
+            dbug.debug("pos = %d at type: %s (%s)%n", args2);
           } else if (node.getKind() == Tree.Kind.METHOD
               && i.getKind() == Insertion.Kind.CONSTRUCTOR
               && (((JCMethodDecl) node).mods.flags & Flags.GENERATEDCONSTR) != 0) {
@@ -1269,7 +1266,8 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
             pos = dpf.scan(node, null);
             insertRecord = astRecord(node);
             assert pos != null;
-            debug("pos = %d at declaration: %s%n", pos, node.getClass());
+            Object[] args1 = { pos, node.getClass() };
+            dbug.debug("pos = %d at declaration: %s%n", args1);
           }
         }
 
@@ -1357,8 +1355,9 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
         // created) receiver.
         Map<Tree, ASTRecord> astIndex = ASTIndex.indexOf(tree);
         ASTRecord insertRecord = astIndex.get(node);
+        Object[] args = { node, i.getCriteria() };
 
-        debug("TreeFinder.scan: node=%s%n  critera=%s%n", node, i.getCriteria());
+        dbug.debug("TreeFinder.scan: node=%s%n  critera=%s%n", args);
 
         if (node.getKind() == Tree.Kind.METHOD
                 && entry.childSelectorIs(ASTPath.TYPE)) {
@@ -1371,15 +1370,15 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
                 if (pos < 0) {  // skip -- inserted w/generated constructor
                     return null;
                 }
-                debug("pos = %d at constructor name: %s%n", pos,
-                      jcnode.sym.toString());
+                Object[] args1 = { pos, jcnode.sym.toString() };
+                dbug.debug("pos = %d at constructor name: %s%n", args1);
             } else {
                 Pair<ASTRecord, Integer> pair = tpf.scan(returnType, i);
                 insertRecord = pair.a;
                 pos = pair.b;
                 assert handled(node);
-                debug("pos = %d at return type node: %s%n", pos,
-                      returnType.getClass());
+                Object[] args1 = { pos, returnType.getClass() };
+                dbug.debug("pos = %d at return type node: %s%n", args1);
             }
         } else if (node.getKind() == Tree.Kind.TYPE_PARAMETER
                     && entry.getTreeKind() == Tree.Kind.TYPE_PARAMETER  // TypeParameter.bound
@@ -1454,12 +1453,14 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
           }
           if (typeScan) {
             // looking for the type
-            debug("Calling tpf.scan(%s: %s)%n", node.getClass(), node);
+            Object[] args1 = { node.getClass(), node };
+            dbug.debug("Calling tpf.scan(%s: %s)%n", args1);
             Pair<ASTRecord, Integer> pair = tpf.scan(node, i);
             insertRecord = pair.a;
             pos = pair.b;
             assert handled(node);
-            debug("pos = %d at type: %s (%s)%n", pos, node.toString(), node.getClass());
+            Object[] args2 = { pos, node.toString(), node.getClass() };
+            dbug.debug("pos = %d at type: %s (%s)%n", args2);
           } else if (node.getKind() == Tree.Kind.METHOD
               && i.getKind() == Insertion.Kind.CONSTRUCTOR
               && (((JCMethodDecl) node).mods.flags & Flags.GENERATEDCONSTR) != 0) {
@@ -1471,7 +1472,8 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
             pos = dpf.scan(node, null);
             insertRecord = astRecord(node);
             assert pos != null;
-            debug("pos = %d at declaration: %s%n", pos, node.getClass());
+            Object[] args1 = { pos, node.getClass() };
+            dbug.debug("pos = %d at declaration: %s%n", args1);
           }
         }
 
@@ -1585,7 +1587,8 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
         String iannNoPackage = Insertion.removePackage(iann).b;
         // System.out.printf("Comparing: %s %s %s%n", ann, iann, iannNoPackage);
         if (ann.equals(iann) || ann.equals(iannNoPackage)) {
-          debug("Already present, not reinserting: %s%n", ann);
+          Object[] args = { ann };
+          dbug.debug("Already present, not reinserting: %s%n", args);
           return true;
         }
       }
@@ -1605,7 +1608,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       // If the message has multiple lines, indent them so it's easier to read.
       System.err.println("\tError: " + e.getMessage().replace("\n", "\n\t\t"));
     }
-    if (debug || Main.print_error_stack) {
+    if (dbug.or(stak).isEnabled()) {
       e.printStackTrace();
     } else {
       System.err.println("\tRun with --print_error_stack to see the stack trace.");
@@ -1863,13 +1866,14 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
         }
       }
     }
-    if (debug) {
+    if (dbug.isEnabled()) {
       // Output every insertion that was not given a position:
       for (Insertion i : uninserted) {
         System.err.println("Unable to insert: " + i);
       }
     }
-    debug("getPositions => %d positions%n", positions.size());
+    Object[] args = { positions.size() };
+    dbug.debug("getPositions => %d positions%n", args);
     return Multimaps.unmodifiableSetMultimap(positions);
   }
 

@@ -34,10 +34,8 @@ final class PackageCriterion implements Criterion {
   @Override
   public boolean isSatisfiedBy(TreePath path) {
     Tree tree = path.getLeaf();
-    if (Criteria.debug) {
-      debug(String.format("PackageCriterion.isSatisfiedBy(%s, %s); this=%s",
-          Main.pathToString(path), tree, this));
-    }
+    Criteria.dbug.debug("PackageCriterion.isSatisfiedBy(%s, %s); this=%s%n",
+        Main.pathToString(path), tree, this.toString());
 
     if (tree.getKind() == Tree.Kind.COMPILATION_UNIT) {
       CompilationUnitTree cu = (CompilationUnitTree)tree;
@@ -49,7 +47,7 @@ final class PackageCriterion implements Criterion {
           return true;
       }
     }
-    debug("PackageCriterion.isSatisfiedBy => false");
+    Criteria.dbug.debug("PackageCriterion.isSatisfiedBy => false%n");
     return false;
   }
 
@@ -60,11 +58,4 @@ final class PackageCriterion implements Criterion {
   public String toString() {
     return "package '" + name + "'";
   }
-
-  private static void debug(String s) {
-    if (Criteria.debug) {
-      System.out.println(s);
-    }
-  }
-
 }
