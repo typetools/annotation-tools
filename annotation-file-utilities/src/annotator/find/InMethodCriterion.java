@@ -37,23 +37,19 @@ final class InMethodCriterion implements Criterion {
   /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path) {
-
-    if (path == null)
-      return false;
-
-    if (Criteria.debug) {
-      debug("InMethodCriterion.isSatisfiedBy(" + Main.pathToString(path) + "); this=" + this);
-    }
+    Criteria.dbug.debug("InMethodCriterion.isSatisfiedBy(%s); this=%s%n",
+        Main.pathToString(path), this.toString());
 
     do {
       if (path.getLeaf().getKind() == Tree.Kind.METHOD) {
         boolean b = sigMethodCriterion.isSatisfiedBy(path);
-        debug("InMethodCriterion.isSatisfiedBy => b");
+        Criteria.dbug.debug("%s%n", "InMethodCriterion.isSatisfiedBy => b");
         return b;
       }
       path = path.getParentPath();
     } while (path != null && path.getLeaf() != null);
-    debug("InMethodCriterion.isSatisfiedBy => false");
+
+    Criteria.dbug.debug("%s%n", "InMethodCriterion.isSatisfiedBy => false");
     return false;
   }
 
@@ -64,11 +60,4 @@ final class InMethodCriterion implements Criterion {
   public String toString() {
     return "in method '" + name + "'";
   }
-
-  private static void debug(String s) {
-    if (Criteria.debug) {
-      System.out.println(s);
-    }
-  }
-
 }

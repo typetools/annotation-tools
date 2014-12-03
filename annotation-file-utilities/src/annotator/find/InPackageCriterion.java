@@ -35,13 +35,11 @@ final class InPackageCriterion implements Criterion {
   /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path) {
-
     if (path == null)
       return false;
 
-    if (Criteria.debug) {
-      debug("InPackageCriterion.isSatisfiedBy(" + Main.pathToString(path) + "); this=" + this);
-    }
+    Criteria.dbug.debug("InPackageCriterion.isSatisfiedBy(%s); this=%s",
+        Main.pathToString(path), this.toString());
 
     do {
       Tree tree = path.getLeaf();
@@ -57,7 +55,8 @@ final class InPackageCriterion implements Criterion {
       }
       path = path.getParentPath();
     } while (path != null && path.getLeaf() != null);
-    debug("InPackageCriterion.isSatisfiedBy => false");
+
+    Criteria.dbug.debug("InPackageCriterion.isSatisfiedBy => false");
     return false;
   }
 
@@ -68,11 +67,4 @@ final class InPackageCriterion implements Criterion {
   public String toString() {
     return "in package '" + name + "'";
   }
-
-  private static void debug(String s) {
-    if (Criteria.debug) {
-      System.out.println(s);
-    }
-  }
-
 }

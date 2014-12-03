@@ -758,7 +758,7 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
   static class Matcher {
     // adapted from IndexFileParser.parseASTPath et al.
     // TODO: refactor switch statement into TreeVisitor?
-    public static boolean debug = false;
+    public static final DebugWriter dbug = new DebugWriter();
     private ASTPath astPath;
 
     Matcher(ASTPath astPath) {
@@ -800,11 +800,11 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
         path = path.getParentPath();
       }
 
-      if (debug) {
-        System.out.println("AST [" + astPath + "]");
+      if (dbug.isEnabled()) {
+        dbug.debug("AST [%s]%n", astPath);
         for (Tree t : actualPath) {
-          System.out.println("  " + t.getKind() + ": "
-              + t.toString().replace('\n', ' '));
+          dbug.debug("  %s: %s%n", t.getKind(),
+              t.toString().replace('\n', ' '));
         }
       }
 
@@ -823,10 +823,8 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
         // in "actualPath". If it's not a match, this is not the correct
         // location. If it is a match, keep going.
         Tree next = null;
-        if (debug) {
-          System.out.println("astNode: " + astNode);
-          System.out.println("actualNode: " + actualNode.getKind());
-        }
+        dbug.debug("astNode: %s%n", astNode);
+        dbug.debug("actualNode: %s%n", actualNode.getKind());
         if (!kindsMatch(astNode.getTreeKind(), actualNode.getKind())) {
           return false;
         }
@@ -1298,13 +1296,9 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
         }
         }
 
-        if (debug) {
-          System.out.println("next: " + next);
-        }
+        dbug.debug("next: %s%n", next);
         if (next != actualPath.get(i + 1)) {
-          if (debug) {
-            System.out.println("no next match");
-          }
+          dbug.debug("no next match%n");
           return false;
         }
       }
