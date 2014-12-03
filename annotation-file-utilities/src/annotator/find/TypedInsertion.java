@@ -8,8 +8,24 @@ import type.DeclaredType;
 import type.Type;
 
 /**
- * @author dbro
+ * Superclass for {@link Insertion} classes for which insertion may
+ * result in code generation other than just annotations.
+ * {@code TypedInsertion}s keep track of insertions on inner types.  If
+ * there is no type given in the source, one may be generated (along
+ * with other code necessary in the context) to serve as an insertion
+ * site.
+ * <p>
+ * We don't know until the end of the whole insertion process whether
+ * the type already exists or not.  To remedy this, we store a reference
+ * to each insertion on an inner type of a receiver in two places: the
+ * global list of all insertions and the {@code TypedInsertion} that is
+ * the parent of the inner type insertion.  If the type is not already
+ * present, the inner type insertions are inserted into the new type and
+ * labeled as "inserted" (with {@link Insertion#setInserted(boolean)})
+ * so they are not inserted as the rest of the insertions list is
+ * processed.
  *
+ * @author dbro
  */
 public abstract class TypedInsertion extends Insertion {
   /**
@@ -57,16 +73,15 @@ public abstract class TypedInsertion extends Insertion {
   }
 
   /**
-   * Gets the type. It is assumed that the returned value will be modified
-   * to update the type to be inserted.
+   * Gets the type.  It is assumed that the returned value will be
+   * modified to update the type to be inserted.
    */
   public Type getType() {
       return type;
   }
 
   /**
-   * Gets a copy of the inner types to go on this receiver. See
-   * {@link ReceiverInsertion} for more details.
+   * Gets the inner type insertions associated with this insertion.
    * @return a copy of the inner types.
    */
   public List<Insertion> getInnerTypeInsertions() {
