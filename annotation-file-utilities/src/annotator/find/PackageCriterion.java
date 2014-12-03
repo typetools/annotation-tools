@@ -27,9 +27,16 @@ final class PackageCriterion implements Criterion {
   @Override
   public boolean isSatisfiedBy(TreePath path, Tree tree) {
     assert path == null || path.getLeaf() == tree;
+    return isSatisfiedBy(path);
+  }
 
+  /** {@inheritDoc} */
+  @Override
+  public boolean isSatisfiedBy(TreePath path) {
+    Tree tree = path.getLeaf();
     if (Criteria.debug) {
-      debug(String.format("PackageCriterion.isSatisfiedBy(%s, %s); this=%s", Main.pathToString(path), tree, this));
+      debug(String.format("PackageCriterion.isSatisfiedBy(%s, %s); this=%s",
+          Main.pathToString(path), tree, this));
     }
 
     if (tree.getKind() == Tree.Kind.COMPILATION_UNIT) {
@@ -44,21 +51,6 @@ final class PackageCriterion implements Criterion {
     }
     debug("PackageCriterion.isSatisfiedBy => false");
     return false;
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public boolean isSatisfiedBy(TreePath path) {
-    debug(String.format("PackageCriterion.isSatisfiedBy(%s); this=%s", Main.pathToString(path), this));
-
-    if (path != null)
-      return false;
-
-    // If we got here, then the criterion isn't satisfied (I think).
-    // return false;
-
-    throw new Error("This should not happen");
-
   }
 
   /**
