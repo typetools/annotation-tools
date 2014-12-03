@@ -42,6 +42,7 @@ import annotations.el.LocalLocation;
 import annotations.io.ASTIndex;
 import annotations.io.ASTPath;
 import annotations.io.ASTRecord;
+import annotations.io.DebugWriter;
 import annotations.io.IndexFileParser;
 import annotations.io.IndexFileWriter;
 import annotations.util.coll.VivifyingMap;
@@ -576,10 +577,14 @@ public class Main {
       System.exit(1);
     }
 
-    if (debug) {
-      TreeFinder.debug = true;
-      Criteria.debug = true;
-    }
+    DebugWriter dbug = new DebugWriter();
+    DebugWriter verb = new DebugWriter();
+    DebugWriter both = dbug.or(verb);
+    dbug.setEnabled(debug);
+    verb.setEnabled(verbose);
+    TreeFinder.stak.setEnabled(print_error_stack);
+    TreeFinder.dbug.setEnabled(debug);
+    Criteria.dbug.setEnabled(debug);
 
     if (convert_jaifs) {
       TreeFinder.convert_jaifs = true;
@@ -649,12 +654,10 @@ public class Main {
               imports.addAll(set);
             }
           }
-          if (verbose || debug) {
-            System.out.printf("Read %d annotations from %s%n",
-                              parsedSpec.size(), arg);
-          }
+          both.debug("Read %d annotations from %s%n", parsedSpec.size(), arg);
           if (omit_annotation != null) {
-            List<Insertion> filtered = new ArrayList<Insertion>(parsedSpec.size());
+            List<Insertion> filtered =
+                new ArrayList<Insertion>(parsedSpec.size());
             for (Insertion insertion : parsedSpec) {
               // TODO: this won't omit annotations if the insertion is more than
               // just the annotation (such as if the insertion is a cast
@@ -664,10 +667,8 @@ public class Main {
               }
             }
             parsedSpec = filtered;
-            if (verbose || debug) {
-              System.out.printf("After filtering: %d annotations from %s%n",
-                                parsedSpec.size(), arg);
-            }
+            both.debug("After filtering: %d annotations from %s%n",
+                parsedSpec.size(), arg);
           }
           insertions.addAll(parsedSpec);
         } catch (RuntimeException e) {
@@ -688,7 +689,7 @@ public class Main {
           if (e.getCause() != null && e.getCause().getMessage() != null) {
             System.err.println('\t' + e.getCause().getMessage());
           }
-          if (debug) {
+          if (print_error_stack) {
             e.printStackTrace();
           }
           System.exit(1);
@@ -698,20 +699,17 @@ public class Main {
       }
     }
 
-    if (debug) {
-      System.out.printf("%d insertions, %d .java files%n", insertions.size(), javafiles.size());
-    }
-    if (debug) {
-      System.out.printf("Insertions:%n");
+    if (dbug.isEnabled()) {
+      dbug.debug("%d insertions, %d .java files%n",
+          insertions.size(), javafiles.size());
+      dbug.debug("Insertions:%n");
       for (Insertion insertion : insertions) {
-        System.out.printf("  %s%n", insertion);
+        dbug.debug("  %s%n", insertion);
       }
     }
 
     for (String javafilename : javafiles) {
-      if (verbose) {
-        System.out.println("Processing " + javafilename);
-      }
+      verb.debug("Processing %s%n", javafilename);
 
       File javafile = new File(javafilename);
       File unannotated = new File(javafilename + ".unannotated");
@@ -721,9 +719,7 @@ public class Main {
         // A user can rename that file back to just .java to cause the
         // .java file to be read.
         if (unannotated.exists()) {
-          if (verbose) {
-            System.out.printf("Renaming %s to %s%n", unannotated, javafile);
-          }
+          verb.debug("Renaming %s to %s%n", unannotated, javafile);
           boolean success = unannotated.renameTo(javafile);
           if (! success) {
             throw new Error(String.format("Failed renaming %s to %s",
@@ -740,9 +736,7 @@ public class Main {
         // fileLineSep is set here so that exceptions can be caught
         fileLineSep = UtilMDE.inferLineSeparator(javafilename);
         src = new Source(javafilename);
-        if (verbose) {
-          System.out.printf("Parsed %s%n", javafilename);
-        }
+        verb.debug("Parsed %s%n", javafilename);
       } catch (Source.CompilerException e) {
         e.printStackTrace();
         return;
@@ -761,10 +755,8 @@ public class Main {
 
         // Create a finder, and use it to get positions.
         TreeFinder finder = new TreeFinder(tree);
-        if (debug) {
-          TreeFinder.debug = true;
-        }
-        SetMultimap<Integer, Insertion> positions = finder.getPositions(tree, insertions);
+        SetMultimap<Integer, Insertion> positions =
+            finder.getPositions(tree, insertions);
 
         if (convert_jaifs) {
           // program used only for JAIF conversion; execute following
@@ -794,8 +786,10 @@ public class Main {
         }
 
         // Apply the positions to the source file.
-        if (debug || verbose) {
-          System.err.printf("getPositions returned %d positions in tree for %s%n", positions.size(), javafilename);
+        if (both.isEnabled()) {
+          System.err.printf(
+              "getPositions returned %d positions in tree for %s%n",
+              positions.size(), javafilename);
         }
 
         Set<Integer> positionKeysUnsorted = positions.keySet();
@@ -813,9 +807,7 @@ public class Main {
           boolean constructorInserted = false;
           List<Insertion> toInsertList = new ArrayList<Insertion>(positions.get(pos));
           Collections.reverse(toInsertList);
-          if (debug) {
-            System.out.printf("insertion pos: %d%n", pos);
-          }
+          dbug.debug("insertion pos: %d%n", pos);
           assert pos >= 0
             : "pos is negative: " + pos + " " + toInsertList.get(0) + " " + javafilename;
           for (Insertion iToInsert : toInsertList) {
@@ -869,13 +861,11 @@ public class Main {
             }
 
             String toInsert = iToInsert.getText(comments, abbreviate,
-                    gotSeparateLine, pos, precedingChar) + trailingWhitespace;
+                gotSeparateLine, pos, precedingChar) + trailingWhitespace;
             if (abbreviate) {
               Set<String> packageNames = iToInsert.getPackageNames();
-              if (debug) {
-                System.out.printf("Need import %s%n  due to insertion %s%n",
-                                  packageNames, toInsert);
-              }
+              dbug.debug("Need import %s%n  due to insertion %s%n",
+                  packageNames, toInsert);
               imports.addAll(packageNames);
             }
 
@@ -886,13 +876,14 @@ public class Main {
             if (precedingTextPos >= 0) {
               String precedingTextPlusChar
                 = src.getString().substring(precedingTextPos, pos);
-              // System.out.println("Inserting " + toInsert + " at " + pos + " in code of length " + src.getString().length() + " with preceding text '" + precedingTextPlusChar + "'");
-              if (toInsert.equals(precedingTextPlusChar.substring(0, toInsert.length()))
+              if (toInsert.equals(
+                      precedingTextPlusChar.substring(0, toInsert.length()))
                   || toInsert.equals(precedingTextPlusChar.substring(1))) {
-                if (debug) {
-                    System.out.println("Inserting " + toInsert + " at " + pos + " in code of length " + src.getString().length() + " with preceding text '" + precedingTextPlusChar + "'");
-                    System.out.println("Already present, skipping");
-                }
+                dbug.debug(
+                    "Inserting %s at %d in code of length %d with preceding text '%s'%n",
+                    toInsert, pos, src.getString().length(),
+                    precedingTextPlusChar);
+                dbug.debug("Already present, skipping%n");
                 continue;
               }
             }
@@ -909,9 +900,7 @@ public class Main {
                 System.out.println();   // terminate the line that contains dots
               }
             }
-            if (debug) {
-              System.out.println("Post-insertion source: " + src.getString());
-            }
+            dbug.debug("Post-insertion source: %n" + src.getString());
           }
         }
       }
@@ -938,10 +927,10 @@ public class Main {
         }
       }
 
-      if (debug) {
-        System.out.println(imports.size() + " imports to insert");
+      if (dbug.isEnabled()) {
+        dbug.debug("%d imports to insert%n", imports.size());
         for (String classname : imports) {
-          System.out.println("  " + classname);
+          dbug.debug("  %s%n", classname);
         }
       }
 
@@ -955,9 +944,7 @@ public class Main {
         if (m.find()) {
           importIndex = m.start();
         } else {
-          // if (debug) {
-          //   System.out.println("Didn't find import in " + srcString);
-          // }
+          // Debug.info("Didn't find import in " + srcString);
           m = packagePattern.matcher(srcString);
           if (m.find()) {
             importIndex = m.end();
@@ -1009,72 +996,6 @@ public class Main {
       }
     }
   }
-
-  
-
-/*
-  private static void addInnerTypePaths(ADeclaration decl,
-      ASTRecord astRecord, TypedInsertion ti,
-      Multimap<Insertion, Annotation> insertionSources) {
-    VivifyingMap<ASTPath, ? extends ATypeElement> vm =
-        ti.getKind() == Insertion.Kind.CAST
-            ? decl.insertTypecasts
-            : decl.insertAnnotations;
-    Map<String, Annotation> annoMap = new HashMap<String, Annotation>();
-    for (Annotation anno : insertionSources.get(ti)) {
-      String key = anno.toString();
-      Annotation a = annoMap.get(key);
-      annoMap.put(key, anno);
-      if (a != null && !a.equals(anno)) {
-        if (debug) {
-          System.err.println("WARNING: conflicting annotations");
-          System.err.println("old: " + a);
-          System.err.println("new: " + anno);
-        }
-      }
-    }
-    addInnerTypePaths(vm, astRecord, ti.getType(),
-        Collections.<String>emptyList(), annoMap);
-  }
-
-  private static void
-  addInnerTypePaths(VivifyingMap<ASTPath, ? extends ATypeElement> vm,
-      ASTRecord astRecord, Type type, List<String> ss,
-      Map<String, Annotation> annoMap) {
-    for (String s : ss) {
-      Annotation anno = annoMap.get(s);
-      if (anno != null) {
-        ATypeElement elem = vm.vivify(astRecord.astPath);
-        elem.tlAnnotationsHere.add(anno);
-      }
-    }
-    switch (type.getKind()) {
-    case ARRAY:
-      type = ((ArrayType) type).getComponentType();
-      astRecord = astRecord.extend(Tree.Kind.ARRAY_TYPE, ASTPath.TYPE);
-      break;
-    case BOUNDED:
-      type = ((BoundedType) type).getBound();
-      astRecord = astRecord.extend(Tree.Kind.TYPE_PARAMETER, ASTPath.BOUND);
-      break;
-    case DECLARED:
-      DeclaredType dt = (DeclaredType) type;
-      int i = 0;
-      for (Type t : dt.getTypeParameters()) {
-        ASTRecord r = astRecord.extend(Tree.Kind.PARAMETERIZED_TYPE,
-            ASTPath.TYPE_PARAMETER, i++);
-        addInnerTypePaths(vm, r, t, t.getAnnotations(), annoMap);
-      }
-      type = dt.getInnerType();
-      if (type == null) { return; }
-      astRecord = astRecord.extend(Tree.Kind.MEMBER_SELECT, ASTPath.EXPRESSION);
-      break;
-    default:
-      throw new RuntimeException("unknown type kind " + type.getKind());
-    }
-    addInnerTypePaths(vm, astRecord, type, type.getAnnotations(), annoMap);
-  }
-*/
 
   public static String pathToString(TreePath path) {
     if (path == null)
