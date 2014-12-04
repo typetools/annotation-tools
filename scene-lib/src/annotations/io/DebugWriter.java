@@ -35,6 +35,9 @@ public class DebugWriter {
   }
 
   public void debug(String format, Object... args) {
-    if (isEnabled()) { out.print(String.format(format, args)); }
+    if (isEnabled()) {
+      out.print(String.format(format, args));
+      out.flush();
+    }
   }
 }
