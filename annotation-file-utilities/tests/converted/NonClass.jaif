@@ -46,3 +46,8 @@ class NonClass$E:
     method <init>(Ljava/lang/String;)V:
         insert-annotation Method.body, Block.statement 1, ExpressionStatement.expression, Assignment.expression, NewClass.identifier: @V(value=0)
 
+package :
+class NonClass$I:
+    insert-annotation Class.bound 0: @X
+    insert-annotation Class.bound 0, ParameterizedType.typeArgument 0: @X
+

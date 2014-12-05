@@ -65,3 +65,11 @@ field names15:
 new *0:
 inner-type 0, 0, 0, 0, 0, 0, 0, 0, 0, 0: @E
 
+field lists:
+type: @B
+inner-type 0, 0: @Z
+inner-type 0, 0, 3, 0: @A
+new *0: @E
+inner-type 0, 0: @C
+inner-type 0, 0, 3, 0: @D
+

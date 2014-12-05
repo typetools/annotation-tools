@@ -43,3 +43,8 @@ class NonClass$E:
 method <init>(Ljava/lang/String;)V:
 new *0: @V(0)
 
+package:
+class NonClass$I:
+implements 0: @X
+inner-type 3, 0: @X
+

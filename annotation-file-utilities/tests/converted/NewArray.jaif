@@ -75,3 +75,11 @@ class NewArray:
     field names15:
         insert-annotation Variable.initializer, NewArray.type 5: @E
 
+//    field lists:
+//        insert-annotation Variable.type: @B
+//        insert-annotation Variable.type, ArrayType.type: @Z
+//        insert-annotation Variable.type, ArrayType.type, ParameterizedType.typeArgument 0: @A
+//        insert-annotation Variable.initializer, NewArray.type 0: @E
+//        insert-annotation Variable.initializer, NewArray.type 1: @C
+//        insert-annotation Variable.initializer, NewArray.type 1, ParameterizedType.typeArgument 0: @D
+

@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.List;
+
 public class NewArray {
 
      String[] names01 = new String[12];
@@ -22,4 +25,6 @@ public class NewArray {
      Object names13 = new String[][][][][] { { { }}};
      Object names14 = new String[][][][][] { { { }}};
      Object names15 = new String[][][][][] { { { }}};
+
+     List<?>[] lists = new ArrayList<?>[2];
 }
