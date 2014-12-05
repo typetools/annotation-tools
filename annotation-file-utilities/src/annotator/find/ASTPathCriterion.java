@@ -681,7 +681,8 @@ public class ASTPathCriterion implements Criterion {
               : entry.childSelectorIs(ASTPath.INITIALIZER)
                     ? newArray.getInitializers()
               : null;
-            return typeTrees != null && checkTypePath(ix+1, typeTrees.get(arg));
+            return typeTrees != null && arg < typeTrees.size()
+                && checkTypePath(ix+1, typeTrees.get(arg));
         default:  // TODO: casts?
             return false;
         }
