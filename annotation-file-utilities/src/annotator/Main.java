@@ -893,7 +893,7 @@ public class Main {
             // fix properly.
             if (iToInsert.getInserted()) { continue; }
             src.insert(pos, toInsert);
-            if (verbose) {
+            if (verbose && !debug) {
               System.out.print(".");
               num_insertions++;
               if ((num_insertions % 50) == 0) {
