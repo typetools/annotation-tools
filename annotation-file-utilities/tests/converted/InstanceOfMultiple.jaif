@@ -12,4 +12,5 @@ class InstanceOfMultiple:
         insert-annotation Method.body, Block.statement 0, If.thenStatement, Block.statement 0, If.thenStatement, Block.statement 0, If.condition, Parenthesized.expression, InstanceOf.type: @java.lang.Mutable
         insert-annotation Method.body, Block.statement 0, If.condition, Parenthesized.expression, InstanceOf.type: @java.lang.ReadOnly
         insert-annotation Method.body, Block.statement 1, If.condition, Parenthesized.expression, InstanceOf.type: @java.lang.Mutable
+        insert-annotation Method.body, Block.statement 1, If.condition, Parenthesized.expression, InstanceOf.type, ParameterizedType.typeArgument 0: @java.lang.ReadOnly
 

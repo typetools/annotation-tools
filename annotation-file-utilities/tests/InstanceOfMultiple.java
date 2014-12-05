@@ -12,7 +12,7 @@ public class InstanceOfMultiple {
       }
     }
 
-    if(o instanceof List) {
+    if(o instanceof List<?>) {
       System.out.println(o);
     }
   }

@@ -13,4 +13,5 @@ class InstanceOfMultiple:
         instanceof #1: @java.lang.ReadOnly
         instanceof #15: @java.lang.Mutable
         instanceof #29: @java.lang.Mutable
+            inner-type 3, 0: @java.lang.ReadOnly
 

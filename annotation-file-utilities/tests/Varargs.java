@@ -11,4 +11,6 @@ public class Varargs {
     public void m3(String ... params) {
     }
 
+    public void m4(Comparable<String> ... params) {
+    }
 }
