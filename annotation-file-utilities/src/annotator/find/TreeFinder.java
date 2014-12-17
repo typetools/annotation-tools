@@ -522,7 +522,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       return node;
     }
 
-    public ArrayTypeTree largestContainingArray(Tree node) {
+    private ArrayTypeTree largestContainingArray(Tree node) {
       TreePath p = getPath(tree, node);
       Tree result = TreeFinder.largestContainingArray(p).getLeaf();
       assert result.getKind() == Tree.Kind.ARRAY_TYPE;
@@ -666,7 +666,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
           ins.getCriteria().getGenericArrayLocation();
       ASTRecord rec = ASTIndex.indexOf(tree).get(node);
       ASTPath astPath = ins.getCriteria().getASTPath();
-      String childSelector;
+      String childSelector = null;
       // Invariant:  na.dims.size() == 0  or  na.elems == null  (but not both)
       // If na.dims.size() != 0, na.elemtype is non-null.
       // If na.dims.size() == 0, na.elemtype may be null or non-null.
@@ -677,28 +677,85 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
         astPath = astRecord(node).astPath.extendNewArray(dim);
         childSelector = ASTPath.TYPE;
       } else {
-        // TODO: The visitor needs to keep track of the ASTPath, if any,
-        // in case there are multiple NewArray entries.
-        ASTPath.ASTEntry lastEntry = astPath.get(-1);
+        ASTPath.ASTEntry lastEntry = null;
+        int n = astPath.size();
+        int i = n;
+        // find matching node = last path entry w/kind NEW_ARRAY
+        while (--i >= 0) {
+          lastEntry = astPath.get(i);
+          if (lastEntry.getTreeKind() == Tree.Kind.NEW_ARRAY) { break; }
+        }
+        assert i >= 0 : "no matching path entry (kind=NEW_ARRAY)";
+        if (n > i+1) {
+          // find correct node further down and visit if present
+          assert dim + 1 == dimsSize;
+          Tree typeTree = na.elemtype;
+          int j = i + dim + 1;
+          while (--dim >= 0) {
+            typeTree = ((ArrayTypeTree) typeTree).getType();
+          }
+loop:
+          while (j < n) {
+            ASTPath.ASTEntry entry = astPath.get(j);
+            switch (entry.getTreeKind()) {
+            case ANNOTATED_TYPE:
+              typeTree = ((AnnotatedTypeTree) typeTree).getUnderlyingType();
+              continue;  // no increment
+            case ARRAY_TYPE:
+              typeTree = ((ArrayTypeTree) typeTree).getType();
+              break;
+            case MEMBER_SELECT:
+              if (typeTree instanceof JCTree.JCFieldAccess) {
+                JCTree.JCFieldAccess jfa = (JCTree.JCFieldAccess) typeTree;
+                typeTree = jfa.getExpression();
+                // if just a qualifier, don't increment loop counter
+                if (jfa.sym.getKind() == ElementKind.PACKAGE) { continue; }
+                break;
+              }
+              break loop;
+            case PARAMETERIZED_TYPE:
+              if (entry.childSelectorIs(ASTPath.TYPE_ARGUMENT)) {
+                int arg = entry.getArgument();
+                List<? extends Tree> typeArgs =
+                    ((ParameterizedTypeTree) typeTree).getTypeArguments();
+                typeTree = typeArgs.get(arg);
+              } else {  // ASTPath.TYPE
+                typeTree = ((ParameterizedTypeTree) typeTree).getType();
+              }
+              break;
+            default:
+              break loop;
+            }
+            ++j;
+          }
+          if (j < n) {
+            // sought node is absent, so return default; insertion can
+            // be applied only as an inner of some TypedInsertion anyway
+            return getBaseTypePosition(na);
+          }
+          return typeTree.accept(this, ins);
+        }
+
         childSelector = lastEntry.getChildSelector();
-        if (lastEntry.getTreeKind() == Tree.Kind.NEW_ARRAY) {
-          if (dim != 0 && ASTPath.TYPE.equals(childSelector)) {
-            dim += lastEntry.getArgument();
-            lastEntry = new ASTPath.ASTEntry(Tree.Kind.NEW_ARRAY,
-                ASTPath.TYPE, dim);
-            astPath = astPath.getParentPath().extend(lastEntry);
-          } else {
-            dim = lastEntry.getArgument();
+        if (dim > 0 && ASTPath.TYPE.equals(childSelector)) {
+          // rebuild path with current value of dim
+          ASTPath newPath = ASTPath.empty();
+          int j = 0;
+          dim += lastEntry.getArgument();
+          while (j < i) {  // [0,i)
+            newPath = newPath.extend(astPath.get(j));
+            j++;
           }
+          lastEntry = new ASTPath.ASTEntry(Tree.Kind.NEW_ARRAY,
+              ASTPath.TYPE, dim);  // i
+          newPath = newPath.extend(lastEntry);
+          while (j < n) {  // [i,n)
+            newPath = newPath.extend(astPath.get(j));
+            j++;
+          }
+          astPath = newPath;
         } else {
-          if (dim == dimsSize) {
-            Tree t = node;
-            do {
-              t = ((JCTree.JCNewArray) t).elemtype;
-            } while (--dim > 0);
-            return t.accept(this, ins);
-          }
-          return null;
+          dim = lastEntry.getArgument();
         }
       }
 
@@ -1315,9 +1372,9 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
           && ((TypeParameterTree) node).getBounds().isEmpty()
           || ASTPath.isWildcard(node.getKind())
           && (entry.getTreeKind() == Tree.Kind.TYPE_PARAMETER
-          || ASTPath.isWildcard(entry.getTreeKind()))
+              || ASTPath.isWildcard(entry.getTreeKind()))
           && entry.childSelectorIs(ASTPath.BOUND)
-          && entry.getArgument() == 0) {
+          && (!entry.hasArgument() || entry.getArgument() == 0)) {
         Pair<ASTRecord, Integer> pair = tpf.scan(node, i);
         insertRecord = pair.a;
         pos = pair.b;
