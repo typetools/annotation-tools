@@ -27,6 +27,7 @@ import com.sun.source.tree.EnhancedForLoopTree;
 import com.sun.source.tree.ExpressionStatementTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.ForLoopTree;
+import com.sun.source.tree.IdentifierTree;
 import com.sun.source.tree.IfTree;
 import com.sun.source.tree.InstanceOfTree;
 import com.sun.source.tree.LabeledStatementTree;
@@ -53,6 +54,8 @@ import com.sun.source.tree.UnionTypeTree;
 import com.sun.source.tree.VariableTree;
 import com.sun.source.tree.WhileLoopTree;
 import com.sun.source.tree.WildcardTree;
+import com.sun.source.tree.Tree.Kind;
+import com.sun.source.util.SimpleTreeVisitor;
 import com.sun.source.util.TreePath;
 import com.sun.tools.javac.code.Flags;
 import com.sun.tools.javac.code.Type;
@@ -161,40 +164,133 @@ public class ASTPathCriterion implements Criterion {
             // Then "next" will be compared with the node following "astNode"
             // in "actualPath". If it's not a match, this is not the correct
             // location. If it is a match, keep going.
-            next = getNext(actualNode, astNode);
+            next = getNext(actualNode, astPath, i);
             if (next == null) {
-                return checkNull(TreePath.getPath(path, actualNode), i);
+                return checkNull(actualPath, i);
             }
             if (!(next instanceof JCTree)) {
                 // converted from array type, not in source AST...
+                if (actualPathLen == i+1) {
                 // need to extend actualPath with "artificial" node
-                actualPath.add(next);
-                ++actualPathLen;
+                  actualPath.add(next);
+                  ++actualPathLen;
+                }
             }
             if (debug) {
                 System.out.println("next: " + next);
             }
 
-            if (++i >= astPathLen || i >= actualPathLen) { break; }
-            if (next != actualPath.get(i)) {
-              if (debug) {
-                  System.out.println("no next match");
-              }
+            //if (++i >= astPathLen || i >= actualPathLen) { break; }
+            if (++i >= astPathLen) { break; }
+            if (i >= actualPathLen) {
+              return checkNull(actualPath, i-1);
+            }
+            if (!matchNext(next, actualPath.get(i))) {
+                if (debug) {
+                    System.out.println("no next match");
+                }
               return false;
             }
         }
 
-        if (i >= actualPathLen || next != actualPath.get(i)) {
-            if (debug) {
-                System.out.println("no next match");
-            }
-            return false;
+        if (i < actualPathLen && matchNext(next, actualPath.get(i))
+                || i <= actualPathLen
+                        && next.getKind() == Tree.Kind.NEW_ARRAY) {
+            return true;
         }
-        return true;
+
+        if (debug) {
+            System.out.println("no next match");
+        }
+        return false;
     }
 
-    private Tree getNext(Tree actualNode, ASTPath.ASTEntry astNode) {
+    private boolean matchNext(Tree next, Tree node) {
+        boolean b1 = next instanceof JCTree;
+        boolean b2 = node instanceof JCTree;
+        if (b1 && !b2) {
+          next = Insertions.TypeTree.fromJCTree((JCTree) next);
+        } else if (b2 && !b1) {
+          node = Insertions.TypeTree.fromJCTree((JCTree) node);
+        }
+
         try {
+            return next.accept(new SimpleTreeVisitor<Boolean, Tree>() {
+                @Override
+                public Boolean
+                defaultAction(Tree t1, Tree t2) {
+                    return t1 == t2;
+                }
+
+                @Override
+                public Boolean
+                visitIdentifier(IdentifierTree v, Tree t) {
+                    return v == t;
+                    //IdentifierTree i2 = (IdentifierTree) t;
+                    //return i1.getName().toString()
+                    //        .equals(i2.getName().toString());
+                }
+
+                @Override
+                public Boolean
+                visitAnnotatedType(AnnotatedTypeTree a1, Tree t) {
+                    AnnotatedTypeTree a2 = (AnnotatedTypeTree) t;
+                    return matchNext(a1.getUnderlyingType(),
+                            a2.getUnderlyingType());
+                }
+
+                //@Override
+                //public Boolean
+                //visitArrayType(ArrayTypeTree b1, Tree t) {
+                //    ArrayTypeTree b2 = (ArrayTypeTree) t;
+                //    return matchNext(b1.getType(), b2.getType());
+                //}
+
+                @Override
+                public Boolean
+                visitMemberSelect(MemberSelectTree c1, Tree t) {
+                    MemberSelectTree c2 = (MemberSelectTree) t;
+                    return c1.getIdentifier().toString()
+                                .equals(c2.getIdentifier().toString())
+                            && matchNext(c1.getExpression(),
+                                    c2.getExpression());
+                }
+
+                @Override
+                public Boolean
+                visitWildcard(WildcardTree d1, Tree t) {
+                    return d1 == (WildcardTree) t;
+                    //WildcardTree d2 = (WildcardTree) t;
+                    //Tree bound2 = d2.getBound();
+                    //Tree bound1 = d1.getBound();
+                    //return bound1 == bound2 || matchNext(bound1, bound2);
+                }
+
+                @Override
+                public Boolean
+                visitParameterizedType(ParameterizedTypeTree e1, Tree t) {
+                    ParameterizedTypeTree e2 = (ParameterizedTypeTree) t;
+                    List<? extends Tree> l2 = e2.getTypeArguments();
+                    List<? extends Tree> l1 = e1.getTypeArguments();
+                    if (l1.size() == l2.size()) {
+                        int i = 0;
+                        for (Tree t1 : l1) {
+                            Tree t2 = l2.get(i++);
+                            if (!matchNext(t1, t2)) { return false; }
+                        }
+                        return matchNext(e1.getType(), e2.getType());
+                    }
+                    return false;
+                }
+            }, node);
+        } catch (RuntimeException ex) {
+            return false;
+        }
+    }
+
+    private Tree getNext(Tree actualNode, ASTPath astPath, int ix) {
+        try {
+            ASTPath.ASTEntry astNode = astPath.get(ix);
             switch (actualNode.getKind()) {
             case ANNOTATED_TYPE: {
                 AnnotatedTypeTree annotatedType =
@@ -437,31 +533,33 @@ public class ASTPathCriterion implements Criterion {
             case NEW_ARRAY: {
                 NewArrayTree newArray = (NewArrayTree) actualNode;
                 if (astNode.childSelectorIs(ASTPath.TYPE)) {
-                    int arg = astNode.getArgument();
                     Type type = ((JCTree.JCNewArray) newArray).type;
                     Tree typeTree = Insertions.TypeTree.fromType(type);
-                    while (arg > 0) {
-                      if (!(typeTree instanceof ArrayTypeTree)) { return null; }
-                      typeTree = ((ArrayTypeTree) typeTree).getType();
-                      --arg;
+                    int arg = astNode.getArgument();
+                    if (arg == 0 && astPath.size() == ix+1) {
+                        return newArray;
+                        //if (astPath.size() != ix+1) { return null; }
+                        //return typeTree;
+                        //return ((ArrayTypeTree) typeTree).getType();
+                        //return newArray;
+                    }
+                    typeTree = ((NewArrayTree) typeTree).getType();
+                    while (--arg > 0) {
+                        if (typeTree.getKind() != Tree.Kind.ARRAY_TYPE) {
+                            return null;
+                        }
+                        typeTree = ((ArrayTypeTree) typeTree).getType();
                     }
                     return typeTree;
-                    //Tree type = newArray.getType();
-                    //return arg == 0 ? typeTree : null;
                 } else if (astNode.childSelectorIs(ASTPath.DIMENSION)) {
                     int arg = astNode.getArgument();
                     List<? extends ExpressionTree> dims = newArray.getDimensions();
-                    if (arg >= dims.size()) {
-                        return null;
-                    }
-                    return dims.get(arg);
+                    return arg < dims.size() ? dims.get(arg) : null;
                 } else {
                     int arg = astNode.getArgument();
-                    List<? extends ExpressionTree> inits = newArray.getInitializers();
-                    if (arg >= inits.size()) {
-                        return null;
-                    }
-                    return inits.get(arg);
+                    List<? extends ExpressionTree> inits =
+                          newArray.getInitializers();
+                    return arg < inits.size() ? inits.get(arg) : null;
                 }
             }
             case NEW_CLASS: {
@@ -631,20 +729,25 @@ public class ASTPathCriterion implements Criterion {
         } catch (RuntimeException ex) { return null; }
     }
 
-    private boolean checkNull(TreePath path, int ix) {
-        Tree node = path.getLeaf();
+    private boolean checkNull(List<Tree> path, int ix) {
+        Tree node = path.get(path.size()-1);
         int last = astPath.size() - 1;
         ASTPath.ASTEntry entry = astPath.get(ix);
         Tree.Kind kind = entry.getTreeKind();
 
         switch (kind) {
-        case ANNOTATION:
+        //case ANNOTATION:
+        //case INTERFACE:
         case CLASS:  // "extends" clause?
-        case INTERFACE:
+            return ASTPath.isClassEquiv(kind)
+                    && ix == last && entry.getArgument() == -1
+                    && entry.childSelectorIs(ASTPath.BOUND);
         case TYPE_PARAMETER:
-            return ix == last && entry.getArgument() == 0
-                && entry.childSelectorIs(ASTPath.BOUND);
+            return node.getKind() == Tree.Kind.TYPE_PARAMETER
+                    && ix == last && entry.getArgument() == 0
+                    && entry.childSelectorIs(ASTPath.BOUND);
         case METHOD:  // nullary constructor? receiver?
+            if (node.getKind() != Tree.Kind.METHOD) { return false; }
             MethodTree method = (MethodTree) node;
             List<? extends VariableTree> params = method.getParameters();
             if ("<init>".equals(method.getName().toString())) {
@@ -662,7 +765,7 @@ public class ASTPathCriterion implements Criterion {
                     && entry.getArgument() == -1) {
                 if (ix == last) { return true; }
                 VariableTree rcvrParam = method.getReceiverParameter();
-                if (rcvrParam == null) {
+                if (rcvrParam == null) {  // TODO
                   //ClassTree clazz = methodReceiverType(path);
                   //return checkReceiverType(ix,
                   //    ((JCTree.JCClassDecl) clazz).type);
@@ -672,19 +775,66 @@ public class ASTPathCriterion implements Criterion {
             }
             return false;
         case NEW_ARRAY:
-            if (entry.childSelectorIs(ASTPath.TYPE)) { return ix == last; }
+            if (node.getKind() != Tree.Kind.NEW_ARRAY) { return false; }
             NewArrayTree newArray = (NewArrayTree) node;
             int arg = entry.getArgument();
-            List<? extends ExpressionTree> typeTrees =
-                entry.childSelectorIs(ASTPath.DIMENSION)
-                    ? newArray.getDimensions()
-              : entry.childSelectorIs(ASTPath.INITIALIZER)
-                    ? newArray.getInitializers()
-              : null;
-            return typeTrees != null && arg < typeTrees.size()
-                && checkTypePath(ix+1, typeTrees.get(arg));
+            if (entry.childSelectorIs(ASTPath.TYPE)) {
+                if (ix == last) { return true; }
+                //Tree t = newArray.getType();
+                //int depth = 1;
+                //while (t.getKind() == Tree.Kind.ARRAY_TYPE) {
+                //    t = ((ArrayTypeTree) t).getType();
+                //    ++depth;
+                //}
+                return arg == arrayDepth(newArray);
+            } else {
+                List<? extends ExpressionTree> typeTrees =
+                        entry.childSelectorIs(ASTPath.DIMENSION)
+                                ? newArray.getDimensions()
+                      : entry.childSelectorIs(ASTPath.INITIALIZER)
+                                ? newArray.getInitializers()
+                      : null;
+                return typeTrees != null && arg < typeTrees.size()
+                      && checkTypePath(ix+1, typeTrees.get(arg));
+            }
+        case UNBOUNDED_WILDCARD:
+            return isBoundableWildcard(path, path.size()-1);
         default:  // TODO: casts?
             return false;
+        }
+    }
+
+    private static int arrayDepth(Tree tree) {
+        if (tree.getKind() == Tree.Kind.NEW_ARRAY) {
+            NewArrayTree newArray = (NewArrayTree) tree;
+            Tree type = newArray.getType();
+            if (type != null) {
+                return type.accept(new SimpleTreeVisitor<Integer, Integer>() {
+                    @Override
+                    public Integer visitArrayType(ArrayTypeTree t, Integer i) {
+                        return t.getType().accept(this, i+1);
+                    }
+                    @Override
+                    public Integer defaultAction(Tree t, Integer i) {
+                        return i;
+                    }
+                }, 1);
+            }
+            int depth = newArray.getDimensions().size();
+            for (ExpressionTree elem : newArray.getInitializers()) {
+                Tree.Kind kind = elem.getKind();
+                if (kind == Tree.Kind.NEW_ARRAY
+                        || kind == Tree.Kind.ARRAY_TYPE) {
+                    depth = Math.max(depth, arrayDepth(elem)+1);
+                }
+            }
+            return depth;
+        } else if (tree.getKind() == Tree.Kind.ANNOTATED_TYPE) {
+            return arrayDepth(((AnnotatedTypeTree) tree).getUnderlyingType());
+        } else if (tree.getKind() == Tree.Kind.ARRAY_TYPE) {
+            return 1 + arrayDepth(((ArrayTypeTree) tree).getType());
+        } else {
+            return 0;
         }
     }
 
@@ -735,7 +885,7 @@ public class ASTPathCriterion implements Criterion {
         return true;
     }
 
-    public static ClassTree methodReceiverType(TreePath path) {
+    private static ClassTree methodReceiverType(TreePath path) {
       Tree t = path.getLeaf();
       if (t.getKind() != Tree.Kind.METHOD) { return null; }
       JCTree.JCMethodDecl method = (JCTree.JCMethodDecl) t;
@@ -962,7 +1112,8 @@ loop:       while (typeTree != null && i < astPath.size()) {
     private boolean isBoundableWildcard(List<Tree> actualPath, int i) {
         if (i <= 0) { return false; }
         Tree actualNode = actualPath.get(i);
-        if (isWildcard(actualNode.getKind())) {
+        if (actualNode.getKind() == Tree.Kind.UNBOUNDED_WILDCARD) {
+          // isWildcard(actualNode.getKind())
           // TODO: refactor GenericArrayLoc to use same code?
           Tree ancestor = actualPath.get(i-1);
           if (ancestor.getKind() == Tree.Kind.INSTANCE_OF) {
