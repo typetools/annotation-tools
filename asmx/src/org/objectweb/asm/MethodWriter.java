@@ -1054,6 +1054,11 @@ class MethodWriter implements MethodVisitor {
         code.put12(Opcodes.MULTIANEWARRAY, cw.newClass(desc)).putByte(dims);
     }
 
+    public void visitInvokeDynamicInsn(int ix1, int ix2) {
+        code.putByte(ix1);
+        code.putByte(ix2);
+    }
+
     public void visitTryCatchBlock(
         final Label start,
         final Label end,

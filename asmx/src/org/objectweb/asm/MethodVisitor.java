@@ -262,6 +262,8 @@ public interface MethodVisitor extends MemberVisitor {
      */
     void visitMultiANewArrayInsn(String desc, int dims);
 
+    void visitInvokeDynamicInsn(int ix1, int ix2);
+
     // -------------------------------------------------------------------------
     // Exceptions table entries, debug information,
     // max stack size and max locals

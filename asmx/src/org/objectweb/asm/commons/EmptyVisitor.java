@@ -188,6 +188,9 @@ public class EmptyVisitor implements
     public void visitMultiANewArrayInsn(String desc, int dims) {
     }
 
+    public void visitInvokeDynamicInsn(int a, int b) {
+    }
+
     public void visitTryCatchBlock(
         Label start,
         Label end,
