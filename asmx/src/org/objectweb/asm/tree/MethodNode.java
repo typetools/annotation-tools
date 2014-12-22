@@ -311,6 +311,11 @@ public class MethodNode extends MemberNode implements MethodVisitor {
         instructions.add(new MultiANewArrayInsnNode(desc, dims));
     }
 
+    @Override
+    public void visitInvokeDynamicInsn(int ix1, int ix2) {
+        instructions.add(new InvokeDynamicInsnNode(ix1, ix2));
+    }
+
     public void visitTryCatchBlock(
         final Label start,
         final Label end,
