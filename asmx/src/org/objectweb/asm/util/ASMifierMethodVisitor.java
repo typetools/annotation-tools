@@ -271,6 +271,14 @@ public class ASMifierMethodVisitor extends ASMifierAbstractVisitor implements
     }
 
     @Override
+    public void visitInvokeDynamicInsn(int ix1, int ix2) {
+        buf.setLength(0);
+        buf.append("mv.visitInvokeDynamicInsn(");
+        buf.append(ix1).append(", ").append(ix2).append(");\n");
+        text.add(buf.toString());
+    }
+
+    @Override
     public void visitTryCatchBlock(
         final Label start,
         final Label end,

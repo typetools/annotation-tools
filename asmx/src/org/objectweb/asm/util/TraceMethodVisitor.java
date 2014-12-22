@@ -387,6 +387,19 @@ public class TraceMethodVisitor extends TraceAbstractVisitor implements
         }
     }
 
+    @Override
+    public void visitInvokeDynamicInsn(int ix1, int ix2) {
+        buf.setLength(0);
+        buf.append(tab2).append("INVOKEDYNAMIC ");
+        buf.append(' ').append(ix1);
+        buf.append(' ').append(ix2).append('\n');
+        text.add(buf.toString());
+
+        if (mv != null) {
+            mv.visitInvokeDynamicInsn(ix1, ix2);
+        }
+    }
+
     public void visitTryCatchBlock(
         final Label start,
         final Label end,
