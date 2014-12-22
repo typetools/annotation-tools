@@ -160,6 +160,10 @@ public class MethodAdapter implements MethodVisitor {
         mv.visitMultiANewArrayInsn(desc, dims);
     }
 
+    public void visitInvokeDynamicInsn(int ix1, int ix2) {
+        mv.visitInvokeDynamicInsn(ix1, ix2);
+    }
+
     public void visitTryCatchBlock(
         final Label start,
         final Label end,

@@ -417,7 +417,7 @@ public class ClassWriter implements ClassVisitor {
         String s = "AAAAAAAAAAAAAAAABCKLLDDDDDEEEEEEEEEEEEEEEEEEEEAAAAAAAADD"
                 + "DDDEEEEEEEEEEEEEEEEEEEEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
                 + "AAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAIIIIIIIIIIIIIIIIDNOAA"
-                + "AAAAGGGGGGGHAFBFAAFFAAQPIIJJIIIIIIIIIIIIIIIIII";
+                + "AAAAGGGGGGGHSFBFAAFFAAQPIIJJIIIIIIIIIIIIIIIIII";
         for (i = 0; i < b.length; ++i) {
             b[i] = (byte) (s.charAt(i) - 'A');
         }
@@ -459,6 +459,8 @@ public class ClassWriter implements ClassVisitor {
         // }
         // b[Constants.INVOKEINTERFACE] = ITFMETH_INSN;
         //
+        // b[Constants.INVOKEDYNAMIC] = INDY;
+				//
         // // LABEL(W)_INSN instructions
         // for (i = Constants.IFEQ; i <= Constants.JSR; ++i) {
         // b[i] = LABEL_INSN;
