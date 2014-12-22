@@ -1174,6 +1174,11 @@ public class ClassReader {
                             mv.visitIincInsn(b[v + 1] & 0xFF, b[v + 2]);
                             v += 3;
                             break;
+                        case ClassWriter.INDY:
+                            mv.visitInvokeDynamicInsn(b[v + 1] & 0xFF,
+                                    b[v + 2]);
+                            v += 5;
+                            break;
                         // case MANA_INSN:
                         default:
                             mv.visitMultiANewArrayInsn(readClass(v + 1, c),

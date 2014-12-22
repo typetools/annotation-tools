@@ -201,6 +201,14 @@ public final class SAXCodeAdapter extends SAXAdapter implements MethodVisitor {
         addElement(AbstractVisitor.OPCODES[Opcodes.MULTIANEWARRAY], attrs);
     }
 
+    @Override
+    public void visitInvokeDynamicInsn(int ix1, int ix2) {
+        AttributesImpl attrs = new AttributesImpl();
+        attrs.addAttribute("", "dims", "dims", "", Integer.toString(ix1));
+        attrs.addAttribute("", "dims", "dims", "", Integer.toString(ix2));
+        addElement(AbstractVisitor.OPCODES[Opcodes.INVOKEDYNAMIC], attrs);
+    }
+
     public final void visitTryCatchBlock(
         Label start,
         Label end,
