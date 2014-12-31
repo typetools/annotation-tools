@@ -576,10 +576,11 @@ extends EmptyVisitor {
           handleNewTypeArgument((AMethod) aElement);
           break;
         case METHOD_INVOCATION_TYPE_ARGUMENT:
-          throw new Error("METHOD_TYPE_ARGUMENT: to do");
-          // break;
+          handleMethodTypeArgument((AMethod) aElement);
+          break;
         case METHOD_TYPE_PARAMETER:
-          throw new Error("METHOD_TYPE_PARAMETER: to do");
+          handleMethodTypeParameter((AMethod) aElement);
+          break;
         case CLASS_TYPE_PARAMETER:
           handleClassTypeParameter((AClass) aElement);
           break;
@@ -709,7 +710,7 @@ extends EmptyVisitor {
           //handleFieldOnClass((AClass) aElement);
           if (strict) { System.err.println("Unhandled FIELD annotation for " + aElement); }
         } else if (aElement instanceof ATypeElement) {
-            aElement.tlAnnotationsHere.add(makeAnnotation());
+          aElement.tlAnnotationsHere.add(makeAnnotation());
         } else {
           throw new RuntimeException("Unknown FIELD aElement: " + aElement);
         }
@@ -720,7 +721,8 @@ extends EmptyVisitor {
           if (strict) { System.err.println("Unhandled FIELD_COMPONENT annotation for " + aElement); }
         } else if (aElement instanceof ATypeElement) {
           ATypeElement aTypeElement = (ATypeElement) aElement;
-          aTypeElement.innerTypes.vivify(makeInnerTypeLocation()).
+          aTypeElement
+              .innerTypes.vivify(makeInnerTypeLocation()).
               tlAnnotationsHere.add(makeAnnotation());
         } else {
           throw new RuntimeException("Unknown FIELD_COMPONENT: " + aElement);
@@ -807,10 +809,12 @@ extends EmptyVisitor {
       // TODO: why is this traced and not other stuff?
       if (trace) { System.out.printf("handleMethodReturnType(%s)%n", aMethod); }
       if (xLocationsArgs.isEmpty()) {
-        aMethod.returnType.tlAnnotationsHere.add(makeAnnotation());
+        aMethod.returnType
+            .tlAnnotationsHere.add(makeAnnotation());
       } else {
-        aMethod.returnType.innerTypes.vivify(makeInnerTypeLocation()).tlAnnotationsHere.add(
-            makeAnnotation());
+        aMethod.returnType
+            .innerTypes.vivify(makeInnerTypeLocation())
+            .tlAnnotationsHere.add(makeAnnotation());
       }
     }
 
@@ -844,8 +848,9 @@ extends EmptyVisitor {
         aClass.bounds.vivify(makeBoundLocation())
             .tlAnnotationsHere.add(makeAnnotation());
       } else {
-        aClass.bounds.vivify(makeBoundLocation()).innerTypes.vivify(
-            makeInnerTypeLocation()).tlAnnotationsHere.add(makeAnnotation());
+        aClass.bounds.vivify(makeBoundLocation())
+            .innerTypes.vivify(makeInnerTypeLocation())
+            .tlAnnotationsHere.add(makeAnnotation());
       }
     }
 
@@ -857,8 +862,9 @@ extends EmptyVisitor {
         aMethod.bounds.vivify(makeBoundLocation())
             .tlAnnotationsHere.add(makeAnnotation());
       } else {
-        aMethod.bounds.vivify(makeBoundLocation()).innerTypes.vivify(
-            makeInnerTypeLocation()).tlAnnotationsHere.add(makeAnnotation());
+        aMethod.bounds.vivify(makeBoundLocation())
+            .innerTypes.vivify(makeInnerTypeLocation())
+            .tlAnnotationsHere.add(makeAnnotation());
       }
     }
 
@@ -868,14 +874,14 @@ extends EmptyVisitor {
             .tlAnnotationsHere.add(makeAnnotation());
       } else {
         aClass.extendsImplements.vivify(makeTypeIndexLocation())
-            .innerTypes.vivify(makeInnerTypeLocation()).tlAnnotationsHere.add(
-                makeAnnotation());
+            .innerTypes.vivify(makeInnerTypeLocation())
+            .tlAnnotationsHere.add(makeAnnotation());
       }
     }
 
     private void handleThrows(AMethod aMethod) {
       aMethod.throwsException.vivify(makeTypeIndexLocation())
-        .tlAnnotationsHere.add(makeAnnotation());
+          .tlAnnotationsHere.add(makeAnnotation());
     }
 
     private void handleNewTypeArgument(AMethod aMethod) {
@@ -888,13 +894,21 @@ extends EmptyVisitor {
       }
     }
 
+    private void handleMethodTypeArgument(AMethod aMethod) {
+      //TODO: throw new RuntimeException("METHOD_INVOCATION_TYPE_ARGUMENT: to do");
+    }
+
+    private void handleMethodTypeParameter(AMethod aMethod) {
+      //TODO: throw new RuntimeException("METHOD_TYPE_PARAMETER: to do");
+    }
+
     /*
      * Hook for NestedAnnotationSceneReader; overridden by
      * ArrayAnnotationSceneReader to add an array element instead of a field
      */
     void supplySubannotation(String fieldName, Annotation annotation) {
       annotationBuilder.addScalarField(fieldName,
-              new AnnotationAFT(annotation.def()), annotation);
+          new AnnotationAFT(annotation.def()), annotation);
     }
 
     @Override
@@ -963,10 +977,8 @@ extends EmptyVisitor {
 
     // The element type may be unknown when this is called.
     // But AnnotationSceneReader expects to know the element type.
-    public ArrayAnnotationSceneReader(
-        AnnotationSceneReader parent,
-        String fieldName,
-        AnnotationFieldType eltType) {
+    public ArrayAnnotationSceneReader(AnnotationSceneReader parent,
+        String fieldName, AnnotationFieldType eltType) {
       super(dummyDesc, parent.visible, parent.aElement);
       if (trace) { System.out.printf("ArrayAnnotationSceneReader(%s, %s)%n", parent, fieldName); }
       this.parent = parent;
@@ -1143,7 +1155,8 @@ extends EmptyVisitor {
   public static void printClasspath() {
     System.out.println("\nClasspath:");
     StringTokenizer tokenizer =
-      new StringTokenizer(System.getProperty("java.class.path"), File.pathSeparator);
+        new StringTokenizer(System.getProperty("java.class.path"),
+            File.pathSeparator);
     while (tokenizer.hasMoreTokens()) {
       System.out.println("  " + tokenizer.nextToken());
     }
