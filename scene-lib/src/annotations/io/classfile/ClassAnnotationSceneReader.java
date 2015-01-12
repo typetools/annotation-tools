@@ -576,7 +576,7 @@ extends EmptyVisitor {
           handleNewTypeArgument((AMethod) aElement);
           break;
         case METHOD_INVOCATION_TYPE_ARGUMENT:
-          handleMethodTypeArgument((AMethod) aElement);
+          handleMethodInvocationTypeArgument((AMethod) aElement);
           break;
         case METHOD_TYPE_PARAMETER:
           handleMethodTypeParameter((AMethod) aElement);
@@ -894,8 +894,15 @@ extends EmptyVisitor {
       }
     }
 
-    private void handleMethodTypeArgument(AMethod aMethod) {
-      //TODO: throw new RuntimeException("METHOD_INVOCATION_TYPE_ARGUMENT: to do");
+    private void handleMethodInvocationTypeArgument(AMethod aMethod) {
+//      if (xLocationsArgs.isEmpty()) {
+//        aMethod.body.methodcalls.vivify(makeOffset(false))
+//            .tlAnnotationsHere.add(makeAnnotation());
+//      } else {
+//        aMethod.body.methodcalls.vivify(makeOffset(false))
+//            .innerTypes.vivify(makeInnerTypeLocation())
+//            .tlAnnotationsHere.add(makeAnnotation());
+//      }
     }
 
     private void handleMethodTypeParameter(AMethod aMethod) {
