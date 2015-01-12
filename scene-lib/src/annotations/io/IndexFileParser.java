@@ -815,9 +815,11 @@ public final class IndexFileParser {
         }
 
         AMethod m = c.methods.vivify(key);
+        parseMethod(m);
+    }
 
+    private void parseMethod(AMethod m) throws IOException, ParseException {
         parseAnnotations(m);
-
         parseBounds(m.bounds);
 
         // Permit return value, receiver, and parameters in any order.
@@ -972,6 +974,53 @@ public final class IndexFileParser {
                 expectChar(':');
                 parseAnnotations(n);
                 parseInnerTypes(n);
+            }
+            while (checkKeyword("call")) {
+                matchKeyword("call");
+                matched = true;
+                evermatched = true;
+                RelativeLocation loc;
+                if (checkChar('#')) {
+                    expectChar('#');
+                    int offset = expectNonNegative(matchNNInteger());
+                    loc = RelativeLocation.createOffset(offset, 0);
+                } else {
+                    expectChar('*');
+                    int index = expectNonNegative(matchNNInteger());
+                    loc = RelativeLocation.createIndex(index, 0);
+                }
+                ATypeElement n = exp.calls.vivify(loc);
+                expectChar(':');
+                parseAnnotations(n);
+                parseInnerTypes(n);
+            }
+            while (checkKeyword("lambda")) {
+                matchKeyword("lambda");
+                matched = true;
+                evermatched = true;
+                RelativeLocation loc;
+                if (checkChar('#')) {
+                    expectChar('#');
+                    int offset = expectNonNegative(matchNNInteger());
+                    int type_index = 0;
+                    if (checkChar(',')) {
+                        expectChar(',');
+                        type_index = expectNonNegative(matchNNInteger());
+                    }
+                    loc = RelativeLocation.createOffset(offset, type_index);
+                } else {
+                    expectChar('*');
+                    int index = expectNonNegative(matchNNInteger());
+                    int type_index = 0;
+                    if (checkChar(',')) {
+                        expectChar(',');
+                        type_index = expectNonNegative(matchNNInteger());
+                    }
+                    loc = RelativeLocation.createIndex(index, type_index);
+                }
+                AMethod m = exp.funs.vivify(loc);
+                expectChar(':');
+                parseMethod(m);
             }
         }
         return evermatched;

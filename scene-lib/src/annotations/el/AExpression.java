@@ -4,6 +4,7 @@ package annotations.el;
 import org.checkerframework.checker.javari.qual.ReadOnly;
 */
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import annotations.util.coll.VivifyingMap;
@@ -26,6 +27,25 @@ public class AExpression extends AElement {
     public final VivifyingMap<RelativeLocation, ATypeElement> news =
             ATypeElement.<RelativeLocation>newVivifyingLHMap_ATE();
 
+    /** The method's annotated method invocations; map key is the offset of the invokestatic bytecode (?) */
+    public final VivifyingMap<RelativeLocation, ATypeElement> calls =
+            ATypeElement.<RelativeLocation>newVivifyingLHMap_ATE();
+
+    /** The method's annotated lambda expressions; map key is the offset of the ??? bytecode (?) */
+    public final VivifyingMap<RelativeLocation, AMethod> funs =
+            new VivifyingMap<RelativeLocation, AMethod>(
+                    new LinkedHashMap<RelativeLocation, AMethod>()) {
+        @Override
+        public AMethod createValueFor(RelativeLocation k) {
+            return new AMethod("" + k);  // FIXME: find generated method name
+        }
+
+        @Override
+        public boolean subPrune(AMethod v) {
+            return v.prune();
+        }
+    };
+
     protected Object id;
 
     AExpression(Object id) {
@@ -47,7 +67,9 @@ public class AExpression extends AElement {
         return super.equals(o)
                 && typecasts.equals(o.typecasts)
                 && instanceofs.equals(o.instanceofs)
-                && news.equals(o.news);
+                && news.equals(o.news)
+                && calls.equals(o.calls)
+                && funs.equals(o.funs);
         }
 
     /**
@@ -56,7 +78,7 @@ public class AExpression extends AElement {
     @Override
     public int hashCode(/*>>> @ReadOnly AExpression this*/) {
         return super.hashCode() + typecasts.hashCode() + instanceofs.hashCode()
-                + news.hashCode();
+                + news.hashCode() + calls.hashCode() + funs.hashCode();
     }
 
     /**
@@ -65,7 +87,7 @@ public class AExpression extends AElement {
     @Override
     public boolean prune() {
         return super.prune() & typecasts.prune() & instanceofs.prune()
-                & news.prune();
+                & news.prune() & calls.prune() & funs.prune();
     }
 
     @Override
@@ -93,6 +115,24 @@ public class AExpression extends AElement {
         }
         for (Map.Entry<RelativeLocation, ATypeElement> em : news.entrySet()) {
             sb.append("new: ");
+            RelativeLocation loc = em.getKey();
+            sb.append(loc);
+            sb.append(": ");
+            AElement ae = em.getValue();
+            sb.append(ae.toString());
+            sb.append(' ');
+        }
+        for (Map.Entry<RelativeLocation, ATypeElement> em : calls.entrySet()) {
+            sb.append("call: ");
+            RelativeLocation loc = em.getKey();
+            sb.append(loc);
+            sb.append(": ");
+            AElement ae = em.getValue();
+            sb.append(ae.toString());
+            sb.append(' ');
+        }
+        for (Map.Entry<RelativeLocation, AMethod> em : funs.entrySet()) {
+            sb.append("fun: ");
             RelativeLocation loc = em.getKey();
             sb.append(loc);
             sb.append(": ");

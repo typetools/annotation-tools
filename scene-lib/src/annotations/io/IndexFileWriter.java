@@ -433,6 +433,21 @@ public final class IndexFileWriter {
                 printRelativeElements(INDENT + INDENT, "instanceof",
                         m.body.instanceofs);
                 printRelativeElements(INDENT + INDENT, "new", m.body.news);
+                printRelativeElements(INDENT + INDENT, "call", m.body.calls);
+                for (Map. /*@ReadOnly*/ Entry<RelativeLocation, /*@ReadOnly*/ AMethod> entry
+                        : m.body.funs.entrySet()) {
+                    /*@ReadOnly*/ AMethod lambda = entry.getValue();
+                    printBounds(INDENT + INDENT + INDENT, lambda.bounds);
+                    printTypeElementAndInnerTypes(INDENT + INDENT + INDENT,
+                        "return", lambda.returnType);
+                    if (!lambda.receiver.type.tlAnnotationsHere.isEmpty()
+                            || !lambda.receiver.type.innerTypes.isEmpty()) {
+                        printElementAndInnerTypes(INDENT + INDENT + INDENT + INDENT,
+                                "receiver", lambda.receiver);
+                    }
+                    printNumberedAmbigiousElements(INDENT + INDENT + INDENT,
+                            "parameter", lambda.parameters);
+                    }
                 // throwsException field is not processed.  Why?
                 printASTInsertions(INDENT + INDENT,
                         m.insertAnnotations, m.insertTypecasts);
