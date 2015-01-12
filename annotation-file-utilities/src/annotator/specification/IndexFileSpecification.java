@@ -225,13 +225,13 @@ public class IndexFileSpecification implements Specification {
       parseMethod(clist, className, entry.getKey(), entry.getValue());
     }
     for (Map.Entry<Integer, ABlock> entry : clazz.staticInits.entrySet()) {
-      parseStaticInit(clist, entry.getKey(), entry.getValue());
+      parseStaticInit(clist, className, entry.getKey(), entry.getValue());
     }
     for (Map.Entry<Integer, ABlock> entry : clazz.instanceInits.entrySet()) {
-      parseInstanceInit(clist, entry.getKey(), entry.getValue());
+      parseInstanceInit(clist, className, entry.getKey(), entry.getValue());
     }
     for (Map.Entry<String, AExpression> entry : clazz.fieldInits.entrySet()) {
-      parseFieldInit(clist, entry.getKey(), entry.getValue());
+      parseFieldInit(clist, className, entry.getKey(), entry.getValue());
     }
 
     debug("parseClass(" + className + "):  done");
@@ -248,25 +248,25 @@ public class IndexFileSpecification implements Specification {
     parseASTInsertions(clist, field.insertAnnotations, field.insertTypecasts);
   }
 
-  private void parseStaticInit(CriterionList clist, int blockID, ABlock block) {
+  private void parseStaticInit(CriterionList clist, String className, int blockID, ABlock block) {
     clist = clist.add(Criteria.inStaticInit(blockID));
     // the method name argument is not used for static initializers, which are only used
     // in source specifications. Same for instance and field initializers.
     // the empty () are there to prevent the whole string to be removed in later parsing.
-    parseBlock(clist, "static init number " + blockID + "()", block);
+    parseBlock(clist, className, "static init number " + blockID + "()", block);
   }
 
-  private void parseInstanceInit(CriterionList clist, int blockID, ABlock block) {
+  private void parseInstanceInit(CriterionList clist, String className, int blockID, ABlock block) {
     clist = clist.add(Criteria.inInstanceInit(blockID));
-    parseBlock(clist, "instance init number " + blockID + "()", block);
+    parseBlock(clist, className, "instance init number " + blockID + "()", block);
   }
 
   // keep the descriptive strings for field initializers and static inits consistent
   // with text used in NewCriterion.
 
-  private void parseFieldInit(CriterionList clist, String fieldName, AExpression exp) {
+  private void parseFieldInit(CriterionList clist, String className, String fieldName, AExpression exp) {
     clist = clist.add(Criteria.inFieldInit(fieldName));
-    parseExpression(clist, "init for field " + fieldName + "()", exp);
+    parseExpression(clist, className, "init for field " + fieldName + "()", exp);
   }
 
   /**
@@ -613,10 +613,12 @@ public class IndexFileSpecification implements Specification {
 
     // parse insert annotations/typecasts of method
     parseASTInsertions(clist, method.insertAnnotations, method.insertTypecasts);
-    parseBlock(clist, methodName, method.body);
+
+    // parse body of method
+    parseBlock(clist, className, methodName, method.body);
   }
 
-  private void parseBlock(CriterionList clist, String methodName, ABlock block) {
+  private void parseBlock(CriterionList clist, String className, String methodName, ABlock block) {
     // parse locals of method
     for (Entry<LocalLocation, AField> entry : block.locals.entrySet()) {
       LocalLocation loc = entry.getKey();
@@ -627,10 +629,10 @@ public class IndexFileSpecification implements Specification {
       parseInnerAndOuterElements(varClist, var.type);
     }
 
-    parseExpression(clist, methodName, block);
+    parseExpression(clist, className, methodName, block);
   }
 
-  private void parseExpression(CriterionList clist, String methodName, AExpression exp) {
+  private void parseExpression(CriterionList clist, String className, String methodName, AExpression exp) {
     // parse typecasts of method
     for (Entry<RelativeLocation, ATypeElement> entry : exp.typecasts.entrySet()) {
       RelativeLocation loc = entry.getKey();
@@ -654,6 +656,34 @@ public class IndexFileSpecification implements Specification {
       CriterionList instanceOfClist = clist.add(Criteria.instanceOf(methodName, loc));
       parseInnerAndOuterElements(instanceOfClist, instanceOf);
     }
+
+    // parse function invocations of method
+    for (Entry<RelativeLocation, ATypeElement> entry : exp.calls.entrySet()) {
+      RelativeLocation loc = entry.getKey();
+      ATypeElement call = entry.getValue();
+      CriterionList callClist = clist.add(Criteria.call(methodName, loc));
+      parseInnerAndOuterElements(callClist, call);
+    }
+
+    // parse lambda expressions of method
+    for (Entry<RelativeLocation, AMethod> entry : exp.funs.entrySet()) {
+      RelativeLocation loc = entry.getKey();
+      AMethod lambda = entry.getValue();
+      CriterionList lambdaClist = clist.add(Criteria.lambda(methodName, loc));
+      parseLambdaExpression(className, methodName, lambda, lambdaClist);
+    }
+  }
+
+  private void parseLambdaExpression(String className, String methodName,
+      AMethod lambda, CriterionList clist) {
+    for (Entry<Integer, AField> entry : lambda.parameters.entrySet()) {
+      Integer index = entry.getKey();
+      AField param = entry.getValue();
+      CriterionList paramClist = clist.add(Criteria.param("(anonymous)", index));
+      parseInnerAndOuterElements(paramClist, param.type);
+      parseASTInsertions(paramClist, param.insertAnnotations, param.insertTypecasts);
+    }
+    parseBlock(clist, className, methodName, lambda.body);
   }
 
   private void parseASTInsertions(CriterionList clist,

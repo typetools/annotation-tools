@@ -453,6 +453,14 @@ public final class Criteria {
     return new InstanceOfCriterion(methodName, loc);
   }
 
+  public final static Criterion call(String methodName, RelativeLocation loc) {
+    return new CallCriterion(methodName, loc);
+  }
+
+  public final static Criterion lambda(String methodName, RelativeLocation loc) {
+    return new LambdaCriterion(methodName, loc);
+  }
+
   public final static Criterion atBoundLocation(BoundLocation loc) {
     return new BoundLocationCriterion(loc);
   }

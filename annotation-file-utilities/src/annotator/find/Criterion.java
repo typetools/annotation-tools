@@ -35,6 +35,8 @@ public interface Criterion {
         FIELD,
         NEW,
         INSTANCE_OF,
+        METHOD_CALL,
+        LAMBDA_EXPRESSION,
         BOUND_LOCATION,
         EXTIMPLS_LOCATION,
         METHOD_BOUND,
