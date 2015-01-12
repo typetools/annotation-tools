@@ -1,5 +1,8 @@
 package annotator.find;
 
+import java.util.List;
+
+import com.sun.source.tree.LambdaExpressionTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.tree.VariableTree;
@@ -36,18 +39,23 @@ public class ParamCriterion implements Criterion {
     Tree leaf = path.getLeaf();
     if (leaf instanceof VariableTree) {
       Tree parent = path.getParentPath().getLeaf();
-      if (parent.getKind() == Tree.Kind.METHOD) {
-        MethodTree mt = (MethodTree) parent;
-        if (mt.getParameters().size() > paramPos) {
-          if (mt.getParameters().get(paramPos).equals(leaf)) {
-            return true;
-          }
-        }
+      List<? extends VariableTree> params;
+      switch (parent.getKind()) {
+      case METHOD:
+        params = ((MethodTree) parent).getParameters();
+        break;
+      case LAMBDA_EXPRESSION:
+        params = ((LambdaExpressionTree) parent).getParameters();
+        break;
+      default:
+        params = null;
+        break;
       }
-    } else {
-      return this.isSatisfiedBy(path.getParentPath());
+      return params != null && params.size() > paramPos
+          && params.get(paramPos).equals(leaf);
     }
-    return false;
+
+    return this.isSatisfiedBy(path.getParentPath());
   }
 
   @Override
