@@ -108,6 +108,7 @@ public class ASTIndex extends WrapperMap<Tree, ASTRecord> {
     // the clarity of the code.)
     cut.accept(new SimpleTreeVisitor<Void, ASTRecord>() {
       Deque<Integer> counters = new ArrayDeque<Integer>();
+      String inMethod = null;
 
       private void save(Tree node, ASTRecord rec,
           Kind kind, String sel) {
@@ -352,29 +353,30 @@ public class ASTIndex extends WrapperMap<Tree, ASTRecord> {
       @Override
       public Void visitMethod(MethodTree node, ASTRecord rec) {
         Kind kind = node.getKind();
-        String methodName = JVMNames.getJVMMethodName(node);
         Tree rcvr = node.getReceiverParameter();
         List<? extends Tree> params = node.getParameters();
+        String outMethod = inMethod;
+        inMethod = JVMNames.getJVMMethodName(node);
         if (params != null && !params.isEmpty()) {
           Map<String, List<String>> map = formals.get(rec.className);
           List<String> names = new ArrayList<String>(params.size());
           int i = 0;
-          map.put(methodName, names);
+          map.put(inMethod, names);
           for (Tree param : params) {
             if (param != null) {
               names.add(((VariableTree) param).getName().toString());
               param.accept(this, new ASTRecord(cut, rec.className,
-                      methodName, null, ASTPath.empty())
+                      inMethod, null, ASTPath.empty())
                   .extend(Tree.Kind.METHOD, ASTPath.PARAMETER, i++));
             }
           }
         }
         if (rcvr != null) {
-          rec = new ASTRecord(cut, rec.className, methodName, null,
+          rec = new ASTRecord(cut, rec.className, inMethod, null,
               ASTPath.empty());
           rcvr.accept(this, rec.extend(kind, ASTPath.PARAMETER, -1));
         }
-        rec = new ASTRecord(cut, rec.className, methodName, null,
+        rec = new ASTRecord(cut, rec.className, inMethod, null,
             ASTPath.empty());
         save(node.getReturnType(), rec, kind, ASTPath.TYPE);
         saveAll(node.getTypeParameters(), rec, kind, ASTPath.TYPE_PARAMETER);
@@ -382,6 +384,7 @@ public class ASTIndex extends WrapperMap<Tree, ASTRecord> {
         //saveAll(node.getParameters(), rec, kind, ASTPath.PARAMETER);
         saveAll(node.getThrows(), rec, kind, ASTPath.THROWS);
         save(node.getBody(), rec, kind, ASTPath.BODY);
+        inMethod = outMethod;
         return defaultAction(node, rec);
       }
 
@@ -438,8 +441,25 @@ public class ASTIndex extends WrapperMap<Tree, ASTRecord> {
       public Void visitLambdaExpression(LambdaExpressionTree node,
           ASTRecord rec) {
         Kind kind = node.getKind();
-        saveAll(node.getParameters(), rec, kind, ASTPath.PARAMETER);
+        String outMethod = inMethod;
+        Iterable<? extends Tree> nodes = node.getParameters();
+        if (nodes != null) {
+          int i = 0;
+          for (Tree t : nodes) {
+            ASTRecord newRec = rec.extend(kind, ASTPath.PARAMETER, i++);
+            Tree.Kind newKind = t.getKind();
+            if (newKind == Tree.Kind.VARIABLE) {
+              VariableTree vt = (VariableTree) t;
+              save(vt.getType(), newRec, newKind, ASTPath.TYPE);
+              save(vt.getInitializer(), newRec, newKind, ASTPath.INITIALIZER);
+              defaultAction(vt, newRec);
+            } else {
+              t.accept(this, rec.extend(kind, ASTPath.PARAMETER, i++));
+            }
+          }
+        }
         save(node.getBody(), rec, kind, ASTPath.BODY);
+        inMethod = outMethod;
         return defaultAction(node, rec);
       }
 
