@@ -1,7 +1,7 @@
 package annotator.find;
 
 import annotations.el.RelativeLocation;
-// TODO import annotator.scanner.CallScanner;
+import annotator.scanner.MethodCallScanner;
 
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
@@ -32,10 +32,11 @@ public class CallCriterion implements Criterion {
     Tree leaf = path.getLeaf();
 
     if (leaf.getKind() == Tree.Kind.METHOD_INVOCATION) {
-      int indexInSource = 0; // TODO CallScanner.indexOfCallTree(path, leaf);
+      int indexInSource = MethodCallScanner.indexOfMethodCallTree(path, leaf);
       boolean b;
       if (loc.isBytecodeOffset()) {
-        int indexInClass = 1; // TODO CallScanner.getMethodCallIndex(methodName, loc.offset);
+        int indexInClass =
+            MethodCallScanner.getMethodCallIndex(methodName, loc.offset);
         b = (indexInSource == indexInClass);
       } else {
         b = (indexInSource == loc.index);
