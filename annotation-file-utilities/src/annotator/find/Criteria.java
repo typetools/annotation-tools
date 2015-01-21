@@ -453,8 +453,16 @@ public final class Criteria {
     return new InstanceOfCriterion(methodName, loc);
   }
 
-  public final static Criterion call(String methodName, RelativeLocation loc) {
+  public static Criterion memberReference(String methodName, RelativeLocation loc) {
+    return new MemberReferenceCriterion(methodName, loc);
+  }
+
+  public static Criterion methodCall(String methodName, RelativeLocation loc) {
     return new CallCriterion(methodName, loc);
+  }
+
+  public final static Criterion typeArgument(String methodName, RelativeLocation loc) {
+    return new TypeArgumentCriterion(methodName, loc);
   }
 
   public final static Criterion lambda(String methodName, RelativeLocation loc) {
