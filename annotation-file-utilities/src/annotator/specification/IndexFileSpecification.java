@@ -657,12 +657,37 @@ public class IndexFileSpecification implements Specification {
       parseInnerAndOuterElements(instanceOfClist, instanceOf);
     }
 
-    // parse function invocations of method
-    for (Entry<RelativeLocation, ATypeElement> entry : exp.calls.entrySet()) {
+    // parse member references of method
+    for (Entry<RelativeLocation, ATypeElement> entry : exp.refs.entrySet()) {
       RelativeLocation loc = entry.getKey();
-      ATypeElement call = entry.getValue();
-      CriterionList callClist = clist.add(Criteria.call(methodName, loc));
-      parseInnerAndOuterElements(callClist, call);
+      ATypeElement ref = entry.getValue();
+      CriterionList refClist = clist.add(Criteria.memberReference(methodName, loc));
+      parseInnerAndOuterElements(refClist, ref);
+      if (ref.typeargs != null) {
+        for (Entry<RelativeLocation, ATypeElement> te :
+            ref.typeargs.entrySet()) {
+          ATypeElement typearg = te.getValue();
+          CriterionList typeArgClist = refClist.add(
+              Criteria.typeArgument(methodName, te.getKey()));
+          parseInnerAndOuterElements(typeArgClist, typearg);
+        }
+      }
+    }
+
+    // parse method invocations of method
+    for (Entry<RelativeLocation, AElement> entry : exp.calls.entrySet()) {
+      RelativeLocation loc = entry.getKey();
+      AElement call = entry.getValue();
+      CriterionList callClist = clist.add(Criteria.methodCall(methodName, loc));
+      if (call.typeargs != null) {
+        for (Entry<RelativeLocation, ATypeElement> te :
+            call.typeargs.entrySet()) {
+          ATypeElement typearg = te.getValue();
+          CriterionList typeArgClist = callClist.add(
+              Criteria.typeArgument(methodName, te.getKey()));
+          parseInnerAndOuterElements(typeArgClist, typearg);
+        }
+      }
     }
 
     // parse lambda expressions of method
