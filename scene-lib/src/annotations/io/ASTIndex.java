@@ -486,8 +486,10 @@ public class ASTIndex extends WrapperMap<Tree, ASTRecord> {
       @Override
       public Void visitMemberReference(MemberReferenceTree node,
           ASTRecord rec) {
-        save(node.getQualifierExpression(), rec, node.getKind(),
+        Kind kind = node.getKind();
+        save(node.getQualifierExpression(), rec, kind,
             ASTPath.QUALIFIER_EXPRESSION);
+        saveAll(node.getTypeArguments(), rec, kind, ASTPath.TYPE_ARGUMENT);
         return defaultAction(node, rec);
       }
 
