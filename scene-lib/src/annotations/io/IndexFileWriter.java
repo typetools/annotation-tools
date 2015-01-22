@@ -140,6 +140,14 @@ public final class IndexFileWriter {
         pw.print(indentation + desc + ":");
         printAnnotations(e);
         pw.println();
+        if (e.typeargs != null) {
+          for (Map.Entry<RelativeLocation, ATypeElement> entry :
+              e.typeargs.entrySet()) {
+            RelativeLocation loc = entry.getKey();
+            printTypeElementAndInnerTypes(indentation + INDENT,
+                "type-argument " + loc.index, entry.getValue());
+          }
+        }
     }
 
     private void printElementAndInnerTypes(String indentation,
@@ -254,6 +262,23 @@ public final class IndexFileWriter {
             /*@ReadOnly*/ ATypeElement t = te.getValue();
             printTypeElementAndInnerTypes(indentation,
                     desc + " " + te.getKey().getLocationString(), t);
+        }
+    }
+
+    private void printCalls(String indentation,
+            String desc,
+            /*@ReadOnly*/ Map<RelativeLocation, /*@ReadOnly*/ AElement> els) {
+        for (Map. /*@ReadOnly*/ Entry<RelativeLocation, /*@ReadOnly*/ AElement> el
+                : els.entrySet()) {
+            /*@ReadOnly*/ AElement e = el.getValue();
+            if (e.typeargs != null) {
+                for (Map. /*@ReadOnly*/ Entry<RelativeLocation,
+                        /*@ReadOnly*/ ATypeElement> te : e.typeargs.entrySet()) {
+                  /*@ReadOnly*/ ATypeElement t = te.getValue();
+                  printTypeElementAndInnerTypes(indentation,
+                      "type-argument " + te.getKey().getLocationString(), t);
+                }
+            }
         }
     }
 
@@ -433,21 +458,32 @@ public final class IndexFileWriter {
                 printRelativeElements(INDENT + INDENT, "instanceof",
                         m.body.instanceofs);
                 printRelativeElements(INDENT + INDENT, "new", m.body.news);
-                printRelativeElements(INDENT + INDENT, "call", m.body.calls);
+                printRelativeElements(INDENT + INDENT, "type-argument", m.body.refs);
+                printCalls(INDENT + INDENT, "type-argument", m.body.calls);
                 for (Map. /*@ReadOnly*/ Entry<RelativeLocation, /*@ReadOnly*/ AMethod> entry
                         : m.body.funs.entrySet()) {
                     /*@ReadOnly*/ AMethod lambda = entry.getValue();
                     printBounds(INDENT + INDENT + INDENT, lambda.bounds);
                     printTypeElementAndInnerTypes(INDENT + INDENT + INDENT,
                         "return", lambda.returnType);
-                    if (!lambda.receiver.type.tlAnnotationsHere.isEmpty()
-                            || !lambda.receiver.type.innerTypes.isEmpty()) {
-                        printElementAndInnerTypes(INDENT + INDENT + INDENT + INDENT,
-                                "receiver", lambda.receiver);
-                    }
-                    printNumberedAmbigiousElements(INDENT + INDENT + INDENT,
-                            "parameter", lambda.parameters);
-                    }
+                    //if (!lambda.receiver.type.tlAnnotationsHere.isEmpty()
+                    //        || !lambda.receiver.type.innerTypes.isEmpty()) {
+                    //    printElementAndInnerTypes(INDENT + INDENT + INDENT + INDENT,
+                    //            "receiver", lambda.receiver);
+                    //}
+                    //printNumberedAmbigiousElements(INDENT + INDENT + INDENT,
+                    //        "parameter", lambda.parameters);
+                    //printRelativeElements(INDENT + INDENT + INDENT,
+                    //    "typecast", lambda.body.typecasts);
+                    //printRelativeElements(INDENT + INDENT + INDENT,
+                    //    "instanceof", lambda.body.instanceofs);
+                    //printRelativeElements(INDENT + INDENT + INDENT,
+                    //    "new", lambda.body.news);
+                    //printRelativeElements(INDENT + INDENT + INDENT,
+                    //    "type-argument", lambda.body.refs);
+                    //printCalls(INDENT + INDENT + INDENT,
+                    //    "type-argument", lambda.body.calls);
+                }
                 // throwsException field is not processed.  Why?
                 printASTInsertions(INDENT + INDENT,
                         m.insertAnnotations, m.insertTypecasts);

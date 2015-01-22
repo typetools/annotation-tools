@@ -505,6 +505,9 @@ expression:
 \qquad    \bnfnt{typecast}* \\
 \qquad    \bnfnt{instanceof}* \\
 \qquad    \bnfnt{new}* \\
+\qquad    \bnfnt{call}* \\
+\qquad    \bnfnt{reference}* \\
+\qquad    \bnfnt{lambda}* \\
 \qquad    \bnfnt{source-insert-typecast}* \\
 \qquad    \bnfnt{source-insert-annotation}*
 \end{tabbing}
@@ -618,7 +621,8 @@ The grammar uses \bnflit{\#} for bytecode offsets and \bnflit{*} for source code
 \bnfnt{instanceof-location} ::= \\
 \qquad    \bnfcmt Bytecode offset: the integer is the offset field of the annotation~\cite{JSR308-webpage-201110}. \\
 \qquad    (\bnflit{\#} \bnfnt{integer}) \\
-\qquad    \bnfcmt Source code index: the integer is the zero-based index of the \code{instanceof} within the method. \\
+\qquad    \bnfcmt Source code index: the integer is the zero-based index of the \code{instanceof} \\
+\qquad    \bnfcmt within the method. \\
 \qquad    \bnfor{} (\bnflit{*} \bnfnt{integer}) \\
 \\
 \bnfnt{instanceof} ::= \\
@@ -634,6 +638,63 @@ The grammar uses \bnflit{\#} for bytecode offsets and \bnflit{*} for source code
 \\
 \bnfnt{new} ::= \\
 \qquad    \bnflit{new} \bnfnt{new-location} \bnflit{:} \bnfnt{type-annotation}* \lineend  \\
+\qquad    \bnfnt{compound-type}*
+\\
+\bnfnt{call-location} ::= \\
+\qquad    \bnfcmt Bytecode offset: the first integer is the offset field and the optional \\
+\qquad    \bnfcmt second integer is the zero-based index of the runtime type argument~\cite{JSR308-webpage-201110}. \\
+\qquad    (\bnflit{\#} \bnfnt{integer}) \\
+\qquad    \bnfcmt Source code index: the integer is the zero-based index of the method call \\
+\qquad    \bnfcmt within the method and the second integer is the zero-based index of the \\
+\qquad    \bnfcmt runtime type argument~\cite{JSR308-webpage-201110}. \\
+\qquad    \bnfor{} (\bnflit{*} \bnfnt{integer}) \\
+\\
+\bnfnt{call} ::= \\
+\qquad    \bnflit{method-call} \bnfnt{call-location} \bnflit{:} \lineend \\
+\qquad    \bnfnt{expression-annotations}* \\
+\\
+\bnfnt{reference-location} ::= \\
+\qquad    \bnfcmt Bytecode offset: the integer is the offset field of the annotation~\cite{JSR308-webpage-201110}. \\
+\qquad    (\bnflit{\#} \bnfnt{integer}) \\
+\qquad    \bnfcmt Source code index: the integer is the zero-based index of the member \\
+\qquad    \bnfcmt reference~\cite{JSR308-webpage-201110}. \\
+\qquad    \bnfor{} (\bnflit{*} \bnfnt{integer}) \\
+\\
+\bnfnt{reference} ::= \\
+\qquad    \bnflit{method-reference} \bnfnt{reference-location} \bnflit{:} \bnfnt{type-annotation}* \lineend \\
+\qquad        \bnfnt{typearg-definition}* \\
+\qquad        \bnfnt{typearg-bound}* \\
+%\qquad        \bnfnt{return-type}? \\
+\qquad        \bnfnt{parameter-definition}* \\
+\qquad        \bnfnt{variable-definition}* \\
+\qquad        \bnfnt{expression-annotations}*
+\\
+\bnfnt{lambda-location} ::= \\
+\qquad    \bnfcmt Bytecode offset: the integer is the offset field of the annotation~\cite{JSR308-webpage-201110}. \\
+\qquad    (\bnflit{\#} \bnfnt{integer}) \\
+\qquad    \bnfcmt Source code index: the integer is the zero-based index of the lambda \\
+\qquad    \bnfcmt expression~\cite{JSR308-webpage-201110}. \\
+\qquad    \bnfor{} (\bnflit{*} \bnfnt{integer}) \\
+\\
+\bnfnt{lambda} ::= \\
+\qquad    \bnflit{lambda} \bnfnt{lambda-location} \bnflit{:} \bnfnt{type-annotation}* \lineend \\
+\qquad        \bnfnt{typearg-definition}* \\
+\qquad        \bnfnt{typearg-bound}* \\
+%\qquad        \bnfnt{return-type}? \\
+\qquad        \bnfnt{parameter-definition}* \\
+\qquad        \bnfnt{variable-definition}* \\
+\qquad        \bnfnt{expression-annotations}*
+\\
+\qquad \= \kill
+\bnfnt{typearg-definition} ::= \\
+\qquad    \bnfcmt The integer is the zero-based type argument index. \\
+\qquad    \bnflit{type-argument} \bnfnt{integer} \bnflit{:} \bnfnt{type-annotation}* \lineend \\
+\qquad    \bnfnt{compound-type}*
+\\
+\bnfnt{typearg-bound} ::= \\
+\qquad    \bnfcmt The integers are respectively the argument and bound indexes of \\
+\qquad    \bnfcmt the type argument bound~\cite{JSR308-webpage-201110}. \\
+\qquad    \bnflit{bound} \bnfnt{integer} \bnflit{\&} \bnfnt{integer} \bnflit{:} \bnfnt{type-annotation}* \lineend \\
 \qquad    \bnfnt{compound-type}*
 \end{tabbing}
 
