@@ -975,8 +975,8 @@ public final class IndexFileParser {
                 parseAnnotations(n);
                 parseInnerTypes(n);
             }
-            while (checkKeyword("call")) {
-                matchKeyword("call");
+            while (checkKeyword("method-call")) {
+                matchKeyword("method-call");
                 matched = true;
                 evermatched = true;
                 RelativeLocation loc;
@@ -989,10 +989,29 @@ public final class IndexFileParser {
                     int index = expectNonNegative(matchNNInteger());
                     loc = RelativeLocation.createIndex(index, 0);
                 }
-                ATypeElement n = exp.calls.vivify(loc);
+                AElement n = exp.calls.vivify(loc);
                 expectChar(':');
-                parseAnnotations(n);
-                parseInnerTypes(n);
+                parseTypeArgument(n);
+            }
+            while (checkKeyword("method-reference")) {
+              matchKeyword("method-reference");
+              matched = true;
+              evermatched = true;
+              RelativeLocation loc;
+              if (checkChar('#')) {
+                  expectChar('#');
+                  int offset = expectNonNegative(matchNNInteger());
+                  loc = RelativeLocation.createOffset(offset, 0);
+              } else {
+                  expectChar('*');
+                  int index = expectNonNegative(matchNNInteger());
+                  loc = RelativeLocation.createIndex(index, 0);
+              }
+              ATypeElement n = exp.refs.vivify(loc);
+              expectChar(':');
+              parseAnnotations(n);
+              parseInnerTypes(n);
+              parseTypeArgument(n);
             }
             while (checkKeyword("lambda")) {
                 matchKeyword("lambda");
@@ -1024,6 +1043,21 @@ public final class IndexFileParser {
             }
         }
         return evermatched;
+    }
+
+    private void parseTypeArgument(AElement elem) throws IOException,
+        ParseException {
+      while (checkKeyword("type-argument")) {
+        expectKeyword("type-argument");
+        // make "#" optional
+        if (checkChar('#')) { matchChar('#'); }
+        int idx = expectNonNegative(matchNNInteger());
+        RelativeLocation loc = RelativeLocation.createIndex(idx, 0);
+        ATypeElement n = elem.typeargs.vivify(loc);
+        expectChar(':');
+        parseAnnotations(n);
+        parseInnerTypes(n);
+      }
     }
 
     private static boolean isTypeSelector(String selector) {
