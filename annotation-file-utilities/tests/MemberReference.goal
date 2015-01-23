@@ -20,6 +20,7 @@ import java.util.function.UnaryOperator;
 @Target(ElementType.TYPE_USE) @interface C {}
 @Target(ElementType.TYPE_USE) @interface D {}
 
+@skip-test
 public class MemberReference<T> {
   class Inner<U> implements Map.Entry<T, U> {
     @Override
