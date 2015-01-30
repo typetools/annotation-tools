@@ -641,17 +641,16 @@ The grammar uses \bnflit{\#} for bytecode offsets and \bnflit{*} for source code
 \qquad    \bnfnt{compound-type}*
 \\
 \bnfnt{call-location} ::= \\
-\qquad    \bnfcmt Bytecode offset: the first integer is the offset field and the optional \\
-\qquad    \bnfcmt second integer is the zero-based index of the runtime type argument~\cite{JSR308-webpage-201110}. \\
+\qquad    \bnfcmt Bytecode offset: the integer is the offset field of the annotation~\cite{JSR308-webpage-201110}. \\
 \qquad    (\bnflit{\#} \bnfnt{integer}) \\
 \qquad    \bnfcmt Source code index: the integer is the zero-based index of the method call \\
-\qquad    \bnfcmt within the method and the second integer is the zero-based index of the \\
-\qquad    \bnfcmt runtime type argument~\cite{JSR308-webpage-201110}. \\
+\qquad    \bnfcmt within the field or method definition. \\
 \qquad    \bnfor{} (\bnflit{*} \bnfnt{integer}) \\
 \\
 \bnfnt{call} ::= \\
-\qquad    \bnflit{method-call} \bnfnt{call-location} \bnflit{:} \lineend \\
-\qquad    \bnfnt{expression-annotations}* \\
+\qquad    \bnflit{call} \bnfnt{call-location} \bnflit{:} \lineend \\
+\qquad    \bnfnt{typearg-definition}* \\
+\qquad    \bnfnt{typearg-bound}* \\
 \\
 \bnfnt{reference-location} ::= \\
 \qquad    \bnfcmt Bytecode offset: the integer is the offset field of the annotation~\cite{JSR308-webpage-201110}. \\
@@ -661,13 +660,12 @@ The grammar uses \bnflit{\#} for bytecode offsets and \bnflit{*} for source code
 \qquad    \bnfor{} (\bnflit{*} \bnfnt{integer}) \\
 \\
 \bnfnt{reference} ::= \\
-\qquad    \bnflit{method-reference} \bnfnt{reference-location} \bnflit{:} \bnfnt{type-annotation}* \lineend \\
+\qquad    \bnflit{reference} \bnfnt{reference-location} \bnflit{:} \bnfnt{type-annotation}* \lineend \\
 \qquad        \bnfnt{typearg-definition}* \\
 \qquad        \bnfnt{typearg-bound}* \\
 %\qquad        \bnfnt{return-type}? \\
 \qquad        \bnfnt{parameter-definition}* \\
 \qquad        \bnfnt{variable-definition}* \\
-\qquad        \bnfnt{expression-annotations}*
 \\
 \bnfnt{lambda-location} ::= \\
 \qquad    \bnfcmt Bytecode offset: the integer is the offset field of the annotation~\cite{JSR308-webpage-201110}. \\
@@ -688,7 +686,7 @@ The grammar uses \bnflit{\#} for bytecode offsets and \bnflit{*} for source code
 \qquad \= \kill
 \bnfnt{typearg-definition} ::= \\
 \qquad    \bnfcmt The integer is the zero-based type argument index. \\
-\qquad    \bnflit{type-argument} \bnfnt{integer} \bnflit{:} \bnfnt{type-annotation}* \lineend \\
+\qquad    \bnflit{typearg} \bnfnt{integer} \bnflit{:} \bnfnt{type-annotation}* \lineend \\
 \qquad    \bnfnt{compound-type}*
 \\
 \bnfnt{typearg-bound} ::= \\
