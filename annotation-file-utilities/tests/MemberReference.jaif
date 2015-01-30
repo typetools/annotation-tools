@@ -7,53 +7,53 @@ annotation @D: @java.lang.annotation.Target(value={TYPE_USE})
 class MemberReference:
 
     field o1:
-        method-reference *0: @A
+        reference *0: @A
 
     field o2:
-        method-reference *0: @A
+        reference *0: @A
 
     field o3:
-        method-reference *0: @A
+        reference *0: @A
             inner-type 3, 0: @B
 
     field o4:
-        method-reference *0: @A
+        reference *0: @A
 
     field o5:
-        method-reference *0: @B
+        reference *0: @B
             inner-type 0, 0: @A
 
     field o6:
-        method-reference *0: @A
+        reference *0: @A
 
     field o9:
-        method-call *0:
-            type-argument 0: @A
+        call *0:
+            typearg 0: @A
 
     field o10:
-        method-reference *0: @A
+        reference *0: @A
             inner-type 3, 0: @B
 
     field o11:
-        method-reference *0: @A
+        reference *0: @A
 
     field o12:
-        method-reference *0: @A
+        reference *0: @A
             inner-type 3, 0: @B
-            type-argument 0: @C
+            typearg 0: @C
 
     field o13:
-        method-reference *0: @A
+        reference *0: @A
             inner-type 3, 0: @B
-            type-argument 0: @C
+            typearg 0: @C
 
     field o14:
-        method-reference *0: @A
+        reference *0: @A
             inner-type 3, 0: @B
             inner-type 1, 0, 3, 0: @C
-            type-argument 0: @D
+            typearg 0: @D
 
     field o15:
-        method-reference *0: @B
+        reference *0: @B
             inner-type 0, 0: @A
 
