@@ -975,8 +975,8 @@ public final class IndexFileParser {
                 parseAnnotations(n);
                 parseInnerTypes(n);
             }
-            while (checkKeyword("method-call")) {
-                matchKeyword("method-call");
+            while (checkKeyword("call")) {
+                matchKeyword("call");
                 matched = true;
                 evermatched = true;
                 RelativeLocation loc;
@@ -993,8 +993,8 @@ public final class IndexFileParser {
                 expectChar(':');
                 parseTypeArgument(n);
             }
-            while (checkKeyword("method-reference")) {
-              matchKeyword("method-reference");
+            while (checkKeyword("reference")) {
+              matchKeyword("reference");
               matched = true;
               evermatched = true;
               RelativeLocation loc;
@@ -1047,8 +1047,8 @@ public final class IndexFileParser {
 
     private void parseTypeArgument(AElement elem) throws IOException,
         ParseException {
-      while (checkKeyword("type-argument")) {
-        expectKeyword("type-argument");
+      while (checkKeyword("typearg")) {
+        expectKeyword("typearg");
         // make "#" optional
         if (checkChar('#')) { matchChar('#'); }
         int idx = expectNonNegative(matchNNInteger());
@@ -1563,7 +1563,6 @@ public final class IndexFileParser {
         // argggh!!! stupid default needs to be overridden! see java bug 4217680
         st.ordinaryChar('/');
 
-        // for "type-argument"
         st.wordChars('-', '-');
 
         // java identifiers can contain numbers, _, and $

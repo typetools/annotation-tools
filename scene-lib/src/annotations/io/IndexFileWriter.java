@@ -145,7 +145,7 @@ public final class IndexFileWriter {
               e.typeargs.entrySet()) {
             RelativeLocation loc = entry.getKey();
             printTypeElementAndInnerTypes(indentation + INDENT,
-                "type-argument " + loc.index, entry.getValue());
+                "typearg " + loc.index, entry.getValue());
           }
         }
     }
@@ -265,18 +265,20 @@ public final class IndexFileWriter {
         }
     }
 
-    private void printCalls(String indentation,
+    private void printTypeArguments(String indentation,
             String desc,
-            /*@ReadOnly*/ Map<RelativeLocation, /*@ReadOnly*/ AElement> els) {
-        for (Map. /*@ReadOnly*/ Entry<RelativeLocation, /*@ReadOnly*/ AElement> el
-                : els.entrySet()) {
+            /*@ReadOnly*/ Map<RelativeLocation,
+                /*@ReadOnly*/ ? extends AElement> els) {
+        for (Map. /*@ReadOnly*/ Entry<RelativeLocation,
+                /*@ReadOnly*/ ? extends AElement> el : els.entrySet()) {
             /*@ReadOnly*/ AElement e = el.getValue();
+            //printElement(indentation, desc, x);
             if (e.typeargs != null) {
                 for (Map. /*@ReadOnly*/ Entry<RelativeLocation,
                         /*@ReadOnly*/ ATypeElement> te : e.typeargs.entrySet()) {
                   /*@ReadOnly*/ ATypeElement t = te.getValue();
                   printTypeElementAndInnerTypes(indentation,
-                      "type-argument " + te.getKey().getLocationString(), t);
+                      "typearg " + te.getKey().getLocationString(), t);
                 }
             }
         }
@@ -458,8 +460,8 @@ public final class IndexFileWriter {
                 printRelativeElements(INDENT + INDENT, "instanceof",
                         m.body.instanceofs);
                 printRelativeElements(INDENT + INDENT, "new", m.body.news);
-                printRelativeElements(INDENT + INDENT, "type-argument", m.body.refs);
-                printCalls(INDENT + INDENT, "type-argument", m.body.calls);
+                printTypeArguments(INDENT + INDENT, "reference", m.body.refs);
+                printTypeArguments(INDENT + INDENT, "call", m.body.calls);
                 for (Map. /*@ReadOnly*/ Entry<RelativeLocation, /*@ReadOnly*/ AMethod> entry
                         : m.body.funs.entrySet()) {
                     /*@ReadOnly*/ AMethod lambda = entry.getValue();
@@ -480,9 +482,9 @@ public final class IndexFileWriter {
                     //printRelativeElements(INDENT + INDENT + INDENT,
                     //    "new", lambda.body.news);
                     //printRelativeElements(INDENT + INDENT + INDENT,
-                    //    "type-argument", lambda.body.refs);
+                    //    "typearg", lambda.body.refs);
                     //printCalls(INDENT + INDENT + INDENT,
-                    //    "type-argument", lambda.body.calls);
+                    //    "typearg", lambda.body.calls);
                 }
                 // throwsException field is not processed.  Why?
                 printASTInsertions(INDENT + INDENT,
