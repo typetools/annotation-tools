@@ -1068,7 +1068,7 @@ loop:
       case MEMBER_SELECT:
         if (t instanceof JCTree.JCFieldAccess) {
           JCTree.JCFieldAccess jfa = (JCTree.JCFieldAccess) t;
-          if (jfa.sym.kind == Kinds.PCK) {
+          if (jfa.sym.kind == Kinds.Kind.PCK) {
             t = jfa.getExpression();
             continue;
           }
