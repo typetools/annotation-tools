@@ -83,7 +83,7 @@
       <!-- alternate for distribution:
       <pathelement location="${annotations-compiler}/bin"/>
       -->
-      <pathelement location="${annotations-compiler}/dist/lib/javac.jar"/>
+      <pathelement location="${annotations-compiler}/dist/lib/java.compiler.jar"/>
       <pathelement location="${annotation-tools}/annotation-file-utilities/lib/plume.jar"/>
       <pathelement location="${annotation-tools}/annotation-file-utilities/lib/guava-15.0.jar"/>
       <pathelement location="${scene-lib}/bin"/>
@@ -457,7 +457,7 @@
           description="run tests for the annotator">
     <exec dir="tests/" executable="make" failonerror="true">
         <env key="XJAVAC" value="${annotations-compiler-absolute}/dist/bin/javac"/>
-        <env key="JAVAC_JAR" value="${annotations-compiler-absolute}/dist/lib/javac.jar"/>
+        <env key="JAVAC_JAR" value="${annotations-compiler-absolute}/dist/lib/jdk.compiler.jar"/>
     </exec>
   </target>
 
@@ -498,7 +498,7 @@
             failonerror="true"
             classpathref="libpath"
             classname="com.sun.tools.javac.Main">
-          <jvmarg line="-Xbootclasspath/p:${annotations-compiler-absolute}/dist/lib/javac.jar"/>
+          <jvmarg line="-Xbootclasspath/p:${annotations-compiler-absolute}/dist/lib/jdk.compiler.jar"/>
           <arg value="-g"/>
           <arg line="-sourcepath src"/>
           <arg line="-d bin"/>
