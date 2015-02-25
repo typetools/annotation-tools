@@ -16,7 +16,7 @@ public class AField extends ADeclaration {
         new LinkedHashMap<K, AField>()) {
       @Override
       public AField createValueFor(K k) {
-        return new AField(k);
+        return new AField("" + k);
       }
 
       @Override
@@ -26,8 +26,12 @@ public class AField extends ADeclaration {
     };
   }
 
-  protected AField(Object description) {
-    super(description);
+  public AExpression init;
+  private final String fieldName;
+
+  AField(String fieldName) {
+    super(fieldName);
+    this.fieldName = fieldName;
   }
 
   @Override
@@ -45,6 +49,8 @@ public class AField extends ADeclaration {
   @Override  // TODO: remove?
   public String toString() {
     StringBuilder sb = new StringBuilder();
+    sb.append("AField ");
+    sb.append(fieldName);
     sb.append(super.toString());
     return sb.toString();
   }

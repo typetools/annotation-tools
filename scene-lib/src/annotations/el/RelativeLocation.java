@@ -12,7 +12,7 @@ import org.checkerframework.checker.javari.qual.*;
  * instanceof, cast, or new: either the bytecode offset or the source code index.
  * I call instanceof, cast, or new "the construct".
  */
-public final /*@ReadOnly*/ class RelativeLocation {
+public final /*@ReadOnly*/ class RelativeLocation implements Comparable<RelativeLocation> {
     /**
      * The bytecode offset of the construct.
      */
@@ -59,13 +59,25 @@ public final /*@ReadOnly*/ class RelativeLocation {
         }
     }
 
+    @Override
+    public int compareTo(RelativeLocation l) {
+        int c = Integer.compare(offset,  l.offset);
+        if (c == 0) {
+            c = Integer.compare(index, l.index);
+            if (c == 0) {
+                c = Integer.compare(type_index, l.type_index);
+            }
+        }
+        return c;
+    }
+
     /**
      * Returns whether this {@link RelativeLocation} equals <code>o</code>; a
      * slightly faster variant of {@link #equals(Object)} for when the argument
      * is statically known to be another nonnull {@link RelativeLocation}.
      */
     public boolean equals(RelativeLocation l) {
-        return offset == l.offset && index == l.index && type_index == l.type_index;
+        return compareTo(l) == 0;
     }
 
     /**

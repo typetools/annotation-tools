@@ -6,6 +6,9 @@ import org.checkerframework.checker.javari.qual.ReadOnly;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import annotations.util.coll.VivifyingMap;
 
@@ -27,13 +30,13 @@ public class AExpression extends AElement {
     public final VivifyingMap<RelativeLocation, ATypeElement> news =
             ATypeElement.<RelativeLocation>newVivifyingLHMap_ATE();
 
-    /** The method's annotated member references; map key is the offset of the ??? bytecode */
-    public final VivifyingMap<RelativeLocation, ATypeElement> refs =
+    /** A method invocation's annotated type arguments; map key is the offset of the invokestatic bytecode (?) */
+    public final VivifyingMap<RelativeLocation, ATypeElement> calls =
             ATypeElement.<RelativeLocation>newVivifyingLHMap_ATE();
 
-    /** The method's annotated method invocations; map key is the offset of the invokestatic bytecode (?) */
-    public final VivifyingMap<RelativeLocation, AElement> calls =
-            AElement.<RelativeLocation>newVivifyingLHMap_AE();
+    /** A member reference's annotated type parameters; map key is the offset of the ??? bytecode */
+    public final VivifyingMap<RelativeLocation, ATypeElement> refs =
+            ATypeElement.<RelativeLocation>newVivifyingLHMap_ATE();
 
     /** The method's annotated lambda expressions; map key is the offset of the invokedynamic bytecode */
     public final VivifyingMap<RelativeLocation, AMethod> funs =
@@ -72,8 +75,8 @@ public class AExpression extends AElement {
                 && typecasts.equals(o.typecasts)
                 && instanceofs.equals(o.instanceofs)
                 && news.equals(o.news)
-                && calls.equals(o.calls)
                 && refs.equals(o.refs)
+                && calls.equals(o.calls)
                 && funs.equals(o.funs);
         }
 
@@ -84,7 +87,7 @@ public class AExpression extends AElement {
     public int hashCode(/*>>> @ReadOnly AExpression this*/) {
         return super.hashCode() + typecasts.hashCode()
             + instanceofs.hashCode() + news.hashCode()
-            + calls.hashCode() + refs.hashCode() + funs.hashCode();
+            + refs.hashCode() + calls.hashCode() + funs.hashCode();
     }
 
     /**
@@ -93,12 +96,15 @@ public class AExpression extends AElement {
     @Override
     public boolean prune() {
         return super.prune() & typecasts.prune() & instanceofs.prune()
-                & news.prune() & calls.prune() & refs.prune() & funs.prune();
+                & news.prune() & refs.prune() & calls.prune() & funs.prune();
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
+        SortedMap<RelativeLocation, ATypeElement> map =
+            new TreeMap<RelativeLocation, ATypeElement>();
+        RelativeLocation prev = null;
         // sb.append("AExpression ");
         // sb.append(id);
         for (Map.Entry<RelativeLocation, ATypeElement> em : typecasts.entrySet()) {
@@ -120,7 +126,7 @@ public class AExpression extends AElement {
             sb.append(' ');
         }
         for (Map.Entry<RelativeLocation, ATypeElement> em : news.entrySet()) {
-            sb.append("new: ");
+            sb.append("new ");
             RelativeLocation loc = em.getKey();
             sb.append(loc);
             sb.append(": ");
@@ -128,17 +134,53 @@ public class AExpression extends AElement {
             sb.append(ae.toString());
             sb.append(' ');
         }
-        for (Map.Entry<RelativeLocation, AElement> em : calls.entrySet()) {
-            sb.append("call: ");
+        map.putAll(refs);
+        for (Entry<RelativeLocation, ATypeElement> em : map.entrySet()) {
             RelativeLocation loc = em.getKey();
-            sb.append(loc);
-            sb.append(": ");
             AElement ae = em.getValue();
-            sb.append(ae.toString());
-            sb.append(' ');
+            boolean isOffset = loc.index < 0;
+            if (prev == null
+                    || (isOffset ? loc.offset == prev.offset
+                        : loc.index == prev.index)) {
+                sb.append("reference ");
+                sb.append(isOffset ? "*" + loc.offset : "#" + loc.index);
+                sb.append(": ");
+                sb.append(ae.toString());
+            }
+            if (loc.type_index >= 0) {
+                sb.append("typearg " + loc);
+                sb.append(": ");
+                sb.append(ae.toString());
+                sb.append(' ');
+            }
+            prev = loc;
         }
+        prev = null;
+        map.clear();
+        map.putAll(calls);
+        for (Entry<RelativeLocation, ATypeElement> em : map.entrySet()) {
+            RelativeLocation loc = em.getKey();
+            AElement ae = em.getValue();
+            boolean isOffset = loc.index < 0;
+            if (prev == null
+                    || (isOffset ? loc.offset == prev.offset
+                        : loc.index == prev.index)) {
+                sb.append("call ");
+                sb.append(isOffset ? "*" + loc.offset : "#" + loc.index);
+                sb.append(": ");
+            }
+            if (loc.type_index >= 0) {
+                sb.append("typearg " + loc);
+                sb.append(": ");
+                sb.append(ae.toString());
+                sb.append(' ');
+            }
+            prev = loc;
+        }
+        prev = null;
+        map.clear();
         for (Map.Entry<RelativeLocation, AMethod> em : funs.entrySet()) {
-            sb.append("fun: ");
+            sb.append("lambda ");
             RelativeLocation loc = em.getKey();
             sb.append(loc);
             sb.append(": ");

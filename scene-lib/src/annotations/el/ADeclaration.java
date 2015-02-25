@@ -88,7 +88,7 @@ public abstract class ADeclaration extends AElement {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder(super.toString());
+    StringBuilder sb = new StringBuilder();
     for (Map.Entry<ASTPath, ATypeElement> em :
             insertAnnotations.entrySet()) {
         sb.append("insert-annotation: ");
