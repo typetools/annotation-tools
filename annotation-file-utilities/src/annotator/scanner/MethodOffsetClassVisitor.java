@@ -1,6 +1,7 @@
 package annotator.scanner;
 
 import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Handle;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodAdapter;
 import org.objectweb.asm.MethodVisitor;
@@ -98,6 +99,30 @@ public class MethodOffsetClassVisitor extends ClassWriter {
       if (opcode == Opcodes.NEWARRAY) {
         NewScanner.addNewToMethod(methodName, lastLabel.getOffset());
       }
+    }
+
+    @Override
+    public void visitMethodInsn(int opcode, String owner, String name,
+        String desc) {
+      super.visitMethodInsn(opcode, owner, name, desc);
+      switch (opcode) {
+      case Opcodes.INVOKEINTERFACE:
+      case Opcodes.INVOKESTATIC:
+      case Opcodes.INVOKEVIRTUAL:
+        MethodCallScanner.addMethodCallToMethod(methodName,
+            lastLabel.getOffset());
+        // fall through
+      default:
+        break;
+      }
+    }
+
+    @Override
+    public void visitInvokeDynamicInsn(String name, String desc,
+        Handle bsm, Object... bsmArgs) {
+      super.visitInvokeDynamicInsn(name, desc, bsm, bsmArgs);
+      LambdaScanner.addLambdaExpressionToMethod(methodName,
+          lastLabel.getOffset());
     }
   }
 }
