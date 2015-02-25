@@ -1105,6 +1105,112 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
       }
     }
 
+    private void ensureVisitMemberReferenceAnnotations() {
+        ensureVisitMemberReferenceAnnotations(false);
+        ensureVisitMemberReferenceAnnotations(true);
+    }
+
+    private void ensureVisitMemberReferenceAnnotations(boolean b) {
+      for (Map.Entry<RelativeLocation, ATypeElement> entry :
+          aMethod.body.refs.entrySet()) {
+        if (!entry.getKey().isBytecodeOffset()) {
+          // if the RelativeLocation is a source index, we cannot insert it
+          // into bytecode
+          // TODO: output a warning or translate
+          if (strict) { System.err.println("ClassAnnotationSceneWriter.ensureVisitTypeTestAnnotation: no bytecode offset found!"); }
+        }
+        int offset = entry.getKey().offset;
+        int typeIndex = entry.getKey().type_index;
+        ATypeElement aTypeArg = entry.getValue();
+        TargetType tt = b
+                ? TargetType.METHOD_REFERENCE_TYPE_ARGUMENT
+                : TargetType.CONSTRUCTOR_REFERENCE_TYPE_ARGUMENT;
+
+        for (Annotation tla : aTypeArg.tlAnnotationsHere) {
+          if (shouldSkip(tla)) continue;
+
+          TypeAnnotationVisitor xav = visitTypeAnnotation(tla, true);
+          visitTargetType(xav, tt);
+          visitOffset(xav, offset);
+          visitTypeIndex(xav, typeIndex);
+          visitLocations(xav, InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION);
+          visitFields(xav, tla);
+          xav.visitEnd();
+        }
+
+        // now do inner annotations of member reference
+        for (Map.Entry<InnerTypeLocation, ATypeElement> e :
+            aTypeArg.innerTypes.entrySet()) {
+          InnerTypeLocation aTypeArgLocation = e.getKey();
+          AElement aInnerType = e.getValue();
+          for (Annotation tla : aInnerType.tlAnnotationsHere) {
+            if (shouldSkip(tla)) continue;
+
+            TypeAnnotationVisitor xav = visitTypeAnnotation(tla, true);
+            visitTargetType(xav, tt);
+            visitOffset(xav, offset);
+            visitTypeIndex(xav, typeIndex);
+            visitLocations(xav, aTypeArgLocation);
+            visitFields(xav, tla);
+            xav.visitEnd();
+          }
+        }
+      }
+    }
+
+    private void ensureVisitMethodInvocationAnnotations() {
+        ensureVisitMethodInvocationAnnotations(false);
+        ensureVisitMethodInvocationAnnotations(true);
+    }
+
+    private void ensureVisitMethodInvocationAnnotations(boolean b) {
+      for (Map.Entry<RelativeLocation, ATypeElement>
+          entry : aMethod.body.calls.entrySet()) {
+        if (!entry.getKey().isBytecodeOffset()) {
+          // if the RelativeLocation is a source index, we cannot insert it
+          // into bytecode
+          // TODO: output a warning or translate
+          if (strict) { System.err.println("ClassAnnotationSceneWriter.ensureVisitTypeTestAnnotation: no bytecode offset found!"); }
+        }
+        int offset = entry.getKey().offset;
+        int typeIndex = entry.getKey().type_index;
+        ATypeElement aCall = entry.getValue();
+        TargetType tt = b
+                ? TargetType.METHOD_INVOCATION_TYPE_ARGUMENT
+                : TargetType.CONSTRUCTOR_INVOCATION_TYPE_ARGUMENT;
+
+        for (Annotation tla : aCall.tlAnnotationsHere) {
+          if (shouldSkip(tla)) continue;
+
+          TypeAnnotationVisitor xav = visitTypeAnnotation(tla, true);
+          visitTargetType(xav, tt);
+          visitOffset(xav, offset);
+          visitTypeIndex(xav, typeIndex);
+          visitLocations(xav, InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION);
+          visitFields(xav, tla);
+          xav.visitEnd();
+        }
+
+        // now do inner annotations of call
+        for (Map.Entry<InnerTypeLocation, ATypeElement> e :
+            aCall.innerTypes.entrySet()) {
+          InnerTypeLocation aCallLocation = e.getKey();
+          AElement aInnerType = e.getValue();
+          for (Annotation tla : aInnerType.tlAnnotationsHere) {
+            if (shouldSkip(tla)) continue;
+
+            TypeAnnotationVisitor xav = visitTypeAnnotation(tla, true);
+            visitTargetType(xav, TargetType.INSTANCEOF);
+            visitOffset(xav, offset);
+            visitTypeIndex(xav, typeIndex);
+            visitLocations(xav, aCallLocation);
+            visitFields(xav, tla);
+            xav.visitEnd();
+          }
+        }
+      }
+    }
+
     /**
      * Have this method visit the annotations in scene if and only if
      *  it has not visited them before.
@@ -1117,7 +1223,8 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
         ensureVisitReturnTypeAnnotations();
 
         // Now iterate through method's locals, news, parameter, receiver,
-        // and typecasts annotations, which will all be extended annotations
+        // typecasts, and type argument annotations, which will all be
+        // extended annotations
         ensureVisitTypeParameterBoundAnnotations();
         ensureVisitLocalVariablesAnnotations();
         ensureVisitObjectCreationAnnotations();
@@ -1125,6 +1232,8 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
         ensureVisitReceiverAnnotations();
         ensureVisitTypecastAnnotations();
         ensureVisitTypeTestAnnotations();
+        ensureVisitMemberReferenceAnnotations();
+        ensureVisitMethodInvocationAnnotations();
         // TODO: throw clauses?!
         // TODO: catch clauses!?
       }

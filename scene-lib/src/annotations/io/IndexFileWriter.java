@@ -140,14 +140,6 @@ public final class IndexFileWriter {
         pw.print(indentation + desc + ":");
         printAnnotations(e);
         pw.println();
-        if (e.typeargs != null) {
-          for (Map.Entry<RelativeLocation, ATypeElement> entry :
-              e.typeargs.entrySet()) {
-            RelativeLocation loc = entry.getKey();
-            printTypeElementAndInnerTypes(indentation + INDENT,
-                "typearg " + loc.index, entry.getValue());
-          }
-        }
     }
 
     private void printElementAndInnerTypes(String indentation,
@@ -265,22 +257,30 @@ public final class IndexFileWriter {
         }
     }
 
-    private void printTypeArguments(String indentation,
-            String desc,
-            /*@ReadOnly*/ Map<RelativeLocation,
-                /*@ReadOnly*/ ? extends AElement> els) {
-        for (Map. /*@ReadOnly*/ Entry<RelativeLocation,
-                /*@ReadOnly*/ ? extends AElement> el : els.entrySet()) {
-            /*@ReadOnly*/ AElement e = el.getValue();
-            //printElement(indentation, desc, x);
-            if (e.typeargs != null) {
-                for (Map. /*@ReadOnly*/ Entry<RelativeLocation,
-                        /*@ReadOnly*/ ATypeElement> te : e.typeargs.entrySet()) {
-                  /*@ReadOnly*/ ATypeElement t = te.getValue();
-                  printTypeElementAndInnerTypes(indentation,
-                      "typearg " + te.getKey().getLocationString(), t);
-                }
+    private void printRelativeElements(String indentation,
+            String desc1, String desc2,
+            /*@ReadOnly*/ Map<RelativeLocation, /*@ReadOnly*/ ATypeElement> nels) {
+        RelativeLocation prev = null;
+        for (Map. /*@ReadOnly*/ Entry<RelativeLocation, /*@ReadOnly*/ ATypeElement> te
+                : nels.entrySet()) {
+            /*@ReadOnly*/ ATypeElement t = te.getValue();
+            RelativeLocation loc = te.getKey();
+            boolean isOffset = loc.index < 0;
+            if (prev == null || loc.type_index < 0
+                    || (isOffset ? loc.offset != prev.offset
+                            : loc.index != prev.index)) {
+                pw.print(indentation + desc1 + " ");
+                pw.print(isOffset ? "#" + loc.offset : "*" + loc.index);
+                pw.print(":");
+                if (loc.type_index < 0) { printAnnotations(t); }
+                pw.println();
+                printInnerTypes(indentation + INDENT, t);
             }
+            if (loc.type_index >= 0) {
+                printTypeElementAndInnerTypes(indentation + INDENT,
+                        desc2 + " " + loc.type_index, t);
+            }
+            prev = loc;
         }
     }
 
@@ -403,6 +403,8 @@ public final class IndexFileWriter {
         }
 
         // And then the annotated classes
+        final String indent2 = INDENT + INDENT;
+        final String indent3 = INDENT + indent2;
         for (Map. /*@ReadOnly*/ Entry<String, /*@ReadOnly*/ AClass> ce
                 : scene.classes.entrySet()) {
             String cname = ce.getKey();
@@ -424,8 +426,8 @@ public final class IndexFileWriter {
                 /*@ReadOnly*/ AField f = fe.getValue();
                 pw.println();
                 printElement(INDENT, "field " + fname, f);
-                printTypeElementAndInnerTypes(INDENT + INDENT, "type", f.type);
-                printASTInsertions(INDENT + INDENT,
+                printTypeElementAndInnerTypes(indent2, "type", f.type);
+                printASTInsertions(indent2,
                         f.insertAnnotations, f.insertTypecasts);
             }
             for (Map. /*@ReadOnly*/ Entry<String, /*@ReadOnly*/ AMethod> me
@@ -434,16 +436,19 @@ public final class IndexFileWriter {
                 /*@ReadOnly*/ AMethod m = me.getValue();
                 pw.println();
                 printElement(INDENT, "method " + mkey, m);
-                printBounds(INDENT + INDENT, m.bounds);
-                printTypeElementAndInnerTypes(INDENT + INDENT, "return", m.returnType);
-                if (!m.receiver.type.tlAnnotationsHere.isEmpty() || !m.receiver.type.innerTypes.isEmpty()) {
-                    // Only output the receiver if there is something to say. This is a bit
-                    // inconsistent with the return type, but so be it.
-                    printElementAndInnerTypes(INDENT + INDENT, "receiver", m.receiver);
+                printBounds(indent2, m.bounds);
+                printTypeElementAndInnerTypes(indent2, "return", m.returnType);
+                if (!m.receiver.type.tlAnnotationsHere.isEmpty()
+                        || !m.receiver.type.innerTypes.isEmpty()) {
+                    // Only output the receiver if there is something to
+                    // say.  This is a bit inconsistent with the return
+                    // type, but so be it.
+                    printElementAndInnerTypes(indent2, "receiver", m.receiver);
                 }
-                printNumberedAmbigiousElements(INDENT + INDENT, "parameter", m.parameters);
-                for (Map. /*@ReadOnly*/ Entry<LocalLocation, /*@ReadOnly*/ AField> le
-                        : m.body.locals.entrySet()) {
+                printNumberedAmbigiousElements(indent2,
+                        "parameter", m.parameters);
+                for (Map. /*@ReadOnly*/ Entry<LocalLocation,
+                        /*@ReadOnly*/ AField> le : m.body.locals.entrySet()) {
                     LocalLocation loc = le.getKey();
                     /*@ReadOnly*/ AElement l = le.getValue();
                     StringBuilder sb = new StringBuilder("local ");
@@ -451,43 +456,28 @@ public final class IndexFileWriter {
                         ? loc.index
                             + " #" + loc.scopeStart + "+" + loc.scopeLength
                         : loc.varName);
-                    printElement(INDENT + INDENT, sb.toString(), l);
-                    printTypeElementAndInnerTypes(INDENT + INDENT + INDENT,
+                    printElement(indent2, sb.toString(), l);
+                    printTypeElementAndInnerTypes(indent3,
                             "type", l.type);
                 }
-                printRelativeElements(INDENT + INDENT, "typecast",
+                printRelativeElements(indent2, "typecast",
                         m.body.typecasts);
-                printRelativeElements(INDENT + INDENT, "instanceof",
+                printRelativeElements(indent2, "instanceof",
                         m.body.instanceofs);
-                printRelativeElements(INDENT + INDENT, "new", m.body.news);
-                printTypeArguments(INDENT + INDENT, "reference", m.body.refs);
-                printTypeArguments(INDENT + INDENT, "call", m.body.calls);
-                for (Map. /*@ReadOnly*/ Entry<RelativeLocation, /*@ReadOnly*/ AMethod> entry
-                        : m.body.funs.entrySet()) {
+                printRelativeElements(indent2, "new", m.body.news);
+                printRelativeElements(indent2, "reference", "typearg", m.body.refs);
+                printRelativeElements(indent2, "call", "typearg", m.body.calls);
+                for (Map. /*@ReadOnly*/ Entry<RelativeLocation,
+                        /*@ReadOnly*/ AMethod> entry : m.body.funs.entrySet()) {
                     /*@ReadOnly*/ AMethod lambda = entry.getValue();
-                    printBounds(INDENT + INDENT + INDENT, lambda.bounds);
-                    printTypeElementAndInnerTypes(INDENT + INDENT + INDENT,
+                    RelativeLocation loc = entry.getKey();
+                    pw.print("lambda " + loc.getLocationString() + ":\n");
+                    printBounds(indent3, lambda.bounds);
+                    printTypeElementAndInnerTypes(indent3,
                         "return", lambda.returnType);
-                    //if (!lambda.receiver.type.tlAnnotationsHere.isEmpty()
-                    //        || !lambda.receiver.type.innerTypes.isEmpty()) {
-                    //    printElementAndInnerTypes(INDENT + INDENT + INDENT + INDENT,
-                    //            "receiver", lambda.receiver);
-                    //}
-                    //printNumberedAmbigiousElements(INDENT + INDENT + INDENT,
-                    //        "parameter", lambda.parameters);
-                    //printRelativeElements(INDENT + INDENT + INDENT,
-                    //    "typecast", lambda.body.typecasts);
-                    //printRelativeElements(INDENT + INDENT + INDENT,
-                    //    "instanceof", lambda.body.instanceofs);
-                    //printRelativeElements(INDENT + INDENT + INDENT,
-                    //    "new", lambda.body.news);
-                    //printRelativeElements(INDENT + INDENT + INDENT,
-                    //    "typearg", lambda.body.refs);
-                    //printCalls(INDENT + INDENT + INDENT,
-                    //    "typearg", lambda.body.calls);
                 }
                 // throwsException field is not processed.  Why?
-                printASTInsertions(INDENT + INDENT,
+                printASTInsertions(indent2,
                         m.insertAnnotations, m.insertTypecasts);
             }
             pw.println();
