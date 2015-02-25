@@ -1,5 +1,6 @@
 package org.objectweb.asm.tree;
 
+import org.objectweb.asm.Handle;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
@@ -8,25 +9,55 @@ import org.objectweb.asm.Opcodes;
  */
 public class InvokeDynamicInsnNode extends AbstractInsnNode {
 
-  /**
-   * Index of call site specifier in the constant pool.
-   */
-  public int index;
+    /**
+     * Invokedynamic name.
+     */
+    public String name;
 
-  public InvokeDynamicInsnNode(int ix1, int ix2) {
-      this(((ix1 << 8) & 0xff) | (ix2 & 0xff));
-  }
+    /**
+     * Invokedynamic descriptor.
+     */
+    public String desc;
 
-  public InvokeDynamicInsnNode(int index) {
-      super(Opcodes.INVOKEDYNAMIC);
-      this.index = index;
-  }
+    /**
+     * Bootstrap method
+     */
+    public Handle bsm;
 
-  public void accept(final MethodVisitor mv) {
-      mv.visitInvokeDynamicInsn((index >> 8) & 0xff, index & 0xff);
-  }
+    /**
+     * Bootstrap constant arguments
+     */
+    public Object[] bsmArgs;
 
-  public int getType() {
-      return MULTIANEWARRAY_INSN;
-  }
+    /**
+     * Constructs a new {@link InvokeDynamicInsnNode}.
+     * 
+     * @param name
+     *            invokedynamic name.
+     * @param desc
+     *            invokedynamic descriptor (see {@link org.objectweb.asm.Type}).
+     * @param bsm
+     *            the bootstrap method.
+     * @param bsmArgs
+     *            the boostrap constant arguments.
+     */
+    public InvokeDynamicInsnNode(final String name, final String desc,
+            final Handle bsm, final Object... bsmArgs) {
+        super(Opcodes.INVOKEDYNAMIC);
+        this.name = name;
+        this.desc = desc;
+        this.bsm = bsm;
+        this.bsmArgs = bsmArgs;
+    }
+
+    @Override
+    public int getType() {
+        return INVOKE_DYNAMIC_INSN;
+    }
+
+    @Override
+    public void accept(final MethodVisitor mv) {
+        mv.visitInvokeDynamicInsn(name, desc, bsm, bsmArgs);
+        acceptAnnotations(mv);
+    }
 }

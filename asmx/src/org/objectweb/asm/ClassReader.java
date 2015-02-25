@@ -49,6 +49,67 @@ import java.util.List;
 public class ClassReader {
 
     /**
+     * True to enable signatures support.
+     */
+    static final boolean SIGNATURES = true;
+
+    /**
+     * True to enable annotations support.
+     */
+    static final boolean ANNOTATIONS = true;
+
+    /**
+     * True to enable stack map frames support.
+     */
+    static final boolean FRAMES = true;
+
+    /**
+     * True to enable bytecode writing support.
+     */
+    static final boolean WRITER = true;
+
+    /**
+     * True to enable JSR_W and GOTO_W support.
+     */
+    static final boolean RESIZE = true;
+
+    /**
+     * Flag to skip method code. If this class is set <code>CODE</code>
+     * attribute won't be visited. This can be used, for example, to retrieve
+     * annotations for methods and method parameters.
+     */
+    public static final int SKIP_CODE = 1;
+
+    /**
+     * Flag to skip the debug information in the class. If this flag is set the
+     * debug information of the class is not visited, i.e. the
+     * {@link MethodVisitor#visitLocalVariable visitLocalVariable} and
+     * {@link MethodVisitor#visitLineNumber visitLineNumber} methods will not be
+     * called.
+     */
+    public static final int SKIP_DEBUG = 2;
+
+    /**
+     * Flag to skip the stack map frames in the class. If this flag is set the
+     * stack map frames of the class is not visited, i.e. the
+     * {@link MethodVisitor#visitFrame visitFrame} method will not be called.
+     * This flag is useful when the {@link ClassWriter#COMPUTE_FRAMES} option is
+     * used: it avoids visiting frames that will be ignored and recomputed from
+     * scratch in the class writer.
+     */
+    public static final int SKIP_FRAMES = 4;
+
+    /**
+     * Flag to expand the stack map frames. By default stack map frames are
+     * visited in their original format (i.e. "expanded" for classes whose
+     * version is less than V1_6, and "compressed" for the other classes). If
+     * this flag is set, stack map frames are always visited in expanded format
+     * (this option adds a decompression/recompression step in ClassReader and
+     * ClassWriter which degrades performances quite a lot).
+     */
+    public static final int EXPAND_FRAMES = 8;
+
+    /**
      * The class to be parsed. <i>The content of this array must not be
      * modified. This field is intended for {@link Attribute} sub classes, and
      * is normally not needed by class generators or adapters.</i>
@@ -60,7 +121,7 @@ public class ClassReader {
      * The one byte offset skips the constant pool item tag that indicates its
      * type.
      */
-    private int[] items;
+    private final int[] items;
 
     /**
      * The String objects corresponding to the CONSTANT_Utf8 items. This cache
@@ -70,19 +131,24 @@ public class ClassReader {
      * would not be so great for these items (because they are much less
      * expensive to parse than CONSTANT_Utf8 items).
      */
-    private String[] strings;
+    private final String[] strings;
 
     /**
      * Maximum length of the strings contained in the constant pool of the
      * class.
      */
-    private int maxStringLength;
+    private final int maxStringLength;
 
     /**
      * Start index of the class header information (access, name...) in
      * {@link #b b}.
      */
     public final int header;
+
+    /**
+     * The start index of each bootstrap method.
+     */
+    int[] bootstrapMethods;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -142,6 +208,7 @@ public class ClassReader {
                     break;
                 // case ClassWriter.CLASS:
                 // case ClassWriter.STR:
+                // case ClassWriter.MTYPE
                 default:
                     size = 3;
                     break;
@@ -213,11 +280,29 @@ public class ClassReader {
                                 buf);
                     }
                     item.set(tag, s, null, null);
-                }
                     break;
-
+                }
+                case ClassWriter.HANDLE: {
+                    int fieldOrMethodRef = items[readUnsignedShort(index + 1)];
+                    nameType = items[readUnsignedShort(fieldOrMethodRef + 2)];
+                    item.set(ClassWriter.HANDLE_BASE + readByte(index),
+                            readClass(fieldOrMethodRef, buf),
+                            readUTF8(nameType, buf),
+                            readUTF8(nameType + 2, buf));
+                    break;
+                }
+                case ClassWriter.INDY:
+                    if (classWriter.bootstrapMethods == null) {
+                        copyBootstrapMethods(classWriter, items2, buf);
+                    }
+                    nameType = items[readUnsignedShort(index + 2)];
+                    item.set(readUTF8(nameType, buf),
+                            readUTF8(nameType + 2, buf),
+                            readUnsignedShort(index));
+                    break;
                 // case ClassWriter.STR:
                 // case ClassWriter.CLASS:
+                // case ClassWriter.MTYPE
                 default:
                     item.set(tag, readUTF8(index, buf), null, null);
                     break;
@@ -233,6 +318,52 @@ public class ClassReader {
         classWriter.items = items2;
         classWriter.threshold = (int) (0.75d * ll);
         classWriter.index = ll;
+    }
+
+    /**
+     * Copies the bootstrap method data into the given {@link ClassWriter}.
+     * Should be called before the {@link #accept(ClassVisitor,int)} method.
+     * 
+     * @param classWriter
+     *            the {@link ClassWriter} to copy bootstrap methods into.
+     */
+    private void copyBootstrapMethods(final ClassWriter classWriter,
+            final Item[] items, final char[] c) {
+        // finds the "BootstrapMethods" attribute
+        int u = getAttributes();
+        boolean found = false;
+        for (int i = readUnsignedShort(u); i > 0; --i) {
+            String attrName = readUTF8(u + 2, c);
+            if ("BootstrapMethods".equals(attrName)) {
+                found = true;
+                break;
+            }
+            u += 6 + readInt(u + 4);
+        }
+        if (!found) {
+            return;
+        }
+        // copies the bootstrap methods in the class writer
+        int boostrapMethodCount = readUnsignedShort(u + 8);
+        for (int j = 0, v = u + 10; j < boostrapMethodCount; j++) {
+            int position = v - u - 10;
+            int hashCode = readConst(readUnsignedShort(v), c).hashCode();
+            for (int k = readUnsignedShort(v + 2); k > 0; --k) {
+                hashCode ^= readConst(readUnsignedShort(v + 4), c).hashCode();
+                v += 2;
+            }
+            v += 4;
+            Item item = new Item(j);
+            item.set(position, hashCode & 0x7FFFFFFF);
+            int index = item.hashCode % items.length;
+            item.next = items[index];
+            items[index] = item;
+        }
+        int attrSize = readInt(u + 4);
+        ByteVector bootstrapMethods = new ByteVector(attrSize + 62);
+        bootstrapMethods.putByteArray(b, u + 10, attrSize - 2);
+        classWriter.bootstrapMethodsCount = boostrapMethodCount;
+        classWriter.bootstrapMethods = bootstrapMethods;
     }
 
     /**
@@ -281,8 +412,13 @@ public class ClassReader {
             }
             len += n;
             if (len == b.length) {
+                    int last = is.read();
+                    if (last < 0) {
+                        return b;
+                    }
                 byte[] c = new byte[b.length + 1000];
                 System.arraycopy(b, 0, c, 0, len);
+                c[len++] = (byte) last;
                 b = c;
             }
         }
@@ -427,6 +563,13 @@ public class ClassReader {
                 xanns = v + 6;
             } else if (attrName.equals("RuntimeInvisibleTypeAnnotations")) {
                 ixanns = v + 6;
+            } else if ("BootstrapMethods".equals(attrName)) {
+                int off = v + 8;
+                bootstrapMethods = new int[readUnsignedShort(v + 6)];
+                for (j = 0; j < bootstrapMethods.length; j++) {
+                    bootstrapMethods[j] = off;
+                    off += 2 + readUnsignedShort(off + 2) << 1;
+                }
             } else {
                 attr = readAttribute(attrs,
                         attrName,
@@ -1175,8 +1318,20 @@ public class ClassReader {
                             v += 3;
                             break;
                         case ClassWriter.INDY:
-                            mv.visitInvokeDynamicInsn(b[v + 1] & 0xFF,
-                                    b[v + 2]);
+                            cpIndex = items[readUnsignedShort(v + 1)];
+                            int bsmIndex = bootstrapMethods[readUnsignedShort(cpIndex)];
+                            Handle bsm = (Handle) readConst(readUnsignedShort(bsmIndex), c);
+                            int bsmArgCount = readUnsignedShort(bsmIndex + 2);
+                            Object[] bsmArgs = new Object[bsmArgCount];
+                            bsmIndex += 4;
+                            for (i = 0; i < bsmArgCount; i++) {
+                                bsmArgs[i] = readConst(readUnsignedShort(bsmIndex), c);
+                                bsmIndex += 2;
+                            }
+                            cpIndex = items[readUnsignedShort(cpIndex + 2)];
+                            iname = readUTF8(cpIndex, c);
+                            idesc = readUTF8(cpIndex + 2, c);
+                            mv.visitInvokeDynamicInsn(iname, idesc, bsm, bsmArgs);
                             v += 5;
                             break;
                         // case MANA_INSN:
@@ -1712,6 +1867,32 @@ public class ClassReader {
     }
 
     /**
+     * Returns the start index of the attribute_info structure of this class.
+     * 
+     * @return the start index of the attribute_info structure of this class.
+     */
+    private int getAttributes() {
+        // skips the header
+        int u = header + 8 + readUnsignedShort(header + 6) * 2;
+        // skips fields and methods
+        for (int i = readUnsignedShort(u); i > 0; --i) {
+            for (int j = readUnsignedShort(u + 8); j > 0; --j) {
+                u += 6 + readInt(u + 12);
+            }
+            u += 8;
+        }
+        u += 2;
+        for (int i = readUnsignedShort(u); i > 0; --i) {
+            for (int j = readUnsignedShort(u + 8); j > 0; --j) {
+                u += 6 + readInt(u + 12);
+            }
+            u += 8;
+        }
+        // the attribute_info structure starts just after the methods
+        return u + 2;
+    }
+
+    /**
      * Reads an attribute in {@link #b b}.
      *
      * @param attrs prototypes of the attributes that must be parsed during the
@@ -1947,9 +2128,19 @@ public class ClassReader {
             case ClassWriter.CLASS:
                 String s = readUTF8(index, buf);
                 return Type.getType(s.charAt(0) == '[' ? s : "L" + s + ";");
-            // case ClassWriter.STR:
-            default:
+            case ClassWriter.STR:
                 return readUTF8(index, buf);
+            case ClassWriter.MTYPE:
+                return Type.getMethodType(readUTF8(index, buf));
+            default: // case ClassWriter.HANDLE_BASE + [1..9]:
+                int tag = readByte(index);
+                int[] items = this.items;
+                int cpIndex = items[readUnsignedShort(index + 1)];
+                String owner = readClass(cpIndex, buf);
+                cpIndex = items[readUnsignedShort(cpIndex + 2)];
+                String name = readUTF8(cpIndex, buf);
+                String desc = readUTF8(cpIndex + 2, buf);
+                return new Handle(tag, owner, name, desc);
         }
     }
 }

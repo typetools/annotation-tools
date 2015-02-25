@@ -33,11 +33,13 @@ import java.util.HashMap;
 
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Attribute;
+import org.objectweb.asm.Handle;
 import org.objectweb.asm.TypeAnnotationVisitor;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
+import org.objectweb.asm.TypePath;
 import org.objectweb.asm.signature.SignatureReader;
 import org.objectweb.asm.util.attrs.Traceable;
 
@@ -273,6 +275,20 @@ public class TraceMethodVisitor extends TraceAbstractVisitor implements
         }
     }
 
+    @Override
+    public void visitInvokeDynamicInsn(String name, String desc, Handle bsm,
+        Object... bsmArgs) {
+      // TODO Auto-generated method stub
+      
+    }
+
+    @Override
+    public AnnotationVisitor visitInsnAnnotation(int typeRef,
+        TypePath typePath, String desc, boolean visible) {
+      // TODO Auto-generated method stub
+      return null;
+    }
+
     public void visitJumpInsn(final int opcode, final Label label) {
         buf.setLength(0);
         buf.append(tab2).append(OPCODES[opcode]).append(' ');
@@ -384,19 +400,6 @@ public class TraceMethodVisitor extends TraceAbstractVisitor implements
 
         if (mv != null) {
             mv.visitMultiANewArrayInsn(desc, dims);
-        }
-    }
-
-    @Override
-    public void visitInvokeDynamicInsn(int ix1, int ix2) {
-        buf.setLength(0);
-        buf.append(tab2).append("INVOKEDYNAMIC ");
-        buf.append(' ').append(ix1);
-        buf.append(' ').append(ix2).append('\n');
-        text.add(buf.toString());
-
-        if (mv != null) {
-            mv.visitInvokeDynamicInsn(ix1, ix2);
         }
     }
 
