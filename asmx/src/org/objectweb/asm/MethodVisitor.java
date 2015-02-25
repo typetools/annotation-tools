@@ -189,6 +189,25 @@ public interface MethodVisitor extends MemberVisitor {
     void visitMethodInsn(int opcode, String owner, String name, String desc);
 
     /**
+     * Visits an invokedynamic instruction.
+     * 
+     * @param name
+     *            the method's name.
+     * @param desc
+     *            the method's descriptor (see {@link Type Type}).
+     * @param bsm
+     *            the bootstrap method.
+     * @param bsmArgs
+     *            the bootstrap method constant arguments. Each argument must be
+     *            an {@link Integer}, {@link Float}, {@link Long},
+     *            {@link Double}, {@link String}, {@link Type} or {@link Handle}
+     *            value. This method is allowed to modify the content of the
+     *            array so a caller should expect that this array may change.
+     */
+    void visitInvokeDynamicInsn(String name, String desc, Handle bsm,
+            Object... bsmArgs);
+
+    /**
      * Visits a jump instruction. A jump instruction is an instruction that may
      * jump to another instruction.
      * 
@@ -262,7 +281,39 @@ public interface MethodVisitor extends MemberVisitor {
      */
     void visitMultiANewArrayInsn(String desc, int dims);
 
-    void visitInvokeDynamicInsn(int ix1, int ix2);
+    /**
+     * Visits an annotation on an instruction. This method must be called just
+     * <i>after</i> the annotated instruction. It can be called several times
+     * for the same instruction.
+     * 
+     * @param typeRef
+     *            a reference to the annotated type. The sort of this type
+     *            reference must be {@link TypeReference#INSTANCEOF INSTANCEOF},
+     *            {@link TypeReference#NEW NEW},
+     *            {@link TypeReference#CONSTRUCTOR_REFERENCE
+     *            CONSTRUCTOR_REFERENCE}, {@link TypeReference#METHOD_REFERENCE
+     *            METHOD_REFERENCE}, {@link TypeReference#CAST CAST},
+     *            {@link TypeReference#CONSTRUCTOR_INVOCATION_TYPE_ARGUMENT
+     *            CONSTRUCTOR_INVOCATION_TYPE_ARGUMENT},
+     *            {@link TypeReference#METHOD_INVOCATION_TYPE_ARGUMENT
+     *            METHOD_INVOCATION_TYPE_ARGUMENT},
+     *            {@link TypeReference#CONSTRUCTOR_REFERENCE_TYPE_ARGUMENT
+     *            CONSTRUCTOR_REFERENCE_TYPE_ARGUMENT}, or
+     *            {@link TypeReference#METHOD_REFERENCE_TYPE_ARGUMENT
+     *            METHOD_REFERENCE_TYPE_ARGUMENT}. See {@link TypeReference}.
+     * @param typePath
+     *            the path to the annotated type argument, wildcard bound, array
+     *            element type, or static inner type within 'typeRef'. May be
+     *            <tt>null</tt> if the annotation targets 'typeRef' as a whole.
+     * @param desc
+     *            the class descriptor of the annotation class.
+     * @param visible
+     *            <tt>true</tt> if the annotation is visible at runtime.
+     * @return a visitor to visit the annotation values, or <tt>null</tt> if
+     *         this visitor is not interested in visiting this annotation.
+     */
+    public AnnotationVisitor visitInsnAnnotation(int typeRef,
+            TypePath typePath, String desc, boolean visible);
 
     // -------------------------------------------------------------------------
     // Exceptions table entries, debug information,

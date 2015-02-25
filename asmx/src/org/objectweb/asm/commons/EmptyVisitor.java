@@ -32,11 +32,13 @@ package org.objectweb.asm.commons;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Attribute;
 import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.Handle;
 import org.objectweb.asm.TypeAnnotationVisitor;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.PrecompiledMethodVisitor;
+import org.objectweb.asm.TypePath;
 
 import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
 
@@ -162,6 +164,11 @@ public class EmptyVisitor implements
     {
     }
 
+    @Override
+    public void visitInvokeDynamicInsn(String name, String desc, Handle bsm,
+        Object... bsmArgs) {
+    }
+
     public void visitJumpInsn(int opcode, Label label) {
     }
 
@@ -189,6 +196,16 @@ public class EmptyVisitor implements
     }
 
     public void visitInvokeDynamicInsn(int a, int b) {
+    }
+
+    @Override
+    public AnnotationVisitor visitInsnAnnotation(
+        int typeRef,
+        TypePath typePath,
+        String desc,
+        boolean visible)
+    {
+        return this;
     }
 
     public void visitTryCatchBlock(

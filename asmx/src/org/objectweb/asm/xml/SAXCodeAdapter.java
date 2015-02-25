@@ -34,11 +34,13 @@ import java.util.Map;
 
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Attribute;
+import org.objectweb.asm.Handle;
 import org.objectweb.asm.TypeAnnotationVisitor;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
+import org.objectweb.asm.TypePath;
 import org.objectweb.asm.util.AbstractVisitor;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.helpers.AttributesImpl;
@@ -122,6 +124,27 @@ public final class SAXCodeAdapter extends SAXAdapter implements MethodVisitor {
         addElement(AbstractVisitor.OPCODES[opcode], attrs);
     }
 
+    @Override
+    public void visitInvokeDynamicInsn(String name, String desc, Handle bsm,
+            Object... bsmArgs) {
+        AttributesImpl attrs = new AttributesImpl();
+        attrs.addAttribute("", "name", "name", "", name);
+        attrs.addAttribute("", "desc", "desc", "", desc);
+        attrs.addAttribute("", "bsm", "bsm", "",
+                SAXClassAdapter.encode(bsm.toString()));
+        String o = AbstractVisitor.OPCODES[Opcodes.INVOKEDYNAMIC];
+        addStart(o, attrs);
+        for (int i = 0; i < bsmArgs.length; i++) {
+            AttributesImpl cattrs = new AttributesImpl();
+            cattrs.addAttribute("", "cst", "cst", "",
+                    SAXClassAdapter.encode(bsmArgs[i].toString()));
+            cattrs.addAttribute("", "desc", "desc", "",
+                    Type.getDescriptor(bsmArgs[i].getClass()));
+            addElement("bsmArg", cattrs);
+        }
+        addEnd(o);
+    }
+
     public final void visitJumpInsn(int opcode, Label label) {
         AttributesImpl attrs = new AttributesImpl();
         attrs.addAttribute("", "label", "label", "", getLabel(label));
@@ -199,14 +222,6 @@ public final class SAXCodeAdapter extends SAXAdapter implements MethodVisitor {
         attrs.addAttribute("", "desc", "desc", "", desc);
         attrs.addAttribute("", "dims", "dims", "", Integer.toString(dims));
         addElement(AbstractVisitor.OPCODES[Opcodes.MULTIANEWARRAY], attrs);
-    }
-
-    @Override
-    public void visitInvokeDynamicInsn(int ix1, int ix2) {
-        AttributesImpl attrs = new AttributesImpl();
-        attrs.addAttribute("", "dims", "dims", "", Integer.toString(ix1));
-        attrs.addAttribute("", "dims", "dims", "", Integer.toString(ix2));
-        addElement(AbstractVisitor.OPCODES[Opcodes.INVOKEDYNAMIC], attrs);
     }
 
     public final void visitTryCatchBlock(
@@ -323,6 +338,16 @@ public final class SAXCodeAdapter extends SAXAdapter implements MethodVisitor {
             labelNames.put(label, name);
         }
         return name;
+    }
+
+    @Override
+    public AnnotationVisitor visitInsnAnnotation(
+        int typeRef,
+        TypePath typePath,
+        String desc,
+        boolean visible)
+    {
+        return null;
     }
 
 }

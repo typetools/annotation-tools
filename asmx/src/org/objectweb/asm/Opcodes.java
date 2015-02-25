@@ -88,6 +88,18 @@ public interface Opcodes {
     int T_INT = 10;
     int T_LONG = 11;
 
+    // tags for Handle
+
+    int H_GETFIELD = 1;
+    int H_GETSTATIC = 2;
+    int H_PUTFIELD = 3;
+    int H_PUTSTATIC = 4;
+    int H_INVOKEVIRTUAL = 5;
+    int H_INVOKESTATIC = 6;
+    int H_INVOKESPECIAL = 7;
+    int H_NEWINVOKESPECIAL = 8;
+    int H_INVOKEINTERFACE = 9;
+
     // opcodes // visit method (- = idem)
 
     int NOP = 0; // visitInsn

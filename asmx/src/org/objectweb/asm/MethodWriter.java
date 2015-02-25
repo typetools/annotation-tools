@@ -223,6 +223,11 @@ class MethodWriter implements MethodVisitor {
     private ByteVector lineNumber;
 
     /**
+     * The start offset of the last visited instruction.
+     */
+    private int lastCodeOffset;
+
+    /**
      * The non standard attributes of the method's code.
      */
     private Attribute cattrs;
@@ -862,6 +867,52 @@ class MethodWriter implements MethodVisitor {
         }
     }
 
+    public void visitInvokeDynamicInsn(int ix1, int ix2) {
+        code.putByte(ix1);
+        code.putByte(ix2);
+    }
+
+    @Override
+    public void visitInvokeDynamicInsn(final String name, final String desc,
+            final Handle bsm, final Object... bsmArgs) {
+        lastCodeOffset = code.length;
+        Item i = cw.newInvokeDynamicItem(name, desc, bsm, bsmArgs);
+        int argSize = i.intVal;
+        // Label currentBlock = this.currentBlock;
+        if (currentBlock != null) {
+            //if (compute == FRAMES) {
+            //    currentBlock.frame.execute(Opcodes.INVOKEDYNAMIC, 0, cw, i);
+            //} else {
+            /*
+             * computes the stack size variation. In order not to recompute
+             * several times this variation for the same Item, we use the
+             * intVal field of this item to store this variation, once it
+             * has been computed. More precisely this intVal field stores
+             * the sizes of the arguments and of the return value
+             * corresponding to desc.
+             */
+            if (argSize == 0) {
+                // the above sizes have not been computed yet,
+                // so we compute them...
+                argSize = Type.getArgumentsAndReturnSizes(desc);
+                // ... and we save them in order
+                // not to recompute them in the future
+                i.intVal = argSize;
+            }
+            int size = stackSize - (argSize >> 2) + (argSize & 0x03) + 1;
+
+            // updates current and max stack sizes
+            if (size > maxStackSize) {
+                maxStackSize = size;
+            }
+            stackSize = size;
+            //}
+        }
+        // adds the instruction to the bytecode of the method
+        code.put12(Opcodes.INVOKEDYNAMIC, i.index);
+        code.putShort(0);
+    }
+
     public void visitJumpInsn(final int opcode, final Label label) {
         if (computeMaxs) {
             if (opcode == Opcodes.GOTO) {
@@ -1054,9 +1105,26 @@ class MethodWriter implements MethodVisitor {
         code.put12(Opcodes.MULTIANEWARRAY, cw.newClass(desc)).putByte(dims);
     }
 
-    public void visitInvokeDynamicInsn(int ix1, int ix2) {
-        code.putByte(ix1);
-        code.putByte(ix2);
+    @Override
+    public AnnotationVisitor visitInsnAnnotation(int typeRef,
+            TypePath typePath, String desc, boolean visible) {
+        ByteVector bv = new ByteVector();
+        // write target_type and target_info
+        typeRef = (typeRef & 0xFF0000FF) | (lastCodeOffset << 8);
+        // TODO: AnnotationWriter.putTarget(typeRef, typePath, bv);
+        // write type, and reserve space for values count
+        bv.putShort(cw.newUTF8(desc)).putShort(0);
+        AnnotationWriter aw = new AnnotationWriter(cw, true, bv, bv,
+                bv.length - 2);
+        // TODO: 
+        //if (visible) {
+        //    aw.next = ctanns;
+        //    ctanns = aw;
+        //} else {
+        //    aw.next = ictanns;
+        //    ictanns = aw;
+        //}
+        return aw;
     }
 
     public void visitTryCatchBlock(

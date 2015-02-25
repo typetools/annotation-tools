@@ -32,9 +32,11 @@ package org.objectweb.asm.util;
 import java.util.HashMap;
 
 import org.objectweb.asm.AnnotationVisitor;
+import org.objectweb.asm.Handle;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.TypePath;
 
 /**
  * A {@link MethodVisitor} that prints the ASM code that generates the methods
@@ -167,6 +169,20 @@ public class ASMifierMethodVisitor extends ASMifierAbstractVisitor implements
     }
 
     @Override
+    public void visitInvokeDynamicInsn(String name, String desc, Handle bsm,
+        Object... bsmArgs) {
+      // TODO Auto-generated method stub
+      
+    }
+
+    @Override
+    public AnnotationVisitor visitInsnAnnotation(int typeRef,
+        TypePath typePath, String desc, boolean visible) {
+      // TODO Auto-generated method stub
+      return null;
+    }
+
+    @Override
     public void visitJumpInsn(final int opcode, final Label label) {
         buf.setLength(0);
         declareLabel(label);
@@ -267,14 +283,6 @@ public class ASMifierMethodVisitor extends ASMifierAbstractVisitor implements
         buf.append("mv.visitMultiANewArrayInsn(");
         appendConstant(desc);
         buf.append(", ").append(dims).append(");\n");
-        text.add(buf.toString());
-    }
-
-    @Override
-    public void visitInvokeDynamicInsn(int ix1, int ix2) {
-        buf.setLength(0);
-        buf.append("mv.visitInvokeDynamicInsn(");
-        buf.append(ix1).append(", ").append(ix2).append(");\n");
         text.add(buf.toString());
     }
 

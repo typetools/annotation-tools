@@ -36,11 +36,13 @@ import java.util.List;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Attribute;
 import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.Handle;
 import org.objectweb.asm.TypeAnnotationVisitor;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
+import org.objectweb.asm.TypePath;
 
 /**
  * A node that represents a method.
@@ -274,6 +276,16 @@ public class MethodNode extends MemberNode implements MethodVisitor {
         instructions.add(new MethodInsnNode(opcode, owner, name, desc));
     }
 
+    @Override
+    public void visitInvokeDynamicInsn(
+        String name,
+        String desc,
+        Handle bsm,
+        Object... bsmArgs)
+    {
+        instructions.add(new InvokeDynamicInsnNode(name, desc, bsm, bsmArgs));
+    }
+
     public void visitJumpInsn(final int opcode, final Label label) {
         instructions.add(new JumpInsnNode(opcode, label));
     }
@@ -309,11 +321,6 @@ public class MethodNode extends MemberNode implements MethodVisitor {
 
     public void visitMultiANewArrayInsn(final String desc, final int dims) {
         instructions.add(new MultiANewArrayInsnNode(desc, dims));
-    }
-
-    @Override
-    public void visitInvokeDynamicInsn(int ix1, int ix2) {
-        instructions.add(new InvokeDynamicInsnNode(ix1, ix2));
     }
 
     public void visitTryCatchBlock(
@@ -450,5 +457,12 @@ public class MethodNode extends MemberNode implements MethodVisitor {
             mv.visitMaxs(maxStack, maxLocals);
         }
         mv.visitEnd();
+    }
+
+    @Override
+    public AnnotationVisitor visitInsnAnnotation(int typeRef,
+        TypePath typePath, String desc, boolean visible) {
+      // TODO Auto-generated method stub
+      return null;
     }
 }
