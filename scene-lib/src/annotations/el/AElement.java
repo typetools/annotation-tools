@@ -63,9 +63,6 @@ public class AElement {
     /** The type of a field or a method parameter */
     public final ATypeElement type; // initialized in constructor
 
-    /** Runtime type arguments of a member reference or (static) invocation */
-    public final VivifyingMap<RelativeLocation, ATypeElement> typeargs;
-
     public Annotation lookup(String name) {
         for (Annotation anno : tlAnnotationsHere) {
             if (anno.def.name.equals(name)) {
@@ -86,7 +83,6 @@ public class AElement {
         tlAnnotationsHere = new LinkedHashSet<Annotation>();
         this.description = description;
         type = hasType ? new ATypeElement("type of " + description) : null;
-        typeargs = ATypeElement.<RelativeLocation>newVivifyingLHMap_ATE();
     }
 
     /**
@@ -133,8 +129,7 @@ public class AElement {
     final boolean equalsElement(/*>>> @ReadOnly AElement this, */
             /*@ReadOnly*/ AElement o) {
         return o.tlAnnotationsHere.equals(tlAnnotationsHere)
-            && (o.type == null ? type == null : o.type.equals(type))
-            && o.typeargs.equals(typeargs);
+            && (o.type == null ? type == null : o.type.equals(type));
     }
 
     /**
@@ -143,7 +138,7 @@ public class AElement {
     @Override
     public int hashCode(/*>>> @ReadOnly AElement this*/) {
         return getClass().getName().hashCode() + tlAnnotationsHere.hashCode()
-            + typeargs.hashCode() + (type == null ? 0 : type.hashCode());
+            + (type == null ? 0 : type.hashCode());
     }
 
     /**
@@ -154,7 +149,6 @@ public class AElement {
     // we should prune everything even if the first subelement is nonempty.
     public boolean prune() {
         return tlAnnotationsHere.isEmpty()
-            & typeargs.prune()
             & (type == null || type.prune());
     }
 

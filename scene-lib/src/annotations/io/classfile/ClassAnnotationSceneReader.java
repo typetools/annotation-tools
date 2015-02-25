@@ -11,6 +11,7 @@ import java.io.File;
 import java.util.*;
 
 import org.objectweb.asm.AnnotationVisitor;
+import org.objectweb.asm.Label;
 import org.objectweb.asm.TypeAnnotationVisitor;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
@@ -56,7 +57,7 @@ extends EmptyVisitor {
   //  and inserts the annotations correctly into the specified AElement
 
   // Whether to output tracing information
-  private static final boolean trace = false;
+  private static final boolean trace = true;
 
   // Whether to output error messages for unsupported cases
   private static final boolean strict = false;
@@ -132,7 +133,7 @@ extends EmptyVisitor {
       String signature,
       Object value  ) {
     if (trace) { System.out.printf("visitField(%s, %s, %s, %s, %s) in %s (%s)%n", access, name, desc, signature, value, this, this.getClass()); }
-    AElement aField = aClass.fields.vivify(name);
+    AField aField = aClass.fields.vivify(name);
     return new FieldAnnotationSceneReader(name, desc, signature, value, aField);
   }
 
@@ -572,11 +573,17 @@ extends EmptyVisitor {
         case THROWS:
           handleThrows((AMethod) aElement);
           break;
-        case CONSTRUCTOR_INVOCATION_TYPE_ARGUMENT:
-          handleNewTypeArgument((AMethod) aElement);
+        case CONSTRUCTOR_REFERENCE:  // TODO
+        case METHOD_REFERENCE:
+          handleMethodReference((AMethod) aElement);
           break;
+        case CONSTRUCTOR_REFERENCE_TYPE_ARGUMENT:  // TODO
+        case METHOD_REFERENCE_TYPE_ARGUMENT:
+          handleReferenceTypeArgument((AMethod) aElement);
+          break;
+        case CONSTRUCTOR_INVOCATION_TYPE_ARGUMENT:  // TODO
         case METHOD_INVOCATION_TYPE_ARGUMENT:
-          handleMethodInvocationTypeArgument((AMethod) aElement);
+          handleCallTypeArgument((AMethod) aElement);
           break;
         case METHOD_TYPE_PARAMETER:
           handleMethodTypeParameter((AMethod) aElement);
@@ -654,7 +661,7 @@ extends EmptyVisitor {
       if (needTypeIndex) {
         typeIndex = xTypeIndexArgs.get(0);
       } else {
-        typeIndex = 0;
+        typeIndex = -1;
       }
       return RelativeLocation.createOffset(xOffsetArgs.get(0), typeIndex);
     }
@@ -894,15 +901,37 @@ extends EmptyVisitor {
       }
     }
 
-    private void handleMethodInvocationTypeArgument(AMethod aMethod) {
-//      if (xLocationsArgs.isEmpty()) {
-//        aMethod.body.methodcalls.vivify(makeOffset(false))
-//            .tlAnnotationsHere.add(makeAnnotation());
-//      } else {
-//        aMethod.body.methodcalls.vivify(makeOffset(false))
-//            .innerTypes.vivify(makeInnerTypeLocation())
-//            .tlAnnotationsHere.add(makeAnnotation());
-//      }
+    private void handleMethodReference(AMethod aMethod) {
+      if (xLocationsArgs.isEmpty()) {
+        aMethod.body.refs.vivify(makeOffset(false))
+            .tlAnnotationsHere.add(makeAnnotation());
+      } else {
+        aMethod.body.refs.vivify(makeOffset(false))
+            .innerTypes.vivify(makeInnerTypeLocation())
+            .tlAnnotationsHere.add(makeAnnotation());
+      }
+    }
+
+    private void handleReferenceTypeArgument(AMethod aMethod) {
+      if (xLocationsArgs.isEmpty()) {
+        aMethod.body.refs.vivify(makeOffset(true))
+            .tlAnnotationsHere.add(makeAnnotation());
+      } else {
+        aMethod.body.refs.vivify(makeOffset(true))
+            .innerTypes.vivify(makeInnerTypeLocation())
+            .tlAnnotationsHere.add(makeAnnotation());
+      }
+    }
+
+    private void handleCallTypeArgument(AMethod aMethod) {
+      if (xLocationsArgs.isEmpty()) {
+        aMethod.body.calls.vivify(makeOffset(true))
+            .tlAnnotationsHere.add(makeAnnotation());
+      } else {
+        aMethod.body.calls.vivify(makeOffset(true))
+            .innerTypes.vivify(makeInnerTypeLocation())
+            .tlAnnotationsHere.add(makeAnnotation());
+      }
     }
 
     private void handleMethodTypeParameter(AMethod aMethod) {
@@ -1155,6 +1184,12 @@ extends EmptyVisitor {
       if (trace) { System.out.printf("visitParameterAnnotation(%s, %s, %s) in %s (%s)%n", parameter, desc, visible, this, this.getClass()); }
       return new AnnotationSceneReader(desc, visible,
               ((AMethod) aMethod).parameters.vivify(parameter));
+    }
+
+    @Override
+    public void visitLocalVariable(String name, String desc, String signature,
+        Label start, Label end, int index) {
+      // TODO!
     }
 
   }

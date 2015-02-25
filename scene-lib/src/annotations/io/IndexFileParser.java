@@ -758,8 +758,8 @@ public final class IndexFileParser {
             parseInnerTypes(f.type);
         }
 
-        AExpression fieldinit = c.fieldInits.vivify(name);
-        parseExpression(fieldinit);
+        f.init = c.fieldInits.vivify(name);
+        parseExpression(f.init);
         parseASTInsertions(f);
     }
 
@@ -815,11 +815,11 @@ public final class IndexFileParser {
         }
 
         AMethod m = c.methods.vivify(key);
+        parseAnnotations(m);
         parseMethod(m);
     }
 
     private void parseMethod(AMethod m) throws IOException, ParseException {
-        parseAnnotations(m);
         parseBounds(m.bounds);
 
         // Permit return value, receiver, and parameters in any order.
@@ -979,39 +979,57 @@ public final class IndexFileParser {
                 matchKeyword("call");
                 matched = true;
                 evermatched = true;
-                RelativeLocation loc;
-                if (checkChar('#')) {
-                    expectChar('#');
-                    int offset = expectNonNegative(matchNNInteger());
-                    loc = RelativeLocation.createOffset(offset, 0);
-                } else {
-                    expectChar('*');
-                    int index = expectNonNegative(matchNNInteger());
-                    loc = RelativeLocation.createIndex(index, 0);
-                }
-                AElement n = exp.calls.vivify(loc);
+                int i;
+                boolean isOffset = checkChar('#');
+                expectChar(isOffset ? '#' : '*');
+                i = expectNonNegative(matchNNInteger());
                 expectChar(':');
-                parseTypeArgument(n);
+                while (checkKeyword("typearg")) {
+                    matchKeyword("typearg");
+                    if (checkChar('#')) { matchChar('#'); }
+                    int type_index = expectNonNegative(matchNNInteger());
+                    RelativeLocation loc = isOffset
+                            ? RelativeLocation.createOffset(i, type_index)
+                            : RelativeLocation.createIndex(i, type_index);
+                    ATypeElement t = exp.calls.vivify(loc);
+                    expectChar(':');
+                    parseAnnotations(t);
+                    parseInnerTypes(t);
+                }
             }
             while (checkKeyword("reference")) {
-              matchKeyword("reference");
-              matched = true;
-              evermatched = true;
-              RelativeLocation loc;
-              if (checkChar('#')) {
-                  expectChar('#');
-                  int offset = expectNonNegative(matchNNInteger());
-                  loc = RelativeLocation.createOffset(offset, 0);
-              } else {
-                  expectChar('*');
-                  int index = expectNonNegative(matchNNInteger());
-                  loc = RelativeLocation.createIndex(index, 0);
-              }
-              ATypeElement n = exp.refs.vivify(loc);
-              expectChar(':');
-              parseAnnotations(n);
-              parseInnerTypes(n);
-              parseTypeArgument(n);
+                matchKeyword("reference");
+                matched = true;
+                evermatched = true;
+                ATypeElement t;
+                RelativeLocation loc;
+                int i;
+                boolean isOffset = checkChar('#');
+                if (isOffset) {
+                    expectChar('#');
+                    i = expectNonNegative(matchNNInteger());
+                    loc = RelativeLocation.createOffset(i, -1);
+                } else {
+                    expectChar('*');
+                    i = expectNonNegative(matchNNInteger());
+                    loc = RelativeLocation.createIndex(i, -1);
+                }
+                expectChar(':');
+                t = exp.refs.vivify(loc);
+                parseAnnotations(t);
+                parseInnerTypes(t);
+                while (checkKeyword("typearg")) {
+                    matchKeyword("typearg");
+                    if (checkChar('#')) { matchChar('#'); }
+                    int type_index = expectNonNegative(matchNNInteger());
+                    loc = isOffset
+                        ? RelativeLocation.createOffset(i, type_index)
+                        : RelativeLocation.createIndex(i, type_index);
+                    t = exp.refs.vivify(loc);
+                    expectChar(':');
+                    parseAnnotations(t);
+                    parseInnerTypes(t);
+                }
             }
             while (checkKeyword("lambda")) {
                 matchKeyword("lambda");
@@ -1043,21 +1061,6 @@ public final class IndexFileParser {
             }
         }
         return evermatched;
-    }
-
-    private void parseTypeArgument(AElement elem) throws IOException,
-        ParseException {
-      while (checkKeyword("typearg")) {
-        expectKeyword("typearg");
-        // make "#" optional
-        if (checkChar('#')) { matchChar('#'); }
-        int idx = expectNonNegative(matchNNInteger());
-        RelativeLocation loc = RelativeLocation.createIndex(idx, 0);
-        ATypeElement n = elem.typeargs.vivify(loc);
-        expectChar(':');
-        parseAnnotations(n);
-        parseInnerTypes(n);
-      }
     }
 
     private static boolean isTypeSelector(String selector) {
@@ -1563,6 +1566,7 @@ public final class IndexFileParser {
         // argggh!!! stupid default needs to be overridden! see java bug 4217680
         st.ordinaryChar('/');
 
+        // for "type-argument"
         st.wordChars('-', '-');
 
         // java identifiers can contain numbers, _, and $

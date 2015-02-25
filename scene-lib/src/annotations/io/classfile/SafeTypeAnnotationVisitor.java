@@ -338,6 +338,9 @@ implements TypeAnnotationVisitor {
       checkListSize(0, 0, c, 1, 0, 0, 1, 1, 0,
       "Invalid method type parameter bound annotation:");
       break;
+    //TODO:
+    //case CONSTRUCTOR_INVOCATION_TYPE_ARGUMENT:
+    //case METHOD_INVOCATION_TYPE_ARGUMENT:
     case CLASS_EXTENDS:
       checkListSize(0, 0, c, 1, 0, 0, 0, 0, 1,
       "Invalid class extends/implements annotation:");
