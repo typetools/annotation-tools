@@ -625,7 +625,7 @@ public class IndexFileSpecification implements Specification {
       AElement var = entry.getValue();
       CriterionList varClist = clist.add(Criteria.local(methodName, loc));
       // parse declaration annotations
-      parseElement(varClist, var);  // TODO: _?_
+      parseElement(varClist, var);
       parseInnerAndOuterElements(varClist, var.type);
     }
 
@@ -660,34 +660,17 @@ public class IndexFileSpecification implements Specification {
     // parse member references of method
     for (Entry<RelativeLocation, ATypeElement> entry : exp.refs.entrySet()) {
       RelativeLocation loc = entry.getKey();
-      ATypeElement ref = entry.getValue();
-      CriterionList refClist = clist.add(Criteria.memberReference(methodName, loc));
-      parseInnerAndOuterElements(refClist, ref);
-      if (ref.typeargs != null) {
-        for (Entry<RelativeLocation, ATypeElement> te :
-            ref.typeargs.entrySet()) {
-          ATypeElement typearg = te.getValue();
-          CriterionList typeArgClist = refClist.add(
-              Criteria.typeArgument(methodName, te.getKey()));
-          parseInnerAndOuterElements(typeArgClist, typearg);
-        }
-      }
+      ATypeElement instanceOf = entry.getValue();
+      CriterionList instanceOfClist = clist.add(Criteria.instanceOf(methodName, loc));
+      parseInnerAndOuterElements(instanceOfClist, instanceOf);
     }
 
     // parse method invocations of method
-    for (Entry<RelativeLocation, AElement> entry : exp.calls.entrySet()) {
+    for (Entry<RelativeLocation, ATypeElement> entry : exp.calls.entrySet()) {
       RelativeLocation loc = entry.getKey();
-      AElement call = entry.getValue();
-      CriterionList callClist = clist.add(Criteria.methodCall(methodName, loc));
-      if (call.typeargs != null) {
-        for (Entry<RelativeLocation, ATypeElement> te :
-            call.typeargs.entrySet()) {
-          ATypeElement typearg = te.getValue();
-          CriterionList typeArgClist = callClist.add(
-              Criteria.typeArgument(methodName, te.getKey()));
-          parseInnerAndOuterElements(typeArgClist, typearg);
-        }
-      }
+      ATypeElement instanceOf = entry.getValue();
+      CriterionList instanceOfClist = clist.add(Criteria.instanceOf(methodName, loc));
+      parseInnerAndOuterElements(instanceOfClist, instanceOf);
     }
 
     // parse lambda expressions of method
