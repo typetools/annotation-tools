@@ -29,6 +29,8 @@
  */
 package org.objectweb.asm.tree;
 
+import java.util.List;
+
 import org.objectweb.asm.MethodVisitor;
 
 /**
@@ -41,72 +43,109 @@ public abstract class AbstractInsnNode {
     /**
      * The type of {@link InsnNode} instructions.
      */
-    public final static int INSN = 0;
+    public static final int INSN = 0;
 
     /**
      * The type of {@link IntInsnNode} instructions.
      */
-    public final static int INT_INSN = 1;
+    public static final int INT_INSN = 1;
 
     /**
      * The type of {@link VarInsnNode} instructions.
      */
-    public final static int VAR_INSN = 2;
+    public static final int VAR_INSN = 2;
 
     /**
      * The type of {@link TypeInsnNode} instructions.
      */
-    public final static int TYPE_INSN = 3;
+    public static final int TYPE_INSN = 3;
 
     /**
      * The type of {@link FieldInsnNode} instructions.
      */
-    public final static int FIELD_INSN = 4;
+    public static final int FIELD_INSN = 4;
 
     /**
      * The type of {@link MethodInsnNode} instructions.
      */
-    public final static int METHOD_INSN = 5;
+    public static final int METHOD_INSN = 5;
+
+    /**
+     * The type of {@link InvokeDynamicInsnNode} instructions.
+     */
+    public static final int INVOKE_DYNAMIC_INSN = 6;
 
     /**
      * The type of {@link JumpInsnNode} instructions.
      */
-    public final static int JUMP_INSN = 6;
+    public static final int JUMP_INSN = 7;
 
     /**
      * The type of {@link LabelNode} "instructions".
      */
-    public final static int LABEL = 7;
+    public static final int LABEL = 8;
 
     /**
      * The type of {@link LdcInsnNode} instructions.
      */
-    public final static int LDC_INSN = 8;
+    public static final int LDC_INSN = 9;
 
     /**
      * The type of {@link IincInsnNode} instructions.
      */
-    public final static int IINC_INSN = 9;
+    public static final int IINC_INSN = 10;
 
     /**
      * The type of {@link TableSwitchInsnNode} instructions.
      */
-    public final static int TABLESWITCH_INSN = 10;
+    public static final int TABLESWITCH_INSN = 11;
 
     /**
      * The type of {@link LookupSwitchInsnNode} instructions.
      */
-    public final static int LOOKUPSWITCH_INSN = 11;
+    public static final int LOOKUPSWITCH_INSN = 12;
 
     /**
      * The type of {@link MultiANewArrayInsnNode} instructions.
      */
-    public final static int MULTIANEWARRAY_INSN = 12;
+    public static final int MULTIANEWARRAY_INSN = 13;
+
+    /**
+     * The type of {@link FrameNode} "instructions".
+     */
+    public static final int FRAME = 14;
+
+    /**
+     * The type of {@link LineNumberNode} "instructions".
+     */
+    public static final int LINE = 15;
 
     /**
      * The opcode of this instruction.
      */
     protected int opcode;
+
+    /**
+     * The runtime visible type annotations of this instruction. This field is
+     * only used for real instructions (i.e. not for labels, frames, or line
+     * number nodes). This list is a list of {@link TypeAnnotationNode} objects.
+     * May be <tt>null</tt>.
+     * 
+     * @associates org.objectweb.asm.tree.TypeAnnotationNode
+     * @label visible
+     */
+    public List<TypeAnnotationNode> visibleTypeAnnotations;
+
+    /**
+     * The runtime invisible type annotations of this instruction. This field is
+     * only used for real instructions (i.e. not for labels, frames, or line
+     * number nodes). This list is a list of {@link TypeAnnotationNode} objects.
+     * May be <tt>null</tt>.
+     * 
+     * @associates org.objectweb.asm.tree.TypeAnnotationNode
+     * @label invisible
+     */
+    public List<TypeAnnotationNode> invisibleTypeAnnotations;
 
     /**
      * Constructs a new {@link AbstractInsnNode}.
@@ -140,4 +179,28 @@ public abstract class AbstractInsnNode {
      * @param cv a code visitor.
      */
     public abstract void accept(final MethodVisitor cv);
+
+    /**
+     * Makes the given visitor visit the annotations of this instruction.
+     * 
+     * @param mv
+     *            a method visitor.
+     */
+    protected final void acceptAnnotations(final MethodVisitor mv) {
+        // TODO: needed?
+        //int n = visibleTypeAnnotations == null ? 0 : visibleTypeAnnotations
+        //        .size();
+        //for (int i = 0; i < n; ++i) {
+        //    TypeAnnotationNode an = visibleTypeAnnotations.get(i);
+        //    an.accept(mv.visitInsnAnnotation(an.typeRef, an.typePath, an.desc,
+        //            true));
+        //}
+        //n = invisibleTypeAnnotations == null ? 0 : invisibleTypeAnnotations
+        //        .size();
+        //for (int i = 0; i < n; ++i) {
+        //    TypeAnnotationNode an = invisibleTypeAnnotations.get(i);
+        //    an.accept(mv.visitInsnAnnotation(an.typeRef, an.typePath, an.desc,
+        //            false));
+        //}
+    }
 }

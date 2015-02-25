@@ -281,6 +281,11 @@ public class ClassWriter implements ClassVisitor {
     Item key3;
 
     /**
+     * A reusable key used to look for items in the hash {@link #items items}.
+     */
+    Item key4;
+
+    /**
      * The access flags of this class.
      */
     private int access;
@@ -365,6 +370,16 @@ public class ClassWriter implements ClassVisitor {
      * The InnerClasses attribute.
      */
     private ByteVector innerClasses;
+
+    /**
+     * The number of entries in the BootstrapMethods attribute.
+     */
+    int bootstrapMethodsCount;
+
+    /**
+     * The BootstrapMethods attribute.
+     */
+    ByteVector bootstrapMethods;
 
     /**
      * The fields of this class. These fields are stored in a linked list of
@@ -538,6 +553,7 @@ public class ClassWriter implements ClassVisitor {
         key = new Item();
         key2 = new Item();
         key3 = new Item();
+        key4 = new Item();
         this.computeMaxs = computeMaxs;
     }
 
@@ -904,10 +920,11 @@ public class ClassWriter implements ClassVisitor {
      * Adds a number or string constant to the constant pool of the class being
      * build. Does nothing if the constant pool already contains a similar item.
      * 
-     * @param cst the value of the constant to be added to the constant pool.
-     *        This parameter must be an {@link Integer}, a {@link Float}, a
-     *        {@link Long}, a {@link Double}, a {@link String} or a
-     *        {@link Type}.
+     * @param cst
+     *            the value of the constant to be added to the constant pool.
+     *            This parameter must be an {@link Integer}, a {@link Float}, a
+     *            {@link Long}, a {@link Double}, a {@link String} or a
+     *            {@link Type}.
      * @return a new or already existing constant item with the given value.
      */
     Item newConstItem(final Object cst) {
@@ -939,9 +956,17 @@ public class ClassWriter implements ClassVisitor {
             return newString((String) cst);
         } else if (cst instanceof Type) {
             Type t = (Type) cst;
-            return newClassItem(t.getSort() == Type.OBJECT
-                    ? t.getInternalName()
-                    : t.getDescriptor());
+            int s = t.getSort();
+            if (s == Type.OBJECT) {
+                return newClassItem(t.getInternalName());
+            } else if (s == Type.METHOD) {
+                return newMethodTypeItem(t.getDescriptor());
+            } else { // s == primitive type or array
+                return newClassItem(t.getDescriptor());
+            }
+        } else if (cst instanceof Handle) {
+            Handle h = (Handle) cst;
+            return newHandleItem(h.tag, h.owner, h.name, h.desc);
         } else {
             throw new IllegalArgumentException("value " + cst);
         }
@@ -1011,6 +1036,195 @@ public class ClassWriter implements ClassVisitor {
         if (result == null) {
             pool.put12(CLASS, newUTF8(value));
             result = new Item(index++, key2);
+            put(result);
+        }
+        return result;
+    }
+
+    /**
+     * Adds a method type reference to the constant pool of the class being
+     * build. Does nothing if the constant pool already contains a similar item.
+     * <i>This method is intended for {@link Attribute} sub classes, and is
+     * normally not needed by class generators or adapters.</i>
+     * 
+     * @param methodDesc
+     *            method descriptor of the method type.
+     * @return a new or already existing method type reference item.
+     */
+    Item newMethodTypeItem(final String methodDesc) {
+        key2.set(MTYPE, methodDesc, null, null);
+        Item result = get(key2);
+        if (result == null) {
+            pool.put12(MTYPE, newUTF8(methodDesc));
+            result = new Item(index++, key2);
+            put(result);
+        }
+        return result;
+    }
+
+    /**
+     * Adds a method type reference to the constant pool of the class being
+     * build. Does nothing if the constant pool already contains a similar item.
+     * <i>This method is intended for {@link Attribute} sub classes, and is
+     * normally not needed by class generators or adapters.</i>
+     * 
+     * @param methodDesc
+     *            method descriptor of the method type.
+     * @return the index of a new or already existing method type reference
+     *         item.
+     */
+    public int newMethodType(final String methodDesc) {
+        return newMethodTypeItem(methodDesc).index;
+    }
+
+    /**
+     * Adds a handle to the constant pool of the class being build. Does nothing
+     * if the constant pool already contains a similar item. <i>This method is
+     * intended for {@link Attribute} sub classes, and is normally not needed by
+     * class generators or adapters.</i>
+     * 
+     * @param tag
+     *            the kind of this handle. Must be {@link Opcodes#H_GETFIELD},
+     *            {@link Opcodes#H_GETSTATIC}, {@link Opcodes#H_PUTFIELD},
+     *            {@link Opcodes#H_PUTSTATIC}, {@link Opcodes#H_INVOKEVIRTUAL},
+     *            {@link Opcodes#H_INVOKESTATIC},
+     *            {@link Opcodes#H_INVOKESPECIAL},
+     *            {@link Opcodes#H_NEWINVOKESPECIAL} or
+     *            {@link Opcodes#H_INVOKEINTERFACE}.
+     * @param owner
+     *            the internal name of the field or method owner class.
+     * @param name
+     *            the name of the field or method.
+     * @param desc
+     *            the descriptor of the field or method.
+     * @return a new or an already existing method type reference item.
+     */
+    Item newHandleItem(final int tag, final String owner, final String name,
+            final String desc) {
+        key4.set(HANDLE_BASE + tag, owner, name, desc);
+        Item result = get(key4);
+        if (result == null) {
+            if (tag <= Opcodes.H_PUTSTATIC) {
+                put112(HANDLE, tag, newField(owner, name, desc));
+            } else {
+                put112(HANDLE,
+                        tag,
+                        newMethod(owner, name, desc,
+                                tag == Opcodes.H_INVOKEINTERFACE));
+            }
+            result = new Item(index++, key4);
+            put(result);
+        }
+        return result;
+    }
+
+    /**
+     * Adds a handle to the constant pool of the class being build. Does nothing
+     * if the constant pool already contains a similar item. <i>This method is
+     * intended for {@link Attribute} sub classes, and is normally not needed by
+     * class generators or adapters.</i>
+     * 
+     * @param tag
+     *            the kind of this handle. Must be {@link Opcodes#H_GETFIELD},
+     *            {@link Opcodes#H_GETSTATIC}, {@link Opcodes#H_PUTFIELD},
+     *            {@link Opcodes#H_PUTSTATIC}, {@link Opcodes#H_INVOKEVIRTUAL},
+     *            {@link Opcodes#H_INVOKESTATIC},
+     *            {@link Opcodes#H_INVOKESPECIAL},
+     *            {@link Opcodes#H_NEWINVOKESPECIAL} or
+     *            {@link Opcodes#H_INVOKEINTERFACE}.
+     * @param owner
+     *            the internal name of the field or method owner class.
+     * @param name
+     *            the name of the field or method.
+     * @param desc
+     *            the descriptor of the field or method.
+     * @return the index of a new or already existing method type reference
+     *         item.
+     */
+    public int newHandle(final int tag, final String owner, final String name,
+            final String desc) {
+        return newHandleItem(tag, owner, name, desc).index;
+    }
+
+    /**
+     * Adds an invokedynamic reference to the constant pool of the class being
+     * build. Does nothing if the constant pool already contains a similar item.
+     * <i>This method is intended for {@link Attribute} sub classes, and is
+     * normally not needed by class generators or adapters.</i>
+     * 
+     * @param name
+     *            name of the invoked method.
+     * @param desc
+     *            descriptor of the invoke method.
+     * @param bsm
+     *            the bootstrap method.
+     * @param bsmArgs
+     *            the bootstrap method constant arguments.
+     * 
+     * @return a new or an already existing invokedynamic type reference item.
+     */
+    Item newInvokeDynamicItem(final String name, final String desc,
+            final Handle bsm, final Object... bsmArgs) {
+        // cache for performance
+        ByteVector bootstrapMethods = this.bootstrapMethods;
+        if (bootstrapMethods == null) {
+            bootstrapMethods = this.bootstrapMethods = new ByteVector();
+        }
+
+        int position = bootstrapMethods.length; // record current position
+
+        int hashCode = bsm.hashCode();
+        bootstrapMethods.putShort(newHandle(bsm.tag, bsm.owner, bsm.name,
+                bsm.desc));
+
+        int argsLength = bsmArgs.length;
+        bootstrapMethods.putShort(argsLength);
+
+        for (int i = 0; i < argsLength; i++) {
+            Object bsmArg = bsmArgs[i];
+            hashCode ^= bsmArg.hashCode();
+            bootstrapMethods.putShort(newConst(bsmArg));
+        }
+
+        byte[] data = bootstrapMethods.data;
+        int length = (1 + 1 + argsLength) << 1; // (bsm + argCount + arguments)
+        hashCode &= 0x7FFFFFFF;
+        Item result = items[hashCode % items.length];
+        loop: while (result != null) {
+            if (result.type != BSM || result.hashCode != hashCode) {
+                result = result.next;
+                continue;
+            }
+
+            // because the data encode the size of the argument
+            // we don't need to test if these size are equals
+            int resultPosition = result.intVal;
+            for (int p = 0; p < length; p++) {
+                if (data[position + p] != data[resultPosition + p]) {
+                    result = result.next;
+                    continue loop;
+                }
+            }
+            break;
+        }
+
+        int bootstrapMethodIndex;
+        if (result != null) {
+            bootstrapMethodIndex = result.index;
+            bootstrapMethods.length = position; // revert to old position
+        } else {
+            bootstrapMethodIndex = bootstrapMethodsCount++;
+            result = new Item(bootstrapMethodIndex);
+            result.set(position, hashCode);
+            put(result);
+        }
+
+        // now, create the InvokeDynamic constant
+        key3.set(name, desc, bootstrapMethodIndex);
+        result = get(key3);
+        if (result == null) {
+            put122(INDY, bootstrapMethodIndex, newNameType(name, desc));
+            result = new Item(index++, key3);
             put(result);
         }
         return result;
@@ -1243,6 +1457,17 @@ public class ClassWriter implements ClassVisitor {
         int index = i.hashCode % items.length;
         i.next = items[index];
         items[index] = i;
+    }
+
+    /**
+     * Puts two bytes and one short into the constant pool.
+     * 
+     * @param b a byte.
+     * @param s1 a short.
+     * @param s2 another short.
+     */
+    private void put112(final int b1, final int b2, final int s) {
+        pool.put11(b1, b2).putShort(s);
     }
 
     /**

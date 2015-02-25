@@ -123,6 +123,16 @@ public class MethodAdapter implements MethodVisitor {
         mv.visitMethodInsn(opcode, owner, name, desc);
     }
 
+    @Override
+    public void visitInvokeDynamicInsn(
+        final String name,
+        final String desc,
+        final Handle bsm,
+        final Object... bsmArgs)
+    {
+        mv.visitInvokeDynamicInsn(name, desc, bsm, bsmArgs);
+    }
+
     public void visitJumpInsn(final int opcode, final Label label) {
         mv.visitJumpInsn(opcode, label);
     }
@@ -160,8 +170,14 @@ public class MethodAdapter implements MethodVisitor {
         mv.visitMultiANewArrayInsn(desc, dims);
     }
 
-    public void visitInvokeDynamicInsn(int ix1, int ix2) {
-        mv.visitInvokeDynamicInsn(ix1, ix2);
+    @Override
+    public AnnotationVisitor visitInsnAnnotation(
+        int typeRef,
+        TypePath typePath,
+        String desc,
+        boolean visible)
+    {
+        return mv.visitInsnAnnotation(typeRef, typePath, desc, visible);
     }
 
     public void visitTryCatchBlock(
