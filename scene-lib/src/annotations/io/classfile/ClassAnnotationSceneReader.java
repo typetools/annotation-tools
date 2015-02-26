@@ -57,7 +57,7 @@ extends EmptyVisitor {
   //  and inserts the annotations correctly into the specified AElement
 
   // Whether to output tracing information
-  private static final boolean trace = true;
+  private static final boolean trace = false;
 
   // Whether to output error messages for unsupported cases
   private static final boolean strict = false;
