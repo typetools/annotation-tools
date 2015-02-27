@@ -292,11 +292,15 @@ public class Class<K> {
 }
 \end{verbatim}
 
+or on the type parameters on the left-hand side of a member reference,
+as on \code{String} in \code{List<String>::size}.
+
 \begin{tabbing}
 \qquad \= \kill
 \bnfnt{typeparam-definition} ::= \\
 \qquad    \bnfcmt The integer is the zero-based type parameter index. \\
-\qquad    \bnflit{typeparam} \bnfnt{integer} \bnflit{:} \bnfnt{type-annotation}* \lineend
+\qquad    \bnflit{typeparam} \bnfnt{integer} \bnflit{:} \bnfnt{type-annotation}* \lineend \\
+\qquad    \bnfnt{compound-type}*
 \end{tabbing}
 
 
@@ -650,7 +654,6 @@ The grammar uses \bnflit{\#} for bytecode offsets and \bnflit{*} for source code
 \bnfnt{call} ::= \\
 \qquad    \bnflit{call} \bnfnt{call-location} \bnflit{:} \lineend \\
 \qquad    \bnfnt{typearg-definition}* \\
-\qquad    \bnfnt{typearg-bound}* \\
 \\
 \bnfnt{reference-location} ::= \\
 \qquad    \bnfcmt Bytecode offset: the integer is the offset field of the annotation~\cite{JSR308-webpage-201110}. \\
@@ -660,12 +663,9 @@ The grammar uses \bnflit{\#} for bytecode offsets and \bnflit{*} for source code
 \qquad    \bnfor{} (\bnflit{*} \bnfnt{integer}) \\
 \\
 \bnfnt{reference} ::= \\
-\qquad    \bnflit{reference} \bnfnt{reference-location} \bnflit{:} \lineend \\
-\qquad        \bnfnt{typearg-definition}* \\
-\qquad        \bnfnt{typearg-bound}* \\
-%\qquad        \bnfnt{return-type}? \\
-\qquad        \bnfnt{parameter-definition}* \\
-\qquad        \bnfnt{variable-definition}* \\
+\qquad    \bnflit{reference} \bnfnt{reference-location} \bnflit{:} \bnfnt{type-annotation}* \lineend \\
+\qquad    \bnfnt{compound-type}* \\
+\qquad    \bnfnt{typearg-definition}* \\
 \\
 \bnfnt{lambda-location} ::= \\
 \qquad    \bnfcmt Bytecode offset: the integer is the offset field of the annotation~\cite{JSR308-webpage-201110}. \\
@@ -675,9 +675,7 @@ The grammar uses \bnflit{\#} for bytecode offsets and \bnflit{*} for source code
 \qquad    \bnfor{} (\bnflit{*} \bnfnt{integer}) \\
 \\
 \bnfnt{lambda} ::= \\
-\qquad    \bnflit{lambda} \bnfnt{lambda-location} \bnflit{:} \bnfnt{type-annotation}* \lineend \\
-\qquad        \bnfnt{typearg-definition}* \\
-\qquad        \bnfnt{typearg-bound}* \\
+\qquad    \bnflit{lambda} \bnfnt{lambda-location} \bnflit{:} \lineend \\
 %\qquad        \bnfnt{return-type}? \\
 \qquad        \bnfnt{parameter-definition}* \\
 \qquad        \bnfnt{variable-definition}* \\
@@ -687,12 +685,6 @@ The grammar uses \bnflit{\#} for bytecode offsets and \bnflit{*} for source code
 \bnfnt{typearg-definition} ::= \\
 \qquad    \bnfcmt The integer is the zero-based type argument index. \\
 \qquad    \bnflit{typearg} \bnfnt{integer} \bnflit{:} \bnfnt{type-annotation}* \lineend \\
-\qquad    \bnfnt{compound-type}*
-\\
-\bnfnt{typearg-bound} ::= \\
-\qquad    \bnfcmt The integers are respectively the argument and bound indexes of \\
-\qquad    \bnfcmt the type argument bound~\cite{JSR308-webpage-201110}. \\
-\qquad    \bnflit{bound} \bnfnt{integer} \bnflit{\&} \bnfnt{integer} \bnflit{:} \bnfnt{type-annotation}* \lineend \\
 \qquad    \bnfnt{compound-type}*
 \end{tabbing}
 
