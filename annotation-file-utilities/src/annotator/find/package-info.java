@@ -16,6 +16,6 @@
  * the current node; when there is a match, the program finds and
  * records the appropriate source position.
  *
- * @see TreeFinder#getPositions(com.sun.tools.javac.tree.JCTree.JCCompilationUnit, java.util.List)
+ * @see TreeFinder#getInsertionsByPosition(com.sun.tools.javac.tree.JCTree.JCCompilationUnit, java.util.List)
  */
 package annotator.find;
