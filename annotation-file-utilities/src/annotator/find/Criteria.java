@@ -190,6 +190,19 @@ public final class Criteria {
   }
 
   /**
+   * Returns true if this Criteria is on the given method.
+   */
+  public boolean isOnFieldDeclaration() {
+    for (Criterion c : criteria.values()) {
+      if (c.getKind() == Criterion.Kind.FIELD
+          && ((FieldCriterion) c).isDeclaration) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
    * Gives the AST path specified in the criteria, if any.
    *
    * @return AST path from {@link ASTPathCriterion}, or null if none present
@@ -399,8 +412,13 @@ public final class Criteria {
     return new GenericArrayLocationCriterion(loc);
   }
 
+  @Deprecated
   public final static Criterion field(String varName) {
     return new FieldCriterion(varName);
+  }
+
+  public final static Criterion field(String varName, boolean isOnDeclaration) {
+    return new FieldCriterion(varName, isOnDeclaration);
   }
 
   public final static Criterion inStaticInit(int blockID) {

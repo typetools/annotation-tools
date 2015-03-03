@@ -239,11 +239,11 @@ public class IndexFileSpecification implements Specification {
 
   /** Fill in this.insertions with insertion pairs. */
   private void parseField(CriterionList clist, String fieldName, AField field) {
-    clist = clist.add(Criteria.field(fieldName));
-
     // parse declaration annotations
-    parseElement(clist, field);
+    parseElement(clist.add(Criteria.field(fieldName, true)), field);
 
+    // parse type annotations
+    clist = clist.add(Criteria.field(fieldName, false));
     parseInnerAndOuterElements(clist, field.type);
     parseASTInsertions(clist, field.insertAnnotations, field.insertTypecasts);
   }
@@ -352,8 +352,9 @@ public class IndexFileSpecification implements Specification {
       List<Insertion> elementInsertions = new ArrayList<Insertion>();
       String annotationString = p.a;
       Annotation annotation = p.b;
-      Boolean isDeclarationAnnotation = !annotation.def.isTypeAnnotation();
       Criteria criteria = clist.criteria();
+      Boolean isDeclarationAnnotation = !annotation.def.isTypeAnnotation()
+          || criteria.isOnFieldDeclaration();
       if (noTypePath(criteria) && isOnReceiver(criteria)) {
         if (receiver == null) {
           DeclaredType type = new DeclaredType();
