@@ -755,7 +755,7 @@ public class Main {
 
         // Create a finder, and use it to get positions.
         TreeFinder finder = new TreeFinder(tree);
-        SetMultimap<Integer, Insertion> positions =
+        SetMultimap<Pair<Integer, ASTPath>, Insertion> positions =
             finder.getPositions(tree, insertions);
 
         if (convert_jaifs) {
@@ -792,20 +792,30 @@ public class Main {
               positions.size(), javafilename);
         }
 
-        Set<Integer> positionKeysUnsorted = positions.keySet();
-        Set<Integer> positionKeysSorted =
-          new TreeSet<Integer>(new Comparator<Integer>() {
-            @Override
-            public int compare(Integer o1, Integer o2) {
-              return o1.compareTo(o2) * -1;
-            }
-          });
+        Set<Pair<Integer, ASTPath>> positionKeysUnsorted =
+            positions.keySet();
+        Set<Pair<Integer, ASTPath>> positionKeysSorted =
+          new TreeSet<Pair<Integer, ASTPath>>(
+              new Comparator<Pair<Integer, ASTPath>>() {
+                @Override
+                public int compare(Pair<Integer, ASTPath> p1,
+                    Pair<Integer, ASTPath> p2) {
+                  int c = Integer.compare(p2.a, p1.a);
+                  if (c == 0) {
+                    c = p2.b == null ? p1.b == null ? 0 : -1
+                        : p1.b == null ? 1 : p2.b.compareTo(p1.b);
+                  }
+                  return c;
+                }
+              });
         positionKeysSorted.addAll(positionKeysUnsorted);
-        for (Integer pos : positionKeysSorted) {
+        for (Pair<Integer, ASTPath> pair : positionKeysSorted) {
           boolean receiverInserted = false;
           boolean newInserted = false;
           boolean constructorInserted = false;
-          List<Insertion> toInsertList = new ArrayList<Insertion>(positions.get(pos));
+          int pos = pair.a;
+          Set<String> seen = new TreeSet<String>();
+          List<Insertion> toInsertList = new ArrayList<Insertion>(positions.get(pair));
           Collections.reverse(toInsertList);
           dbug.debug("insertion pos: %d%n", pos);
           assert pos >= 0
@@ -862,6 +872,8 @@ public class Main {
 
             String toInsert = iToInsert.getText(comments, abbreviate,
                 gotSeparateLine, pos, precedingChar) + trailingWhitespace;
+            if (seen.contains(toInsert)) { continue; }  // eliminate duplicates
+            seen.add(toInsert);
             if (abbreviate) {
               Set<String> packageNames = iToInsert.getPackageNames();
               dbug.debug("Need import %s%n  due to insertion %s%n",
