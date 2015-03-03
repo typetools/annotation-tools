@@ -5,6 +5,10 @@ package annotator.tests:
 class FieldMultiple:
 
     field foo:
+        type: @java.lang.ReadOnly
+
+    field bar:
+        type: @java.lang.ReadOnly
 
     field d: @java.lang.ReadOnly
 

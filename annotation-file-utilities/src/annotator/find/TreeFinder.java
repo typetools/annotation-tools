@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
+import javax.lang.model.element.Name;
 import javax.lang.model.type.NullType;
 
 import com.google.common.collect.LinkedHashMultimap;
@@ -80,7 +81,7 @@ import plume.Pair;
 
 /**
  * A {@code TreeScanner} that is able to locate program elements in an
- * AST based on {@code Criteria}. {@link #getPositions(JCCompilationUnit,List)}
+ * AST based on {@code Criteria}. {@link #getInsertionsByPosition(JCCompilationUnit,List)}
  * scans a tree and returns a
  * mapping of source positions (as character offsets) to insertion text.
  */
@@ -352,14 +353,19 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
 
     @Override
     public Pair<ASTRecord, Integer> visitVariable(VariableTree node, Insertion ins) {
-      JCTree jt = ((JCVariableDecl) node).getType();
+      Name name = node.getName();
+      JCVariableDecl jn = (JCVariableDecl) node;
+      JCTree jt = jn.getType();
+      Criteria criteria = ins.getCriteria();
       dbug.debug("visitVariable: %s %s%n", jt, jt.getClass());
+      if (name != null && criteria.isOnFieldDeclaration()) {
+        return Pair.of(astRecord(node), jn.getStartPosition());
+      }
       if (jt instanceof JCTypeApply) {
-        JCTypeApply vt = (JCTypeApply) jt;
-        JCExpression type = vt.clazz;
+        JCExpression type = ((JCTypeApply) jt).clazz;
         return pathAndPos(type);
       }
-      return Pair.of(astRecord(node), jt.pos);
+      return Pair.of(astRecord(node), jn.pos);
       //return getBaseTypePosition((JCExpression) jt);
     }
 
@@ -935,7 +941,7 @@ loop:
   private final TypePositionFinder tpf;
   private final DeclarationPositionFinder dpf;
   private final JCCompilationUnit tree;
-  private final SetMultimap<Integer, Insertion> positions;
+  private final SetMultimap<Pair<Integer, ASTPath>, Insertion> insertions;
   private final SetMultimap<ASTRecord, Insertion> astInsertions;
 
   /**
@@ -945,7 +951,7 @@ loop:
    */
   public TreeFinder(JCCompilationUnit tree) {
     this.tree = tree;
-    this.positions = LinkedHashMultimap.create();
+    this.insertions = LinkedHashMultimap.create();
     this.astInsertions = LinkedHashMultimap.create();
     this.tpf = new TypePositionFinder();
     this.dpf = new DeclarationPositionFinder();
@@ -1055,7 +1061,7 @@ loop:
         if (pos != null) {
           dbug.debug("  ... satisfied! at %d for node of type %s: %s%n",
               pos, node.getClass(), Main.treeToString(node));
-          positions.put(pos, i);
+          insertions.put(Pair.of(pos, astPath), i);
         }
       }
       it.remove();
@@ -1824,7 +1830,8 @@ loop:
    * @param p the list of insertion criteria
    * @return the source position to insertion text mapping
    */
-  public SetMultimap<Integer, Insertion> getPositions(JCCompilationUnit node, List<Insertion> p) {
+  public SetMultimap<Pair<Integer, ASTPath>, Insertion>
+  getInsertionsByPosition(JCCompilationUnit node, List<Insertion> p) {
     List<Insertion> uninserted = new ArrayList<Insertion>(p);
     this.scan(node, uninserted);
     // There may be many extra annotations in a .jaif file.  For instance,
@@ -1856,8 +1863,8 @@ loop:
         System.err.println("Unable to insert: " + i);
       }
     }
-    dbug.debug("getPositions => %d positions%n", positions.size());
-    return Multimaps.unmodifiableSetMultimap(positions);
+    dbug.debug("getPositions => %d positions%n", insertions.size());
+    return Multimaps.unmodifiableSetMultimap(insertions);
   }
 
   /**
@@ -1872,8 +1879,8 @@ loop:
    * @param insertions the insertion criteria
    * @return the source position to insertion text mapping
    */
-  public SetMultimap<Integer, Insertion> getPositions(JCCompilationUnit node,
-      Insertions insertions) {
+  public SetMultimap<Pair<Integer, ASTPath>, Insertion>
+  getPositions(JCCompilationUnit node, Insertions insertions) {
     List<Insertion> list = new ArrayList<Insertion>();
     list.addAll(insertions.forOuterClass(node, ""));
     for (JCTree decl : node.getTypeDecls()) {
@@ -1883,7 +1890,7 @@ loop:
         list.addAll(forClass);
       }
     }
-    return getPositions(node, list);
+    return getInsertionsByPosition(node, list);
   }
 
   /*

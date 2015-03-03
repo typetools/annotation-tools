@@ -6,11 +6,17 @@ import com.sun.source.util.TreePath;
 public class FieldCriterion implements Criterion {
 
   public final String varName;
+  public final boolean isDeclaration;
   public final Criterion varCriterion;
   public final Criterion notInMethodCriterion;
 
   public FieldCriterion(String varName) {
+    this(varName, false);
+  }
+
+  public FieldCriterion(String varName, boolean isDeclaration) {
     this.varName = varName;
+    this.isDeclaration = isDeclaration;
     this.varCriterion = Criteria.is(Tree.Kind.VARIABLE, varName);
     this.notInMethodCriterion = Criteria.notInMethod();
   }
@@ -25,7 +31,8 @@ public class FieldCriterion implements Criterion {
   /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path) {
-    if (path == null) {
+    if (path == null || (isDeclaration
+            && path.getLeaf().getKind() != Tree.Kind.VARIABLE)) {
       return false;
     }
 
