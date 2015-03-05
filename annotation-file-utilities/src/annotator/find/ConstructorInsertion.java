@@ -44,15 +44,21 @@ public class ConstructorInsertion extends TypedInsertion {
     } else {
       boolean commentAnnotation =
           comments && getBaseType().getName().isEmpty();
+      String typeString = typeToString(type, commentAnnotation, true);
+      int ix = typeString.lastIndexOf('$');  // FIXME: exclude '$' in source
+      typeString = typeString.substring(ix+1);
+
       for (Insertion i : declarationInsertions) {
         b.append(i.getText(commentAnnotation, abbreviate)).append("\n");
         if (abbreviate) {
           packageNames.addAll(i.getPackageNames());
         }
       }
-      b.append("public ")
-          .append(typeToString(type, commentAnnotation, true))
-          .append("(").append(") { super(); }");
+      b.append("public ").append(typeString).append("(");
+      if (receiverInsertion != null && !receiverInsertion.getInserted()) {
+        b.append(receiverInsertion.getText(comments, abbreviate));
+      }
+      b.append(") { super(); }");
       return b.toString();
     }
   }
