@@ -1094,6 +1094,7 @@ loop:
 
         if (node.getKind() == Tree.Kind.METHOD) {
           JCMethodDecl method = (JCMethodDecl) node;
+          // TODO: account for the following situation in matching phase instead
           if (method.sym.owner.isAnonymous()) { return null; }
           if ((method.mods.flags & Flags.GENERATEDCONSTR) != 0) {
             //              generated = true;
