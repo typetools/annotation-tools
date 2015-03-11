@@ -16,6 +16,7 @@ import java.lang.annotation.RetentionPolicy;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Attribute;
 import org.objectweb.asm.ClassAdapter;
+import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.TypeAnnotationVisitor;
 import org.objectweb.asm.FieldVisitor;
@@ -121,11 +122,12 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
    * it visits.  <code> scene </code> must be an {@link AScene} over the
    * class that this will visit.
    *
+   * @param cr the reader for the class being modified
    * @param scene the annotation scene containing annotations to be inserted
    * into the class this visits
    */
-  public ClassAnnotationSceneWriter(AScene scene, boolean overwrite) {
-    super(new ClassWriter(false));
+  public ClassAnnotationSceneWriter(ClassReader cr, AScene scene, boolean overwrite) {
+    super(new ClassWriter(cr, false));
     this.scene = scene;
     this.hasVisitedClassAnnotationsInScene = false;
     this.aClass = null;
