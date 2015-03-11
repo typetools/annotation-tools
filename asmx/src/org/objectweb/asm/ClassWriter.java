@@ -128,91 +128,91 @@ public class ClassWriter implements ClassVisitor {
     /**
      * The instruction types of all JVM opcodes.
      */
-    static byte[] TYPE;
+    static final byte[] TYPE;
 
     /**
      * The type of CONSTANT_Class constant pool items.
      */
-    final static int CLASS = 7;
+    static final int CLASS = 7;
 
     /**
      * The type of CONSTANT_Fieldref constant pool items.
      */
-    final static int FIELD = 9;
+    static final int FIELD = 9;
 
     /**
      * The type of CONSTANT_Methodref constant pool items.
      */
-    final static int METH = 10;
+    static final int METH = 10;
 
     /**
      * The type of CONSTANT_InterfaceMethodref constant pool items.
      */
-    final static int IMETH = 11;
+    static final int IMETH = 11;
 
     /**
      * The type of CONSTANT_String constant pool items.
      */
-    final static int STR = 8;
+    static final int STR = 8;
 
     /**
      * The type of CONSTANT_Integer constant pool items.
      */
-    final static int INT = 3;
+    static final int INT = 3;
 
     /**
      * The type of CONSTANT_Float constant pool items.
      */
-    final static int FLOAT = 4;
+    static final int FLOAT = 4;
 
     /**
      * The type of CONSTANT_Long constant pool items.
      */
-    final static int LONG = 5;
+    static final int LONG = 5;
 
     /**
      * The type of CONSTANT_Double constant pool items.
      */
-    final static int DOUBLE = 6;
+    static final int DOUBLE = 6;
 
     /**
      * The type of CONSTANT_NameAndType constant pool items.
      */
-    final static int NAME_TYPE = 12;
+    static final int NAME_TYPE = 12;
 
     /**
      * The type of CONSTANT_Utf8 constant pool items.
      */
-    final static int UTF8 = 1;
+    static final int UTF8 = 1;
 
     /**
      * The type of CONSTANT_MethodType constant pool items.
      */
-    final static int MTYPE = 16;
+    static final int MTYPE = 16;
 
     /**
      * The type of CONSTANT_MethodHandle constant pool items.
      */
-    final static int HANDLE = 15;
+    static final int HANDLE = 15;
 
     /**
      * The type of CONSTANT_InvokeDynamic constant pool items.
      */
-    final static int INDY = 18;
+    static final int INDY = 18;
 
     /**
      * The base value for all CONSTANT_MethodHandle constant pool items.
      * Internally, ASM store the 9 variations of CONSTANT_MethodHandle into 9
      * different items.
      */
-    final static int HANDLE_BASE = 20;
+    static final int HANDLE_BASE = 20;
 
     /**
      * Normal type Item stored in the ClassWriter {@link ClassWriter#typeTable},
      * instead of the constant pool, in order to avoid clashes with normal
      * constant pool items in the ClassWriter constant pool's hash table.
      */
-    final static int TYPE_NORMAL = 30;
+    static final int TYPE_NORMAL = 30;
 
     /**
      * Uninitialized type Item stored in the ClassWriter
@@ -220,20 +220,20 @@ public class ClassWriter implements ClassVisitor {
      * avoid clashes with normal constant pool items in the ClassWriter constant
      * pool's hash table.
      */
-    final static int TYPE_UNINIT = 31;
+    static final int TYPE_UNINIT = 31;
 
     /**
      * Merged type Item stored in the ClassWriter {@link ClassWriter#typeTable},
      * instead of the constant pool, in order to avoid clashes with normal
      * constant pool items in the ClassWriter constant pool's hash table.
      */
-    final static int TYPE_MERGED = 32;
+    static final int TYPE_MERGED = 32;
 
     /**
      * The type of BootstrapMethods items. These items are stored in a special
      * class attribute named BootstrapMethods and not in the constant pool.
      */
-    final static int BSM = 33;
+    static final int BSM = 33;
 
     /**
      * The class reader from which this class writer was constructed, if any.
