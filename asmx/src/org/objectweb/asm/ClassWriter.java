@@ -755,6 +755,13 @@ public class ClassWriter implements ClassVisitor {
             mb = mb.next;
         }
         int attributeCount = 0;
+        if (bootstrapMethods != null) {
+            // we put it as first attribute in order to improve a bit
+            // ClassReader.copyBootstrapMethods
+            ++attributeCount;
+            size += 8 + bootstrapMethods.length;
+            newUTF8("BootstrapMethods");
+        }
         if (signature != 0) {
             ++attributeCount;
             size += 8;
@@ -854,6 +861,12 @@ public class ClassWriter implements ClassVisitor {
             mb = mb.next;
         }
         out.putShort(attributeCount);
+        if (bootstrapMethods != null) {
+            out.putShort(newUTF8("BootstrapMethods"));
+            out.putInt(bootstrapMethods.length + 2).putShort(
+                    bootstrapMethodsCount);
+            out.putByteArray(bootstrapMethods.data, 0, bootstrapMethods.length);
+        }
         if (signature != 0) {
             out.putShort(newUTF8("Signature")).putInt(2).putShort(signature);
         }
