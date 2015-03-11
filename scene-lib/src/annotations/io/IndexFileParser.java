@@ -1008,11 +1008,11 @@ public final class IndexFileParser {
                 if (isOffset) {
                     expectChar('#');
                     i = expectNonNegative(matchNNInteger());
-                    loc = RelativeLocation.createOffset(i, -1);
+                    loc = RelativeLocation.createOffset(i, 0);
                 } else {
                     expectChar('*');
                     i = expectNonNegative(matchNNInteger());
-                    loc = RelativeLocation.createIndex(i, -1);
+                    loc = RelativeLocation.createIndex(i, 0);
                 }
                 expectChar(':');
                 t = exp.refs.vivify(loc);
