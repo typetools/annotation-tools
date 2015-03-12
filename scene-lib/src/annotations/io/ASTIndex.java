@@ -520,7 +520,9 @@ public class ASTIndex extends WrapperMap<Tree, ASTRecord> {
       public Void visitCompilationUnit(CompilationUnitTree node,
           ASTRecord rec) {
         for (Tree tree : node.getTypeDecls()) {
-          saveClass((ClassTree) tree);
+          if (ASTPath.isClassEquiv(tree.getKind())) {
+            saveClass((ClassTree) tree);
+          }
         }
         return null;
       }
