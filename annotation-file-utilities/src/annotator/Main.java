@@ -134,6 +134,9 @@ public class Main {
   @Option("Print error stack")
   public static boolean print_error_stack = false;
 
+  @Option("Suppress warnings about disallowed insertions")
+  public static boolean nowarn;
+
   @Option("Convert JAIFs to new format")
   public static boolean convert_jaifs = false;
 
@@ -582,6 +585,7 @@ public class Main {
     DebugWriter both = dbug.or(verb);
     dbug.setEnabled(debug);
     verb.setEnabled(verbose);
+    TreeFinder.warn.setEnabled(!nowarn);
     TreeFinder.stak.setEnabled(print_error_stack);
     TreeFinder.dbug.setEnabled(debug);
     Criteria.dbug.setEnabled(debug);

@@ -1117,17 +1117,15 @@ loop:       while (typeTree != null && i < astPath.size()) {
           // TODO: refactor GenericArrayLoc to use same code?
           Tree ancestor = actualPath.get(i-1);
           if (ancestor.getKind() == Tree.Kind.INSTANCE_OF) {
-            System.err.println("WARNING: wildcard bounds "
-                + "not allowed in 'instanceof' expression; "
-                + "skipping insertion");
+            TreeFinder.warn.debug("WARNING: wildcard bounds not allowed "
+                + "in 'instanceof' expression; skipping insertion%n");
             return false;
           } else if (i > 1 && ancestor.getKind() ==
               Tree.Kind.PARAMETERIZED_TYPE) {
             ancestor = actualPath.get(i-2);
             if (ancestor.getKind() == Tree.Kind.ARRAY_TYPE) {
-              System.err.println("WARNING: wildcard bounds "
-                  + "not allowed in generic array type; "
-                  + "skipping insertion");
+              TreeFinder.warn.debug("WARNING: wildcard bounds not allowed "
+                  + "in 'instanceof' expression; skipping insertion%n");
               return false;
             }
           }

@@ -270,15 +270,15 @@ public class GenericArrayLocationCriterion implements Criterion {
         if (gpath != null) {  // TODO: skip over existing annotations?
           Tree gparent = gpath.getLeaf();
           if (gparent.getKind() == Tree.Kind.INSTANCE_OF) {
-            System.err.println("WARNING: wildcard bounds not allowed in "
-                + "'instanceof' expression; skipping insertion");
+            TreeFinder.warn.debug("WARNING: wildcard bounds not allowed "
+                + "in 'instanceof' expression; skipping insertion%n");
             return false;
           } else if (gparent.getKind() == Tree.Kind.PARAMETERIZED_TYPE) {
             gpath = gpath.getParentPath();
             if (gpath != null
                 && gpath.getLeaf().getKind() == Tree.Kind.ARRAY_TYPE) {
-              System.err.println("WARNING: wildcard bounds not allowed in "
-                  + "generic array type; skipping insertion");
+              TreeFinder.warn.debug("WARNING: wildcard bounds not allowed "
+                  + "in generic array type; skipping insertion%n");
               return false;
             }
           }
