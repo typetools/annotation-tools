@@ -89,17 +89,84 @@ package annotations.tests:
 annotation @C0E: @java.lang.annotation.Target(value={TYPE_USE,FIELD})
 
 package annotations.tests:
-annotation @A0F: @java.lang.annotation.Target(value={TYPE_USE})
+annotation @A20: @java.lang.annotation.Target(value={TYPE_USE})
 
 package annotations.tests:
-annotation @C0F: @java.lang.annotation.Target(value={TYPE_USE})
+annotation @C20: @java.lang.annotation.Target(value={TYPE_USE})
+
+package annotations.tests:
+annotation @A21: @java.lang.annotation.Target(value={TYPE_USE})
+
+package annotations.tests:
+annotation @C21: @java.lang.annotation.Target(value={TYPE_USE})
+
+package annotations.tests:
+annotation @A22: @java.lang.annotation.Target(value={TYPE_USE})
+
+package annotations.tests:
+annotation @C22: @java.lang.annotation.Target(value={TYPE_USE})
+
+package annotations.tests:
+annotation @A23: @java.lang.annotation.Target(value={TYPE_USE})
+
+package annotations.tests:
+annotation @C23: @java.lang.annotation.Target(value={TYPE_USE})
+
+package annotations.tests:
+annotation @A24: @java.lang.annotation.Target(value={TYPE_USE})
+
+package annotations.tests:
+annotation @C24: @java.lang.annotation.Target(value={TYPE_USE})
+
+package annotations.tests:
+annotation @A2B:
+
+package annotations.tests:
+annotation @C2B:
+
+package annotations.tests:
+annotation @A2C: @java.lang.annotation.Target(value={TYPE_USE})
+
+package annotations.tests:
+annotation @C2C: @java.lang.annotation.Target(value={TYPE_USE})
+
+package annotations.tests:
+annotation @A2D: @java.lang.annotation.Target(value={TYPE_USE})
+
+package annotations.tests:
+annotation @C2D: @java.lang.annotation.Target(value={TYPE_USE})
+
+package annotations.tests:
+annotation @A2E: @java.lang.annotation.Target(value={TYPE_USE})
+
+package annotations.tests:
+annotation @C2E: @java.lang.annotation.Target(value={TYPE_USE})
+
+package annotations.tests:
+annotation @A2F: @java.lang.annotation.Target(value={TYPE_USE})
+
+package annotations.tests:
+annotation @C2F: @java.lang.annotation.Target(value={TYPE_USE})
 
 package annotations.tests:
 class AnnotationTest: @annotations.tests.AClass @annotations.tests.CClass
 
     field field: @annotations.tests.A0E @annotations.tests.C0E
         type: @annotations.tests.A0E @annotations.tests.C0E
-            inner-type 3, 0: @annotations.tests.A0F @annotations.tests.C0F
+            inner-type 3, 0: @annotations.tests.A20 @annotations.tests.C20
+            inner-type 3, 0,0, 0: @annotations.tests.A21 @annotations.tests.C21
+
+    field inner:
+        type:
+            inner-type 1, 0,1, 0: @annotations.tests.A22 @annotations.tests.C22
+            inner-type 1, 0,1, 0,3, 0: @annotations.tests.A23 @annotations.tests.C23
+            inner-type 1, 0: @annotations.tests.A24 @annotations.tests.C24
+
+    field entry: @annotations.tests.A2B @annotations.tests.C2B
+        type: @annotations.tests.A2C @annotations.tests.C2C
+            inner-type 3, 0: @annotations.tests.A2D @annotations.tests.C2D
+            inner-type 3, 1: @annotations.tests.A2E @annotations.tests.C2E
+            inner-type 3, 1,2, 0: @annotations.tests.A2F @annotations.tests.C2F
 
     method <init>()V:
         return:
