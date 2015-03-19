@@ -74,7 +74,7 @@ public class InstanceOfCriterion implements Criterion {
       return b;
     } else {
       boolean b = this.isSatisfiedBy(path.getParentPath());
-      Criteria.dbug.debug("return parent: %b" + b);
+      Criteria.dbug.debug("return parent: %b%n", b);
       return b;
     }
   }

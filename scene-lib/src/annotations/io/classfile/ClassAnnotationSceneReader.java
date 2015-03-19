@@ -657,13 +657,9 @@ extends EmptyVisitor {
      * Returns the offset for this annotation.
      */
     private RelativeLocation makeOffset(boolean needTypeIndex) {
-      int typeIndex;
-      if (needTypeIndex) {
-        typeIndex = xTypeIndexArgs.get(0);
-      } else {
-        typeIndex = -1;
-      }
-      return RelativeLocation.createOffset(xOffsetArgs.get(0), typeIndex);
+      int offset = xOffsetArgs.get(0);
+      int typeIndex = needTypeIndex ? xTypeIndexArgs.get(0) : 0;
+      return RelativeLocation.createOffset(offset, typeIndex);
     }
 
     /*

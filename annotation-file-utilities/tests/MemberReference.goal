@@ -94,7 +94,7 @@ public class MemberReference<T> {
   public static void main(String[] args) {
     String[] ss = {"a", "b"};
     System.out.println(java.util.Arrays.asList(ss).stream()
-        .map(String::toUpperCase)
+        .map(@A String::toUpperCase)
         .collect(java.util.stream.Collectors.joining(" ")));
   }
 }

@@ -36,10 +36,27 @@ import java.lang.annotation.*;
 
 @Target({ElementType.TYPE_USE, ElementType.FIELD})
 @interface A0E {}
+@Target({ElementType.TYPE_USE})
+@interface A21 {}
 
 
 @Target(ElementType.TYPE_USE)
-@interface A0F {}
+@interface A20 {}
+@Target(ElementType.TYPE_USE)
+@interface A22 {}
+@Target(ElementType.TYPE_USE)
+@interface A23 {}
+@Target(ElementType.TYPE_USE)
+@interface A24 {}
+@interface A2B {}
+@Target(ElementType.TYPE_USE)
+@interface A2C {}
+@Target(ElementType.TYPE_USE)
+@interface A2D {}
+@Target(ElementType.TYPE_USE)
+@interface A2E {}
+@Target(ElementType.TYPE_USE)
+@interface A2F {}
 @interface A10 {}
 @interface A11 {}
 @interface A12 {}
@@ -76,15 +93,39 @@ import java.lang.annotation.*;
 @Target({ElementType.TYPE_USE, ElementType.FIELD})
 @interface C0E {}
 @Target(ElementType.TYPE_USE)
-@interface C0F {}
+@interface C20 {}
+@Target(ElementType.TYPE_USE)
+@interface C21 {}
+@Target(ElementType.TYPE_USE)
+@interface C22 {}
+@Target(ElementType.TYPE_USE)
+@interface C23 {}
+@Target(ElementType.TYPE_USE)
+@interface C24 {}
+@interface C2B {}
+@Target(ElementType.TYPE_USE)
+@interface C2C {}
+@Target(ElementType.TYPE_USE)
+@interface C2D {}
+@Target(ElementType.TYPE_USE)
+@interface C2E {}
+@Target(ElementType.TYPE_USE)
+@interface C2F {}
 @interface C10 {}
 @interface C11 {}
 @interface C12 {}
 @interface C13 {}
 
 public @AClass /*@CClass*/ class AnnotationTest<Foo extends /*A10*/ /*C10*/ Comparable</*A11*/ /*C11*/ Integer>> {
+    class Outer {
+        class Inner<Baz> {
+            int baz(Baz o) { return o.hashCode() ^ this.hashCode(); }
+        }
+    }
 
-    @A0E /*@C0E*/ Iterable<@A0F /*@C0F*/ String> field;
+    @A0E /*@C0E*/ Iterable<@A21 /*@C21*/ String @A20 /*@C20*/ []> field;
+    @A24 /*@C24*/ Outer.@A22 /*@C22*/ Inner<@A23 /*@C23*/ String> inner;
+    @A2B /*@C2B*/ Map.@A2C /*@C2C*/ Entry<@A2D /*@C2D*/ Integer, @A2E /*@C2E*/ ? extends @A2F /*@C2F*/ CharSequence> entry;
 
     // TODO: crash when A12, C12, A13, or C13 are annotations!
     <Bar extends /*A12*/ /*C12*/ Comparable</*A13*/ /*C13*/ Integer>> @A0A /*@C0A*/ @A0AT /*@C0AT*/ HashSet<@A0B /*@C0B*/ Integer>

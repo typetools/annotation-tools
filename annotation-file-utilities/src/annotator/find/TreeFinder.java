@@ -89,6 +89,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
   public static boolean convert_jaifs = false;
   public static final DebugWriter dbug = new DebugWriter();
   public static final DebugWriter stak = new DebugWriter();
+  public static final DebugWriter warn = new DebugWriter();
 
   /**
    * String representation of regular expression matching a comment in
@@ -1076,9 +1077,9 @@ loop:
       // on method declarations of anonymous inner classes.
       if (i.getCriteria().isOnReceiver()
           && path.getParentPath().getParentPath().getLeaf().getKind() == Tree.Kind.NEW_CLASS) {
-        System.err.println("WARNING: Cannot insert a receiver parameter on a method "
-            + "declaration of an anonymous inner class. This insertion will be skipped.\n"
-            + "    Insertion: " + i);
+        warn.debug("WARNING: Cannot insert a receiver parameter "
+            + "on a method declaration of an anonymous inner class.  "
+            + "This insertion will be skipped.%n    Insertion: %s%n", i);
         return null;
       }
 
@@ -1290,10 +1291,9 @@ loop:
           && entry.getArgument() == -1
           && path.getParentPath().getParentPath().getLeaf().getKind()
           == Tree.Kind.NEW_CLASS) {
-        System.err.println("WARNING: Cannot insert a receiver "
-            + "parameter on a method declaration of an anonymous "
-            + "inner class. This insertion will be skipped.\n"
-            + "    Insertion: " + i);
+        warn.debug("WARNING: Cannot insert a receiver parameter "
+            + "on a method declaration of an anonymous inner class.  "
+            + "This insertion will be skipped.%n    Insertion: %s%n", i);
         return null;
       }
 
