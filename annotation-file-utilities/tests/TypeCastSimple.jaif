@@ -1,0 +1,11 @@
+package java.lang:
+annotation @Mutable: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+
+package annotator.tests:
+class TypeCastSimple:
+
+    method <init>()V:
+
+    method foo(Ljava/lang/Object;)V:
+        typecast #1: @java.lang.Mutable
+

@@ -1,0 +1,19 @@
+package java.lang:
+annotation @Mutable: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+
+package java.lang:
+annotation @ReadOnly: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+
+package annotator.tests:
+class IntCell:
+
+    field i:
+
+    method <init>(I)V:
+
+    method set(I)V:
+        receiver: @java.lang.Mutable
+
+    method get()I:
+        receiver: @java.lang.ReadOnly
+
