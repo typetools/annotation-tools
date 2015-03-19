@@ -295,11 +295,11 @@ public final class IndexFileWriter {
                 pw.print(indentation + desc1 + " ");
                 pw.print(isOffset ? "#" + loc.offset : "*" + loc.index);
                 pw.print(":");
-                if (loc.type_index < 0) { printAnnotations(t); }
+                if (loc.type_index <= 0) { printAnnotations(t); }
                 pw.println();
                 printInnerTypes(indentation + INDENT, t);
             }
-            if (loc.type_index >= 0) {
+            if (loc.type_index > 0) {
                 printTypeElementAndInnerTypes(indentation + INDENT,
                         desc2 + " " + loc.type_index, t);
             }

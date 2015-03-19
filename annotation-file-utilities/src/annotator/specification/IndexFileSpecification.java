@@ -662,7 +662,8 @@ public class IndexFileSpecification implements Specification {
     for (Entry<RelativeLocation, ATypeElement> entry : exp.refs.entrySet()) {
       RelativeLocation loc = entry.getKey();
       ATypeElement instanceOf = entry.getValue();
-      CriterionList instanceOfClist = clist.add(Criteria.instanceOf(methodName, loc));
+      CriterionList instanceOfClist =
+          clist.add(Criteria.memberReference(methodName, loc));
       parseInnerAndOuterElements(instanceOfClist, instanceOf);
     }
 
@@ -670,7 +671,8 @@ public class IndexFileSpecification implements Specification {
     for (Entry<RelativeLocation, ATypeElement> entry : exp.calls.entrySet()) {
       RelativeLocation loc = entry.getKey();
       ATypeElement instanceOf = entry.getValue();
-      CriterionList instanceOfClist = clist.add(Criteria.instanceOf(methodName, loc));
+      CriterionList instanceOfClist =
+          clist.add(Criteria.methodCall(methodName, loc));
       parseInnerAndOuterElements(instanceOfClist, instanceOf);
     }
 

@@ -563,12 +563,11 @@ public class ClassReader {
                 xanns = v + 6;
             } else if (attrName.equals("RuntimeInvisibleTypeAnnotations")) {
                 ixanns = v + 6;
-            } else if ("BootstrapMethods".equals(attrName)) {
-                int off = v + 8;
+            } else if (attrName.equals("BootstrapMethods")) {
                 bootstrapMethods = new int[readUnsignedShort(v + 6)];
-                for (j = 0; j < bootstrapMethods.length; j++) {
-                    bootstrapMethods[j] = off;
-                    off += 2 + readUnsignedShort(off + 2) << 1;
+                for (j = 0, u = v + 8; j < bootstrapMethods.length; j++) {
+                    bootstrapMethods[j] = u;
+                    u += 2 + readUnsignedShort(u + 2) << 1;
                 }
             } else {
                 attr = readAttribute(attrs,
@@ -660,6 +659,7 @@ public class ClassReader {
         }
 
         // visits the fields
+        u = header + 8 + 2 * implementedItfs.length;
         i = readUnsignedShort(u); // i = u2 fields_count
         u += 2; // u = field_info[fields_count]
         for (; i > 0; --i) {
@@ -1059,6 +1059,7 @@ public class ClassReader {
                             v += 3;
                             break;
                         case ClassWriter.ITFMETH_INSN:
+                        case ClassWriter.INDY:
                             v += 5;
                             break;
                         // case MANA_INSN:
