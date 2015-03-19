@@ -11,11 +11,34 @@ import java.io.PrintWriter;
 import java.io.Writer;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import annotations.Annotation;
-import annotations.el.*;
-import annotations.field.*;
+import annotations.el.AClass;
+import annotations.el.AElement;
+import annotations.el.AField;
+import annotations.el.AMethod;
+import annotations.el.AScene;
+import annotations.el.ATypeElement;
+import annotations.el.ATypeElementWithType;
+import annotations.el.AnnotationDef;
+import annotations.el.BoundLocation;
+import annotations.el.DefCollector;
+import annotations.el.DefException;
+import annotations.el.InnerTypeLocation;
+import annotations.el.LocalLocation;
+import annotations.el.RelativeLocation;
+import annotations.el.TypeIndexLocation;
+import annotations.field.AnnotationAFT;
+import annotations.field.AnnotationFieldType;
+import annotations.field.ArrayAFT;
+import annotations.field.BasicAFT;
+import annotations.field.ClassTokenAFT;
 import annotations.util.Strings;
 
 import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
@@ -211,7 +234,7 @@ public final class IndexFileWriter {
             String desc,
             /*@ReadOnly*/ Map<Integer, ? extends /*@ReadOnly*/ AElement> nels) {
         for (Map. /*@ReadOnly*/ Entry<Integer,
-        				? extends /*@ReadOnly*/ AElement> te : nels.entrySet()) {
+                ? extends /*@ReadOnly*/ AElement> te : nels.entrySet()) {
             /*@ReadOnly*/ AElement t = te.getValue();
             printAmbElementAndInnerTypes(indentation,
                     desc + " #" + te.getKey(), t);

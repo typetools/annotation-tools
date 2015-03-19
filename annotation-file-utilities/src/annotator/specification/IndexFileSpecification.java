@@ -36,8 +36,8 @@ import annotations.io.IndexFileParser;
 import annotations.util.coll.VivifyingMap;
 import annotator.find.AnnotationInsertion;
 import annotator.find.CastInsertion;
-import annotator.find.ConstructorInsertion;
 import annotator.find.CloseParenthesisInsertion;
+import annotator.find.ConstructorInsertion;
 import annotator.find.Criteria;
 import annotator.find.GenericArrayLocationCriterion;
 import annotator.find.Insertion;
@@ -397,7 +397,7 @@ public class IndexFileSpecification implements Specification {
             // Annotations on compound types of a cast insertion will be
             // inserted directly on the cast insertion.
             //this.insertions.add(ins);
-        		elementInsertions.add(ins);
+            elementInsertions.add(ins);
         }
         annotationInsertions.add(ins);
         addInsertionSource(ins, annotation);
@@ -412,7 +412,7 @@ public class IndexFileSpecification implements Specification {
               new ArrayList<Insertion>());
           this.insertions.add(cons);
         }
-        // no addInsertionSource, as cons is not explicit in scene  
+        // no addInsertionSource, as cons is not explicit in scene
         for (Insertion i : elementInsertions) {
           if (i.getKind() == Insertion.Kind.RECEIVER) {
             cons.addReceiverInsertion((ReceiverInsertion) i);
@@ -474,7 +474,7 @@ public class IndexFileSpecification implements Specification {
       if (astPath == null || astPath.isEmpty()) {
         return !criteria.isOnNew();  // exclude expression annotations
       }
-      ASTPath.ASTEntry entry = astPath.get(0); 
+      ASTPath.ASTEntry entry = astPath.get(0);
       return entry.getTreeKind() == Tree.Kind.METHOD
           && entry.childSelectorIs(ASTPath.TYPE);
     }
