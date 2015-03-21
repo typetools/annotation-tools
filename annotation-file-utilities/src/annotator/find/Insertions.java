@@ -1306,7 +1306,7 @@ loop:
      * @param jtype
      * @return
      */
-    private static Type conv(final com.sun.tools.javac.code.Type jtype) {
+    static Type conv(final com.sun.tools.javac.code.Type jtype) {
       Type type = null;
       DeclaredType d;
       com.sun.tools.javac.code.Type t;
