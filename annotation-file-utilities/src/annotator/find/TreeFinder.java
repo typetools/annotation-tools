@@ -1717,16 +1717,13 @@ loop:
       NewArrayTree newArray) {
     DeclaredType baseType = neu.getBaseType();
     if (baseType.getName().isEmpty()) {
-      Tree t = path.getParentPath().getLeaf();
-      if (t.getKind() == Tree.Kind.VARIABLE) {
-        List<String> annotations = baseType.getAnnotations();
-        Tree varType = ((VariableTree) t).getType();
-        Type newType = treeToType(varType);
-        neu.setType(newType);
-        for (String ann : annotations) {
-          newType.addAnnotation(ann);
-        }
+      List<String> annotations = neu.getType().getAnnotations();
+      Type newType = Insertions.TypeTree.conv(
+          ((JCTree.JCNewArray) newArray).type);
+      for (String ann : annotations) {
+        newType.addAnnotation(ann);
       }
+      neu.setType(newType);
     }
     Insertion.decorateType(neu.getInnerTypeInsertions(), neu.getType(),
         neu.getCriteria().getASTPath());
