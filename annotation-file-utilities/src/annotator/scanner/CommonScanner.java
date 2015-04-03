@@ -41,7 +41,9 @@ public class CommonScanner extends TreePathScanner<Void, Void> {
     // classes
 
     public static TreePath findEnclosingClass(TreePath path) {
-        while (!hasClassKind(path.getLeaf())) {
+        while (!hasClassKind(path.getLeaf())
+                || path.getParentPath().getLeaf().getKind() ==
+                    Tree.Kind.NEW_CLASS) {
             path = path.getParentPath();
             if (path == null) {
                 return null;
