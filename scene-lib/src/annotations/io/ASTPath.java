@@ -92,6 +92,7 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
   public static final String INITIALIZER = "initializer";
   public static final String LEFT_OPERAND = "leftOperand";
   public static final String METHOD_SELECT = "methodSelect";
+  public static final String MODIFIERS = "modifiers";
   public static final String PARAMETER = "parameter";
   public static final String QUALIFIER_EXPRESSION = "qualifierExpression";
   public static final String RESOURCE = "resource";
