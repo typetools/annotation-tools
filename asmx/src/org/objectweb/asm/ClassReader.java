@@ -1325,8 +1325,8 @@ public class ClassReader {
                             int bsmArgCount = readUnsignedShort(bsmIndex + 2);
                             Object[] bsmArgs = new Object[bsmArgCount];
                             bsmIndex += 4;
-                            for (i = 0; i < bsmArgCount; i++) {
-                                bsmArgs[i] = readConst(readUnsignedShort(bsmIndex), c);
+                            for (j = 0; j < bsmArgCount; j++) {
+                                bsmArgs[j] = readConst(readUnsignedShort(bsmIndex), c);
                                 bsmIndex += 2;
                             }
                             cpIndex = items[readUnsignedShort(cpIndex + 2)];
