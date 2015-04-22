@@ -9,8 +9,11 @@ import org.checkerframework.checker.nullness.qual.*;
 */
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import java.lang.annotation.RetentionPolicy;
 
 import org.objectweb.asm.AnnotationVisitor;
@@ -18,6 +21,9 @@ import org.objectweb.asm.Attribute;
 import org.objectweb.asm.ClassAdapter;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Handle;
+import org.objectweb.asm.Label;
+import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.TypeAnnotationVisitor;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodAdapter;
@@ -116,6 +122,10 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
    */
   private final boolean overwrite;
 
+  private Map<String, Set<Integer>> dynamicConstructors = null;
+
+  private ClassReader cr = null;
+
   /**
    * Constructs a new <code> ClassAnnotationSceneWriter </code> that will
    * insert all the annotations in <code> scene </code> into the class that
@@ -133,6 +143,8 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
     this.aClass = null;
     this.existingClassAnnotations = new ArrayList<String>();
     this.overwrite = overwrite;
+    this.dynamicConstructors = new HashMap<String, Set<Integer>>();
+    this.cr = cr;
   }
 
   /**
@@ -155,6 +167,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
   @Override
   public void visit(int version, int access, String name,
       String signature, String superName, String[] interfaces) {
+    cr.accept(new MethodCodeIndexer(), false);
     super.visit(version, access, name, signature, superName, interfaces);
     // class files store fully quantified class names with '/' instead of '.'
     name = name.replace('/', '.');
@@ -195,8 +208,10 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
     ensureVisitSceneClassAnnotations();
     // MethodAnnotationSceneWriter ensures that the method visits all
     //  its annotations in the scene.
-    return new MethodAnnotationSceneWriter(name, desc,
-        super.visitMethod(access, name, desc, signature, exceptions));
+    // MethodAdapter is used here only for getting around an unsound
+    //  "optimization" in ClassReader.
+    return new MethodAdapter(new MethodAnnotationSceneWriter(name, desc,
+            super.visitMethod(access, name, desc, signature, exceptions)));
   }
 
   /**
@@ -1108,11 +1123,6 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
     }
 
     private void ensureVisitMemberReferenceAnnotations() {
-        ensureVisitMemberReferenceAnnotations(false);
-        ensureVisitMemberReferenceAnnotations(true);
-    }
-
-    private void ensureVisitMemberReferenceAnnotations(boolean b) {
       for (Map.Entry<RelativeLocation, ATypeElement> entry :
           aMethod.body.refs.entrySet()) {
         if (!entry.getKey().isBytecodeOffset()) {
@@ -1120,13 +1130,16 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
           // into bytecode
           // TODO: output a warning or translate
           if (strict) { System.err.println("ClassAnnotationSceneWriter.ensureVisitTypeTestAnnotation: no bytecode offset found!"); }
+          continue;
         }
         int offset = entry.getKey().offset;
         int typeIndex = entry.getKey().type_index;
         ATypeElement aTypeArg = entry.getValue();
-        TargetType tt = b
-                ? TargetType.METHOD_REFERENCE_TYPE_ARGUMENT
-                : TargetType.CONSTRUCTOR_REFERENCE_TYPE_ARGUMENT;
+        // FIXME: convert bytecode offset to code offset! (or v.v. above)
+        Set<Integer> bs = dynamicConstructors.get(aMethod.methodName);
+        TargetType tt = bs != null && bs.contains(offset)
+                ? TargetType.CONSTRUCTOR_REFERENCE_TYPE_ARGUMENT
+                : TargetType.METHOD_REFERENCE_TYPE_ARGUMENT;
 
         for (Annotation tla : aTypeArg.tlAnnotationsHere) {
           if (shouldSkip(tla)) continue;
@@ -1161,11 +1174,6 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
     }
 
     private void ensureVisitMethodInvocationAnnotations() {
-        ensureVisitMethodInvocationAnnotations(false);
-        ensureVisitMethodInvocationAnnotations(true);
-    }
-
-    private void ensureVisitMethodInvocationAnnotations(boolean b) {
       for (Map.Entry<RelativeLocation, ATypeElement>
           entry : aMethod.body.calls.entrySet()) {
         if (!entry.getKey().isBytecodeOffset()) {
@@ -1177,9 +1185,10 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
         int offset = entry.getKey().offset;
         int typeIndex = entry.getKey().type_index;
         ATypeElement aCall = entry.getValue();
-        TargetType tt = b
-                ? TargetType.METHOD_INVOCATION_TYPE_ARGUMENT
-                : TargetType.CONSTRUCTOR_INVOCATION_TYPE_ARGUMENT;
+        Set<Integer> bs = dynamicConstructors.get(aMethod.methodName);
+        TargetType tt = bs != null && bs.contains(offset)
+                ? TargetType.CONSTRUCTOR_INVOCATION_TYPE_ARGUMENT
+                : TargetType.METHOD_INVOCATION_TYPE_ARGUMENT;
 
         for (Annotation tla : aCall.tlAnnotationsHere) {
           if (shouldSkip(tla)) continue;
@@ -1239,6 +1248,208 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
         // TODO: throw clauses?!
         // TODO: catch clauses!?
       }
+    }
+  }
+
+  class MethodCodeIndexer extends EmptyVisitor {
+    private final char[] buf;
+    private int codeStart = 0;
+    Set<Integer> offsets;
+
+    MethodCodeIndexer() {
+      int fieldCount;
+      // max code size is (not lowest) upper bound of string length
+      buf = new char[cr.b.length];  // TODO: use tighter bound
+      codeStart = cr.header + 6;
+      codeStart += 2 + 2 * cr.readUnsignedShort(codeStart);
+      fieldCount = cr.readUnsignedShort(codeStart);
+      codeStart += 2;
+      while (--fieldCount >= 0) {
+        int attrCount = cr.readUnsignedShort(codeStart + 6);
+        codeStart += 8;
+        while (--attrCount >= 0) {
+          codeStart += 6 + cr.readInt(codeStart + 2);
+        }
+      }
+      codeStart += 2;
+    }
+
+    @Override
+    public void visit(int version, int access, String name, String signature,
+        String superName, String[] interfaces) {
+    }
+
+    @Override
+    public void visitSource(String source, String debug) {}
+
+    @Override
+    public void visitOuterClass(String owner, String name, String desc) {}
+
+    @Override
+    public void visitInnerClass(String name, String outerName,
+        String innerName, int access) {
+    }
+
+    @Override
+    public FieldVisitor visitField(int access, String name, String desc,
+        String signature, Object value) {
+      return null;
+    }
+
+    @Override
+    public MethodVisitor visitMethod(int access,
+        String name, String desc, String signature, String[] exceptions) {
+      String methodDescription = name + desc;
+      offsets = dynamicConstructors.get(methodDescription);
+      if (offsets == null) {
+        offsets = new TreeSet<Integer>();
+        dynamicConstructors.put(methodDescription, offsets);
+      }
+
+      MethodVisitor mv = new CodeOffsetAdapter(
+          new EmptyVisitor(), buf, codeStart) {
+        int attrCount;
+        {
+          this.attrCount = cr.readUnsignedShort(this.codeStart + 6);
+          this.codeStart += 8;
+          // find code attribute
+          while (this.attrCount > 0) {
+            String attrName = cr.readUTF8(codeStart, buf);
+            if ("Code".equals(attrName)) { break; }
+            this.codeStart += 6 + cr.readInt(this.codeStart + 2);
+            --this.attrCount;
+          }
+        }
+        @Override
+        public void visitInvokeDynamicInsn(String name, String desc,
+            Handle bsm, Object... bsmArgs) {
+          String methodName = ((Handle) bsmArgs[1]).getName();
+          if ("<init>".equals(methodName)) { offsets.add(getOffset()); }
+          super.visitInvokeDynamicInsn(name, desc, bsm, bsmArgs);
+        }
+        @Override
+        public void visitEnd() {
+          //codeStart += getOffset();
+          while (attrCount > 0) {
+            this.codeStart += 6 + cr.readInt(this.codeStart + 2);
+            --attrCount;
+          }
+          super.visitEnd();
+        }
+      };
+
+      return mv;
+    }
+  }
+
+  class CodeOffsetAdapter extends MethodAdapter {
+    final char[] buf;
+    int offset = 0;
+    int codeStart = 0;
+
+    public CodeOffsetAdapter(MethodVisitor mv, char[] buf, int codeStart) {
+      super(mv);
+      this.buf = buf;
+      this.codeStart = codeStart;
+    }
+
+    int readInt(int i) {
+      return cr.readInt(codeStart + i);
+    }
+
+    int readUnsignedShort(int i) {
+      return cr.readUnsignedShort(codeStart + i);
+    }
+
+    String readString(int i) {
+      return cr.readUTF8(codeStart + i, buf);
+    }
+
+    int getOffset() { return offset; }
+
+    @Override
+    public void visitFieldInsn(int opcode,
+        String owner, String name, String desc) {
+      super.visitFieldInsn(opcode, owner, name, desc);
+      offset += 3;
+    }
+
+    @Override
+    public void visitIincInsn(int var, int increment) {
+      super.visitIincInsn(var, increment);
+      offset += 3;
+    }
+
+    @Override
+    public void visitInsn(int opcode) {
+      super.visitInsn(opcode);
+      ++offset;
+    }
+
+    @Override
+    public void visitIntInsn(int opcode, int operand) {
+      super.visitIntInsn(opcode, operand);
+      offset += opcode == Opcodes.SIPUSH ? 3 : 2;
+    }
+
+    @Override
+    public void visitInvokeDynamicInsn(String name, String desc,
+        Handle bsm, Object... bsmArgs) {
+      super.visitInvokeDynamicInsn(name, desc, bsm, bsmArgs);
+      offset += 5;
+    }
+
+    @Override
+    public void visitJumpInsn(int opcode, Label label) {
+      super.visitJumpInsn(opcode, label);
+      offset += 3;
+    }
+
+    @Override
+    public void visitLdcInsn(Object cst) {
+      super.visitLdcInsn(cst);
+      offset += 2;
+    }
+
+    @Override
+    public void visitLookupSwitchInsn(Label dflt, int[] keys,
+        Label[] labels) {
+      super.visitLookupSwitchInsn(dflt, keys, labels);
+      offset += 8 - ((offset - codeStart) & 3);
+      offset += 4 + 8 * readInt(offset);
+    }
+
+    @Override
+    public void visitMethodInsn(int opcode,
+        String owner, String name, String desc) {
+      super.visitMethodInsn(opcode, owner, name, desc);
+      offset += opcode == Opcodes.INVOKEINTERFACE ? 5 : 3;
+    }
+
+    @Override
+    public void visitMultiANewArrayInsn(String desc, int dims) {
+      super.visitMultiANewArrayInsn(desc, dims);
+      offset += 4;
+    }
+
+    @Override
+    public void visitTableSwitchInsn(int min, int max,
+        Label dflt, Label[] labels) {
+      super.visitTableSwitchInsn(min, max, dflt, labels);
+      offset += 8 - ((offset - codeStart) & 3);
+      offset += 4 * (readInt(offset + 4) - readInt(offset) + 3);
+    }
+
+    @Override
+    public void visitTypeInsn(int opcode, String desc) {
+      super.visitTypeInsn(opcode, desc);
+      offset += 3;
+    }
+
+    @Override
+    public void visitVarInsn(int opcode, int var) {
+      super.visitVarInsn(opcode, var);
+      offset += var < 4 ? 1 : 2;
     }
   }
 }
