@@ -11,6 +11,8 @@ import java.io.File;
 import java.util.*;
 
 import org.objectweb.asm.AnnotationVisitor;
+import org.objectweb.asm.Attribute;
+import org.objectweb.asm.Handle;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.TypeAnnotationVisitor;
 import org.objectweb.asm.FieldVisitor;
@@ -82,6 +84,10 @@ extends EmptyVisitor {
     return result;
   }
 
+  /**
+   * Handles specified in BootstrapMethods.
+   */
+  private final ArrayList<Handle> bsmHandles;
 
   /**
    * constructs a new <code> ClassAnnotationSceneReader </code> that will
@@ -93,6 +99,7 @@ extends EmptyVisitor {
    */
   public ClassAnnotationSceneReader(AScene scene) {
     this.scene = scene;
+    this.bsmHandles = new ArrayList<Handle>();
   }
 
   /**
@@ -1142,8 +1149,9 @@ extends EmptyVisitor {
 
   /*
    * Similarly to FieldAnnotationSceneReader, this is a MethodVisitor that
-   * only cares about visiting [extended]annotations.  Attributes are ignored,
-   * all code is ignored and visitEnd() has no effect.  An AnnotationSceneReader
+   * only cares about visiting [extended]annotations.  Attributes other than
+   * BootstrapMethods are ignored, all code is ignored, and visitEnd() has no
+   * effect.  An AnnotationSceneReader
    * is returned for declaration and type AnnotationVisitors.  The
    * AnnotationSceneReaders have a reference to an AMethod that this is
    * visiting, and they will write out all the information to that
