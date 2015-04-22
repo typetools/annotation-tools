@@ -30,11 +30,11 @@ public class AExpression extends AElement {
     public final VivifyingMap<RelativeLocation, ATypeElement> news =
             ATypeElement.<RelativeLocation>newVivifyingLHMap_ATE();
 
-    /** A method invocation's annotated type arguments; map key is the offset of the invokestatic bytecode (?) */
+    /** A method invocation's annotated type arguments; map key is the offset of the invokestatic bytecode */
     public final VivifyingMap<RelativeLocation, ATypeElement> calls =
             ATypeElement.<RelativeLocation>newVivifyingLHMap_ATE();
 
-    /** A member reference's annotated type parameters; map key is the offset of the ??? bytecode */
+    /** A member reference's annotated type parameters; map key is the offset of the invokestatic bytecode */
     public final VivifyingMap<RelativeLocation, ATypeElement> refs =
             ATypeElement.<RelativeLocation>newVivifyingLHMap_ATE();
 
