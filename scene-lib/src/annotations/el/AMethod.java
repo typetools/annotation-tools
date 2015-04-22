@@ -31,7 +31,7 @@ public final class AMethod extends ADeclaration {
         ATypeElement.<TypeIndexLocation>newVivifyingLHMap_ATE();
 
     public ABlock body;
-    private final String methodName;
+    public final String methodName;
 
     AMethod(String methodName) {
       super("method: " + methodName);
@@ -60,6 +60,7 @@ public final class AMethod extends ADeclaration {
             && receiver.equals(o.receiver)
             && parameters.equals(o.parameters)
             && body.equals(o.body)
+            && methodName.equals(o.methodName)
             && throwsException.equals(o.throwsException);
     }
 
@@ -68,9 +69,10 @@ public final class AMethod extends ADeclaration {
      */
     @Override
     public int hashCode(/*>>> @ReadOnly AMethod this*/) {
-        return super.hashCode() + bounds.hashCode()
-                + receiver.hashCode() + parameters.hashCode()
-                + throwsException.hashCode() + body.hashCode();
+        return super.hashCode()
+                + bounds.hashCode() + receiver.hashCode()
+                + parameters.hashCode() + throwsException.hashCode()
+                + body.hashCode() + methodName.hashCode();
     }
 
     /**
