@@ -58,5 +58,5 @@ class MemberReference:
             inner-type 0, 0: @A
 
     method main([Ljava/lang/String;)V:
-        reference *0: @A
+        reference #27: @A
 
