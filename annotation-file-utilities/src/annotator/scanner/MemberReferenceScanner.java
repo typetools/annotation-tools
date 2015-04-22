@@ -62,7 +62,7 @@ public class MemberReferenceScanner extends CommonScanner {
       new HashMap<String, List<Integer>>();
 
   /**
-   * Adds a lambda expression bytecode offset to the current list of
+   * Adds a member reference bytecode offset to the current list of
    * offsets for methodName.  This method must be called with
    * monotonically increasing offsets for any one method.
    *
