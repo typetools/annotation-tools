@@ -274,6 +274,19 @@ public final class Criteria {
     return null;
   }
 
+  /**
+   * @return a RelativeCriterion if this has one, else null
+   */
+  public RelativeLocation getCastRelativeLocation() {
+    RelativeLocation result = null;
+    for (Criterion c : criteria.values()) {
+      if (c.getKind() == Criterion.Kind.CAST) {
+        result = ((CastCriterion) c).getLocation();
+      }
+    }
+    return result;
+  }
+
   // Returns the last one. Should really return the outermost one.
   // However, there should not be more than one unless all are equivalent.
   /**

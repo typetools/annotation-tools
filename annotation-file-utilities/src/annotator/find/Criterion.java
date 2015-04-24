@@ -41,6 +41,7 @@ public interface Criterion {
         LAMBDA_EXPRESSION,
         BOUND_LOCATION,
         EXTIMPLS_LOCATION,
+        INTERSECT_LOCATION,
         METHOD_BOUND,
         CLASS_BOUND,
         IN_PACKAGE,
