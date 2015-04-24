@@ -41,6 +41,7 @@ import annotator.find.ConstructorInsertion;
 import annotator.find.Criteria;
 import annotator.find.GenericArrayLocationCriterion;
 import annotator.find.Insertion;
+import annotator.find.IntersectionTypeLocationCriterion;
 import annotator.find.NewInsertion;
 import annotator.find.ReceiverInsertion;
 import annotator.scanner.MethodOffsetClassVisitor;
@@ -390,6 +391,10 @@ public class IndexFileSpecification implements Specification {
         }
         addInsertionSource(cast, annotation);
       } else {
+        RelativeLocation loc = criteria.getCastRelativeLocation();
+        if (loc != null && loc.type_index > 0) {
+          criteria.add(new IntersectionTypeLocationCriterion(loc));
+        }
         Insertion ins = new AnnotationInsertion(annotationString, criteria,
                                       isDeclarationAnnotation);
         debug("parsed: " + ins);

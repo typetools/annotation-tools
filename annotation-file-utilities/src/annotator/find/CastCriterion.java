@@ -52,6 +52,8 @@ public class CastCriterion implements Criterion {
     }
   }
 
+  public RelativeLocation getLocation() { return loc; }
+
   @Override
   public Kind getKind() {
     return Kind.CAST;
