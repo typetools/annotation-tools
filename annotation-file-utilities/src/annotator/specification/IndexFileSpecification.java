@@ -666,19 +666,19 @@ public class IndexFileSpecification implements Specification {
     // parse member references of method
     for (Entry<RelativeLocation, ATypeElement> entry : exp.refs.entrySet()) {
       RelativeLocation loc = entry.getKey();
-      ATypeElement instanceOf = entry.getValue();
+      ATypeElement ref = entry.getValue();
       CriterionList instanceOfClist =
           clist.add(Criteria.memberReference(methodName, loc));
-      parseInnerAndOuterElements(instanceOfClist, instanceOf);
+      parseInnerAndOuterElements(instanceOfClist, ref);
     }
 
     // parse method invocations of method
     for (Entry<RelativeLocation, ATypeElement> entry : exp.calls.entrySet()) {
       RelativeLocation loc = entry.getKey();
-      ATypeElement instanceOf = entry.getValue();
+      ATypeElement call = entry.getValue();
       CriterionList instanceOfClist =
           clist.add(Criteria.methodCall(methodName, loc));
-      parseInnerAndOuterElements(instanceOfClist, instanceOf);
+      parseInnerAndOuterElements(instanceOfClist, call);
     }
 
     // parse lambda expressions of method
