@@ -11,8 +11,7 @@ import java.io.File;
 import java.util.*;
 
 import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.Attribute;
-import org.objectweb.asm.Handle;
+import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.TypeAnnotationVisitor;
 import org.objectweb.asm.FieldVisitor;
@@ -70,6 +69,8 @@ extends EmptyVisitor {
   // The AClass that represents this class in scene.
   private AClass aClass;
 
+  private final ClassReader cr;
+
   /**
    * Holds definitions we've seen so far.  Maps from annotation name to
    * the definition itself.  Maps from both the qualified name and the
@@ -85,21 +86,17 @@ extends EmptyVisitor {
   }
 
   /**
-   * Handles specified in BootstrapMethods.
-   */
-  private final ArrayList<Handle> bsmHandles;
-
-  /**
    * constructs a new <code> ClassAnnotationSceneReader </code> that will
    * insert all the annotations in the class that it visits into
    * <code> scene </code>
+   * @param cr
    *
    * @param scene the annotation scene into which annotations this visits
    *  will be inserted
    */
-  public ClassAnnotationSceneReader(AScene scene) {
+  public ClassAnnotationSceneReader(ClassReader cr, AScene scene) {
+    this.cr = cr;
     this.scene = scene;
-    this.bsmHandles = new ArrayList<Handle>();
   }
 
   /**
@@ -1196,6 +1193,7 @@ extends EmptyVisitor {
       // TODO!
     }
 
+    // TODO: visit code!
   }
 
   public static void printClasspath() {
@@ -1207,5 +1205,4 @@ extends EmptyVisitor {
       System.out.println("  " + tokenizer.nextToken());
     }
   }
-
 }

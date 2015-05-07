@@ -196,7 +196,7 @@ public class ClassFileReader {
   }
 
   public static void read(AScene scene, ClassReader cr) {
-    ClassAnnotationSceneReader ca = new ClassAnnotationSceneReader(scene);
+    ClassAnnotationSceneReader ca = new ClassAnnotationSceneReader(cr, scene);
     cr.accept(ca, true);
   }
 
