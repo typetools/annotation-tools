@@ -855,6 +855,28 @@ public final class IndexFileParser {
         parseASTInsertions(m);
     }
 
+    private void parseLambda(AMethod m) throws IOException, ParseException {
+        while (checkKeyword("parameter")) {
+            matchKeyword("parameter");
+            // make "#" optional
+            if (checkChar('#')) {
+                matchChar('#');
+            }
+            int idx = expectNonNegative(matchNNInteger());
+            AField p = m.parameters.vivify(idx);
+            expectChar(':');
+            parseAnnotations(p);
+            if (checkKeyword("type") && matchKeyword("type")) {
+                expectChar(':');
+                parseAnnotations(p.type);
+                parseInnerTypes(p.type);
+            }
+        }
+
+        //parseBlock(m.body, true);
+        parseASTInsertions(m);
+    }
+
     private void parseBlock(ABlock bl) throws IOException,
             ParseException {
         boolean matched = true;
@@ -1057,7 +1079,9 @@ public final class IndexFileParser {
                 }
                 AMethod m = exp.funs.vivify(loc);
                 expectChar(':');
-                parseMethod(m);
+                //parseAnnotations(m);
+                parseLambda(m);
+                //parseMethod(m);
             }
         }
         return evermatched;
