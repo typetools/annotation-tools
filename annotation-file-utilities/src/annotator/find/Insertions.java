@@ -1356,8 +1356,11 @@ loop:
         break;
       case TYPEVAR:
         t = ((com.sun.tools.javac.code.Type.TypeVar) jtype).getUpperBound();
-        type = new BoundedType(new DeclaredType(jtype.tsym.name.toString()),
-            BoundedType.BoundKind.EXTENDS, (DeclaredType) conv(t));
+        type = conv(t);
+        if (type.getKind() == Type.Kind.DECLARED) {
+          type = new BoundedType(new DeclaredType(jtype.tsym.name.toString()),
+              BoundedType.BoundKind.EXTENDS, (DeclaredType) type);
+        }  // otherwise previous conv should have been here already
         break;
       case INTERSECTION:
         t = jtype.tsym.erasure_field;  // ???
