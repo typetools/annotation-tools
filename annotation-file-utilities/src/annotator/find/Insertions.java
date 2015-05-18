@@ -16,6 +16,7 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import javax.lang.model.element.Name;
 import javax.lang.model.type.TypeKind;
@@ -71,17 +72,44 @@ import com.sun.tools.javac.util.Pair;
  * performance.
  */
 public class Insertions implements Iterable<Insertion> {
+  private static int kindLevel(Insertion i) {
+    // ordered so insertion that depends on another gets inserted after other
+    switch (i.getKind()) {
+    case CONSTRUCTOR:
+      return 3;
+    case NEW:
+    case RECEIVER:
+      return 2;
+    case CAST:
+        return 1;
+    //case ANNOTATION:
+    //case CLOSE_PARENTHESIS:
+    default:
+      return 0;
+    }
+  }
+
   private static final Comparator<Insertion> byASTRecord =
       new Comparator<Insertion>() {
         @Override
         public int compare(Insertion o1, Insertion o2) {
           Criteria c1 = o1.getCriteria();
           Criteria c2 = o2.getCriteria();
-          ASTRecord r1 = new ASTRecord(null, c1.getClassName(),
-              c1.getMethodName(), c1.getFieldName(), c1.getASTPath());
-          ASTRecord r2 = new ASTRecord(null, c2.getClassName(),
-              c2.getMethodName(), c2.getFieldName(), c2.getASTPath());
-          return r1.compareTo(r2);
+          ASTPath p1 = c1.getASTPath();
+          ASTPath p2 = c2.getASTPath();
+          ASTRecord r1 = new ASTRecord(null,
+              c1.getClassName(), c1.getMethodName(), c1.getFieldName(),
+              p1 == null ? ASTPath.empty() : p1);
+          ASTRecord r2 = new ASTRecord(null,
+              c2.getClassName(), c2.getMethodName(), c2.getFieldName(),
+              p2 == null ? ASTPath.empty() : p2);
+          int c = r1.compareTo(r2);
+          if (c == 0) {
+            //c = o1.getKind().compareTo(o2.getKind());
+            c = Integer.compare(kindLevel(o2), kindLevel(o1));  // descending
+            if (c == 0) { c = o1.toString().compareTo(o2.toString()); }
+          }
+          return c;
         }
       };
 
@@ -108,7 +136,8 @@ public class Insertions implements Iterable<Insertion> {
     Pair<String, String> pair = nameSplit(qualifiedClassName);
     Map<String, Set<Insertion>> map = store.get(pair.fst);
     if (map != null) {
-      Set<Insertion> set = map.get(pair.snd);
+      Set<Insertion> set = new TreeSet<Insertion>(byASTRecord);
+      set.addAll(map.get(pair.snd));
       if (set != null) {
         set = organizeTypedInsertions(cut, qualifiedClassName, set);
         result.addAll(set);
@@ -367,7 +396,7 @@ public class Insertions implements Iterable<Insertion> {
           }
           if (tins == null) {
             map.put(rec, (TypedInsertion) ins);
-          } else {
+          } else if (tins.getType().equals(((TypedInsertion) ins).getType())) {
             mergeTypedInsertions(tins, (TypedInsertion) ins);
           }
         } else {
