@@ -1358,6 +1358,15 @@ loop:
           node, i.getCriteria());
 
       if (node.getKind() == Tree.Kind.METHOD
+          && i.getCriteria().isOnMethod("<init>()V")
+          && entry.childSelectorIs(ASTPath.PARAMETER)
+          && entry.getArgument() < 0) {
+        if (i.getKind() != Insertion.Kind.CONSTRUCTOR) { return null; }
+        Tree parent = path.getParentPath().getLeaf();
+        insertRecord = insertRecord.extend(Tree.Kind.METHOD, ASTPath.PARAMETER, -1);
+        pos = ((JCTree) parent).getEndPosition(tree.endPositions) - 1;
+      } else
+      if (node.getKind() == Tree.Kind.METHOD
           && entry.childSelectorIs(ASTPath.TYPE)) {
         JCMethodDecl jcnode = (JCMethodDecl) node;
         Tree returnType = jcnode.getReturnType();

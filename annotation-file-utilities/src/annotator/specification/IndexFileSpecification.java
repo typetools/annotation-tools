@@ -481,7 +481,7 @@ public class IndexFileSpecification implements Specification {
       }
       ASTPath.ASTEntry entry = astPath.get(0);
       return entry.getTreeKind() == Tree.Kind.METHOD
-          && entry.childSelectorIs(ASTPath.TYPE);
+          && (entry.childSelectorIs(ASTPath.TYPE) || isOnReceiver(criteria));
     }
     return false;
   }
