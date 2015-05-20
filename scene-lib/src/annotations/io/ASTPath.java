@@ -430,13 +430,14 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
     // hacky fix: remove {Method,Class}.body for comparison 
     PersistentStack<ASTEntry> s0 = canonical(this);
     PersistentStack<ASTEntry> s1 = canonical(o);
-    int c = s1.size() - s0.size();
+    int c = 0;
     while (c == 0 && !s0.isEmpty()) {
+      if (s1.isEmpty()) { return -1; }
       c = s0.peek().compareTo(s1.peek());
       s0 = s0.pop();
       s1 = s1.pop();
     }
-    return Integer.signum(c);
+    return c == 0 && !s1.isEmpty() ? 1 : Integer.signum(c);
   }
 
   private static ASTPath canonical(ASTPath astPath) {
