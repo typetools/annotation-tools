@@ -87,28 +87,28 @@ public class CodeOffsetAdapter extends ClassAdapter {
       @Override
       public void visitFieldInsn(int opcode,
           String owner, String name, String desc) {
-System.err.println(offset + ": visitFieldInsn");
-super.visitFieldInsn(opcode, owner, name, desc);
+//System.err.println(offset + ": visitFieldInsn");
+        super.visitFieldInsn(opcode, owner, name, desc);
         offset += 3;
       }
 
       @Override
       public void visitIincInsn(int var, int increment) {
-System.err.println(offset + ": visitIincInsn");
+//System.err.println(offset + ": visitIincInsn");
         super.visitIincInsn(var, increment);
         offset += 3;
       }
 
       @Override
       public void visitInsn(int opcode) {
-System.err.println(offset + ": visitInsn");
+//System.err.println(offset + ": visitInsn");
         super.visitInsn(opcode);
         ++offset;
       }
 
       @Override
       public void visitIntInsn(int opcode, int operand) {
-System.err.println(offset + ": visitIntInsn");
+//System.err.println(offset + ": visitIntInsn");
         super.visitIntInsn(opcode, operand);
         offset += opcode == Opcodes.SIPUSH ? 3 : 2;
       }
@@ -116,21 +116,21 @@ System.err.println(offset + ": visitIntInsn");
       @Override
       public void visitInvokeDynamicInsn(String name, String desc,
           Handle bsm, Object... bsmArgs) {
-System.err.println(offset + ": visitInvokeDynamicInsn");
+//System.err.println(offset + ": visitInvokeDynamicInsn");
         super.visitInvokeDynamicInsn(name, desc, bsm, bsmArgs);
         offset += 5;
       }
 
       @Override
       public void visitJumpInsn(int opcode, Label label) {
-System.err.println(offset + ": visitJumpInsn");
+//System.err.println(offset + ": visitJumpInsn");
         super.visitJumpInsn(opcode, label);
         offset += 3;
       }
 
       @Override
       public void visitLdcInsn(Object cst) {
-System.err.println(offset + ": visitLdcInsn");
+//System.err.println(offset + ": visitLdcInsn");
         super.visitLdcInsn(cst);
         offset += 2;
       }
@@ -138,7 +138,7 @@ System.err.println(offset + ": visitLdcInsn");
       @Override
       public void visitLookupSwitchInsn(Label dflt, int[] keys,
           Label[] labels) {
-System.err.println(offset + ": visitLookupSwitchInsn");
+//System.err.println(offset + ": visitLookupSwitchInsn");
         super.visitLookupSwitchInsn(dflt, keys, labels);
         offset += 8 - (offset & 3);
         offset += 4 + 8 * readInt(offset);
@@ -147,14 +147,14 @@ System.err.println(offset + ": visitLookupSwitchInsn");
       @Override
       public void visitMethodInsn(int opcode,
           String owner, String name, String desc) {
-System.err.println(offset + ": visitMethodInsn");
+//System.err.println(offset + ": visitMethodInsn");
         super.visitMethodInsn(opcode, owner, name, desc);
         offset += opcode == Opcodes.INVOKEINTERFACE ? 5 : 3;
       }
 
       @Override
       public void visitMultiANewArrayInsn(String desc, int dims) {
-System.err.println(offset + ": visitMultiANewArrayInsn");
+//System.err.println(offset + ": visitMultiANewArrayInsn");
         super.visitMultiANewArrayInsn(desc, dims);
         offset += 4;
       }
@@ -162,7 +162,7 @@ System.err.println(offset + ": visitMultiANewArrayInsn");
       @Override
       public void visitTableSwitchInsn(int min, int max,
           Label dflt, Label[] labels) {
-System.err.println(offset + ": visitTableSwitchInsn");
+//System.err.println(offset + ": visitTableSwitchInsn");
         super.visitTableSwitchInsn(min, max, dflt, labels);
         offset += 8 - (offset & 3);
         offset += 4 * (readInt(offset + 4) - readInt(offset) + 3);
@@ -170,14 +170,14 @@ System.err.println(offset + ": visitTableSwitchInsn");
 
       @Override
       public void visitTypeInsn(int opcode, String desc) {
-System.err.println(offset + ": visitTypeInsn");
+//System.err.println(offset + ": visitTypeInsn");
         super.visitTypeInsn(opcode, desc);
         offset += 3;
       }
 
       @Override
       public void visitVarInsn(int opcode, int var) {
-System.err.println(offset + ": visitVarInsn");
+//System.err.println(offset + ": visitVarInsn");
         super.visitVarInsn(opcode, var);
         offset += var < 4 ? 1 : 2;
       }
