@@ -156,7 +156,7 @@ public class IndexFileSpecification implements Specification {
       debug("parseClass(" + className + ")");
       try {
         ClassReader classReader = new ClassReader(className);
-        MethodOffsetClassVisitor cv = new MethodOffsetClassVisitor();
+        MethodOffsetClassVisitor cv = new MethodOffsetClassVisitor(classReader);
         classReader.accept(cv, false);
         debug("Done reading " + className + ".class");
       } catch (IOException e) {
