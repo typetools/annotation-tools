@@ -20,7 +20,6 @@ import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Attribute;
 import org.objectweb.asm.ClassAdapter;
 import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Handle;
 import org.objectweb.asm.TypeAnnotationVisitor;
@@ -124,7 +123,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
   private final Map<String, Set<Integer>> dynamicConstructors;
   private final Map<String, Set<Integer>> lambdaExpressions;
 
-  private final ClassReader cr;
+  private ClassReader cr = null;
 
   /**
    * Constructs a new <code> ClassAnnotationSceneWriter </code> that will
@@ -137,7 +136,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
    * into the class this visits
    */
   public ClassAnnotationSceneWriter(ClassReader cr, AScene scene, boolean overwrite) {
-    super(new CodeOffsetAdapter(cr, new ClassWriter(cr, false)));
+    super(new ClassWriter(cr, false));
     this.scene = scene;
     this.hasVisitedClassAnnotationsInScene = false;
     this.aClass = null;
@@ -158,8 +157,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
    * @return a byte array of the merged class file
    */
   public byte[] toByteArray() {
-    ClassVisitor v = ((CodeOffsetAdapter) cv).getDelegate();
-    return ((ClassWriter) v).toByteArray();
+    return ((ClassWriter) cv).toByteArray();
   }
 
   /**
@@ -169,7 +167,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
   @Override
   public void visit(int version, int access, String name,
       String signature, String superName, String[] interfaces) {
-    cr.accept(new MethodCodeIndexer(cr), false);
+    cr.accept(new MethodCodeIndexer(), false);
     super.visit(version, access, name, signature, superName, interfaces);
     // class files store fully quantified class names with '/' instead of '.'
     name = name.replace('/', '.');
@@ -1315,12 +1313,48 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
     }
   }
 
-  class MethodCodeIndexer extends CodeOffsetAdapter {
+  class MethodCodeIndexer extends EmptyVisitor {
+    private int codeStart = 0;
     Set<Integer> constrs;  // distinguishes constructors from methods
     Set<Integer> lambdas;  // distinguishes lambda exprs from member refs
 
-    MethodCodeIndexer(ClassReader cr) {
-      super(cr, new ClassWriter(cr, true));
+    MethodCodeIndexer() {
+      int fieldCount;
+      // const pool size is (not lowest) upper bound of string length
+      codeStart = cr.header + 6;
+      codeStart += 2 + 2 * cr.readUnsignedShort(codeStart);
+      fieldCount = cr.readUnsignedShort(codeStart);
+      codeStart += 2;
+      while (--fieldCount >= 0) {
+        int attrCount = cr.readUnsignedShort(codeStart + 6);
+        codeStart += 8;
+        while (--attrCount >= 0) {
+          codeStart += 6 + cr.readInt(codeStart + 2);
+        }
+      }
+      codeStart += 2;
+    }
+
+    @Override
+    public void visit(int version, int access, String name, String signature,
+        String superName, String[] interfaces) {
+    }
+
+    @Override
+    public void visitSource(String source, String debug) {}
+
+    @Override
+    public void visitOuterClass(String owner, String name, String desc) {}
+
+    @Override
+    public void visitInnerClass(String name, String outerName,
+        String innerName, int access) {
+    }
+
+    @Override
+    public FieldVisitor visitField(int access, String name, String desc,
+        String signature, Object value) {
+      return null;
     }
 
     @Override
@@ -1338,27 +1372,27 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
         lambdaExpressions.put(methodDescription, lambdas);
       }
 
-      return new MethodAdapter(super.visitMethod(access,
-            name, methodDescription, signature, exceptions)) {
-        @Override
-        public void visitInvokeDynamicInsn(String name,
-            String desc, Handle bsm, Object... bsmArgs) {
-          String methodName = ((Handle) bsmArgs[1]).getName();
-          int off = ((CodeOffsetAdapter) cv).getMethodCodeOffset();
-          if ("<init>".equals(methodName)) {
-            constrs.add(off);
-          } else {
-            int ix = methodName.lastIndexOf('.');
-            if (ix >= 0) {
-              methodName = methodName.substring(ix+1);
-            }
-            if (methodName.startsWith("lambda$")) {
-              lambdas.add(off);
-            }
-          }
-          super.visitInvokeDynamicInsn(name, desc, bsm, bsmArgs);
-        }
-      };
+      return new MethodAdapter(
+          new MethodCodeOffsetAdapter(cr, new EmptyVisitor(), codeStart) {
+              @Override
+              public void visitInvokeDynamicInsn(String name,
+                  String desc, Handle bsm, Object... bsmArgs) {
+                String methodName = ((Handle) bsmArgs[1]).getName();
+                int off = getMethodCodeOffset();
+                if ("<init>".equals(methodName)) {
+                  constrs.add(off);
+                } else {
+                  int ix = methodName.lastIndexOf('.');
+                  if (ix >= 0) {
+                    methodName = methodName.substring(ix+1);
+                  }
+                  if (methodName.startsWith("lambda$")) {
+                    lambdas.add(off);
+                  }
+                }
+                super.visitInvokeDynamicInsn(name, desc, bsm, bsmArgs);
+              }
+          });
     }
   }
 }
