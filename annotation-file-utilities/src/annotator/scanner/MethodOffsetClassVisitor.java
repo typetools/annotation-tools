@@ -1,14 +1,11 @@
 package annotator.scanner;
 
-import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Handle;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodAdapter;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
-
-import annotations.io.classfile.CodeOffsetAdapter;
 
 import com.sun.tools.javac.util.Pair;
 
@@ -23,14 +20,14 @@ import com.sun.tools.javac.util.Pair;
 // Note: in order to ensure all labels are visited, this class
 // needs to extend ClassWriter and not other class visitor classes.
 // There is no good reason why this is the case with ASM.
-public class MethodOffsetClassVisitor extends CodeOffsetAdapter {
+public class MethodOffsetClassVisitor extends ClassWriter {
 
   // This field should be set by entry on a method through visitMethod,
   // and so all the visit* methods in LocalVariableMethodVisitor
   private String methodName;
 
-  public MethodOffsetClassVisitor(ClassReader cr) {
-    super(cr, new ClassWriter(cr, true));
+  public MethodOffsetClassVisitor() {
+    super(true, false);
     this.methodName = "LocalVariableVisitor: DEFAULT_METHOD";
   }
 
@@ -50,12 +47,10 @@ public class MethodOffsetClassVisitor extends CodeOffsetAdapter {
    */
   private class MethodOffsetMethodVisitor extends MethodAdapter {
     private Label lastLabel;
-    private int lastOffset;
 
     public MethodOffsetMethodVisitor(MethodVisitor mv) {
       super(mv);
       lastLabel = null;
-      lastOffset = 0;
     }
 
     @Override
@@ -73,37 +68,36 @@ public class MethodOffsetClassVisitor extends CodeOffsetAdapter {
     public void visitLabel(Label label) {
       super.visitLabel(label);
       lastLabel = label;
-      lastOffset = getMethodCodeOffset();
     }
 
     @Override
     public void visitTypeInsn(int opcode,  String desc)   {
       super.visitTypeInsn(opcode, desc);
       if (opcode == Opcodes.CHECKCAST) {
-        CastScanner.addCastToMethod(methodName, lastOffset + 1);
+        CastScanner.addCastToMethod(methodName, lastLabel.getOffset() + 1);
       }
 
       if (opcode == Opcodes.NEW || opcode == Opcodes.ANEWARRAY) {
-        NewScanner.addNewToMethod(methodName, lastOffset);
+        NewScanner.addNewToMethod(methodName, lastLabel.getOffset());
       }
 
       if (opcode == Opcodes.INSTANCEOF) {
         InstanceOfScanner.addInstanceOfToMethod(methodName,
-            lastOffset + 1);
+            lastLabel.getOffset() + 1);
       }
     }
 
     @Override
     public void visitMultiANewArrayInsn(String desc, int dims)  {
       super.visitMultiANewArrayInsn(desc, dims);
-      NewScanner.addNewToMethod(methodName, lastOffset);
+      NewScanner.addNewToMethod(methodName, lastLabel.getOffset());
     }
 
     @Override
     public void visitIntInsn(int opcode, int operand)  {
       super.visitIntInsn(opcode, operand);
       if (opcode == Opcodes.NEWARRAY) {
-        NewScanner.addNewToMethod(methodName, lastOffset);
+        NewScanner.addNewToMethod(methodName, lastLabel.getOffset());
       }
     }
 
@@ -116,7 +110,7 @@ public class MethodOffsetClassVisitor extends CodeOffsetAdapter {
       case Opcodes.INVOKESTATIC:
       case Opcodes.INVOKEVIRTUAL:
         MethodCallScanner.addMethodCallToMethod(methodName,
-            lastOffset);
+            lastLabel.getOffset());
         // fall through
       default:
         break;
@@ -128,7 +122,7 @@ public class MethodOffsetClassVisitor extends CodeOffsetAdapter {
         Handle bsm, Object... bsmArgs) {
       super.visitInvokeDynamicInsn(name, desc, bsm, bsmArgs);
       LambdaScanner.addLambdaExpressionToMethod(methodName,
-          lastOffset);
+          lastLabel.getOffset());
     }
   }
 }
