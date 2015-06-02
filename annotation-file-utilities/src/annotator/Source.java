@@ -118,7 +118,7 @@ public final class Source {
             // Add type information to the AST.
             try {
               task.analyze();
-            } catch (Exception e) {
+            } catch (Throwable e) {
               System.err.println("WARNING: " + path
                   + ": type analysis failed; skipping");
               System.err.println("(incomplete CLASSPATH?)");

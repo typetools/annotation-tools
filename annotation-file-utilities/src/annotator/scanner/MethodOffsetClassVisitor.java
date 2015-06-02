@@ -11,11 +11,11 @@ import com.sun.tools.javac.util.Pair;
 
 
 /**
- * MethodOffsetClassVisitor is a class visitor that can should be passed to
- * ASM's ClassReader in order to retrieve extra information about method offsets
- * needed by all of the annotator.scanner classes.  This visitor should visit
- * every class that is to be annotated, and should be done before trying
- * to match elements in the tree to the various criterion.
+ * MethodOffsetClassVisitor is a class visitor that should be passed to
+ * ASM's ClassReader in order to retrieve extra information about method
+ * offsets needed by all of the annotator.scanner classes.  This visitor
+ * should visit every class that is to be annotated, and should be done
+ * before trying to match elements in the tree to the various criterion.
  */
 // Note: in order to ensure all labels are visited, this class
 // needs to extend ClassWriter and not other class visitor classes.
@@ -53,6 +53,14 @@ public class MethodOffsetClassVisitor extends ClassWriter {
       lastLabel = null;
     }
 
+    private int labelOffset() {
+      try {
+        return lastLabel.getOffset();
+      } catch (Exception ex) {
+        return 0;  // TODO: find a better default?
+      }
+    }
+
     @Override
     public void visitLocalVariable(String name, String desc,
           String signature, Label start, Label end, int index)  {
@@ -74,30 +82,30 @@ public class MethodOffsetClassVisitor extends ClassWriter {
     public void visitTypeInsn(int opcode,  String desc)   {
       super.visitTypeInsn(opcode, desc);
       if (opcode == Opcodes.CHECKCAST) {
-        CastScanner.addCastToMethod(methodName, lastLabel.getOffset() + 1);
+        CastScanner.addCastToMethod(methodName, labelOffset() + 1);
       }
 
       if (opcode == Opcodes.NEW || opcode == Opcodes.ANEWARRAY) {
-        NewScanner.addNewToMethod(methodName, lastLabel.getOffset());
+        NewScanner.addNewToMethod(methodName, labelOffset());
       }
 
       if (opcode == Opcodes.INSTANCEOF) {
         InstanceOfScanner.addInstanceOfToMethod(methodName,
-            lastLabel.getOffset() + 1);
+            labelOffset() + 1);
       }
     }
 
     @Override
     public void visitMultiANewArrayInsn(String desc, int dims)  {
       super.visitMultiANewArrayInsn(desc, dims);
-      NewScanner.addNewToMethod(methodName, lastLabel.getOffset());
+      NewScanner.addNewToMethod(methodName, labelOffset());
     }
 
     @Override
     public void visitIntInsn(int opcode, int operand)  {
       super.visitIntInsn(opcode, operand);
       if (opcode == Opcodes.NEWARRAY) {
-        NewScanner.addNewToMethod(methodName, lastLabel.getOffset());
+        NewScanner.addNewToMethod(methodName, labelOffset());
       }
     }
 
@@ -110,7 +118,7 @@ public class MethodOffsetClassVisitor extends ClassWriter {
       case Opcodes.INVOKESTATIC:
       case Opcodes.INVOKEVIRTUAL:
         MethodCallScanner.addMethodCallToMethod(methodName,
-            lastLabel.getOffset());
+            labelOffset());
         // fall through
       default:
         break;
@@ -122,7 +130,7 @@ public class MethodOffsetClassVisitor extends ClassWriter {
         Handle bsm, Object... bsmArgs) {
       super.visitInvokeDynamicInsn(name, desc, bsm, bsmArgs);
       LambdaScanner.addLambdaExpressionToMethod(methodName,
-          lastLabel.getOffset());
+          labelOffset());
     }
   }
 }
