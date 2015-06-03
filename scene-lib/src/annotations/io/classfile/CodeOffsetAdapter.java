@@ -38,10 +38,6 @@ public class CodeOffsetAdapter extends ClassAdapter {
     methodStart += 2;
   }
 
-  public ClassVisitor getDelegate() {
-    return cv;
-  }
-
   @Override
   public MethodVisitor visitMethod(int access, String name, String desc,
       String signature, String[] exceptions) {
