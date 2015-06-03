@@ -1159,46 +1159,46 @@ public final class IndexFileParser {
     // an ASTPath corresponds to an AST node.  This method restores the
     // invariant by separating out the inner type information.
     private Pair<ASTPath, InnerTypeLocation> splitNewArrayType(ASTPath astPath) {
-      ASTPath outerPath = astPath;
-      InnerTypeLocation loc = null;
-      int last = astPath.size()-1;
+      	ASTPath outerPath = astPath;
+      	InnerTypeLocation loc = null;
+      	int last = astPath.size()-1;
 
-      if (last > 0) {
-        ASTPath.ASTEntry entry = astPath.get(last);
-        if (entry.getTreeKind() == Kind.NEW_ARRAY
-            && entry.childSelectorIs(ASTPath.TYPE)) {
-          int a = entry.getArgument();
-          if (a > 0) {
-            outerPath = astPath.getParentPath()
-                .extend(new ASTPath.ASTEntry(Kind.NEW_ARRAY, ASTPath.TYPE, 0));
+      	if (last > 0) {
+        		ASTPath.ASTEntry entry = astPath.get(last);
+        		if (entry.getTreeKind() == Kind.NEW_ARRAY
+            				&& entry.childSelectorIs(ASTPath.TYPE)) {
+          			int a = entry.getArgument();
+          			if (a > 0) {
+            				outerPath = astPath.getParentPath().extend(
+            						new ASTPath.ASTEntry(Kind.NEW_ARRAY, ASTPath.TYPE, 0));
             loc = new InnerTypeLocation(TypeAnnotationPosition
-                .getTypePathFromBinary(Collections.nCopies(2*a, 0)));
-          }
-        }
-      }
+                		.getTypePathFromBinary(Collections.nCopies(2*a, 0)));
+          			}
+        		}
+      	}
 
-      return Pair.of(outerPath, loc);
+      	return Pair.of(outerPath, loc);
     }
 
     private ASTPath fixNewArrayType(ASTPath astPath) {
-      ASTPath outerPath = astPath;
-      int last = astPath.size()-1;
+      	ASTPath outerPath = astPath;
+      	int last = astPath.size()-1;
 
-      if (last > 0) {
-        ASTPath.ASTEntry entry = astPath.get(last);
-        if (entry.getTreeKind() == Kind.NEW_ARRAY
-            && entry.childSelectorIs(ASTPath.TYPE)) {
-          int a = entry.getArgument();
-          outerPath = astPath.getParentPath().extend(
-              new ASTPath.ASTEntry(Kind.NEW_ARRAY, ASTPath.TYPE, 0));
-          while (--a >= 0) {
-            outerPath = outerPath.extend(
-                new ASTPath.ASTEntry(Kind.ARRAY_TYPE, ASTPath.TYPE));
-          }
-        }
-      }
+      	if (last > 0) {
+        		ASTPath.ASTEntry entry = astPath.get(last);
+        		if (entry.getTreeKind() == Kind.NEW_ARRAY
+            				&& entry.childSelectorIs(ASTPath.TYPE)) {
+          			int a = entry.getArgument();
+          			outerPath = astPath.getParentPath().extend(
+              			new ASTPath.ASTEntry(Kind.NEW_ARRAY, ASTPath.TYPE, 0));
+          			while (--a >= 0) {
+            				outerPath = outerPath.extend(
+                				new ASTPath.ASTEntry(Kind.ARRAY_TYPE, ASTPath.TYPE));
+          			}
+        		}
+      	}
 
-      return outerPath;
+      	return outerPath;
     }
 
     /**
@@ -1623,7 +1623,7 @@ public final class IndexFileParser {
      * Caveat: Parsing of floating point numbers currently does not work.
      */
     public static void parse(LineNumberReader in, AScene scene)
-        throws IOException, ParseException {
+            throws IOException, ParseException {
         IndexFileParser parser = new IndexFileParser(in, scene);
         // no filename is available in the exception messages
         try {
@@ -1640,7 +1640,7 @@ public final class IndexFileParser {
      * them into <code>scene</code>; see {@link #parse(LineNumberReader, AScene)}.
      */
     public static void parseFile(String filename, AScene scene)
-        throws IOException {
+            throws IOException {
         LineNumberReader in = new LineNumberReader(new FileReader(filename));
         IndexFileParser parser = new IndexFileParser(in, scene);
         try {
@@ -1658,7 +1658,7 @@ public final class IndexFileParser {
      * Primarily for testing.
      */
     public static void parseString(String fileContents, AScene scene)
-        throws IOException {
+        		throws IOException {
         String filename = "While parsing string: \n----------------BEGIN----------------\n" + fileContents + "----------------END----------------\n";
         LineNumberReader in = new LineNumberReader(new StringReader(fileContents));
         try {
