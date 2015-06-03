@@ -70,7 +70,7 @@ public class InstanceOfCriterion implements Criterion {
         b = (indexInSource == loc.index);
         Criteria.dbug.debug("return loc.index: %d%n", loc.index);
       }
-      Criteria.dbug.debug("return new: %b" + b);
+      Criteria.dbug.debug("return new: %b", b);
       return b;
     } else {
       boolean b = this.isSatisfiedBy(path.getParentPath());
