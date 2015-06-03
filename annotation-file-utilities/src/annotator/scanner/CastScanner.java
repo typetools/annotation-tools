@@ -38,6 +38,9 @@ public class CastScanner extends CommonScanner {
   private int index = -1;
   private boolean done = false;
   private final Tree tree;
+  private static String prevMethodName = null;
+  private static int prevOffset = -1;
+  private static int nestLevels = 0;
 
   private CastScanner(Tree tree) {
     this.index = -1;
@@ -77,7 +80,17 @@ public class CastScanner extends CommonScanner {
       offsetList = new ArrayList<  Integer>();
       methodNameToCastOffsets.put(methodName, offsetList);
     }
-    offsetList.add(offset);
+    if (methodName.equals(prevMethodName) && offset-prevOffset == 3) {
+      // consecutive instructions -> nested casts -> reverse order!
+      // TODO: other cases for nested casts?
+      ++nestLevels;
+      offsetList.add(offsetList.size()-nestLevels, offset);
+    } else {
+      nestLevels = 0;
+      offsetList.add(offset);
+    }
+    prevMethodName = methodName;
+    prevOffset = offset;
   }
 
   /**
