@@ -13,7 +13,6 @@ class MethodCodeOffsetAdapter extends MethodAdapter {
   private int offset = 0;
   private int codeStart = 0;
   private int attrCount = 0;
-  private int codeEnd = 0;
 
   public MethodCodeOffsetAdapter(ClassReader classReader,
       MethodVisitor methodVisitor, int start) {
@@ -132,11 +131,6 @@ class MethodCodeOffsetAdapter extends MethodAdapter {
 
   @Override
   public void visitEnd() {
-    this.codeEnd = this.codeStart + offset;
-    while (attrCount > 0) {
-      this.codeEnd += 6 + cr.readInt(this.codeEnd + 2);
-      --attrCount;
-    }
-    super.visitEnd();
+    offset = -1;  // invalidated
   }
 }
