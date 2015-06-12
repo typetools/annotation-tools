@@ -7,7 +7,9 @@ import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Deque;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -430,14 +432,29 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
     // hacky fix: remove {Method,Class}.body for comparison 
     PersistentStack<ASTEntry> s0 = canonical(this);
     PersistentStack<ASTEntry> s1 = canonical(o);
+    Deque<ASTEntry> d0 = new LinkedList<ASTEntry>();
+    Deque<ASTEntry> d1 = new LinkedList<ASTEntry>();
     int c = 0;
-    while (c == 0 && !s0.isEmpty()) {
-      if (s1.isEmpty()) { return -1; }
-      c = s0.peek().compareTo(s1.peek());
+    while (!s0.isEmpty()) {
+      d0.push(s0.peek());
       s0 = s0.pop();
+    }
+    while (!s1.isEmpty()) {
+      d1.push(s1.peek());
       s1 = s1.pop();
     }
-    return c == 0 && !s1.isEmpty() ? 1 : Integer.signum(c);
+    int n0 = d0.size();
+    int n1 = d1.size();
+    c = Integer.compare(n0, n1);
+    if (c == 0) {
+      Iterator<ASTEntry> i0 = d0.iterator();
+      Iterator<ASTEntry> i1 = d1.iterator();
+      while (i0.hasNext()) {
+        c = i0.next().compareTo(i1.next());
+        if (c != 0) { return c; }
+      }
+    }
+    return c;
   }
 
   private static ASTPath canonical(ASTPath astPath) {
