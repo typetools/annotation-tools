@@ -547,11 +547,13 @@ public class Insertions implements Iterable<Insertion> {
       // MEMBER_SELECTs in the AST path that don't correspond to
       // existing nodes are part of a type use.
       if (node == null) {
-        ASTPath ap;
-        do {
-          ap = ap0.getParentPath();
-          node = ASTIndex.getNode(cut, rec.replacePath(ap));
-        } while (node == null && !astack.isEmpty());
+        ASTPath ap = ap0;
+        if (!ap.isEmpty()) {
+          do {
+            ap = ap.getParentPath();
+            node = ASTIndex.getNode(cut, rec.replacePath(ap));
+          } while (node == null && !ap.isEmpty());
+        }
         if (node == null) {
           organized.add(ins);
           continue;
