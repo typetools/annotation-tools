@@ -1,5 +1,8 @@
 package annotator.tests;
 
+import java.io.Closeable;
+import java.io.IOException;
+
 public class Receivers {
     public void m(@checkers.igj.quals.ReadOnly Receivers this) {}
 
@@ -62,3 +65,60 @@ class Receivers10<K, V> {
 }
 
 @interface Anno {}
+
+// Test receiver insertion on inner class's default constructor.
+final class ScriptBasedMapping  {
+  private final class RawScriptBasedMapping {
+  public RawScriptBasedMapping(@checkers.inference.quals.VarAnnot(0) ScriptBasedMapping ScriptBasedMapping.this) { super(); }
+  }
+}
+
+// Test receiver insertion before first parameter annotation.
+interface GenericInterface<T extends Object> {
+  public T map(T toMap);
+}
+class GenericArray<Z extends Object> implements GenericInterface<String []> {
+  private Z z;
+  public void setZ(Z z) {
+    this.z = z;
+  }
+  public String [] map(@trusted.quals.Untrusted GenericArray<Z> this, @trusted.quals.Untrusted String @trusted.quals.Untrusted [] toMap) {
+    return toMap;
+  }
+}
+class GenericFields {
+  private GenericArray<String> genArray;
+}
+
+// Test inner receiver insertion before first parameter annotation.
+class Outer<T, S> {
+  class Inner<T2 extends T> {
+    private S s;
+    private T t;
+  
+    protected void initialize(@checkers.inference.quals.VarAnnot(21) Outer<T, S>.Inner<@checkers.inference.quals.VarAnnot(20) T2> this, S s, T t) {
+      this.s = s;
+      this.t = t;
+    }
+    
+    public Inner(S s, T t) {
+      initialize(s, t);
+    }
+  }
+}
+
+// Test that parameters inside an anonymous class get annotated.
+interface Interface {
+    String get(@trusted.quals.Untrusted Interface this, @trusted.quals.Untrusted String param);
+}
+
+// Test for infinite loop bug.
+class Closer<T> implements Closeable {
+  private final Closeable proxyProvider = System.out;
+
+  @Override
+  public void close(@checkers.inference.quals.VarAnnot(5) Closer<@checkers.inference.quals.VarAnnot(6) T> this) throws IOException {
+    proxyProvider.close();
+  }
+}
+
