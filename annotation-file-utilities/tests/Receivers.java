@@ -1,5 +1,8 @@
 package annotator.tests;
 
+import java.io.Closeable;
+import java.io.IOException;
+
 public class Receivers {
     public void m() {}
 
@@ -62,3 +65,59 @@ class Receivers10<K, V> {
 }
 
 @interface Anno {}
+
+// Test receiver insertion on inner class's default constructor.
+final class ScriptBasedMapping  {
+  private final class RawScriptBasedMapping {
+  }
+}
+
+// Test receiver insertion before first parameter annotation.
+interface GenericInterface<T extends Object> {
+  public T map(T toMap);
+}
+class GenericArray<Z extends Object> implements GenericInterface<String []> {
+  private Z z;
+  public void setZ(Z z) {
+    this.z = z;
+  }
+  public String [] map(String [] toMap) {
+    return toMap;
+  }
+}
+class GenericFields {
+  private GenericArray<String> genArray;
+}
+
+// Test inner receiver insertion before first parameter annotation.
+class Outer<T, S> {
+  class Inner<T2 extends T> {
+    private S s;
+    private T t;
+  
+    protected void initialize(S s, T t) {
+      this.s = s;
+      this.t = t;
+    }
+    
+    public Inner(S s, T t) {
+      initialize(s, t);
+    }
+  }
+}
+
+// Test that parameters inside an anonymous class get annotated.
+interface Interface {
+    String get(String param);
+}
+
+// Test for infinite loop bug.
+class Closer<T> implements Closeable {
+  private final Closeable proxyProvider = System.out;
+
+  @Override
+  public void close() throws IOException {
+    proxyProvider.close();
+  }
+}
+
