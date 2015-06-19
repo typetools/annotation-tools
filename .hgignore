@@ -18,7 +18,9 @@ annotation-file-utilities/annotation-file-format.ps
 annotation-file-utilities/annotation-file-format.toc
 annotation-file-utilities/annotation-file-utilities.jar
 annotation-file-utilities/annotation-tools.zip
-# not annotation-file-utilities/annotation-file-utilities.zip which is outdated
+annotation-file-utilities/design.aux
+annotation-file-utilities/design.log
+annotation-file-utilities/design.pdf
 
 annotation-file-utilities/javadoc
 
