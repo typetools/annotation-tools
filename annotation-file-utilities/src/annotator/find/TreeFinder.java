@@ -1409,6 +1409,12 @@ loop:
       } else if (i.getKind() == Insertion.Kind.CAST) {
         Type t = ((CastInsertion) i).getType();
         JCTree jcTree = (JCTree) node;
+        if (jcTree.getKind() == Tree.Kind.VARIABLE && !astPath.isEmpty()
+            && astPath.get(-1).childSelectorIs(ASTPath.INITIALIZER)) {
+          node = ((JCVariableDecl) node).getInitializer();
+          if (node == null) { return null; }
+          jcTree = (JCTree) node;
+        }
         pos = jcTree.getStartPosition();  // unless special case applies...
         //if (node.getKind() == Tree.Kind.METHOD && !astPath.isEmpty()) {
         //    ASTPath.ASTEntry lastEntry = astPath.get(-1);
@@ -1420,35 +1426,23 @@ loop:
         if (t.getKind() == Type.Kind.DECLARED) {
           DeclaredType dt = (DeclaredType) t;
           if (dt.getName().isEmpty()) {
-            if (node.getKind() == Tree.Kind.NEW_ARRAY && false) {
-              JCNewArray na = (JCNewArray) node;
-              int ndims = na.dims.size();
-              if (ndims == 0 && na.elems != null) {
-                ndims = na.elems.size();
+              if (jcTree.type instanceof NullType) {
+                dt.setName("Object");
+              } else {
+                t = Insertions.TypeTree.conv(jcTree.type);
+                t.setAnnotations(dt.getAnnotations());
+                ((CastInsertion) i).setType(t);
               }
-
-              int arg = entry.getArgument();
-              int end = jcTree.getEndPosition(tree.endPositions);
-              if (entry.childSelectorIs(ASTPath.TYPE)) {
-                if (arg < ndims) {
-                  pos = getNthInstanceInRange('[',
-                                                pos, end, arg+1);
-                }
-              } else if (entry.childSelectorIs(ASTPath.DIMENSION)) {
-                pos = getNthInstanceInRange('[',
-                    pos, end, arg+1) + 1;
-              } else {  // ASTPath.INITIALIZER
-                // TODO?
-              }
-            } else {
-              dt.setName(jcTree.type instanceof NullType
-                  ? "Object"
-                      : jcTree.type.toString());  // FIXME: not just name here!
-            }
           }
         }
       } else if (i.getKind() == Insertion.Kind.CLOSE_PARENTHESIS) {
         JCTree jcTree = (JCTree) node;
+        if (jcTree.getKind() == Tree.Kind.VARIABLE && !astPath.isEmpty()
+            && astPath.get(-1).childSelectorIs(ASTPath.INITIALIZER)) {
+          node = ((JCVariableDecl) node).getInitializer();
+          if (node == null) { return null; }
+          jcTree = (JCTree) node;
+        }
         pos = jcTree.getEndPosition(tree.endPositions);
       } else {
         boolean typeScan = true;

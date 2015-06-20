@@ -49,6 +49,10 @@ public class CastInsertion extends Insertion {
       return type;
   }
 
+  protected void setType(Type t) {
+      type = t;
+  }
+
   /** {@inheritDoc} */
   @Override
   protected String getText(boolean comments, boolean abbreviate) {
