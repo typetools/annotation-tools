@@ -1,0 +1,25 @@
+package :
+annotation @A: @java.lang.annotation.Target(java.lang.annotation.ElementType.TYPE_USE)
+annotation @B: @java.lang.annotation.Target(java.lang.annotation.ElementType.TYPE_USE)
+annotation @C: @java.lang.annotation.Target(java.lang.annotation.ElementType.TYPE_USE)
+annotation @D: @java.lang.annotation.Target(java.lang.annotation.ElementType.TYPE_USE)
+
+package java.lang:
+annotation @Mutable: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+annotation @ReadOnly: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+
+package annotator.tests:
+class TypeCastMultiple:
+
+    method <init>()V:
+
+    method foo(Ljava/lang/Object;)V:
+        typecast #1: @java.lang.Mutable
+        typecast #6: @java.lang.ReadOnly
+        //typecast #11: @java.lang.ReadOnly  // inserts in wrong place!
+        typecast *3: @java.lang.ReadOnly
+        typecast *4, 0: @A
+        typecast *4, 1: @B
+            inner-type 3, 0: @C
+        typecast *4, 2: @D
+

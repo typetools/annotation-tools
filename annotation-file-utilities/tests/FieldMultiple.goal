@@ -1,0 +1,7 @@
+package annotator.tests;
+
+public class FieldMultiple {
+  public @java.lang.ReadOnly Integer foo, bar;
+  @java.lang.ReadOnly
+  public Integer d;
+}
