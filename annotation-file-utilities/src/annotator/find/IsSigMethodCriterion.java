@@ -283,7 +283,8 @@ public class IsSigMethodCriterion implements Criterion {
                  // Hacky way to handle the possibility that fulltype is an
                  // inner type but simple type is unqualified.
                  || (fullType.startsWith(prefix)
-                     && fullType.endsWith("$" + simpleType2)));
+                     && (fullType.endsWith("$" + simpleType2)
+                         || fullType2.endsWith("." + simpleType2))));
     Criteria.dbug.debug("matchWithPrefix(%s, %s, %s) => %b)%n",
         fullType2, simpleType, prefix, b);
     return b;
