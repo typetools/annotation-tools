@@ -1,9 +1,56 @@
+package annotator.tests;
+
 public class ExtImpl {
   class Top<X, Y> {}
   interface Iface<A, B> {}
   interface Iface2<C, D> {}
+  interface I {}
 
   class C1 extends @A Top<@B Object, @C String> implements @D Iface<@E Integer, @F String> {}
 
   class C2 implements @A Iface<@B String, @C Object>, @D Iface2<@E Object, @F Float> {}
+
+  class C3 {
+    class I implements annotator.tests.ExtImpl.I {}
+
+    /*
+     * the jaif file  says that the simple name of
+     * the return type in JVM format is
+     * LI;
+     */
+    @java.lang.SuppressWarnings({})
+    annotator.tests.ExtImpl.C3.I getI1() {
+      return null;
+    }
+
+    /*
+     * in this case, the jaif file uses the fully qualified name
+     * for the return type
+     * Lannotator.tests.ExtImpl.C3.I;
+     */
+    @java.lang.SuppressWarnings({})
+    annotator.tests.ExtImpl.C3.I getI2() {
+      return null;
+    }
+
+    /*
+     * the jaif file uses the simple name of the return type
+     * LC3$I;
+     */
+    @java.lang.SuppressWarnings({})
+    I getI3() {
+      return null;
+    }
+
+    /*
+     * in the jaif file, the return type is I
+     * (ambiguous: could be short for the interface
+     * annotator.tests.ExtImpl.I)
+     */
+    @java.lang.SuppressWarnings({})
+    I getI4() {
+      return null;
+    }
+  }
 }
+
