@@ -613,7 +613,7 @@ public class IndexFileSpecification implements Specification {
       AField param = entry.getValue();
       CriterionList paramClist = clist.add(Criteria.param(methodName, index));
       // parse declaration annotations
-      parseField(paramClist, index.toString(), param);
+      //parseField(paramClist, index.toString(), param);
       parseInnerAndOuterElements(paramClist, param.type);
     }
 
