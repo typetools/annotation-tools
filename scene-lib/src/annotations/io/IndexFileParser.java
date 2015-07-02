@@ -529,8 +529,10 @@ public final class IndexFileParser {
                 Annotation a = parseAnnotationBody(d, ab);
                 for (Annotation other : e.tlAnnotationsHere) {
                     if (a.def.name.equals(other.def.name)) {
-                        throw new ParseException(
-                          "Duplicate annotation of type " + a.def().name);
+                        System.err.println(
+                                "WARNING: duplicate annotation of type "
+                                        + a.def().name);
+                        continue;
                     }
                 }
                 Annotation tla = a;
