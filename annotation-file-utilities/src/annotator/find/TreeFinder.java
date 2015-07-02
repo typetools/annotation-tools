@@ -1206,8 +1206,9 @@ loop:
         insertRecord = pair.a;
         pos = pair.b;
 
-        Integer nextpos1 = getFirstInstanceAfter(',', pos+1);
-        Integer nextpos2 = getFirstInstanceAfter('>', pos+1);
+        int limit = ((JCTree) parent(node)).getEndPosition(tree.endPositions);
+        Integer nextpos1 = getNthInstanceInRange(',', pos+1, limit, 1);
+        Integer nextpos2 = getNthInstanceInRange('>', pos+1, limit, 1);
         pos = (nextpos1 != Position.NOPOS && nextpos1 < nextpos2) ? nextpos1 : nextpos2;
 
         if (i instanceof AnnotationInsertion) {
