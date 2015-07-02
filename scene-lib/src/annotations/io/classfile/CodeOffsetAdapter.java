@@ -9,14 +9,21 @@ import org.objectweb.asm.MethodAdapter;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
+import annotations.io.DebugWriter;
 import annotations.util.AbstractClassVisitor;
 
 public class CodeOffsetAdapter extends ClassAdapter {
+  static final DebugWriter debug;
   final ClassReader cr;
   final char[] buf;
   int methodStart;
   int codeStart;
   int offset;
+
+  static {
+    debug = new DebugWriter();
+    debug.setEnabled(false);
+  }
 
   public CodeOffsetAdapter(ClassReader cr) {
     this(cr, new AbstractClassVisitor());
@@ -39,66 +46,77 @@ public class CodeOffsetAdapter extends ClassAdapter {
   }
 
   @Override
-  public MethodVisitor visitMethod(int access, String name, String desc,
+  public MethodVisitor visitMethod(int access,
+      String name, String desc,
       String signature, String[] exceptions) {
     MethodVisitor v =
         super.visitMethod(access, name, desc, signature, exceptions);
     return new MethodAdapter(v) {
-      private int methodEnd = 0;
+      private int methodEnd;
+
+      {
+        String name = cr.readUTF8(methodStart + 2, buf);
+        String desc = cr.readUTF8(methodStart + 4, buf);
+        int attrCount = cr.readUnsignedShort(methodStart + 6);
+        debug.debug("visiting %s%s (%d)", name, desc, methodStart);
+        debug.debug("%d attributes", attrCount);
+        methodEnd = methodStart + 8;
+
+        // find code attribute
+        codeStart = methodEnd;
+        if (attrCount > 0) {
+          while (--attrCount >= 0) {
+            String attrName = cr.readUTF8(codeStart, buf);
+            debug.debug("attribute %s", attrName);
+            if ("Code".equals(attrName)) {
+              codeStart += 6;
+              offset = codeStart + cr.readInt(codeStart - 4);
+              codeStart += 8;
+              while (--attrCount >= 0) {
+                debug.debug("attribute %s", cr.readUTF8(offset, buf));
+                offset += 6 + cr.readInt(offset + 2);
+              }
+              methodEnd = offset;
+              break;
+            }
+            codeStart += 6 + cr.readInt(codeStart + 2);
+            methodEnd = codeStart;
+          }
+        }
+        offset = 0;
+      }
 
       private int readInt(int i) {
         return cr.readInt(codeStart + i);
       }
 
       @Override
-      public void visitCode() {
-        super.visitCode();
-        int attrCount = cr.readUnsignedShort(methodStart + 6);
-      
-        // find code attribute
-        codeStart = methodStart + 8;
-        if (attrCount > 0) {
-          while (--attrCount >= 0) {
-            String attrName = cr.readUTF8(codeStart, buf);
-            if ("Code".equals(attrName)) {
-              codeStart += 6;
-              offset = codeStart + cr.readInt(codeStart - 4);
-              while (--attrCount >= 0) {
-                offset += 6 + cr.readInt(offset + 2);
-              }
-              methodEnd = offset;
-              offset = 0;
-              return;
-            }
-            codeStart += 6 + cr.readInt(codeStart + 2);
-          }
-        }
-        methodEnd = 0;
-        offset = 0;
-      }
-
-      @Override
       public void visitFieldInsn(int opcode,
           String owner, String name, String desc) {
         super.visitFieldInsn(opcode, owner, name, desc);
+        debug.debug("%d visitFieldInsn(%d, %s, %s, %s)", offset,
+            opcode, owner, name, desc);
         offset += 3;
       }
 
       @Override
       public void visitIincInsn(int var, int increment) {
         super.visitIincInsn(var, increment);
+        debug.debug("%d visitIincInsn(%d, %d)", offset, var, increment);
         offset += 3;
       }
 
       @Override
       public void visitInsn(int opcode) {
         super.visitInsn(opcode);
+        debug.debug("%d visitInsn(%d)", offset, opcode);
         ++offset;
       }
 
       @Override
       public void visitIntInsn(int opcode, int operand) {
         super.visitIntInsn(opcode, operand);
+        debug.debug("%d visitIntInsn(%d, %d)", offset, opcode, operand);
         offset += opcode == Opcodes.SIPUSH ? 3 : 2;
       }
 
@@ -106,18 +124,22 @@ public class CodeOffsetAdapter extends ClassAdapter {
       public void visitInvokeDynamicInsn(String name, String desc,
           Handle bsm, Object... bsmArgs) {
         super.visitInvokeDynamicInsn(name, desc, bsm, bsmArgs);
+        debug.debug("%d visitInvokeDynamicInsn(%s, %s)", offset,
+            name, desc, bsm, bsmArgs);
         offset += 5;
       }
 
       @Override
       public void visitJumpInsn(int opcode, Label label) {
         super.visitJumpInsn(opcode, label);
+        debug.debug("%d visitJumpInsn(%d, %s)", offset, opcode, label);
         offset += 3;
       }
 
       @Override
       public void visitLdcInsn(Object cst) {
         super.visitLdcInsn(cst);
+        debug.debug("%d visitLdcInsn(%s)", offset, cst);
         offset += 2;
       }
 
@@ -125,7 +147,9 @@ public class CodeOffsetAdapter extends ClassAdapter {
       public void visitLookupSwitchInsn(Label dflt, int[] keys,
           Label[] labels) {
         super.visitLookupSwitchInsn(dflt, keys, labels);
-        offset += 8 - ((offset - codeStart) & 3);
+        debug.debug("%d visitLookupSwitchInsn(%s)", offset,
+            dflt, keys, labels);
+        offset += 8 - (offset & 3);
         offset += 4 + 8 * readInt(offset);
       }
 
@@ -133,12 +157,16 @@ public class CodeOffsetAdapter extends ClassAdapter {
       public void visitMethodInsn(int opcode,
           String owner, String name, String desc) {
         super.visitMethodInsn(opcode, owner, name, desc);
+        debug.debug("%d visitMethodInsn(%d, %s, %s, %s)", offset,
+            opcode, owner, name, desc);
         offset += opcode == Opcodes.INVOKEINTERFACE ? 5 : 3;
       }
 
       @Override
       public void visitMultiANewArrayInsn(String desc, int dims) {
         super.visitMultiANewArrayInsn(desc, dims);
+        debug.debug("%d visitMultiANewArrayInsn(%s, %d)", offset,
+            desc, dims);
         offset += 4;
       }
 
@@ -146,25 +174,29 @@ public class CodeOffsetAdapter extends ClassAdapter {
       public void visitTableSwitchInsn(int min, int max,
           Label dflt, Label[] labels) {
         super.visitTableSwitchInsn(min, max, dflt, labels);
-        offset += 8 - ((offset - codeStart) & 3);
+        debug.debug("%d visitTableSwitchInsn(%d, %d, %s)", offset,
+            min, max, dflt, labels);
+        offset += 8 - (offset & 3);
         offset += 4 * (readInt(offset + 4) - readInt(offset) + 3);
       }
 
       @Override
       public void visitTypeInsn(int opcode, String desc) {
         super.visitTypeInsn(opcode, desc);
+        debug.debug("%d visitTypeInsn(%d, %s)", offset, opcode, desc);
         offset += 3;
       }
 
       @Override
       public void visitVarInsn(int opcode, int var) {
         super.visitVarInsn(opcode, var);
+        debug.debug("%d visitVarInsn(%d, %d)", offset, opcode, var);
         offset += var < 4 ? 1 : 2;
       }
 
       @Override
       public void visitEnd() {
-        methodStart = methodEnd > 0 ? methodEnd : methodStart + offset;
+        methodStart = methodEnd;
       }
     };
   }
