@@ -7,6 +7,13 @@ annotation @D:
 annotation @E:
 annotation @F:
 
+package java.lang:
+
+annotation @SuppressWarnings:
+    String[] value
+
+package annotator.tests:
+
 class ExtImpl$C1:
 extends: @A
 inner-type 3, 0: @B
@@ -22,4 +29,10 @@ inner-type 3, 1: @C
 implements 1: @D
 inner-type 3, 0: @E
 inner-type 3, 1: @F
+
+class ExtImpl$C3:
+    method getI1()LI;: @SuppressWarnings({})
+    method getI2()Lannotator.tests.ExtImpl$C3$I;: @SuppressWarnings({})
+    method getI3()LExtImpl$C3$I;: @SuppressWarnings({})
+    method getI4()LI;: @SuppressWarnings({})
 
