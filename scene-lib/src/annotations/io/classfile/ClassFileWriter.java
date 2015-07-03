@@ -107,44 +107,44 @@ public class ClassFileWriter {
 
     for (int i = 0; i < file_args.length; i++) {
 
-     String className = file_args[i];
-     i++;
-     if (i >= file_args.length) {
-       System.out.println("Error: incorrect number of arguments");
-       System.out.println("Run insert-annotations --help for usage information");
-       return;
-     }
-     String indexFileName = file_args[i];
+      String className = file_args[i];
+      i++;
+      if (i >= file_args.length) {
+        System.out.println("Error: incorrect number of arguments");
+        System.out.println("Run insert-annotations --help for usage information");
+        return;
+      }
+      String indexFileName = file_args[i];
 
-     AScene scene = new AScene();
+      AScene scene = new AScene();
 
-     IndexFileParser.parseFile(indexFileName, scene);
+      IndexFileParser.parseFile(indexFileName, scene);
 
-     // annotations loaded from index file into scene, now insert them
-     // into class file
-     try {
-       if (className.endsWith(".class")) {
-         System.out.printf("Adding annotations to class file %s%n", className);
-         insert(scene, className, true);
-       } else {
-         String outputFileName = className + ".class";
-         System.out.printf("Reading class file %s; writing with annotations to %s%n",
-                           className, outputFileName);
-         insert(scene, className, outputFileName, true);
-       }
-     } catch(IOException e) {
-       System.out.printf("IOException: %s%n", e.getMessage());
-       return;
-     } catch(Exception e) {
-       System.out.println("Unknown error trying to insert annotations from: " +
-           indexFileName + " to " + className);
-       e.printStackTrace();
-       System.out.println("Please submit a bug report at");
-       System.out.println("  http://code.google.com/p/annotation-tools/issues");
-       System.out.println("Be sure to include a copy of the following output trace, instructions on how");
-       System.out.println("to reproduce this error, and all input files.  Thanks!");
-       return;
-     }
+      // annotations loaded from index file into scene, now insert them
+      // into class file
+      try {
+        if (className.endsWith(".class")) {
+          System.out.printf("Adding annotations to class file %s%n", className);
+          insert(scene, className, true);
+        } else {
+          String outputFileName = className + ".class";
+          System.out.printf("Reading class file %s; writing with annotations to %s%n",
+                            className, outputFileName);
+          insert(scene, className, outputFileName, true);
+        }
+      } catch(IOException e) {
+        System.out.printf("IOException: %s%n", e.getMessage());
+        return;
+      } catch(Exception e) {
+        System.out.println("Unknown error trying to insert annotations from: " +
+                           indexFileName + " to " + className);
+        e.printStackTrace();
+        System.out.println("Please submit a bug report at");
+        System.out.println("  https://github.com/typetools/annotation-tools/issues");
+        System.out.println("Be sure to include a copy of the following output trace, instructions on how");
+        System.out.println("to reproduce this error, and all input files.  Thanks!");
+        return;
+      }
     }
 
   }

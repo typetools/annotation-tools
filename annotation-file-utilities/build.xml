@@ -194,8 +194,8 @@
     <delete dir="${temp-jarfile}"/>
   </target>
 
-  <target name="check-hg-status" depends="init-properties">
-    <exec executable="hg"
+  <target name="check-git-status" depends="init-properties">
+    <exec executable="git"
           outputproperty="status.output">
       <arg value="status" />
     </exec>
@@ -207,7 +207,7 @@
     </condition>
 
     <fail unless="status.output.empty"
-          message="`hg status' did not return empty output.
+          message="`git status' did not return empty output.
   Commit/add/remove files as appropriate, then re-try."/>
   </target>
 
@@ -216,11 +216,14 @@
   <target name="update-workspace" depends="init-properties">
     <delete dir="${temp-annotation-tools}" />
 
-    <exec executable="hg">
-      <arg value="archive" />
+    <exec executable="git">
+      <arg value="clone" />
+      <arg value="." />
       <arg value="${temp-annotation-tools}" />
     </exec>
     <delete dir="${temp-annotation-tools}/scene-lib.orig-hand-annos" />
+    <delete dir="${temp-annotation-tools}/.git" />
+    <delete file="${temp-annotation-tools}/.gitignore" />
     <delete file="${temp-annotation-tools}/.hg_archival.txt" />
     <delete file="${temp-annotation-tools}/.hgignore" />
 
@@ -311,10 +314,10 @@
   </target>
 
   <!-- TODO: I am not sure this target works as the original author intended
-       TODO: (i.e. I don't think check-hg-status gets executed twice)
+       TODO: (i.e. I don't think check-git-status gets executed twice)
        TODO: but I am maintaining the previous behavior.
        -->
-  <target name="web" depends="check-hg-status,web-no-checks,check-hg-status"/>
+  <target name="web" depends="check-git-status,web-no-checks,check-git-status"/>
 
   <!-- New release process runs checks prior to running the web-no-checks target-->
   <target name="web-no-checks" depends="clean,zipfile"

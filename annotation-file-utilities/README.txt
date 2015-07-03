@@ -30,7 +30,7 @@ variable must be set like so:
 
 export BIBINPUTS=.:/path/to/plume/bib
 
-plume-bib is available at https://code.google.com/p/plume-bib/ .
+plume-bib is available at https://github.com/mernst/plume-bib .
 
 ===========================================================================
 
@@ -43,8 +43,8 @@ Be sure to run these instructions in an account that uses JDK 7, not JDK 8.
 Write a description of the most significant changes in:
     changelog.html
 It may be helpful to examine the changes since the last release:
-  hg log -r 3.5.3:.
-  hg diff -r 3.5.3
+  git log v3.5.3..
+  git diff v3.5.3..
 
 Manually update the version number and date in the following places:
     annotation-file-utilities.html  (in "Installation" section)
@@ -59,7 +59,7 @@ Run
 and if there are any problems, re-make the distribution.
 
 Tag the release, for example:
-  hg tag 3.5.3
+  git tag v3.5.3
 
 Send email to: checker-framework-discuss@googlegroups.com
 

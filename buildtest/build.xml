@@ -32,25 +32,25 @@
     </target>
     
     <target name="checkout-annotation-tools" depends="init">
-        <exec dir="${builddir}" executable="hg">
+        <exec dir="${builddir}" executable="git">
             <arg value="clone"/>
-            <arg value="https://code.google.com/p/annotation-tools/"/>
+            <arg value="https://github.com/typetools/annotation-tools.git"/>
             <arg value="annotation-tools"/>
         </exec>
     </target>
     
     <target name="checkout-checker-framework" depends="init">
-        <exec dir="${builddir}" executable="hg">
+        <exec dir="${builddir}" executable="git">
             <arg value="clone"/>
-            <arg value="https://code.google.com/p/checker-framework/"/>
+            <arg value="https://github.com/typetools/checker-framework.git"/>
             <arg value="checker-framework"/>
         </exec>
     </target>
     
     <target name="checkout-javarifier" depends="init">
-        <exec dir="${builddir}" executable="hg">
+        <exec dir="${builddir}" executable="git">
             <arg value="clone"/>
-            <arg value="https://code.google.com/p/javarifier/"/>
+            <arg value="https://github.com/typetools/javarifier.git"/>
             <arg value="javarifier"/>
         </exec>
     </target>
