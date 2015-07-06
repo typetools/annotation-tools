@@ -1,0 +1,40 @@
+#!/bin/sh
+
+# Ad hoc script for merging annotated JDKs.  Arguments are JDK source
+# directories, assumed to be children of $js and identified by directory
+# name only (e.g. "merge-annotations igj javari nullness").
+
+if [ $# -le 1 ]; then exit 0; fi
+
+js="$JSR308/jdk8u/jdk/src/share/classes"
+jb="$CHECKERFRAMEWORK/checker/dist/*"
+cf="$CHECKERFRAMEWORK/checker/build"
+sl="$JSR308/annotation-tools/scene-lib/bin"
+al="$JSR308/annotation-tools/annotation-file-utilities/lib"
+jj=./jdk.jaif
+wd=`pwd`
+cp="$jb:$cf:$sl:$al/*:$wd:$CLASSPATH"
+if [ 0 -eq 1 ] ; then
+td=/tmp/merge-jaifs.*
+else
+td=/tmp/merge-jaifs.$$
+
+for aj in $* ; do
+    cd $aj/build
+    for f in `find . -name '*\.class' -print | sed 's-^\./--'` ; do
+        CLASSPATH="$wd/$aj/build:$CHECKERFRAMEWORK/checker/build:$CLASSPATH" \
+          extract-annotations "$f"
+        if [ $? -eq 0 ] ; then
+            d=`dirname "$f"`
+            mkdir -p "$td/$aj/$d"
+            mv "$d"/*.jaif "$td/$aj/$d"
+        fi
+    done
+    cd "$wd"
+done
+fi
+
+find $td -type f -print | xargs java -cp "$cp" annotations.tools.IndexFileMerger $td | sed 's/(value={\[/({/g' | sed 's/\]}/}/g' > "./$jj" &&\
+find "$js" -name "*\.java" -print | CLASSPATH="$cp" xargs insert-annotations-to-source --print-error-stack "$jj" &&\
+rm -rf $td
+
