@@ -53,6 +53,7 @@ import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.JCTree.JCAnnotatedType;
 import com.sun.tools.javac.tree.JCTree.JCAnnotation;
 import com.sun.tools.javac.tree.JCTree.JCArrayTypeTree;
+import com.sun.tools.javac.tree.JCTree.JCBlock;
 import com.sun.tools.javac.tree.JCTree.JCClassDecl;
 import com.sun.tools.javac.tree.JCTree.JCCompilationUnit;
 import com.sun.tools.javac.tree.JCTree.JCExpression;
@@ -220,7 +221,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       int pos = Position.NOPOS;
       int stop = Math.min(end, s.length());
       String cQuoted = c == '/' ? nonDelimSlash : Pattern.quote("" + c);
-      String regex = "(?:" + otherThan(c) + ")*" + cQuoted;
+      String regex = "(?:" + otherThan(c) + ")*+" + cQuoted;
       Pattern p = Pattern.compile(regex, Pattern.MULTILINE);
       Matcher m = p.matcher(s).region(start, stop);
 
@@ -933,7 +934,7 @@ loop:
       assert result >= 0 || cd.name.isEmpty()
         : String.format("%d %d %d%n", cd.getStartPosition(),
                         cd.getPreferredPosition(), cd.pos);
-      return result;
+      return result < 0 ? null : result;
     }
 
   }
@@ -1267,8 +1268,7 @@ loop:
           // looking for the declaration
           pos = dpf.scan(node, null);
           insertRecord = astRecord(node);
-          assert pos != null;
-          dbug.debug("pos = %d at declaration: %s%n", pos, node.getClass());
+          dbug.debug("pos = %s at declaration: %s%n", pos, node.getClass());
         }
       }
 
@@ -1400,8 +1400,9 @@ loop:
         insertRecord = pair.a;
         pos = pair.b;
 
-        Integer nextpos1 = getFirstInstanceAfter(',', pos+1);
-        Integer nextpos2 = getFirstInstanceAfter('>', pos+1);
+        int limit = ((JCTree) parent(node)).getEndPosition(tree.endPositions);
+        Integer nextpos1 = getNthInstanceInRange(',', pos+1, limit, 1);
+        Integer nextpos2 = getNthInstanceInRange('>', pos+1, limit, 1);
         pos = (nextpos1 != Position.NOPOS && nextpos1 < nextpos2) ? nextpos1 : nextpos2;
 
         if (i instanceof AnnotationInsertion) {
@@ -1501,10 +1502,18 @@ loop:
     String sym = node.sym.toString();
     String name = sym.substring(0, sym.indexOf('('));
     JCModifiers mods = node.getModifiers();
+    JCBlock body = node.body;
     if ((mods.flags & Flags.GENERATEDCONSTR) != 0) { return Position.NOPOS; }
-    int start = node.getStartPosition() + mods.toString().length();
-    int end = start + node.toString().length()
-        - (node.body == null ? 1 : node.body.toString().length());
+    int nodeStart = node.getStartPosition();
+    int nodeEnd = node.getEndPosition(tree.endPositions);
+    int nodeLength = nodeEnd - nodeStart;
+    int modsLength = mods.getEndPosition(tree.endPositions)
+        - mods.getStartPosition();  // can't trust string length!
+    int bodyLength = body == null ? 1
+        : body.getEndPosition(tree.endPositions) - body.getStartPosition();
+    int start = nodeStart + modsLength;
+    int end = nodeStart + nodeLength - bodyLength;
+        //start - (node.body == null ? 1 : node.body.toString().length());
     int angle = name.lastIndexOf('>');  // check for type params
     if (angle >= 0) { name = name.substring(angle + 1); }
 
