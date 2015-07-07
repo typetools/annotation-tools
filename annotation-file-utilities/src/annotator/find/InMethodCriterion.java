@@ -1,5 +1,7 @@
 package annotator.find;
 
+import javax.lang.model.element.Modifier;
+
 import annotator.Main;
 
 import com.sun.source.tree.*;
@@ -39,6 +41,8 @@ final class InMethodCriterion implements Criterion {
   public boolean isSatisfiedBy(TreePath path) {
     Criteria.dbug.debug("InMethodCriterion.isSatisfiedBy(%s); this=%s%n",
         Main.pathToString(path), this.toString());
+    boolean staticDecl = false;
+    boolean result = false;
 
     do {
       if (path.getLeaf().getKind() == Tree.Kind.METHOD) {
@@ -46,11 +50,17 @@ final class InMethodCriterion implements Criterion {
         Criteria.dbug.debug("%s%n", "InMethodCriterion.isSatisfiedBy => b");
         return b;
       }
+      if (path.getLeaf().getKind() == Tree.Kind.VARIABLE) {
+        ModifiersTree mods = ((VariableTree) path.getLeaf()).getModifiers();
+        staticDecl = mods.getFlags().contains(Modifier.STATIC);
+      }
       path = path.getParentPath();
     } while (path != null && path.getLeaf() != null);
 
-    Criteria.dbug.debug("%s%n", "InMethodCriterion.isSatisfiedBy => false");
-    return false;
+    result = (staticDecl ? "<clinit>()V" : "<init>()V").equals(name);
+
+    Criteria.dbug.debug("InMethodCriterion.isSatisfiedBy => %s%n", result);
+    return result;
   }
 
   /**
