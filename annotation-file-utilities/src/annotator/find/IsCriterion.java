@@ -1,5 +1,7 @@
 package annotator.find;
 
+import annotator.scanner.CommonScanner;
+
 import com.sun.source.tree.*;
 import com.sun.source.util.TreePath;
 
@@ -38,6 +40,8 @@ final class IsCriterion implements Criterion {
     if (path == null)
       return false;
     Tree tree = path.getLeaf();
+    if (CommonScanner.hasClassKind(tree))
+      return InClassCriterion.isSatisfiedBy(path, name, /*exactMatch=*/ true);
     if (tree.getKind() != kind)
       return false;
     switch (tree.getKind()) {
@@ -47,8 +51,8 @@ final class IsCriterion implements Criterion {
     case METHOD:
       String methodName = ((MethodTree)tree).getName().toString();
       return methodName.equals(name);
-    case CLASS:
-      return InClassCriterion.isSatisfiedBy(path, name, /*exactMatch=*/ true);
+    //case CLASS:
+    //  return InClassCriterion.isSatisfiedBy(path, name, /*exactMatch=*/ true);
     default:
       throw new Error("unknown tree kind " + kind);
     }
