@@ -2,6 +2,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class NewArray {
+     private static final int MAX_HOOKS = 10;
+     private static final Runnable[] hooks = new Runnable[MAX_HOOKS];
 
      String[] names01 = new String[12];
 
