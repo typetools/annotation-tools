@@ -1,8 +1,8 @@
 package annotator.tests;
 
-import java.util.List;
+import java.util.Comparator;
 import java.util.Date;
-import java.io.PrintStream;
+import java.util.List;
 
 public class BoundMethodSimple {
   public <T extends @java.lang.ReadOnly Date> void foo(T t) {
@@ -12,4 +12,9 @@ public class BoundMethodSimple {
   public <T extends java.lang.@java.lang.ReadOnly Object> void foo2(T t) {
     System.out.println(t);
   }
+
+  public static <T extends java.lang.@org.checkerframework.checker.nullness.qual.Nullable @org.checkerframework.checker.nullness.qual.UnknownKeyFor Object> void
+  foo3(List<T> list, Comparator<? super T> c) {
+  }
 }
+

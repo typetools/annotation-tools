@@ -46,6 +46,7 @@ import annotations.io.DebugWriter;
 import annotations.io.IndexFileParser;
 import annotations.io.IndexFileWriter;
 import annotations.util.coll.VivifyingMap;
+import annotator.find.AnnotationInsertion;
 import annotator.find.CastInsertion;
 import annotator.find.ConstructorInsertion;
 import annotator.find.Criteria;
@@ -855,12 +856,23 @@ public class Main {
             } else {
               precedingChar = '\0';
             }
-            if (iToInsert.getKind() == Insertion.Kind.CAST) {
+
+            if (iToInsert.getKind() == Insertion.Kind.ANNOTATION) {
+              AnnotationInsertion ai = (AnnotationInsertion) iToInsert;
+              if (ai.isGenerateExtends()) {  // avoid multiple "extends"
+                try {
+                  String s = src.substring(pos, pos+20);
+                  if (" extends java.lang.@".equals(s)) {
+                    ai.setGenerateExtends(false);
+                    pos += 19;
+                    precedingChar = '.';
+                  }
+                } catch (StringIndexOutOfBoundsException e) {}
+              }
+            } else if (iToInsert.getKind() == Insertion.Kind.CAST) {
                 ((CastInsertion) iToInsert)
                         .setOnArrayLiteral(src.charAt(pos) == '{');
-            }
-
-            if (iToInsert.getKind() == Insertion.Kind.RECEIVER) {
+            } else if (iToInsert.getKind() == Insertion.Kind.RECEIVER) {
               ReceiverInsertion ri = (ReceiverInsertion) iToInsert;
               ri.setAnnotationsOnly(receiverInserted);
               receiverInserted = true;

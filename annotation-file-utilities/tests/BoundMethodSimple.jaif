@@ -1,6 +1,10 @@
 package java.lang:
 annotation @ReadOnly: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
 
+package org.checkerframework.checker.nullness.qual:
+annotation @Nullable: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+annotation @UnknownKeyFor: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+
 package annotator.tests:
 class BoundMethodSimple:
 
@@ -11,3 +15,7 @@ class BoundMethodSimple:
 
     method foo2(Ljava/lang/Object;)V:
         bound 0 & 0: @java.lang.ReadOnly
+
+    method foo3(Ljava/util/List;Ljava/util/Comparator;)V:
+        bound 0 & 0: @org.checkerframework.checker.nullness.qual.Nullable @org.checkerframework.checker.nullness.qual.UnknownKeyFor
+

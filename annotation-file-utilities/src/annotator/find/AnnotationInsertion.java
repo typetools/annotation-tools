@@ -39,11 +39,11 @@ public class AnnotationInsertion extends Insertion {
         this(annotation, new Criteria(), false);
     }
 
-    protected boolean isGenerateExtends() {
+    public boolean isGenerateExtends() {
       return generateExtends;
     }
 
-    protected void setGenerateExtends(boolean generateExtends) {
+    public void setGenerateExtends(boolean generateExtends) {
       this.generateExtends = generateExtends;
     }
 
