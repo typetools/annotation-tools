@@ -74,6 +74,7 @@ import annotations.io.ASTPath;
 import annotations.io.ASTRecord;
 import annotations.io.DebugWriter;
 import annotator.Main;
+import annotator.scanner.CommonScanner;
 import annotator.specification.IndexFileSpecification;
 import type.ArrayType;
 import type.DeclaredType;
@@ -924,11 +925,12 @@ loop:
     @Override
     public Integer visitClass(ClassTree node, Void p) {
       JCClassDecl cd = (JCClassDecl) node;
-      int result;
+      int result = -1;
       if (cd.mods != null
           && (cd.mods.flags != 0 || cd.mods.annotations.size() > 0)) {
         result = cd.mods.getPreferredPosition();
-      } else {
+      }
+      if (result < 0) {
         result = cd.getPreferredPosition();
       }
       assert result >= 0 || cd.name.isEmpty()
@@ -1246,7 +1248,7 @@ loop:
         if (node.getKind() == Tree.Kind.METHOD) { // MethodTree
           // looking for the receiver or the declaration
           typeScan = i.getCriteria().isOnReceiver();
-        } else if (node.getKind() == Tree.Kind.CLASS) { // ClassTree
+        } else if (CommonScanner.hasClassKind(node)) { // ClassTree
           typeScan = ! i.getSeparateLine(); // hacky check
         }
         if (typeScan) {

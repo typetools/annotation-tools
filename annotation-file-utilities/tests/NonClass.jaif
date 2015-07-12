@@ -44,7 +44,7 @@ method <init>(Ljava/lang/String;)V:
 new *0: @V(0)
 
 package:
-class NonClass$I:
+class NonClass$I: @X
 implements 0: @X
 inner-type 3, 0: @X
 
