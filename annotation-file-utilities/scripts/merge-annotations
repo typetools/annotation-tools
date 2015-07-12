@@ -6,7 +6,7 @@
 
 if [ $# -le 1 ]; then exit 0; fi
 
-js="$JSR308/jdk8u/jdk/src/share/classes"
+js="$HOME/src/jdk1.8.0_45/src"
 jb="$CHECKERFRAMEWORK/checker/dist/*"
 cf="$CHECKERFRAMEWORK/checker/build"
 sl="$JSR308/annotation-tools/scene-lib/bin"
