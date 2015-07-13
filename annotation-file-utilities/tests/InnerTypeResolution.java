@@ -1,6 +1,6 @@
 package annotator.tests;
 
-import java.util.*;
+import java.util.Map;
 
 public class InnerTypeResolution {
     Map.Entry method01(Map m){
