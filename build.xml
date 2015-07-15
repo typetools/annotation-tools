@@ -8,7 +8,8 @@
     <property name="scene-lib" location="scene-lib"/>
     <property name="afu" location="annotation-file-utilities"/>
 
-    <target name="all" depends="compile,test"/>
+    <target name="all" description="Compile and tests"
+	depends="compile,test"/>
 
     <target name="compile" description="Compile all annotation tools"
         depends="compile-all"/>
