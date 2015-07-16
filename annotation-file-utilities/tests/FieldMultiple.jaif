@@ -10,6 +10,8 @@ class FieldMultiple:
     field bar:
         type: @java.lang.ReadOnly
 
+    field i: @java.lang.ReadOnly
+
     field d: @java.lang.ReadOnly
 
     method <init>()V:

@@ -1,7 +1,12 @@
 package annotator.tests;
 
+@skip-test
+
 public class FieldMultiple {
-  public @java.lang.ReadOnly Integer foo, bar;
+  public @java.lang.ReadOnly Integer foo;
+  public @java.lang.ReadOnly Integer bar;
+  @java.lang.ReadOnly
+  public Integer i;
   @java.lang.ReadOnly
   public Integer d;
 }
