@@ -1,11 +1,13 @@
 package annotator.tests;
 
+@skip-test
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
 public class BoundClassMultiple<
   T extends @java.lang.A Date,
-  U extends @java.lang.B List & @java.lang.C Serializable,
-  V extends @java.lang.D Comparable<@java.lang.E V>> {
+  U extends java.lang.@java.lang.B Object & @java.lang.C List & @java.lang.D Serializable,
+  V extends @java.lang.E Comparable<@java.lang.F V>> {
 }

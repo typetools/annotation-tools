@@ -16,6 +16,9 @@ annotation @E: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYP
 package java.lang:
 annotation @F: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
 
+package java.lang:
+annotation @G: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+
 package annotator.tests:
 class BoundMethodMultiple:
 
@@ -31,8 +34,9 @@ class BoundMethodMultiple:
     method foo(Ljava/util/List;)V:
         bound 0 & 0: @java.lang.C
         bound 0 & 1: @java.lang.D
+        bound 0 & 2: @java.lang.E
 
     method foo(Lannotator/tests/Date;Ljava/util/Map;)V:
-        bound 0 & 0: @java.lang.E
-        bound 1 & 0: @java.lang.F
+        bound 0 & 0: @java.lang.F
+        bound 1 & 0: @java.lang.G
 
