@@ -1,5 +1,7 @@
 package annotator.tests;
 
+@skip-test
+
 public class ExtImpl {
   class Top<X, Y> {}
   interface Iface<A, B> {}
