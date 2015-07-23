@@ -1,0 +1,38 @@
+package :
+annotation @X: @java.lang.annotation.Target({java.lang.annotation.ElementType.TYPE_USE})
+annotation @Y: @java.lang.annotation.Target({java.lang.annotation.ElementType.TYPE_USE})
+
+class BoundZero:
+
+    method m0:
+        type:
+            bound 0&0:
+
+    method m1:
+        type:
+            bound 0&0:
+
+    method m2:
+        type:
+            bound 0&0:
+
+    method m3:
+        type:
+            bound 0&0:
+
+    method m4:
+        type:
+            bound 0&0:
+
+    method m5:
+        type:
+            bound 0&0:
+
+    method m6:
+        type:
+            bound 0&0:
+
+    method m7:
+        type:
+            bound 0&0:
+
