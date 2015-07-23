@@ -26,7 +26,7 @@
     <target name="checkout-jsr308-langtools" depends="init">
         <exec dir="${builddir}" executable="hg">
             <arg value="clone"/>
-            <arg value="https://code.google.com/p/jsr308-langtools/"/>
+            <arg value="https://bitbucket.org/typetools/jsr308-langtools"/>
             <arg value="jsr308-langtools"/>
         </exec>
     </target>
