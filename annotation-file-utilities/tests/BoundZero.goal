@@ -1,0 +1,19 @@
+import java.lang.annotation.ElementType.TYPE_USE;
+import java.lang.annotation.Target;
+
+@skip-test
+
+@Target({TYPE_USE}) @interface X {}
+@Target({TYPE_USE}) @interface Y {}
+
+class BoundZero {
+  <T extends @java.lang.Y Object> m0(T o) {}
+  <T extends @java.lang.Y Object & Comparable<T>> m1(T o) {}
+  <T extends @java.lang.Y Object & Comparable<T>> m2(T o) {}
+  <T extends @X @java.lang.Y Object & Comparable<T>> m3(T o) {}
+  <T extends @java.lang.X @java.lang.Y Object & Comparable<T>> m4(T o) {}
+  <T extends java.lang.@java.lang.Y Object & Comparable<T>> m5(T o) {}
+  <T extends java.lang.@X @java.lang.Y Object & Comparable<T>> m6(T o) {}
+  <T extends java.lang.@java.lang.X @java.lang.Y Object & Comparable<T>> m7(T o) {}
+}
+
