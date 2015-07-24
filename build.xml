@@ -35,6 +35,10 @@
         <ant dir="${scene-lib}" target="bin"/>
     </target>
 
+    <target name="javadoc-scene-lib">
+        <ant dir="${scene-lib}" target="javadoc"/>
+    </target>
+
     <target name="test-scene-lib">
         <ant dir="${scene-lib}" target="test"/>
     </target>
@@ -61,5 +65,9 @@
       <ant dir="${scene-lib}" target="clean"/>
       <ant dir="${afu}" target="clean"/>
     </target>
+
+    <target name="javadoc" depends="javadoc-scene-lib,javadoc-afu">
+    </target>
+
 
 </project>
