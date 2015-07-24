@@ -1466,8 +1466,8 @@ file to access and manipulate.
 \label{fig:scene-lib-type-hierarchy}
 \end{figure}
 
-Internally, a \code{.jaif} file is represented by the
-scene-lib/src/annotations/el/AScene.java class. The \code{AScene} class (or
+Internally, a \code{.jaif} file is represented by the class
+\code{scene-lib/src/annotations/el/AScene.java}. The \code{AScene} class (or
 ``annotated scene'') roughly parallels the root of an abstract syntax tree. An
 \code{AScene} has a number of classes (\code{AClass}) as children. Each class
 has a number of methods (\code{AMethod}), fields (\code{AElement}), etc. as
@@ -1486,7 +1486,7 @@ the following fields: bounds, return type, receiver parameters, and throws
 clause. Each of these fields holds the annotations stored on that part of the
 method. For details on the remainder of the classes in the type hierarchy, and
 their respective fields, see the documentation for each file in
-scene-lib/src/annotations/el/.
+\code{scene-lib/src/annotations/el/}.
 
 An \code{AScene} instance can be created in two ways. An empty \code{AScene} can
 be created by calling the \code{AScene} constructor, or an \code{AScene} can be
