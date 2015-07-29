@@ -89,11 +89,11 @@ public class ASTInsert {
     }
 }
 
-class Wild<X extends List<? extends java.lang.@Bla Object>> {
+class Wild<X extends List<? extends @Bla Object>> {
   Wild(@Bla Wild<X> n, X p) {
   }
 }
 
-class Unbound<X extends java.lang.@A Object> {}
+class Unbound<X extends @A Object> {}
 
 class Bound<@A X extends @B Object & @C Comparable<@D int @E []> & @F Map<@G ? extends @H Object, @I ?>, @J Y> {}

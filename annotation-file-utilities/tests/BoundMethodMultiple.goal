@@ -1,7 +1,5 @@
 package annotator.tests;
 
-@skip-test
-
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
@@ -16,7 +14,7 @@ public class BoundMethodMultiple {
 
   }
 
-  public <T extends java.lang.@java.lang.C Object & java.lang.D List & @java.lang.E Serializable> void foo(T t) {
+  public <T extends @java.lang.C Object & @java.lang.D List & @java.lang.E Serializable> void foo(T t) {
 
   }
 
