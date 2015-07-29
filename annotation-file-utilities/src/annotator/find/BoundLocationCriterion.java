@@ -9,6 +9,8 @@ import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.tree.TypeParameterTree;
 import com.sun.source.util.TreePath;
+import com.sun.tools.javac.code.Type;
+import com.sun.tools.javac.tree.JCTree.JCExpression;
 
 public class BoundLocationCriterion implements Criterion {
 
@@ -68,19 +70,26 @@ public class BoundLocationCriterion implements Criterion {
     // in parent
     if (boundIndex != -1) {
       if (parent instanceof TypeParameterTree) {
-        TypeParameterTree tpt = (TypeParameterTree) parent;
-        List<? extends Tree> bounds = tpt.getBounds();
-        if (boundIndex < bounds.size()) {
-          if (bounds.get(boundIndex) == leaf) {
-            returnValue = parentCriterion.isSatisfiedBy(parentPath);
-          }
+        List<? extends Tree> bounds = ((TypeParameterTree) parent).getBounds();
+        int ix = boundIndex;
+        if (!bounds.isEmpty() && isInterface((JCExpression) bounds.get(0))) {
+          --ix;
         }
-      } else if ((boundIndex == 0)
-                 && (leaf instanceof TypeParameterTree)
-                 && ((TypeParameterTree) leaf).getBounds().size() == 0) {
+        if (ix < 0 || ix < bounds.size() && bounds.get(ix) == leaf) {
+          returnValue = parentCriterion.isSatisfiedBy(parentPath);
+        }
+      } else if (boundIndex == 0 && leaf instanceof TypeParameterTree) {
+        List<? extends Tree> bounds = ((TypeParameterTree) leaf).getBounds();
+        if (bounds.isEmpty() || isInterface((JCExpression) bounds.get(0))) {
           // If the bound is implicit (i.e., a missing "extends Object"),
           // then permit the match here.
           returnValue = parentCriterion.isSatisfiedBy(path);
+        } else {
+          Type type = ((JCExpression) bounds.get(0)).type;
+          if (type != null && type.tsym != null && type.tsym.isInterface()) {
+            returnValue = parentCriterion.isSatisfiedBy(parentPath);
+          }
+        }
       }
     } else if (paramIndex != -1) {
       // if paramIndex is not null, need to ensure this present
@@ -107,6 +116,11 @@ public class BoundLocationCriterion implements Criterion {
     } else {
       return true;
     }
+  }
+
+  private boolean isInterface(JCExpression bound) {
+    Type type = bound.type;
+    return type != null && type.tsym != null && type.tsym.isInterface();
   }
 
   /** {@inheritDoc} */

@@ -1199,23 +1199,32 @@ loop:
           dbug.debug("pos = %d at return type node: %s%n",
               pos, returnType.getClass());
         }
-      } else if (((node.getKind() == Tree.Kind.TYPE_PARAMETER)
-          && (i.getCriteria().onBoundZero())
-          && ((TypeParameterTree) node).getBounds().isEmpty())
-          || ((node instanceof WildcardTree)
+      } else if (node.getKind() == Tree.Kind.TYPE_PARAMETER
+          && i.getCriteria().onBoundZero()
+          && (((TypeParameterTree) node).getBounds().isEmpty()
+              || (((JCExpression) ((TypeParameterTree) node)
+                      .getBounds().get(0))).type.tsym.isInterface())
+          || (node instanceof WildcardTree
               && ((WildcardTree) node).getBound() == null
-              && wildcardLast(i.getCriteria().getGenericArrayLocation().getLocation()))) {
+              && wildcardLast(i.getCriteria()
+                      .getGenericArrayLocation().getLocation()))) {
         Pair<ASTRecord, Integer> pair = tpf.scan(node, i);
         insertRecord = pair.a;
         pos = pair.b;
 
-        int limit = ((JCTree) parent(node)).getEndPosition(tree.endPositions);
-        Integer nextpos1 = getNthInstanceInRange(',', pos+1, limit, 1);
-        Integer nextpos2 = getNthInstanceInRange('>', pos+1, limit, 1);
-        pos = (nextpos1 != Position.NOPOS && nextpos1 < nextpos2) ? nextpos1 : nextpos2;
-
-        if (i instanceof AnnotationInsertion) {
-          ((AnnotationInsertion) i).setGenerateExtends(true);
+        if (i.getKind() == Insertion.Kind.ANNOTATION) {
+          if (node.getKind() == Tree.Kind.TYPE_PARAMETER
+              && !((TypeParameterTree) node).getBounds().isEmpty()) {
+            Tree bound = ((TypeParameterTree) node).getBounds().get(0);
+            pos = ((JCExpression) bound).getStartPosition();
+            ((AnnotationInsertion) i).setGenerateBound(true);
+          } else {
+            int limit = ((JCTree) parent(node)).getEndPosition(tree.endPositions);
+            Integer nextpos1 = getNthInstanceInRange(',', pos+1, limit, 1);
+            Integer nextpos2 = getNthInstanceInRange('>', pos+1, limit, 1);
+            pos = (nextpos1 != Position.NOPOS && nextpos1 < nextpos2) ? nextpos1 : nextpos2;
+            ((AnnotationInsertion) i).setGenerateExtends(true);
+          }
         }
       } else if (i.getKind() == Insertion.Kind.CAST) {
         Type t = ((CastInsertion) i).getType();
@@ -1392,7 +1401,9 @@ loop:
         }
       } else if (node.getKind() == Tree.Kind.TYPE_PARAMETER
           && entry.getTreeKind() == Tree.Kind.TYPE_PARAMETER  // TypeParameter.bound
-          && ((TypeParameterTree) node).getBounds().isEmpty()
+          && (((TypeParameterTree) node).getBounds().isEmpty()
+              || (((JCExpression) ((TypeParameterTree) node)
+                      .getBounds().get(0))).type.tsym.isInterface())
           || ASTPath.isWildcard(node.getKind())
           && (entry.getTreeKind() == Tree.Kind.TYPE_PARAMETER
               || ASTPath.isWildcard(entry.getTreeKind()))
@@ -1402,13 +1413,19 @@ loop:
         insertRecord = pair.a;
         pos = pair.b;
 
-        int limit = ((JCTree) parent(node)).getEndPosition(tree.endPositions);
-        Integer nextpos1 = getNthInstanceInRange(',', pos+1, limit, 1);
-        Integer nextpos2 = getNthInstanceInRange('>', pos+1, limit, 1);
-        pos = (nextpos1 != Position.NOPOS && nextpos1 < nextpos2) ? nextpos1 : nextpos2;
-
-        if (i instanceof AnnotationInsertion) {
-          ((AnnotationInsertion) i).setGenerateExtends(true);
+        if (i.getKind() == Insertion.Kind.ANNOTATION) {
+          if (node.getKind() == Tree.Kind.TYPE_PARAMETER
+              && !((TypeParameterTree) node).getBounds().isEmpty()) {
+            Tree bound = ((TypeParameterTree) node).getBounds().get(0);
+            pos = ((JCExpression) bound).getStartPosition();
+            ((AnnotationInsertion) i).setGenerateBound(true);
+          } else {
+            int limit = ((JCTree) parent(node)).getEndPosition(tree.endPositions);
+            Integer nextpos1 = getNthInstanceInRange(',', pos+1, limit, 1);
+            Integer nextpos2 = getNthInstanceInRange('>', pos+1, limit, 1);
+            pos = (nextpos1 != Position.NOPOS && nextpos1 < nextpos2) ? nextpos1 : nextpos2;
+            ((AnnotationInsertion) i).setGenerateExtends(true);
+          }
         }
       } else if (i.getKind() == Insertion.Kind.CAST) {
         Type t = ((CastInsertion) i).getType();

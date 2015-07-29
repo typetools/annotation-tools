@@ -13,6 +13,7 @@ public class AnnotationInsertion extends Insertion {
     private final String annotation;
     private String type;
     private boolean generateExtends;
+    private boolean generateBound;
 
     /**
      * Creates a new insertion.
@@ -40,11 +41,19 @@ public class AnnotationInsertion extends Insertion {
     }
 
     public boolean isGenerateExtends() {
-      return generateExtends;
+        return generateExtends;
+    }
+
+    public boolean isGenerateBound() {
+        return generateBound;
     }
 
     public void setGenerateExtends(boolean generateExtends) {
-      this.generateExtends = generateExtends;
+        this.generateExtends = generateExtends;
+    }
+
+    public void setGenerateBound(boolean b) {
+        generateBound = b;
     }
 
     /**
@@ -71,17 +80,19 @@ public class AnnotationInsertion extends Insertion {
         if (!result.startsWith("@")) {
             throw new Error("Illegal insertion, must start with @: " + result);
         }
-        
+
         // We insert a "new " when annotating a variable initializer that is a
         // bare array expression (e.g., as in "int[] a = {0, 1};")  Since the
         // syntax doesn't permit adding the type annotation in front of the
         // expression, we generate the explicit "new"
         // (as in "int[] a = new int[] {0, 1}") to provide a legal insertion site.
-        
+
         if (type != null) {
             result = "new " + result + " " + type;
+        } else if (generateBound) {
+            result += " Object &";
         } else if (generateExtends) {
-            result = "extends java.lang." + result + " Object";
+            result = "extends " + result + " Object";
         }
         return comments ? "/*" + result + "*/" : result;
     }
@@ -122,6 +133,6 @@ public class AnnotationInsertion extends Insertion {
     }
 
     public void setType(String s) {
-      this.type = s;
+        this.type = s;
     }
 }

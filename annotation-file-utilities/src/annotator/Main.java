@@ -859,12 +859,21 @@ public class Main {
 
             if (iToInsert.getKind() == Insertion.Kind.ANNOTATION) {
               AnnotationInsertion ai = (AnnotationInsertion) iToInsert;
+              if (ai.isGenerateBound()) {  // avoid multiple ampersands
+                try {
+                  String s = src.substring(pos, pos+9);
+                  if ("Object & ".equals(s)) {
+                    ai.setGenerateBound(false);
+                    precedingChar = '.';  // suppress leading space
+                  }
+                } catch (StringIndexOutOfBoundsException e) {}
+              }
               if (ai.isGenerateExtends()) {  // avoid multiple "extends"
                 try {
-                  String s = src.substring(pos, pos+20);
-                  if (" extends java.lang.@".equals(s)) {
+                  String s = src.substring(pos, pos+9);
+                  if (" extends ".equals(s)) {
                     ai.setGenerateExtends(false);
-                    pos += 19;
+                    pos += 9;
                     precedingChar = '.';
                   }
                 } catch (StringIndexOutOfBoundsException e) {}
