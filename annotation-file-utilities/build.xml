@@ -123,7 +123,7 @@
         <srcfiles dir="${asmx}/bin" excludes="tmp/**"/>
       </uptodate>
       <uptodate property="scene-lib.bin.uptodate" targetfile="annotation-file-utilities.jar">
-        <srcfiles dir="${scene-lib}/bin" />
+        <srcfiles dir="${scene-lib}/bin" excludes="annotations-expected/**,annotations/tests/**"/>
       </uptodate>
       <uptodate property="build.classes.uptodate" targetfile="annotation-file-utilities.jar">
         <srcfiles dir="${annotations-compiler}/build/classes" />
@@ -165,7 +165,7 @@
     <copy todir="${temp-jarfile}">
       <fileset dir="bin" />
       <fileset dir="${asmx}/bin" excludes="tmp/**"/>
-      <fileset dir="${scene-lib}/bin" />
+      <fileset dir="${scene-lib}/bin" excludes="annotations-expected/**,annotations/tests/**"/>
       <fileset dir="${annotations-compiler}/build/classes" />
     </copy>
     <!-- Also need to get class files in libraries -->
