@@ -25,6 +25,16 @@
           <li><a href="#extract-annotations">Extract-annotations</a></li>
           <li><a href="#insert-annotations-to-source">Insert-annotations-to-source</a></li>
         </ul></li>
+      <li><a href="#implementation">Design and Implementation Details</a>
+        <ul>
+          <li><a href="#asmx">Asmx</a>
+          <li><a href="#scene-lib">Scene-lib</a></li>
+            <ul>
+              <li><a href="#bytecode-insertion">Bytecode Insertion</a></li>
+              <li><a href="#bytecode-extraction">Bytecode Extraction</a></li>
+            </ul></li>
+          <li><a href="#source-insertion">Annotation-file-utilities</a></li>
+        </ul></li>
       <li><a href="#feedback">Feedback and bug reports</a>
         <ul>
           <li><a href="#changelog">Changelog</a></li>
@@ -73,6 +83,8 @@ file format supports both the declaration annotations and type annotations.
 An annotation file
 conventionally has the extension <code>.jaif</code> (for Java Annotation Index
 File).
+The <a href="#scene-lib"><code>scene-lib</code></a> sub-project provides
+API methods for building and manipulating annotation files.
 </p>
 
 
@@ -322,6 +334,200 @@ In this case, you should add type arguments, such as changing
 <pre>  public void pushNonezeroRing(Stack stack, Hashtable seen) {</pre>
 <p>to</p>
 <pre>  public void pushNonezeroRing(Stack&lt;Edge&gt; stack, Hashtable&lt;Edge, ?&gt; seen) {</pre>
+
+
+<hr />
+<h2 id="implementation">Design and Implementation Details</h2>
+
+<p>This section describes some high level-design and implementation
+details of the Annotation File Utilities, including the different
+components of the Annotation File Utilities and how they fit together.
+It is intended for someone who is beginning work on the Annotation File
+Utilities or is curious about how the Annotation File Utilities work.</p>
+
+<p>The Annotation File Utilities is composed of three sub-projects:
+<code>asmx</code>, <code>scene-lib</code>, and
+<code>annotation-file-utilities</code>.  The <code>asmx</code>
+sub-project provides methods for reading and writing class files.  The
+<code>scene-lib</code> sub-project represents a <code>.jaif</code> file
+and inserts and extracts annotations to/from bytecode.  The
+<code>annotation-file-utilities</code> sub-project inserts annotations
+into source code.</p>
+
+<h3 id="asmx" class="subsection">Asmx</h3>
+
+<p>The <code>asmx</code> sub-project provides methods for reading and
+writing class files.  <code>asmx</code> is based on an old version
+(2.2.2) of the <a href="#ASM">ASM Framework</a>. It has been modified to
+allow it to read and write <a href="#JSR308-webpage-201110">JSR 308</a>
+annotations in bytecode.  However, it is far behind the current ASM
+version (5.0), which provides support for type annotations. We should
+discard the custom <code>asmx</code> in the Annotation File Utilities
+and adapt the Annotation File Utilities to use the official, supported
+version of ASM.</p>
+
+<h3 id="scene-lib" class="subsection">Scene-lib</h3>
+
+<p><code>scene-lib</code> is an interface to a <code>.jaif</code> file.
+It reads in and writes out <code>.jaif</code> files and provides an
+internal representation of a <code>.jaif</code> file to access and
+manipulate.</p>
+
+<p>Internally, a <code>.jaif</code> file is represented by the
+<code>scene-lib/src/annotations/el/AScene.java</code> class. The
+<code>AScene</code> class (or &ldquo;annotated scene&rdquo;) roughly
+parallels the root of an abstract syntax tree. An <code>AScene</code>
+has a number of classes (<code>AClass</code>) as children. Each class
+has a number of methods (<code>AMethod</code>), fields
+(<code>AElement</code>), etc. as children. All of these classes are
+related in the type hierarchy shown below.</p>
+
+<div>
+<img src="scene-lib-type-hierarchy.png"></div>
+</div>
+
+<p>Note that this type hierarchy does not have a traditional
+&ldquo;is-a&rdquo; relationship between its classes. For example, it is
+not valid to say that a method is-a block, as the type hierarchy
+implies. In fact, it makes more sense to view the type hierarchy upside
+down, like so: a method contains a block, a block contains multiple
+expressions, and an expression contains an element.  (Perhaps object
+composition would have been a better pattern to follow here.)</p>
+
+<p>Each class in the type hierarchy has one or more fields to hold
+annotations for the different components of the class. For example, the
+<code>AMethod</code> class has the following fields: bounds, return
+type, receiver parameters, and throws clause. Each of these fields
+holds the annotations stored on that part of the method. For details on
+the remainder of the classes in the type hierarchy, and their
+respective fields, see the documentation for each file in
+<code>scene-lib/src/annotations/el/</code>.</p>
+
+<p>An <code>AScene</code> instance can be created in two ways. An empty
+<code>AScene</code> can be created by calling the <code>AScene</code>
+constructor, or an <code>AScene</code> can be created by parsing an
+existing <code>.jaif</code> file. Once an <code>AScene</code> is
+created, annotations can be added to it by adding them to the correct
+fields of the children. An <code>AScene</code> can also be output to
+create a new <code>.jaif</code> file.</p>
+
+<h4 id="bytecode-insertion" class="subsubsection">Bytecode Insertion</h4>
+
+<p>Annotations can be inserted into bytecode by executing the
+<code>annotation-file-utilities/scripts/insert-annotations</code>
+script. This script takes one or more &langle;class name,
+<code>.jaif</code> file&rangle; pairs as arguments. The annotations
+specified in the <code>.jaif</code> file are inserted into the
+classfile directly before the <code>.jaif</code> file in the argument
+list.</p><p>First, each <code>.jaif</code> file is parsed into an
+<code>AScene</code> (as described in
+<a href="#scene-lib">Scene-lib</a>). Then,
+<code>asmx/src/org/objectweb/asm/ClassReader.java</code> parses the
+classfile.  As it is parsing the classfile, it passes the parsed
+bytecode off to the
+<code>scene-lib/src/annotations/io/classfile/ClassAnnotationSceneWriter.java</code>
+class. This class has a reference to the <code>AScene</code> parsed
+from the <code>.jaif</code> file. As this class receives the parsed
+bytecode it inserts the relevant annotations from the
+<code>AScene</code> in the bytecode and then writes the bytecode back
+out.</p>
+
+<h4 id="bytecode-extraction" class="subsubsection">Bytecode Extraction</h4>
+
+<p>Annotations can be extracted from bytecode by executing the
+<code>annotation-file-utilities/scripts/extract-annotations</code>
+script. This script takes one or more class names as arguments and
+outputs the annotations found in those classes to <code>.jaif</code>
+files.</p><p>First, an empty <code>AScene</code> is constructed to store
+the annotations.
+<code>asmx/src/org/objectweb/asm/ClassReader.java</code> parses the
+classfile and passes the parsed bytecode off to the
+<code>scene-lib/src/annotations/io/classfile/ClassAnnotationSceneReader.java</code>
+class. This class filters out the annotations in the bytecode and adds
+them to the correct part of the <code>AScene</code>. After this, the
+<code>AScene</code> is output to a <code>.jaif</code> file.</p>
+
+<h3 id="source-insertion" class="subsection">Annotation-file-utilities</h3>
+
+<p>The <code>annotation-file-utilities</code> sub-project inserts annotations into source
+code. It can be run by executing the
+<code>annotation-file-utilities/scripts/insert-annotations-to-source</code>
+script.  The script takes one or more <code>.jaif</code> files, followed by one or more <code>.java</code> source files as arguments. The annotations in the <code>.jaif</code> files are inserted into the <code>.java</code> source files.</p><p>First, an instance of
+<code>annotation-file-utilities/src/annotator/specification/IndexFileSpecification.java</code>
+is created. Its <code>parse</code> method parses the <code>.jaif</code>
+file into an <code>AScene</code> (as described in
+<a href="#scene-lib">Scene-lib</a>).  The <code>parse</code> method
+calls the <code>parseScene</code> method, which traverses through the
+<code>AScene</code> and creates an
+<code>annotation-file-utilities/src/annotator/specification/CriterionList.java.</code>
+A <code>CriterionList</code> identifies a unique AST node that is the
+location of an insertion. It contains objects that implement the
+<code>annotation-file-utilities/src/annotator/find/Criterion.java</code>
+interface.
+Each <code>Criterion</code> has an <code>isSatisifiedBy</code> method —
+a predicate that takes an AST node and returns <code>true</code> if the
+AST node satisfies the <code>Criterion</code> and <code>false</code>
+otherwise. To determine if a given node matches a
+<code>CriterionList</code>, the node is passed to all of the
+<code>Criterion</code>s in the <code>CriteriaList</code>. If every
+<code>Criterion</code> returns <code>true</code> then it is match. If
+one or more <code>Criterion</code>s return <code>false</code> then it is
+not a match.  The various <code>Criterion</code> classes are in the
+<code>annotation-file-utilities/src/annotator/find/</code> directory.
+For example, take the following source code:</p>
+
+<pre class="verbatim">package afu.example;
+
+public class Test {
+    public void m(boolean b, int i) {
+      // ...
+    }
+}
+</pre>
+
+<p>The <code>CriterionList</code> to specify the location of the
+<code>i</code> parameter contains the following
+<code>Criterion</code>s:</p>
+
+<ul class="itemize"><li class="li-itemize">
+<code>InPackageCriterion("afu.example")</code>
+</li><li class="li-itemize"><code>InClassCriterion("Test")</code>
+</li><li class="li-itemize"><code>InMethodCriterion("m(ZI)V")</code>
+</li><li class="li-itemize"><code>ParamCriterion(1)</code>
+</li></ul>
+
+<p>After this <code>CriterionList</code> is built up an
+<code>annotation-file-utilities/src/annotator/find/Insertion.java</code>
+is created.  An <code>Insertion</code> stores an
+<code>annotation-file-utilities/src/annotator/find/Criteria.java</code>
+(which is created from a <code>CriterionList</code>) and the text to be
+inserted. All of these <code>Insertion</code>s are then added to a
+list. The Java compiler then is called to parse the Java source into an
+abstract syntax tree. This is followed by a call to the
+<code>getPositions</code> method of
+<code>annotation-file-utilities/src/annotator/find/TreeFinder.java</code>,
+which scans through each node of the abstract syntax trees. For each node,
+it runs through the <code>Criteria</code> for each un-matched
+<code>Insertion</code>. If at least one of the <code>Criteria</code>
+does not match, then this is not the correct place for the
+<code>Insertion</code> and the <code>Insertion</code> will be checked
+at the remaining nodes of the tree. If all of the <code>Criteria</code>
+match, then this node is the correct place for the
+<code>Insertion</code>. It is removed from the list of un-matched
+<code>Insertion</code>s and the position where to insert the
+<code>Insertion</code> is determined. This position is the integer
+index in the file where the <code>Insertion</code> should be inserted.
+After the positions are found for all of the <code>Insertion</code>s,
+the <code>Insertion</code> text is inserted into the file. This happens
+backwards, with <code>Insertion</code>s at the end of the file (i.e.
+with higher positions) being inserted first. If <code>Insertion</code>s
+were instead inserted from the beginning of the file then a single
+<code>Insertion</code> would invalidate all of the positions for the
+following <code>Insertion</code>s.</p>
+
+<p>If there are remaining <code>Insertion</code>s that were not matched
+to a node in the abstract syntax tree then an error message is
+displayed.</p>
 
 
 <hr />
