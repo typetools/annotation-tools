@@ -1,10 +1,6 @@
 \newcommand{\etalchar}[1]{$^{#1}$}
 \begin{thebibliography}{DDE{\etalchar{+}}11}
 
-\bibitem[ASM]{ASM}
-{ASM} website.
-\newblock \url{http://asm.ow2.org/}.
-
 \bibitem[Che]{CF}
 {Checker Framework} website.
 \newblock \url{http://types.cs.washington.edu/checker-framework/}.
