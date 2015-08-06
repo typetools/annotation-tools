@@ -1,9 +1,0 @@
-#!/bin/bash
-
-SCENE_LIB=$(dirname $0)
-WORKSPACE=$SCENE_LIB/..
-ASMX=$WORKSPACE/asmx
-ANNO_SHARED=$WORKSPACE/annotations-shared
-
-export CLASSPATH=$SCENE_LIB/bin:$ASMX/bin:$ANNO_SHARED/bin
-java annotations.tools.AnncatMain "$@"

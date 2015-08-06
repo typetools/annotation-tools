@@ -1,6 +1,0 @@
-package annotations.tests.classfile.foo:
-annotation visible @A
-
-package annotations.tests.classfile.cases:
-class TestClassEmpty: @annotations.tests.classfile.foo.A
-	
