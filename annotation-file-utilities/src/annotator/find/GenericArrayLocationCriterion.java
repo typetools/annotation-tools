@@ -299,8 +299,9 @@ public class GenericArrayLocationCriterion implements Criterion {
             && !isStatic((JCFieldAccess) inner)) {
           //fieldAccess.type != null && fieldAccess.type.getKind() == TypeKind.DECLARED
           //&& fieldAccess.type.tsym.isStatic()
-          if (i < 0 || locationRemaining.get(i).tag !=
-              TypePathEntryKind.INNER_TYPE) {
+          // TODO: check whether MEMBER_SELECT indicates inner or qualifier?
+          if (i < 0) { break; }
+          if (locationRemaining.get(i).tag != TypePathEntryKind.INNER_TYPE) {
             return false;
           }
           locationRemaining.remove(i--);
