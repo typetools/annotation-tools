@@ -1,4 +1,4 @@
-package java.lang:
+package java.lang.annotation:
 annotation @Deprecated:
 annotation @ReadOnly:
 
@@ -12,4 +12,10 @@ class InnerTypeResolution:
         return:
         parameter #0:
             type: @ReadOnly
+
+    method method02(Ljava/util/Map;)Ljava/util/Map$Entry;: @Deprecated
+        return:
+        parameter #0:
+            type:
+                inner-type 3, 0: @ReadOnly
 
