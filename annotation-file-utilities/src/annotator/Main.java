@@ -123,8 +123,16 @@ public class Main {
   @Option("-o Omit given annotation")
   public static String omit_annotation;
 
+  @Option("Suppress warnings about disallowed insertions")
+  public static boolean nowarn;
+
+  @Option("Convert JAIFs to new format")
+  public static boolean convert_jaifs = false;
+
   @Option("-h Print usage information and exit")
   public static boolean help = false;
+
+  // Debugging options go below here.
 
   @Option("-v Verbose (print progress information)")
   public static boolean verbose;
@@ -135,11 +143,6 @@ public class Main {
   @Option("Print error stack")
   public static boolean print_error_stack = false;
 
-  @Option("Suppress warnings about disallowed insertions")
-  public static boolean nowarn;
-
-  @Option("Convert JAIFs to new format")
-  public static boolean convert_jaifs = false;
 
   private static ElementVisitor<Void, AElement> classFilter =
       new ElementVisitor<Void, AElement>() {
