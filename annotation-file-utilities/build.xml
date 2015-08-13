@@ -88,6 +88,8 @@
       <pathelement location="${annotation-tools}/annotation-file-utilities/lib/guava-15.0.jar"/>
       <pathelement location="${scene-lib}/bin"/>
       <pathelement location="${asmx}/bin"/>
+      <!-- needed for optionsdoc target -->
+      <pathelement location="bin"/>
       <!-- additional for distribution:
       <pathelement location="${jre1.6.0}"/>
       -->
@@ -113,6 +115,35 @@
 <!--
       noqualifier="annotations:annotations.el:annotations.field:annotations.io:annotations.io.classfile:annotations.util:annotations.util.coll:java.lang"
 -->
+  </target>
+
+  <target name="optionsdoc" depends="javadoc, init">
+    <javadoc sourcepathref="javadoc-sourcepath"
+        sourcefiles="src/annotator/Main.java"
+        classpathref="libpath"
+        docletpathref="libpath"
+        failonerror="true"
+        >
+      <doclet name="plume.OptionsDoclet">
+        <param name="-format" value="javadoc"/>
+        <param name="-i"/>
+        <param name="-docfile" value="src/annotator/Main.java"/>
+      </doclet>
+    </javadoc>
+
+    <javadoc sourcepathref="javadoc-sourcepath"
+        sourcefiles="src/annotator/Main.java"
+        classpathref="libpath"
+        docletpathref="libpath"
+        failonerror="true"
+        >
+      <doclet name="plume.OptionsDoclet">
+        <param name="-format" value="html"/>
+        <param name="-i"/>
+        <param name="-docfile" value="annotation-file-utilities.html"/>
+      </doclet>
+    </javadoc>
+    
   </target>
 
   <target name="jarfile.check.uptodate">
