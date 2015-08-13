@@ -82,8 +82,8 @@ import type.Type;
 import plume.Pair;
 
 /**
- * A {@code TreeScanner} that is able to locate program elements in an
- * AST based on {@code Criteria}. {@link #getInsertionsByPosition(JCCompilationUnit,List)}
+ * A {@link TreeScanner} that is able to locate program elements in an
+ * AST based on {@code Criteria}. {@link #getInsertionsByPosition(JCTree.JCCompilationUnit,List)}
  * scans a tree and returns a
  * mapping of source positions (as character offsets) to insertion text.
  */
