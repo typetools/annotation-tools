@@ -15,9 +15,19 @@ import com.sun.tools.javac.main.CommandLine;
 import plume.FileIOException;
 import annotations.Annotation;
 import annotations.Annotations;
+import annotations.el.ABlock;
+import annotations.el.AClass;
+import annotations.el.ADeclaration;
+import annotations.el.AElement;
+import annotations.el.AExpression;
+import annotations.el.AField;
+import annotations.el.AMethod;
 import annotations.el.AScene;
+import annotations.el.ATypeElement;
+import annotations.el.ATypeElementWithType;
 import annotations.el.AnnotationDef;
 import annotations.el.DefException;
+import annotations.el.ElementVisitor;
 import annotations.field.AnnotationFieldType;
 import annotations.io.IndexFileParser;
 import annotations.io.IndexFileWriter;
@@ -32,7 +42,7 @@ public class IndexFileMerger {
   public static void main(String[] args) {
     if (args.length < 1) { System.exit(0); }
 
-    SetMultimap<String, String> annotatedFor = HashMultimap.create();
+    final SetMultimap<String, String> annotatedFor = HashMultimap.create();
     String[] inputArgs;
 
     // TODO: document assumptions
@@ -49,32 +59,36 @@ public class IndexFileMerger {
         return;  // so compiler knows inputArgs defined after try/catch
       }
 
-      String basePath = new File(inputArgs[0]).getCanonicalPath();
+      File baseFile = new File(inputArgs[0]);
+      boolean byDir = baseFile.isDirectory();
+      String basePath = baseFile.getCanonicalPath();
       AScene scene = new AScene();
 
-      for (int i = 1; i < inputArgs.length; i++) {
+      for (int i = byDir ? 1 : 0; i < inputArgs.length; i++) {
         File inputFile = new File(inputArgs[i]);
         String inputPath = inputFile.getCanonicalPath();
         String filename = inputFile.getName();
 
-        if (!(filename.endsWith(".jaif") || filename.endsWith("jann"))) {
-          System.err.println("WARNING: ignoring non-JAIF " + filename);
-          continue;
-        }
-        if (!inputPath.startsWith(basePath)) {
-          System.err.println("WARNING: ignoring file outside base directory "
-              + filename);
-          continue;
-        }
+        if (byDir) {
+          if (!(filename.endsWith(".jaif") || filename.endsWith("jann"))) {
+            System.err.println("WARNING: ignoring non-JAIF " + filename);
+            continue;
+          }
+          if (!inputPath.startsWith(basePath)) {
+            System.err.println("WARNING: ignoring file outside base directory "
+                + filename);
+            continue;
+          }
 
-        // note which base subdirectory JAIF came from
-        String relPath = inputPath.substring(basePath.length()+1);  // +1 for /
-        int ix = relPath.indexOf(File.separator);
-        String subdir = ix < 0 ? relPath : relPath.substring(0, ix);
-        // trim .jaif or .jann and subdir, convert directory to package id
-        String classname = relPath.substring(0, relPath.lastIndexOf('.'))
-            .substring(relPath.indexOf('/')+1).replace(File.separator, ".");
-        annotatedFor.put(classname, "\"" + subdir + "\"");
+          // note which base subdirectory JAIF came from
+          String relPath = inputPath.substring(basePath.length()+1);  // +1 '/'
+          int ix = relPath.indexOf(File.separator);
+          String subdir = ix < 0 ? relPath : relPath.substring(0, ix);
+          // trim .jaif or .jann and subdir, convert directory to package id
+          String classname = relPath.substring(0, relPath.lastIndexOf('.'))
+              .substring(relPath.indexOf('/')+1).replace(File.separator, ".");
+          annotatedFor.put(classname, "\"" + subdir + "\"");
+        }
 
         try {
           IndexFileParser.parseFile(inputPath, scene);
@@ -85,6 +99,148 @@ public class IndexFileMerger {
         } catch (FileIOException e) {
           e.printStackTrace();  // TODO
           System.exit(1);
+        }
+      }
+
+      if (!byDir) {
+/*
+        // collect defs
+        Map<String, String> annoPkgs = new HashMap<String, String>();
+        try {
+          new DefCollector(scene) {
+            @Override
+            protected void visitAnnotationDef(AnnotationDef d) {
+              String[] a = d.name.split("\\.");
+              if (a.length > 2 && a[a.length-2].matches("quals?")) {
+                String s = a[a.length-1];
+                annoPkgs.put(s, d.name.substring(0));
+              }
+            }
+          }.visit();
+        } catch (DefException e) {
+          System.err.println("DefCollector failed!");
+          e.printStackTrace();
+          System.exit(1);
+        }
+*/
+
+        for (Map.Entry<String, AClass> entry : scene.classes.entrySet()) {
+          //final String classname = entry.getKey();
+
+          entry.getValue().accept(new ElementVisitor<Void, Void>() {
+            //Map<String, String> annoPkgs = new HashMap<String, String>();
+
+            //Void process(AElement el) {
+            //  for (Annotation anno : el.tlAnnotationsHere) {
+            //    AnnotationDef def = anno.def();
+            //    String[] a = def.name.split("\\.");
+            //    if ("AnnotatedFor".equals(a[a.length-1])) {
+            //      @SuppressWarnings("unchecked")
+            //      List<String> vals =
+            //          (List<String>) anno.getFieldValue("value");
+            //      for (String val : vals) {
+            //        annotatedFor.put(classname, val);
+            //      }
+            //    } else if (a.length > 2 && a[a.length-2].matches("quals?")) {
+            //      annotatedFor.put(classname, a[a.length-3]);
+            //    }
+            //  }
+            //  return null;
+            //}
+
+            Void visit(AElement el) {
+              if (el != null) { el.accept(this, null); }
+              return null;
+            }
+
+            <T, E extends AElement> Void visitMap(Map<T, E> map) {
+              if (map != null) {
+                for (E el : map.values()) { visit(el); }
+              }
+              return null;
+            }
+
+            @Override
+            public Void visitAnnotationDef(AnnotationDef d, Void v) {
+              //String[] a = d.name.split("\\.");
+              //if (a.length > 2 && a[a.length-2].matches("quals?")) {
+              //  String s = a[a.length-1];
+              //  annoPkgs.put(s, d.name.substring(0));
+              //}
+              return null;  // process(d);
+            }
+
+            @Override
+            public Void visitBlock(ABlock el, Void v) {
+              visitMap(el.locals);
+              return visitExpression(el, v);
+            }
+
+            @Override
+            public Void visitClass(AClass el, Void v) {
+              visitMap(el.bounds);
+              visitMap(el.extendsImplements);
+              visitMap(el.instanceInits);
+              visitMap(el.staticInits);
+              visitMap(el.methods);
+              visitMap(el.fields);
+              visitMap(el.fieldInits);
+              return visitDeclaration(el, v);
+            }
+
+            @Override
+            public Void visitDeclaration(ADeclaration el, Void v) {
+              visitMap(el.insertAnnotations);
+              visitMap(el.insertTypecasts);
+              return visitElement(el, v);
+            }
+
+            @Override
+            public Void visitExpression(AExpression el, Void v) {
+              visitMap(el.calls);
+              visitMap(el.funs);
+              visitMap(el.instanceofs);
+              visitMap(el.news);
+              visitMap(el.refs);
+              visitMap(el.typecasts);
+              return visitElement(el, v);
+            }
+
+            @Override
+            public Void visitField(AField el, Void v) {
+              visit(el.init);
+              return visitDeclaration(el, v);
+            }
+
+            @Override
+            public Void visitMethod(AMethod el, Void v) {
+              visit(el.receiver);
+              visitMap(el.parameters);
+              visitMap(el.bounds);
+              visit(el.returnType);
+              visit(el.body);
+              visitMap(el.throwsException);
+              return visitDeclaration(el, v);
+            }
+
+            @Override
+            public Void visitTypeElement(ATypeElement el, Void v) {
+              visitMap(el.innerTypes);
+              return visitElement(el, v);
+            }
+
+            @Override
+            public Void visitTypeElementWithType(ATypeElementWithType el,
+                Void v) {
+              return visitTypeElement(el, v);
+            }
+
+            @Override
+            public Void visitElement(AElement el, Void v) {
+              visit(el.type);
+              return null;  // process(el);
+            }
+          }, null);
         }
       }
 
@@ -103,7 +259,7 @@ public class IndexFileMerger {
                 .<String, Collection<String>>singletonMap("value", values));
         scene.classes.vivify(key).tlAnnotationsHere.add(afAnno);
       }
-      annotatedFor = null;  // for gc
+      annotatedFor.clear();  // for gc
 
       try {
         IndexFileWriter.write(scene, new PrintWriter(System.out, true));
