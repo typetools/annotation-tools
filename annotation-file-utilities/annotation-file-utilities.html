@@ -316,7 +316,8 @@ signatures without the class on your classpath.
 </p>
 
 <p>
-Your source code needs to contain the locations that your
+In general (but see below for exceptions), your source code needs to
+contain the locations that your
 <code>.jaif</code> file references.  In particular, if the
 <code>.jaif</code> file contains annotations for a type parameter, but the
 source code uses a raw type, then you will get an error such as
@@ -331,6 +332,17 @@ In this case, you should add type arguments, such as changing
 <pre>  public void pushNonezeroRing(Stack stack, Hashtable seen) {</pre>
 <p>to</p>
 <pre>  public void pushNonezeroRing(Stack&lt;Edge&gt; stack, Hashtable&lt;Edge, ?&gt; seen) {</pre>
+<p>
+In a few cases, insert-annotations-to-source will generate ``default''
+code to provide a location for an annotation.  These include
+<ul>
+<li>method and constructor <a href="http://docs.oracle.com/javase/specs/jls/se8/html/jls-8.html#jls-8.4.1-220">receivers;</a></li>
+<li>type parameter bounds (<code>extends Object</code>);</li>
+<li>type casts for expressions</li>
+<li>nullary constructor definitions; and</li>
+<li>explicit constructor invocations for literal arrays (e.g., <code>{"a", "b"}</code> becomes <code>new String[] {"a", "b"}</code>).</li>
+</ul>
+</p>
 
 <p>
 The command-line options are as follows:
