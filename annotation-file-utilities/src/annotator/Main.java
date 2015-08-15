@@ -166,7 +166,9 @@ public class Main {
   @Option("Suppress warnings about disallowed insertions")
   public static boolean nowarn;
 
-  @Option("Convert JAIFs to new format")
+  // Instead of doing insertions, create new JAIFs using AST paths
+  //  extracted from existing JAIFs and source files they match
+  @Option("Convert JAIFs to AST Path format")
   public static boolean convert_jaifs = false;
 
   @Option("-h Print usage information and exit")
@@ -183,7 +185,6 @@ public class Main {
 
   @Option("Print error stack")
   public static boolean print_error_stack = false;
-
 
   private static ElementVisitor<Void, AElement> classFilter =
       new ElementVisitor<Void, AElement>() {
@@ -310,108 +311,6 @@ public class Main {
     filtered.prune();
     return filtered;
   }
-
-  //private static Set<AnnotationDef> annotationDefs(final AScene scene)
-  //    throws DefException {
-  //  if (annoCache.containsKey(scene)) { return annoCache.get(scene); }
-  //  final Set<AnnotationDef> defs = new HashSet<AnnotationDef>();
-  //  new DefCollector(scene) {
-  //    @Override
-  //    protected void visitAnnotationDef(AnnotationDef d) {
-  //      defs.add(d);
-  //    }
-  //  }.visit();
-  //  annoCache.put(scene, defs);
-  //  return defs;
-  //}
-
-  //private static Map<AScene, Set<AnnotationDef>> annoCache =
-  //    new HashMap<AScene, Set<AnnotationDef>>();
-
-/*
-  private static Pair<ASTPath, Pair<TypeTree, TypePathEntry>>
-  inner(ASTPath path, TypePathEntry tpe, Iterator<TypePathEntry> iter,
-      TypeTree tt) {
-    Tree node = tt;
-    int n = 0;
-
-    while (node.getKind() == Tree.Kind.MEMBER_SELECT) {
-      MemberSelectTree mst = (MemberSelectTree) node;
-      ++n;
-      node = mst.getExpression();
-    }
-
-    while (tpe.tag == TypePathEntryKind.INNER_TYPE && --n >= 0) {
-      if (!iter.hasNext()) {
-        tpe = null;
-        break;
-      }
-      tpe = iter.next();
-    }
-
-    while (--n >= 0) {
-      path = path.add(new ASTPath.ASTEntry(Tree.Kind.MEMBER_SELECT,
-          ASTPath.EXPRESSION));
-    }
-
-    return Pair.of(path, Pair.of((TypeTree) node, tpe));
-  }
-
-  private static ASTPath innerASTPath(ASTPath astPath,
-      List<TypePathEntry> tpes, Type type) {
-    if (tpes.isEmpty()) { return astPath; }
-    Iterator<TypePathEntry> iter = tpes.iterator();
-    Pair<ASTPath, Pair<TypeTree, TypePathEntry>> tuple =
-        inner(astPath, iter.next(), iter, TypeTree.fromType(type));
-    TypePathEntry tpe = tuple.b.b;
-    Tree node = tuple.b.a;
-    astPath = tuple.a;
-
-    while (tpe != null) {
-      Tree.Kind kind = node.getKind();
-      switch (kind) {
-      case ARRAY_TYPE:
-        if (tpe.tag != TypePathEntryKind.ARRAY) { return null; }
-        node = ((ArrayTypeTree) node);
-        astPath = astPath.add(new ASTPath.ASTEntry(kind, ASTPath.TYPE));
-        tpe = iter.hasNext() ? iter.next() : null;
-        break;
-      case MEMBER_SELECT:
-        if (tpe.tag != TypePathEntryKind.INNER_TYPE) { return null; }
-        tuple = inner(astPath, tpe, iter, (TypeTree) node);
-        tpe = tuple.b.b; node = tuple.b.a; astPath = tuple.a;
-        break;
-      case PARAMETERIZED_TYPE:
-        ParameterizedTypeTree ptt = (ParameterizedTypeTree) node;
-        tuple = inner(astPath, tpe, iter, (TypeTree) ptt.getType());
-        tpe = tuple.b.b; node = tuple.b.a; astPath = tuple.a;
-        if (node.getKind() == Tree.Kind.MEMBER_SELECT
-            || tpe.tag != TypePathEntryKind.TYPE_ARGUMENT
-            || tpe.arg >= ptt.getTypeArguments().size()) {
-          return null;
-        }
-        node = ptt.getTypeArguments().get(tpe.arg);
-        astPath = astPath.add(new ASTPath.ASTEntry(kind,
-                ASTPath.TYPE_PARAMETER, tpe.arg));
-        tpe = iter.hasNext() ? iter.next() : null;
-        break;
-      case EXTENDS_WILDCARD:
-      case SUPER_WILDCARD:
-        if (tpe.tag != TypePathEntryKind.WILDCARD) { return null; }
-        node = ((WildcardTree) node).getBound();
-        astPath = astPath.add(  // ASTPath uses UNBOUNDED for all wildcards
-            new ASTPath.ASTEntry(Tree.Kind.UNBOUNDED_WILDCARD, ASTPath.BOUND));
-        tpe = iter.hasNext() ? iter.next() : null;
-        break;
-      default:
-        return null;
-      }
-
-      if (node == null) { return null; }
-    }
-    return astPath;
-  }
-*/
 
   private static ATypeElement findInnerTypeElement(Tree t,
       ASTRecord rec, ADeclaration decl, Type type, Insertion ins) {
@@ -571,13 +470,6 @@ public class Main {
               for (Annotation a : insertionSources.get(inner)) {
                 elem.tlAnnotationsHere.add(a);
               }
-//              GenericArrayLocationCriterion galc =
-//                  inner.getCriteria().getGenericArrayLocation();
-//              ASTPath path =
-//                  innerASTPath(astPath, galc.getLocation(), type);
-//              ATypeElement elem = vm.vivify(path);
-//              for (Annotation a : insertionSources.get(inner)) {
-//                elem.tlAnnotationsHere.add(a);
             }
           }
         }
@@ -635,10 +527,6 @@ public class Main {
     TreeFinder.dbug.setEnabled(debug);
     Criteria.dbug.setEnabled(debug);
 
-    if (convert_jaifs) {
-      TreeFinder.convert_jaifs = true;
-    }
-
     if (help) {
       options.print_usage();
       System.exit(0);
@@ -687,15 +575,17 @@ public class Main {
                   : p2 == null ? 1 : p1.compareTo(p2);
             }
           });
-          scenes.put(arg, convert_jaifs ? filteredScene(scene) : scene);
-          for (Insertion ins : parsedSpec) {
-            insertionOrigins.put(ins, arg);
+          if (convert_jaifs) {
+            scenes.put(arg, convert_jaifs ? filteredScene(scene) : scene);
+            for (Insertion ins : parsedSpec) {
+              insertionOrigins.put(ins, arg);
+            }
+            if (!insertionIndex.containsKey(arg)) {
+              insertionIndex.put(arg,
+                  LinkedHashMultimap.<Insertion, Annotation>create());
+            }
+            insertionIndex.get(arg).putAll(spec.insertionSources());
           }
-          if (!insertionIndex.containsKey(arg)) {
-            insertionIndex.put(arg,
-                LinkedHashMultimap.<Insertion, Annotation>create());
-          }
-          insertionIndex.get(arg).putAll(spec.insertionSources());
           if (abbreviate) {
             Map<String, Set<String>> annotationImports =
                 spec.annotationImports();
