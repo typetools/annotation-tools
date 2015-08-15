@@ -13,6 +13,7 @@ import java.util.*;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Label;
+import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.TypeAnnotationVisitor;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
@@ -152,6 +153,8 @@ extends EmptyVisitor {
       String signature,
       String[] exceptions) {
     if (trace) { System.out.printf("visitMethod(%s, %s, %s, %s, %s) in %s (%s)%n", access, name, desc, signature, exceptions, this, this.getClass()); }
+    // uncomment below to omit implementation-dependent compiler-generated code
+    // if ((access & Opcodes.ACC_BRIDGE) != 0) { return null; }
     AMethod aMethod = aClass.methods.vivify(name+desc);
     return new MethodAnnotationSceneReader(name, desc, signature, aMethod);
   }
