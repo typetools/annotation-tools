@@ -353,7 +353,11 @@ public class IsSigMethodCriterion implements Criterion {
       String paramClass = "Object";
       List<? extends Tree> paramBounds = param.getBounds();
       if (paramBounds != null && paramBounds.size() >= 1) {
-        paramClass = paramBounds.get(0).toString();
+        Tree boundZero = paramBounds.get(0);
+        if (boundZero.getKind() == Tree.Kind.ANNOTATED_TYPE) {
+          boundZero = ((AnnotatedTypeTree) boundZero).getUnderlyingType();
+        }
+        paramClass = boundZero.toString();
       }
       typeToClassMap.put(paramName, paramClass);
     }
