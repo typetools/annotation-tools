@@ -9,6 +9,7 @@ cd $ROOT/annotation-tools
 ant clean
 ant all
 
-curl https://raw.githubusercontent.com/mernst/plume-lib/master/bin/trigger-travis.sh > trigger-travis.sh
+echo Triggering build of typetools/checker-framework
+curl -s https://raw.githubusercontent.com/mernst/plume-lib/master/bin/trigger-travis.sh > trigger-travis.sh
 bash trigger-travis.sh typetools checker-framework $TRAVISTOKEN
 rm trigger-travis.sh
