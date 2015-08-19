@@ -2,6 +2,13 @@ language: java
 
 script: ./.travis-build.sh
 
+after_success:
+  - echo Triggering build of typetools/checker-framework
+  - curl -s https://raw.githubusercontent.com/mernst/plume-lib/master/bin/trigger-travis.sh > trigger-travis.sh  
+  - bash trigger-travis.sh typetools checker-framework $TRAVISTOKEN
+  - rm trigger-travis.sh  
+
+
 jdk:
   - oraclejdk8
   - oraclejdk7
