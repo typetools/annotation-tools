@@ -176,6 +176,9 @@ public class GenericArrayLocationCriterion implements Criterion {
 
       boolean result = ((leaf.getKind() == Tree.Kind.NEW_ARRAY)
                         || (leaf.getKind() == Tree.Kind.NEW_CLASS)
+                        || (leaf.getKind() == Tree.Kind.ANNOTATED_TYPE
+                            && isSatisfiedBy(TreePath.getPath(path,
+                              ((AnnotatedTypeTree) leaf).getUnderlyingType())))
                         || ((isGenericOrArray(leaf)
                              // or, it might be a raw type
                              || (leaf.getKind() == Tree.Kind.IDENTIFIER) // IdentifierTree

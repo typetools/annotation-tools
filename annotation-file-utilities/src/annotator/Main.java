@@ -752,17 +752,17 @@ public class Main {
           boolean receiverInserted = false;
           boolean newInserted = false;
           boolean constructorInserted = false;
-          int pos = pair.a;
           Set<String> seen = new TreeSet<String>();
           List<Insertion> toInsertList = new ArrayList<Insertion>(positions.get(pair));
           Collections.reverse(toInsertList);
-          dbug.debug("insertion pos: %d%n", pos);
-          assert pos >= 0
-            : "pos is negative: " + pos + " " + toInsertList.get(0) + " " + javafilename;
+          dbug.debug("insertion pos: %d%n", pair.a);
+          assert pair.a >= 0
+            : "pos is negative: " + pair.a + " " + toInsertList.get(0) + " " + javafilename;
           for (Insertion iToInsert : toInsertList) {
             // Possibly add whitespace after the insertion
             String trailingWhitespace = "";
             boolean gotSeparateLine = false;
+            int pos = pair.a;  // reset each iteration in case of dyn adjustment
             if (iToInsert.getSeparateLine()) {
               // System.out.printf("getSeparateLine=true for insertion at pos %d: %s%n", pos, iToInsert);
               int indentation = 0;
@@ -807,8 +807,7 @@ public class Main {
                   String s = src.substring(pos, pos+9);
                   if (" extends ".equals(s)) {
                     ai.setGenerateExtends(false);
-                    pos += 9;
-                    precedingChar = '.';
+                    pos += 8;
                   }
                 } catch (StringIndexOutOfBoundsException e) {}
               }

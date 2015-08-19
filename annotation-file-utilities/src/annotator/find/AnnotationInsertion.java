@@ -12,8 +12,9 @@ public class AnnotationInsertion extends Insertion {
      */
     private final String annotation;
     private String type;
-    private boolean generateExtends;
     private boolean generateBound;
+    private boolean generateExtends;
+    private boolean wasGenerateExtends;
 
     /**
      * Creates a new insertion.
@@ -27,7 +28,9 @@ public class AnnotationInsertion extends Insertion {
         super(criteria, separateLine);
         this.annotation = annotation;
         type = null;
+        generateBound = false;
         generateExtends = false;
+        wasGenerateExtends = false;
     }
 
     /**
@@ -50,6 +53,7 @@ public class AnnotationInsertion extends Insertion {
 
     public void setGenerateExtends(boolean generateExtends) {
         this.generateExtends = generateExtends;
+        this.wasGenerateExtends |= generateExtends;
     }
 
     public void setGenerateBound(boolean b) {
@@ -92,7 +96,7 @@ public class AnnotationInsertion extends Insertion {
         } else if (generateBound) {
             result += " Object &";
         } else if (generateExtends) {
-            result = "extends " + result + " Object";
+            result = " extends " + result + " Object";
         }
         return comments ? "/*" + result + "*/" : result;
     }
@@ -108,7 +112,7 @@ public class AnnotationInsertion extends Insertion {
     /** {@inheritDoc} */
     protected boolean addLeadingSpace(boolean gotSeparateLine, int pos,
             char precedingChar) {
-        if (precedingChar == '.') {
+        if (generateExtends || precedingChar == '.') {
             return false;
         }
         return super.addLeadingSpace(gotSeparateLine, pos, precedingChar);
@@ -119,8 +123,8 @@ public class AnnotationInsertion extends Insertion {
      */
     @Override
     protected boolean addTrailingSpace(boolean gotSeparateLine) {
-        // Never add a trailing space for an extends insertion.
-        return !generateExtends && super.addTrailingSpace(gotSeparateLine);
+        // Never add a trailing space on a type parameter bound.
+        return !wasGenerateExtends && super.addTrailingSpace(gotSeparateLine);
     }
 
     /** {@inheritDoc} */
