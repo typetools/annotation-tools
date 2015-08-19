@@ -19,5 +19,6 @@ class BoundZero<U> {
   <T extends Comparable<T>> void m7(T o) {}
   <T extends @Y Comparable<T>> void m8(T o) {}
   <T extends @annotator.tests.Y Comparable<T>> void m9(T o) {}
+  class Inner<@X V extends @Y Object> {}
 }
 

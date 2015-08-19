@@ -36,3 +36,6 @@ class BoundZero:
     method m9(Ljava/lang/Object;)V:
         bound 0&0: @X
 
+class BoundZero$Inner:
+    bound 0&0: @A @B @C
+
