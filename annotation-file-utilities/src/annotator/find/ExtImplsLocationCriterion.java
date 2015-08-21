@@ -3,10 +3,12 @@ package annotator.find;
 import java.util.List;
 
 import annotations.el.TypeIndexLocation;
+import annotator.scanner.CommonScanner;
 
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
+import com.sun.tools.javac.tree.JCTree;
 
 /**
  * A criterion to find a given extends or implements clause.
@@ -57,7 +59,10 @@ public class ExtImplsLocationCriterion implements Criterion {
 
     boolean returnValue = false;
 
-    if (parent instanceof ClassTree) {
+    if (index == -1 && leaf.getKind() == Tree.Kind.CLASS) {
+        return ((JCTree.JCClassDecl) leaf).getExtendsClause() == null;
+    }
+    if (CommonScanner.hasClassKind(parent)) {
         ClassTree ct = (ClassTree) parent;
 
         if (index==-1) {
@@ -78,6 +83,10 @@ public class ExtImplsLocationCriterion implements Criterion {
     } else {
         return true;
     }
+  }
+
+  public Integer getIndex() {
+    return index;
   }
 
   /** {@inheritDoc} */

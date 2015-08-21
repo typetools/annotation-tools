@@ -1102,6 +1102,11 @@ loop:
       dbug.debug("TreeFinder.scan: node=%s%n  critera=%s%n",
           node, i.getCriteria());
 
+      if (CommonScanner.hasClassKind(node)
+          && i.getCriteria().isOnClassExtendsBound()
+          && ((ClassTree) node).getExtendsClause() == null) {
+        return implicitClassBoundPosition((JCClassDecl) node, i);
+      }
       if (node.getKind() == Tree.Kind.METHOD
           && i.getCriteria().isOnReturnType()) {
         JCMethodDecl jcnode = (JCMethodDecl) node;
@@ -1283,6 +1288,12 @@ loop:
       dbug.debug("TreeFinder.scan: node=%s%n  criteria=%s%n",
           node, i.getCriteria());
 
+      if (CommonScanner.hasClassKind(node)
+          && entry.childSelectorIs(ASTPath.BOUND)
+          && entry.getArgument() < 0
+          && ((ClassTree) node).getExtendsClause() == null) {
+        return implicitClassBoundPosition((JCClassDecl) node, i);
+      }
       if (node.getKind() == Tree.Kind.METHOD
           && i.getCriteria().isOnMethod("<init>()V")
           && entry.childSelectorIs(ASTPath.PARAMETER)
@@ -1414,6 +1425,34 @@ loop:
       reportInsertionError(i, e);
       return null;
     }
+  }
+
+  private Integer implicitClassBoundPosition(JCClassDecl cd, Insertion i) {
+    Integer pos;
+    if (cd.sym == null || cd.sym.isAnonymous()
+        || i.getKind() != Insertion.Kind.ANNOTATION) {
+      return null;
+    }
+    JCModifiers mods = cd.getModifiers();
+    String name = cd.getSimpleName().toString();
+    if (cd.typarams == null || cd.typarams.isEmpty()) {
+      int start = cd.getStartPosition();
+      int offset = Math.max(start,
+          mods.getEndPosition(tree.endPositions) + 1);
+      String s = cd.toString().substring(offset - start);
+      Pattern p = Pattern.compile("(?:\\s|" + comment
+          + ")*+class(?:\\s|" + comment
+          + ")++" + Pattern.quote(name) + "\\b");
+      Matcher m = p.matcher(s);
+      if (!m.find() || m.start() != 0) { return null; }
+      pos = offset + m.end() - 1;
+    } else {  // generic class
+      JCTypeParameter param = cd.typarams.get(cd.typarams.length()-1);
+      int start = param.getEndPosition(tree.endPositions);
+      pos = getFirstInstanceAfter('>', start) + 1;
+    }
+    ((AnnotationInsertion) i).setGenerateExtends(true);
+    return pos;
   }
 
   /**

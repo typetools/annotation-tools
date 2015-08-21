@@ -212,8 +212,7 @@ public class IndexFileSpecification implements Specification {
         CriterionList innerBoundList = eiList.add(Criteria.atLocation(innerLoc));
         parseElement(innerBoundList, ae);
       }
-      CriterionList outerClist = eiList.add(Criteria.atLocation());
-      parseElement(outerClist, ei);
+      parseElement(eiList, ei);
     }
 
     parseASTInsertions(clist, clazz.insertAnnotations, clazz.insertTypecasts);

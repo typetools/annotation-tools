@@ -176,6 +176,18 @@ public final class Criteria {
   }
 
   /**
+   * Determines whether this is the criteria on a class {@code extends} bound.
+   */
+  public boolean isOnClassExtendsBound() {
+    for (Criterion c : criteria.values()) {
+      if (c.getKind() == Criterion.Kind.EXTIMPLS_LOCATION) {
+        return ((ExtImplsLocationCriterion) c).getIndex() == -1;
+      }
+    }
+    return false;
+  }
+
+  /**
    * Returns true if this Criteria is on the given method.
    */
   public boolean isOnMethod(String methodname) {
