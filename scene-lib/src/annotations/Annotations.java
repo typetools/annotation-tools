@@ -133,7 +133,7 @@ public abstract class Annotations {
         typeQualifierMetaAnnotations.add(aRetentionRuntime);
         typeQualifierMetaAnnotations.add(aTargetTypeUse);
 
-        adNonNull = new AnnotationDef("checkers.nullness.quals.NonNull",
+        adNonNull = new AnnotationDef("org.checkerframework.checker.nullness.qual.NonNull",
                                       typeQualifierMetaAnnotations,
                                       noFieldTypes);
         aNonNull = new Annotation(adNonNull, noFieldValues);

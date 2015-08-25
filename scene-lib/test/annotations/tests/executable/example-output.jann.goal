@@ -1,7 +1,7 @@
 package :
 annotation @ReadOnly: @java.lang.annotation.Retention(value=RUNTIME)
 
-package checkers.nullness.quals:
+package org.checkerframework.checker.nullness.qual:
 annotation @NonNull: @java.lang.annotation.Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
 
 package :
@@ -14,10 +14,10 @@ class Bar:
         return:
         receiver: @ReadOnly
         parameter #0:
-            type: @checkers.nullness.quals.NonNull
+            type: @org.checkerframework.checker.nullness.qual.NonNull
 
     method setSomething(Ljava/lang/String;)V:
         return:
         parameter #0: @NonNull
-            type: @checkers.nullness.quals.NonNull
+            type: @org.checkerframework.checker.nullness.qual.NonNull
 
