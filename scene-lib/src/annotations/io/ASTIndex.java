@@ -72,8 +72,9 @@ import annotations.util.coll.WrapperMap;
  * @author dbro
  */
 public class ASTIndex extends WrapperMap<Tree, ASTRecord> {
-  private static final Map<CompilationUnitTree, Map<Tree, ASTRecord>>
-      cache = new HashMap<CompilationUnitTree, Map<Tree, ASTRecord>>();
+  // single-item cache
+  private static Tree cachedRoot = null;
+  private static Map<Tree, ASTRecord> cachedIndex = null;
   private static final int EXPECTED_SIZE = 128;
 
   private final CompilationUnitTree cut;
@@ -86,12 +87,11 @@ public class ASTIndex extends WrapperMap<Tree, ASTRecord> {
    * @return map of trees in compilation unit to AST paths
    */
   public static Map<Tree, ASTRecord> indexOf(CompilationUnitTree root) {
-    Map<Tree, ASTRecord> index = cache.get(root);
-    if (index == null) {
-      index = new ASTIndex(root);
-      cache.put(root, index);
+    if (cachedRoot == null || !cachedRoot.equals(root)) {
+      cachedRoot = root;
+      cachedIndex = new ASTIndex(root);
     }
-    return index;
+    return cachedIndex;
   }
 
   private ASTIndex(CompilationUnitTree root) {

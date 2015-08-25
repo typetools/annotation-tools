@@ -1811,6 +1811,7 @@ loop:
   public SetMultimap<Pair<Integer, ASTPath>, Insertion>
   getPositions(JCCompilationUnit node, Insertions insertions) {
     List<Insertion> list = new ArrayList<Insertion>();
+    treePathCache.clear();
     list.addAll(insertions.forOuterClass(node, ""));
     for (JCTree decl : node.getTypeDecls()) {
       if (decl.getTag() == JCTree.Tag.CLASSDEF) {
