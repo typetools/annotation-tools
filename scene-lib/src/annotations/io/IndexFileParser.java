@@ -1624,34 +1624,22 @@ public final class IndexFileParser {
      * <p>
      * Caveat: Parsing of floating point numbers currently does not work.
      */
-    public static void parse(LineNumberReader in, AScene scene)
-            throws IOException, ParseException {
+    public static Map<String, AnnotationDef> parse(LineNumberReader in,
+            AScene scene) throws IOException, ParseException {
         IndexFileParser parser = new IndexFileParser(in, scene);
         // no filename is available in the exception messages
-        try {
-            parser.parse();
-        } catch (IOException e) {
-            throw new FileIOException(in, e);
-        } catch (ParseException e) {
-            throw new FileIOException(in, e);
-        }
+        return parseAndReturnAnnotationDefs(null, in, parser);
     }
 
     /**
      * Reads annotations from the index file <code>filename</code> and merges
      * them into <code>scene</code>; see {@link #parse(LineNumberReader, AScene)}.
      */
-    public static void parseFile(String filename, AScene scene)
-            throws IOException {
+    public static Map<String, AnnotationDef> parseFile(String filename,
+            AScene scene) throws IOException {
         LineNumberReader in = new LineNumberReader(new FileReader(filename));
         IndexFileParser parser = new IndexFileParser(in, scene);
-        try {
-            parser.parse();
-        } catch (IOException e) {
-            throw new FileIOException(in, filename, e);
-        } catch (ParseException e) {
-            throw new FileIOException(in, filename, e);
-        }
+        return parseAndReturnAnnotationDefs(filename, in, parser);
     }
 
     /**
@@ -1659,18 +1647,30 @@ public final class IndexFileParser {
      * them into <code>scene</code>; see {@link #parse(LineNumberReader, AScene)}.
      * Primarily for testing.
      */
-    public static void parseString(String fileContents, AScene scene)
-        		throws IOException {
-        String filename = "While parsing string: \n----------------BEGIN----------------\n" + fileContents + "----------------END----------------\n";
-        LineNumberReader in = new LineNumberReader(new StringReader(fileContents));
-        try {
-            IndexFileParser parser = new IndexFileParser(in, scene);
-            parser.parse();
-        } catch (IOException e) {
-            throw new FileIOException(in, filename, e);
-        } catch (ParseException e) {
-            throw new FileIOException(in, filename, e);
-        }
+    public static Map<String, AnnotationDef> parseString(String fileContents,
+            AScene scene) throws IOException {
+        String filename =
+            "While parsing string: \n----------------BEGIN----------------\n"
+                    + fileContents + "----------------END----------------\n";
+        LineNumberReader in = new LineNumberReader(
+            new StringReader(fileContents));
+        IndexFileParser parser = new IndexFileParser(in, scene);
+        return parseAndReturnAnnotationDefs(filename, in, parser);
+    }
+
+    private static Map<String, AnnotationDef> parseAndReturnAnnotationDefs(
+          String filename, LineNumberReader in, IndexFileParser parser)
+              throws IOException {
+      try {
+          parser.parse();
+          return Collections.unmodifiableMap(parser.defs);
+      } catch (IOException e) {
+          throw filename == null ? new FileIOException(in, e)
+                  : new FileIOException(in, filename, e);
+      } catch (ParseException e) {
+          throw filename == null ? new FileIOException(in, e)
+                  : new FileIOException(in, filename, e);
+      }
     }
 
     /**

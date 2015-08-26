@@ -576,7 +576,7 @@ public class Main {
             }
           });
           if (convert_jaifs) {
-            scenes.put(arg, convert_jaifs ? filteredScene(scene) : scene);
+            scenes.put(arg, filteredScene(scene));
             for (Insertion ins : parsedSpec) {
               insertionOrigins.put(ins, arg);
             }
@@ -830,10 +830,10 @@ public class Main {
 
             String toInsert = iToInsert.getText(comments, abbreviate,
                 gotSeparateLine, pos, precedingChar) + trailingWhitespace;
+            Set<String> packageNames = iToInsert.getPackageNames();
             if (seen.contains(toInsert)) { continue; }  // eliminate duplicates
             seen.add(toInsert);
-            if (abbreviate) {
-              Set<String> packageNames = iToInsert.getPackageNames();
+            if (!packageNames.isEmpty()) {
               dbug.debug("Need import %s%n  due to insertion %s%n",
                   packageNames, toInsert);
               imports.addAll(packageNames);

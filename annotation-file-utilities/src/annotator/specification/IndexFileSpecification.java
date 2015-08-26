@@ -73,7 +73,22 @@ public class IndexFileSpecification implements Specification {
   @Override
   public List<Insertion> parse() throws FileIOException {
     try {
-      IndexFileParser.parseFile(indexFileName, scene);
+      Map<String, AnnotationDef> annotationDefs =
+          IndexFileParser.parseFile(indexFileName, scene);
+      Set<String> defKeys = annotationDefs.keySet();
+      Set<String> ambiguous = new LinkedHashSet<String>();
+      // If a qualified name's unqualified counterpart maps to null in
+      // defKeys, it means that the unqualified name is ambiguous and
+      // thus should always be qualified.
+      for (String key : defKeys) {
+        int ix = Math.max(key.lastIndexOf("."), key.lastIndexOf("$"));
+        if (ix >= 0) {
+          String name = key.substring(ix+1);
+          // containsKey() would give wrong result here
+          if (annotationDefs.get(name) == null) { ambiguous.add(name); }
+        }
+      }
+      Insertion.setAlwaysQualify(ambiguous);
     } catch(FileIOException e) {
       throw e;
     } catch(Exception e) {

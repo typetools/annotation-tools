@@ -49,6 +49,12 @@ public abstract class Insertion {
     protected Set<String> packageNames;
 
     /**
+     * Set of annotation names that should always be qualified, even
+     *  when {@link getText(boolean, boolean)} is called with abbreviate true.
+     */
+    protected static Set<String> alwaysQualify = new LinkedHashSet<String>();
+
+    /**
      * Creates a new insertion.
      *
      * @param criteria where to insert the text
@@ -182,6 +188,20 @@ public abstract class Insertion {
     }
 
     /**
+     * Gets the set of annotation names that should always be qualified.
+     */
+    public static Set<String> getAlwaysQualify() {
+        return alwaysQualify;
+    }
+
+    /**
+     * Sets the set of annotation names that should always be qualified.
+     */
+    public static void setAlwaysQualify(Set<String> set) {
+        alwaysQualify = set;
+    }
+
+    /**
      * Gets whether the insertion goes on a separate line.
      *
      * @return whether the insertion goes on a separate line
@@ -234,16 +254,18 @@ public abstract class Insertion {
         }
         int dotIndex = s.lastIndexOf(".", nameEnd);
         if (dotIndex != -1) {
-            String packageName = s.substring(0, nameEnd);
-            if (packageName.startsWith("@")) {
-                return Pair.of(packageName.substring(1),
-                        "@" + s.substring(dotIndex + 1));
-            } else {
-                return Pair.of(packageName, s.substring(dotIndex + 1));
+            String basename = s.substring(dotIndex + 1);
+            if (!alwaysQualify.contains(basename)) {
+                String packageName = s.substring(0, nameEnd);
+                if (packageName.startsWith("@")) {
+                    return Pair.of(packageName.substring(1),
+                            "@" + basename);
+                } else {
+                    return Pair.of(packageName, basename);
+                }
             }
-        } else {
-            return Pair.of((String) null, s);
         }
+        return Pair.of((String) null, s);
     }
 
     /**
