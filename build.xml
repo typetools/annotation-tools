@@ -69,5 +69,15 @@
     <target name="javadoc" depends="javadoc-scene-lib,javadoc-afu">
     </target>
 
+    <target name="tags-scene-lib">
+        <ant dir="${scene-lib}" target="tags"/>
+    </target>
+
+    <target name="tags-afu">
+        <ant dir="${afu}" target="tags"/>
+    </target>
+
+    <target name="tags" depends="tags-scene-lib,tags-afu">
+    </target>
 
 </project>
