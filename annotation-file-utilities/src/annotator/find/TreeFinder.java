@@ -1103,7 +1103,7 @@ loop:
           node, i.getCriteria());
 
       if (CommonScanner.hasClassKind(node)
-          && i.getCriteria().isOnClassExtendsBound()
+          && i.getCriteria().isOnTypeDeclarationExtendsClause()
           && ((ClassTree) node).getExtendsClause() == null) {
         return implicitClassBoundPosition((JCClassDecl) node, i);
       }

@@ -178,7 +178,7 @@ public final class Criteria {
   /**
    * Determines whether this is the criteria on a class {@code extends} bound.
    */
-  public boolean isOnClassExtendsBound() {
+  public boolean isOnTypeDeclarationExtendsClause() {
     for (Criterion c : criteria.values()) {
       if (c.getKind() == Criterion.Kind.EXTIMPLS_LOCATION) {
         return ((ExtImplsLocationCriterion) c).getIndex() == -1;
