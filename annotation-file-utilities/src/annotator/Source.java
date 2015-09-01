@@ -86,6 +86,7 @@ public final class Source {
         in.close();
         source.append(bytes.toString());
         bytes.close();
+        fileManager.close();
     }
 
     /**
