@@ -16,7 +16,7 @@ import annotations.io.*;
  * Prints information about ReadOnly and NonNull annotations on a given class.
  * Invoke as:
  * <pre>
- * java Example <i>input.jann</i> <i>ClassToProcess</i> <i>output.jann</i>
+ * java Example <i>input.jaif</i> <i>ClassToProcess</i> <i>output.jaif</i>
  * </pre>
  **/
 public class Example {

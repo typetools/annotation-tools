@@ -16,11 +16,11 @@ public class RegurgitateDemo {
         // foo: @pkg.A(value=dinglewompus)";
         /*@NonNull*/ AScene scene = new AScene();
         try {
-            LineNumberReader in = new LineNumberReader(new FileReader("test2-2.jann"));
+            LineNumberReader in = new LineNumberReader(new FileReader("test2-2.jaif"));
             IndexFileParser.parse(in, scene);
 
             System.out.println("regurgitating:");
-            IndexFileWriter.write(scene, new FileWriter("test2-3.jann"));
+            IndexFileWriter.write(scene, new FileWriter("test2-3.jaif"));
         } catch (ParseException p) {
             p.printStackTrace(System.err);
         } catch (DefException p) {

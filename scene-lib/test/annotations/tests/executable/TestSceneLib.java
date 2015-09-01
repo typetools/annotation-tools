@@ -156,7 +156,7 @@ public /*@ReadOnly*/ class TestSceneLib extends TestCase {
     }
 
     public void testParseRetrieve1() throws Exception {
-        LineNumberReader fr = openPackagedIndexFile("test1.jann");
+        LineNumberReader fr = openPackagedIndexFile("test1.jaif");
         AScene s1 = newScene();
         IndexFileParser.parse(fr, s1);
 
@@ -212,7 +212,7 @@ public /*@ReadOnly*/ class TestSceneLib extends TestCase {
     }
 
     public void testParseRetrieveTypes() throws Exception {
-        LineNumberReader fr = openPackagedIndexFile("test1.jann");
+        LineNumberReader fr = openPackagedIndexFile("test1.jaif");
         AScene s1 = newScene();
         IndexFileParser.parse(fr, s1);
 
@@ -247,7 +247,7 @@ public /*@ReadOnly*/ class TestSceneLib extends TestCase {
     }
 
     public void testParseRetrieveValues() throws Exception {
-        LineNumberReader fr = openPackagedIndexFile("test1.jann");
+        LineNumberReader fr = openPackagedIndexFile("test1.jaif");
         AScene s1 = newScene();
         IndexFileParser.parse(fr, s1);
 
@@ -282,12 +282,12 @@ public /*@ReadOnly*/ class TestSceneLib extends TestCase {
     }
 
     public void testRewriteOne() throws Exception {
-        LineNumberReader fr = openPackagedIndexFile("test1.jann");
+        LineNumberReader fr = openPackagedIndexFile("test1.jaif");
         doRewriteTest(fr);
     }
 
     public void testRewriteTwo() throws Exception {
-        LineNumberReader fr = openPackagedIndexFile("test2.jann");
+        LineNumberReader fr = openPackagedIndexFile("test2.jaif");
         doRewriteTest(fr);
     }
 

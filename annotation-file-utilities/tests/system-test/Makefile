@@ -31,11 +31,11 @@ out1:
 
 # Step 2: Convert the annotated class file to an annotation file.
 # Do we get the right annotations?
-out2.jann:
-	CLASSPATH=`pwd`/out1 ${ANNCAT} --class out1/annotations/tests/AnnotationTest.class --out --index out2.jann
+out2.jaif:
+	CLASSPATH=`pwd`/out1 ${ANNCAT} --class out1/annotations/tests/AnnotationTest.class --out --index out2.jaif
 
-out2.diff: out2.jann
-	diff -u expected-annos.jann out2.jann > out2.diff
+out2.diff: out2.jaif
+	diff -u expected-annos.jaif out2.jaif > out2.diff
 
 .PHONY: check-out2
 # Fail if out2.diff is non-empty
@@ -50,18 +50,18 @@ out3:
 # Step 4: Insert annotations into the class file.
 # Can debug with:  javap -v out4.class
 out4.class: out3
-	CLASSPATH=`pwd`/out1 ${ANNCAT} --index expected-annos.jann --out --class out3/annotations/tests/AnnotationTest.class --to out4.class
+	CLASSPATH=`pwd`/out1 ${ANNCAT} --index expected-annos.jaif --out --class out3/annotations/tests/AnnotationTest.class --to out4.class
 
 # Step 5: Convert the annotation-inserted class file to an annotation file.
 # Do we get the right annotations?
 # (The annotation-compiled and annotation-inserted class files tend to differ
 # for stupid reasons (e.g., order of items in the constant pool), so we don't
 # compare them.)
-out5.jann: out4.class
-	CLASSPATH=`pwd`/out1 ${ANNCAT} --class out4.class --out --index out5.jann
+out5.jaif: out4.class
+	CLASSPATH=`pwd`/out1 ${ANNCAT} --class out4.class --out --index out5.jaif
 
-out5.diff: out5.jann
-	diff -u expected-annos.jann out5.jann > out5.diff
+out5.diff: out5.jaif
+	diff -u expected-annos.jaif out5.jaif > out5.diff
 
 .PHONY: check-out5
 # Fail if out5.diff is non-empty

@@ -24,10 +24,10 @@ public class Anncat {
                 "usage: anncat <inspec>* [ --out <outspec> ], where:\n" +
                 "    <inspec> ::=\n" +
                 "        ( --javap <in.javap> )\n" +
-                "        | ( --index <in.jann> )\n" +
+                "        | ( --index <in.jaif> )\n" +
                 "        | ( --class <in.class> )\n" +
                 "    <outspec> ::=\n" +
-                "        ( --index <out.jann> )\n" +
+                "        ( --index <out.jaif> )\n" +
                 "        | ( --class [ --overwrite ] <orig.class> [ --to <out.class> ] )\n" +
         "If outspec is omitted, default is index file to stdout.\n");
     }

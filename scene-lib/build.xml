@@ -163,7 +163,7 @@
     <target name="bin" depends="init, bin-check-uptodate" unless="bin.uptodate">
         <echo message="Running bin"/>
         <mkdir dir="bin"/>
-        <!-- Copy non-java files to bin.  These are mostly .jann files. -->
+        <!-- Copy non-java files to bin.  These are mostly .jaif files. -->
         <copy todir="bin">
             <fileset dir="src" excludes="**/*.java"/>
             <fileset dir="test" excludes="**/*.java"/>
@@ -245,34 +245,34 @@
              but there are other uses of ${scene-lib} in this target.
         -->
         <java classname="annotations.tests.executable.Example"
-              output="${scene-lib}/test/annotations/tests/executable/example-stdout.jann"
+              output="${scene-lib}/test/annotations/tests/executable/example-stdout.jaif"
               classpathref="libpath">
-            <arg value="${scene-lib}/test/annotations/tests/executable/example-input.jann" />
+            <arg value="${scene-lib}/test/annotations/tests/executable/example-input.jaif" />
             <arg value="foo.Bar" />
-            <arg value="${scene-lib}/test/annotations/tests/executable/example-output.jann" />
+            <arg value="${scene-lib}/test/annotations/tests/executable/example-output.jaif" />
         </java>
         <condition property="example.output.matches">
-            <filesmatch file1="${scene-lib}/test/annotations/tests/executable/example-output.jann.goal"
-                        file2="${scene-lib}/test/annotations/tests/executable/example-output.jann"/>
+            <filesmatch file1="${scene-lib}/test/annotations/tests/executable/example-output.jaif.goal"
+                        file2="${scene-lib}/test/annotations/tests/executable/example-output.jaif"/>
         </condition>
         <!-- Debugging output in case I don't have access to the filesystem. -->
         <if>
             <isfalse value="${example.output.matches}"/>
             <then>
                 <exec executable="cat">
-                  <arg value="${scene-lib}/test/annotations/tests/executable/example-output.jann.goal"/>
-                  <arg value="${scene-lib}/test/annotations/tests/executable/example-output.jann"/>
+                  <arg value="${scene-lib}/test/annotations/tests/executable/example-output.jaif.goal"/>
+                  <arg value="${scene-lib}/test/annotations/tests/executable/example-output.jaif"/>
                 </exec>
             </then>
         </if>
         <fail unless="example.output.matches" 
-            message="In ${scene-lib}/test/annotations/tests/executable/, file example-output.jann does not match goal."/>
+            message="In ${scene-lib}/test/annotations/tests/executable/, file example-output.jaif does not match goal."/>
         <condition property="example.stdout.matches">
-            <filesmatch file1="${scene-lib}/test/annotations/tests/executable/example-stdout.jann.goal"
-                        file2="${scene-lib}/test/annotations/tests/executable/example-stdout.jann"/>
+            <filesmatch file1="${scene-lib}/test/annotations/tests/executable/example-stdout.jaif.goal"
+                        file2="${scene-lib}/test/annotations/tests/executable/example-stdout.jaif"/>
         </condition>
         <fail unless="example.stdout.matches" 
-            message="In ${scene-lib}/test/annotations/tests/executable/, file example-stdout.jann does not match goal."/>
+            message="In ${scene-lib}/test/annotations/tests/executable/, file example-stdout.jaif does not match goal."/>
 
     </target>
 

@@ -27,9 +27,9 @@ annotation-file-utilities/tests/source-extension/*.log
 annotation-file-utilities/tests/source-extension/*.output
 annotation-file-utilities/tests/Makefile.user
 annotation-file-utilities/tests/system-test/out2.diff
-annotation-file-utilities/tests/system-test/out2.jann
+annotation-file-utilities/tests/system-test/out2.jaif
 annotation-file-utilities/tests/system-test/out5.diff
-annotation-file-utilities/tests/system-test/out5.jann
+annotation-file-utilities/tests/system-test/out5.jaif
 annotation-file-utilities/tests/*.diff
 annotation-file-utilities/tests/*.log
 annotation-file-utilities/tests/*.output
@@ -37,8 +37,8 @@ annotation-file-utilities/tests/*.output
 
 scene-lib/javadoc
 scene-lib/reports
-scene-lib/test/annotations/tests/executable/example-output.jann
-scene-lib/test/annotations/tests/executable/example-stdout.jann
+scene-lib/test/annotations/tests/executable/example-output.jaif
+scene-lib/test/annotations/tests/executable/example-stdout.jaif
 
 *.class-via-classfile-scene.txt
 *.class-correct-scene.txt

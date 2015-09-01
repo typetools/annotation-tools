@@ -33,7 +33,7 @@ import annotations.tests.classfile.foo.A;
  *  <li>place two files in directory {@link #CLASS_FILE_BASE}:
  *    a .class file (for the base version of the class), an _Expected.class
  *    file (for the annotated version of the class)
- *  <li>place one file in directory {@link #INDEX_FILE_BASE}: a .jann index file.
+ *  <li>place one file in directory {@link #INDEX_FILE_BASE}: a .jaif index file.
  *  <li>Add a <code>testc*()</code> method to test against class file and a
  *    <code>testi*()</code> method to test against index file; this is just so
  *     that JUnit has an accurate count of all tests.
@@ -41,7 +41,7 @@ import annotations.tests.classfile.foo.A;
  *
  * Two types of tests are performed:
  * <ul>
- *   <li>Read the annotations from <code>name.jann</code>, insert them into
+ *   <li>Read the annotations from <code>name.jaif</code>, insert them into
  *      <code>name.class</code>, write the results to a temporary file
  *      (name_Generated.class), and compare this generated class file with
  *      <code>name_Expected.class</code>, asserting that they have the same
@@ -67,7 +67,7 @@ public class AnnotationsTest extends TestCase {
 
   /**
    * An array of all the classes to test.  For each name in this array, there
-   * must be a corresponding .jann file in {@link #INDEX_FILE_BASE} and
+   * must be a corresponding .jaif file in {@link #INDEX_FILE_BASE} and
    * .class and _Expected.class files in {@link #CLASS_FILE_BASE}
    */
   public static final String[] allTests = {
@@ -338,8 +338,8 @@ public class AnnotationsTest extends TestCase {
    */
   public void testAll() throws Exception {
 //    for (String s : allTests) {
-//      testAgainstIndexFile(nameIndex(s + ".jann"), nameClass(s+".class"));
-//      testAgainstClass(nameIndex(s + ".jann"), nameClass(s));
+//      testAgainstIndexFile(nameIndex(s + ".jaif"), nameClass(s+".class"));
+//      testAgainstClass(nameIndex(s + ".jaif"), nameClass(s));
 //    }
   }
 
@@ -347,7 +347,7 @@ public class AnnotationsTest extends TestCase {
    * Runs a test on class files for TestClassEmpty.
    */
   public void testcClassEmpty() {
-    testAgainstClass(nameIndex("TestClassEmpty.jann"),
+    testAgainstClass(nameIndex("TestClassEmpty.jaif"),
         nameClass("TestClassEmpty"));
   }
 
@@ -355,7 +355,7 @@ public class AnnotationsTest extends TestCase {
    * Runs a test on index files for TestClassEmpty.
    */
   public void testiClassEmpty() {
-    testAgainstIndexFile(nameIndex("TestClassEmpty.jann"),
+    testAgainstIndexFile(nameIndex("TestClassEmpty.jaif"),
         nameClass("TestClassEmpty.class"));
   }
 
@@ -363,7 +363,7 @@ public class AnnotationsTest extends TestCase {
    * Runs a test on class files for TestClassNonEmpty.
    */
   public void testcClassNonEmpty() {
-    testAgainstClass(nameIndex("TestClassNonEmpty.jann"),
+    testAgainstClass(nameIndex("TestClassNonEmpty.jaif"),
         nameClass("TestClassNonEmpty"));
   }
 
@@ -371,7 +371,7 @@ public class AnnotationsTest extends TestCase {
    * Runs a test on index files for TestClassNonEmpty.
    */
   public void testiClassNonEmpty() {
-    testAgainstIndexFile(nameIndex("TestClassNonEmpty.jann"),
+    testAgainstIndexFile(nameIndex("TestClassNonEmpty.jaif"),
         nameClass("TestClassNonEmpty.class"));
   }
 
@@ -379,7 +379,7 @@ public class AnnotationsTest extends TestCase {
    * Runs a test on class files for TestFieldSimple.
    */
   public void testcFieldSimple() {
-    testAgainstClass(nameIndex("TestFieldSimple.jann"),
+    testAgainstClass(nameIndex("TestFieldSimple.jaif"),
         nameClass("TestFieldSimple"));
   }
 
@@ -387,7 +387,7 @@ public class AnnotationsTest extends TestCase {
    * Runs a test on index files for TestFieldSimple.
    */
   public void testiFieldSimple() {
-    testAgainstIndexFile(nameIndex("TestFieldSimple.jann"),
+    testAgainstIndexFile(nameIndex("TestFieldSimple.jaif"),
         nameClass("TestFieldSimple.class"));
   }
 
@@ -395,7 +395,7 @@ public class AnnotationsTest extends TestCase {
    * Runs a test on class files for TestFieldGeneric.
    */
   public void testcFieldGeneric() {
-    testAgainstClass(nameIndex("TestFieldGeneric.jann"),
+    testAgainstClass(nameIndex("TestFieldGeneric.jaif"),
         nameClass("TestFieldGeneric"));
   }
 
@@ -403,7 +403,7 @@ public class AnnotationsTest extends TestCase {
    * Runs a test on index files for TestFieldGeneric.
    */
   public void testiFieldGeneric() {
-    testAgainstIndexFile(nameIndex("TestFieldGeneric.jann"),
+    testAgainstIndexFile(nameIndex("TestFieldGeneric.jaif"),
         nameClass("TestFieldGeneric.class"));
   }
 
@@ -411,7 +411,7 @@ public class AnnotationsTest extends TestCase {
    * Runs a test on class files for TestLocalVariable.
    */
   public void testcLocalVariable() {
-    testAgainstClass(nameIndex("TestLocalVariable.jann"),
+    testAgainstClass(nameIndex("TestLocalVariable.jaif"),
         nameClass("TestLocalVariable"));
   }
 
@@ -419,7 +419,7 @@ public class AnnotationsTest extends TestCase {
    * Runs a test on index files for TestLocalVariable.
    */
   public void testiLocalVariable() {
-    testAgainstIndexFile(nameIndex("TestLocalVariable.jann"),
+    testAgainstIndexFile(nameIndex("TestLocalVariable.jaif"),
         nameClass("TestLocalVariable.class"));
   }
 
@@ -427,7 +427,7 @@ public class AnnotationsTest extends TestCase {
    * Runs a test on class files for TestLocalVariableGenericArray.
    */
   public void testcLocalVariableGenericArray() {
-    testAgainstClass(nameIndex("TestLocalVariableGenericArray.jann"),
+    testAgainstClass(nameIndex("TestLocalVariableGenericArray.jaif"),
         nameClass("TestLocalVariableGenericArray"));
   }
 
@@ -435,7 +435,7 @@ public class AnnotationsTest extends TestCase {
    * Runs a test on index files for TestLocalVariableGenericArray.
    */
   public void testiLocalVariableGenericArray() {
-    testAgainstIndexFile(nameIndex("TestLocalVariableGenericArray.jann"),
+    testAgainstIndexFile(nameIndex("TestLocalVariableGenericArray.jaif"),
         nameClass("TestLocalVariableGenericArray.class"));
   }
 
@@ -443,7 +443,7 @@ public class AnnotationsTest extends TestCase {
    * Runs a test on class files for TestTypecast.
    */
   public void testcTypecast() {
-    testAgainstClass(nameIndex("TestTypecast.jann"),
+    testAgainstClass(nameIndex("TestTypecast.jaif"),
         nameClass("TestTypecast"));
   }
 
@@ -451,7 +451,7 @@ public class AnnotationsTest extends TestCase {
    * Runs a test on index files for TestTypecast.
    */
   public void testiTypecast() {
-    testAgainstIndexFile(nameIndex("TestTypecast.jann"),
+    testAgainstIndexFile(nameIndex("TestTypecast.jaif"),
         nameClass("TestTypecast.class"));
   }
 
@@ -459,7 +459,7 @@ public class AnnotationsTest extends TestCase {
    * Runs a test on class files for TestTypecastGenericArray.
    */
   public void testcTypecastGenericArray() {
-    testAgainstClass(nameIndex("TestTypecastGenericArray.jann"),
+    testAgainstClass(nameIndex("TestTypecastGenericArray.jaif"),
         nameClass("TestTypecastGenericArray"));
   }
 
@@ -467,7 +467,7 @@ public class AnnotationsTest extends TestCase {
    * Runs a test on index files for TestTypecastGenericArray.
    */
   public void testiTypecastGenericArray() {
-    testAgainstIndexFile(nameIndex("TestTypecastGenericArray.jann"),
+    testAgainstIndexFile(nameIndex("TestTypecastGenericArray.jaif"),
         nameClass("TestTypecastGenericArray.class"));
   }
 
@@ -475,7 +475,7 @@ public class AnnotationsTest extends TestCase {
    * Runs a test on class files for TestTypeTest.
    */
   public void testcTypeTest() {
-    testAgainstClass(nameIndex("TestTypeTest.jann"),
+    testAgainstClass(nameIndex("TestTypeTest.jaif"),
         nameClass("TestTypeTest"));
   }
 
@@ -483,7 +483,7 @@ public class AnnotationsTest extends TestCase {
    * Runs a test on index files for TestTypeTest.
    */
   public void testiTypeTest() {
-    testAgainstIndexFile(nameIndex("TestTypeTest.jann"),
+    testAgainstIndexFile(nameIndex("TestTypeTest.jaif"),
         nameClass("TestTypeTest.class"));
   }
 
@@ -491,7 +491,7 @@ public class AnnotationsTest extends TestCase {
    * Runs a test on class files for TestObjectCreation.
    */
   public void testcObjectCreation() {
-    testAgainstClass(nameIndex("TestObjectCreation.jann"),
+    testAgainstClass(nameIndex("TestObjectCreation.jaif"),
         nameClass("TestObjectCreation"));
   }
 
@@ -499,7 +499,7 @@ public class AnnotationsTest extends TestCase {
    * Runs a test on index files for TestObjectCreation.
    */
   public void testiObjectCreation() {
-    testAgainstIndexFile(nameIndex("TestObjectCreation.jann"),
+    testAgainstIndexFile(nameIndex("TestObjectCreation.jaif"),
         nameClass("TestObjectCreation.class"));
   }
 
@@ -507,7 +507,7 @@ public class AnnotationsTest extends TestCase {
    * Runs a test on class files for TestObjectCreationGenericArray.
    */
   public void testcObjectCreationGenericArray() {
-    testAgainstClass(nameIndex("TestObjectCreationGenericArray.jann"),
+    testAgainstClass(nameIndex("TestObjectCreationGenericArray.jaif"),
         nameClass("TestObjectCreationGenericArray"));
   }
 
@@ -515,7 +515,7 @@ public class AnnotationsTest extends TestCase {
    * Runs a test on index files for TestObjectCreationGenericArray.
    */
   public void testiObjectCreationGenericArray() {
-    testAgainstIndexFile(nameIndex("TestObjectCreationGenericArray.jann"),
+    testAgainstIndexFile(nameIndex("TestObjectCreationGenericArray.jaif"),
         nameClass("TestObjectCreationGenericArray.class"));
   }
 
@@ -523,7 +523,7 @@ public class AnnotationsTest extends TestCase {
    * Runs a test on class files for TestMethodReceiver.
    */
   public void testcMethodReceiver() {
-    testAgainstClass(nameIndex("TestMethodReceiver.jann"),
+    testAgainstClass(nameIndex("TestMethodReceiver.jaif"),
         nameClass("TestMethodReceiver"));
   }
 
@@ -531,7 +531,7 @@ public class AnnotationsTest extends TestCase {
    * Runs a test on index files for TestMethodReceiver.
    */
   public void testiMethodReceiver() {
-    testAgainstIndexFile(nameIndex("TestMethodReceiver.jann"),
+    testAgainstIndexFile(nameIndex("TestMethodReceiver.jaif"),
         nameClass("TestMethodReceiver.class"));
   }
 
@@ -539,7 +539,7 @@ public class AnnotationsTest extends TestCase {
    * Runs a test on class files for TestMethodReturnTypeGenericArray.
    */
   public void testcMethodReturnTypeGenericArray() {
-    testAgainstClass(nameIndex("TestMethodReturnTypeGenericArray.jann"),
+    testAgainstClass(nameIndex("TestMethodReturnTypeGenericArray.jaif"),
         nameClass("TestMethodReturnTypeGenericArray"));
   }
 
@@ -547,7 +547,7 @@ public class AnnotationsTest extends TestCase {
    * Runs a test on index files for TestMethodReturnTypeGenericArray.
    */
   public void testiMethodReturnTypeGenericArray() {
-    testAgainstIndexFile(nameIndex("TestMethodReturnTypeGenericArray.jann"),
+    testAgainstIndexFile(nameIndex("TestMethodReturnTypeGenericArray.jaif"),
         nameClass("TestMethodReturnTypeGenericArray.class"));
   }
 
