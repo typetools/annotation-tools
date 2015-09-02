@@ -77,7 +77,7 @@ public class JVMNames {
      * @param type the Type to convert to JVML
      * @return The JVML representation of type
      */
-    private static String typeToJvmlString(Type type) {
+    public static String typeToJvmlString(Type type) {
         if (type.getKind() == TypeKind.ARRAY) {
             return "[" + typeToJvmlString((Type) ((ArrayType) type).getComponentType());
         } else if (type.getKind() == TypeKind.INTERSECTION) {
