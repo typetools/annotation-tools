@@ -438,14 +438,6 @@ related in the type hierarchy shown below.</p>
 <img src="scene-lib-type-hierarchy.png"></div>
 </div>
 
-<p>Note that this type hierarchy does not have a traditional
-&ldquo;is-a&rdquo; relationship between its classes. For example, it is
-not valid to say that a method is-a block, as the type hierarchy
-implies. In fact, it makes more sense to view the type hierarchy upside
-down, like so: a method contains a block, a block contains multiple
-expressions, and an expression contains an element.  (Perhaps object
-composition would have been a better pattern to follow here.)</p>
-
 <p>Each class in the type hierarchy has one or more fields to hold
 annotations for the different components of the class. For example, the
 <code>AMethod</code> class has the following fields: bounds, return
