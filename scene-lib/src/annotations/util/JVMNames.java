@@ -34,37 +34,52 @@ public class JVMNames {
      */
     public static String getJVMMethodName(MethodTree methodTree) {
         ExecutableElement methodElement = ((JCMethodDecl) methodTree).sym;
+        if (methodElement != null) {
+            return getJVMMethodName(methodElement);
+        }
         StringBuilder builder = new StringBuilder();
         String returnTypeStr;
         builder.append(methodTree.getName());
         builder.append("(");
 
-        if (methodElement == null) {
-            // use source AST in lieu of symbol table
-            List<JCVariableDecl> params = ((JCMethodDecl) methodTree).params;
-            JCVariableDecl param = params.head;
-            JCExpression typeTree = ((JCMethodDecl) methodTree).restype;
-            returnTypeStr = treeToJVMLString(typeTree);
-            while (param != null) {
-                builder.append(treeToJVMLString(param.vartype));
-                params = params.tail;
-                param = params.head;
-            }
-        } else {
-            TypeMirror returnType = methodElement.getReturnType();
-            returnTypeStr = typeToJvmlString((Type)returnType);
-            for (VariableElement ve : methodElement.getParameters()) {
-                Type vt = (Type) ve.asType();
-                if (vt.getTag() == TypeTag.TYPEVAR) {
-                    vt = vt.getUpperBound();
-                }
-                builder.append(typeToJvmlString(vt));
-            }
+        // use source AST in lieu of symbol table
+        List<JCVariableDecl> params = ((JCMethodDecl) methodTree).params;
+        JCVariableDecl param = params.head;
+        JCExpression typeTree = ((JCMethodDecl) methodTree).restype;
+        returnTypeStr = treeToJVMLString(typeTree);
+        while (param != null) {
+            builder.append(treeToJVMLString(param.vartype));
+            params = params.tail;
+            param = params.head;
         }
-
         builder.append(")");
         builder.append(returnTypeStr);
-//System.err.println("@"+methodTree.getName()+"("+methodTree.getParameters()+") "+methodTree.getReturnType()+" "+builder.toString());
+        return builder.toString();
+    }
+
+    /**
+     * Converts a method element into a jvml format method signature.
+     * There is probably an API to do this, but I couldn't find it.
+     *
+     * @param methodElement the method element to convert
+     * @return a String signature of methodElement in jvml format
+     */
+    public static String getJVMMethodName(ExecutableElement methodElement) {
+        StringBuilder builder = new StringBuilder();
+        String returnTypeStr;
+        builder.append(methodElement.getSimpleName());
+        builder.append("(");
+        TypeMirror returnType = methodElement.getReturnType();
+        returnTypeStr = typeToJvmlString((Type)returnType);
+        for (VariableElement ve : methodElement.getParameters()) {
+            Type vt = (Type) ve.asType();
+            if (vt.getTag() == TypeTag.TYPEVAR) {
+                vt = vt.getUpperBound();
+            }
+            builder.append(typeToJvmlString(vt));
+        }
+        builder.append(")");
+        builder.append(returnTypeStr);
         return builder.toString();
     }
 
