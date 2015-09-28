@@ -39,3 +39,6 @@ class BoundZero:
 class BoundZero$Inner:
     bound 0&0: @A @B @C
 
+class Outer:
+    bound 0&0: @A @B @C
+

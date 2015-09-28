@@ -3,8 +3,7 @@ package annotator.tests;
 import static java.lang.annotation.ElementType.TYPE_USE;
 import java.lang.annotation.Target;
 
-@skip-test
-
+//@skip-test
 @Target({TYPE_USE}) @interface A {}
 @Target({TYPE_USE}) @interface B {}
 @Target({TYPE_USE}) @interface C {}
@@ -22,5 +21,8 @@ class BoundZero<U extends @annotator.tests.A @annotator.tests.B @annotator.tests
   <T extends @annotator.tests.X Object & @Y Comparable<T>> void m8(T o) {}
   <T extends @annotator.tests.X Object & @annotator.tests.Y Comparable<T>> void m9(T o) {}
   class Inner<@X V extends @Y @annotator.tests.A @annotator.tests.B @annotator.tests.C Object> {}
+}
+
+class Outer<S extends @annotator.tests.A @annotator.tests.B @annotator.tests.C Object & java.io.Serializable> {
 }
 

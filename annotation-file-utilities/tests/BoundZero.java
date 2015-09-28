@@ -22,3 +22,6 @@ class BoundZero<U> {
   class Inner<@X V extends @Y Object> {}
 }
 
+class Outer<S extends java.io.Serializable> {
+}
+
