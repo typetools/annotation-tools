@@ -26,6 +26,7 @@ public abstract class Insertion {
         ANNOTATION,
         CAST,
         CONSTRUCTOR,
+        METHOD,
         NEW,
         RECEIVER,
         CLOSE_PARENTHESIS
