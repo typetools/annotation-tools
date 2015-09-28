@@ -131,4 +131,9 @@ public class JVMNames {
             break;
         }
     }
+
+    public static String jvmlStringToJavaTypeString(String str) {
+        return str.equals("V") ? "void"
+                : UtilMDE.fieldDescriptorToBinaryName(str);
+    }
 }
