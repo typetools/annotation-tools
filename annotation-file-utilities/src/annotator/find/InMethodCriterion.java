@@ -12,12 +12,17 @@ import com.sun.source.util.TreePath;
  * certain name.
  */
 final class InMethodCriterion implements Criterion {
-
   public final String name;
+  public final boolean isDeclaration;
   private final IsSigMethodCriterion sigMethodCriterion;
 
-  InMethodCriterion(String name) {
+  InMethodCriterion(String varName) {
+    this(varName, false);
+  }
+
+  InMethodCriterion(String name, boolean isDeclaration) {
     this.name = name;
+    this.isDeclaration = isDeclaration;
     sigMethodCriterion = new IsSigMethodCriterion(name);
   }
 

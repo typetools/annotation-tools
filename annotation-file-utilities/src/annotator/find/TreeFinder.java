@@ -12,7 +12,6 @@ import java.util.regex.Pattern;
 
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
-import javax.lang.model.element.Name;
 import javax.lang.model.type.NullType;
 
 import com.google.common.collect.LinkedHashMultimap;
@@ -250,50 +249,77 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
    */
   private class TypePositionFinder
   extends TreeScanner<Pair<ASTRecord, Integer>, Insertion> {
+    @Override
+    public Pair<ASTRecord, Integer> reduce(Pair<ASTRecord, Integer> p,
+        Pair<ASTRecord, Integer> q) {
+      return q == null ? p : q;
+    }
+
     private Pair<ASTRecord, Integer> pathAndPos(JCTree t) {
-      return Pair.of(astRecord(t), t.pos);
+      return Pair.of(astRecord(t), t.getStartPosition());
     }
 
     private Pair<ASTRecord, Integer> pathAndPos(JCTree t, int i) {
       return Pair.of(astRecord(t), i);
     }
 
-    /** @param t an expression for a type */
-    private Pair<ASTRecord, Integer> getBaseTypePosition(JCTree t) {
+    /** @param node an expression for a type */
+    private Pair<ASTRecord, Integer> getBaseTypePosition(JCTree node) {
+      JCTree t = node;
       while (true) {
         switch (t.getKind()) {
         case IDENTIFIER:
         case PRIMITIVE_TYPE:
           return pathAndPos(t);
         case MEMBER_SELECT:
-          JCTree exp = t;
-          do {  // locate pkg name, if any
-            JCFieldAccess jfa = (JCFieldAccess) exp;
-            exp = jfa.getExpression();
+          JCFieldAccess jfa = (JCFieldAccess) t;
+          JCTree exp = jfa;
+          Tree.Kind kind;
+          while (true) {
             if (jfa.sym.isStatic()) {
-              return pathAndPos(exp,
-                  getFirstInstanceAfter('.',
-                      exp.getEndPosition(tree.endPositions)) + 1);
+              return pathAndPos(t,
+                  t.getEndPosition(tree.endPositions)
+                  - ((JCFieldAccess) t).name.length());
             }
-          } while (exp instanceof JCFieldAccess
-              && ((JCFieldAccess) exp).sym.getKind() != ElementKind.PACKAGE);
-          if (exp != null) {
-            if (exp.getKind() == Tree.Kind.IDENTIFIER) {
-              Symbol sym = ((JCIdent) exp).sym;
-              if (!(sym.isStatic() || sym.getKind() == ElementKind.PACKAGE)) {
-                return pathAndPos(t, t.getStartPosition());
+            exp = jfa.getExpression();
+            if (exp.getKind() == Tree.Kind.ANNOTATED_TYPE) {
+              exp = ((JCAnnotatedType) exp).getUnderlyingType();
+            }
+            t = exp;  // save
+            if (exp.getKind() == Tree.Kind.PARAMETERIZED_TYPE) {
+              exp = ((JCTypeApply) exp).getType();
+            }
+            if (exp.getKind() != Tree.Kind.MEMBER_SELECT) {
+              if (exp.getKind() != Tree.Kind.IDENTIFIER) {
+                exp = t;  // restore
               }
+              break;
             }
-            t = exp;
+            jfa = (JCFieldAccess) exp;
+            if (jfa.sym.getKind() == ElementKind.PACKAGE) { break; }
           }
-          return pathAndPos(t,
-              getFirstInstanceAfter('.',
-                  t.getEndPosition(tree.endPositions)) + 1);
+          kind = exp.getKind();
+          if (kind == Tree.Kind.IDENTIFIER) {
+            Symbol sym = ((JCIdent) exp).sym;
+            if (!(sym.isStatic() || sym.getKind() == ElementKind.PACKAGE)) {
+              return pathAndPos(node,
+                  node.getEndPosition(tree.endPositions)
+                  - ((JCFieldAccess) node).name.length());
+            }
+          } else if (kind != Tree.Kind.ARRAY_TYPE
+              && kind != Tree.Kind.PARAMETERIZED_TYPE) {
+            return pathAndPos(exp,
+                getFirstInstanceAfter('.',
+                    exp.getEndPosition(tree.endPositions)) + 1);
+          }
+          t = exp;
+          break;
         case ARRAY_TYPE:
           t = ((JCArrayTypeTree) t).elemtype;
           break;
         case PARAMETERIZED_TYPE:
-          return pathAndPos(t, t.getStartPosition());
+          t = ((JCTypeApply) t).getType();
+          break;
         case EXTENDS_WILDCARD:
         case SUPER_WILDCARD:
           t = ((JCWildcard) t).inner;
@@ -316,19 +342,13 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
 
     @Override
     public Pair<ASTRecord, Integer> visitVariable(VariableTree node, Insertion ins) {
-      Name name = node.getName();
       JCVariableDecl jn = (JCVariableDecl) node;
       JCTree jt = jn.getType();
       Criteria criteria = ins.getCriteria();
       dbug.debug("visitVariable: %s %s%n", jt, jt.getClass());
-      if (name != null && criteria.isOnFieldDeclaration()) {
-        return Pair.of(astRecord(node), jn.getStartPosition());
-      }
-      if (jt instanceof JCTypeApply) {
-        JCExpression type = ((JCTypeApply) jt).clazz;
-        return pathAndPos(type);
-      }
-      return Pair.of(astRecord(node), jn.pos);
+      return (node.getName() != null && criteria.isOnFieldDeclaration())
+          ? Pair.of(astRecord(node), jn.getStartPosition())
+          : jt.accept(this, ins);
     }
 
     // When a method is visited, it is visited for the receiver, not the
@@ -340,7 +360,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
 
       JCMethodDecl jcnode = (JCMethodDecl) node;
       JCVariableDecl jcvar = (JCVariableDecl) node.getReceiverParameter();
-      if (jcvar != null) { return pathAndPos(jcvar); }
+      if (jcvar != null) { return getBaseTypePosition(jcvar.getType()); }
 
       int pos = Position.NOPOS;
       ASTRecord astPath = astRecord(jcnode)
@@ -405,7 +425,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       } else {
         ASTRecord astRecord = astRecord(node);
         astPath = astRecord.astPath;
-        i = ((JCIdent) node).pos;
+        i = jcnode.getStartPosition();
       }
 
       dbug.debug("visitIdentifier(%s) => %d where parent (%s) = %s%n",
@@ -416,9 +436,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     @Override
     public Pair<ASTRecord, Integer> visitMemberSelect(MemberSelectTree node, Insertion ins) {
       dbug.debug("TypePositionFinder.visitMemberSelect(%s)%n", node);
-      JCFieldAccess raw = (JCFieldAccess) node;
-      return Pair.of(astRecord(node),
-          raw.getEndPosition(tree.endPositions) - raw.name.length());
+      return getBaseTypePosition((JCFieldAccess) node);
     }
 
     @Override
@@ -802,27 +820,25 @@ loop:
 
     @Override
     public Pair<ASTRecord, Integer> visitNewClass(NewClassTree node, Insertion ins) {
-      JCNewClass na = (JCNewClass) node;
-      JCExpression className = na.clazz;
-      // System.out.printf("classname %s (%s)%n", className, className.getClass());
-      while (! (className.getKind() == Tree.Kind.IDENTIFIER)) { // IdentifierTree
-        if (className instanceof JCAnnotatedType) {
-          className = ((JCAnnotatedType) className).underlyingType;
-        } else if (className instanceof JCTypeApply) {
-          className = ((JCTypeApply) className).clazz;
-        } else if (className instanceof JCFieldAccess) {
-          // This occurs for fully qualified names, e.g. "new java.lang.Object()".
-          // I'm not quite sure why the field "selected" is taken, but "name" would
-          // be a type mismatch. It seems to work, see NewPackage test case.
-          className = ((JCFieldAccess) className).selected;
-        } else {
-          throw new Error(String.format("unrecognized JCNewClass.clazz (%s): %s%n" +
-                  "   surrounding new class tree: %s%n", className.getClass(), className, node));
+      JCExpression clazz = ((JCNewClass) node).clazz;
+
+      loop:
+      while (clazz != null) {
+        switch (clazz.getKind()) {
+        case IDENTIFIER:
+        case MEMBER_SELECT:
+          //return visitIdentifier((IdentifierTree) clazz, ins);
+          return clazz.accept(this, ins);
+        case PARAMETERIZED_TYPE:
+          clazz = ((JCTypeApply) clazz).clazz;
+          break;
+        default:
+          break loop;
         }
-        // System.out.printf("classname %s (%s)%n", className, className.getClass());
       }
 
-      return visitIdentifier((IdentifierTree) className, ins);
+      throw new Error(String.format("unrecognized JCNewClass.clazz (%s): %s%n" +
+          "   surrounding new class tree: %s%n", clazz.getClass(), clazz, node));
     }
   }
 
@@ -1050,13 +1066,13 @@ loop:
       }
 
       if (i.getKind() == Insertion.Kind.CONSTRUCTOR) {
-        ConstructorInsertion cons = (ConstructorInsertion) i;
+        MethodInsertion cons = (MethodInsertion) i;
         if (node.getKind() == Tree.Kind.METHOD) {
           JCMethodDecl method = (JCMethodDecl) node;
           // TODO: account for the following situation in matching phase instead
           if (method.sym.owner.isAnonymous()) { return null; }
           if ((method.mods.flags & Flags.GENERATEDCONSTR) != 0) {
-            addConstructor(path, cons, method);
+            addConstructor(path, cons);
           } else {
             cons.setAnnotationsOnly(true);
             cons.setInserted(true);
@@ -1065,16 +1081,40 @@ loop:
           }
         } else {
           cons.setAnnotationsOnly(true);
+          cons.setInserted(true);
+          i = cons.getReceiverInsertion();
+          if (i == null) { return null; }
         }
       }
 
-      if (i.getKind() == Insertion.Kind.RECEIVER && node.getKind() == Tree.Kind.METHOD) {
-        ReceiverInsertion receiver = (ReceiverInsertion) i;
-        MethodTree method = (MethodTree) node;
-        VariableTree rcv = method.getReceiverParameter();
+      if (i.getKind() == Insertion.Kind.METHOD) {
+        MethodInsertion meth = (MethodInsertion) i;
+        if (node.getKind() == Tree.Kind.METHOD) {
+          JCMethodDecl method = (JCMethodDecl) node;
+          // TODO: account for the following situation in matching phase instead
+          if (method.sym.owner.isAnonymous()) { return null; }
+          if ((method.mods.flags & Flags.GENERATEDCONSTR) != 0) {
+            addMethod(path, meth);
+          } else {
+            meth.setAnnotationsOnly(true);
+            meth.setInserted(true);
+            i = meth.getReceiverInsertion();
+            if (i == null) { return null; }
+          }
+        } else if (ASTPath.isClassEquiv(node.getKind())) {
+          meth.setAnnotationsOnly(true);
+        }
+      }
 
-        if (rcv == null) {
-          addReceiverType(path, receiver, method);
+      if (i.getKind() == Insertion.Kind.RECEIVER) {
+        ReceiverInsertion receiver = (ReceiverInsertion) i;
+        if (node.getKind() == Tree.Kind.METHOD) {
+          MethodTree method = (MethodTree) node;
+          if (method.getReceiverParameter() == null) {
+            addReceiverType(path, receiver);
+          }
+        } else if (ASTPath.isClassEquiv(node.getKind())) {
+          addReceiverType(path, receiver);
         }
       }
 
@@ -1238,29 +1278,60 @@ loop:
       }
 
       if (i.getKind() == Insertion.Kind.CONSTRUCTOR) {
-        ConstructorInsertion cons = (ConstructorInsertion) i;
+        MethodInsertion cons = (MethodInsertion) i;
 
         if (node.getKind() == Tree.Kind.METHOD) {
           JCMethodDecl method = (JCMethodDecl) node;
           if ((method.mods.flags & Flags.GENERATEDCONSTR) != 0) {
-            addConstructor(path, cons, method);
+            addConstructor(path, cons);
           } else {
             cons.setAnnotationsOnly(true);
             cons.setInserted(true);
             i = cons.getReceiverInsertion();
             if (i == null) { return null; }
           }
+        } else if (node.getKind() == Tree.Kind.CLASS) {
+          addConstructor(path, cons);
         } else {
           cons.setAnnotationsOnly(true);
+          cons.setInserted(true);
+          i = cons.getReceiverInsertion();
+          if (i == null) { return null; }
         }
       }
 
-      if (i.getKind() == Insertion.Kind.RECEIVER && node.getKind() == Tree.Kind.METHOD) {
-        ReceiverInsertion receiver = (ReceiverInsertion) i;
-        MethodTree method = (MethodTree) node;
+      if (i.getKind() == Insertion.Kind.METHOD) {
+        MethodInsertion meth = (MethodInsertion) i;
 
-        if (method.getReceiverParameter() == null) {
-          addReceiverType(path, receiver, method);
+        if (node.getKind() == Tree.Kind.METHOD) {
+          JCMethodDecl method = (JCMethodDecl) node;
+          if ((method.mods.flags & Flags.GENERATEDCONSTR) != 0) {
+            addMethod(path, meth);
+          } else {
+            meth.setAnnotationsOnly(true);
+            meth.setInserted(true);
+            i = meth.getReceiverInsertion();
+            if (i == null) { return null; }
+          }
+        } else if (node.getKind() == Tree.Kind.CLASS) {
+          addMethod(path, meth);
+        } else {
+          meth.setAnnotationsOnly(true);
+          meth.setInserted(true);
+          i = meth.getReceiverInsertion();
+          if (i == null) { return null; }
+        }
+      }
+
+      if (i.getKind() == Insertion.Kind.RECEIVER) {
+        ReceiverInsertion receiver = (ReceiverInsertion) i;
+        if (node.getKind() == Tree.Kind.METHOD) {
+          MethodTree method = (MethodTree) node;
+          if (method.getReceiverParameter() == null) {
+            addReceiverType(path, receiver);
+          }
+        } else if (ASTPath.isClassEquiv(node.getKind())) {
+          addReceiverType(path, receiver);
         }
       }
 
@@ -1402,9 +1473,14 @@ loop:
               pos, node.toString(), node.getClass());
         } else if (node.getKind() == Tree.Kind.METHOD
             && i.getKind() == Insertion.Kind.CONSTRUCTOR
-            && (((JCMethodDecl) node).mods.flags & Flags.GENERATEDCONSTR) != 0) {
+            && (((JCMethodDecl) node).mods.flags
+                & Flags.GENERATEDCONSTR) != 0) {
           Tree parent = path.getParentPath().getLeaf();
           pos = ((JCClassDecl) parent).getEndPosition(tree.endPositions) - 1;
+          insertRecord = null;  // TODO
+        } else if (node.getKind() == Tree.Kind.CLASS
+            && i.getKind() == Insertion.Kind.CONSTRUCTOR) {
+          pos = ((JCClassDecl) node).getEndPosition(tree.endPositions) - 1;
           insertRecord = null;  // TODO
         } else {
           // looking for the declaration
@@ -1596,10 +1672,8 @@ loop:
    *
    * @param path The location in the AST to insert the receiver.
    * @param receiver Details of the receiver to insert.
-   * @param method The method the receiver is being inserted into.
    */
-  private void addReceiverType(TreePath path, ReceiverInsertion receiver,
-      MethodTree method) {
+  private void addReceiverType(TreePath path, ReceiverInsertion receiver) {
     // Find the name of the class
     // with type parameters to create the receiver. Walk up the tree and
     // pick up class names to add to the receiver type. Since we're
@@ -1618,7 +1692,9 @@ loop:
     DeclaredType staticType = null;
     // For an inner class constructor, the receiver comes from the
     // superclass, so skip past the first type definition.
-    boolean isCon = ((MethodTree) parent.getLeaf()).getReturnType() == null;
+    String methodName = receiver.getCriteria().getMethodName();
+    boolean isNullary = methodName.contains("()");
+    boolean isCon = methodName.startsWith("<init>");
     boolean skip = isCon;
 
     while (kind != Tree.Kind.COMPILATION_UNIT
@@ -1689,7 +1765,7 @@ loop:
         receiver.getCriteria().getASTPath());
 
     // If the method doesn't have parameters, don't add a comma.
-    receiver.setAddComma(method.getParameters().size() > 0);
+    receiver.setAddComma(!isNullary);
   }
 
   private void addNewType(TreePath path, NewInsertion neu,
@@ -1708,12 +1784,16 @@ loop:
         neu.getCriteria().getASTPath());
   }
 
-  private void addConstructor(TreePath path, ConstructorInsertion cons,
-      MethodTree method) {
-    ReceiverInsertion recv = cons.getReceiverInsertion();
-    MethodTree leaf = (MethodTree) path.getLeaf();
-    ClassTree parent = (ClassTree) path.getParentPath().getLeaf();
+  private void addConstructor(TreePath path, MethodInsertion cons) {
     DeclaredType baseType = cons.getBaseType();
+    ReceiverInsertion recv = cons.getReceiverInsertion();
+    Tree leaf = path.getLeaf();
+    ClassTree parent;
+    if (leaf.getKind() == Tree.Kind.METHOD) {
+      parent = (ClassTree) path.getParentPath().getLeaf();
+    } else {  // leaf.getKind() == Tree.Kind.CLASS
+      parent = (ClassTree) leaf;
+    }
     if (baseType.getName().isEmpty()) {
       List<String> annotations = baseType.getAnnotations();
       String className = parent.getSimpleName().toString();
@@ -1724,9 +1804,10 @@ loop:
       }
     }
     if (recv != null) {
-      Iterator<Insertion> iter = cons.getInnerTypeInsertions().iterator();
+      List<Insertion> innerTypeInsertions = cons.getInnerTypeInsertions();
+      Iterator<Insertion> iter = innerTypeInsertions.iterator();
       List<Insertion> recvInner = new ArrayList<Insertion>();
-      addReceiverType(path, recv, leaf);
+      addReceiverType(path, recv);
       while (iter.hasNext()) {
         Insertion i = iter.next();
         if (i.getCriteria().isOnReceiver()) {
@@ -1739,6 +1820,43 @@ loop:
     }
     Insertion.decorateType(cons.getInnerTypeInsertions(), cons.getType(),
         cons.getCriteria().getASTPath());
+  }
+
+  private void addMethod(TreePath path, MethodInsertion meth) {
+    ReceiverInsertion recv = meth.getReceiverInsertion();
+    DeclaredType baseType = meth.getBaseType();
+    Tree leaf = path.getLeaf();
+    ClassTree parent;
+    if (leaf.getKind() == Tree.Kind.METHOD) {
+      parent = (ClassTree) path.getParentPath().getLeaf();
+    } else {  // leaf.getKind() == Tree.Kind.CLASS
+      parent = (ClassTree) leaf;
+    }
+    if (baseType.getName().isEmpty()) {
+      List<String> annotations = baseType.getAnnotations();
+      String className = parent.getSimpleName().toString();
+      Type newType = new DeclaredType(className);
+      meth.setType(newType);
+      for (String ann : annotations) {
+        newType.addAnnotation(ann);
+      }
+    }
+    if (recv != null) {
+      Iterator<Insertion> iter = meth.getInnerTypeInsertions().iterator();
+      List<Insertion> recvInner = new ArrayList<Insertion>();
+      addReceiverType(path, recv);
+      while (iter.hasNext()) {
+        Insertion i = iter.next();
+        if (i.getCriteria().isOnReceiver()) {
+          recvInner.add(i);
+          iter.remove();
+        }
+      }
+      Insertion.decorateType(recvInner, recv.getType(),
+          meth.getCriteria().getASTPath());
+    }
+    Insertion.decorateType(meth.getInnerTypeInsertions(), meth.getType(),
+        meth.getCriteria().getASTPath());
   }
 
   public SetMultimap<ASTRecord, Insertion> getPaths() {

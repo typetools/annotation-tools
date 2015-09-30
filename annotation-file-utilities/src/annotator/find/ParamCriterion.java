@@ -9,9 +9,8 @@ import com.sun.source.tree.VariableTree;
 import com.sun.source.util.TreePath;
 
 public class ParamCriterion implements Criterion {
-
-  private final String methodName;
-  private final Integer paramPos;
+  final String methodName;
+  final Integer paramPos;
 
   public ParamCriterion(String methodName, Integer pos) {
     this.methodName = methodName.substring(0, methodName.indexOf(")") + 1);

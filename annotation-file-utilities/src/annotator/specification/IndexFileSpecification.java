@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.objectweb.asm.ClassReader;
 
@@ -37,11 +38,11 @@ import annotations.util.coll.VivifyingMap;
 import annotator.find.AnnotationInsertion;
 import annotator.find.CastInsertion;
 import annotator.find.CloseParenthesisInsertion;
-import annotator.find.ConstructorInsertion;
 import annotator.find.Criteria;
 import annotator.find.GenericArrayLocationCriterion;
 import annotator.find.Insertion;
 import annotator.find.IntersectionTypeLocationCriterion;
+import annotator.find.MethodInsertion;
 import annotator.find.NewInsertion;
 import annotator.find.ReceiverInsertion;
 import annotator.scanner.MethodOffsetClassVisitor;
@@ -63,7 +64,9 @@ public class IndexFileSpecification implements Specification {
 
   private static boolean debug = false;
 
-  private ConstructorInsertion cons = null;
+  private MethodInsertion cons = null;
+  private Map<String, MethodInsertion> meths =
+      new TreeMap<String, MethodInsertion>();
 
   public IndexFileSpecification(String indexFileName) {
     this.indexFileName = indexFileName;
@@ -166,6 +169,7 @@ public class IndexFileSpecification implements Specification {
    */
   private void parseClass(CriterionList clist, String className, AClass clazz) {
     cons = null;  // 0 or 1 per class
+    meths.clear();
     if (! noAsm) {
       //  load extra info using asm
       debug("parseClass(" + className + ")");
@@ -370,7 +374,13 @@ public class IndexFileSpecification implements Specification {
       Criteria criteria = clist.criteria();
       Boolean isDeclarationAnnotation = !annotation.def.isTypeAnnotation()
           || criteria.isOnFieldDeclaration();
-      if (noTypePath(criteria) && isOnReceiver(criteria)) {
+      int pp = criteria.getParamPos();
+      if (pp >= 0 || criteria.isOnReturnType()) {  // subordinate to MethodIns.
+        Insertion ins = new AnnotationInsertion(annotationString, criteria,
+            isDeclarationAnnotation);
+        elementInsertions.add(ins);
+        addInsertionSource(ins, annotation);
+      } else if (noTypePath(criteria) && isOnReceiver(criteria)) {
         if (receiver == null) {
           DeclaredType type = new DeclaredType();
           type.addAnnotation(annotationString);
@@ -427,7 +437,7 @@ public class IndexFileSpecification implements Specification {
       if (noTypePath(criteria) && isOnNullaryConstructor(criteria)) {
         if (cons == null) {
           DeclaredType type = new DeclaredType(criteria.getClassName());
-          cons = new ConstructorInsertion(type, criteria,
+          cons = new MethodInsertion(type, criteria,
               new ArrayList<Insertion>());
           this.insertions.add(cons);
         }
@@ -439,7 +449,34 @@ public class IndexFileSpecification implements Specification {
             ((DeclaredType) cons.getType()).addAnnotation(annotationString);
           } else if (isDeclarationAnnotation) {
             cons.addDeclarationInsertion(i);
-            i.setInserted(true);
+            //i.setInserted(true);
+          } else {
+            annotationInsertions.add(i);
+          }
+        }
+      } else if (isOnMethodDeclaration(criteria)) {
+        String className = criteria.getClassName();
+        MethodInsertion meth = meths.get(className);
+        if (meth == null) {
+          DeclaredType type = new DeclaredType(className);
+          String methodName = criteria.getMethodName();
+          CriterionList mclist = new CriterionList(criteria.getInClass()).add(
+              Criteria.inMethod(methodName, true));
+          meth = new MethodInsertion(type, methodName,
+              mclist.criteria(), new ArrayList<Insertion>());
+          meths.put(methodName, meth);
+          this.insertions.add(meth);
+        }
+        // no addInsertionSource, as meth is not explicit in scene
+        for (Insertion i : elementInsertions) {
+          if (pp >= 0) {
+            meth.addParameterInsertion(i, pp);
+          } else if (i.getKind() == Insertion.Kind.RECEIVER) {
+            meth.addReceiverInsertion((ReceiverInsertion) i);
+          } else if (i.getCriteria().isOnReturnType()) {
+            meth.addReturnTypeInsertion(i);
+          } else if (isDeclarationAnnotation) {
+            meth.addDeclarationInsertion(i);
           } else {
             annotationInsertions.add(i);
           }
@@ -460,7 +497,7 @@ public class IndexFileSpecification implements Specification {
     return annotationInsertions;
   }
 
-  private boolean noTypePath(Criteria criteria) {
+  private static boolean noTypePath(Criteria criteria) {
     GenericArrayLocationCriterion galc =
         criteria.getGenericArrayLocation();
     return galc == null || galc.getLocation().isEmpty();
@@ -488,16 +525,25 @@ public class IndexFileSpecification implements Specification {
   }
 
   private static boolean isOnNullaryConstructor(Criteria criteria) {
-    if (criteria.isOnMethod("<init>()V")) {
-      ASTPath astPath = criteria.getASTPath();
-      if (astPath == null || astPath.isEmpty()) {
-        return !criteria.isOnNew();  // exclude expression annotations
-      }
-      ASTPath.ASTEntry entry = astPath.get(0);
-      return entry.getTreeKind() == Tree.Kind.METHOD
-          && (entry.childSelectorIs(ASTPath.TYPE) || isOnReceiver(criteria));
+    return criteria.isOnMethod("<init>()V")
+        && isOnMethodOrConstructor(criteria);
+  }
+
+  private static boolean isOnMethodDeclaration(Criteria criteria) {
+    return !criteria.isOnMethod("<init>()V")
+        && criteria.isOnMethodDeclaration()
+        && isOnMethodOrConstructor(criteria);
+  }
+
+  private static boolean isOnMethodOrConstructor(Criteria criteria) {
+    if (!noTypePath(criteria)) { return false; }
+    ASTPath astPath = criteria.getASTPath();
+    if (astPath == null || astPath.isEmpty()) {
+      return !isOnNew(criteria);  // exclude expression annotations
     }
-    return false;
+    ASTPath.ASTEntry entry = astPath.get(0);
+    return entry.getTreeKind() == Tree.Kind.METHOD
+        && (entry.childSelectorIs(ASTPath.TYPE) || isOnReceiver(criteria));
   }
 
   /**
@@ -552,7 +598,7 @@ public class IndexFileSpecification implements Specification {
       innerInsertions.addAll(parseElement(innerClist, innerElement, isCastInsertion));
     }
     CriterionList outerClist = clist;
-    if (!isCastInsertion) {
+    if (!isCastInsertion) { //&& clist.criteria().getMethodName() == null)
       // Cast insertion is never on an existing type.
       outerClist = clist.add(Criteria.atLocation());
     }
@@ -597,13 +643,13 @@ public class IndexFileSpecification implements Specification {
   }
 
   private void parseMethod(CriterionList clist, String className, String methodName, AMethod method) {
+    // parse declaration annotations
+    parseElement(clist.add(Criteria.inMethod(methodName, true)), method);
+
     // Being "in" a method refers to being somewhere in the
     // method's tree, which includes return types, parameters, receiver, and
     // elements inside the method body.
-    clist = clist.add(Criteria.inMethod(methodName));
-
-    // parse declaration annotations
-    parseElement(clist, method);
+    clist = clist.add(Criteria.inMethod(methodName, false));
 
     // parse receiver
     CriterionList receiverClist = clist.add(Criteria.receiver(methodName));

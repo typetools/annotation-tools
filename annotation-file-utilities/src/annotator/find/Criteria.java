@@ -106,6 +106,31 @@ public final class Criteria {
   }
 
   /**
+   * Determines whether this is the criteria on a parameter.
+   *
+   * @return true iff this is the criteria on a parameter
+   */
+  public boolean isOnParameter() {
+    for (Criterion c : criteria.values()) {
+      if (c.getKind() == Criterion.Kind.PARAM) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  public int getParamPos() {
+    for (Criterion c : criteria.values()) {
+      if (c.getKind() == Criterion.Kind.PARAM) {
+        return ((ParamCriterion) c).paramPos;
+      }
+    }
+
+    return -1;
+  }
+
+  /**
    * Determines whether this is the criteria on a package.
    *
    * @return true iff this is the criteria on a package
@@ -202,7 +227,34 @@ public final class Criteria {
   }
 
   /**
-   * Returns true if this Criteria is on the given method.
+   * Returns true if this Criteria is on a method declaration.
+   */
+  public boolean isOnMethodDeclaration() {
+    for (Criterion c : criteria.values()) {
+      if (c.getKind() == Criterion.Kind.IN_METHOD
+          && ((InMethodCriterion) c).isDeclaration) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Returns true if this Criteria is on the given field.
+   */
+  public boolean isOnField(String methodname) {
+    for (Criterion c : criteria.values()) {
+      if (c.getKind() == Criterion.Kind.FIELD) {
+        if (((FieldCriterion) c).varName.equals(methodname)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Returns true if this Criteria is on a field declaration.
    */
   public boolean isOnFieldDeclaration() {
     for (Criterion c : criteria.values()) {
@@ -404,6 +456,11 @@ public final class Criteria {
     return new InClassCriterion(name, /*exactmatch=*/ true);
   }
 
+  @Deprecated
+  public final static Criterion inMethod(String varName) {
+    return new InMethodCriterion(varName);
+  }
+
   /**
    * Creates an "in method" criterion: that a program element is enclosed
    * by the specified method.
@@ -411,8 +468,8 @@ public final class Criteria {
    * @param name the name of the enclosing method
    * @return an "in method" criterion
    */
-  public final static Criterion inMethod(String name) {
-    return new InMethodCriterion(name);
+  public final static Criterion inMethod(String name, boolean isDeclaration) {
+    return new InMethodCriterion(name, isDeclaration);
   }
 
   /**
@@ -470,15 +527,9 @@ public final class Criteria {
     return new IsSigMethodCriterion(methodName);
   }
 
-
   public final static Criterion param(String methodName, Integer pos) {
     return new ParamCriterion(methodName, pos);
   }
-//
-//  public final static Criterion param(String methodName, Integer pos, InnerTypeLocation loc) {
-//    return new ParamCriterion(methodName, pos, loc);
-//  }
-
 
   public final static Criterion local(String methodName, LocalLocation loc) {
     return new LocalVariableCriterion(methodName, loc);

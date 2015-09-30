@@ -54,6 +54,7 @@ import annotator.find.Criteria;
 import annotator.find.GenericArrayLocationCriterion;
 import annotator.find.Insertion;
 import annotator.find.Insertions;
+import annotator.find.MethodInsertion;
 import annotator.find.NewInsertion;
 import annotator.find.ReceiverInsertion;
 import annotator.find.TreeFinder;
@@ -752,6 +753,7 @@ public class Main {
           boolean receiverInserted = false;
           boolean newInserted = false;
           boolean constructorInserted = false;
+          Set<String> methodsInserted = new TreeSet<String>();
           Set<String> seen = new TreeSet<String>();
           List<Insertion> toInsertList = new ArrayList<Insertion>(positions.get(pair));
           Collections.reverse(toInsertList);
@@ -823,9 +825,17 @@ public class Main {
               ni.setAnnotationsOnly(newInserted);
               newInserted = true;
             } else if (iToInsert.getKind() == Insertion.Kind.CONSTRUCTOR) {
-              ConstructorInsertion ci = (ConstructorInsertion) iToInsert;
+              MethodInsertion ci = (MethodInsertion) iToInsert;
               if (constructorInserted) { ci.setAnnotationsOnly(true); }
               constructorInserted = true;
+            } else if (iToInsert.getKind() == Insertion.Kind.METHOD) {
+              MethodInsertion mi = (MethodInsertion) iToInsert;
+              String methodName = mi.getCriteria().getMethodName();
+              if (methodsInserted.contains(methodName)) {
+                mi.setAnnotationsOnly(true);
+              } else {
+                methodsInserted.add(methodName);
+              }
             }
 
             String toInsert = iToInsert.getText(comments, abbreviate,

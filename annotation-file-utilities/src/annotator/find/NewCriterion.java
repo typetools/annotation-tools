@@ -23,7 +23,7 @@ public class NewCriterion implements Criterion {
             methodName.startsWith("static init number")
             || methodName.startsWith("instance init number"))) {
       // keep strings consistent with text used in IndexFileSpecification
-      this.inMethodCriterion = Criteria.inMethod(methodName);
+      this.inMethodCriterion = Criteria.inMethod(methodName, false);
     } else {
       this.inMethodCriterion = null;
     }
