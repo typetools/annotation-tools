@@ -8,6 +8,8 @@ import javax.tools.JavaCompiler.CompilationTask;
 
 import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.util.JavacTask;
+import com.sun.tools.javac.api.JavacTaskImpl;
+import com.sun.tools.javac.code.Types;
 
 /**
  * Represents a Java source file. This class provides three major operations:
@@ -23,6 +25,7 @@ public final class Source {
     private StringBuilder source;
     private DiagnosticCollector<JavaFileObject> diagnostics;
     private String path;
+    private Types types;
 
     /**
      * Signifies that a problem has occurred with the compiler that produces
@@ -74,6 +77,7 @@ public final class Source {
         if (!(cTask instanceof JavacTask))
             throw new CompilerException("could not get a valid JavacTask: " + cTask.getClass());
         this.task = (JavacTask)cTask;
+        this.types = Types.instance(((JavacTaskImpl)cTask).getContext());
 
         // Read the source file into a buffer.
         path = src;
@@ -88,6 +92,11 @@ public final class Source {
         bytes.close();
         fileManager.close();
     }
+
+    /**
+     * @return an object that provides utility methods for types
+     */
+    public Types getTypes() { return types; }
 
     /**
      * Parse the input file, returning a set of Tree API roots (as
