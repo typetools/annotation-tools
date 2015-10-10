@@ -566,6 +566,12 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     }
 
     @Override
+    public Pair<ASTRecord, Integer> visitAnnotatedType(AnnotatedTypeTree node, Insertion ins) {
+      // TODO: special case for insertion on annotation?
+      return node.getUnderlyingType().accept(this, ins);      
+    }
+
+    @Override
     public Pair<ASTRecord, Integer> visitCompilationUnit(CompilationUnitTree node, Insertion ins) {
       dbug.debug("TypePositionFinder.visitCompilationUnit%n");
       JCCompilationUnit cu = (JCCompilationUnit) node;

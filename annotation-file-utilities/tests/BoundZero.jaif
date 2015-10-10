@@ -26,14 +26,14 @@ class BoundZero:
     method m6(Ljava/lang/Object;)V:
         bound 0&0: @X
 
-    method m7(Ljava/lang/Object;)V:
+    method m7(Ljava/lang/Comparable;)V:
         bound 0&0: @X
         bound 0&1: @Y
 
-    method m8(Ljava/lang/Object;)V:
+    method m8(Ljava/lang/Comparable;)V:
         bound 0&0: @X
 
-    method m9(Ljava/lang/Object;)V:
+    method m9(Ljava/lang/Comparable;)V:
         bound 0&0: @X
 
 class BoundZero$Inner:
