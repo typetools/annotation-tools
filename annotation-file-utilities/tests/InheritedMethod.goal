@@ -1,0 +1,6 @@
+package annotator.tests;
+
+class InheritedMethod {
+public @A String toString() { return super.toString(); }
+}
+
