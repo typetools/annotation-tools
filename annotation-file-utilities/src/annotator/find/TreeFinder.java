@@ -582,8 +582,9 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     public Pair<ASTRecord, Integer> visitClass(ClassTree node, Insertion ins) {
       dbug.debug("TypePositionFinder.visitClass%n");
       JCClassDecl cd = (JCClassDecl) node;
-      JCTree t = cd.mods == null ? cd : cd.mods;
-      return Pair.of(astRecord(cd), t.getPreferredPosition());
+      JCTree t = (cd.mods == null || cd.mods.pos < 0) ? cd : cd.mods;
+      int pos = t.getPreferredPosition();
+      return Pair.of(astRecord(cd), pos);
     }
 
     // There are three types of array initializers:
@@ -1108,7 +1109,15 @@ loop:
             if (i == null) { return null; }
           }
         } else if (ASTPath.isClassEquiv(node.getKind())) {
-          meth.setAnnotationsOnly(true);
+          String methodName = i.getCriteria().getMethodName();
+          Symbol.ClassSymbol csym = ((JCClassDecl) node).sym;
+          if (InheritedSymbolFinder.isInheritedIn(csym, methodName)) {
+            addMethod(path, meth);
+          } else {
+            meth.setAnnotationsOnly(true);
+            meth.setInserted(true);
+            return null;
+          }
         }
       }
 
@@ -1238,6 +1247,11 @@ loop:
           Tree parent = path.getParentPath().getLeaf();
           pos = ((JCClassDecl) parent).getEndPosition(tree.endPositions) - 1;
           insertRecord = null;  // TODO
+        } else if (CommonScanner.hasClassKind(node)
+            && i.getKind() == Insertion.Kind.METHOD) {
+          Tree parent = path.getParentPath().getLeaf();
+          pos = ((JCTree) parent).getEndPosition(tree.endPositions) - 1;
+          insertRecord = null;  // TODO
         } else {
           // looking for the declaration
           pos = dpf.scan(node, null);
@@ -1269,6 +1283,7 @@ loop:
       if (entry.getTreeKind() == Tree.Kind.METHOD
           && entry.childSelectorIs(ASTPath.PARAMETER)
           && entry.getArgument() == -1
+          && path.getParentPath().getParentPath() != null
           && path.getParentPath().getParentPath().getLeaf().getKind()
           == Tree.Kind.NEW_CLASS) {
         warn.debug("WARNING: Cannot insert a receiver parameter "
@@ -1465,7 +1480,7 @@ loop:
         if (node.getKind() == Tree.Kind.METHOD) { // MethodTree
           // looking for the receiver or the declaration
           typeScan = IndexFileSpecification.isOnReceiver(i.getCriteria());
-        } else if (node.getKind() == Tree.Kind.CLASS) { // ClassTree
+        } else if (CommonScanner.hasClassKind(node)) { // ClassTree
           typeScan = ! i.getSeparateLine(); // hacky check
         }
         if (typeScan) {
@@ -1797,6 +1812,9 @@ loop:
     ClassTree parent;
     if (leaf.getKind() == Tree.Kind.METHOD) {
       parent = (ClassTree) path.getParentPath().getLeaf();
+      for (Insertion ins : cons.getSubordinateInsertions()) {
+        ins.setInserted(true);
+      }
     } else {  // leaf.getKind() == Tree.Kind.CLASS
       parent = (ClassTree) leaf;
     }
@@ -1837,6 +1855,9 @@ loop:
       parent = (ClassTree) path.getParentPath().getLeaf();
     } else {  // leaf.getKind() == Tree.Kind.CLASS
       parent = (ClassTree) leaf;
+      for (Insertion ins : meth.getSubordinateInsertions()) {
+        ins.setInserted(true);
+      }
     }
     if (baseType.getName().isEmpty()) {
       List<String> annotations = baseType.getAnnotations();

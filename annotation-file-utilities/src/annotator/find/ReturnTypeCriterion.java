@@ -5,6 +5,7 @@ import annotator.scanner.CommonScanner;
 
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
+import com.sun.tools.javac.tree.JCTree;
 
 public class ReturnTypeCriterion implements Criterion {
 
@@ -33,6 +34,11 @@ public class ReturnTypeCriterion implements Criterion {
 
     Criteria.dbug.debug("ReturnTypeCriterion.isSatisfiedBy(%s); this=%n",
         Main.pathToString(path), this.toString());
+
+    if (path.getLeaf().getKind() == Tree.Kind.CLASS) {
+      JCTree.JCClassDecl decl = (JCTree.JCClassDecl) path.getLeaf();
+      return InheritedSymbolFinder.isInheritedIn(decl.sym, methodName);
+    }
 
     do {
       if (path.getLeaf().getKind() == Tree.Kind.METHOD) {

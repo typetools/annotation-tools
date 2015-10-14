@@ -131,16 +131,9 @@ public class ASTPathCriterion implements Criterion {
             }
         }
 
-        if (actualPath.isEmpty()) {
-            // could work only for method or constructor to be generated
-            // FIXME: allow non-receiver subordinate insertions
-            return kind == Tree.Kind.CLASS
-                    && astEntry.getTreeKind() == Tree.Kind.METHOD
-                    && isReceiverEntry(astEntry);
-        }
-
         int astPathLen = astPath.size();
         int actualPathLen = actualPath.size();
+        if (actualPathLen <= 0) { return false; }
         //if (actualPathLen != astPathLen + (isOnNewArrayType ? 0 : 1)) {
         //    return false;
         //}

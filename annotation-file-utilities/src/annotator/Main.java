@@ -52,6 +52,7 @@ import annotator.find.CastInsertion;
 import annotator.find.ConstructorInsertion;
 import annotator.find.Criteria;
 import annotator.find.GenericArrayLocationCriterion;
+import annotator.find.InheritedSymbolFinder;
 import annotator.find.Insertion;
 import annotator.find.Insertions;
 import annotator.find.MethodInsertion;
@@ -677,6 +678,7 @@ public class Main {
         fileLineSep = UtilMDE.inferLineSeparator(javafilename);
         src = new Source(javafilename);
         verb.debug("Parsed %s%n", javafilename);
+        InheritedSymbolFinder.setSource(src);
       } catch (Source.CompilerException e) {
         e.printStackTrace();
         return;

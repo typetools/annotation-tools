@@ -379,6 +379,7 @@ public class IndexFileSpecification implements Specification {
         Insertion ins = new AnnotationInsertion(annotationString, criteria,
             isDeclarationAnnotation);
         elementInsertions.add(ins);
+        annotationInsertions.add(ins);
         addInsertionSource(ins, annotation);
       } else if (noTypePath(criteria) && isOnReceiver(criteria)) {
         if (receiver == null) {
@@ -456,10 +457,10 @@ public class IndexFileSpecification implements Specification {
         }
       } else if (isOnMethodDeclaration(criteria)) {
         String className = criteria.getClassName();
-        MethodInsertion meth = meths.get(className);
+        String methodName = criteria.getMethodName();
+        MethodInsertion meth = meths.get(methodName);
         if (meth == null) {
           DeclaredType type = new DeclaredType(className);
-          String methodName = criteria.getMethodName();
           CriterionList mclist = new CriterionList(criteria.getInClass()).add(
               Criteria.inMethod(methodName, true));
           meth = new MethodInsertion(type, methodName,
@@ -576,9 +577,11 @@ public class IndexFileSpecification implements Specification {
    * Fill in this.insertions with insertion pairs for the outer and inner types.
    * @param clist The criteria specifying the location of the insertions.
    * @param typeElement Holds the annotations to be inserted.
+   * @return The created insertions.
    */
-  private void parseInnerAndOuterElements(CriterionList clist, ATypeElement typeElement) {
-    parseInnerAndOuterElements(clist, typeElement, false);
+  private List<Insertion> parseInnerAndOuterElements(CriterionList clist,
+      ATypeElement typeElement) {
+    return parseInnerAndOuterElements(clist, typeElement, false);
   }
 
   /**
@@ -587,8 +590,9 @@ public class IndexFileSpecification implements Specification {
    * @param typeElement Holds the annotations to be inserted.
    * @param isCastInsertion {@code true} if this for a cast insertion, {@code false}
    *          otherwise.
+   * @return The created insertions.
    */
-  private void parseInnerAndOuterElements(CriterionList clist,
+  private List<Insertion> parseInnerAndOuterElements(CriterionList clist,
       ATypeElement typeElement, boolean isCastInsertion) {
     List<Insertion> innerInsertions = new ArrayList<Insertion>();
     for (Entry<InnerTypeLocation, ATypeElement> innerEntry: typeElement.innerTypes.entrySet()) {
@@ -602,7 +606,7 @@ public class IndexFileSpecification implements Specification {
       // Cast insertion is never on an existing type.
       outerClist = clist.add(Criteria.atLocation());
     }
-    parseElement(outerClist, typeElement, innerInsertions);
+    return parseElement(outerClist, typeElement, innerInsertions);
   }
 
   // Returns a string representation of the annotations at the element.
@@ -643,8 +647,23 @@ public class IndexFileSpecification implements Specification {
   }
 
   private void parseMethod(CriterionList clist, String className, String methodName, AMethod method) {
+    Type type = new DeclaredType(className);
+    List<Insertion> innerTypeInsertions = new ArrayList<Insertion>();
+    List<Insertion> subordinateInsertions = new ArrayList<Insertion>();
+    CriterionList dlist = clist.add(Criteria.inMethod(methodName, true));
+    MethodInsertion meth = meths.get(methodName);
+    if (meth == null) {
+      meth = new MethodInsertion(type, methodName, dlist.criteria(),
+          innerTypeInsertions);
+      meths.put(methodName, meth);
+      //this.insertions.add(meth);
+    }
+
     // parse declaration annotations
-    parseElement(clist.add(Criteria.inMethod(methodName, true)), method);
+    subordinateInsertions = parseElement(dlist, method);
+    for (Insertion ins : subordinateInsertions) {
+      meth.addDeclarationInsertion(ins);
+    }
 
     // Being "in" a method refers to being somewhere in the
     // method's tree, which includes return types, parameters, receiver, and
@@ -653,11 +672,19 @@ public class IndexFileSpecification implements Specification {
 
     // parse receiver
     CriterionList receiverClist = clist.add(Criteria.receiver(methodName));
-    parseInnerAndOuterElements(receiverClist, method.receiver.type);
+    subordinateInsertions =
+        parseInnerAndOuterElements(receiverClist, method.receiver.type);
+    for (Insertion ins : subordinateInsertions) {
+      meth.addReceiverInsertion((ReceiverInsertion) ins);
+    }
 
     // parse return type
     CriterionList returnClist = clist.add(Criteria.returnType(className, methodName));
-    parseInnerAndOuterElements(returnClist, method.returnType);
+    subordinateInsertions =
+        parseInnerAndOuterElements(returnClist, method.returnType);
+    for (Insertion ins : subordinateInsertions) {
+      meth.addReturnTypeInsertion(ins);
+    }
 
     // parse bounds of method
     for (Entry<BoundLocation, ATypeElement> entry : method.bounds.entrySet()) {
@@ -674,7 +701,18 @@ public class IndexFileSpecification implements Specification {
       CriterionList paramClist = clist.add(Criteria.param(methodName, index));
       // parse declaration annotations
       //parseField(paramClist, index.toString(), param);
-      parseInnerAndOuterElements(paramClist, param.type);
+      subordinateInsertions =
+          parseInnerAndOuterElements(paramClist, param.type);
+      for (Insertion ins : subordinateInsertions) {
+        meth.addReturnTypeInsertion(ins);
+      }
+    }
+
+    if (meth.getReceiverInsertion() != null
+        || !meth.getParameterInsertions().isEmpty()
+        || !meth.getReturnTypeInsertions().isEmpty()
+        || !meth.getDeclarationInsertions().isEmpty()) {
+      this.insertions.add(meth);
     }
 
     // parse insert annotations/typecasts of method

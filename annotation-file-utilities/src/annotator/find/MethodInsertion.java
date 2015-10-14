@@ -17,7 +17,7 @@ import type.Type;
 
 public class MethodInsertion extends TypedInsertion {
   final String methodName;
-  final boolean isCon;
+  final boolean isDefCon;  // default (nullary) constructor?
   ReceiverInsertion receiverInsertion = null;
   Set<Insertion> declarationInsertions = new LinkedHashSet<Insertion>();
   Set<Insertion> returnTypeInsertions = new LinkedHashSet<Insertion>();
@@ -38,7 +38,7 @@ public class MethodInsertion extends TypedInsertion {
       List<Insertion> innerTypeInsertions) {
     super(type, criteria, true, innerTypeInsertions);
     methodName = name;
-    isCon = isNullaryConstructor;
+    isDefCon = isNullaryConstructor;
   }
 
   /**
@@ -77,7 +77,7 @@ public class MethodInsertion extends TypedInsertion {
     StringBuilder b = new StringBuilder();
     boolean isCon = methodName.startsWith("<init>");
     if (annotationsOnly) {
-      if (isCon) { return ""; }
+      if (isDefCon) { return ""; }
       List<String> annotations = type.getAnnotations();
       if (annotations.isEmpty()) { return ""; }
       for (String a : annotations) {
@@ -113,21 +113,32 @@ public class MethodInsertion extends TypedInsertion {
         b.append("public ").append(typeString);
       } else {
         Type rt = parseJVMLType(typeString, rp+1).fst;
+        for (Insertion i : returnTypeInsertions) {
+          if (i.getKind() == Insertion.Kind.ANNOTATION) {
+            String[] a = i.getText(comments, abbreviate)
+                .toString().split(" ");
+            for (int j = 0; j < a.length; j++) {
+              if (!rt.getAnnotations().contains(a[j])) {
+                rt.addAnnotation(a[j]);
+              }
+            }
+          }
+        }
         decorateType(innerTypeInsertions, rt);
         b.append(nl).append("public ");  // FIXME: use mods from impl class
-        for (Insertion i : declarationInsertions) {
-          b.append(i.getText(commentAnnotation, abbreviate)).append(
-              System.lineSeparator());
-          if (abbreviate) {  // TODO: ensure no abbreviation conflicts
-            packageNames.addAll(i.getPackageNames());
-          }
-        }
-        for (Insertion i : returnTypeInsertions) {
-          b.append(i.getText(commentAnnotation, abbreviate)).append(" ");
-          if (abbreviate) {  // TODO: ensure no abbreviation conflicts
-            packageNames.addAll(i.getPackageNames());
-          }
-        }
+        //for (Insertion i : declarationInsertions) {
+        //  b.append(i.getText(commentAnnotation, abbreviate)).append(
+        //      System.lineSeparator());
+        //  if (abbreviate) {  // TODO: ensure no abbreviation conflicts
+        //    packageNames.addAll(i.getPackageNames());
+        //  }
+        //}
+        //for (Insertion i : returnTypeInsertions) {
+        //  b.append(i.getText(commentAnnotation, abbreviate)).append(" ");
+        //  if (abbreviate) {  // TODO: ensure no abbreviation conflicts
+        //    packageNames.addAll(i.getPackageNames());
+        //  }
+        //}
         b.append(typeToString(rt, false, abbreviate))
             .append(" ").append(nameOnly);
       }
@@ -194,7 +205,7 @@ public class MethodInsertion extends TypedInsertion {
     return Pair.of(t, j);
   }
 
-  protected ReceiverInsertion getReceiverInsertion() {
+  public ReceiverInsertion getReceiverInsertion() {
     return receiverInsertion;
   }
 
@@ -207,7 +218,7 @@ public class MethodInsertion extends TypedInsertion {
     }
   }
 
-  protected Set<Insertion> getReturnTypeInsertions() {
+  public Set<Insertion> getReturnTypeInsertions() {
     return returnTypeInsertions;
   }
 
@@ -215,7 +226,7 @@ public class MethodInsertion extends TypedInsertion {
     returnTypeInsertions.add(i);
   }
 
-  protected Set<Insertion> getParameterInsertions() {
+  public Set<Insertion> getParameterInsertions() {
     Set<Insertion> pins = new LinkedHashSet<Insertion>();
     for (Set<Insertion> s : parameterInsertions.values()) {
       pins.addAll(s);
@@ -232,7 +243,7 @@ public class MethodInsertion extends TypedInsertion {
     pins.add(ins);
   }
 
-  protected Set<Insertion> getDeclarationInsertions() {
+  public Set<Insertion> getDeclarationInsertions() {
     return declarationInsertions;
   }
 
@@ -240,8 +251,19 @@ public class MethodInsertion extends TypedInsertion {
     declarationInsertions.add(ins);
   }
 
+  public Set<Insertion> getSubordinateInsertions() {
+    Set<Insertion> s = new LinkedHashSet<Insertion>();
+    s.addAll(declarationInsertions);
+    s.addAll(returnTypeInsertions);
+    //if (receiverInsertion != null) { s.add(receiverInsertion); }
+    for (Set<Insertion> p : parameterInsertions.values()) {
+      s.addAll(p);
+    }
+    return s;
+  }
+
   protected boolean isDefaultConstructorInsertion() {
-    return isCon;
+    return isDefCon;
   }
 
   /** {@inheritDoc} */
@@ -266,6 +288,6 @@ public class MethodInsertion extends TypedInsertion {
   /** {@inheritDoc} */
   @Override
   public Kind getKind() {
-    return isCon ? Kind.CONSTRUCTOR : Kind.METHOD;
+    return isDefCon ? Kind.CONSTRUCTOR : Kind.METHOD;
   }
 }

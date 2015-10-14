@@ -6,6 +6,7 @@ import annotator.Main;
 
 import com.sun.source.tree.*;
 import com.sun.source.util.TreePath;
+import com.sun.tools.javac.tree.JCTree;
 
 /**
  * Represents the criterion that a program element is in a method with a
@@ -48,6 +49,11 @@ final class InMethodCriterion implements Criterion {
         Main.pathToString(path), this.toString());
     boolean staticDecl = false;
     boolean result = false;
+
+    if (path.getLeaf().getKind() == Tree.Kind.CLASS) {
+      JCTree.JCClassDecl decl = (JCTree.JCClassDecl) path.getLeaf();
+      return InheritedSymbolFinder.isInheritedIn(decl.sym, name);
+    }
 
     do {
       if (path.getLeaf().getKind() == Tree.Kind.METHOD) {
