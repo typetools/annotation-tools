@@ -1,7 +1,7 @@
 package annotator.tests;
 
-//@skip-test
 class InheritedMethod {
-public @A String toString() { return super.toString(); }
+
+public java.lang.@annotator.tests.A String toString() { return super.toString(); }
 }
 
