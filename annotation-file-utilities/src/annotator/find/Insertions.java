@@ -76,6 +76,7 @@ public class Insertions implements Iterable<Insertion> {
     // ordered so insertion that depends on another gets inserted after other
     switch (i.getKind()) {
     case CONSTRUCTOR:
+    case METHOD:
       return 3;
     case NEW:
     case RECEIVER:
@@ -563,6 +564,7 @@ public class Insertions implements Iterable<Insertion> {
         ClassSymbol csym = null;
         switch (tins.getKind()) {
         case CONSTRUCTOR:
+        case METHOD:
           if (node instanceof JCTree.JCMethodDecl) {
             MethodSymbol msym = ((JCTree.JCMethodDecl) node).sym;
             csym = (ClassSymbol) msym.owner;
