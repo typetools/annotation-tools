@@ -1,7 +1,7 @@
 #!/bin/bash
 ROOT=$TRAVIS_BUILD_DIR/..
 cd $ROOT
-git clone https://github.com/typetools/jsr308-langtools.git
+hg clone https://bitbucket.org/typetools/jsr308-langtools
 cd jsr308-langtools/
 ./.travis-build.sh
 
