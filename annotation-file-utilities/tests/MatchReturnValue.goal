@@ -7,6 +7,4 @@ public class MatchReturnValue<T> {
     return this;
   }
 
-
-public java.lang.Object clone() { return super.clone(); }
 }
