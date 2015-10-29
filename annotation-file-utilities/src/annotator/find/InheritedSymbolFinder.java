@@ -1,6 +1,5 @@
 package annotator.find;
 
-import java.util.ArrayDeque;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.HashSet;
@@ -9,16 +8,20 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.TypeKind;
+import javax.lang.model.util.ElementFilter;
+import javax.lang.model.util.Elements;
+import javax.lang.model.util.Types;
 
 import annotations.util.JVMNames;
 import annotator.Source;
 
-import com.sun.tools.javac.code.Scope;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Type;
-import com.sun.tools.javac.code.TypeTag;
-import com.sun.tools.javac.code.Types;
 import com.sun.tools.javac.util.Filter;
 
 /**
@@ -34,6 +37,14 @@ public class InheritedSymbolFinder {
   private static Map<String, Set<String>> cache =
       new TreeMap<String, Set<String>>();  // few classes expected
 
+  private static Filter<Symbol> methodSymbolFilter =
+      new Filter<Symbol>() {
+        @Override
+        public boolean accepts(Symbol t) {
+          return t.getKind() == ElementKind.METHOD;
+        }
+      };
+
   private InheritedSymbolFinder() {}
 
   public static void setSource(Source source) {
@@ -45,86 +56,97 @@ public class InheritedSymbolFinder {
 
   /**
    * Finds whether a method matching a JVML descriptor has an inherited
-   *  implementation in a given class.
+   *  implementation.
    *
-   * @param csym symbol table entry for a class
-   * @param methodName JVML descriptor for a method
-   * @return whether a matching method exists in the class
+   * @param clazz type the class defines
+   * @param methodDescriptor JVML descriptor for a method in the
+   *         specified class
+   * @return whether the method inherits its implementation from a
+   *          superclass or interface
    */
-  public static boolean isInheritedIn(Symbol.ClassSymbol csym,
-      String methodName) {
-    Set<String> inherited = getInherited(csym);
-    return inherited.contains(methodName);
+  public static boolean isInheritedIn(Type type,
+      String methodDescriptor) {
+    return type.getKind() == TypeKind.DECLARED
+        && isInheritedIn((Symbol.ClassSymbol) type.tsym, methodDescriptor);
   }
 
   /**
-   * Finds inherited methods defined for a given class.
+   * Finds whether a method matching a JVML descriptor has an inherited
+   *  implementation in a given class.
    *
-   * @param csym symbol table entry for a class
+   * @param classSymbol symbol table entry for a class
+   * @param methodDescriptor JVML descriptor for a method
+   * @return whether a matching method exists in the class
+   */
+  public static boolean isInheritedIn(Symbol.ClassSymbol classSymbol,
+      String methodDescriptor) {
+    Set<String> inherited = getInherited(classSymbol);
+    return inherited.contains(methodDescriptor);
+  }
+
+  /**
+   * Finds inherited methods defined for a class (given by its symbol
+   *  table entry).
+   *
+   * @param classSymbol symbol table entry for a class
    * @return JVML descriptors of methods in scope of class
    */
-  public static Set<String> getInherited(final Symbol.ClassSymbol csym) {
-    String className = csym.flatName().toString();
-    if (cache.containsKey(className)) { return cache.get(className); }
+  private static Set<String>
+  getInherited(final Symbol.ClassSymbol classSymbol) {
     if (source == null) { throw new IllegalStateException("null source"); }
 
-    final Types types = source.getTypes();
+    final Elements elements = source.getElementUtils();
+    final Types types = source.getTypeUtils();
+    String className = classSymbol.flatName().toString();
+
+    if (elements == null) {
+      throw new IllegalStateException("source.getElementUtils() returned null");
+    }
     if (types == null) {
-      throw new IllegalStateException("source.getTypes() returned null");
+      throw new IllegalStateException("source.getTypeUtils() returned null");
     }
+    if (cache.containsKey(className)) { return cache.get(className); }
 
-    Filter<Symbol> filter = new Filter<Symbol>() {
-      @Override
-      public boolean accepts(final Symbol t) {
-        return t.getKind() == ElementKind.METHOD
-            && t.isInheritedIn(csym, types);
-      }
-    };
-    Set<String> ss = new HashSet<String>();
-    Deque<Type.ClassType> td = new ArrayDeque<Type.ClassType>();
-    addParents((Type.ClassType) csym.type, td);
-    //Deque<Symbol.ClassSymbol> syms = new ArrayDeque<Symbol.ClassSymbol>();
-    //addParents(csym, syms);
+    Set<String> names = new HashSet<String>();
+    List<? extends Element> allMembers =
+        elements.getAllMembers((TypeElement) classSymbol);
+    Set<ExecutableElement> eelems =
+        ElementFilter.methodsIn(new HashSet<Element>(allMembers));
 
-    while (!td.isEmpty()) {
-      Type.ClassType type = td.removeFirst();
-      Scope scope = type.tsym.members();
-      if (scope == null) { continue; }
-
-      for (Symbol sym : scope.getElements(filter)) {
-        if (sym.owner == csym) { continue; }  // reject if defined here
-        Symbol.MethodSymbol msym = (Symbol.MethodSymbol) sym;
-        StringBuilder sb =
-            new StringBuilder(msym.getSimpleName()).append('(');
-        for (Symbol.VarSymbol param : msym.getParameters()) {
-          sb = sb.append(JVMNames.typeToJvmlString(param.type));
+    for (ExecutableElement eelem : eelems) {
+      if (eelem instanceof Symbol.MethodSymbol) {
+        Symbol.MethodSymbol msym = (Symbol.MethodSymbol) eelem;
+        if (msym.owner != classSymbol) {
+          names.add(JVMNames.getJVMMethodName(msym));
         }
-        sb = sb.append(')').append(
-            JVMNames.typeToJvmlString(msym.getReturnType()));
-        ss.add(sb.toString());
       }
-
-      addParents(type, td);
     }
-
-    Set<String> names = ss.isEmpty() ? Collections.<String>emptySet()
-        : Collections.<String>unmodifiableSet(ss);
+    // cache unmodifiable view of result
+    names = names.isEmpty() ? Collections.<String>emptySet()
+        : Collections.<String>unmodifiableSet(names);
     cache.put(className, names);
     return names;
   }
 
-  private static void addParents(final Type.ClassType ct,
-      Deque<Type.ClassType> td) {
-    Type st = ct.supertype_field;
-    List<Type> its = ct.all_interfaces_field;
-    if (st != null && !st.isErroneous() && st.hasTag(TypeTag.CLASS)) {
-      td.addFirst((Type.ClassType) st);
+  // Adds supertypes and implemented interfaces to working list.
+  private static void addParents(final Symbol.ClassSymbol csym,
+      Deque<Symbol.ClassSymbol> deque) {
+    enqueueClassSymbol(csym.getSuperclass(), deque);
+    for (Type interfaceType : csym.getInterfaces()) {
+      enqueueClassSymbol(interfaceType, deque);
     }
-    if (its != null) {
-      for (Type it : ct.all_interfaces_field) {
-        if (!it.isErroneous() && it.hasTag(TypeTag.CLASS)) {
-          td.addLast((Type.ClassType) it);
-        }
+  }
+
+  // Adds type's symbol to working list iff type is a declared type.
+  private static void enqueueClassSymbol(Type type,
+      Deque<Symbol.ClassSymbol> deque) {
+    if (type.getKind() == TypeKind.DECLARED) {
+      Symbol.TypeSymbol tsym = ((Type.ClassType) type).tsym;
+      Symbol.ClassSymbol csym = (Symbol.ClassSymbol) tsym;
+      if (type.isInterface()) {
+        deque.addLast(csym);
+      } else {
+        deque.addFirst(csym);
       }
     }
   }
