@@ -18,7 +18,6 @@ import java.util.function.ToIntBiFunction;
 
 @Target(ElementType.TYPE_USE) @interface C {}
 
-@skip-test
 class LambdaExpression {
   //Single inferred-type parameter
   IntFunction<Integer> f0 = (x) -> x+1;

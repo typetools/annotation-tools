@@ -1,7 +1,6 @@
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
 
-@skip-test
 public abstract class NonStandardSpacing {
 
     public void m1() {
