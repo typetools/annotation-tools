@@ -157,7 +157,6 @@
         <srcfiles dir="${scene-lib}/bin" excludes="annotations-expected/**,annotations/tests/**"/>
       </uptodate>
       <uptodate property="annotations-compiler.uptodate" targetfile="annotation-file-utilities.jar" srcfile="${annotations-compiler}/dist/lib/javac.jar"/>
-      <uptodate property="annotations-disassembler.uptodate" targetfile="annotation-file-utilities.jar" srcfile="${annotations-disassembler}/dist/lib/javap.jar"/>
       <uptodate property="plume.uptodate" targetfile="annotation-file-utilities.jar" srcfile="lib/plume.jar"/>
       <uptodate property="google-collect.uptodate" targetfile="annotation-file-utilities.jar" srcfile="lib/guava-15.0.jar"/>
 
@@ -167,7 +166,6 @@
           <isset property="asmx.bin.uptodate"/>
           <isset property="scene-lib.bin.uptodate"/>
           <isset property="annotations-compiler.uptodate"/>
-          <isset property="annotations-disassembler.uptodate"/>
           <isset property="plume.uptodate"/>
           <isset property="google-collect.uptodate"/>
         </and>
@@ -177,7 +175,6 @@
       <echo message="asmx.bin.uptodate: ${asmx.bin.uptodate}"/>
       <echo message="scene-lib.bin.uptodate: ${scene-lib.bin.uptodate}"/>
       <echo message="annotations-compiler.uptodate: ${annotations-compiler.uptodate}"/>
-      <echo message="annotations-disassembler.uptodate: ${annotations-disassembler.uptodate}"/>
       <echo message="plume.uptodate: ${plume.uptodate}"/>
       <echo message="google-collect.uptodate: ${google-collect.uptodate}"/>
       <echo message="jarfile.uptodate: ${jarfile.uptodate}"/>
@@ -213,12 +210,6 @@
       </patternset>
     </unjar>
     <unjar src="${annotations-compiler}/dist/lib/javac.jar" dest="${temp-jarfile}">
-      <patternset>
-        <include name="**/*.class"/>
-        <exclude name="META-INF/" />
-      </patternset>
-    </unjar>
-    <unjar src="${annotations-disassembler}/dist/lib/javap.jar" dest="${temp-jarfile}">
       <patternset>
         <include name="**/*.class"/>
         <exclude name="META-INF/" />
