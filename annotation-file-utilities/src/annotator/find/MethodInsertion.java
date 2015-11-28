@@ -113,6 +113,12 @@ public class MethodInsertion extends TypedInsertion {
         b.append("public ").append(typeString);
       } else {
         Type rt = parseJVMLType(typeString, rp+1).fst;
+        for (Insertion i : declarationInsertions) {
+          b.append(nl).append(i.getText(commentAnnotation, abbreviate));
+          if (abbreviate) {  // TODO: ensure no abbreviation conflicts
+            packageNames.addAll(i.getPackageNames());
+          }
+        }
         for (Insertion i : returnTypeInsertions) {
           if (i.getKind() == Insertion.Kind.ANNOTATION) {
             String[] a = i.getText(comments, abbreviate)
@@ -143,7 +149,7 @@ public class MethodInsertion extends TypedInsertion {
             .append(" ").append(nameOnly);
       }
       b.append("(");
-      if (receiverInsertion != null && !receiverInsertion.getInserted()) {
+      if (receiverInsertion != null) {
         b.append(receiverInsertion.getText(comments, abbreviate));
       }
       if (isCon) {
@@ -255,7 +261,7 @@ public class MethodInsertion extends TypedInsertion {
     Set<Insertion> s = new LinkedHashSet<Insertion>();
     s.addAll(declarationInsertions);
     s.addAll(returnTypeInsertions);
-    //if (receiverInsertion != null) { s.add(receiverInsertion); }
+    if (receiverInsertion != null) { s.add(receiverInsertion); }
     for (Set<Insertion> p : parameterInsertions.values()) {
       s.addAll(p);
     }

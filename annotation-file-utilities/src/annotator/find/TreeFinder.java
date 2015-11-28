@@ -1083,14 +1083,12 @@ loop:
           } else {
             cons.setAnnotationsOnly(true);
             cons.setInserted(true);
-            i = cons.getReceiverInsertion();
-            if (i == null) { return null; }
+            if (cons.getReceiverInsertion() == null) { return null; }
           }
         } else {
           cons.setAnnotationsOnly(true);
           cons.setInserted(true);
-          i = cons.getReceiverInsertion();
-          if (i == null) { return null; }
+          if (cons.getReceiverInsertion() == null) { return null; }
         }
       }
 
@@ -1105,8 +1103,7 @@ loop:
           } else {
             meth.setAnnotationsOnly(true);
             meth.setInserted(true);
-            i = meth.getReceiverInsertion();
-            if (i == null) { return null; }
+            if (meth.getReceiverInsertion() == null) { return null; }
           }
         } else if (ASTPath.isClassEquiv(node.getKind())) {
           String methodName = i.getCriteria().getMethodName();
@@ -1244,14 +1241,22 @@ loop:
         } else if (node.getKind() == Tree.Kind.METHOD
             && i.getKind() == Insertion.Kind.CONSTRUCTOR
             && (((JCMethodDecl) node).mods.flags & Flags.GENERATEDCONSTR) != 0) {
-          Tree parent = path.getParentPath().getLeaf();
-          pos = ((JCClassDecl) parent).getEndPosition(tree.endPositions) - 1;
-          insertRecord = null;  // TODO
+          JCClassDecl parent = (JCClassDecl) path.getParentPath().getLeaf();
+          pos = parent.getEndPosition(tree.endPositions) - 1;
+          insertRecord = new ASTRecord(tree, i.getCriteria().getClassName(),
+              "<init>()V", null, ASTPath.empty());
+          for (Insertion sub : ((MethodInsertion) i).getSubordinateInsertions()) {
+            sub.setInserted(true);
+          }
         } else if (CommonScanner.hasClassKind(node)
             && i.getKind() == Insertion.Kind.METHOD) {
-          Tree parent = path.getParentPath().getLeaf();
-          pos = ((JCTree) parent).getEndPosition(tree.endPositions) - 1;
-          insertRecord = null;  // TODO
+          JCClassDecl leaf = (JCClassDecl) path.getLeaf();
+          pos = leaf.getEndPosition(tree.endPositions) - 1;
+          insertRecord = new ASTRecord(tree, i.getCriteria().getClassName(),
+              i.getCriteria().getMethodName(), null, ASTPath.empty());
+          for (Insertion sub : ((MethodInsertion) i).getSubordinateInsertions()) {
+            sub.setInserted(true);
+          }
         } else {
           // looking for the declaration
           pos = dpf.scan(node, null);
@@ -1308,16 +1313,14 @@ loop:
           } else {
             cons.setAnnotationsOnly(true);
             cons.setInserted(true);
-            i = cons.getReceiverInsertion();
-            if (i == null) { return null; }
+            if (cons.getReceiverInsertion() == null) { return null; }
           }
         } else if (node.getKind() == Tree.Kind.CLASS) {
           addConstructor(path, cons);
         } else {
           cons.setAnnotationsOnly(true);
           cons.setInserted(true);
-          i = cons.getReceiverInsertion();
-          if (i == null) { return null; }
+          if (cons.getReceiverInsertion() == null) { return null; }
         }
       }
 
@@ -1331,16 +1334,14 @@ loop:
           } else {
             meth.setAnnotationsOnly(true);
             meth.setInserted(true);
-            i = meth.getReceiverInsertion();
-            if (i == null) { return null; }
+            if (meth.getReceiverInsertion() == null) { return null; }
           }
         } else if (node.getKind() == Tree.Kind.CLASS) {
           addMethod(path, meth);
         } else {
           meth.setAnnotationsOnly(true);
           meth.setInserted(true);
-          i = meth.getReceiverInsertion();
-          if (i == null) { return null; }
+          if (meth.getReceiverInsertion() == null) { return null; }
         }
       }
 
@@ -1394,6 +1395,15 @@ loop:
         Tree parent = path.getParentPath().getLeaf();
         insertRecord = insertRecord.extend(Tree.Kind.METHOD, ASTPath.PARAMETER, -1);
         pos = ((JCTree) parent).getEndPosition(tree.endPositions) - 1;
+      //} else
+      //if (CommonScanner.hasClassKind(node)
+      //    && i.getKind() == Insertion.Kind.METHOD
+      //    && entry.childSelectorIs(ASTPath.PARAMETER)
+      //    && entry.getArgument() < 0) {
+      //  String name = i.getCriteria().getMethodName();
+      //  if (name == null) { return null; }
+      //  insertRecord = insertRecord.extend(Tree.Kind.METHOD, ASTPath.PARAMETER, -1);
+      //  pos = ((JCTree) node).getEndPosition(tree.endPositions) - 1;
       } else
       if (node.getKind() == Tree.Kind.METHOD
           && entry.childSelectorIs(ASTPath.TYPE)) {
@@ -1499,8 +1509,8 @@ loop:
           Tree parent = path.getParentPath().getLeaf();
           pos = ((JCClassDecl) parent).getEndPosition(tree.endPositions) - 1;
           insertRecord = null;  // TODO
-        } else if (node.getKind() == Tree.Kind.CLASS
-            && i.getKind() == Insertion.Kind.CONSTRUCTOR) {
+        } else if (CommonScanner.hasClassKind(node)
+            && i.getKind() == Insertion.Kind.METHOD) {  // CONSTRUCTOR?
           pos = ((JCClassDecl) node).getEndPosition(tree.endPositions) - 1;
           insertRecord = null;  // TODO
         } else {
@@ -1812,9 +1822,6 @@ loop:
     ClassTree parent;
     if (leaf.getKind() == Tree.Kind.METHOD) {
       parent = (ClassTree) path.getParentPath().getLeaf();
-      for (Insertion ins : cons.getSubordinateInsertions()) {
-        ins.setInserted(true);
-      }
     } else {  // leaf.getKind() == Tree.Kind.CLASS
       parent = (ClassTree) leaf;
     }
@@ -1855,9 +1862,6 @@ loop:
       parent = (ClassTree) path.getParentPath().getLeaf();
     } else {  // leaf.getKind() == Tree.Kind.CLASS
       parent = (ClassTree) leaf;
-      for (Insertion ins : meth.getSubordinateInsertions()) {
-        ins.setInserted(true);
-      }
     }
     if (baseType.getName().isEmpty()) {
       List<String> annotations = baseType.getAnnotations();

@@ -2,6 +2,7 @@ package annotator.tests;
 
 class InheritedMethod {
 
-public java.lang.@annotator.tests.A String toString() { return super.toString(); }
+@annotator.tests.D
+public java.lang.@annotator.tests.A String toString(@annotator.tests.B InheritedMethod this) { return super.toString(); }
 }
 

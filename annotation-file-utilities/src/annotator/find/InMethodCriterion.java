@@ -66,9 +66,9 @@ final class InMethodCriterion implements Criterion {
         staticDecl = mods.getFlags().contains(Modifier.STATIC);
       }
       path = path.getParentPath();
-    } while (path != null && path.getLeaf() != null);
+    } while (path != null);
 
-    result = (staticDecl ? "<clinit>()V" : "<init>()V").equals(name);
+    result |= (staticDecl ? "<clinit>()V" : "<init>()V").equals(name);
 
     Criteria.dbug.debug("InMethodCriterion.isSatisfiedBy => %s%n", result);
     return result;

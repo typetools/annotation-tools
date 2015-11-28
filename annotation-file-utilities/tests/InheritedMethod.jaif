@@ -1,7 +1,10 @@
 package annotator.tests:
 annotation @A: @java.lang.annotation.Target({java.lang.annotation.ElementType.TYPE_USE})
+annotation @B: @java.lang.annotation.Target({java.lang.annotation.ElementType.TYPE_USE})
+annotation @D:
 
 class InheritedMethod:
-    method toString()Ljava/lang/String;:
+    method toString()Ljava/lang/String;: @D
         return: @A
+        receiver: @B
 

@@ -386,7 +386,7 @@ public class IndexFileSpecification implements Specification {
           DeclaredType type = new DeclaredType();
           type.addAnnotation(annotationString);
           receiver = new ReceiverInsertion(type, criteria, innerTypeInsertions);
-          elementInsertions.add(receiver);
+          annotationInsertions.add(receiver);
         } else {
           receiver.getType().addAnnotation(annotationString);
         }
@@ -436,6 +436,7 @@ public class IndexFileSpecification implements Specification {
 
       // exclude expression annotations
       if (noTypePath(criteria) && isOnNullaryConstructor(criteria)) {
+        if (cons == null) { cons = meths.get(criteria.getMethodName()); }
         if (cons == null) {
           DeclaredType type = new DeclaredType(criteria.getClassName());
           cons = new MethodInsertion(type, criteria,
@@ -704,19 +705,27 @@ public class IndexFileSpecification implements Specification {
       subordinateInsertions =
           parseInnerAndOuterElements(paramClist, param.type);
       for (Insertion ins : subordinateInsertions) {
-        meth.addReturnTypeInsertion(ins);
+        meth.addParameterInsertion(ins, ins.getCriteria().getParamPos());
       }
     }
 
-    if (meth.getReceiverInsertion() != null
-        || !meth.getParameterInsertions().isEmpty()
-        || !meth.getReturnTypeInsertions().isEmpty()
-        || !meth.getDeclarationInsertions().isEmpty()) {
-      this.insertions.add(meth);
+    // parse insert annotations/typecasts of method
+    subordinateInsertions =
+        parseASTInsertions(clist, method.insertAnnotations, method.insertTypecasts);
+    for (Insertion ins : subordinateInsertions) {
+      Criteria subCriteria = ins.getCriteria();
+      if (subCriteria.isOnReceiver()) {
+        meth.addReceiverInsertion((ReceiverInsertion) ins);
+      } else if (subCriteria.isOnReturnType()) {
+        meth.addReturnTypeInsertion(ins);
+      } else if (subCriteria.isOnParameter()) {
+        meth.addParameterInsertion(ins, ins.getCriteria().getParamPos());
+      }
     }
 
-    // parse insert annotations/typecasts of method
-    parseASTInsertions(clist, method.insertAnnotations, method.insertTypecasts);
+    if (!meth.getSubordinateInsertions().isEmpty()) {
+      this.insertions.add(meth);
+    }
 
     // parse body of method
     parseBlock(clist, className, methodName, method.body);
@@ -800,22 +809,25 @@ public class IndexFileSpecification implements Specification {
     parseBlock(clist, className, methodName, lambda.body);
   }
 
-  private void parseASTInsertions(CriterionList clist,
+  private List<Insertion> parseASTInsertions(CriterionList clist,
       VivifyingMap<ASTPath, ATypeElement> insertAnnotations,
       VivifyingMap<ASTPath, ATypeElementWithType> insertTypecasts) {
+    List<Insertion> insertions = new ArrayList<Insertion>();
     for (Entry<ASTPath, ATypeElement> entry : insertAnnotations.entrySet()) {
       ASTPath astPath = entry.getKey();
       ATypeElement insertAnnotation = entry.getValue();
       CriterionList insertAnnotationClist =
           clist.add(Criteria.astPath(astPath));
-      parseInnerAndOuterElements(insertAnnotationClist,
-          insertAnnotation, true);
+      insertions.addAll(parseInnerAndOuterElements(insertAnnotationClist,
+              insertAnnotation, true));
     }
     for (Entry<ASTPath, ATypeElementWithType> entry : insertTypecasts.entrySet()) {
       ASTPath astPath = entry.getKey();
       ATypeElementWithType insertTypecast = entry.getValue();
       CriterionList insertTypecastClist = clist.add(Criteria.astPath(astPath));
-      parseInnerAndOuterElements(insertTypecastClist, insertTypecast, true);
+      insertions.addAll(parseInnerAndOuterElements(insertTypecastClist,
+              insertTypecast, true));
     }
+    return insertions;
   }
 }
