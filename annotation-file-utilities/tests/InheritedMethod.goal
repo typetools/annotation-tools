@@ -1,8 +1,20 @@
 package annotator.tests;
 
+//@skip-test
 class InheritedMethod {
+  abstract class Base {
+    public abstract int f();
+    public int[] g(String[] a, int i) { return new int[0]; }
+  }
 
-@annotator.tests.D
+  public class Super extends Base {
+    public int f() { return 0; }
+  
+@annotator.tests.A
+public @annotator.tests.B int @annotator.tests.C [] g(@annotator.tests.D InheritedMethods this, @annotator.tests.E String @annotator.tests.F [] arg0, @annotator.tests.G int arg1) { return super.g(arg0, arg1); }
+  }
+
+@annotator.tests.Z
 public java.lang.@annotator.tests.A String toString(@annotator.tests.B InheritedMethod this) { return super.toString(); }
 }
 
