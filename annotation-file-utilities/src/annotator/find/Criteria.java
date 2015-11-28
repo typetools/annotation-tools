@@ -96,6 +96,14 @@ public final class Criteria {
    * @return true iff this is the criteria on a receiver
    */
   public boolean isOnReceiver() {
+    ASTPath astPath = getASTPath();
+    if (astPath != null && !astPath.isEmpty()) {
+      ASTPath.ASTEntry entry = astPath.get(-1);
+      return entry.getTreeKind() == Tree.Kind.METHOD
+          && entry.childSelectorIs(ASTPath.PARAMETER)
+          && entry.getArgument() < 0;
+    }
+
     for (Criterion c : criteria.values()) {
       if (c.getKind() == Criterion.Kind.RECEIVER) {
         return true;
@@ -111,6 +119,14 @@ public final class Criteria {
    * @return true iff this is the criteria on a parameter
    */
   public boolean isOnParameter() {
+    ASTPath astPath = getASTPath();
+    if (astPath != null && !astPath.isEmpty()) {
+      ASTPath.ASTEntry entry = astPath.get(-1);
+      return entry.getTreeKind() == Tree.Kind.METHOD
+          && entry.childSelectorIs(ASTPath.PARAMETER)
+          && entry.getArgument() >= 0;
+    }
+
     for (Criterion c : criteria.values()) {
       if (c.getKind() == Criterion.Kind.PARAM) {
         return true;
@@ -151,6 +167,13 @@ public final class Criteria {
    * @return true iff this is the criteria on a return type
    */
   public boolean isOnReturnType() {
+    ASTPath astPath = getASTPath();
+    if (astPath != null && !astPath.isEmpty()) {
+      ASTPath.ASTEntry entry = astPath.get(-1);
+      return entry.getTreeKind() == Tree.Kind.METHOD
+          && entry.childSelectorIs(ASTPath.TYPE);
+    }
+
     for (Criterion c : criteria.values()) {
       if (c.getKind() == Criterion.Kind.RETURN_TYPE) {
         return true;

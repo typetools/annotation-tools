@@ -1,5 +1,7 @@
 package annotator.find;
 
+import annotator.scanner.CommonScanner;
+
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
@@ -28,6 +30,8 @@ public class ReceiverCriterion implements Criterion {
     if (path == null) {
       return false;
     }
+
+    if (CommonScanner.hasClassKind(path.getLeaf())) { return false; }
 
     if (path.getLeaf().getKind() == Tree.Kind.METHOD) {
       if (isSigMethodCriterion.isSatisfiedBy(path)) {
