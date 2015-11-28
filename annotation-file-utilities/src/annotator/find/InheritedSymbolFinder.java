@@ -1,7 +1,6 @@
 package annotator.find;
 
 import java.util.Collections;
-import java.util.Deque;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -12,7 +11,6 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.type.TypeKind;
 import javax.lang.model.util.ElementFilter;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
@@ -22,7 +20,7 @@ import annotator.Source;
 
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Type;
-import com.sun.tools.javac.util.Filter;
+import com.sun.tools.javac.code.TypeTag;
 
 /**
  * Provides static access to JVML descriptors of methods for which
@@ -37,14 +35,6 @@ public class InheritedSymbolFinder {
   private static Map<String, Set<String>> cache =
       new TreeMap<String, Set<String>>();  // few classes expected
 
-  private static Filter<Symbol> methodSymbolFilter =
-      new Filter<Symbol>() {
-        @Override
-        public boolean accepts(Symbol t) {
-          return t.getKind() == ElementKind.METHOD;
-        }
-      };
-
   private InheritedSymbolFinder() {}
 
   public static void setSource(Source source) {
@@ -52,22 +42,6 @@ public class InheritedSymbolFinder {
       InheritedSymbolFinder.source = source;
       cache.clear();
     }
-  }
-
-  /**
-   * Finds whether a method matching a JVML descriptor has an inherited
-   *  implementation.
-   *
-   * @param clazz type the class defines
-   * @param methodDescriptor JVML descriptor for a method in the
-   *         specified class
-   * @return whether the method inherits its implementation from a
-   *          superclass or interface
-   */
-  public static boolean isInheritedIn(Type type,
-      String methodDescriptor) {
-    return type.getKind() == TypeKind.DECLARED
-        && isInheritedIn((Symbol.ClassSymbol) type.tsym, methodDescriptor);
   }
 
   /**
@@ -80,8 +54,8 @@ public class InheritedSymbolFinder {
    */
   public static boolean isInheritedIn(Symbol.ClassSymbol classSymbol,
       String methodDescriptor) {
-    Set<String> inherited = getInherited(classSymbol);
-    return inherited.contains(methodDescriptor);
+    String key = removeJVMReturnType(methodDescriptor);
+    return key != null && getInherited(classSymbol).contains(key);
   }
 
   /**
@@ -117,7 +91,15 @@ public class InheritedSymbolFinder {
       if (eelem instanceof Symbol.MethodSymbol) {
         Symbol.MethodSymbol msym = (Symbol.MethodSymbol) eelem;
         if (msym.owner != classSymbol) {
-          names.add(JVMNames.getJVMMethodName(msym));
+          final String jvmMethodName = JVMNames.getJVMMethodName(msym);
+          final String key = removeJVMReturnType(jvmMethodName);
+          // no need to match return type; if local method and
+          // superclass method both compile, the former overrides the
+          // latter
+          if (key != null && msym.owner.getKind() == ElementKind.CLASS
+              && inHierarchy(msym.owner.type, classSymbol)) {
+            names.add(key);
+          }
         }
       }
     }
@@ -128,26 +110,38 @@ public class InheritedSymbolFinder {
     return names;
   }
 
-  // Adds supertypes and implemented interfaces to working list.
-  private static void addParents(final Symbol.ClassSymbol csym,
-      Deque<Symbol.ClassSymbol> deque) {
-    enqueueClassSymbol(csym.getSuperclass(), deque);
-    for (Type interfaceType : csym.getInterfaces()) {
-      enqueueClassSymbol(interfaceType, deque);
+  private static boolean inHierarchy(Type ownerType,
+      Symbol.ClassSymbol csym) {
+    for (Type type = csym.type;
+        type != null && type.getTag() == TypeTag.CLASS;
+        type = ((Type.ClassType) type).supertype_field) {
+      if (type == ownerType) { return true; }
     }
+    return false;
   }
 
-  // Adds type's symbol to working list iff type is a declared type.
-  private static void enqueueClassSymbol(Type type,
-      Deque<Symbol.ClassSymbol> deque) {
-    if (type.getKind() == TypeKind.DECLARED) {
-      Symbol.TypeSymbol tsym = ((Type.ClassType) type).tsym;
-      Symbol.ClassSymbol csym = (Symbol.ClassSymbol) tsym;
-      if (type.isInterface()) {
-        deque.addLast(csym);
-      } else {
-        deque.addFirst(csym);
-      }
-    }
+//  private static boolean isSuperclassOf(Types types,
+//      Type.ClassType ownerType, Type.ClassType classType) {
+//    Type type = classType.supertype_field;
+//    while (type != null && type.getTag() == TypeTag.CLASS) {
+//      if (types.isSameType(type, ownerType)) { return true; }
+//      type = ((Type.ClassType) type).supertype_field;
+//    }
+//    return false;
+//  }
+//
+//  private static boolean encloses(Types types,
+//      Type.ClassType sup, Type.ClassType sub) {
+//    Type type = sub.supertype_field;
+//    while (type != null && type.getTag() == TypeTag.CLASS) {
+//      if (types.isSameType(type, sup)) { return true; }
+//      type = ((Type.ClassType) type).getEnclosingType();
+//    }
+//    return false;
+//  }
+
+   private static String removeJVMReturnType(String methodDescriptor) {
+    int ix = methodDescriptor.lastIndexOf(')');
+    return ix > 0 ? methodDescriptor.substring(0, ix+1) : null;
   }
 }
