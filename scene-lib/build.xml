@@ -116,8 +116,8 @@
             <pathelement location="${annotation-tools}/annotation-file-utilities/lib/plume.jar"/>
             <pathelement location="${annotation-tools}/annotation-file-utilities/lib/guava-15.0.jar"/>
             <!-- remainder only for repository version -->
-            <pathelement location="${annotations-compiler}/dist/lib/javac.jar"/>
-            <pathelement location="${annotations-compiler}/dist/lib/javap.jar"/>
+            <pathelement location="${annotations-compiler}/dist/lib/java.compiler.jar"/>
+            <pathelement location="${annotations-compiler}/dist/lib/jdk.compiler.jar"/>
             <pathelement location="bin"/>
         </path>
     </target>
