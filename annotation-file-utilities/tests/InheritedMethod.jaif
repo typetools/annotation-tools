@@ -1,26 +1,25 @@
 package annotator.tests:
-annotation @A: @java.lang.annotation.Target({java.lang.annotation.ElementType.TYPE_USE})
+annotation @A:
 annotation @B: @java.lang.annotation.Target({java.lang.annotation.ElementType.TYPE_USE})
 annotation @C: @java.lang.annotation.Target({java.lang.annotation.ElementType.TYPE_USE})
 annotation @D: @java.lang.annotation.Target({java.lang.annotation.ElementType.TYPE_USE})
 annotation @E: @java.lang.annotation.Target({java.lang.annotation.ElementType.TYPE_USE})
 annotation @F: @java.lang.annotation.Target({java.lang.annotation.ElementType.TYPE_USE})
 annotation @G: @java.lang.annotation.Target({java.lang.annotation.ElementType.TYPE_USE})
-annotation @Z:
 
 class InheritedMethod:
-    method toString()Ljava/lang/String;: @Z
-        return: @A
-        receiver: @B
+    method toString()Ljava/lang/String;: @A
+        return: @B
+        receiver: @C
 
-class InheritedMethod$Super:
+class InheritedMethod$Sub:
 method g([Ljava/lang/String;I)[I: @A
+    return: @C
+        inner-type 0, 0: @B
     receiver: @D
     parameter 0:
         type: @F
             inner-type 0, 0: @E
     parameter 1:
         type: @G
-    insert-annotation Method.type, ArrayType.type: @B
-    insert-annotation Method.type: @C
 

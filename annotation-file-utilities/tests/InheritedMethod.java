@@ -6,7 +6,7 @@ class InheritedMethod {
     public int[] g(String[] a, int i) { return new int[0]; }
   }
 
-  public class Super extends Base {
+  public class Sub extends Base {
     public int f() { return 0; }
   }
 }
