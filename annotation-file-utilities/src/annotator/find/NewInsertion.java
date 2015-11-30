@@ -11,7 +11,7 @@ import type.Type;
  * @author dbro
  *
  */
-public class NewInsertion extends TypedInsertion {
+public class NewInsertion extends Insertion {
   private final static Pattern qualifiers = Pattern.compile("(?:\\w++\\.)*+");
 
   /**

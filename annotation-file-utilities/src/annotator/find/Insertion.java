@@ -50,10 +50,26 @@ public abstract class Insertion {
     protected Set<String> packageNames;
 
     /**
+     * The inner types to go on this insertion. See {@link ReceiverInsertion}
+     * for more details.
+     */
+    protected List<Insertion> innerTypeInsertions;
+
+    /**
      * Set of annotation names that should always be qualified, even
      *  when {@link getText(boolean, boolean)} is called with abbreviate true.
      */
     protected static Set<String> alwaysQualify = new LinkedHashSet<String>();
+
+    /**
+     * Type to be inserted, if applicable; otherwise null.
+     */
+    protected Type type;
+
+    /**
+     * If true only the annotations from {@link type} will be inserted.
+     */
+    protected boolean annotationsOnly;
 
     /**
      * Creates a new insertion.
@@ -62,10 +78,23 @@ public abstract class Insertion {
      * @param separateLine whether to insert the text on its own
      */
     public Insertion(Criteria criteria, boolean separateLine) {
+        this(null, criteria, separateLine, null);
+    }
+
+    public Insertion(Type type, Criteria criteria,
+            List<Insertion> innerTypeInsertions) {
+        this(type, criteria, false, innerTypeInsertions);
+    }
+
+    public Insertion(Type type, Criteria criteria, boolean separateLine,
+            List<Insertion> innerTypeInsertions) {
         this.criteria = criteria;
         this.separateLine = separateLine;
         this.packageNames = new LinkedHashSet<String>();
         this.inserted = false;
+        this.type = type;
+        this.innerTypeInsertions = innerTypeInsertions;
+        this.annotationsOnly = false;
     }
 
     /**
@@ -203,6 +232,43 @@ public abstract class Insertion {
     }
 
     /**
+     * Gets the type.  It is assumed that the returned value will be
+     * modified to update the type to be inserted.
+     */
+    public Type getType() {
+        return type;
+    }
+
+    /**
+     * Sets the type.
+     */
+    public void setType(Type type) {
+        this.type = type;
+    }
+
+    public DeclaredType getBaseType() {
+        return getBaseType(type);
+    }
+
+    public static DeclaredType getBaseType(Type type) {
+        if (type != null) {
+            switch (type.getKind()) {
+            case DECLARED:
+                return (DeclaredType) type;
+            case BOUNDED:
+                return getBaseType(((BoundedType) type).getType());
+            case ARRAY:
+                return getBaseType(((ArrayType) type).getComponentType());
+            }
+        }
+        return null;
+    }
+
+    public void setAnnotationsOnly(boolean annotationsOnly) {
+        this.annotationsOnly = annotationsOnly;
+    }
+
+    /**
      * Gets whether the insertion goes on a separate line.
      *
      * @return whether the insertion goes on a separate line
@@ -227,6 +293,14 @@ public abstract class Insertion {
      */
     public void setInserted(boolean inserted) {
         this.inserted = inserted;
+    }
+
+    /**
+     * Gets the inner type insertions associated with this insertion.
+     * @return a copy of the inner types.
+     */
+    public List<Insertion> getInnerTypeInsertions() {
+        return innerTypeInsertions;
     }
 
     /**

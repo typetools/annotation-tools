@@ -49,7 +49,6 @@ import annotations.io.IndexFileWriter;
 import annotations.util.coll.VivifyingMap;
 import annotator.find.AnnotationInsertion;
 import annotator.find.CastInsertion;
-import annotator.find.ConstructorInsertion;
 import annotator.find.Criteria;
 import annotator.find.GenericArrayLocationCriterion;
 import annotator.find.InheritedSymbolFinder;
@@ -59,7 +58,6 @@ import annotator.find.MethodInsertion;
 import annotator.find.NewInsertion;
 import annotator.find.ReceiverInsertion;
 import annotator.find.TreeFinder;
-import annotator.find.TypedInsertion;
 import annotator.scanner.LocalVariableScanner;
 import annotator.specification.IndexFileSpecification;
 
@@ -459,16 +457,15 @@ public class Main {
         for (Annotation anno : annos) {
           el.tlAnnotationsHere.add(anno);
         }
-        if (ins instanceof TypedInsertion) {
-          TypedInsertion ti = (TypedInsertion) ins;
+        if (ins.getType() != null) {
           if (!rec.astPath.isEmpty()) {
-            //addInnerTypePaths(decl, rec, ti, insertionSources);
+            //addInnerTypePaths(decl, rec, ins, insertionSources);
           }
-          for (Insertion inner : ti.getInnerTypeInsertions()) {
+          for (Insertion inner : ins.getInnerTypeInsertions()) {
             Tree t = ASTIndex.getNode(tree, rec);
             if (t != null) {
               ATypeElement elem = findInnerTypeElement(t,
-                  rec, decl, ti.getType(), inner);
+                  rec, decl, ins.getType(), inner);
               for (Annotation a : insertionSources.get(inner)) {
                 elem.tlAnnotationsHere.add(a);
               }

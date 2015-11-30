@@ -9,7 +9,7 @@ import type.DeclaredType;
  * annotation on an existing receiver and creating a new (annotated)
  * receiver if none are present.
  */
-public class ReceiverInsertion extends TypedInsertion {
+public class ReceiverInsertion extends Insertion {
     /**
      * If true a comma will be added at the end of the insertion (only if also
      * inserting the receiver).

@@ -65,7 +65,7 @@ import com.sun.tools.javac.util.Pair;
  * The class now serves a second purpose, which should probably be
  * separated out (according to OO dogma, at least): It attaches
  * {@link annotations.io.ASTPath}-based inner type {@link Insertion}s to
- * a {@link TypedInsertion} on the outer type if one exists (see
+ * an {@link Insertion} on the outer type if one exists (see
  * {@link #organizeTypedInsertions(CompilationUnitTree, String, Collection)}.
  * Since getting these insertions right depends on this organization,
  * this class is now essential for correctness, not merely for
@@ -293,12 +293,12 @@ public class Insertions implements Iterable<Insertion> {
    */
   private Set<Insertion> organizeTypedInsertions(CompilationUnitTree cut,
       String className, Collection<Insertion> insertions) {
-    ASTRecordMap<TypedInsertion> map = new ASTRecordMap<TypedInsertion>();
+    ASTRecordMap<Insertion> map = new ASTRecordMap<Insertion>();
     Set<Insertion> organized = new LinkedHashSet<Insertion>();
     Set<Insertion> unorganized = new LinkedHashSet<Insertion>();
     List<Insertion> list = new ArrayList<Insertion>();
 
-    // First divide the insertions into three buckets: TypedInsertions
+    // First divide the insertions into three buckets: typed insertions
     // on outer types (map), ASTPath-based insertions on local types
     // (unorganized -- built as list and then sorted, since building as
     // a set spuriously removes "duplicates" according to the
@@ -333,8 +333,8 @@ public class Insertions implements Iterable<Insertion> {
           node = ASTIndex.getNode(cut, rec);
         }
 
-        if (ins instanceof TypedInsertion) {
-          TypedInsertion tins = map.get(rec);
+        if (ins.getType() != null) {
+          Insertion tins = map.get(rec);
           if (ins instanceof NewInsertion) {
             NewInsertion nins = (NewInsertion) ins;
             if (entry.getTreeKind() == Tree.Kind.NEW_ARRAY
@@ -396,9 +396,9 @@ public class Insertions implements Iterable<Insertion> {
             }
           }
           if (tins == null) {
-            map.put(rec, (TypedInsertion) ins);
-          } else if (tins.getType().equals(((TypedInsertion) ins).getType())) {
-            mergeTypedInsertions(tins, (TypedInsertion) ins);
+            map.put(rec, ins);
+          } else if (tins.getType().equals(ins.getType())) {
+            mergeTypedInsertions(tins, ins);
           }
         } else {
           int d = newArrayInnerTypeDepth(p);
@@ -416,7 +416,7 @@ public class Insertions implements Iterable<Insertion> {
             temp = temp.extend(
                 new ASTPath.ASTEntry(Tree.Kind.NEW_ARRAY, ASTPath.TYPE, 0));
             if (node.toString().startsWith("{")) {
-              TypedInsertion tins = map.get(rec.replacePath(temp));
+              Insertion tins = map.get(rec.replacePath(temp));
               if (tins == null) {
                 // TODO
               } else {
@@ -487,7 +487,7 @@ public class Insertions implements Iterable<Insertion> {
         rec = new ASTRecord(cut, className, methodName, fieldName, ap0);
       } while (!(astack.isEmpty() || map.containsKey(rec)));
 
-      TypedInsertion tins = map.get(rec);
+      Insertion tins = map.get(rec);
       TreePath path = ASTIndex.getTreePath(cut, rec);
       Tree node = path == null ? null : path.getLeaf();
       if (node == null && ap0.isEmpty()) {
@@ -1011,8 +1011,8 @@ outer:
   }
 
   // merge annotations, assuming types are structurally identical
-  private void mergeTypedInsertions(TypedInsertion ins0, TypedInsertion ins1) {
-    mergeTypes(ins0.getType(), ins1.getType());
+  private void mergeTypedInsertions(Insertion tins, Insertion ins) {
+    mergeTypes(tins.getType(), ins.getType());
   }
 
   private void mergeTypes(Type t0, Type t1) {

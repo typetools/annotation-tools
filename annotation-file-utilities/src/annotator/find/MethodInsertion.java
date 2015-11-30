@@ -15,7 +15,7 @@ import type.ArrayType;
 import type.DeclaredType;
 import type.Type;
 
-public class MethodInsertion extends TypedInsertion {
+public class MethodInsertion extends Insertion {
   final String methodName;
   final boolean isDefCon;  // default (nullary) constructor?
   ReceiverInsertion receiverInsertion = null;

@@ -18,12 +18,6 @@ import type.Type;
  * after the expression to close the parentheses left open by this insertion.
  */
 public class CastInsertion extends Insertion {
-
-  /**
-   * The type to cast to.
-   */
-  private Type type;
-
   /**
    * Whether insertion is to take place on a bare array literal. 
    */
@@ -38,19 +32,6 @@ public class CastInsertion extends Insertion {
   public CastInsertion(Criteria criteria, Type type) {
     super(criteria, false);
     this.type = type;
-  }
-
-  /**
-   * Gets the type for this insertion. It is assumed that the returned value will be modified
-   * to update the type to be inserted.
-   * @return the type
-   */
-  public Type getType() {
-      return type;
-  }
-
-  protected void setType(Type t) {
-      type = t;
   }
 
   /** {@inheritDoc} */

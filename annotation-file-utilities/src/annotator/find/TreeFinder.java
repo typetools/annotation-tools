@@ -1064,9 +1064,8 @@ loop:
       }
 
       // TODO: Find a more fine-grained replacement for the 2nd conjunct below.
-      // The real issue is whether the insertion will add non-annotation code,
-      // which is only sometimes the case for a TypedInsertion.
-      if (alreadyPresent(path, i) && !(i instanceof TypedInsertion)) {
+      // The real issue is whether the insertion will add non-annotation code.
+      if (alreadyPresent(path, i) && i.getType() == null) {
         // Don't insert a duplicate if this particular annotation is already
         // present at this location.
         return null;
