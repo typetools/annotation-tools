@@ -359,10 +359,12 @@
 
     <fail unless="deploy-dir" message="You must specify a deploy-dir, the live site deploy-dir=/cse/www2/types/annotation-file-utilities/releases/_version num_"/>
 
+    <fail unless="afu.version" message="You must specify an afu.version, such as 3.6.22"/>
+
     <echo message="Export location: ${deploy-dir}"/>
     <echo message="Copying annotation-tools.zip"/>
     <copy file="annotation-tools.zip"
-      todir="${deploy-dir}"/>
+      tofile="${deploy-dir}/annotation-tools-${afu.version}.zip"/>
 
     <echo message="Copying annotation-file-utilities.html"/>
     <copy file="annotation-file-utilities.html"
