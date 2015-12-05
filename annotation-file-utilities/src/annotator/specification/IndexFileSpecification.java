@@ -388,7 +388,7 @@ public class IndexFileSpecification implements Specification {
       int pp = criteria.getParamPos();
       if (pp >= 0 || criteria.isOnReturnType()) {  // subordinate to MethodIns.
         Insertion ins = new AnnotationInsertion(annotationString, criteria,
-            isDeclarationAnnotation);
+            isDeclarationAnnotation/*, innerTypeInsertions*/);
         elementInsertions.add(ins);
         annotationInsertions.add(ins);
         addInsertionSource(ins, annotation);
@@ -476,7 +476,7 @@ public class IndexFileSpecification implements Specification {
           CriterionList mclist = new CriterionList(criteria.getInClass()).add(
               Criteria.inMethod(methodName, true));
           meth = new MethodInsertion(type, methodName,
-              mclist.criteria(), new ArrayList<Insertion>());
+              mclist.criteria(), innerTypeInsertions);
           meths.put(methodName, meth);
           this.insertions.add(meth);
         }
