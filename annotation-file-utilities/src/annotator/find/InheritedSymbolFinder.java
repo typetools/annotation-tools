@@ -1,6 +1,7 @@
 package annotator.find;
 
-import java.util.Collections;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -18,9 +19,13 @@ import javax.lang.model.util.Types;
 import annotations.util.JVMNames;
 import annotator.Source;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.LinkedHashMultimap;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
+
 import com.sun.tools.javac.code.Symbol;
-import com.sun.tools.javac.code.Type;
-import com.sun.tools.javac.code.TypeTag;
+import com.sun.tools.javac.model.JavacElements;
 
 /**
  * Provides static access to JVML descriptors of methods for which
@@ -31,18 +36,43 @@ import com.sun.tools.javac.code.TypeTag;
 public class InheritedSymbolFinder {
   private static Source source = null;
 
-  // map of class (flat) names to sets of JVML method descriptors
-  private static Map<String, Set<String>> cache =
-      new TreeMap<String, Set<String>>();  // few classes expected
+  // class name -> method index
+  private static Map<String, Multimap<String, ExecutableElement>> cache =
+      new TreeMap<String, Multimap<String, ExecutableElement>>();
+
+  // keys: class (flat) name + ':' + method (simple) name
+  // values: multimap of method (simple) name to matching method elems
+  private static Map<String, Multimap<String, ExecutableElement>> cash =
+      new HashMap<String, Multimap<String, ExecutableElement>>();
+
+  // initialized once and for all
+  private static Multimap<String, ExecutableElement> objectMethods = null;
 
   private InheritedSymbolFinder() {}
 
   // Needed for obtaining instances of utility classes Types and Elements.
-  // TODO: make methods non-static and pass source to constructor instead
+  // TODO: make methods non-static and pass source to constructor instead.
   public static void setSource(Source source) {
     if (InheritedSymbolFinder.source != source) {
       InheritedSymbolFinder.source = source;
       cache.clear();
+      cash.clear();
+      if (source != null) {
+        // initialize objectMethods
+        if (objectMethods == null) {
+          TypeElement o =
+              source.getElementUtils().getTypeElement("java.lang.Object");
+          objectMethods =
+              LinkedHashMultimap.<String, ExecutableElement>create();
+          for (Element e : o.getEnclosedElements()) {
+            if (e.getKind() == ElementKind.METHOD) {
+              String key = keyFor((Symbol.MethodSymbol) e);
+              objectMethods.put(key, (ExecutableElement) e);
+            }
+          }
+        }
+        cash.put("java.lang.Object", objectMethods);
+      }
     }
   }
 
@@ -56,8 +86,27 @@ public class InheritedSymbolFinder {
    */
   public static boolean isInheritedIn(Symbol.ClassSymbol classSymbol,
       String methodDescriptor) {
-    String key = removeJVMReturnType(methodDescriptor);
-    return key != null && getInherited(classSymbol).contains(key);
+    Multimap<String, ExecutableElement> inherited = getInherited(classSymbol);
+    int ix = methodDescriptor.indexOf('(');
+    String key = methodDescriptor.substring(0, ix);
+    Collection<ExecutableElement> elems = inherited.get(key);
+
+    // There may be multiple methods stored under the same key (bare
+    // method name), so check each of them.
+    // TODO: figure out good way to determine whether method descriptor
+    // gives the type of an inherited method.  (Only exact matches work
+    // now.)
+    if (elems != null) {
+      for (ExecutableElement elem : elems) {
+        String jvmName = JVMNames.getJVMMethodName(elem);
+        int ix0 = methodDescriptor.lastIndexOf(')') + 1;
+        int ix1 = jvmName.lastIndexOf(')') + 1;
+        String key0 = methodDescriptor.substring(0, ix0);
+        String key1 = jvmName.substring(0, ix1);
+        if (key0.equals(key1)) { return true; }
+      }
+    }
+    return false;
   }
 
   /**
@@ -67,8 +116,59 @@ public class InheritedSymbolFinder {
    * @param classSymbol symbol table entry for a class
    * @return JVML descriptors of methods in scope of class
    */
-  private static Set<String>
+  private static Multimap<String, ExecutableElement>
   getInherited(final Symbol.ClassSymbol classSymbol) {
+    if (source == null) { throw new IllegalStateException("null source"); }
+
+    final JavacElements elements = (JavacElements) source.getElementUtils();
+    final Types types = source.getTypeUtils();
+    String className = classSymbol.flatName().toString();
+
+    if (elements == null) {
+      throw new IllegalStateException("source.getElementUtils() returned null");
+    }
+    if (types == null) {
+      throw new IllegalStateException("source.getTypeUtils() returned null");
+    }
+    if (cache.containsKey(className)) { return cache.get(className); }
+
+    Multimap<String, ExecutableElement> inherited =
+        HashMultimap.<String, ExecutableElement>create();
+    Multimap<String, ExecutableElement> subElems =
+        getInstanceMethods(classSymbol);
+
+    // check pairs of methods (resp. from class and superclass) w/same name
+    for (ExecutableElement eelem0 : subElems.values()) {
+      Symbol.MethodSymbol msym = (Symbol.MethodSymbol) eelem0;
+      if (msym.owner.getKind() == ElementKind.CLASS) {
+        String key = keyFor(msym);
+        if (msym.owner != classSymbol) {  // otherwise, defined in subclass
+          Multimap<String, ExecutableElement> superElems =
+              getInstanceMethods((Symbol.ClassSymbol) msym.owner);
+          for (ExecutableElement eelem1 : superElems.get(key)) {
+            // override => not inherited
+            if (elements.overrides(eelem0, eelem1, classSymbol)) { break; }
+          }
+          inherited.put(key, eelem0);
+        }
+      }
+    }
+    // cache unmodifiable view of result
+    inherited =
+        Multimaps.<String, ExecutableElement>unmodifiableMultimap(inherited);
+    cache.put(className, inherited);
+    return inherited;
+  }
+
+  /**
+   * Finds inherited methods defined for a class (given by its symbol
+   *  table entry).
+   *
+   * @param classSymbol symbol table entry for a class
+   * @return JVML descriptors of methods in scope of class
+   */
+  private static Multimap<String, ExecutableElement>
+  getInstanceMethods(final Symbol.ClassSymbol classSymbol) {
     if (source == null) { throw new IllegalStateException("null source"); }
 
     final Elements elements = source.getElementUtils();
@@ -81,51 +181,31 @@ public class InheritedSymbolFinder {
     if (types == null) {
       throw new IllegalStateException("source.getTypeUtils() returned null");
     }
-    if (cache.containsKey(className)) { return cache.get(className); }
+    if (cash.containsKey(className)) { return cash.get(className); }
 
-    Set<String> names = new HashSet<String>();
+    Multimap<String, ExecutableElement> names =
+        LinkedHashMultimap.<String, ExecutableElement>create();
     List<? extends Element> allMembers =
         elements.getAllMembers((TypeElement) classSymbol);
     Set<ExecutableElement> eelems =
         ElementFilter.methodsIn(new HashSet<Element>(allMembers));
 
     for (ExecutableElement eelem : eelems) {
-      if (eelem instanceof Symbol.MethodSymbol) {
-        Symbol.MethodSymbol msym = (Symbol.MethodSymbol) eelem;
-        if (msym.owner != classSymbol) {
-          final String jvmMethodName = JVMNames.getJVMMethodName(msym);
-          final String key = removeJVMReturnType(jvmMethodName);
-          // no need to match return type; if local method and
-          // superclass method both compile, the former overrides the
-          // latter
-          if (key != null && msym.owner.getKind() == ElementKind.CLASS
-              && inHierarchy(msym.owner.type, classSymbol)) {
-            names.add(key);
-          }
-        }
-      }
+      String key = keyFor(eelem);
+      names.put(key, eelem);
     }
+
     // cache unmodifiable view of result
-    names = names.isEmpty() ? Collections.<String>emptySet()
-        : Collections.<String>unmodifiableSet(names);
-    cache.put(className, names);
+    names = Multimaps.<String, ExecutableElement>unmodifiableMultimap(names);
+    cash.put(className, names);
     return names;
   }
 
-  // is ownerType an ancestor of csym?
-  private static boolean inHierarchy(Type ownerType,
-      Symbol.ClassSymbol csym) {
-    for (Type type = csym.type;
-        type != null && type.getTag() == TypeTag.CLASS;
-        type = ((Type.ClassType) type).supertype_field) {
-      if (type == ownerType) { return true; }
-    }
-    return false;
-  }
-
-  // take return type off end of JVML method spec
-  private static String removeJVMReturnType(String methodDescriptor) {
-    int ix = methodDescriptor.lastIndexOf(')');
-    return ix > 0 ? methodDescriptor.substring(0, ix+1) : null;
+  // key for storage in "cash"
+  private static String keyFor(ExecutableElement eelem) {
+    //String key = JVMNames.getJVMMethodName(eelem);
+    //int ix = key.lastIndexOf(')');
+    //return key.substring(0, ix+1);
+    return eelem.getSimpleName().toString();
   }
 }
