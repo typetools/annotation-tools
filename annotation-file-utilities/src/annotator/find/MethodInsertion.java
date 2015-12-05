@@ -10,6 +10,7 @@ import java.util.TreeMap;
 
 import com.sun.tools.javac.util.Pair;
 
+import annotations.io.ASTPath;
 import annotations.util.JVMNames;
 import type.ArrayType;
 import type.DeclaredType;
@@ -238,7 +239,9 @@ public class MethodInsertion extends Insertion {
    * @return subordinate return type insertions, if any
    */
   public Set<Insertion> getReturnTypeInsertions() {
-    return returnTypeInsertions;
+    Set<Insertion> s = returnTypeInsertions;
+    if (innerTypeInsertions != null) { s.addAll(innerTypeInsertions); }
+    return s;
   }
 
   /**
@@ -247,7 +250,15 @@ public class MethodInsertion extends Insertion {
    * @param i subordinate insertion to be added
    */
   public void addReturnTypeInsertion(Insertion i) {
-    returnTypeInsertions.add(i);
+    Criteria c = i.getCriteria();
+    GenericArrayLocationCriterion galc = c.getGenericArrayLocation();
+    ASTPath astPath = c.getASTPath();
+    if ((galc == null || galc.getLocation().isEmpty())
+        && (astPath == null || astPath.isEmpty())) {
+      returnTypeInsertions.add(i);
+    } else {
+      innerTypeInsertions.add(i);
+    }
   }
 
   /**
