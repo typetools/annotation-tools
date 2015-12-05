@@ -186,6 +186,7 @@ public class MethodInsertion extends Insertion {
     }
   }
 
+  // read types from JVML string
   private List<Type> paramTypes(String paramString) {
     int n = paramString.length();
     int i = 0;
@@ -198,6 +199,7 @@ public class MethodInsertion extends Insertion {
     return ts;
   }
 
+  // read type from JVML string
   private Pair<Type, Integer> parseJVMLType(String typeString, int i) {
     char c = typeString.charAt(i);
     if (c == '[') {
@@ -211,10 +213,18 @@ public class MethodInsertion extends Insertion {
     return Pair.of(t, j);
   }
 
+  /**
+   * @return subordinate receiver insertion, if any
+   */
   public ReceiverInsertion getReceiverInsertion() {
     return receiverInsertion;
   }
 
+  /**
+   * Adds a subordinate receiver insertion.
+   *
+   * @param i subordinate insertion to be added
+   */
   public void addReceiverInsertion(ReceiverInsertion recv) {
     if (receiverInsertion == null) {
       receiverInsertion = recv;
@@ -224,14 +234,25 @@ public class MethodInsertion extends Insertion {
     }
   }
 
+  /**
+   * @return subordinate return type insertions, if any
+   */
   public Set<Insertion> getReturnTypeInsertions() {
     return returnTypeInsertions;
   }
 
+  /**
+   * Adds a subordinate return type insertion.
+   *
+   * @param i subordinate insertion to be added
+   */
   public void addReturnTypeInsertion(Insertion i) {
     returnTypeInsertions.add(i);
   }
 
+  /**
+   * @return subordinate method parameter insertions, if any
+   */
   public Set<Insertion> getParameterInsertions() {
     Set<Insertion> pins = new LinkedHashSet<Insertion>();
     for (Set<Insertion> s : parameterInsertions.values()) {
@@ -240,6 +261,11 @@ public class MethodInsertion extends Insertion {
     return pins;
   }
 
+  /**
+   * Adds a subordinate method parameter insertion.
+   *
+   * @param i subordinate insertion to be added
+   */
   public void addParameterInsertion(Insertion ins, int ix) {
     Set<Insertion> pins = parameterInsertions.get(ix);
     if (pins == null) {
@@ -249,14 +275,25 @@ public class MethodInsertion extends Insertion {
     pins.add(ins);
   }
 
+  /**
+   * @return subordinate method declaration insertions, if any
+   */
   public Set<Insertion> getDeclarationInsertions() {
     return declarationInsertions;
   }
 
+  /**
+   * Adds a subordinate method declaration insertion.
+   *
+   * @param i subordinate insertion to be added
+   */
   public void addDeclarationInsertion(Insertion ins) {
     declarationInsertions.add(ins);
   }
 
+  /**
+   * @return all subordinate insertions of any type
+   */
   public Set<Insertion> getSubordinateInsertions() {
     Set<Insertion> s = new LinkedHashSet<Insertion>();
     s.addAll(declarationInsertions);
@@ -268,6 +305,7 @@ public class MethodInsertion extends Insertion {
     return s;
   }
 
+  /** is this insertion on a nullary constructor? */
   protected boolean isDefaultConstructorInsertion() {
     return isDefCon;
   }

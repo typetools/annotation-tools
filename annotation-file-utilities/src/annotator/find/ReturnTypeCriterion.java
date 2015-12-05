@@ -35,10 +35,8 @@ public class ReturnTypeCriterion implements Criterion {
         Main.pathToString(path), this.toString());
 
     if (CommonScanner.hasClassKind(path.getLeaf())) { return false; }
-    //if (path.getLeaf().getKind() == Tree.Kind.CLASS) {
-    //  JCTree.JCClassDecl decl = (JCTree.JCClassDecl) path.getLeaf();
-    //  return InheritedSymbolFinder.isInheritedIn(decl.sym, methodName);
-    //}
+    //JCTree.JCClassDecl decl = (JCTree.JCClassDecl) path.getLeaf();
+    //return InheritedSymbolFinder.isInheritedIn(decl.sym, methodName);
 
     do {
       if (path.getLeaf().getKind() == Tree.Kind.METHOD) {

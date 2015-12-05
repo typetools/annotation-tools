@@ -13,6 +13,7 @@ import com.sun.tools.javac.tree.JCTree;
  * certain name.
  */
 final class InMethodCriterion implements Criterion {
+
   public final String name;
   public final boolean isDeclaration;
   private final IsSigMethodCriterion sigMethodCriterion;

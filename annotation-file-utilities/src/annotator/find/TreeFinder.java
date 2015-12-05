@@ -237,6 +237,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
 
   Map<Tree, TreePath> treePathCache = new HashMap<Tree, TreePath>();
 
+  // Find the ASTRecord that identifies a node.
   private ASTRecord astRecord(Tree node) {
     Map<Tree, ASTRecord> index = ASTIndex.indexOf(tree);
     return index.get(node);
@@ -467,8 +468,8 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     }
 
     /**
-     * Returns the number of array levels that are in the given array type tree,
-     * or 0 if the given node is not an array type tree.
+     * Returns the number of array levels that are in the given array type,
+     * or 0 if the given type is not an array type.
      */
     private int arrayLevels(com.sun.tools.javac.code.Type t) {
       return t.accept(new Types.SimpleVisitor<Integer, Integer>() {
@@ -484,6 +485,10 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       }, 0);
     }
 
+    /**
+     * Returns the number of array levels that are in the given array type tree,
+     * or 0 if the given node is not an array type tree.
+     */
     private int arrayLevels(Tree node) {
       int result = 0;
       while (node.getKind() == Tree.Kind.ARRAY_TYPE) {
@@ -1394,15 +1399,6 @@ loop:
         Tree parent = path.getParentPath().getLeaf();
         insertRecord = insertRecord.extend(Tree.Kind.METHOD, ASTPath.PARAMETER, -1);
         pos = ((JCTree) parent).getEndPosition(tree.endPositions) - 1;
-      //} else
-      //if (CommonScanner.hasClassKind(node)
-      //    && i.getKind() == Insertion.Kind.METHOD
-      //    && entry.childSelectorIs(ASTPath.PARAMETER)
-      //    && entry.getArgument() < 0) {
-      //  String name = i.getCriteria().getMethodName();
-      //  if (name == null) { return null; }
-      //  insertRecord = insertRecord.extend(Tree.Kind.METHOD, ASTPath.PARAMETER, -1);
-      //  pos = ((JCTree) node).getEndPosition(tree.endPositions) - 1;
       } else
       if (node.getKind() == Tree.Kind.METHOD
           && entry.childSelectorIs(ASTPath.TYPE)) {
@@ -1798,6 +1794,7 @@ loop:
     receiver.setAddComma(!isNullary);
   }
 
+  // annotate type for insertion
   private void addNewType(TreePath path, NewInsertion neu,
       NewArrayTree newArray) {
     DeclaredType baseType = neu.getBaseType();
@@ -1814,6 +1811,7 @@ loop:
         neu.getCriteria().getASTPath());
   }
 
+  // annotate type for insertion
   private void addConstructor(TreePath path, MethodInsertion cons) {
     DeclaredType baseType = cons.getBaseType();
     ReceiverInsertion recv = cons.getReceiverInsertion();
@@ -1852,6 +1850,7 @@ loop:
         cons.getCriteria().getASTPath());
   }
 
+  // annotate types for insertion
   private void addMethod(TreePath path, MethodInsertion meth) {
     ReceiverInsertion recv = meth.getReceiverInsertion();
     DeclaredType baseType = meth.getBaseType();

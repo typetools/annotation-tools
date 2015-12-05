@@ -108,14 +108,22 @@ public class IndexFileSpecification implements Specification {
     return this.insertions;
   }
 
+  /**
+   * @return map of annotation types to required imports
+   *          (if "abbreviate" option set)
+   */
   public Map<String, Set<String>> annotationImports() {
     return scene.imports;
   }
 
+  /**
+   * Tracks for each insertion the annotation(s) that specified it.
+   */
   public Multimap<Insertion, Annotation> insertionSources() {
     return insertionSources;
   }
 
+  // record specified annotation that led to insertion
   private void addInsertionSource(Insertion ins, Annotation anno) {
     insertionSources.put(ins, anno);
   }
@@ -267,6 +275,7 @@ public class IndexFileSpecification implements Specification {
     parseASTInsertions(clist, field.insertAnnotations, field.insertTypecasts);
   }
 
+  /** Find insertions for static initializer. */
   private void parseStaticInit(CriterionList clist, String className, int blockID, ABlock block) {
     clist = clist.add(Criteria.inStaticInit(blockID));
     // the method name argument is not used for static initializers, which are only used
@@ -275,6 +284,7 @@ public class IndexFileSpecification implements Specification {
     parseBlock(clist, className, "static init number " + blockID + "()", block);
   }
 
+  /** Find insertions for instance initializer. */
   private void parseInstanceInit(CriterionList clist, String className, int blockID, ABlock block) {
     clist = clist.add(Criteria.inInstanceInit(blockID));
     parseBlock(clist, className, "instance init number " + blockID + "()", block);
@@ -283,6 +293,7 @@ public class IndexFileSpecification implements Specification {
   // keep the descriptive strings for field initializers and static inits consistent
   // with text used in NewCriterion.
 
+  /** Find insertions for field initializer. */
   private void parseFieldInit(CriterionList clist, String className, String fieldName, AExpression exp) {
     clist = clist.add(Criteria.inFieldInit(fieldName));
     parseExpression(clist, className, "init for field " + fieldName + "()", exp);
@@ -499,12 +510,14 @@ public class IndexFileSpecification implements Specification {
     return annotationInsertions;
   }
 
+  // true if no (non-empty) type path specified in criteria
   private static boolean noTypePath(Criteria criteria) {
     GenericArrayLocationCriterion galc =
         criteria.getGenericArrayLocation();
     return galc == null || galc.getLocation().isEmpty();
   }
 
+  // are these criteria for a receiver?
   public static boolean isOnReceiver(Criteria criteria) {
     ASTPath astPath = criteria.getASTPath();
     if (astPath == null) { return criteria.isOnReceiver(); }
@@ -514,6 +527,7 @@ public class IndexFileSpecification implements Specification {
         && entry.getArgument() < 0;
   }
 
+  // are these criteria for a "new" expression?
   public static boolean isOnNew(Criteria criteria) {
     ASTPath astPath = criteria.getASTPath();
     if (astPath == null || astPath.isEmpty()) { return criteria.isOnNew(); }
@@ -526,17 +540,20 @@ public class IndexFileSpecification implements Specification {
             && entry.childSelectorIs(ASTPath.IDENTIFIER);
   }
 
+  // are these criteria for a nullary constructor?
   private static boolean isOnNullaryConstructor(Criteria criteria) {
     return criteria.isOnMethod("<init>()V")
         && isOnMethodOrConstructor(criteria);
   }
 
+  // are these criteria for a method declaration (inclusive of constructors)?
   private static boolean isOnMethodDeclaration(Criteria criteria) {
     return !criteria.isOnMethod("<init>()V")
         && criteria.isOnMethodDeclaration()
         && isOnMethodOrConstructor(criteria);
   }
 
+  // auxiliary for previous two methods
   private static boolean isOnMethodOrConstructor(Criteria criteria) {
     if (!noTypePath(criteria)) { return false; }
     ASTPath astPath = criteria.getASTPath();
@@ -603,7 +620,7 @@ public class IndexFileSpecification implements Specification {
       innerInsertions.addAll(parseElement(innerClist, innerElement, isCastInsertion));
     }
     CriterionList outerClist = clist;
-    if (!isCastInsertion) { //&& clist.criteria().getMethodName() == null)
+    if (!isCastInsertion) {
       // Cast insertion is never on an existing type.
       outerClist = clist.add(Criteria.atLocation());
     }

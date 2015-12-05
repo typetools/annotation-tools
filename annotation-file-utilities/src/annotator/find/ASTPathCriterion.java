@@ -198,12 +198,6 @@ public class ASTPathCriterion implements Criterion {
         return false;
     }
 
-    private boolean isReceiverEntry(ASTPath.ASTEntry astEntry) {
-      return astEntry.getTreeKind() == Tree.Kind.METHOD
-              && astEntry.childSelectorIs(ASTPath.PARAMETER)
-              && astEntry.getArgument() < 0;
-    }
-
     private boolean matchNext(Tree next, Tree node) {
         boolean b1 = next instanceof JCTree;
         boolean b2 = node instanceof JCTree;

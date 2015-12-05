@@ -489,6 +489,8 @@ public final class Criteria {
    * by the specified method.
    *
    * @param name the name of the enclosing method
+   * @param isDeclaration whether annotation applies to a declaration
+   *         (i.e., is not a type annotation)
    * @return an "in method" criterion
    */
   public final static Criterion inMethod(String name, boolean isDeclaration) {

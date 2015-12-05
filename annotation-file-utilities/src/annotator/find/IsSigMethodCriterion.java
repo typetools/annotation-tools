@@ -11,18 +11,15 @@ import java.util.Set;
 
 import plume.UtilMDE;
 
-import com.sun.source.tree.AnnotatedTypeTree;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.ImportTree;
 import com.sun.source.tree.MethodTree;
-import com.sun.source.tree.ParameterizedTypeTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.tree.TypeParameterTree;
 import com.sun.source.tree.VariableTree;
 import com.sun.source.util.TreePath;
-import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.JCTree.JCExpression;
@@ -51,13 +48,6 @@ public class IsSigMethodCriterion implements Criterion {
   public IsSigMethodCriterion(String methodName) {
     this.fullMethodName = methodName.substring(0, methodName.indexOf(")") + 1);
     this.simpleMethodName = methodName.substring(0, methodName.indexOf("("));
-//    this.fullyQualifiedParams = new ArrayList<String>();
-//    for (String s : methodName.substring(
-//        methodName.indexOf("(") + 1, methodName.indexOf(")")).split(",")) {
-//      if (s.length() > 0) {
-//        fullyQualifiedParams.add(s);
-//      }
-//    }
     this.fullyQualifiedParams = new ArrayList<String>();
     try {
       parseParams(
@@ -392,16 +382,8 @@ public class IsSigMethodCriterion implements Criterion {
     return true;
   }
 
+  /** Find a type parameter's bound in the current context. */
   private String erasure(TypeParameterTree param) {
-//    String paramClass = "Object";
-//    List<? extends Tree> paramBounds = param.getBounds();
-//    if (paramBounds != null && paramBounds.size() >= 1) {
-//      Tree boundZero = paramBounds.get(0);
-//      if (boundZero.getKind() == Tree.Kind.ANNOTATED_TYPE) {
-//        boundZero = ((AnnotatedTypeTree) boundZero).getUnderlyingType();
-//      }
-//      paramClass = boundZero.toString();
-//    }
     List<JCExpression> bounds = ((JCTree.JCTypeParameter) param).getBounds();
     if (bounds != null && !bounds.isEmpty()) {
       Type erasure = bounds.get(0).type.tsym.erasure_field;

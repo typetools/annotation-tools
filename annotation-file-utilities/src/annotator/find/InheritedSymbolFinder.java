@@ -37,6 +37,8 @@ public class InheritedSymbolFinder {
 
   private InheritedSymbolFinder() {}
 
+  // Needed for obtaining instances of utility classes Types and Elements.
+  // TODO: make methods non-static and pass source to constructor instead
   public static void setSource(Source source) {
     if (InheritedSymbolFinder.source != source) {
       InheritedSymbolFinder.source = source;
@@ -110,6 +112,7 @@ public class InheritedSymbolFinder {
     return names;
   }
 
+  // is ownerType an ancestor of csym?
   private static boolean inHierarchy(Type ownerType,
       Symbol.ClassSymbol csym) {
     for (Type type = csym.type;
@@ -120,27 +123,8 @@ public class InheritedSymbolFinder {
     return false;
   }
 
-//  private static boolean isSuperclassOf(Types types,
-//      Type.ClassType ownerType, Type.ClassType classType) {
-//    Type type = classType.supertype_field;
-//    while (type != null && type.getTag() == TypeTag.CLASS) {
-//      if (types.isSameType(type, ownerType)) { return true; }
-//      type = ((Type.ClassType) type).supertype_field;
-//    }
-//    return false;
-//  }
-//
-//  private static boolean encloses(Types types,
-//      Type.ClassType sup, Type.ClassType sub) {
-//    Type type = sub.supertype_field;
-//    while (type != null && type.getTag() == TypeTag.CLASS) {
-//      if (types.isSameType(type, sup)) { return true; }
-//      type = ((Type.ClassType) type).getEnclosingType();
-//    }
-//    return false;
-//  }
-
-   private static String removeJVMReturnType(String methodDescriptor) {
+  // take return type off end of JVML method spec
+  private static String removeJVMReturnType(String methodDescriptor) {
     int ix = methodDescriptor.lastIndexOf(')');
     return ix > 0 ? methodDescriptor.substring(0, ix+1) : null;
   }
