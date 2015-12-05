@@ -188,8 +188,9 @@ public class AnnotationsTest extends TestCase {
           new FileInputStream(oldFileName),
           new FileOutputStream(newFileName),
           overwrite);
-    } catch(Exception e) {
-      System.err.println("caught exception: ");
+    } catch (Throwable e) {
+      System.err.printf("caught exception in writeClass(%s, %s, ...): %n",
+                        oldFileName, newFileName);
       e.printStackTrace();
       fail();
     }
