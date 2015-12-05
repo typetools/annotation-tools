@@ -36,11 +36,11 @@ import com.sun.tools.javac.model.JavacElements;
 public class InheritedSymbolFinder {
   private static Source source = null;
 
-  // class name -> method index
+  // class (flat) name -> method index
   private static Map<String, Multimap<String, ExecutableElement>> cache =
       new TreeMap<String, Multimap<String, ExecutableElement>>();
 
-  // keys: class (flat) name + ':' + method (simple) name
+  // keys: class (flat) name
   // values: multimap of method (simple) name to matching method elems
   private static Map<String, Multimap<String, ExecutableElement>> cash =
       new HashMap<String, Multimap<String, ExecutableElement>>();
