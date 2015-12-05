@@ -13,6 +13,8 @@ class InheritedMethod:
         receiver: @C
 
 class InheritedMethod$Sub:
+method f(Ljava/lang/Integer;)Ljava/lang/Integer;:
+    return: @B
 method g([Ljava/lang/String;I)[I: @A
     return: @C
         inner-type 0, 0: @B
