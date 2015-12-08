@@ -1,6 +1,7 @@
 package annotator.find;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.LinkedHashSet;
@@ -120,18 +121,7 @@ public class MethodInsertion extends Insertion {
             packageNames.addAll(i.getPackageNames());
           }
         }
-        for (Insertion i : returnTypeInsertions) {
-          if (i.getKind() == Insertion.Kind.ANNOTATION) {
-            String[] a = i.getText(comments, abbreviate)
-                .toString().split(" ");
-            for (int j = 0; j < a.length; j++) {
-              if (!rt.getAnnotations().contains(a[j])) {
-                rt.addAnnotation(a[j]);
-              }
-            }
-          }
-        }
-        decorateType(innerTypeInsertions, rt);
+        decorateType(returnTypeInsertions, rt, comments, abbreviate);
         b.append(nl).append("public ");  // FIXME: use mods from impl class
         //for (Insertion i : declarationInsertions) {
         //  b.append(i.getText(commentAnnotation, abbreviate)).append(
@@ -161,17 +151,14 @@ public class MethodInsertion extends Insertion {
         List<Type> paramTypes = paramTypes(paramString);
         Iterator<Type> iter = paramTypes.iterator();
         if (iter.hasNext()) {
-          String s = typeToString(iter.next(), commentAnnotation, true);
-          if (parameterInsertions.containsKey(i)) {
-            Set<Insertion> pins = parameterInsertions.get(i);
-            for (Insertion pin : pins) {
-              b.append(pin.getText(comments, abbreviate)).append(" ");
-            }
-          }
-          b.append(s).append(" arg").append(i++);
+          String s = paramText(iter.next(), i++,
+              commentAnnotation, abbreviate);
+          if (receiverInsertion != null) { b.append(' '); }  // after ','
+          b.append(s);
           while (iter.hasNext()) {
-            s = typeToString(iter.next(), commentAnnotation, true);
-            b.append(", ").append(s).append(" arg").append(i++);
+            s = paramText(iter.next(), i++,
+                commentAnnotation, abbreviate);
+            b.append(", ").append(s);
           }
         }
         b.append(") { ");
@@ -185,6 +172,39 @@ public class MethodInsertion extends Insertion {
       }
       return b.toString();
     }
+  }
+
+  private void decorateType(Collection<Insertion> insertions, Type type,
+      boolean comments, boolean abbreviate) {
+    for (Insertion i : insertions) {
+      if (i.getKind() == Insertion.Kind.ANNOTATION) {
+        String[] a = i.getText(comments, abbreviate)
+            .toString().split(" ");
+        List<Insertion> innerInsertions = i.getInnerTypeInsertions();
+        for (int j = 0; j < a.length; j++) {
+          if (!type.getAnnotations().contains(a[j])) {
+            type.addAnnotation(a[j]);
+          }
+        }
+        if (innerInsertions != null) {
+          innerTypeInsertions.addAll(innerInsertions);
+        }
+      }
+    }
+    decorateType(innerTypeInsertions, type);
+    innerTypeInsertions.clear();  // used as local var.
+  }
+
+  private String paramText(Type type, int i,
+      boolean comments, boolean abbreviate) {
+    StringBuffer b = new StringBuffer();
+    if (parameterInsertions.containsKey(i)) {
+      Set<Insertion> pins = parameterInsertions.get(i);
+      decorateType(pins, type, comments, abbreviate);
+    }
+    b.append(typeToString(type, comments, abbreviate));
+    b.append(" arg").append(i);
+    return b.toString();
   }
 
   // read types from JVML string

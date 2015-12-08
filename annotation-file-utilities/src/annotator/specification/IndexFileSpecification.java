@@ -388,7 +388,7 @@ public class IndexFileSpecification implements Specification {
       int pp = criteria.getParamPos();
       if (pp >= 0 || criteria.isOnReturnType()) {  // subordinate to MethodIns.
         Insertion ins = new AnnotationInsertion(annotationString, criteria,
-            isDeclarationAnnotation/*, innerTypeInsertions*/);
+            isDeclarationAnnotation, innerTypeInsertions);
         elementInsertions.add(ins);
         annotationInsertions.add(ins);
         addInsertionSource(ins, annotation);
@@ -546,7 +546,8 @@ public class IndexFileSpecification implements Specification {
         && isOnMethodOrConstructor(criteria);
   }
 
-  // are these criteria for a method declaration (inclusive of constructors)?
+  // are these criteria for a method declaration (inclusive of
+  // non-nullary constructors)?
   private static boolean isOnMethodDeclaration(Criteria criteria) {
     return !criteria.isOnMethod("<init>()V")
         && criteria.isOnMethodDeclaration()
