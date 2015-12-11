@@ -2,19 +2,20 @@ language: java
 
 script: ./.travis-build.sh
 
+sudo: false
+
+jdk:
+  - oraclejdk8
+#  - oraclejdk7
+  - openjdk7
+
+notifications:
+  email:
+    - annotation-tools-dev@googlegroups.com
+
 after_success:
   - echo Triggering build of typetools/checker-framework
   - curl -s https://raw.githubusercontent.com/mernst/plume-lib/master/bin/trigger-travis.sh > trigger-travis.sh  
   - bash trigger-travis.sh typetools checker-framework $TRAVISTOKEN
   - rm trigger-travis.sh  
 
-sudo: false
-
-jdk:
-  - oraclejdk8
-  - oraclejdk7
-  - openjdk7
-
-notifications:
-  email:
-    - annotation-tools-dev@googlegroups.com
