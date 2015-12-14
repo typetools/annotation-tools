@@ -252,7 +252,7 @@
 
     <exec executable="git" failonerror="true">
       <arg value="clone" />
-      <arg value="." />
+      <arg value="${annotation-tools}" />
       <arg value="${temp-annotation-tools}" />
     </exec>
     <delete dir="${temp-annotation-tools}/scene-lib.orig-hand-annos" />
