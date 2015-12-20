@@ -84,8 +84,8 @@ public abstract class Insertion {
     /**
      * Creates a new insertion.
      *
+     * @param type type to be generated, if applicable
      * @param criteria where to insert the text
-     * @param separateLine whether to insert the text on its own
      * @param innerTypeInsertions insertions to go on inner parts of type
      */
     public Insertion(Type type, Criteria criteria,

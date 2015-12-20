@@ -251,7 +251,7 @@ public class MethodInsertion extends Insertion {
   /**
    * Adds a subordinate receiver insertion.
    *
-   * @param i subordinate insertion to be added
+   * @param recv subordinate insertion to be added
    */
   public void addReceiverInsertion(ReceiverInsertion recv) {
     if (receiverInsertion == null) {
@@ -302,7 +302,8 @@ public class MethodInsertion extends Insertion {
   /**
    * Adds a subordinate method parameter insertion.
    *
-   * @param i subordinate insertion to be added
+   * @param ins subordinate insertion to be added
+   * @param ix 0-based parameter index
    */
   public void addParameterInsertion(Insertion ins, int ix) {
     Set<Insertion> pins = parameterInsertions.get(ix);
@@ -323,7 +324,7 @@ public class MethodInsertion extends Insertion {
   /**
    * Adds a subordinate method declaration insertion.
    *
-   * @param i subordinate insertion to be added
+   * @param ins subordinate insertion to be added
    */
   public void addDeclarationInsertion(Insertion ins) {
     declarationInsertions.add(ins);
