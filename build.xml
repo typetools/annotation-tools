@@ -8,8 +8,8 @@
     <property name="scene-lib" location="scene-lib"/>
     <property name="afu" location="annotation-file-utilities"/>
 
-    <target name="all" description="Compile and tests"
-	depends="compile,test"/>
+    <target name="all" description="Compile, run Javadoc, and run tests"
+	depends="compile,javadoc,test"/>
 
     <target name="compile" description="Compile all annotation tools"
         depends="compile-all"/>

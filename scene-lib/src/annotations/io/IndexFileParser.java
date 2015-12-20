@@ -26,14 +26,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import plume.ArraysMDE;
-import plume.FileIOException;
-import plume.Pair;
-import type.ArrayType;
-import type.BoundedType;
-import type.BoundedType.BoundKind;
-import type.DeclaredType;
-import type.Type;
+import com.sun.source.tree.Tree.Kind;
+import com.sun.tools.javac.code.TypeAnnotationPosition;
+
 import annotations.Annotation;
 import annotations.AnnotationBuilder;
 import annotations.AnnotationFactory;
@@ -65,8 +60,15 @@ import annotations.field.EnumAFT;
 import annotations.field.ScalarAFT;
 import annotations.util.coll.VivifyingMap;
 
-import com.sun.source.tree.Tree.Kind;
-import com.sun.tools.javac.code.TypeAnnotationPosition;
+import plume.ArraysMDE;
+import plume.FileIOException;
+import plume.Pair;
+
+import type.ArrayType;
+import type.BoundedType;
+import type.BoundedType.BoundKind;
+import type.DeclaredType;
+import type.Type;
 
 /**
  * IndexFileParser provides static methods
@@ -1161,46 +1163,40 @@ public final class IndexFileParser {
     // an ASTPath corresponds to an AST node.  This method restores the
     // invariant by separating out the inner type information.
     private Pair<ASTPath, InnerTypeLocation> splitNewArrayType(ASTPath astPath) {
-      	ASTPath outerPath = astPath;
-      	InnerTypeLocation loc = null;
-      	int last = astPath.size()-1;
+        ASTPath outerPath = astPath;
+        InnerTypeLocation loc = null;
+        int last = astPath.size() - 1;
 
-      	if (last > 0) {
-        		ASTPath.ASTEntry entry = astPath.get(last);
-        		if (entry.getTreeKind() == Kind.NEW_ARRAY
-            				&& entry.childSelectorIs(ASTPath.TYPE)) {
-          			int a = entry.getArgument();
-          			if (a > 0) {
-            				outerPath = astPath.getParentPath().extend(
-            						new ASTPath.ASTEntry(Kind.NEW_ARRAY, ASTPath.TYPE, 0));
-            loc = new InnerTypeLocation(TypeAnnotationPosition
-                		.getTypePathFromBinary(Collections.nCopies(2*a, 0)));
-          			}
-        		}
-      	}
+        if (last > 0) {
+            ASTPath.ASTEntry entry = astPath.get(last);
+            if (entry.getTreeKind() == Kind.NEW_ARRAY && entry.childSelectorIs(ASTPath.TYPE)) {
+                int a = entry.getArgument();
+                if (a > 0) {
+                    outerPath = astPath.getParentPath().extend(new ASTPath.ASTEntry(Kind.NEW_ARRAY, ASTPath.TYPE, 0));
+            loc = new InnerTypeLocation(TypeAnnotationPosition.getTypePathFromBinary(Collections.nCopies(2 * a, 0)));
+                }
+            }
+        }
 
-      	return Pair.of(outerPath, loc);
+        return Pair.of(outerPath, loc);
     }
 
     private ASTPath fixNewArrayType(ASTPath astPath) {
-      	ASTPath outerPath = astPath;
-      	int last = astPath.size()-1;
+        ASTPath outerPath = astPath;
+        int last = astPath.size() - 1;
 
-      	if (last > 0) {
-        		ASTPath.ASTEntry entry = astPath.get(last);
-        		if (entry.getTreeKind() == Kind.NEW_ARRAY
-            				&& entry.childSelectorIs(ASTPath.TYPE)) {
-          			int a = entry.getArgument();
-          			outerPath = astPath.getParentPath().extend(
-              			new ASTPath.ASTEntry(Kind.NEW_ARRAY, ASTPath.TYPE, 0));
-          			while (--a >= 0) {
-            				outerPath = outerPath.extend(
-                				new ASTPath.ASTEntry(Kind.ARRAY_TYPE, ASTPath.TYPE));
-          			}
-        		}
-      	}
+        if (last > 0) {
+            ASTPath.ASTEntry entry = astPath.get(last);
+            if (entry.getTreeKind() == Kind.NEW_ARRAY && entry.childSelectorIs(ASTPath.TYPE)) {
+                int a = entry.getArgument();
+                outerPath = astPath.getParentPath().extend(new ASTPath.ASTEntry(Kind.NEW_ARRAY, ASTPath.TYPE, 0));
+                while (--a >= 0) {
+                    outerPath = outerPath.extend(new ASTPath.ASTEntry(Kind.ARRAY_TYPE, ASTPath.TYPE));
+                }
+            }
+        }
 
-      	return outerPath;
+        return outerPath;
     }
 
     /**

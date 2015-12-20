@@ -279,6 +279,13 @@ public abstract class Insertion {
         return null;
     }
 
+    /**
+     * Indicates whether inserted text should consist <em>only</em> of
+     *  the indicated annotations.  Useful when subordinate insertions
+     *  have already been added.
+     *
+     * @param annotationsOnly
+     */
     public void setAnnotationsOnly(boolean annotationsOnly) {
         this.annotationsOnly = annotationsOnly;
     }
@@ -478,6 +485,20 @@ public abstract class Insertion {
         decorateType(innerTypeInsertions, outerType, null);
     }
 
+    /**
+     * Adds each of the given inner type insertions to the correct part of the
+     * type, based on the insertion's type path.
+     *
+     * @param innerTypeInsertions
+     *          The insertions to add to the type. These must be inner type
+     *          insertions, meaning each of the insertions' {@link Criteria}
+     *          must contain a {@link GenericArrayLocationCriterion} and
+     *          {@link GenericArrayLocationCriterion#getLocation()} must return
+     *          a non-empty list.
+     * @param outerType The type to add the insertions to.
+     * @param outerPath The portion of the AST path that leads to the
+     *          outer type.
+     */
     public static void decorateType(List<Insertion> innerTypeInsertions,
             final Type outerType, ASTPath outerPath) {
         for (Insertion innerInsertion : innerTypeInsertions) {
@@ -570,9 +591,9 @@ public abstract class Insertion {
         }
     }
 
+    // auxiliary for previous method
     private static void decorateType(ASTPath astPath,
             String annos, Type type, ASTPath outerPath) {
-        //type.addAnnotation(annos);  // TODO
         Iterator<ASTPath.ASTEntry> ii = astPath.iterator();
         Iterator<ASTPath.ASTEntry> oi = outerPath.iterator();
 

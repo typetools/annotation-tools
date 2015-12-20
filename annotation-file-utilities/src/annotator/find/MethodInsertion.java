@@ -17,6 +17,12 @@ import type.ArrayType;
 import type.DeclaredType;
 import type.Type;
 
+/**
+ * An {@link Insertion} specified for a method header.  Inserting
+ *  includes generating inherited methods where appropriate.
+ *
+ * @author dbro
+ */
 public class MethodInsertion extends Insertion {
   final String methodName;
   final boolean isDefCon;  // default (nullary) constructor?
@@ -174,8 +180,11 @@ public class MethodInsertion extends Insertion {
     }
   }
 
-  private void decorateType(Collection<Insertion> insertions, Type type,
-      boolean comments, boolean abbreviate) {
+  // Annotates inner types of return type and method parameter types.
+  // See also methods with same name in superclass (Insertion).
+  private static void decorateType(Collection<Insertion> insertions,
+      Type type, boolean comments, boolean abbreviate) {
+    List<Insertion> innerTypeInsertions = new ArrayList<Insertion>();
     for (Insertion i : insertions) {
       if (i.getKind() == Insertion.Kind.ANNOTATION) {
         String[] a = i.getText(comments, abbreviate)
@@ -186,9 +195,7 @@ public class MethodInsertion extends Insertion {
             type.addAnnotation(a[j]);
           }
         }
-        if (innerInsertions != null) {
-          innerTypeInsertions.addAll(innerInsertions);
-        }
+        innerTypeInsertions.addAll(innerInsertions);
       }
     }
     decorateType(innerTypeInsertions, type);
