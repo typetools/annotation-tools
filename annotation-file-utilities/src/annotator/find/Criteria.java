@@ -136,6 +136,12 @@ public final class Criteria {
     return false;
   }
 
+  /**
+   * Gives the index of the indicated parameter, if any.
+   *
+   * @return the zero-based index of the parameter, or -1 if this
+   *          contains no such information
+   */
   public int getParamPos() {
     for (Criterion c : criteria.values()) {
       if (c.getKind() == Criterion.Kind.PARAM) {
@@ -479,6 +485,9 @@ public final class Criteria {
     return new InClassCriterion(name, /*exactmatch=*/ true);
   }
 
+  /**
+   * @see #inMethod(String, boolean)
+   */
   @Deprecated
   public final static Criterion inMethod(String varName) {
     return new InMethodCriterion(varName);
@@ -519,11 +528,23 @@ public final class Criteria {
     return new GenericArrayLocationCriterion(loc);
   }
 
+  /**
+   * @see #inField(String, boolean)
+   */
   @Deprecated
   public final static Criterion field(String varName) {
     return new FieldCriterion(varName);
   }
 
+  /**
+   * Creates an "in field" criterion: that a program element is enclosed
+   * by the specified field declaration or initializer.
+   *
+   * @param name the name of the field
+   * @param isDeclaration whether annotation applies to a declaration
+   *         (i.e., is not a type annotation)
+   * @return an "in field" criterion
+   */
   public final static Criterion field(String varName, boolean isOnDeclaration) {
     return new FieldCriterion(varName, isOnDeclaration);
   }
@@ -551,6 +572,7 @@ public final class Criteria {
   public final static Criterion isSigMethod(String methodName) {
     return new IsSigMethodCriterion(methodName);
   }
+
 
   public final static Criterion param(String methodName, Integer pos) {
     return new ParamCriterion(methodName, pos);
