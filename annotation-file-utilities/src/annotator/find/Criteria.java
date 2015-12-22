@@ -529,7 +529,7 @@ public final class Criteria {
   }
 
   /**
-   * @see #inField(String, boolean)
+   * @see #field(String, boolean)
    */
   @Deprecated
   public final static Criterion field(String varName) {
@@ -540,8 +540,8 @@ public final class Criteria {
    * Creates an "in field" criterion: that a program element is enclosed
    * by the specified field declaration or initializer.
    *
-   * @param name the name of the field
-   * @param isDeclaration whether annotation applies to a declaration
+   * @param varName the name of the field
+   * @param isOnDeclaration whether annotation applies to a declaration
    *         (i.e., is not a type annotation)
    * @return an "in field" criterion
    */
