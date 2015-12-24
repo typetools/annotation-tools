@@ -13,18 +13,32 @@ import java.util.*;
 import java.util.regex.*;
 import java.net.URL;
 
-/*>>>
-import org.checkerframework.checker.initialization.qual.*;
-import org.checkerframework.checker.nullness.qual.*;
-import org.checkerframework.checker.regex.qual.*;
-import org.checkerframework.dataflow.qual.*;
-*/
-
 // annotation-tools note:
 // Running insert-annotations-to-source on this code from plume-lib
 // revealed a bug in annotations.io.classfile.CodeOffsetVisitor.
 // Makefile now includes plume-lib in its classpath (via 
-// annotation-file-utilities.jar) so this test can be compiled.
+// annotation-file-utilities.jar) so this test can be compiled.  The
+// following stub definitions for annotations eliminate the original
+// code's Checker Framework dependency.
+
+import java.lang.annotation.Target;
+import static java.lang.annotation.ElementType.TYPE_USE;
+
+@interface EnsuresNonNull { String value(); }
+@interface Initialized {}
+@Target({TYPE_USE})
+@interface NonNull {}
+@Target({TYPE_USE})
+@interface Nullable {}
+@interface Pure {}
+@Target({TYPE_USE})
+@interface Raw {}
+@Target({TYPE_USE})
+@interface Regex { int value() default 0; }
+@interface RequiresNonNull { String value(); }
+@interface SideEffectFree {}
+@Target({TYPE_USE})
+@interface UnknownInitialization {}
 
 // A related program is the "mr" program (http://kitenet.net/~joey/code/mr/).
 // To read its documentation:  pod2man mr | nroff -man
