@@ -156,7 +156,7 @@
       <uptodate property="scene-lib.bin.uptodate" targetfile="annotation-file-utilities.jar">
         <srcfiles dir="${scene-lib}/bin" excludes="annotations-expected/**,annotations/tests/**"/>
       </uptodate>
-      <uptodate property="annotations-compiler.uptodate" targetfile="annotation-file-utilities.jar" srcfile="${annotations-compiler}/dist/lib/javac.jar"/>
+      <uptodate property="annotations-compiler.uptodate" targetfile="annotation-file-utilities.jar" srcfile="${annotations-compiler}/dist/lib/java.compiler.jar"/>
       <uptodate property="plume.uptodate" targetfile="annotation-file-utilities.jar" srcfile="lib/plume.jar"/>
       <uptodate property="google-collect.uptodate" targetfile="annotation-file-utilities.jar" srcfile="lib/guava-15.0.jar"/>
 
@@ -209,7 +209,13 @@
         <exclude name="META-INF/" />
       </patternset>
     </unjar>
-    <unjar src="${annotations-compiler}/dist/lib/javac.jar" dest="${temp-jarfile}">
+    <unjar src="${annotations-compiler}/dist/lib/java.compiler.jar" dest="${temp-jarfile}">
+      <patternset>
+        <include name="**/*.class"/>
+        <exclude name="META-INF/" />
+      </patternset>
+    </unjar>
+    <unjar src="${annotations-compiler}/dist/lib/jdk.compiler.jar" dest="${temp-jarfile}">
       <patternset>
         <include name="**/*.class"/>
         <exclude name="META-INF/" />
