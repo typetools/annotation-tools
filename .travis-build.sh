@@ -1,10 +1,8 @@
 #!/bin/bash
-ROOT=$TRAVIS_BUILD_DIR/..
-cd $ROOT
-hg clone https://bitbucket.org/typetools/jsr308-langtools
-cd jsr308-langtools/
-./.travis-build.sh
 
-cd $ROOT/annotation-tools
-ant clean
+# Fail the whole script if any command fails
+set -e
+
+./.travis-build-without-test.sh
+
 ant all

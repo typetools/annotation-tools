@@ -24,7 +24,7 @@
     -->
 
     <target name="checkout-jsr308-langtools" depends="init">
-        <exec dir="${builddir}" executable="hg">
+        <exec dir="${builddir}" executable="hg" failonerror="true">
             <arg value="clone"/>
             <arg value="https://bitbucket.org/typetools/jsr308-langtools"/>
             <arg value="jsr308-langtools"/>
@@ -32,7 +32,7 @@
     </target>
     
     <target name="checkout-annotation-tools" depends="init">
-        <exec dir="${builddir}" executable="git">
+        <exec dir="${builddir}" executable="git" failonerror="true">
             <arg value="clone"/>
             <arg value="https://github.com/typetools/annotation-tools.git"/>
             <arg value="annotation-tools"/>
@@ -40,7 +40,7 @@
     </target>
     
     <target name="checkout-checker-framework" depends="init">
-        <exec dir="${builddir}" executable="git">
+        <exec dir="${builddir}" executable="git" failonerror="true">
             <arg value="clone"/>
             <arg value="https://github.com/typetools/checker-framework.git"/>
             <arg value="checker-framework"/>
@@ -48,7 +48,7 @@
     </target>
     
     <target name="checkout-javarifier" depends="init">
-        <exec dir="${builddir}" executable="git">
+        <exec dir="${builddir}" executable="git" failonerror="true">
             <arg value="clone"/>
             <arg value="https://github.com/typetools/javarifier.git"/>
             <arg value="javarifier"/>
@@ -122,7 +122,7 @@
     <!-- Runs the tests on the annotator - the index file to source code tool
         of the annotation file utilities. -->
     <target name="test-annotator" depends="build-annotator">
-        <exec dir="${annotator}/tests" executable="make"
+        <exec dir="${annotator}/tests" executable="make" failonerror="true"
             output="./reports/test-annotator.result">
             <arg value="all"/>
         </exec>
@@ -131,7 +131,7 @@
     <!-- Runs the tests on the javarifier, including the unit tests, jolden
          and the annotation scene library. -->
     <target name="test-javarifier" depends="build-javarifier">
-        <exec dir="${javarifier}/tests" executable="make"
+        <exec dir="${javarifier}/tests" executable="make" failonerror="true"
             output="./reports/test-javarifier.result">
             <arg value="all"/>
         </exec>

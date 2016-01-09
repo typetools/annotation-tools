@@ -235,7 +235,7 @@
   </target>
 
   <target name="check-git-status" depends="init-properties">
-    <exec executable="git"
+    <exec executable="git" failonerror="true"
           outputproperty="status.output">
       <arg value="status" />
     </exec>
@@ -256,9 +256,9 @@
   <target name="update-workspace" depends="init-properties">
     <delete dir="${temp-annotation-tools}" />
 
-    <exec executable="git">
+    <exec executable="git" failonerror="true">
       <arg value="clone" />
-      <arg value="." />
+      <arg value="${annotation-tools}" />
       <arg value="${temp-annotation-tools}" />
     </exec>
     <delete dir="${temp-annotation-tools}/scene-lib.orig-hand-annos" />
@@ -365,10 +365,12 @@
 
     <fail unless="deploy-dir" message="You must specify a deploy-dir, the live site deploy-dir=/cse/www2/types/annotation-file-utilities/releases/_version num_"/>
 
+    <fail unless="afu.version" message="You must specify an afu.version, such as 3.6.22"/>
+
     <echo message="Export location: ${deploy-dir}"/>
     <echo message="Copying annotation-tools.zip"/>
     <copy file="annotation-tools.zip"
-      todir="${deploy-dir}"/>
+      tofile="${deploy-dir}/annotation-tools-${afu.version}.zip"/>
 
     <echo message="Copying annotation-file-utilities.html"/>
     <copy file="annotation-file-utilities.html"
@@ -404,7 +406,7 @@
     <delete file="annotation-file-format.log"/>
     <delete file="annotation-file-format.pdf"/>
     <delete file="annotation-file-format.toc"/>
-    <exec executable="make">
+    <exec executable="make" failonerror="true">
       <arg value="-C"/>
       <arg value="figures"/>
       <arg value="clean"/>
@@ -418,26 +420,26 @@
     the document, perhaps.  -->
   <target name="annotation-file-format"
           description="Make documentation: annotation-file-format.{html,pdf}">
-    <exec executable="make">
+    <exec executable="make" failonerror="true">
       <arg value="-C"/>
       <arg value="figures"/>
     </exec>
-    <exec executable="latex">
+    <exec executable="latex" failonerror="true">
       <arg value="annotation-file-format.tex"/>
     </exec>
-    <exec executable="bibtex">
+    <exec executable="bibtex" failonerror="true">
       <arg value="annotation-file-format"/>
     </exec>
-    <exec executable="latex">
+    <exec executable="latex" failonerror="true">
       <arg value="annotation-file-format.tex"/>
     </exec>
-    <exec executable="latex">
+    <exec executable="latex" failonerror="true">
       <arg value="annotation-file-format.tex"/>
     </exec>
-    <exec executable="pdflatex">
+    <exec executable="pdflatex" failonerror="true">
       <arg value="annotation-file-format.tex"/>
     </exec>
-    <exec executable="hevea">
+    <exec executable="hevea" failonerror="true">
       <arg value="-fix"/>
       <arg value="-exec"/>
       <arg value="xxdate.exe"/>
@@ -562,8 +564,8 @@
   <target name="etags" depends="tags">
   </target>
   <target name="tags"
-          description="create Emacs TAGS table, including scene library files">
-    <exec executable="/bin/sh">
+          description="create Emacs TAGS table, including scene-lib files">
+    <exec executable="/bin/sh" failonerror="true">
       <arg value="-c"/>
       <arg value="etags `find src -name '*.java' | sort-directory-order` `find ../scene-lib -name '*.java' | sort-directory-order`"/>
     </exec>
