@@ -95,7 +95,9 @@ public class ASTPathCriterion implements Criterion {
     /** {@inheritDoc} */
     @Override
     public boolean isSatisfiedBy(TreePath path) {
-        if (path == null || astPath.isEmpty()) { return false; }
+        if (path == null || astPath.isEmpty()) {
+            return false;
+        }
 
         // actualPath stores the path through the source code AST to this
         // location (specified by the "path" parameter to this method). It is
