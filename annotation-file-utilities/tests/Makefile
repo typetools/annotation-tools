@@ -15,6 +15,7 @@
 #   JAVA=${JAVA_HOME}/bin/java
 #   JAVAC=${JAVA_HOME}/bin/javac
 JAVA?=java -ea
+JAVAC?=javac
 XJAVAC?=javac
 
 export SHELL=/bin/bash -o pipefail
@@ -53,7 +54,7 @@ results: bin/VerifyDiffs.class
 
 # Remakes the little java program that checks and compares diffs
 bin/VerifyDiffs.class : VerifyDiffs.java
-	@$(XJAVAC) -g -cp ../bincompile -d bin VerifyDiffs.java
+	@$(JAVAC) -g -cp ../bincompile -d bin VerifyDiffs.java
 
 # Compiles all the test cases (be verbose about this).
 compile :
