@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -545,8 +546,6 @@ public class Main {
     Insertions insertions = new Insertions();
     // The Java files into which to insert.
     List<String> javafiles = new ArrayList<String>();
-    // Imports required to resolve annotations (when abbreviate==true).
-    Set<String> imports = new LinkedHashSet<String>();
 
     // Indices to maintain insertion source traces. 
     Map<String, Multimap<Insertion, Annotation>> insertionIndex =
@@ -584,13 +583,6 @@ public class Main {
                   LinkedHashMultimap.<Insertion, Annotation>create());
             }
             insertionIndex.get(arg).putAll(spec.insertionSources());
-          }
-          if (abbreviate) {
-            Map<String, Set<String>> annotationImports =
-                spec.annotationImports();
-            for (Set<String> set : annotationImports.values()) {
-              imports.addAll(set);
-            }
           }
           both.debug("Read %d annotations from %s%n", parsedSpec.size(), arg);
           if (omit_annotation != null) {
@@ -684,6 +676,8 @@ public class Main {
         return;
       }
 
+      // Imports required to resolve annotations (when abbreviate==true).
+      LinkedHashSet<String> imports = new LinkedHashSet<String>();
       int num_insertions = 0;
       String pkg = "";
 
@@ -839,14 +833,8 @@ public class Main {
 
             String toInsert = iToInsert.getText(comments, abbreviate,
                 gotSeparateLine, pos, precedingChar) + trailingWhitespace;
-            Set<String> packageNames = iToInsert.getPackageNames();
             if (seen.contains(toInsert)) { continue; }  // eliminate duplicates
             seen.add(toInsert);
-            if (!packageNames.isEmpty()) {
-              dbug.debug("Need import %s%n  due to insertion %s%n",
-                  packageNames, toInsert);
-              imports.addAll(packageNames);
-            }
 
             // If it's already there, don't re-insert.  This is a hack!
             // Also, I think this is already checked when constructing the
@@ -880,6 +868,13 @@ public class Main {
               }
             }
             dbug.debug("Post-insertion source: %n" + src.getString());
+
+            Set<String> packageNames = iToInsert.getPackageNames();
+            if (!packageNames.isEmpty()) {
+              dbug.debug("Need import %s%n  due to insertion %s%n",
+                  packageNames, toInsert);
+              imports.addAll(packageNames);
+            }
           }
         }
       }
@@ -898,12 +893,6 @@ public class Main {
           }
         }
         return;  // done with conversion
-      }
-
-      if (verbose) {
-        if ((num_insertions % 50) != 0) {
-          System.out.println();   // terminate the line that contains dots
-        }
       }
 
       if (dbug.isEnabled()) {
