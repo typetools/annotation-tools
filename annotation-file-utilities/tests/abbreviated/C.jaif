@@ -1,0 +1,10 @@
+package org.checkerframework.checker.nullness.qual:
+annotation @Nullable:
+
+package :
+class C1:
+    method foo(Ljava/lang/Object;)Lplume/C1;:
+        return:
+        parameter #0:
+            type: @org.checkerframework.checker.nullness.qual.Nullable
+
