@@ -1,0 +1,6 @@
+import org.checkerframework.checker.nullness.qual.Nullable;
+public class C1<T extends Object> {
+  public <A extends Object> C1<A> foo(@Nullable A a) {
+      return null;
+  }
+}
