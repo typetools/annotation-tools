@@ -8,6 +8,8 @@ import org.checkerframework.checker.javari.qual.*;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.common.escape.SourceCodeEscapers;
+
 /**
  * A <code>BasicAFT</code> represents a primitive or {@link String} annotation
  * field type. Get one using {@link #forType(Class)}.
@@ -91,7 +93,9 @@ public final /*@ReadOnly*/ class BasicAFT extends ScalarAFT {
     @Override
     public String format(Object o) {
         if (type == String.class) {
-            return "\"" + (String)o + "\"";
+            return "\""
+                + SourceCodeEscapers.javaCharEscaper().escape((String)o)
+                + "\"";
         } else {
             return o.toString();
         }
