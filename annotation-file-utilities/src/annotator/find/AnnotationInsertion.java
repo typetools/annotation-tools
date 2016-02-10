@@ -24,7 +24,7 @@ public class AnnotationInsertion extends Insertion {
      *
      * @param annotation the annotation to insert
      * @param criteria where to insert the annotation
-     * @param separateLine whether to insert the annotation on its own
+     * @param separateLine whether to insert the annotation on its own line
      * @param innerTypeInsertions subordinate insertions applicable to
      *         components of the type to which the annotation is to be
      *         added

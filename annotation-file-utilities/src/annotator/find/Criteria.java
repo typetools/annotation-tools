@@ -114,9 +114,11 @@ public final class Criteria {
   }
 
   /**
-   * Determines whether this is the criteria on a parameter.
+   * Determines whether this is the criteria on a formal parameter,
+   * but not the receiver.
    *
-   * @return true iff this is the criteria on a parameter
+   * @return true iff this is the criteria on a formal parameter,
+   * but not the receiver
    */
   public boolean isOnParameter() {
     ASTPath astPath = getASTPath();
@@ -137,7 +139,8 @@ public final class Criteria {
   }
 
   /**
-   * Gives the index of the indicated parameter, if any.
+   * Gives the index of the indicated formal parameter, if any.
+   * Does not work for the receiver formal parameter.
    *
    * @return the zero-based index of the parameter, or -1 if this
    *          contains no such information
@@ -298,7 +301,8 @@ public final class Criteria {
   /**
    * Gives the AST path specified in the criteria, if any.
    *
-   * @return AST path from {@link ASTPathCriterion}, or null if none present
+   * @return AST path from an {@link ASTPathCriterion},
+   * or null if no criterion in this is an ASTPathCriterion
    */
   public ASTPath getASTPath() {
     for (Criterion c : criteria.values()) {
