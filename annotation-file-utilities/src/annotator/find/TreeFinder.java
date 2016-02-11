@@ -1538,7 +1538,15 @@ loop:
         } else if (n.getKind() == Tree.Kind.PARAMETERIZED_TYPE) {
           // If we pass through a parameterized type, stop, otherwise we
           // mix up annotations on the outer type.
-          // TODO: is something similar needed for Arrays?
+          break;
+        } else if (n.getKind() == Tree.Kind.ARRAY_TYPE) {
+          Tree type = ((ArrayTypeTree) n).getType();
+          if (type.getKind() == Tree.Kind.ANNOTATED_TYPE) {
+            alreadyPresent = ((AnnotatedTypeTree) type).getAnnotations();
+          }
+          break;
+        } else if (n.getKind() == Tree.Kind.ANNOTATED_TYPE) {
+          alreadyPresent = ((AnnotatedTypeTree) n).getAnnotations();
           break;
         }
         // TODO: don't add cast insertion if it's already present.
