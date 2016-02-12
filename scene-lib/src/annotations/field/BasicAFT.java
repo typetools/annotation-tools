@@ -8,7 +8,8 @@ import org.checkerframework.checker.javari.qual.*;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.google.common.escape.SourceCodeEscapers;
+import com.google.common.escape.CharEscaperBuilder;
+import com.google.common.escape.Escaper;
 
 /**
  * A <code>BasicAFT</code> represents a primitive or {@link String} annotation
@@ -16,6 +17,17 @@ import com.google.common.escape.SourceCodeEscapers;
  */
 // should be an enum except they can't be generic and can't extend a class
 public final /*@ReadOnly*/ class BasicAFT extends ScalarAFT {
+    static final Escaper charEscaper =
+        new CharEscaperBuilder()
+            .addEscape('\b', "\\b")
+            .addEscape('\f', "\\f")
+            .addEscape('\n', "\\n")
+            .addEscape('\r', "\\r")
+            .addEscape('\t', "\\t")
+            .addEscape('\"', "\\\"")
+            .addEscape('\\', "\\\\")
+            .addEscape('\'', "\\'")
+            .toEscaper();
 
     /**
      * The Java type backing this annotation field type.
@@ -92,13 +104,8 @@ public final /*@ReadOnly*/ class BasicAFT extends ScalarAFT {
      */
     @Override
     public String format(Object o) {
-        if (type == String.class) {
-            return "\""
-                + SourceCodeEscapers.javaCharEscaper().escape((String)o)
-                + "\"";
-        } else {
-            return o.toString();
-        }
+      return type != String.class ? o.toString()
+          : "\"" + charEscaper.escape((String) o) + "\"";
     }
 
     @Override

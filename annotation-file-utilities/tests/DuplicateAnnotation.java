@@ -22,4 +22,9 @@ public class DuplicateAnnotation {
     @SuppressWarnings("F")
     Object o = new Object();
   }
+
+  int /*@annotator.tests.TA*/ [] i;
 }
+
+@java.lang.annotation.Target({java.lang.annotation.ElementType.TYPE_USE})
+@interface TA {}
