@@ -58,7 +58,7 @@ public class IsSigMethodCriterion implements Criterion {
       parseParams(
         methodName.substring(methodName.indexOf("(") + 1,
             methodName.indexOf(")")));
-    } catch(Exception e) {
+    } catch (Exception e) {
       throw new RuntimeException("Caught exception while parsing method: " +
           methodName, e);
     }

@@ -163,7 +163,7 @@ annotation file.
 
 \subsection{Grammar conventions\label{grammar-conventions}}
 
-Throughout this document, ``name'' is any valid Java simple name or 
+Throughout this document, ``name'' is any valid Java simple name or
 binary name, ``type'' is any valid type, and ``value'' is any
 valid Java constant, and quoted strings are literal values.
 %
@@ -173,10 +173,10 @@ The Kleene qualifiers ``*'' (zero or more), ``?'' (zero or one), and ``+''
 A vertical bar (``\bnfor'') separates alternatives.
 Parentheses (``()'') denote grouping, and square brackets (``[]'')
 denote optional syntax, which is equivalent to ``( \ldots\ )\ ?''\ but more concise.
-We use the hash/pound/octothorpe symbol (``\#'') for comments within the grammar. 
+We use the hash/pound/octothorpe symbol (``\#'') for comments within the grammar.
 
 In the annotation file,
-besides its use as token separator, 
+besides its use as token separator,
 whitespace (excluding
 newlines) is optional with one exception: no space is permitted
 between an ``@'' character and a subsequent name. Indentation is
@@ -1060,7 +1060,7 @@ that annotation in an annotation file.
 \bnfnt{annotation-definition} ::= \\
 \qquad    \bnfcmt The \bnfnt{decl-annotation}s are the meta-annotations on this annotation. \\
 \qquad    \bnflit{annotation} \bnflit{@}\bnfnt{name}
-    \bnflit{:} \bnfnt{decl-annotation}* \lineend  \\ 
+    \bnflit{:} \bnfnt{decl-annotation}* \lineend  \\
 \qquad    \bnfnt{annotation-field-definition}* \\
 \\
 \bnfnt{annotation-field-definition} ::= \\
@@ -1380,7 +1380,7 @@ converting among them.
 
 
 
-An alternative to the format described in this document would be XML\@.  
+An alternative to the format described in this document would be XML\@.
 % It would be easy to use an XML format to augment the one proposed here, but
 XML does not seem to provide any compelling advantages.  Programmers
 interact with annotation files in two ways:  textually (when reading, writing,

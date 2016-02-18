@@ -98,14 +98,14 @@ import com.sun.tools.javac.tree.JCTree;
  *  of the .java files.  This behavior permits a user to tweak the .jaif
  *  file and re-run the annotator.
  *  <p>
- * 
+ *
  *  Note that if the user runs the annotator with --in-place, makes edits,
  *  and then re-runs the annotator with this --in-place option, those
  *  edits are lost.  Similarly, if the user runs the annotator twice in a
  *  row with --in-place, only the last set of annotations will appear in
  *  the codebase at the end.
  *  <p>
- * 
+ *
  *  To preserve changes when using the --in-place option, first remove the
  *  backup files.  Or, use the <tt>-d .</tt> option, which makes (and
  *  reads) no backup, instead of --in-place. [default false]</li>
@@ -548,7 +548,7 @@ public class Main {
     // The Java files into which to insert.
     List<String> javafiles = new ArrayList<String>();
 
-    // Indices to maintain insertion source traces. 
+    // Indices to maintain insertion source traces.
     Map<String, Multimap<Insertion, Annotation>> insertionIndex =
         new HashMap<String, Multimap<Insertion, Annotation>>();
     Map<Insertion, String> insertionOrigins = new HashMap<Insertion, String>();
@@ -693,7 +693,7 @@ public class Main {
 
         if (convert_jaifs) {
           // program used only for JAIF conversion; execute following
-          // block and then skip remainder of loop 
+          // block and then skip remainder of loop
           Multimap<ASTRecord, Insertion> astInsertions =
               finder.getPaths();
           for (Map.Entry<ASTRecord, Collection<Insertion>> entry :

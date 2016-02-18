@@ -25,7 +25,7 @@ public class CastInsertion extends Insertion {
   private Type type;
 
   /**
-   * Whether insertion is to take place on a bare array literal. 
+   * Whether insertion is to take place on a bare array literal.
    */
   public boolean onArrayLiteral = false;
 

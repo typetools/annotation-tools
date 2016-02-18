@@ -15,7 +15,7 @@ public class CommonScanner extends TreePathScanner<Void, Void> {
         Tree.Kind kind = tree.getKind();
         // Tree.Kind.NEW_CLASS is excluded here because 1) there is no
         // type name to be annotated on an anonymous inner class, and
-        // consequently 2) NEW_CLASS insertions are handled separately. 
+        // consequently 2) NEW_CLASS insertions are handled separately.
         return kind == Tree.Kind.CLASS
                 || kind == Tree.Kind.INTERFACE
                 || kind == Tree.Kind.ENUM

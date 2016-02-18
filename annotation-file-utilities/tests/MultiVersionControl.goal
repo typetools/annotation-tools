@@ -16,7 +16,7 @@ import java.net.URL;
 // annotation-tools note:
 // Running insert-annotations-to-source on this code from plume-lib
 // revealed a bug in annotations.io.classfile.CodeOffsetVisitor.
-// Makefile now includes plume-lib in its classpath (via 
+// Makefile now includes plume-lib in its classpath (via
 // annotation-file-utilities.jar) so this test can be compiled.  The
 // following stub definitions for annotations eliminate the original
 // code's Checker Framework dependency.
@@ -1238,7 +1238,7 @@ public class MultiVersionControl {
 
           // Necessary because "git status --porcelain" does not report:
           //   # Your branch is ahead of 'origin/master' by 1 commit.
-          // If you have pushed but not pulled, then this will report 
+          // If you have pushed but not pulled, then this will report
           pb2.command(git_executable, "log", "--branches", "--not", "--remotes");
           addArgs(pb2, git_arg);
           replacers.add(new Replacer("^commit .*(.*\\n)+", "unpushed commits: " + pb2.directory() + "\n"));
