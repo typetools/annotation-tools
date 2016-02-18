@@ -18,7 +18,7 @@ scripts/
   Java, class, and annotation files.
 annotation-file-utilities.jar
   Java library used by the programs.
-build.xml, src/, lib/, tests/, 
+build.xml, src/, lib/, tests/
   For developers only:  buildfile, source code, libraries, tests.
 
 ===========================================================================

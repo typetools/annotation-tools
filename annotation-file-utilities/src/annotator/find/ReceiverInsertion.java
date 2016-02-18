@@ -37,7 +37,7 @@ public class ReceiverInsertion extends TypedInsertion {
      * A comma will not be added to the end of the receiver. In the case that
      * there is a parameter following the inserted receiver pass {@code true} to
      * {@link #setAddComma(boolean)} to add a comma to the end of the receiver.
-     * 
+     *
      * @param type the type to use when inserting the receiver.
      * @param criteria where to insert the text.
      * @param innerTypeInsertions the inner types to go on this receiver.

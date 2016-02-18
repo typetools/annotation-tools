@@ -17,8 +17,8 @@ public class VerifyDiffs {
     private static boolean show_all = false;
 
     private static void parseArgs(String[] args) {
-        for(String s : args) {
-            if(s.equals("--show_all")) {
+        for (String s : args) {
+            if (s.equals("--show_all")) {
                 VerifyDiffs.show_all = true;
             }
         }
@@ -37,33 +37,33 @@ public class VerifyDiffs {
             List<File> allDiffs = new ArrayList<File>();
             gatherDiffs(allDiffs, dir);
             Collections.sort(allDiffs);
-            for(File f : allDiffs) {
+            for (File f : allDiffs) {
                 String fileName = f.toString();
                 if (fileName.startsWith("./")) {
                     fileName = fileName.substring(2);
                 }
                 FileReader fr = new FileReader(f);
-                if(fr.read() != -1) { // if not empty, output error message
+                if (fr.read() != -1) { // if not empty, output error message
                     System.out.println(fileName + " ...FAILED");
                     pass = false;
                     failCount++;
                 } else {
-                    if(VerifyDiffs.show_all) {
+                    if (VerifyDiffs.show_all) {
                         System.out.println(fileName + " ...OK");
                     }
                     passCount++;
                 }
                 fr.close();
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             System.out.println("verify diffs failed due to exception: "
                                + e.getMessage());
             pass = false;
         }
 
         System.out.println("Passed: " + passCount + "    Failed: " + failCount);
-        if(pass) {
-            if(VerifyDiffs.show_all) {
+        if (pass) {
+            if (VerifyDiffs.show_all) {
                 System.out.println("All tests succeeded.");
             }
         } else {
@@ -80,11 +80,11 @@ public class VerifyDiffs {
      * @param dir the directory to start gathering diffs
      */
     private static void gatherDiffs(List<File> diffs, File dir) {
-      for(File f : dir.listFiles()) {
-        if(f.toString().endsWith(".diff")) {
+      for (File f : dir.listFiles()) {
+        if (f.toString().endsWith(".diff")) {
           diffs.add(f);
         }
-        if(f.isDirectory()) {
+        if (f.isDirectory()) {
           gatherDiffs(diffs, f);
         }
       }

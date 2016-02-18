@@ -89,9 +89,9 @@ public class IndexFileSpecification implements Specification {
         }
       }
       Insertion.setAlwaysQualify(ambiguous);
-    } catch(FileIOException e) {
+    } catch (FileIOException e) {
       throw e;
-    } catch(Exception e) {
+    } catch (Exception e) {
       throw new RuntimeException("Exception while parsing index file", e);
     }
 

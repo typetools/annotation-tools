@@ -30,7 +30,7 @@ public class NewInsertion extends TypedInsertion {
    * {@code @Anno new Type[] \{...\}}), set the name to the type to insert.
    * This can be done either before calling this constructor, or by modifying
    * the return value of {@link #getType()}.
-   * 
+   *
    * @param type the type to use when inserting the receiver.
    * @param criteria where to insert the text.
    * @param innerTypeInsertions the inner types to go on this receiver.

@@ -17,7 +17,7 @@ public class ConstructorInsertion extends TypedInsertion {
    * {@code @Anno Type this}) the name should be set to the type to insert.
    * This can either be done before calling this constructor, or by modifying
    * the return value of {@link #getType()}.
-   * 
+   *
    * @param type the type to use when inserting the constructor.
    * @param criteria where to insert the text.
    * @param innerTypeInsertions the inner types to go on this constructor.
