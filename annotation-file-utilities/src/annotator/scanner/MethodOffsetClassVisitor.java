@@ -1,20 +1,15 @@
 package annotator.scanner;
 
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.Attribute;
 import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Handle;
 import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodAdapter;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.TypeAnnotationVisitor;
-import org.objectweb.asm.TypePath;
-
-import annotations.io.classfile.CodeOffsetAdapter;
 
 import com.sun.tools.javac.util.Pair;
+
+import annotations.io.classfile.CodeOffsetAdapter;
 
 
 /**
@@ -24,10 +19,7 @@ import com.sun.tools.javac.util.Pair;
  * should visit every class that is to be annotated, and should be done
  * before trying to match elements in the tree to the various criterion.
  */
-// Note: in order to ensure all labels are visited, this class
-// needs to extend ClassWriter and not other class visitor classes.
-// There is no good reason why this is the case with ASM.
-public class MethodOffsetClassVisitor extends ClassWriter {
+public class MethodOffsetClassVisitor extends /*X*/ClassVisitor {
   CodeOffsetAdapter coa;
   MethodVisitor mcoa;
 
@@ -36,7 +28,7 @@ public class MethodOffsetClassVisitor extends ClassWriter {
   private String methodName;
 
   public MethodOffsetClassVisitor(ClassReader cr) {
-    super(true, false);
+    super(Opcodes.ASM5);  // COMPUTE_MAXS?
     this.methodName = "LocalVariableVisitor: DEFAULT_METHOD";
     coa = new CodeOffsetAdapter(cr);
   }
@@ -56,11 +48,11 @@ public class MethodOffsetClassVisitor extends ClassWriter {
    * all the offset information by calling the appropriate static
    * methods in annotator.scanner classes.
    */
-  private class MethodOffsetMethodVisitor extends MethodAdapter {
+  private class MethodOffsetMethodVisitor extends /*X*/MethodVisitor {
     private Label lastLabel;
 
     public MethodOffsetMethodVisitor(MethodVisitor mv) {
-      super(mv);
+      super(Opcodes.ASM5, mv);
       lastLabel = null;
     }
 
@@ -130,8 +122,8 @@ public class MethodOffsetClassVisitor extends ClassWriter {
 
     @Override
     public void visitMethodInsn(int opcode, String owner, String name,
-        String desc) {
-      super.visitMethodInsn(opcode, owner, name, desc);
+        String desc, boolean itf) {
+      super.visitMethodInsn(opcode, owner, name, desc, itf);
       switch (opcode) {
       case Opcodes.INVOKEINTERFACE:
       case Opcodes.INVOKESTATIC:
@@ -142,7 +134,7 @@ public class MethodOffsetClassVisitor extends ClassWriter {
       default:
         break;
       }
-      mcoa.visitMethodInsn(opcode, owner, name, desc);
+      mcoa.visitMethodInsn(opcode, owner, name, desc, itf);
     }
 
     @Override
@@ -199,7 +191,7 @@ public class MethodOffsetClassVisitor extends ClassWriter {
 
     @Override
     public void visitTableSwitchInsn(int min, int max, Label dflt,
-        Label[] labels) {
+        Label... labels) {
       super.visitTableSwitchInsn(min, max, dflt, labels);
       mcoa.visitTableSwitchInsn(min, max, dflt, labels);
     }

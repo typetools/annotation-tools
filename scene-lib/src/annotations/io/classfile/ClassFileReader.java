@@ -22,7 +22,7 @@ import annotations.io.IndexFileWriter;
 public class ClassFileReader {
 
   public static final String INDEX_UTILS_VERSION
-    = "Annotation File Utilities v3.6.25";
+    = "Annotation File Utilities v3.6.24";
 
   @Option("-h print usage information and exit")
   public static boolean help = false;
@@ -197,7 +197,7 @@ public class ClassFileReader {
 
   public static void read(AScene scene, ClassReader cr) {
     ClassAnnotationSceneReader ca = new ClassAnnotationSceneReader(cr, scene);
-    cr.accept(ca, true);
+    cr.accept(ca, 0);
   }
 
 }

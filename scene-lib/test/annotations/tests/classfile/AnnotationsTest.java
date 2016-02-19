@@ -16,14 +16,11 @@ import junit.framework.TestSuite;
 
 import org.objectweb.asm.ClassReader;
 
-import annotations.Annotation;
-import annotations.AnnotationFactory;
 import annotations.el.AScene;
 import annotations.io.IndexFileParser;
 import annotations.io.IndexFileWriter;
 import annotations.io.classfile.ClassFileReader;
 import annotations.io.classfile.ClassFileWriter;
-import annotations.tests.classfile.foo.A;
 
 /**
  * This class is the testing framework for the class file/index file
@@ -245,12 +242,21 @@ public class AnnotationsTest extends TestCase {
       InputStream generatedIs = new FileInputStream(generatedClass);
 
       ClassReader crCorrect = new ClassReader(correctIs);
-      ClassReader crGenerated = new ClassReader(generatedIs);
+      ClassReader crGenerated = new ClassReader(generatedIs) {
+        @Override
+        public org.objectweb.asm.Label readLabel(int offset,
+            org.objectweb.asm.Label[] labels) {
+          if (offset >= labels.length) {
+            return null;
+          }
+          return super.readLabel(offset, labels);
+        }
+      };
 
       AnnotationVerifier av = new AnnotationVerifier();
 
-      crCorrect.accept(av.originalVisitor(), false);
-      crGenerated.accept(av.newVisitor(), false);
+      crCorrect.accept(av.originalVisitor(), 0);
+      crGenerated.accept(av.newVisitor(), 0);
 
       try {
         av.verify();

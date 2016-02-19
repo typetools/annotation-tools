@@ -89,9 +89,9 @@ public class IndexFileSpecification implements Specification {
         }
       }
       Insertion.setAlwaysQualify(ambiguous);
-    } catch (FileIOException e) {
+    } catch(FileIOException e) {
       throw e;
-    } catch (Exception e) {
+    } catch(Exception e) {
       throw new RuntimeException("Exception while parsing index file", e);
     }
 
@@ -172,7 +172,7 @@ public class IndexFileSpecification implements Specification {
       try {
         ClassReader classReader = new ClassReader(className);
         MethodOffsetClassVisitor cv = new MethodOffsetClassVisitor(classReader);
-        classReader.accept(cv, false);
+        classReader.accept(cv, 0);
         debug("Done reading " + className + ".class");
       } catch (IOException e) {
         // If .class file not found, still proceed, in case
