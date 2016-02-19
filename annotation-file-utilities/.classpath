@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry combineaccessrules="false" kind="src" path="/jsr308-langtools"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/scene-lib"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/asmx"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/scene-lib"/>
 	<classpathentry kind="lib" path="lib/guava-15.0.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/plume-lib"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/asm"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

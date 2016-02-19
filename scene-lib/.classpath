@@ -2,9 +2,10 @@
 <classpath>
 	<classpathentry combineaccessrules="false" kind="src" path="/jsr308-langtools"/>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="test"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="junit.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/asmx"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/asm"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/plume-lib"/>
 	<classpathentry kind="lib" path="/annotation-file-utilities/lib/guava-15.0.jar"/>
 	<classpathentry kind="output" path="bin"/>

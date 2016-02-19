@@ -9,7 +9,6 @@
         <property name="builddir" location="build-current-${DSTAMP}" />
         <mkdir dir="${builddir}"/>
 
-        <property name="asmx" location="${builddir}/annotations/asmx" />
         <property name="scene-lib" location="${builddir}/annotations/scene-lib" />
         <property name="annotations-compiler" location="${builddir}/jsr308-langtools/src/share/opensource/javac" />
         <property name="annotations-disassembler" location="${builddir}/annotations/disassembler" />
@@ -60,10 +59,6 @@
     <!-- 
         Targets to build all the projects.
     -->
-    <target name="build-asmx" depends="checkout-annotations">
-        <ant dir="${asmx}" inheritAll="false" target="bin"/>
-    </target>
-    
     <target name="build-scene-lib" depends="checkout-annotations">
         <ant dir="${scene-lib}" inheritAll="false" target="bin"/>
     </target>
