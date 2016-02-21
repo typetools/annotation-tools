@@ -854,11 +854,6 @@ public class ClassAnnotationSceneWriter extends CodeOffsetAdapter {
     @Override
     public void visitTypeInsn(int opcode, String desc) {
       super.visitTypeInsn(opcode, desc);
-      if (opcode == Opcodes.INSTANCEOF) {
-        track(TypeReference.INSTANCEOF, 0, aMethod.body.instanceofs);
-      } else if (opcode == Opcodes.NEW || opcode == Opcodes.NEWARRAY) {
-        track(TypeReference.NEW, 0, aMethod.body.news);
-      }
       track();
     }
 
@@ -1019,6 +1014,8 @@ public class ClassAnnotationSceneWriter extends CodeOffsetAdapter {
     }
 
     private void track() {
+      track(TypeReference.INSTANCEOF, 0, aMethod.body.instanceofs);
+      track(TypeReference.NEW, 0, aMethod.body.news);
       for (Map.Entry<RelativeLocation, ATypeElement> entry :
           aMethod.body.typecasts.entrySet()) {
         RelativeLocation loc = entry.getKey();

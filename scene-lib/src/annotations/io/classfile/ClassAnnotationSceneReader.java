@@ -23,6 +23,7 @@ import org.objectweb.asm.TypeReference;
 import annotations.*;
 import annotations.el.*;
 import annotations.field.*;
+import annotations.util.coll.VivifyingMap;
 
 import com.sun.tools.javac.code.TargetType;
 import com.sun.tools.javac.code.TypeAnnotationPosition;
@@ -70,7 +71,7 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
   // The AClass that represents this class in scene.
   private AClass aClass;
 
-  private final ClassReader cr;
+  //private final ClassReader cr;
 
   /**
    * Holds definitions we've seen so far.  Maps from annotation name to
@@ -97,7 +98,7 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
    */
   public ClassAnnotationSceneReader(ClassReader cr, AScene scene) {
     super(cr);
-    this.cr = cr;
+    //this.cr = cr;
     this.scene = scene;
   }
 
@@ -1238,47 +1239,6 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
     }
 
     @Override
-    public AnnotationVisitor visitInsnAnnotation(int typeRef,
-        TypePath typePath, String desc, boolean visible) {
-      //super.visitInsnAnnotation(typeRef, typePath, desc, visible);
-      TypeReference typeReference = new TypeReference(typeRef);
-      int off = getPreviousCodeOffset();
-      ABlock body = ((AMethod) aMethod).body;
-      AElement elem;
-
-      switch (typeReference.getSort()) {
-      case TypeReference.INSTANCEOF:
-        elem = body.instanceofs.vivify(RelativeLocation.createOffset(off, 0));
-        break;
-      case TypeReference.NEW:
-        elem = body.news.vivify(RelativeLocation.createOffset(off, 0));
-        break;
-      case TypeReference.CONSTRUCTOR_REFERENCE:
-      case TypeReference.METHOD_REFERENCE:
-        elem = body.refs.vivify(RelativeLocation.createOffset(off, 0));
-        break;
-      case TypeReference.CAST:
-        elem = body.typecasts.vivify(RelativeLocation.createOffset(off,
-            typeReference.getTypeArgumentIndex()));
-        break;
-      case TypeReference.CONSTRUCTOR_INVOCATION_TYPE_ARGUMENT:
-      case TypeReference.METHOD_INVOCATION_TYPE_ARGUMENT:
-        elem = body.calls.vivify(RelativeLocation.createOffset(off,
-            typeReference.getTypeArgumentIndex()));
-        break;
-      case TypeReference.CONSTRUCTOR_REFERENCE_TYPE_ARGUMENT:
-      case TypeReference.METHOD_REFERENCE_TYPE_ARGUMENT:
-        elem = body.refs.vivify(RelativeLocation.createOffset(off,
-            typeReference.getTypeArgumentIndex()));
-        break;
-      default:
-        throw new RuntimeException();
-      }
-      return new AnnotationSceneReader(typeRef, typePath,
-          desc, visible, aMethod);
-    }
-
-    @Override
     public AnnotationVisitor visitTypeAnnotation(int typeRef,
         TypePath typePath, String desc, boolean visible/*, boolean inCode*/) {
       super.visitTypeAnnotation(typeRef, typePath, desc, visible);
@@ -1302,7 +1262,7 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
 
       case TypeReference.LOCAL_VARIABLE:
       case TypeReference.RESOURCE_VARIABLE:
-        // better handled in visitLocalVariable?
+        // handled in visitLocalVariable
 //        av.visitXNumEntries(1);
 //        av.visitXStartPc(loc.scopeStart);
 //        av.visitXLength(loc.scopeLength);
@@ -1396,6 +1356,62 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
         av.visitEnd();
       }
       return v;
+    }
+
+    @Override
+    public AnnotationVisitor visitInsnAnnotation(int typeRef,
+        TypePath typePath, String desc, boolean visible) {
+      //super.visitInsnAnnotation(typeRef, typePath, desc, visible);
+      TypeReference typeReference = new TypeReference(typeRef);
+      ABlock body = ((AMethod) aMethod).body;
+      XAnnotationVisitor av = new AnnotationSceneReader(typeRef,
+          typePath, desc, visible, aMethod);
+
+      switch (typeReference.getSort()) {
+      case TypeReference.INSTANCEOF:
+        visitInsnAnnotation(typeRef, av, body.instanceofs, false);
+        break;
+      case TypeReference.NEW:
+        visitInsnAnnotation(typeRef, av, body.news, false);
+        break;
+      case TypeReference.CONSTRUCTOR_REFERENCE:
+      case TypeReference.METHOD_REFERENCE:
+        visitInsnAnnotation(typeRef, av, body.refs, false);
+        break;
+      case TypeReference.CAST:
+        visitInsnAnnotation(typeRef, av, body.typecasts, true);
+        break;
+      case TypeReference.CONSTRUCTOR_INVOCATION_TYPE_ARGUMENT:
+      case TypeReference.METHOD_INVOCATION_TYPE_ARGUMENT:
+        visitInsnAnnotation(typeRef, av, body.calls, true);
+        break;
+      case TypeReference.CONSTRUCTOR_REFERENCE_TYPE_ARGUMENT:
+      case TypeReference.METHOD_REFERENCE_TYPE_ARGUMENT:
+        visitInsnAnnotation(typeRef, av, body.refs, true);
+        break;
+      default:
+        throw new RuntimeException();
+      }
+    
+      return av;
+    }
+
+    /**
+     * @param typeRef
+     * @param av
+     * @param map
+     */
+    public void visitInsnAnnotation(int typeRef, XAnnotationVisitor av,
+        VivifyingMap<RelativeLocation, ATypeElement> map,
+        boolean hasTypeIndex) {
+      TypeReference typeReference = new TypeReference(typeRef);
+      int off = getPreviousCodeOffset();
+      int idx = hasTypeIndex ? typeReference.getTypeArgumentIndex() : 0;
+      map.vivify(RelativeLocation.createOffset(off, idx));
+      av.visitXOffset(off);
+      if (hasTypeIndex) {
+        av.visitXTypeIndex(idx);
+      }
     }
 
 //    @Override
