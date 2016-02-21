@@ -19,7 +19,7 @@ import annotations.io.classfile.CodeOffsetAdapter;
  * should visit every class that is to be annotated, and should be done
  * before trying to match elements in the tree to the various criterion.
  */
-public class MethodOffsetClassVisitor extends /*X*/ClassVisitor {
+public class MethodOffsetClassVisitor extends ClassVisitor {
   CodeOffsetAdapter coa;
   MethodVisitor mcoa;
 
@@ -48,20 +48,17 @@ public class MethodOffsetClassVisitor extends /*X*/ClassVisitor {
    * all the offset information by calling the appropriate static
    * methods in annotator.scanner classes.
    */
-  private class MethodOffsetMethodVisitor extends /*X*/MethodVisitor {
-    private Label lastLabel;
-
+  private class MethodOffsetMethodVisitor extends MethodVisitor {
     public MethodOffsetMethodVisitor(MethodVisitor mv) {
       super(Opcodes.ASM5, mv);
-      lastLabel = null;
     }
 
-    private int labelOffset() {
-      try {
-        return lastLabel.getOffset();
-      } catch (Exception ex) {
-        return 0;  // TODO: find a better default?
-      }
+    /**
+     * @return the current scan position, given as an offset from the
+     * beginning of the method's code attribute
+     */
+    public int getOffset() {
+      return coa.getMethodCodeOffset();
     }
 
     @Override
@@ -79,7 +76,6 @@ public class MethodOffsetClassVisitor extends /*X*/ClassVisitor {
     @Override
     public void visitLabel(Label label) {
       super.visitLabel(label);
-      lastLabel = label;
       mcoa.visitLabel(label);
     }
 
@@ -88,17 +84,16 @@ public class MethodOffsetClassVisitor extends /*X*/ClassVisitor {
       super.visitTypeInsn(opcode, desc);
       switch (opcode) {
       case Opcodes.CHECKCAST:
-        //CastScanner.addCastToMethod(methodName, labelOffset() + 1);
         CastScanner.addCastToMethod(methodName,
-            coa.getMethodCodeOffset());
+            getOffset());
         break;
       case Opcodes.NEW:
       case Opcodes.ANEWARRAY:
-        NewScanner.addNewToMethod(methodName, labelOffset());
+        NewScanner.addNewToMethod(methodName, getOffset());
         break;
       case Opcodes.INSTANCEOF:
         InstanceOfScanner.addInstanceOfToMethod(methodName,
-            labelOffset() + 1);
+            getOffset());
         break;
       }
       mcoa.visitTypeInsn(opcode, desc);
@@ -107,7 +102,7 @@ public class MethodOffsetClassVisitor extends /*X*/ClassVisitor {
     @Override
     public void visitMultiANewArrayInsn(String desc, int dims)  {
       super.visitMultiANewArrayInsn(desc, dims);
-      NewScanner.addNewToMethod(methodName, labelOffset());
+      NewScanner.addNewToMethod(methodName, getOffset());
       mcoa.visitMultiANewArrayInsn(desc, dims);
     }
 
@@ -115,7 +110,7 @@ public class MethodOffsetClassVisitor extends /*X*/ClassVisitor {
     public void visitIntInsn(int opcode, int operand)  {
       super.visitIntInsn(opcode, operand);
       if (opcode == Opcodes.NEWARRAY) {
-        NewScanner.addNewToMethod(methodName, labelOffset());
+        NewScanner.addNewToMethod(methodName, getOffset());
       }
       mcoa.visitIntInsn(opcode, operand);
     }
@@ -129,7 +124,7 @@ public class MethodOffsetClassVisitor extends /*X*/ClassVisitor {
       case Opcodes.INVOKESTATIC:
       case Opcodes.INVOKEVIRTUAL:
         MethodCallScanner.addMethodCallToMethod(methodName,
-            labelOffset());
+            getOffset());
         // fall through
       default:
         break;
@@ -142,7 +137,7 @@ public class MethodOffsetClassVisitor extends /*X*/ClassVisitor {
         Handle bsm, Object... bsmArgs) {
       super.visitInvokeDynamicInsn(name, desc, bsm, bsmArgs);
       LambdaScanner.addLambdaExpressionToMethod(methodName,
-          labelOffset());
+          getOffset());
       mcoa.visitInvokeDynamicInsn(name, desc, bsm, bsmArgs);
     }
 
