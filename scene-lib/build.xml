@@ -111,7 +111,7 @@
         </path>
 
         <path id="libpath">
-            <pathelement location="${annotation-tools}/../asm/output/build/tmp"/>
+            <pathelement location="${annotation-tools}/annotation-file-utilities/lib/asm-5.0.jar"/>
             <pathelement location="${junit}"/>
             <pathelement location="${annotation-tools}/annotation-file-utilities/lib/plume.jar"/>
             <pathelement location="${annotation-tools}/annotation-file-utilities/lib/guava-15.0.jar"/>
