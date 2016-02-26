@@ -607,6 +607,7 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
           handleMethodTypeParameterBound((AMethod) aElement);
           break;
         case CLASS_EXTENDS:
+          visitXTypeIndex(typeReference.getSuperTypeIndex());
           handleClassExtends((AClass) aElement);
           break;
         case THROWS:
