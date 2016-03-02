@@ -154,6 +154,7 @@
           </and>
         </condition>
 
+        <!-- These print "true" if set and the property name in curly braces, such as "${source.files.java.nopackageinfo.uptodate}", if not set. -->
         <echo message="source.files.non-java.uptodate: ${source.files.non-java.uptodate}"/>
         <echo message="source.files.java.nopackageinfo.uptodate: ${source.files.java.nopackageinfo.uptodate}"/>
         <echo message="source.files.java.packageinfo.uptodate: ${source.files.java.packageinfo.uptodate}"/>
