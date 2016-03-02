@@ -185,6 +185,7 @@
                  A separate target could be added to check the qualifiers
                  and have them in the generated code. -->
             <compilerarg value="-XDTA:noannotationsincomments"/>
+            <compilerarg value="-version"/>
             <!-- Make sure we only have Java 7 source code and generate Java 7 bytecode. -->
             <compilerarg value="-source"/>
             <compilerarg value="7"/>
