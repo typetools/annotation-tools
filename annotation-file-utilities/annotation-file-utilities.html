@@ -52,14 +52,14 @@ Java annotations are meta-data about Java program elements, as in
 &ldquo;<code><font color="red">@Deprecated</font> class Date
 {&nbsp;...&nbsp;}</code>&rdquo; or &ldquo;<code>List&lt;<font color="red">@NonNull</font> String&gt;</code>&rdquo;.
 Ordinarily, Java annotations are
-written in the 
+written in the
 source code of a <code>.java</code> Java source file.  When
 <code>javac</code> compiles the source code, it inserts the annotations in
 the resulting <code>.class</code> file (as
 &ldquo;attributes&rdquo;).
 </p>
 
-<!-- 
+<!--
   I've moved text from here to the annotation-file-format document, but feel
   free to improve that document.
 -->
@@ -102,7 +102,7 @@ to read and write annotation files.
 
 <ul>
   <li> <a href="#insert-annotations"><code>insert-annotations</code></a> reads annotations from an annotation file
-       and inserts them into a class file</li> 
+       and inserts them into a class file</li>
   <li> <a href="#extract-annotations"><code>extract-annotations</code></a> reads annotations from a class file
        and writes them out to an annotation file</li>
   <li> <a href="#insert-annotations-to-source"><code>insert-annotations-to-source</code></a> reads annotations from an
@@ -130,7 +130,7 @@ file.
 <h2 id="installation">Installation</h2>
 
 <p>
-The following instructions assume either a Linux or Windows system using a command-line environment.  
+The following instructions assume either a Linux or Windows system using a command-line environment.
 </p>
 
 <p>
@@ -140,17 +140,17 @@ The current release is Annotation File Utilities version
 
 <ol>
 <li>
-  Download 
-  <a href="annotation-tools-3.6.24.zip">annotation-tools-3.6.24.zip</a>.
+  Download
+  <a href="current/annotation-tools-3.6.25.zip"><!-- annotation-tools-zip-version -->annotation-tools-3.6.25.zip<!-- /annotation-tools-zip-version --></a>.
 </li>
 
 <li>
   Creade a directory named
-  <code>annotation-tools</code> by 
+  <code>annotation-tools</code> by
   unpacking the distribution zipfile (a standard place to do this is in a
   directory <code>~/jsr308/</code>):
 
-  <pre><code>unzip annotation-tools-3.6.24.zip</code></pre>
+  <pre><code>unzip annotation-tools-3.6.25.zip</code></pre>
 
   The <code>annotation-tools</code> directory must be a sibling of the <code>jsr308-langtools</code>
   directory (available at <a href="http://types.cs.washington.edu/jsr308/">http://types.cs.washington.edu/jsr308/</a>).
@@ -175,7 +175,7 @@ For csh/tcsh, add to ~/.tcshrc or ~/.cshrc or ~/.login:
 -->
 </li>
 <li>
-For <b>Windows</b>, add the directory to your 
+For <b>Windows</b>, add the directory to your
 <code>PATH</code> system
 variable by going to
 
@@ -618,7 +618,7 @@ will let us resolve the issue quickly.
 </p>
 
 <p>
-You can also reach the developers at 
+You can also reach the developers at
 <a href="mailto:annotation-tools-dev@googlegroups.com">annotation-tools-dev@googlegroups.com</a>.
 But please use the
   <a href="https://github.com/typetools/annotation-tools/issues">issue

@@ -978,7 +978,7 @@ outer:
               do {
                 r = r.extend(Tree.Kind.MEMBER_SELECT, ASTPath.EXPRESSION);
               } while (--d > 0);
-              return r; 
+              return r;
             }
             tpe = iter.next();
             if (--d == 0) {
@@ -1408,7 +1408,7 @@ loop:
       case SHORT:
       case FLOAT:
       case INT:
-        type = new DeclaredType(jtype.tsym.name.toString()); 
+        type = new DeclaredType(jtype.tsym.name.toString());
         break;
       //case ERROR:
       //case EXECUTABLE:

@@ -182,7 +182,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
    * instance of a character between the given positions, or the last
    * instance if {@code n==0}.  (Assumes position is not inside a
    * comment.)
-   * 
+   *
    * @param c the character being sought
    * @param start position at which the search starts (inclusive)
    * @param end position at which the search ends (exclusive)
@@ -519,10 +519,10 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
 
     /**
      * Find position in source code where annotation is to be inserted.
-     * 
+     *
      * @param start beginning of range to be matched
      * @param end end of range to be matched
-     * 
+     *
      * @return position for annotation insertion
      */
     private int arrayInsertPos(int start, int end) {
@@ -1462,7 +1462,7 @@ loop:
    * Returns the start position of the method's name.  In particular,
    * works properly for constructors, for which the name field in the
    * AST is always "<init>" instead of the name from the source.
-   * 
+   *
    * @param node AST node of method declaration
    * @return position of method name (from {@link JCMethodDecl#sym}) in source
    */
@@ -1538,7 +1538,15 @@ loop:
         } else if (n.getKind() == Tree.Kind.PARAMETERIZED_TYPE) {
           // If we pass through a parameterized type, stop, otherwise we
           // mix up annotations on the outer type.
-          // TODO: is something similar needed for Arrays?
+          break;
+        } else if (n.getKind() == Tree.Kind.ARRAY_TYPE) {
+          Tree type = ((ArrayTypeTree) n).getType();
+          if (type.getKind() == Tree.Kind.ANNOTATED_TYPE) {
+            alreadyPresent = ((AnnotatedTypeTree) type).getAnnotations();
+          }
+          break;
+        } else if (n.getKind() == Tree.Kind.ANNOTATED_TYPE) {
+          alreadyPresent = ((AnnotatedTypeTree) n).getAnnotations();
           break;
         }
         // TODO: don't add cast insertion if it's already present.

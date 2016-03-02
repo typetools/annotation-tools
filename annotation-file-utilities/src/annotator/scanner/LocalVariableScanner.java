@@ -38,7 +38,7 @@ public class LocalVariableScanner extends CommonScanner {
 
     try {
       lvts.scan(path, null);
-    } catch(Throwable e) {
+    } catch (Throwable e) {
       System.out.println("LocalVariableScanner: can't locate: " + varTree);
       return -2; // Don't return -1, which is above return code
     }

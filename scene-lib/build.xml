@@ -154,6 +154,7 @@
           </and>
         </condition>
 
+        <!-- These print "true" if set and the property name in curly braces, such as "${source.files.java.nopackageinfo.uptodate}", if not set. -->
         <echo message="source.files.non-java.uptodate: ${source.files.non-java.uptodate}"/>
         <echo message="source.files.java.nopackageinfo.uptodate: ${source.files.java.nopackageinfo.uptodate}"/>
         <echo message="source.files.java.packageinfo.uptodate: ${source.files.java.packageinfo.uptodate}"/>
@@ -184,6 +185,7 @@
                  A separate target could be added to check the qualifiers
                  and have them in the generated code. -->
             <compilerarg value="-XDTA:noannotationsincomments"/>
+            <compilerarg value="-version"/>
             <!-- Make sure we only have Java 7 source code and generate Java 7 bytecode. -->
             <compilerarg value="-source"/>
             <compilerarg value="7"/>

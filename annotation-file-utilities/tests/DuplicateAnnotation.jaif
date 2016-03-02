@@ -4,7 +4,11 @@ annotation @SuppressWarnings:
 annotation @Deprecated:
 
 package annotator.tests:
+annotation @TA: @java.lang.annotation.Target({java.lang.annotation.ElementType.TYPE_USE})
+
 class DuplicateAnnotation:
+    field i:
+        type: @TA
 
     method m1()V: @java.lang.SuppressWarnings("A")
     method m2()V: @java.lang.SuppressWarnings("B")

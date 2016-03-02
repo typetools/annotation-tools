@@ -14,6 +14,13 @@ This is the changelog for the
 
 <ul>
   <li>
+    Version 3.6.26 (released Mar 1, 2016):
+    <ul>
+        <li>Avoids reinserting an annotation that already exists in comments, fixing Issue
+          <a href="https://github.com/typetools/annotation-tools/issues/114">#114</a>.</li>
+    </ul>
+  </li>
+  <li>
     Version 3.6.25 (released Feb 1, 2016):
     <ul>
         <li>Uses system javac to compile the executable program, thus enabling Java 7 execution.</li>
@@ -573,7 +580,7 @@ This is the changelog for the
 
 	    <pre>  annotation @Nullable: @Retention(value=RUNTIME)</pre>
 
-	      and if it's a type annotation, it should be 
+	      and if it's a type annotation, it should be
 
 	    <pre>  annotation @Nullable: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})</pre>
 	  </li>
@@ -593,7 +600,7 @@ This is the changelog for the
 	<tt>type</tt> marker instead of <tt>return</tt>.  So if p2.A is a
 	declaration annotation targeting the field, while p2.B is a type
 	annotation on the field, the field would be declared as:
-    
+
     <pre> field s: @p2.A
    type: @p2.B</pre>
 

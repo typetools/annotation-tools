@@ -337,13 +337,23 @@
     <fail unless="release.ver"  message="You must specify a release version to update to"/>
     <fail unless="release.date" message="You must specify a release date to update to"/>
 
-    <update file="${annotation-tools}/annotation-file-utilities/annotation-file-utilities.html"
+    <property name="release.version.regexp" value="\d\.\d\.\d+(?:\.\d)"/>
+    <property name="afuWebPage"   value="${annotation-tools}/annotation-file-utilities/annotation-file-utilities.html"/>
+
+    <replaceregexp file="${afuWebPage}" byline="true"
+                   match="annotation-tools-${release.version.regexp}{0,1}.zip" replace="annotation-tools-${release.ver}.zip"/>
+
+    <update file="${afuWebPage}"
+            start="${afu.zip.ver.0}" end="${afu.zip.ver.1}"
+            with="annotation-tools-${release.ver}.zip"/>
+
+    <update file="${afuWebPage}"
             start="${afu.ver.0}" end="${afu.ver.1}"
             with="${release.ver}, ${release.date}"/>
 
-      <update file="${annotation-tools}/annotation-file-utilities/annotation-file-utilities.html"
-              start="${afu.date.0}" end="${afu.date.1}"
-              with="${release.date}"/>
+    <update file="${afuWebPage}"
+            start="${afu.date.0}" end="${afu.date.1}"
+            with="${release.date}"/>
 
     <property name="newCfrValue" value="Annotation File Utilities v${release.ver}"/>
 

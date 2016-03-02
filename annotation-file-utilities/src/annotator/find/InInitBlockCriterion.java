@@ -8,7 +8,7 @@ import com.sun.source.util.TreePath;
 
 /**
  * Criterion for being within a specific initializer.
- * 
+ *
  * @author dbro
  */
 public class InInitBlockCriterion implements Criterion {
