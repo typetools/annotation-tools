@@ -71,8 +71,6 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
   // The AClass that represents this class in scene.
   private AClass aClass;
 
-  //private final ClassReader cr;
-
   /**
    * Holds definitions we've seen so far.  Maps from annotation name to
    * the definition itself.  Maps from both the qualified name and the
@@ -98,7 +96,6 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
    */
   public ClassAnnotationSceneReader(ClassReader cr, AScene scene) {
     super(cr);
-    //this.cr = cr;
     this.scene = scene;
   }
 
@@ -244,6 +241,7 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
     //   }
     // }
 
+    // Retrieve annotation definition, including retention policy.
     @SuppressWarnings("unchecked")
     private AnnotationDef getAnnotationDef(String jvmlClassName) {
       String annoTypeName = classDescToName(jvmlClassName);
@@ -665,6 +663,7 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
       }
     }
 
+    // convenience method to avoid boilerplate in passing a type path
     void visitTypePath(TypePath typePath) {
       int n = typePath.getLength();
       List<Integer> l = new ArrayList<Integer>(n);
@@ -1331,6 +1330,8 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
               ((AMethod) aMethod).parameters.vivify(parameter));
     }
 
+    // following 3 methods invoked after all instructions visited
+
     @Override
     public void visitLocalVariable(String name, String desc, String signature,
         Label start, Label end, int index) {
@@ -1398,9 +1399,13 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
     }
 
     /**
-     * @param typeRef
-     * @param av
-     * @param map
+     * Visits an annotation on a JVM instruction.
+     *
+     * @param typeRef int representation of type target
+     * @param av annotation visitor to visit annotations on current instruction
+     * @param map scene data structure providing annotations for location
+     *
+     * @see org.objectweb.asm.TypeReference
      */
     public void visitInsnAnnotation(int typeRef, XAnnotationVisitor av,
         VivifyingMap<RelativeLocation, ATypeElement> map,

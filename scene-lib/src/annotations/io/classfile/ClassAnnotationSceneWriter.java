@@ -458,10 +458,6 @@ public class ClassAnnotationSceneWriter extends CodeOffsetAdapter {
 
   /**
    * Has av visit the fields in the given annotation.
-   * This method is necessary even with
-   * visitFields(AnnotationVisitor, Annotation)
-   * because a Annotation cannot be created from the Annotation
-   * specified to be available from the Annotation object for subannotations.
    */
   private void visitFields(AnnotationVisitor av, Annotation a) {
     if (av instanceof XAnnotationVisitor) {
@@ -1013,6 +1009,8 @@ public class ClassAnnotationSceneWriter extends CodeOffsetAdapter {
           typePath, desc, visible);
     }
 
+    // Visits instruction annotations.
+    // TODO: better name!
     private void track() {
       track(TypeReference.INSTANCEOF, 0, aMethod.body.instanceofs);
       track(TypeReference.NEW, 0, aMethod.body.news);
@@ -1025,6 +1023,7 @@ public class ClassAnnotationSceneWriter extends CodeOffsetAdapter {
       }
     }
 
+    // Visits instruction annotations of the given sort at the given location.
     private void track(int typeSort, int typeIndex,
         Map<RelativeLocation, ATypeElement> map) {
       RelativeLocation loc =
@@ -1693,6 +1692,7 @@ public class ClassAnnotationSceneWriter extends CodeOffsetAdapter {
     }
   }
 
+  // to be factored out and replaced with CodeOffsetAdapter
   class MethodCodeIndexer extends /*X*/ClassVisitor {
     private int codeStart = 0;
     Set<Integer> constrs;  // distinguishes constructors from methods

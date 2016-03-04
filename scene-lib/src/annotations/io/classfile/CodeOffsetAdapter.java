@@ -13,6 +13,8 @@ import annotations.io.DebugWriter;
 /**
  * Tracks offset within a method's Code attribute as its instructions
  * are visited.  ASM really should expose this information but doesn't.
+ * Class implementation simply does the same arithmetic ASM does under
+ * the hood, staying synchronized with the {@link ClassReader}.
  *
  * @author dbro
  */
@@ -37,6 +39,7 @@ public class CodeOffsetAdapter extends ClassVisitor {
     this.cr = cr;
     // const pool size is (not lowest) upper bound of string length
     buf = new char[cr.header];
+    // find beginning of methods
     methodStart = cr.header + 6;
     methodStart += 4 + 2 * cr.readUnsignedShort(methodStart);
     for (int i = cr.readUnsignedShort(methodStart-2); i > 0; --i) {
@@ -64,7 +67,7 @@ public class CodeOffsetAdapter extends ClassVisitor {
         debug.debug("%d attributes%n", attrCount);
         methodEnd = methodStart + 8;
 
-        // find code attribute
+        // skip ahead to method's code attribute
         codeStart = methodEnd;
         if (attrCount > 0) {
           while (--attrCount >= 0) {
@@ -89,6 +92,7 @@ public class CodeOffsetAdapter extends ClassVisitor {
         previousOffset = -1;
       }
 
+      // convenience method to read from code attribute offset
       private int readInt(int i) {
         return cr.readInt(codeStart + i);
       }
@@ -224,6 +228,7 @@ public class CodeOffsetAdapter extends ClassVisitor {
 
   public int getBytecodeOffset() { return codeStart + offset; }
 
+  // move ahead, marking previous position
   private void advance(int n) {
     previousOffset = offset;
     offset += n;
