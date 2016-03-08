@@ -33,7 +33,7 @@ DEBUG :=
 default : all
 
 .PHONY: all
-all : $(DIFFS) system-test source-extension results
+all : $(DIFFS) abbreviated system-test source-extension results
 
 .PHONY: abbreviated
 abbreviated:
@@ -103,3 +103,4 @@ clean :
 	rm -f *.diff
 	rm -f *.log
 	rm -f *.output
+	(cd abbreviated && make clean)

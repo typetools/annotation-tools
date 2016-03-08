@@ -900,8 +900,18 @@ public class Main {
         int importIndex = 0;      // default: beginning of file
         String srcString = src.getString();
         Matcher m = importPattern.matcher(srcString);
+        Set<String> inSource = new TreeSet<String>();
         if (m.find()) {
           importIndex = m.start();
+          do {
+            int i = m.start();
+            int j = srcString.indexOf(System.lineSeparator(), i) + 1;
+            if (j <= 0) {
+              j = srcString.length();
+            }
+            String s = srcString.substring(i, j);
+            inSource.add(s);
+          } while (m.find());
         } else {
           // Debug.info("Didn't find import in " + srcString);
           m = packagePattern.matcher(srcString);
@@ -911,8 +921,11 @@ public class Main {
         }
         for (String classname : imports) {
           String toInsert = "import " + classname + ";" + fileLineSep;
-          src.insert(importIndex, toInsert);
-          importIndex += toInsert.length();
+          if (!inSource.contains(toInsert)) {
+            inSource.add(toInsert);
+            src.insert(importIndex, toInsert);
+            importIndex += toInsert.length();
+          }
         }
       }
 
