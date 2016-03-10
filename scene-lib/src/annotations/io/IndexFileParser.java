@@ -805,7 +805,8 @@ public final class IndexFileParser {
             key = "<" + basename + ">";
         } else {
             key = expectIdentifier();
-            // too bad className is private
+            // too bad className is private in AClass and thus must be
+            // extracted from what toString() returns
             if (Pattern.matches("AClass: (?:[^. ]+\\.)*" + key,
                     c.toString())) {  // ugh
                 key = "<init>";
