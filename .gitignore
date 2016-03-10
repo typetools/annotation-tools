@@ -22,6 +22,9 @@ annotation-file-utilities/design.pdf
 
 annotation-file-utilities/javadoc
 
+annotation-file-utilities/tests/abbreviated/*.diff
+annotation-file-utilities/tests/abbreviated/*.log
+annotation-file-utilities/tests/abbreviated/*.output
 annotation-file-utilities/tests/source-extension/*.diff
 annotation-file-utilities/tests/source-extension/*.log
 annotation-file-utilities/tests/source-extension/*.output
