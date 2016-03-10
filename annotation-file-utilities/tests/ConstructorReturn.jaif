@@ -3,6 +3,6 @@ annotation @ReadOnly: @Retention(value=RUNTIME) @java.lang.annotation.Target(val
 
 package annotator.tests:
 class ConstructorReturn:
-    method <init>()V:
+    method ConstructorReturn()V:
 return: @ReadOnly
 
