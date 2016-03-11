@@ -10,7 +10,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +24,9 @@ import plume.OptionGroup;
 import plume.Options;
 import plume.Pair;
 import plume.UtilMDE;
+
 import type.Type;
+
 import annotations.Annotation;
 import annotations.el.ABlock;
 import annotations.el.AClass;
@@ -48,6 +49,7 @@ import annotations.io.DebugWriter;
 import annotations.io.IndexFileParser;
 import annotations.io.IndexFileWriter;
 import annotations.util.coll.VivifyingMap;
+
 import annotator.find.AnnotationInsertion;
 import annotator.find.CastInsertion;
 import annotator.find.ConstructorInsertion;
