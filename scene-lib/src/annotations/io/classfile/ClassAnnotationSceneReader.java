@@ -24,6 +24,7 @@ import annotations.*;
 import annotations.el.*;
 import annotations.field.*;
 import annotations.util.coll.VivifyingMap;
+import annotations.util.JVMNames;
 
 import com.sun.tools.javac.code.TargetType;
 import com.sun.tools.javac.code.TypeAnnotationPosition;
@@ -58,6 +59,14 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
   // -use an empty visitor for everything besides annotations, fields and
   //  methods; for those three, use a special visitor that does all the work
   //  and inserts the annotations correctly into the specified AElement
+
+  // fake def for jdk.Profile+Annotations
+  private static final String profileDesc = "Ljdk/Profile+Annotation;";
+  private static final AnnotationDef profileAnnotation =
+      new AnnotationDef(JVMNames.jvmlStringToJavaTypeString(profileDesc),
+          Annotations.noAnnotations,
+          Collections.<String, AnnotationFieldType>singletonMap("value",
+              BasicAFT.forType(int.class)));
 
   // Whether to output tracing information
   private static final boolean trace = false;
@@ -280,7 +289,8 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
       this.visible = visible;
       this.aElement = aElement;
       if (desc != dummyDesc) {    // interned
-        AnnotationDef ad = getAnnotationDef(desc);
+        AnnotationDef ad = profileDesc.equals(desc) ? profileAnnotation
+            : getAnnotationDef(desc);
 
         AnnotationBuilder ab = AnnotationFactory.saf.beginAnnotation(ad);
         if (ab == null)

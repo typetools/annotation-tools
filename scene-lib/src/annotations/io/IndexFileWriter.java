@@ -69,6 +69,10 @@ public final class IndexFileWriter {
 
         @Override
         protected void visitAnnotationDef(AnnotationDef d) {
+            // avoid synthetic annotations such as jdk.Profile+Annotation
+            if (d.name.contains("+")) {
+              return;
+            }
             pw.println("package " + annotations.io.IOUtils.packagePart(d.name) + ":");
             pw.print("annotation @" + annotations.io.IOUtils.basenamePart(d.name) + ":");
             // TODO: We would only print Retention and Target annotations
@@ -130,6 +134,9 @@ public final class IndexFileWriter {
     }
 
     private void printAnnotation(Annotation a) {
+        if (a.def().name.contains("+")) {
+          return;
+        }
         pw.print("@" + a.def().name);
         if (!a.fieldValues.isEmpty()) {
             pw.print('(');
