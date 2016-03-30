@@ -13,7 +13,6 @@ import java.util.*;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Label;
-import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.TypeAnnotationVisitor;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
@@ -23,6 +22,7 @@ import org.objectweb.asm.commons.EmptyVisitor;
 import annotations.*;
 import annotations.el.*;
 import annotations.field.*;
+import annotations.util.JVMNames;
 
 import com.sun.tools.javac.code.TargetType;
 import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
@@ -57,6 +57,14 @@ extends EmptyVisitor {
   // -use an empty visitor for everything besides annotations, fields and
   //  methods; for those three, use a special visitor that does all the work
   //  and inserts the annotations correctly into the specified AElement
+
+  // fake def for jdk.Profile+Annotations
+  private static final String profileDesc = "Ljdk/Profile+Annotation;";
+  private static final AnnotationDef profileAnnotation =
+      new AnnotationDef(JVMNames.jvmlStringToJavaTypeString(profileDesc),
+          Annotations.noAnnotations,
+          Collections.<String, AnnotationFieldType>singletonMap("value",
+              BasicAFT.forType(int.class)));
 
   // Whether to output tracing information
   private static final boolean trace = false;
@@ -268,7 +276,8 @@ extends EmptyVisitor {
       this.visible = visible;
       this.aElement = aElement;
       if (desc != dummyDesc) {    // interned
-        AnnotationDef ad = getAnnotationDef(desc);
+        AnnotationDef ad = profileDesc.equals(desc) ? profileAnnotation
+            : getAnnotationDef(desc);
 
         AnnotationBuilder ab = AnnotationFactory.saf.beginAnnotation(ad);
         if (ab == null)
