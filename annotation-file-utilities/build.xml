@@ -64,6 +64,9 @@
   <!-- Compiles all the subparts of the Annotation File Utilities. -->
   <target name="init-dependencies"
           depends="init-properties">
+      <ant dir="${asmx}" target="bin">
+        <property name="product.noshrink" value="true"/>
+      </ant>
       <ant dir="${scene-lib}" target="bin"/>
       <!-- repository version only: -->
       <!-- I don't see the need for this. -->
@@ -84,7 +87,7 @@
       <pathelement location="${annotation-tools}/annotation-file-utilities/lib/plume.jar"/>
       <pathelement location="${annotation-tools}/annotation-file-utilities/lib/guava-15.0.jar"/>
       <pathelement location="${scene-lib}/bin"/>
-      <pathelement location="${annotation-tools}/annotation-file-utilities/lib/asm-5.0.jar"/>
+      <pathelement location="${asmx}/bin"/>
       <!-- needed for optionsdoc target -->
       <pathelement location="bin"/>
       <!-- additional for distribution:
@@ -147,6 +150,9 @@
       <uptodate property="bin.uptodate" targetfile="annotation-file-utilities.jar">
         <srcfiles dir="bin" />
       </uptodate>
+      <uptodate property="asmx.bin.uptodate" targetfile="annotation-file-utilities.jar">
+        <srcfiles dir="${asmx}/bin" excludes="tmp/**"/>
+      </uptodate>
       <uptodate property="scene-lib.bin.uptodate" targetfile="annotation-file-utilities.jar">
         <srcfiles dir="${scene-lib}/bin" excludes="annotations-expected/**,annotations/tests/**"/>
       </uptodate>
@@ -157,6 +163,7 @@
       <condition property="jarfile.uptodate">
         <and>
           <isset property="bin.uptodate"/>
+          <isset property="asmx.bin.uptodate"/>
           <isset property="scene-lib.bin.uptodate"/>
           <isset property="annotations-compiler.uptodate"/>
           <isset property="plume.uptodate"/>
@@ -165,6 +172,7 @@
       </condition>
 
       <echo message="bin.uptodate: ${bin.uptodate}"/>
+      <echo message="asmx.bin.uptodate: ${asmx.bin.uptodate}"/>
       <echo message="scene-lib.bin.uptodate: ${scene-lib.bin.uptodate}"/>
       <echo message="annotations-compiler.uptodate: ${annotations-compiler.uptodate}"/>
       <echo message="plume.uptodate: ${plume.uptodate}"/>
@@ -185,15 +193,10 @@
     <echo message="Copying .class files to ${temp-jarfile}"/>
     <copy todir="${temp-jarfile}">
       <fileset dir="bin" />
+      <fileset dir="${asmx}/bin" excludes="tmp/**"/>
       <fileset dir="${scene-lib}/bin" excludes="annotations-expected/**,annotations/tests/**"/>
     </copy>
     <!-- Also need to get class files in libraries -->
-    <unjar src="lib/asm-5.0.jar" dest="${temp-jarfile}">
-      <patternset>
-        <include name="**/*.class"/>
-        <exclude name="META-INF/" />
-      </patternset>
-    </unjar>
     <unjar src="lib/plume.jar" dest="${temp-jarfile}">
       <patternset>
         <include name="**/*.class"/>
@@ -268,6 +271,12 @@
       </fileset>
     </copy>
 
+    <copy todir="${temp-annotation-tools}/asmx">
+      <fileset dir="${asmx}">
+        <include name="bin/**"/>
+      </fileset>
+    </copy>
+
     <copy todir="${temp-annotation-tools}/scene-lib">
       <fileset dir="${scene-lib}">
         <include name="bin/**"/>
@@ -322,13 +331,23 @@
     <fail unless="release.ver"  message="You must specify a release version to update to"/>
     <fail unless="release.date" message="You must specify a release date to update to"/>
 
-    <update file="${annotation-tools}/annotation-file-utilities/annotation-file-utilities.html"
+    <property name="release.version.regexp" value="\d\.\d\.\d+(?:\.\d)"/>
+    <property name="afuWebPage"   value="${annotation-tools}/annotation-file-utilities/annotation-file-utilities.html"/>
+
+    <replaceregexp file="${afuWebPage}" byline="true"
+                   match="annotation-tools-${release.version.regexp}{0,1}.zip" replace="annotation-tools-${release.ver}.zip"/>
+
+    <update file="${afuWebPage}"
+            start="${afu.zip.ver.0}" end="${afu.zip.ver.1}"
+            with="annotation-tools-${release.ver}.zip"/>
+
+    <update file="${afuWebPage}"
             start="${afu.ver.0}" end="${afu.ver.1}"
             with="${release.ver}, ${release.date}"/>
 
-      <update file="${annotation-tools}/annotation-file-utilities/annotation-file-utilities.html"
-              start="${afu.date.0}" end="${afu.date.1}"
-              with="${release.date}"/>
+    <update file="${afuWebPage}"
+            start="${afu.date.0}" end="${afu.date.1}"
+            with="${release.date}"/>
 
     <property name="newCfrValue" value="Annotation File Utilities v${release.ver}"/>
 

@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.TypeAnnotationVisitor;
 
 import com.sun.tools.javac.code.TargetType;
 import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
@@ -37,11 +37,11 @@ import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
  * methods have been called, the check will ensure that the data passed to this
  * specifies a legal extended annotation, as defined by its target type.
  */
-@Deprecated  // TODO: integrate checks into XAnnotationVisitor
-public class SafeTypeAnnotationVisitor extends XAnnotationVisitor {
+public class SafeTypeAnnotationVisitor
+implements TypeAnnotationVisitor {
 
   // The visitor this delegates all calls to.
-  private final XAnnotationVisitor xav;
+  private final TypeAnnotationVisitor xav;
 
   // Each list keeps a record of what was passed in to the similarly-named
   // method, and except for xLocationArgs, should all contain at most 1 element.
@@ -65,8 +65,7 @@ public class SafeTypeAnnotationVisitor extends XAnnotationVisitor {
    *
    * @param xav the visitor to delegate all method calls to
    */
-  public SafeTypeAnnotationVisitor(XAnnotationVisitor xav) {
-    super(Opcodes.ASM5);
+  public SafeTypeAnnotationVisitor(TypeAnnotationVisitor xav) {
     this.xav = xav;
     // Start most of these with a capacity of one, since for legal annotations
     // they should not contain more than one element.
@@ -121,7 +120,7 @@ public class SafeTypeAnnotationVisitor extends XAnnotationVisitor {
 
   /**
    * {@inheritDoc}
-   * @see annotations.io.classfile.XAnnotationVisitor#visitXIndex(int)
+   * @see org.objectweb.asm.TypeAnnotationVisitor#visitXIndex(int)
    */
   @Override
   public void visitXIndex(int index) {
@@ -131,7 +130,7 @@ public class SafeTypeAnnotationVisitor extends XAnnotationVisitor {
 
   /**
    * {@inheritDoc}
-   * @see annotations.io.classfile.XAnnotationVisitor#visitXLength(int)
+   * @see org.objectweb.asm.TypeAnnotationVisitor#visitXLength(int)
    */
   @Override
   public void visitXLength(int length) {
@@ -141,7 +140,7 @@ public class SafeTypeAnnotationVisitor extends XAnnotationVisitor {
 
   /**
    * {@inheritDoc}
-   * @see annotations.io.classfile.XAnnotationVisitor#visitXLocation(com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry)
+   * @see org.objectweb.asm.TypeAnnotationVisitor#visitXLocation(TypePathEntry)
    */
   @Override
   public void visitXLocation(TypePathEntry location) {
@@ -151,7 +150,7 @@ public class SafeTypeAnnotationVisitor extends XAnnotationVisitor {
 
   /**
    * {@inheritDoc}
-   * @see annotations.io.classfile.XAnnotationVisitor#visitXLocationLength(int)
+   * @see org.objectweb.asm.TypeAnnotationVisitor#visitXLocationLength(int)
    */
   @Override
   public void visitXLocationLength(int location_length) {
@@ -161,7 +160,7 @@ public class SafeTypeAnnotationVisitor extends XAnnotationVisitor {
 
   /**
    * {@inheritDoc}
-   * @see annotations.io.classfile.XAnnotationVisitor#visitXOffset(int)
+   * @see org.objectweb.asm.TypeAnnotationVisitor#visitXOffset(int)
    */
   @Override
   public void visitXOffset(int offset) {
@@ -175,7 +174,7 @@ public class SafeTypeAnnotationVisitor extends XAnnotationVisitor {
 
   /**
    * {@inheritDoc}
-   * @see annotations.io.classfile.XAnnotationVisitor#visitXStartPc(int)
+   * @see org.objectweb.asm.TypeAnnotationVisitor#visitXStartPc(int)
    */
   @Override
   public void visitXStartPc(int start_pc) {
@@ -185,7 +184,7 @@ public class SafeTypeAnnotationVisitor extends XAnnotationVisitor {
 
   /**
    * {@inheritDoc}
-   * @see annotations.io.classfile.XAnnotationVisitor#visitXTargetType(int)
+   * @see org.objectweb.asm.TypeAnnotationVisitor#visitXTargetType(int)
    */
   @Override
   public void visitXTargetType(int target_type) {
@@ -195,7 +194,7 @@ public class SafeTypeAnnotationVisitor extends XAnnotationVisitor {
 
   /**
    * {@inheritDoc}
-   * @see annotations.io.classfile.XAnnotationVisitor#visitXParamIndex(int)
+   * @see org.objectweb.asm.TypeAnnotationVisitor#visitXParamIndex(int)
    */
   @Override
   public void visitXParamIndex(int param_index) {
@@ -205,7 +204,7 @@ public class SafeTypeAnnotationVisitor extends XAnnotationVisitor {
 
   /**
    * {@inheritDoc}
-   * @see annotations.io.classfile.XAnnotationVisitor#visitXBoundIndex(int)
+   * @see org.objectweb.asm.TypeAnnotationVisitor#visitXBoundIndex(int)
    */
   @Override
   public void visitXBoundIndex(int bound_index) {

@@ -13,7 +13,7 @@ package annotations.tests.classfile.cases:
 class TestLocalVariableGenericArray:
 	
 	method <init>()V:
-		local 3 # 43 + 46 : @annotations.tests.classfile.foo.B(value="good")
+		local 2 # 37 + 55 : @annotations.tests.classfile.foo.B(value="good")
 		    type:
 			inner-type 3, 0 : @annotations.tests.classfile.foo.B(value="first param")
 			inner-type 3, 1 : @annotations.tests.classfile.foo.B(value="second param")

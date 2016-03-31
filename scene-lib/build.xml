@@ -111,7 +111,7 @@
         </path>
 
         <path id="libpath">
-            <pathelement location="${annotation-tools}/annotation-file-utilities/lib/asm-5.0.jar"/>
+            <pathelement location="${asmx}/bin"/>
             <pathelement location="${junit}"/>
             <pathelement location="${annotation-tools}/annotation-file-utilities/lib/plume.jar"/>
             <pathelement location="${annotation-tools}/annotation-file-utilities/lib/guava-15.0.jar"/>
@@ -311,11 +311,9 @@
         <copy todir="${test-package}/src">
             <fileset dir="src" excludes="**/.svn"/>
         </copy>
-<!--
         <jar destfile="${test-package}/deps.jar">
             <fileset dir="${asmx}/bin" includes="org/**"/>
         </jar>
--->
         <zip destfile="${test-package}.zip">
             <zipfileset dir="${test-package}" prefix="${test-package}"/>
         </zip>

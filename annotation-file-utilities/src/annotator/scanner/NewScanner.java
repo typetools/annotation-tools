@@ -107,14 +107,15 @@ public class NewScanner extends CommonScanner {
     public static Integer getMethodNewIndex(String methodName, Integer offset) {
         List<Integer> offsetList = methodNameToNewOffsets.get(methodName);
         if (offsetList == null) {
-            System.err.println("NewScanner.getMethodNewIndex() : "
+            throw new RuntimeException("NewScanner.getMethodNewIndex() : "
                     + "did not find offsets for method: " + methodName);
         }
 
         Integer offsetIndex = offsetList.indexOf(offset);
         if (offsetIndex < 0) {
-            System.err.println("NewScanner.getMethodNewIndex() : in method: "
-                + methodName + " did not find offset: " + offset);
+            throw new RuntimeException("NewScanner.getMethodNewIndex() : "
+                    + "in method: " + methodName + " did not find offset: "
+                    + offset);
         }
 
         return offsetIndex;
