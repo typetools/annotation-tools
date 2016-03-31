@@ -178,7 +178,7 @@ public class ClassFileWriter {
 
     ClassAnnotationSceneWriter cw =
       new ClassAnnotationSceneWriter(cr, scene, overwrite);
-    cr.accept(cw, false);
+    cr.accept(cw, 0);
 
     OutputStream fos = new FileOutputStream(fileName);
     fos.write(cw.toByteArray());
@@ -210,7 +210,7 @@ public class ClassFileWriter {
     ClassAnnotationSceneWriter cw =
       new ClassAnnotationSceneWriter(cr, scene, overwrite);
 
-    cr.accept(cw, false);
+    cr.accept(cw, 0);
 
     out.write(cw.toByteArray());
   }
@@ -239,7 +239,7 @@ public class ClassFileWriter {
     ClassAnnotationSceneWriter cw =
       new ClassAnnotationSceneWriter(cr, scene, overwrite);
 
-    cr.accept(cw, false);
+    cr.accept(cw, 0);
 
     OutputStream fos = new FileOutputStream(outputFileName);
     fos.write(cw.toByteArray());

@@ -13,7 +13,7 @@ if [ "$1" = "-d" ]; then
 fi
 
 AFU=${AFU:-$(dirname $0)/..}
-ANNOTATION_FILE_UTILS=${AFU}/bin:${AFU}/../scene-lib/bin:${AFU}/../asmx/bin:${AFU}/annotation-file-utilities.jar
+ANNOTATION_FILE_UTILS=${AFU}/bin:${AFU}/../scene-lib/bin:${AFU}/lib/asm-5.0.jar:${AFU}/annotation-file-utilities.jar
 # Contains new version of java.lang.annotation.ElementType.
 LANGTOOLS=${LANGTOOLS:-${AFU}/../../jsr308-langtools}
 JAVAC_JAR=${JAVAC_JAR:-${LANGTOOLS}/dist/lib/javac.jar}
