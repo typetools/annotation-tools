@@ -10,7 +10,9 @@ class BoundMethodSimple:
 
     method <init>()V:
 
-    method foo(Lannotator/tests/Date;)V:
+    // Previously foo(Lannotator/tests/Date;)V -- see related note
+    // in TypeParamMethod.jaif
+    method foo(Ljava/util/Date;)V:
         bound 0 & 0: @java.lang.ReadOnly
 
     method foo2(Ljava/lang/Object;)V:

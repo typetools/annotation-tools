@@ -33,6 +33,7 @@ public interface Criterion {
         CAST,
         LOCAL_VARIABLE,
         FIELD,
+        METHOD,
         NEW,
         INSTANCE_OF,
         TYPE_ARGUMENT,

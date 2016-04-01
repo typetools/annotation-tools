@@ -50,15 +50,15 @@ import annotations.io.IndexFileWriter;
 import annotations.util.coll.VivifyingMap;
 import annotator.find.AnnotationInsertion;
 import annotator.find.CastInsertion;
-import annotator.find.ConstructorInsertion;
 import annotator.find.Criteria;
 import annotator.find.GenericArrayLocationCriterion;
+import annotator.find.InheritedSymbolFinder;
 import annotator.find.Insertion;
 import annotator.find.Insertions;
+import annotator.find.MethodInsertion;
 import annotator.find.NewInsertion;
 import annotator.find.ReceiverInsertion;
 import annotator.find.TreeFinder;
-import annotator.find.TypedInsertion;
 import annotator.scanner.LocalVariableScanner;
 import annotator.specification.IndexFileSpecification;
 
@@ -458,16 +458,15 @@ public class Main {
         for (Annotation anno : annos) {
           el.tlAnnotationsHere.add(anno);
         }
-        if (ins instanceof TypedInsertion) {
-          TypedInsertion ti = (TypedInsertion) ins;
+        if (ins.getType() != null) {
           if (!rec.astPath.isEmpty()) {
-            //addInnerTypePaths(decl, rec, ti, insertionSources);
+            //addInnerTypePaths(decl, rec, ins, insertionSources);
           }
-          for (Insertion inner : ti.getInnerTypeInsertions()) {
+          for (Insertion inner : ins.getInnerTypeInsertions()) {
             Tree t = ASTIndex.getNode(tree, rec);
             if (t != null) {
               ATypeElement elem = findInnerTypeElement(t,
-                  rec, decl, ti.getType(), inner);
+                  rec, decl, ins.getType(), inner);
               for (Annotation a : insertionSources.get(inner)) {
                 elem.tlAnnotationsHere.add(a);
               }
@@ -668,6 +667,7 @@ public class Main {
         fileLineSep = UtilMDE.inferLineSeparator(javafilename);
         src = new Source(javafilename);
         verb.debug("Parsed %s%n", javafilename);
+        InheritedSymbolFinder.setSource(src);
       } catch (Source.CompilerException e) {
         e.printStackTrace();
         return;
@@ -746,6 +746,7 @@ public class Main {
           boolean receiverInserted = false;
           boolean newInserted = false;
           boolean constructorInserted = false;
+          Set<String> methodsInserted = new TreeSet<String>();
           Set<String> seen = new TreeSet<String>();
           List<Insertion> toInsertList = new ArrayList<Insertion>(positions.get(pair));
           Collections.reverse(toInsertList);
@@ -817,9 +818,17 @@ public class Main {
               ni.setAnnotationsOnly(newInserted);
               newInserted = true;
             } else if (iToInsert.getKind() == Insertion.Kind.CONSTRUCTOR) {
-              ConstructorInsertion ci = (ConstructorInsertion) iToInsert;
+              MethodInsertion ci = (MethodInsertion) iToInsert;
               if (constructorInserted) { ci.setAnnotationsOnly(true); }
               constructorInserted = true;
+            } else if (iToInsert.getKind() == Insertion.Kind.METHOD) {
+              MethodInsertion mi = (MethodInsertion) iToInsert;
+              String methodName = mi.getCriteria().getMethodName();
+              if (methodsInserted.contains(methodName)) {
+                mi.setAnnotationsOnly(true);
+              } else {
+                methodsInserted.add(methodName);
+              }
             }
 
             String toInsert = iToInsert.getText(comments, abbreviate,

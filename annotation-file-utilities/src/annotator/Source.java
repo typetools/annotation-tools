@@ -3,13 +3,17 @@ package annotator;
 import java.io.*;
 import java.util.*;
 
+import javax.lang.model.util.Elements;
+import javax.lang.model.util.Types;
 import javax.tools.*;
 import javax.tools.JavaCompiler.CompilationTask;
 
 import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.util.JavacTask;
 import com.sun.tools.javac.api.JavacTaskImpl;
-import com.sun.tools.javac.code.Types;
+import com.sun.tools.javac.model.JavacElements;
+import com.sun.tools.javac.model.JavacTypes;
+import com.sun.tools.javac.util.Context;
 
 /**
  * Represents a Java source file. This class provides three major operations:
@@ -25,7 +29,8 @@ public final class Source {
     private StringBuilder source;
     private DiagnosticCollector<JavaFileObject> diagnostics;
     private String path;
-    private Types types;
+    private JavacElements elementUtils;
+    private JavacTypes typeUtils;
 
     /**
      * Signifies that a problem has occurred with the compiler that produces
@@ -76,8 +81,10 @@ public final class Source {
             compiler.getTask(null, fileManager, diagnostics, optsList, null, fileObjs);
         if (!(cTask instanceof JavacTask))
             throw new CompilerException("could not get a valid JavacTask: " + cTask.getClass());
+        Context context = ((JavacTaskImpl)cTask).getContext();
         this.task = (JavacTask)cTask;
-        this.types = Types.instance(((JavacTaskImpl)cTask).getContext());
+        this.typeUtils = JavacTypes.instance(context);
+        this.elementUtils = JavacElements.instance(context);
 
         // Read the source file into a buffer.
         path = src;
@@ -96,7 +103,12 @@ public final class Source {
     /**
      * @return an object that provides utility methods for types
      */
-    public Types getTypes() { return types; }
+    public Types getTypeUtils() { return typeUtils; }
+
+    /**
+     * @return an object that provides utility methods for elements
+     */
+    public Elements getElementUtils() { return elementUtils; }
 
     /**
      * Parse the input file, returning a set of Tree API roots (as

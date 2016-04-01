@@ -96,6 +96,14 @@ public final class Criteria {
    * @return true iff this is the criteria on a receiver
    */
   public boolean isOnReceiver() {
+    ASTPath astPath = getASTPath();
+    if (astPath != null && !astPath.isEmpty()) {
+      ASTPath.ASTEntry entry = astPath.get(-1);
+      return entry.getTreeKind() == Tree.Kind.METHOD
+          && entry.childSelectorIs(ASTPath.PARAMETER)
+          && entry.getArgument() < 0;
+    }
+
     for (Criterion c : criteria.values()) {
       if (c.getKind() == Criterion.Kind.RECEIVER) {
         return true;
@@ -103,6 +111,48 @@ public final class Criteria {
     }
 
     return false;
+  }
+
+  /**
+   * Determines whether this is the criteria on a formal parameter,
+   * but not the receiver.
+   *
+   * @return true iff this is the criteria on a formal parameter,
+   * but not the receiver
+   */
+  public boolean isOnParameter() {
+    ASTPath astPath = getASTPath();
+    if (astPath != null && !astPath.isEmpty()) {
+      ASTPath.ASTEntry entry = astPath.get(-1);
+      return entry.getTreeKind() == Tree.Kind.METHOD
+          && entry.childSelectorIs(ASTPath.PARAMETER)
+          && entry.getArgument() >= 0;
+    }
+
+    for (Criterion c : criteria.values()) {
+      if (c.getKind() == Criterion.Kind.PARAM) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Gives the index of the indicated formal parameter, if any.
+   * Does not work for the receiver formal parameter.
+   *
+   * @return the zero-based index of the parameter, or -1 if this
+   *          contains no such information
+   */
+  public int getParamPos() {
+    for (Criterion c : criteria.values()) {
+      if (c.getKind() == Criterion.Kind.PARAM) {
+        return ((ParamCriterion) c).paramPos;
+      }
+    }
+
+    return -1;
   }
 
   /**
@@ -126,6 +176,13 @@ public final class Criteria {
    * @return true iff this is the criteria on a return type
    */
   public boolean isOnReturnType() {
+    ASTPath astPath = getASTPath();
+    if (astPath != null && !astPath.isEmpty()) {
+      ASTPath.ASTEntry entry = astPath.get(-1);
+      return entry.getTreeKind() == Tree.Kind.METHOD
+          && entry.childSelectorIs(ASTPath.TYPE);
+    }
+
     for (Criterion c : criteria.values()) {
       if (c.getKind() == Criterion.Kind.RETURN_TYPE) {
         return true;
@@ -202,7 +259,34 @@ public final class Criteria {
   }
 
   /**
-   * Returns true if this Criteria is on the given method.
+   * Returns true if this Criteria is on a method declaration.
+   */
+  public boolean isOnMethodDeclaration() {
+    for (Criterion c : criteria.values()) {
+      if (c.getKind() == Criterion.Kind.IN_METHOD
+          && ((InMethodCriterion) c).isDeclaration) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Returns true if this Criteria is on the given field.
+   */
+  public boolean isOnField(String methodname) {
+    for (Criterion c : criteria.values()) {
+      if (c.getKind() == Criterion.Kind.FIELD) {
+        if (((FieldCriterion) c).varName.equals(methodname)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Returns true if this Criteria is on a field declaration.
    */
   public boolean isOnFieldDeclaration() {
     for (Criterion c : criteria.values()) {
@@ -217,7 +301,8 @@ public final class Criteria {
   /**
    * Gives the AST path specified in the criteria, if any.
    *
-   * @return AST path from {@link ASTPathCriterion}, or null if none present
+   * @return AST path from an {@link ASTPathCriterion},
+   * or null if no criterion in this is an ASTPathCriterion
    */
   public ASTPath getASTPath() {
     for (Criterion c : criteria.values()) {
@@ -405,14 +490,24 @@ public final class Criteria {
   }
 
   /**
+   * @see #inMethod(String, boolean)
+   */
+  @Deprecated
+  public final static Criterion inMethod(String varName) {
+    return new InMethodCriterion(varName);
+  }
+
+  /**
    * Creates an "in method" criterion: that a program element is enclosed
    * by the specified method.
    *
    * @param name the name of the enclosing method
+   * @param isDeclaration whether annotation applies to a declaration
+   *         (i.e., is not a type annotation)
    * @return an "in method" criterion
    */
-  public final static Criterion inMethod(String name) {
-    return new InMethodCriterion(name);
+  public final static Criterion inMethod(String name, boolean isDeclaration) {
+    return new InMethodCriterion(name, isDeclaration);
   }
 
   /**
@@ -437,11 +532,23 @@ public final class Criteria {
     return new GenericArrayLocationCriterion(loc);
   }
 
+  /**
+   * @see #field(String, boolean)
+   */
   @Deprecated
   public final static Criterion field(String varName) {
     return new FieldCriterion(varName);
   }
 
+  /**
+   * Creates an "in field" criterion: that a program element is enclosed
+   * by the specified field declaration or initializer.
+   *
+   * @param varName the name of the field
+   * @param isOnDeclaration whether annotation applies to a declaration
+   *         (i.e., is not a type annotation)
+   * @return an "in field" criterion
+   */
   public final static Criterion field(String varName, boolean isOnDeclaration) {
     return new FieldCriterion(varName, isOnDeclaration);
   }
@@ -474,11 +581,6 @@ public final class Criteria {
   public final static Criterion param(String methodName, Integer pos) {
     return new ParamCriterion(methodName, pos);
   }
-//
-//  public final static Criterion param(String methodName, Integer pos, InnerTypeLocation loc) {
-//    return new ParamCriterion(methodName, pos, loc);
-//  }
-
 
   public final static Criterion local(String methodName, LocalLocation loc) {
     return new LocalVariableCriterion(methodName, loc);

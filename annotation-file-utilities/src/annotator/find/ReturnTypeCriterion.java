@@ -34,6 +34,10 @@ public class ReturnTypeCriterion implements Criterion {
     Criteria.dbug.debug("ReturnTypeCriterion.isSatisfiedBy(%s); this=%n",
         Main.pathToString(path), this.toString());
 
+    if (CommonScanner.hasClassKind(path.getLeaf())) { return false; }
+    //JCTree.JCClassDecl decl = (JCTree.JCClassDecl) path.getLeaf();
+    //return InheritedSymbolFinder.isInheritedIn(decl.sym, methodName);
+
     do {
       if (path.getLeaf().getKind() == Tree.Kind.METHOD) {
         if (sigMethodCriterion == null

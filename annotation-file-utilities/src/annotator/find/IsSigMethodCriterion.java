@@ -11,7 +11,6 @@ import java.util.Set;
 
 import plume.UtilMDE;
 
-import com.sun.source.tree.AnnotatedTypeTree;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.tree.ExpressionTree;
@@ -21,6 +20,9 @@ import com.sun.source.tree.Tree;
 import com.sun.source.tree.TypeParameterTree;
 import com.sun.source.tree.VariableTree;
 import com.sun.source.util.TreePath;
+import com.sun.tools.javac.code.Type;
+import com.sun.tools.javac.tree.JCTree;
+import com.sun.tools.javac.tree.JCTree.JCExpression;
 
 public class IsSigMethodCriterion implements Criterion {
 
@@ -46,13 +48,6 @@ public class IsSigMethodCriterion implements Criterion {
   public IsSigMethodCriterion(String methodName) {
     this.fullMethodName = methodName.substring(0, methodName.indexOf(")") + 1);
     this.simpleMethodName = methodName.substring(0, methodName.indexOf("("));
-//    this.fullyQualifiedParams = new ArrayList<String>();
-//    for (String s : methodName.substring(
-//        methodName.indexOf("(") + 1, methodName.indexOf(")")).split(",")) {
-//      if (s.length() > 0) {
-//        fullyQualifiedParams.add(s);
-//      }
-//    }
     this.fullyQualifiedParams = new ArrayList<String>();
     try {
       parseParams(
@@ -350,15 +345,7 @@ public class IsSigMethodCriterion implements Criterion {
     Map<String, String> typeToClassMap = new HashMap<String, String>();
     for (TypeParameterTree param : mt.getTypeParameters()) {
       String paramName = param.getName().toString();
-      String paramClass = "Object";
-      List<? extends Tree> paramBounds = param.getBounds();
-      if (paramBounds != null && paramBounds.size() >= 1) {
-        Tree boundZero = paramBounds.get(0);
-        if (boundZero.getKind() == Tree.Kind.ANNOTATED_TYPE) {
-          boundZero = ((AnnotatedTypeTree) boundZero).getUnderlyingType();
-        }
-        paramClass = boundZero.toString();
-      }
+      String paramClass = erasure(param);
       typeToClassMap.put(paramName, paramClass);
     }
 
@@ -372,15 +359,7 @@ public class IsSigMethodCriterion implements Criterion {
       while (ct!=null) {
         for (TypeParameterTree param : ct.getTypeParameters()) {
           String paramName = param.getName().toString();
-          String paramClass = "Object";
-          List<? extends Tree> paramBounds = param.getBounds();
-          if (paramBounds != null && paramBounds.size() >= 1) {
-            Tree pb = paramBounds.get(0);
-            if (pb.getKind() == Tree.Kind.ANNOTATED_TYPE) {
-                pb = ((AnnotatedTypeTree)pb).getUnderlyingType();
-            }
-            paramClass = pb.toString();
-          }
+          String paramClass = erasure(param);
           typeToClassMap.put(paramName, paramClass);
         }
         classpath = classpath.getParentPath();
@@ -401,6 +380,16 @@ public class IsSigMethodCriterion implements Criterion {
 
     Criteria.dbug.debug("IsSigMethodCriterion.isSatisfiedBy => true%n");
     return true;
+  }
+
+  /** Find a type parameter's bound in the current context. */
+  private String erasure(TypeParameterTree param) {
+    List<JCExpression> bounds = ((JCTree.JCTypeParameter) param).getBounds();
+    if (bounds != null && !bounds.isEmpty()) {
+      Type erasure = bounds.get(0).type.tsym.erasure_field;
+      if (erasure != null) { return erasure.toString(); }
+    }
+    return "java.lang.Object";
   }
 
   /* This is a copy of the method from the Checker Framework

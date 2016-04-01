@@ -15,7 +15,7 @@ public class MethodBoundCriterion implements Criterion {
   public MethodBoundCriterion(String methodName, BoundLocation boundLoc) {
     this.methodName = methodName;
     this.boundLoc = boundLoc;
-    this.sigMethodCriterion = Criteria.inMethod(methodName);
+    this.sigMethodCriterion = Criteria.inMethod(methodName, false);
     this.boundLocationCriterion = Criteria.atBoundLocation(boundLoc);
   }
 

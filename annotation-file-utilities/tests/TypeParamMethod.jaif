@@ -7,7 +7,12 @@ class TypeParamMethod:
     method foo(Ljava/lang/Object;)V:
         typeparam 0: @java.lang.ReadOnly
 
-    method foo2(Lannotator/tests/Date;)V:
+    // Previously foo2(Lannotator/tests/Date;)V, but now that match is
+    // based on erasure type, it would be impossible for _both_ foo2
+    // methods to succeed simultaneously as before, as the import of
+    // java.util.Date conflicts with annotator.tests.Date.  (The test
+    // harness ignores the latter at compile time.)
+    method foo2(Ljava/util/Date;)V:
         typeparam 0: @java.lang.ReadOnly
 
     method foo(Ljava/lang/Object;Ljava/lang/Object;)V:

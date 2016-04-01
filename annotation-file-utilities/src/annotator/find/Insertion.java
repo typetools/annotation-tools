@@ -50,10 +50,26 @@ public abstract class Insertion {
     protected Set<String> packageNames;
 
     /**
+     * The inner types to go on this insertion. See {@link ReceiverInsertion}
+     * for more details.
+     */
+    protected List<Insertion> innerTypeInsertions;
+
+    /**
      * Set of annotation names that should always be qualified, even
      *  when {@link getText(boolean, boolean)} is called with abbreviate true.
      */
     protected static Set<String> alwaysQualify = new LinkedHashSet<String>();
+
+    /**
+     * Type to be inserted, if applicable; otherwise null.
+     */
+    protected Type type;
+
+    /**
+     * If true only the annotations from {@link type} will be inserted.
+     */
+    protected boolean annotationsOnly;
 
     /**
      * Creates a new insertion.
@@ -62,10 +78,38 @@ public abstract class Insertion {
      * @param separateLine whether to insert the text on its own
      */
     public Insertion(Criteria criteria, boolean separateLine) {
+        this(null, criteria, separateLine, null);
+    }
+
+    /**
+     * Creates a new insertion.
+     *
+     * @param type type to be generated, if applicable
+     * @param criteria where to insert the text
+     * @param innerTypeInsertions insertions to go on inner parts of type
+     */
+    public Insertion(Type type, Criteria criteria,
+            List<Insertion> innerTypeInsertions) {
+        this(type, criteria, false, innerTypeInsertions);
+    }
+
+    /**
+     * Creates a new insertion.
+     *
+     * @param type type to be generated, if applicable
+     * @param criteria where to insert the text
+     * @param separateLine whether to insert the text on its own
+     * @param innerTypeInsertions insertions to go on inner parts of type
+     */
+    public Insertion(Type type, Criteria criteria, boolean separateLine,
+            List<Insertion> innerTypeInsertions) {
         this.criteria = criteria;
         this.separateLine = separateLine;
         this.packageNames = new LinkedHashSet<String>();
         this.inserted = false;
+        this.type = type;
+        this.innerTypeInsertions = innerTypeInsertions;
+        this.annotationsOnly = false;
     }
 
     /**
@@ -203,6 +247,50 @@ public abstract class Insertion {
     }
 
     /**
+     * Gets the type.  It is assumed that the returned value will be
+     * modified to update the type to be inserted.
+     */
+    public Type getType() {
+        return type;
+    }
+
+    /**
+     * Sets the type.
+     */
+    public void setType(Type type) {
+        this.type = type;
+    }
+
+    public DeclaredType getBaseType() {
+        return getBaseType(type);
+    }
+
+    public static DeclaredType getBaseType(Type type) {
+        if (type != null) {
+            switch (type.getKind()) {
+            case DECLARED:
+                return (DeclaredType) type;
+            case BOUNDED:
+                return getBaseType(((BoundedType) type).getType());
+            case ARRAY:
+                return getBaseType(((ArrayType) type).getComponentType());
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Indicates whether inserted text should consist <em>only</em> of
+     *  the indicated annotations.  Useful when subordinate insertions
+     *  have already been added.
+     *
+     * @param annotationsOnly
+     */
+    public void setAnnotationsOnly(boolean annotationsOnly) {
+        this.annotationsOnly = annotationsOnly;
+    }
+
+    /**
      * Gets whether the insertion goes on a separate line.
      *
      * @return whether the insertion goes on a separate line
@@ -227,6 +315,14 @@ public abstract class Insertion {
      */
     public void setInserted(boolean inserted) {
         this.inserted = inserted;
+    }
+
+    /**
+     * Gets the inner type insertions associated with this insertion.
+     * @return a copy of the inner types.
+     */
+    public List<Insertion> getInnerTypeInsertions() {
+        return innerTypeInsertions;
     }
 
     /**
@@ -389,6 +485,20 @@ public abstract class Insertion {
         decorateType(innerTypeInsertions, outerType, null);
     }
 
+    /**
+     * Adds each of the given inner type insertions to the correct part of the
+     * type, based on the insertion's type path.
+     *
+     * @param innerTypeInsertions
+     *          The insertions to add to the type. These must be inner type
+     *          insertions, meaning each of the insertions' {@link Criteria}
+     *          must contain a {@link GenericArrayLocationCriterion} and
+     *          {@link GenericArrayLocationCriterion#getLocation()} must return
+     *          a non-empty list.
+     * @param outerType The type to add the insertions to.
+     * @param outerPath The portion of the AST path that leads to the
+     *          outer type.
+     */
     public static void decorateType(List<Insertion> innerTypeInsertions,
             final Type outerType, ASTPath outerPath) {
         for (Insertion innerInsertion : innerTypeInsertions) {
@@ -481,9 +591,9 @@ public abstract class Insertion {
         }
     }
 
+    // auxiliary for previous method
     private static void decorateType(ASTPath astPath,
             String annos, Type type, ASTPath outerPath) {
-        //type.addAnnotation(annos);  // TODO
         Iterator<ASTPath.ASTEntry> ii = astPath.iterator();
         Iterator<ASTPath.ASTEntry> oi = outerPath.iterator();
 

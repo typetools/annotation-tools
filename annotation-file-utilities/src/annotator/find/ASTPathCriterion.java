@@ -54,7 +54,6 @@ import com.sun.source.tree.UnionTypeTree;
 import com.sun.source.tree.VariableTree;
 import com.sun.source.tree.WhileLoopTree;
 import com.sun.source.tree.WildcardTree;
-import com.sun.source.tree.Tree.Kind;
 import com.sun.source.util.SimpleTreeVisitor;
 import com.sun.source.util.TreePath;
 import com.sun.tools.javac.code.Flags;
@@ -96,7 +95,7 @@ public class ASTPathCriterion implements Criterion {
     /** {@inheritDoc} */
     @Override
     public boolean isSatisfiedBy(TreePath path) {
-        if (path == null) {
+        if (path == null || astPath.isEmpty()) {
             return false;
         }
 
@@ -119,14 +118,10 @@ public class ASTPathCriterion implements Criterion {
 
         // If astPath starts with Method.* or Class.*, include the
         // MethodTree or ClassTree on actualPath.
-        if (path != null && !astPath.isEmpty()) {
-            Tree.Kind entryKind = astPath.get(0).getTreeKind();
-            if (entryKind == Tree.Kind.METHOD
-                            && kind == Tree.Kind.METHOD
-                    || entryKind == Tree.Kind.CLASS
-                            && ASTPath.isClassEquiv(kind)) {
-                actualPath.add(0, leaf);
-            }
+        ASTPath.ASTEntry astEntry = astPath.get(0);
+        if (astEntry.getTreeKind() == kind
+                && (kind == Tree.Kind.METHOD || ASTPath.isClassEquiv(kind))) {
+            actualPath.add(0, leaf);
         }
 
         if (debug) {
@@ -140,7 +135,7 @@ public class ASTPathCriterion implements Criterion {
 
         int astPathLen = astPath.size();
         int actualPathLen = actualPath.size();
-        if (astPathLen == 0 || actualPathLen == 0) { return false; }
+        if (actualPathLen <= 0) { return false; }
         //if (actualPathLen != astPathLen + (isOnNewArrayType ? 0 : 1)) {
         //    return false;
         //}

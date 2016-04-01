@@ -187,6 +187,9 @@ public class GenericArrayLocationCriterion implements Criterion {
                              // I don't know why a GenericArrayLocationCriterion
                              // is being created in this case, but it is.
                              || (leaf.getKind() == Tree.Kind.PRIMITIVE_TYPE) // PrimitiveTypeTree
+                             // This case covers situations in which an
+                             // inherited method might be generated.
+                             || (leaf.getKind() == Tree.Kind.CLASS) // ClassTree
                              // TODO: do we need wildcards here?
                              // || leaf instanceof WildcardTree
                              )

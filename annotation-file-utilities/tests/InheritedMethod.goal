@@ -1,0 +1,18 @@
+package annotator.tests;
+
+class InheritedMethod {
+  abstract class Base<T> {
+    //public T f(T t) { return t; }  // type instantiation test (NYI)
+    public int[] g(String[] a, int i) { return new int[0]; }
+  }
+
+  public class Sub extends Base<Integer> {
+  
+@annotator.tests.A
+public @annotator.tests.B int @annotator.tests.C [] g(@annotator.tests.D InheritedMethod.Sub this, java.lang.@annotator.tests.E String @annotator.tests.F [] arg0, @annotator.tests.G int arg1) { return super.g(arg0, arg1); }
+  }
+
+@annotator.tests.A
+public java.lang.@annotator.tests.B String toString(@annotator.tests.C InheritedMethod this) { return super.toString(); }
+}
+

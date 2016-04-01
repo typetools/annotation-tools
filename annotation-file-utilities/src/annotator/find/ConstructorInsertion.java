@@ -6,7 +6,7 @@ import java.util.Set;
 
 import type.Type;
 
-public class ConstructorInsertion extends TypedInsertion {
+public class ConstructorInsertion extends Insertion {
   private ReceiverInsertion receiverInsertion = null;
   private Set<Insertion> declarationInsertions = new LinkedHashSet<Insertion>();
 
