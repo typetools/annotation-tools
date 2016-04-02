@@ -402,7 +402,7 @@
     </copy>
 
     <symlink overwrite="true"
-             link="${deploy-dir}/index.html"
+             link="index.html"
              resource="${deploy-dir}/annotation-file-utilities.html"/>
   </target>
 

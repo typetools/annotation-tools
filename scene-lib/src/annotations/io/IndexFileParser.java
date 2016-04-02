@@ -25,6 +25,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.regex.Pattern;
 
 import com.sun.source.tree.Tree.Kind;
 import com.sun.tools.javac.code.TypeAnnotationPosition;
@@ -804,6 +805,12 @@ public final class IndexFileParser {
             key = "<" + basename + ">";
         } else {
             key = expectIdentifier();
+            // too bad className is private in AClass and thus must be
+            // extracted from what toString() returns
+            if (Pattern.matches("AClass: (?:[^. ]+\\.)*" + key,
+                    c.toString())) {  // ugh
+                key = "<init>";
+            }
         }
 
         expectChar('(');

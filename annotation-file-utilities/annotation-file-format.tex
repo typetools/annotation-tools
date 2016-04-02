@@ -437,7 +437,10 @@ signature is the erased signature of the method and does not contain generic
 type information, but does contain the return type. Using \code{javap -s} makes
 it easy to find the signature. The method keys ``\code{<init>}'' and
 ``\code{<clinit>}'' are used to name instance (constructor) and class (static)
-initialization methods.
+initialization methods.  (The name of the constructor---that is, the final
+element of the class name---can be used in place of ``\code{<init>}''.)
+For both instance and class initializers, the ``return type'' part of the
+signature should be \code{V} (for \code{void}).
 
 % TODO: exception types in catch clause
 % TODO: .class literals
@@ -1461,4 +1464,4 @@ files.
 %  LocalWords:  AClass AMethod AElement objectweb anno tations parseScene
 %  LocalWords:  CriterionList isSatisifiedBy CriteriaList afu getPositions
 %  LocalWords:  InPackageCriterion InClassCriterion InMethodCriterion
-%  LocalWords:  ParamCriterion inserter RUNNABLE asmx ASM src asm
+%  LocalWords:  ParamCriterion inserter RUNNABLE ASM src asm
