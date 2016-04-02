@@ -12,7 +12,7 @@ public class TestTypecast {
   public Set set;
   public HashSet hset;
   public Map map;
-  
+
   public void test() {
     o = (Object) o;
     o = (Object) s;

@@ -37,7 +37,7 @@ public class SceneOps {
    * the first of three arguments, followed in order by the "minuend"
    * and the "subtrahend" (see {@link #diff(AScene, AScene)}.
    *
-   * @throws IOException 
+   * @throws IOException
    */
   public static void main(String[] args) throws IOException {
     assert args.length == 3 && "diff".equals(args[0]);

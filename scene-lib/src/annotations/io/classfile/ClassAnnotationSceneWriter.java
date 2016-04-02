@@ -890,7 +890,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
     private void ensureVisitObjectCreationAnnotations() {
       for (Map.Entry<RelativeLocation, ATypeElement> entry :
           aMethod.body.news.entrySet()) {
-        if(!entry.getKey().isBytecodeOffset()) {
+        if (!entry.getKey().isBytecodeOffset()) {
           // if the RelativeLocation is a source index, we cannot insert it
           // into bytecode
           // TODO: output a warning or translate
@@ -1033,7 +1033,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
     private void ensureVisitTypecastAnnotations() {
       for (Map.Entry<RelativeLocation, ATypeElement> entry :
           aMethod.body.typecasts.entrySet()) {
-        if(!entry.getKey().isBytecodeOffset()) {
+        if (!entry.getKey().isBytecodeOffset()) {
           // if the RelativeLocation is a source index, we cannot insert it
           // into bytecode
           // TODO: output a warning or translate

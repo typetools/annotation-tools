@@ -28,31 +28,31 @@
             <available file="build.properties"/>
         </condition>
         <fail
-            unless="exists.build.properties" 
+            unless="exists.build.properties"
             message="Local build.properites file is missing."/>
 
         <property file="build.properties"/>
 
         <fail
-            unless="global.build.properties" 
+            unless="global.build.properties"
             message="Local build.properties file did not define global buildfile in property global.build.properties"/>
         <condition property="exists.global.build.properties">
             <available file="${global.build.properties}"/>
         </condition>
-        <fail 
+        <fail
             unless="exists.global.build.properties"
         message="File ${global.build.properties} file not found."/>
         <property file="${global.build.properties}"/>
 
-        <fail 
-           unless="user.build.properties" 
+        <fail
+           unless="user.build.properties"
             message="Local build.properties file did not define global buildfile in property user.build.properties"/>
         <condition property="exists.user.build.properties">
             <available file="${user.build.properties}"/>
         </condition>
-        <fail 
+        <fail
             unless="exists.user.build.properties"
-            message="File ${user.build.properties} file not found."/>            
+            message="File ${user.build.properties} file not found."/>
         <property file="${user.build.properties}"/>
 
     </target>
@@ -169,9 +169,9 @@
             <fileset dir="src" excludes="**/*.java"/>
             <fileset dir="test" excludes="**/*.java"/>
         </copy>
-        <javac 
-               destdir="bin" 
-               debug="true" 
+        <javac
+               destdir="bin"
+               debug="true"
                classpathref="libpath"
                classpath="${libpath}"
                includeantruntime="false"
@@ -267,13 +267,13 @@
                 </exec>
             </then>
         </if>
-        <fail unless="example.output.matches" 
+        <fail unless="example.output.matches"
             message="In ${scene-lib}/test/annotations/tests/executable/, file example-output.jaif does not match goal."/>
         <condition property="example.stdout.matches">
             <filesmatch file1="${scene-lib}/test/annotations/tests/executable/example-stdout.jaif.goal"
                         file2="${scene-lib}/test/annotations/tests/executable/example-stdout.jaif"/>
         </condition>
-        <fail unless="example.stdout.matches" 
+        <fail unless="example.stdout.matches"
             message="In ${scene-lib}/test/annotations/tests/executable/, file example-stdout.jaif does not match goal."/>
 
     </target>
@@ -293,12 +293,12 @@
 
     <target name="javadoc" depends="javadoc-clean, init"
        description="Generate Javadoc API documentation">
-        <javadoc sourcepathref="javadoc-sourcepath" 
+        <javadoc sourcepathref="javadoc-sourcepath"
                 classpathref="libpath"
                 packagenames="*"
                 excludepackagenames=""
                 Overview="overview.html"
-                destdir="javadoc" 
+                destdir="javadoc"
                 access="public"
                 noqualifier="annotations:annotations.el:annotations.field:annotations.io:annotations.io.classfile:annotations.util:annotations.util.coll:java.lang"
                 />

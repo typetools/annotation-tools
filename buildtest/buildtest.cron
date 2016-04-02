@@ -1,7 +1,7 @@
 # This is the crontab for the nightly build test for Javarifier and
 # annotations (scene library, asm extension, file utilities).
-# 
-# This file needs to be installed before changes will take effect.  
+#
+# This file needs to be installed before changes will take effect.
 # You can install this crontab by running:
 #  crontab buildtest.cron
 

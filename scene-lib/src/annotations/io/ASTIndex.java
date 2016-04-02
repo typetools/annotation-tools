@@ -82,7 +82,7 @@ public class ASTIndex extends WrapperMap<Tree, ASTRecord> {
 
   /**
    * Maps source trees in compilation unit to corresponding AST paths.
-   * 
+   *
    * @param root compilation unit to be indexed
    * @return map of trees in compilation unit to AST paths
    */

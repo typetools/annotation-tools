@@ -16,7 +16,7 @@ public class TestLocalVariableGenericArray {
 
   public TestLocalVariableGenericArray() {
     int k = 1;
-    for (Map<String, String> e : map2.get("4gf")){
+    for (Map<String, String> e : map2.get("4gf")) {
       if (k < 5) {
         k = map2.get("").indexOf(new ArrayList<Map<String,String>>());
       } else {
@@ -58,7 +58,7 @@ public class TestLocalVariableGenericArray {
       Set<String> s = new HashSet<String>();
       Map<Set<String>, String> m;
       throw new RuntimeException("Hello");
-    } catch(Exception e) {
+    } catch (Exception e) {
       System.out.println(i);
     }
   }

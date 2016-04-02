@@ -115,12 +115,12 @@ public class ClassFileReader {
         String outputFile = origName + ".jaif";
         System.out.println("printing results to : " + outputFile);
         IndexFileWriter.write(scene, outputFile);
-      } catch(IOException e) {
+      } catch (IOException e) {
         System.out.println("There was an error in reading class: " + origName);
         System.out.println(
             "Did you ensure that this class is on your classpath?");
         return;
-      } catch(Exception e) {
+      } catch (Exception e) {
         System.out.println("Unknown error trying to extract annotations from: " +
             origName);
         System.out.println(e.getMessage());

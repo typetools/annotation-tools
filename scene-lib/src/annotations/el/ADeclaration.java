@@ -14,7 +14,7 @@ import org.checkerframework.checker.javari.qual.ReadOnly;
 /**
  * A declaration, as opposed to an expression.  Base class for AClass,
  * AMethod, and AField.
- * 
+ *
  * @author dbro
  */
 public abstract class ADeclaration extends AElement {

@@ -9,18 +9,18 @@ public class TestFieldGeneric<T> {
   List<String> list;
   Set<TestFieldGeneric> set;
   TestFieldGeneric<T> testFieldGeneric = new TestFieldGeneric<T>();
-  
+
   public TestFieldGeneric() {
-    
+
   }
-  
+
   Set<String> otherSet;
-  
+
   public String toString() {
     return s;
   }
-  
+
   Set<TestFieldGeneric<Set<TestFieldGeneric>>> nestedSet;
-  
+
   Map<Set<TestFieldGeneric>, TestFieldGeneric<T>> nestedMap;
 }
