@@ -1,6 +1,5 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<!DOCTYPE html>
+<html>
 <head>
   <title>Annotation File Utilities</title>
 </head>
@@ -49,8 +48,8 @@
 
 <p>
 Java annotations are meta-data about Java program elements, as in
-&ldquo;<code><font color="red">@Deprecated</font> class Date
-{&nbsp;...&nbsp;}</code>&rdquo; or &ldquo;<code>List&lt;<font color="red">@NonNull</font> String&gt;</code>&rdquo;.
+&ldquo;<code><mark>@Deprecated</mark> class Date
+{&nbsp;...&nbsp;}</code>&rdquo; or &ldquo;<code>List&lt;<mark>@NonNull</mark> String&gt;</code>&rdquo;.
 Ordinarily, Java annotations are
 written in the
 source code of a <code>.java</code> Java source file.  When
@@ -114,7 +113,7 @@ A diagram showing the interactions betweeen these tools is below.
 </p>
 
 <div>
-<img src="figures/tool-relations.png" />
+<img src="figures/tool-relations.png" alt="Relationships between AFU tools" />
 </div>
 
 <p>
@@ -167,7 +166,7 @@ Add the <code>annotation-file-utilities</code> directory to your path.
 <li>
 For <b>Unix</b> (including Linux and MacOS), add the directory to your PATH
 environment variable.  If your shell is sh or bash, add to your
-<tt>~/.bashrc</tt> or <tt>~/.bash_profile</tt> file:
+<code>~/.bashrc</code> or <code>~/.bash_profile</code> file:
 <pre><code>export PATH=${PATH}:<em>/path/to</em>/annotation-tools/annotation-file-utilities/scripts</code></pre>
 <!-- Omitted to save space and simplify instructions
 For csh/tcsh, add to ~/.tcshrc or ~/.cshrc or ~/.login:
@@ -368,6 +367,7 @@ In this case, you should add type arguments, such as changing
 <p>
 In a few cases, insert-annotations-to-source will generate "default"
 code to provide a location for an annotation.  These include
+</p>
 <ul>
 <li>method and constructor <a href="http://docs.oracle.com/javase/specs/jls/se8/html/jls-8.html#jls-8.4.1-220">receivers;</a></li>
 <li>type parameter bounds (<code>extends Object</code>);</li>
@@ -375,7 +375,6 @@ code to provide a location for an annotation.  These include
 <li>nullary constructor definitions; and</li>
 <li>explicit constructor invocations for literal arrays (e.g., <code>{"a", "b"}</code> becomes <code>new String[] {"a", "b"}</code>).</li>
 </ul>
-</p>
 
 <p>
 The command-line options are as follows:
@@ -400,7 +399,7 @@ The command-line options are as follows:
  <p>
 
  To preserve changes when using the --in-place option, first remove the
- backup files.  Or, use the <tt>-d .</tt> option, which makes (and
+ backup files.  Or, use the <code>-d .</code> option, which makes (and
  reads) no backup, instead of --in-place. [default false]</li>
       <li id="option:abbreviate"><b>-a</b> <b>--abbreviate=</b><i>boolean</i>. Abbreviate annotation names [default true]</li>
       <li id="option:comments"><b>-c</b> <b>--comments=</b><i>boolean</i>. Insert annotations in comments [default false]</li>
@@ -468,7 +467,7 @@ has a number of methods (<code>AMethod</code>), fields
 related in the type hierarchy shown below.</p>
 
 <div>
-<img src="scene-lib-type-hierarchy.png"></div>
+<img src="scene-lib-type-hierarchy.png" alt="scene-lib type hierarchy">
 </div>
 
 <p>Each class in the type hierarchy has one or more fields to hold

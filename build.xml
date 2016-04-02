@@ -86,8 +86,9 @@
       <arg value="--ignore"/>
       <arg value="/api/"/>
       <arg value="/build/"/>
-      <arg value="/checker/manual/manual.html"/>
-      <arg value="/checker/jdk/nullness/src/java/lang/ref/package.html"/>
+      <arg value="/javadoc/"/>
+      <arg value="/annotation-file-utilities/annotation-file-format.html"/>
+      <arg value="/scene-lib/javadoc/"/>
     </exec>
   </target>
 
