@@ -26,21 +26,30 @@ import annotations.io.IndexFileWriter;
 import annotations.util.coll.VivifyingMap;
 
 /**
- * Containing class for classes implementing algebraic operations on scenes.
+ * Algebraic operations on scenes.
  *
  * @author dbro
  */
 public class SceneOps {
+  private SceneOps() {}
+
   /**
    * Run an operation on a subcommand-specific number of JAIFs.
    * Currently the only available subcommand is "diff", which must be
    * the first of three arguments, followed in order by the "minuend"
-   * and the "subtrahend" (see {@link #diff(AScene, AScene)}.
+   * and the "subtrahend" (see {@link #diff(AScene, AScene)}).  If
+   * successful, the diff subcommand writes the scene it calculates to
+   * {@link System#out}.
    *
-   * @throws IOException
+   * @throws IOException 
    */
   public static void main(String[] args) throws IOException {
-    assert args.length == 3 && "diff".equals(args[0]);
+    if (args.length != 3 || "diff".equals(args[0])) {
+      System.err.println(
+          "usage: java annotations.util.SceneOps diff first.jaif second.jaif");
+      System.exit(1);
+    }
+
     AScene s1 = new AScene();
     AScene s2 = new AScene();
 
@@ -60,8 +69,8 @@ public class SceneOps {
   }
 
   /**
-   * @param s1
-   * @param s2
+   * @param s1 the "minuend"
+   * @param s2 the "subtrahend"
    * @return s1 - s2 ("set difference")
    */
   public static AScene diff(AScene s1, AScene s2) {
@@ -77,7 +86,7 @@ public class SceneOps {
     System.exit(1);
   }
 
-  // beginning of unit test set?
+  // TODO: integrate into scene-lib test suite
   public static void testDiffEmpties() {
     assert new AScene().equals(diff(new AScene(), new AScene()));
   }
@@ -85,7 +94,7 @@ public class SceneOps {
     AScene scene1 = new AScene();
     AScene scene2 = new AScene();
     String dirname =
-        "/homes/gws/dbro/src/jsr308/annotation-tools/scene-lib/test/annotations/tests/classfile/cases";
+        "test/annotations/tests/classfile/cases";
     String[] cases = { "ClassEmpty", "ClassNonEmpty", "FieldGeneric",
         "FieldSimple", "LocalVariableGenericArray", "MethodReceiver",
         "MethodReturnTypeGenericArray", "ObjectCreationGenericArray",
@@ -94,231 +103,265 @@ public class SceneOps {
       String filename = dirname+"/Test"+cases[i]+".jaif";
       IndexFileParser.parseFile(filename, scene1);
       IndexFileParser.parseFile(filename, scene2);
-      boolean b1 = new AScene().equals(diff(scene1, scene1));
-      boolean b2 = new AScene().equals(diff(scene1, scene2));
-      System.err.print(cases[i]+": ");
-      System.err.print(b1 ? "yes! " : "no! ");
-      System.err.println(b2 ? "yes!" : "no!");
+      assert new AScene().equals(diff(scene1, scene1));
+      assert new AScene().equals(diff(scene1, scene2));
     }
   }
 }
 
 /**
  * Visitor for calculating "set difference" of scenes.
+ * Visitor methods fill in a scene instead of returning one because an
+ * {@link AElement} can be created only inside an {@link AScene}. 
  *
  * @author dbro
  */
-class DiffVisitor implements ElementVisitor<Void, Pair<AElement, AElement>> {
+class DiffVisitor
+implements ElementVisitor<Void, Pair<AElement, AElement>> {
   /**
    * Compute the difference of two scenes, that is, a scene containing
-   * insertion specifications that exist in the first but not in the
-   * second.
+   * all and only those insertion specifications that exist in the first
+   * but not in the second.
    *
-   * @param minuend
-   * @param subtrahend
-   * @param diff scene to be filled in with the difference of minuend
-   * and subtrahend
+   * @param s1 the "minuend"
+   * @param s2 the "subtrahend"
+   * @return s1 - s2 ("set difference")
    */
-  public void visitScene(AScene minuend, AScene subtrahend, AScene diff) {
-    visitElements(minuend.packages, subtrahend.packages, diff.packages);
-    diff(minuend.imports, subtrahend.imports, diff.imports);
-    visitElements(minuend.classes, subtrahend.classes, diff.classes);
+  public static AScene diff(AScene s1, AScene s2) {
+    AScene difference = new AScene();
+    new DiffVisitor().visitScene(s1, s2, difference);
+    difference.prune();
+    return difference;
+  }
+
+  /**
+   * Adds all annotations that are in {@code minuend} but not in
+   * {@code subtrahend} to {@code difference}.
+   */
+  public void visitScene(AScene minuend, AScene subtrahend,
+      AScene difference) {
+    visitElements(minuend.packages, subtrahend.packages,
+        difference.packages);
+    diff(minuend.imports, subtrahend.imports, difference.imports);
+    visitElements(minuend.classes, subtrahend.classes,
+        difference.classes);
   }
 
   // Never used, as annotations and definitions don't get duplicated.
   @Override
-  public Void visitAnnotationDef(AnnotationDef m,
+  public Void visitAnnotationDef(AnnotationDef minuend,
       Pair<AElement, AElement> arg) {
+    throw new IllegalStateException(
+        "BUG: DiffVisitor.visitAnnotationDef invoked");
+  }
+
+  /**
+   * Calculates difference between {@code minuend} and first component
+   * of {@code arg}, adding results to second component of {@code arg}.
+   */
+  @Override
+  public Void visitBlock(ABlock minuend, Pair<AElement, AElement> arg) {
+    ABlock subtrahend = (ABlock) arg.fst;
+    ABlock difference = (ABlock) arg.snd;
+    visitElements(minuend.locals, subtrahend.locals, difference.locals);
+    return visitExpression(minuend, arg);
+  }
+
+  /**
+   * Calculates difference between {@code minuend} and first component
+   * of {@code arg}, adding results to second component of {@code arg}.
+   */
+  @Override
+  public Void visitClass(AClass minuend, Pair<AElement, AElement> arg) {
+    AClass subtrahend = (AClass) arg.fst;
+    AClass difference = (AClass) arg.snd;
+    visitElements(minuend.bounds, subtrahend.bounds, difference.bounds);
+    visitElements(minuend.extendsImplements,
+        subtrahend.extendsImplements, difference.extendsImplements);
+    visitElements(minuend.methods, subtrahend.methods,
+        difference.methods);
+    visitElements(minuend.staticInits, subtrahend.staticInits,
+        difference.staticInits);
+    visitElements(minuend.instanceInits, subtrahend.instanceInits,
+        difference.instanceInits);
+    visitElements(minuend.fields, subtrahend.fields, difference.fields);
+    visitElements(minuend.fieldInits, subtrahend.fieldInits,
+        difference.fieldInits);
+    return visitDeclaration(minuend, arg);
+  }
+
+  /**
+   * Calculates difference between {@code minuend} and first component
+   * of {@code arg}, adding results to second component of {@code arg}.
+   */
+  @Override
+  public Void visitDeclaration(ADeclaration minuend,
+      Pair<AElement, AElement> arg) {
+    ADeclaration subtrahend = (ADeclaration) arg.fst;
+    ADeclaration difference = (ADeclaration) arg.snd;
+    visitElements(minuend.insertAnnotations,
+        subtrahend.insertAnnotations, difference.insertAnnotations);
+    visitElements(minuend.insertTypecasts, subtrahend.insertTypecasts,
+        difference.insertTypecasts);
+    return visitElement(minuend, arg);
+  }
+
+  /**
+   * Calculates difference between {@code minuend} and first component
+   * of {@code arg}, adding results to second component of {@code arg}.
+   */
+  @Override
+  public Void visitExpression(AExpression minuend,
+      Pair<AElement, AElement> arg) {
+    AExpression subtrahend = (AExpression) arg.fst;
+    AExpression difference = (AExpression) arg.snd;
+    visitElements(minuend.typecasts, subtrahend.typecasts,
+        difference.typecasts);
+    visitElements(minuend.instanceofs, subtrahend.instanceofs,
+        difference.instanceofs);
+    visitElements(minuend.news, subtrahend.news, difference.news);
+    visitElements(minuend.calls, subtrahend.calls, difference.calls);
+    visitElements(minuend.refs, subtrahend.refs, difference.refs);
+    visitElements(minuend.funs, subtrahend.funs, difference.funs);
+    return visitElement(minuend, arg);
+  }
+
+  /**
+   * Calculates difference between {@code minuend} and first component
+   * of {@code arg}, adding results to second component of {@code arg}.
+   */
+  @Override
+  public Void visitField(AField minuend, Pair<AElement, AElement> arg) {
+    return visitDeclaration(minuend, arg);
+  }
+
+  /**
+   * Calculates difference between {@code minuend} and first component
+   * of {@code arg}, adding results to second component of {@code arg}.
+   */
+  @Override
+  public Void visitMethod(AMethod minuend,
+      Pair<AElement, AElement> arg) {
+    AMethod subtrahend = (AMethod) arg.fst;
+    AMethod difference = (AMethod) arg.snd;
+    visitElements(minuend.bounds, subtrahend.bounds, difference.bounds);
+    visitElements(minuend.parameters, subtrahend.parameters,
+        difference.parameters);
+    visitElements(minuend.throwsException, subtrahend.throwsException,
+        difference.throwsException);
+    visitElements(minuend.parameters, subtrahend.parameters,
+        difference.parameters);
+    visitBlock(minuend.body,
+        elemPair(subtrahend.body, difference.body));
+    if (minuend.returnType != null) {
+      minuend.returnType.accept(this,
+          elemPair(subtrahend.returnType, difference.returnType));
+    }
+    if (minuend.receiver != null) {
+      minuend.receiver.accept(this,
+          elemPair(subtrahend.receiver, difference.receiver));
+    }
+    return visitDeclaration(minuend, arg);
+  }
+
+  /**
+   * Calculates difference between {@code minuend} and first component
+   * of {@code arg}, adding results to second component of {@code arg}.
+   */
+  @Override
+  public Void visitTypeElement(ATypeElement minuend,
+      Pair<AElement, AElement> arg) {
+    ATypeElement subtrahend = (ATypeElement) arg.fst;
+    ATypeElement difference = (ATypeElement) arg.snd;
+    visitElements(minuend.innerTypes, subtrahend.innerTypes,
+        difference.innerTypes);
+    return visitElement(minuend, arg);
+  }
+
+  /**
+   * Calculates difference between {@code minuend} and first component
+   * of {@code arg}, adding results to second component of {@code arg}.
+   */
+  @Override
+  public Void visitTypeElementWithType(ATypeElementWithType minuend,
+      Pair<AElement, AElement> arg) {
+    return visitTypeElement(minuend, arg);
+  }
+
+  /**
+   * Calculates difference between {@code minuend} and first component
+   * of {@code arg}, adding results to second component of {@code arg}.
+   */
+  @Override
+  public Void visitElement(AElement minuend,
+      Pair<AElement, AElement> arg) {
+    AElement subtrahend = arg.fst;
+    AElement difference = arg.snd;
+    diff(minuend.tlAnnotationsHere, subtrahend.tlAnnotationsHere,
+        difference.tlAnnotationsHere);
+    if (minuend.type != null) {
+      AElement stype = subtrahend.type;
+      AElement dtype = difference.type;
+      minuend.type.accept(this, elemPair(stype, dtype));
+    }
     return null;
   }
 
   /**
-   * Calculates difference between {@code m} and first component of
-   * {@code arg}, storing result in second component.
-   */
-  @Override
-  public Void visitBlock(ABlock m, Pair<AElement, AElement> arg) {
-    ABlock s = (ABlock) arg.fst;
-    ABlock d = (ABlock) arg.snd;
-    visitElements(m.locals, s.locals, d.locals);
-    return visitExpression(m, arg);
-  }
-
-  /**
-   * Calculates difference between {@code m} and first component of
-   * {@code arg}, storing result in second component.
-   */
-  @Override
-  public Void visitClass(AClass m, Pair<AElement, AElement> arg) {
-    AClass s = (AClass) arg.fst;
-    AClass d = (AClass) arg.snd;
-    visitElements(m.bounds, s.bounds, d.bounds);
-    visitElements(m.extendsImplements, s.extendsImplements,
-        d.extendsImplements);
-    visitElements(m.methods, s.methods, d.methods);
-    visitElements(m.staticInits, s.staticInits, d.staticInits);
-    visitElements(m.instanceInits, s.instanceInits, d.instanceInits);
-    visitElements(m.fields, s.fields, d.fields);
-    visitElements(m.fieldInits, s.fieldInits, d.fieldInits);
-    return visitDeclaration(m, arg);
-  }
-
-  /**
-   * Calculates difference between {@code m} and first component of
-   * {@code arg}, storing result in second component.
-   */
-  @Override
-  public Void visitDeclaration(ADeclaration m, Pair<AElement, AElement> arg) {
-    ADeclaration s = (ADeclaration) arg.fst;
-    ADeclaration d = (ADeclaration) arg.snd;
-    visitElements(m.insertAnnotations, s.insertAnnotations,
-        d.insertAnnotations);
-    visitElements(m.insertTypecasts, m.insertTypecasts, m.insertTypecasts);
-    return visitElement(m, arg);
-  }
-
-  /**
-   * Calculates difference between {@code m} and first component of
-   * {@code arg}, storing result in second component.
-   */
-  @Override
-  public Void visitExpression(AExpression m, Pair<AElement, AElement> arg) {
-    AExpression s = (AExpression) arg.fst;
-    AExpression d = (AExpression) arg.snd;
-    visitElements(m.typecasts, s.typecasts, d.typecasts);
-    visitElements(m.instanceofs, s.instanceofs, d.instanceofs);
-    visitElements(m.news, s.news, d.news);
-    visitElements(m.calls, s.calls, d.calls);
-    visitElements(m.refs, s.refs, d.refs);
-    visitElements(m.funs, s.funs, d.funs);
-    return visitElement(m, arg);
-  }
-
-  /**
-   * Calculates difference between {@code m} and first component of
-   * {@code arg}, storing result in second component.
-   */
-  @Override
-  public Void visitField(AField m, Pair<AElement, AElement> arg) {
-    return visitDeclaration(m, arg);
-  }
-
-  /**
-   * Calculates difference between {@code m} and first component of
-   * {@code arg}, storing result in second component.
-   */
-  @Override
-  public Void visitMethod(AMethod m, Pair<AElement, AElement> arg) {
-    AMethod s = (AMethod) arg.fst;
-    AMethod d = (AMethod) arg.snd;
-    visitElements(m.bounds, s.bounds, d.bounds);
-    visitElements(m.parameters, s.parameters, d.parameters);
-    visitElements(m.throwsException, s.throwsException, d.throwsException);
-    visitElements(m.parameters, s.parameters, d.parameters);
-    visitBlock(m.body, elemPair(s.body, d.body));
-    if (m.returnType != null) {
-      m.returnType.accept(this, elemPair(s.returnType, d.returnType));
-    }
-    if (m.receiver != null) {
-      m.receiver.accept(this, elemPair(s.receiver, d.receiver));
-    }
-    return visitDeclaration(m, arg);
-  }
-
-  /**
-   * Calculates difference between {@code m} and first component of
-   * {@code arg}, storing result in second component.
-   */
-  @Override
-  public Void visitTypeElement(ATypeElement m, Pair<AElement, AElement> arg) {
-    ATypeElement s = (ATypeElement) arg.fst;
-    ATypeElement d = (ATypeElement) arg.snd;
-    visitElements(m.innerTypes, s.innerTypes, d.innerTypes);
-    return visitElement(m, arg);
-  }
-
-  /**
-   * Calculates difference between {@code m} and first component of
-   * {@code arg}, storing result in second component.
-   */
-  @Override
-  public Void visitTypeElementWithType(ATypeElementWithType m,
-      Pair<AElement, AElement> arg) {
-    return visitTypeElement(m, arg);
-  }
-
-  /**
-   * Calculates difference between {@code m} and {@code s}, storing the
-   * result in {@code d}.
-   */
-  @Override
-  public Void visitElement(AElement m, Pair<AElement, AElement> arg) {
-    AElement s = arg.fst;
-    AElement d = arg.snd;
-    diff(m.tlAnnotationsHere, s.tlAnnotationsHere, d.tlAnnotationsHere);
-    if (m.type != null) {
-      AElement stype = s.type;
-      AElement dtype = d.type;
-      m.type.accept(this, elemPair(stype, dtype));
-    }
-    return null;
-  }
-
-  /**
-   * Calculates difference between {@code m} and {@code s}, storing the
-   * result in {@code d}.
+   * Calculates difference between {@code minuend} and first component
+   * of {@code arg}, adding results to second component of {@code arg}.
    */
   private <K, V extends AElement>
-  void visitElements(VivifyingMap<K, V> m, VivifyingMap<K, V> s,
-      VivifyingMap<K, V> d) {
-    if (m != null) {
-      for (Map.Entry<K, V> e : m.entrySet()) {
+  void visitElements(VivifyingMap<K, V> minuend,
+      VivifyingMap<K, V> subtrahend, VivifyingMap<K, V> difference) {
+    if (minuend != null) {
+      for (Map.Entry<K, V> e : minuend.entrySet()) {
         K key = e.getKey();
         V mval = e.getValue();
-        V sval = s.get(key);
+        V sval = subtrahend.get(key);
         if (sval == null) {
-          d.put(key, mval);
+          difference.put(key, mval);
         } else {
-          mval.accept(this, elemPair(sval, d.vivify(key)));
+          mval.accept(this, elemPair(sval, difference.vivify(key)));
         }
       }
     }
   }
 
   /**
-   * Calculates difference between {@code m} and {@code s}, storing the
-   * result in {@code d}.
+   * Calculates difference between {@code minuend} and
+   * {@code subtrahend}, storing the result in {@code difference}.
    */
-  private static <T> void diff(Set<T> m, Set<T> s, Set<T> d) {
-    if (m != null) {
-      for (T t : m) {
-        if (!s.contains(t)) {
-          d.add(t);
+  private static <T> void diff(Set<T> minuend, Set<T> subtrahend,
+      Set<T> difference) {
+    if (minuend != null) {
+      for (T t : minuend) {
+        if (!subtrahend.contains(t)) {
+          difference.add(t);
         }
       }
     }
   }
 
   /**
-   * Calculates difference between {@code m} and {@code s}, storing the
-   * result in {@code d}.
+   * Calculates difference between {@code minuend} and
+   * {@code subtrahend}, adding the results to {@code difference}.
    */
-  private static <K, V> void diff(Map<K, Set<V>> m, Map<K, Set<V>> s,
-      Map<K, Set<V>> d) {
-    if (m != null) {
-      for (Map.Entry<K, Set<V>> me : m.entrySet()) {
-        K key = me.getKey();
-        Set<V> val = me.getValue();
-        Set<V> mval = s.get(key);
-        if (mval == null) {
-          d.put(key, val);
-        } else if (!mval.equals(val)) {
+  private static <K, V> void diff(Map<K, Set<V>> minuend,
+      Map<K, Set<V>> subtrahend, Map<K, Set<V>> difference) {
+    if (minuend != null) {
+      for (K key : minuend.keySet()) {
+        Set<V> mval = minuend.get(key);
+        Set<V> sval = subtrahend.get(key);
+        if (sval == null) {
+          difference.put(key, mval);
+        } else if (!sval.equals(mval)) {
           try {
             @SuppressWarnings("unchecked")
-            Set<V> diff = (Set<V>) mval.getClass().newInstance();
-            diff(val, mval, diff);
-            if (!diff.isEmpty()) {
-              d.put(key, diff);
+            Set<V> set = (Set<V>) sval.getClass().newInstance();
+            diff(mval, sval, set);
+            if (!set.isEmpty()) {
+              difference.put(key, set);
             }
           } catch (InstantiationException e) {
             e.printStackTrace();
@@ -336,7 +379,8 @@ class DiffVisitor implements ElementVisitor<Void, Pair<AElement, AElement>> {
    * Convenience method for ensuring returned {@link Pair} is of the
    * most general type.
    */
-  private Pair<AElement, AElement> elemPair(AElement stype, AElement dtype) {
+  private Pair<AElement, AElement> elemPair(AElement stype,
+      AElement dtype) {
     return Pair.of(stype, dtype);
   }
 }
