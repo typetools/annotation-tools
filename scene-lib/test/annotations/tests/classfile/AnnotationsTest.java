@@ -132,7 +132,7 @@ public class AnnotationsTest extends TestCase {
   private void writeScene(String filename, AScene scene) {
     try {
       IndexFileWriter.write(scene, filename);
-    } catch(Exception e) {
+    } catch (Exception e) {
       System.err.println("caught exception: ");
       e.printStackTrace();
       fail();
@@ -148,7 +148,7 @@ public class AnnotationsTest extends TestCase {
   private void readScene(String filename, AScene scene) {
     try {
       IndexFileParser.parseFile(filename, scene);
-    } catch(Exception e) {
+    } catch (Exception e) {
       System.err.println("caught exception: ");
       e.printStackTrace();
       fail("caught exception: " + e.toString());
@@ -207,7 +207,7 @@ public class AnnotationsTest extends TestCase {
       AScene scene) {
     try {
       ClassFileReader.read(scene, filename);
-    } catch(Exception e) {
+    } catch (Exception e) {
       System.err.printf("caught exception while reading %s:%n", new File(filename).getAbsolutePath());
       e.printStackTrace();
       fail();
@@ -254,7 +254,7 @@ public class AnnotationsTest extends TestCase {
 
       try {
         av.verify();
-      } catch(AnnotationVerifier.AnnotationMismatchException e) {
+      } catch (AnnotationVerifier.AnnotationMismatchException e) {
         String message = String.format("assertClassAnnotations (consider running javap on the two .class files):%n  correctClass %s%n  generatedClass %s%n%s", correctClass, generatedClass, e.toString());
         System.out.println();
         System.out.println(message);
@@ -264,7 +264,7 @@ public class AnnotationsTest extends TestCase {
         fail(message);
       }
 
-    } catch(IOException e) {
+    } catch (IOException e) {
       fail("IOException caught: " + e);
     }
   }

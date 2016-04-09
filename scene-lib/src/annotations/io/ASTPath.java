@@ -408,7 +408,7 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
 
   @Override
   public int hashCode() {
-    // hacky fix: remove {Method,Class}.body for comparison 
+    // hacky fix: remove {Method,Class}.body for comparison
     PersistentStack<ASTEntry> s = canonical(this);
     int hash = 0;
     while (!s.isEmpty()) {
@@ -429,7 +429,7 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
 
   @Override
   public int compareTo(ASTPath o) {
-    // hacky fix: remove {Method,Class}.body for comparison 
+    // hacky fix: remove {Method,Class}.body for comparison
     PersistentStack<ASTEntry> s0 = canonical(this);
     PersistentStack<ASTEntry> s1 = canonical(o);
     Deque<ASTEntry> d0 = new LinkedList<ASTEntry>();
@@ -475,7 +475,7 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
 
   /**
    * Create a new {@code ASTPath} from a formatted string description.
-   * 
+   *
    * @param s formatted string as in JAIF {@code insert-\{cast,annotation\}}
    * @return the corresponding {@code ASTPath}
    * @throws ParseException
@@ -1622,7 +1622,7 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
 }
 
 /**
- * 
+ *
  * @author dbro
  *
  * @param <E> type of stack elements

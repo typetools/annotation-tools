@@ -5,12 +5,12 @@ import java.util.List;
 
 /**
  * A Java type with optional type parameters and inner type. For example:
- * 
+ *
  * <pre>
  *   <em>type</em>
  *   <em>type</em>&lt;<em>type parameters</em>&gt;.<em>inner type</em>
  * </pre>
- * 
+ *
  * A {@code DeclaredType} can represent a wildcard by using "?" as the
  * {@code name}. If this type is a wildcard, it is illegal to call
  * {@link #addTypeParameter(Type)}, {@link #getTypeParameter(int)},

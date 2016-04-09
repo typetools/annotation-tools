@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Simple shell file that runs the regression tests and displays output only 
+# Simple shell file that runs the regression tests and displays output only
 # if tests fail.  You can run the entire test yourself by executing this file:
 #   ./buildtest
 # This takes a long time to run.
@@ -34,7 +34,7 @@ ant test-javarifier 2>&1 > test-javarifier.log
 # failing test cases.
 # This effectively makes cron send email, since cron sends email only if
 # the script produces output.
-javac TestWrapper.java  
+javac TestWrapper.java
 java TestWrapper reports/*
 
 # The .log files aren't part of the tests, so don't put them in reports

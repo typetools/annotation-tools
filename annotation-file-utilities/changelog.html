@@ -1,6 +1,5 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<!DOCTYPE html>
+<html>
 <head>
   <title>Annotation File Utilities Changelog</title>
 </head>
@@ -49,7 +48,7 @@ This is the changelog for the
     <ul>
         <li>Fixes Issue
           <a href="https://github.com/typetools/annotation-tools/issues/108">#108</a>
-          by adding a <tt>LICENSE.txt</tt> file.</li>
+          by adding a <code>LICENSE.txt</code> file.</li>
         <li>Fixes offset calculation for wide JVM instructions.</li>
         <li>Makes minor improvements to build process.</li>
     </ul>
@@ -538,8 +537,8 @@ This is the changelog for the
         Don't duplicate annotations that are in the source already.
       </li>
       <li>
-        Add <tt>--omit-annotation</tt> option to omit a given annotation
-        (example: <tt>@ThisMutable</tt>, which is the default and need not be
+        Add <code>--omit-annotation</code> option to omit a given annotation
+        (example: <code>@ThisMutable</code>, which is the default and need not be
         inserted in source files).
       </li>
       <li>
@@ -611,16 +610,16 @@ This is the changelog for the
     return: @p2.B</pre>
 
 	Fields and method parameters are treated similarly, but with
-	<tt>type</tt> marker instead of <tt>return</tt>.  So if p2.A is a
+	<code>type</code> marker instead of <code>return</code>.  So if p2.A is a
 	declaration annotation targeting the field, while p2.B is a type
 	annotation on the field, the field would be declared as:
 
     <pre> field s: @p2.A
    type: @p2.B</pre>
 
-	Furthermore, <tt>inner-type:</tt> is permitted only after a keyword
-	that introduces a type, such as <tt>type</tt>, <tt>return</tt>, and
-	<tt>receiver</tt>, to prevent confusion (though the file format
+	Furthermore, <code>inner-type:</code> is permitted only after a keyword
+	that introduces a type, such as <code>type</code>, <code>return</code>, and
+	<code>receiver</code>, to prevent confusion (though the file format
 	becomes slightly more verbose).
 
 	  </li>
@@ -665,7 +664,7 @@ This is the changelog for the
   <li>
   Version 2.3 (released July 29, 2009):
     <ul>
-      <li>Support <tt>-i --in-place</tt> argument.</li>
+      <li>Support <code>-i --in-place</code> argument.</li>
       <li>Fix incorrect array brackets in tests.</li>
       <li>Fix inserting annotations on receivers.</li>
       <li>Improve documentation.</li>

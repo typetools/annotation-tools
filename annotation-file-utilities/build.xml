@@ -109,7 +109,7 @@
           classpathref="libpath"
           failonerror="true"
           packagenames="*"
-          destdir="javadoc" 
+          destdir="javadoc"
           access="public"
           />
 <!--
@@ -143,7 +143,7 @@
         <param name="-docfile" value="annotation-file-utilities.html"/>
       </doclet>
     </javadoc>
-    
+
   </target>
 
   <target name="jarfile.check.uptodate">

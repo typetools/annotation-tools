@@ -2,7 +2,7 @@ package annotations.util;
 
 /**
  * Stack that creates new stacks rather than modify data in place.
- * 
+ *
  * @author dbro
  * @param <E> type of stack elements
  */

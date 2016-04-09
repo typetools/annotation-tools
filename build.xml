@@ -80,4 +80,49 @@
     <target name="tags" depends="tags-scene-lib,tags-afu">
     </target>
 
+  <target name="html-validate"
+	  description="Validate that HTML files are well-formed; only works with JDK 8">
+    <exec executable="html5validator">
+      <arg value="--ignore"/>
+      <arg value="/api/"/>
+      <arg value="/build/"/>
+      <arg value="/javadoc/"/>
+      <arg value="/annotation-file-utilities/annotation-file-format.html"/>
+      <arg value="/scene-lib/javadoc/"/>
+    </exec>
+  </target>
+
+  <property name="style.args1" value="-r -n -e"/>
+  <property name="style.args2" value="--exclude-dir=.git --exclude-dir=api --exclude-dir=asmx --exclude-dir=javadoc --exclude='*.aux' --exclude='*.class' --exclude='*.dvi' --exclude='*.eps' --exclude='*.jaif' --exclude='*.jar' --exclude='*.jtr' --exclude='*.log' --exclude='*.patch' --exclude='*.pdf' --exclude='*.png' --exclude='*.sty' --exclude='*.zip' --exclude='*~' --exclude='CFLogo.ai' --exclude='logfile.log.rec.index' --exclude='annotation-file-format.html' ."/>
+
+  <target name="check-style"
+	  description="Check basic style guidelines">
+    <!-- There should be a way to templatize the following. -->
+    <exec executable="grep" outputproperty="trailingwhitespace" failonerror="false">
+      <arg line="${style.args1}"/>
+      <arg value=" $"/>
+      <arg line="${style.args2}"/>
+    </exec>
+    <fail message="Trailing whitespace:${line.separator}${trailingwhitespace}">
+      <condition>
+	<not>
+	  <equals arg1="${trailingwhitespace}" arg2=""/>
+	</not>
+      </condition>
+    </fail>
+    <exec executable="grep" outputproperty="missingspace" failonerror="false">
+      <arg line="${style.args1}"/>
+      <arg value="[^\\]\b\(else\|finally\|try\){\|}\(catch\|else\|finally\)\b\|){\($\|[^0-9]\)\|\b\(catch\|for\|if\|while\)("/>
+      <arg line="${style.args2}"/>
+      <arg line="--exclude=build.xml"/>
+    </exec>
+    <fail message="Missing space:${line.separator}${missingspace}">
+      <condition>
+	<not>
+	  <equals arg1="${missingspace}" arg2=""/>
+	</not>
+      </condition>
+    </fail>
+  </target>
+
 </project>

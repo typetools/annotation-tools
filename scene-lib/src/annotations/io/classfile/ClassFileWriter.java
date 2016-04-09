@@ -132,10 +132,10 @@ public class ClassFileWriter {
                             className, outputFileName);
           insert(scene, className, outputFileName, true);
         }
-      } catch(IOException e) {
+      } catch (IOException e) {
         System.out.printf("IOException: %s%n", e.getMessage());
         return;
-      } catch(Exception e) {
+      } catch (Exception e) {
         System.out.println("Unknown error trying to insert annotations from: " +
                            indexFileName + " to " + className);
         e.printStackTrace();

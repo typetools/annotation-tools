@@ -35,7 +35,7 @@ import annotations.io.IndexFileWriter;
 /**
  * Utility for merging index files, including multiple versions for the
  *  same class.
- * 
+ *
  * @author dbro
  */
 public class IndexFileMerger {
