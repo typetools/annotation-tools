@@ -11,7 +11,7 @@
   <property name="java-version" value="8"/>
 
   <tstamp>
-      <format property="TIME" pattern="yy-MM-dd-hh-mm-ss-SS" />
+      <format property="TIME" pattern="yy-MM-dd-HH-mm-ss-SS" />
   </tstamp>
   <!-- Avoid conflicts between multiple users on the same computer. -->
   <property name="tmpdir" location="${java.io.tmpdir}/${user.name}/${TIME}" />
