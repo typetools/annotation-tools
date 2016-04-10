@@ -61,6 +61,22 @@ public class AExpression extends AElement {
         this.id = id;
     }
 
+    AExpression(AExpression expr) {
+        super(expr);
+        copyMapContents(expr.typecasts, typecasts);
+        copyMapContents(expr.instanceofs, instanceofs);
+        copyMapContents(expr.news, news);
+        copyMapContents(expr.calls, calls);
+        copyMapContents(expr.refs, refs);
+        copyMapContents(expr.funs, funs);
+        id = expr.id;
+    }
+
+    @Override
+    public AExpression clone() {
+        return new AExpression(this);
+    }
+
     /**
      * {@inheritDoc}
      */

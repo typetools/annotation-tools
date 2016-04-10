@@ -50,6 +50,16 @@ public class ATypeElementWithType extends ATypeElement {
         super(description);
     }
 
+    ATypeElementWithType(ATypeElementWithType elem) {
+        super(elem);
+        type = elem.type;
+    }
+
+    @Override
+    public ATypeElementWithType clone() {
+        return new ATypeElementWithType(this);
+    }
+
     /**
      * Gets the un-annotated type.
      *

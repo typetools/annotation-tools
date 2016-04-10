@@ -24,6 +24,16 @@ public class ABlock extends AExpression {
         super(id);
     }
 
+    ABlock(ABlock block) {
+        super(block);
+        copyMapContents(block.locals, locals);
+    }
+
+    @Override
+    public ABlock clone() {
+        return new ABlock(this);
+    }
+
     /**
      * {@inheritDoc}
      */

@@ -48,6 +48,17 @@ public class ATypeElement extends AElement {
         this.description = description;
     }
 
+    ATypeElement(ATypeElement elem) {
+      super(elem);
+      description = elem.description;
+      copyMapContents(elem.innerTypes, innerTypes);
+    }
+
+    @Override
+    public ATypeElement clone() {
+        return new ATypeElement(this);
+    }
+
     void checkRep() {
         assert type == null;
     }

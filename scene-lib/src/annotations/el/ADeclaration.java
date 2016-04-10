@@ -52,6 +52,18 @@ public abstract class ADeclaration extends AElement {
     super(description, true);
   }
 
+  ADeclaration(ADeclaration decl) {
+    super(decl);
+    copyMapContents(decl.insertAnnotations, insertAnnotations);
+    copyMapContents(decl.insertTypecasts, insertTypecasts);
+  }
+
+  ADeclaration(Object description, ADeclaration decl) {
+    super(decl, description);
+    copyMapContents(decl.insertAnnotations, insertAnnotations);
+    copyMapContents(decl.insertTypecasts, insertTypecasts);
+  }
+
   @Override
   public boolean equals(/*>>> @ReadOnly ADeclaration this, */
       /*@ReadOnly*/ Object o) {

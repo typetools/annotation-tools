@@ -47,6 +47,11 @@ public final /*@ReadOnly*/ class AnnotationDef extends AElement {
         this.name = name;
     }
 
+    @Override
+    public AnnotationDef clone() {
+        throw new UnsupportedOperationException("can't duplicate AnnotationDefs");
+    }
+
     // Problem:  I am not sure how to handle circularities (annotations meta-annotated with themselves)
     /**
      * Look up an AnnotationDefs in adefs.

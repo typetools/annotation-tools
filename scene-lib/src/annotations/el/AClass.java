@@ -102,6 +102,23 @@ public final class AClass extends ADeclaration {
       // allClasses = debugAllClasses;
     }
 
+    AClass(AClass clazz) {
+      super(clazz);
+      className = clazz.className;
+      copyMapContents(clazz.bounds, bounds);
+      copyMapContents(clazz.extendsImplements, extendsImplements);
+      copyMapContents(clazz.fieldInits, fieldInits);
+      copyMapContents(clazz.fields, fields);
+      copyMapContents(clazz.instanceInits, instanceInits);
+      copyMapContents(clazz.methods, methods);
+      copyMapContents(clazz.staticInits, staticInits);
+    }
+
+    @Override
+    public AClass clone() {
+      return new AClass(this);
+    }
+
     /**
      * {@inheritDoc}
      */

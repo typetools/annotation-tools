@@ -34,6 +34,17 @@ public class AField extends ADeclaration {
     this.fieldName = fieldName;
   }
 
+  AField(AField field) {
+    super(field.fieldName, field);
+    fieldName = field.fieldName;
+    init = field.init == null ? null : field.init.clone();
+  }
+
+  @Override
+  public AField clone() {
+    return new AField(this);
+  }
+
   @Override
   public boolean equals(/*>>> @ReadOnly AField this, */
         /*@ReadOnly*/ Object o) {

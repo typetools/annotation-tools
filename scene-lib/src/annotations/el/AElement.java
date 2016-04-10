@@ -20,7 +20,7 @@ import org.checkerframework.checker.javari.qual.ReadOnly;
  * of <code>AElement</code> represents one kind of annotatable element; its
  * name should make this clear.
  */
-public class AElement {
+public class AElement implements Cloneable {
     static <K extends /*@ReadOnly*/ Object> VivifyingMap<K, AElement> newVivifyingLHMap_AE() {
         return new VivifyingMap<K, AElement>(
                 new LinkedHashMap<K, AElement>()) {
@@ -53,6 +53,15 @@ public class AElement {
         };
     }
 
+    @SuppressWarnings("unchecked")
+    <K, V extends AElement> void
+    copyMapContents(VivifyingMap<K, V> orig, VivifyingMap<K, V> copy) {
+        for (K key : orig.keySet()) {
+            V val = orig.get(key);
+            copy.put(key, (V) val.clone());
+        }
+    }
+
     /**
      * The top-level annotations directly on this element.  Annotations on
      * subelements are in those subelements' <code>tlAnnotationsHere</code>
@@ -72,17 +81,44 @@ public class AElement {
         return null;
     }
 
-    // general descrition of the element
-    private final Object description;
+    // general description of the element
+    final Object description;
 
     AElement(Object description) {
         this(description, false);
     }
 
     AElement(Object description, boolean hasType) {
+        this(description,
+            hasType ? new ATypeElement("type of " + description) : null);
+    }
+
+    AElement(Object description, ATypeElement type) {
         tlAnnotationsHere = new LinkedHashSet<Annotation>();
         this.description = description;
-        type = hasType ? new ATypeElement("type of " + description) : null;
+        this.type = type;
+    }
+
+    AElement(AElement elem) {
+        this(elem, elem.type);
+    }
+
+    AElement(AElement elem, ATypeElement type) {
+        this(elem.description,
+            type == null ? null : type.clone());
+        tlAnnotationsHere.addAll(elem.tlAnnotationsHere);
+    }
+
+    AElement(AElement elem, Object description) {
+        this(description, elem.type == null ? null : elem.type.clone());
+        tlAnnotationsHere.addAll(elem.tlAnnotationsHere);
+    }
+
+    // Q: Are there any fields other than elements and maps that can't be shared?
+
+    @Override
+    public AElement clone() {
+        return new AElement(this);
     }
 
     /**

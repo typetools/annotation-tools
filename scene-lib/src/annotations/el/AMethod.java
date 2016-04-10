@@ -41,6 +41,23 @@ public final class AMethod extends ADeclaration {
       receiver = new AField("receiver parameter type of " + methodName);
     }
 
+    AMethod(AMethod method) {
+      super("method: " + method.methodName, method);
+      methodName = method.methodName;
+      body = method.body.clone();
+      returnType = method.returnType.clone();
+      receiver = method.receiver.clone();
+      copyMapContents(method.bounds, bounds);
+      copyMapContents(method.parameters, parameters);
+      copyMapContents(method.throwsException, throwsException);
+      copyMapContents(method.bounds, bounds);
+    }
+
+    @Override
+    public AMethod clone() {
+      return new AMethod(this);
+    }
+
     /**
      * {@inheritDoc}
      */
