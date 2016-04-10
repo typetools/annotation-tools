@@ -204,11 +204,11 @@ public final class AScene implements Cloneable {
 
     public static <K, V extends AElement> void
     checkElems(VivifyingMap<K, V> m0, VivifyingMap<K, V> m1) {
-        if (m0 == null || m0.isEmpty()) {
-            if (m1 != null && !m1.isEmpty()) {
+        if (m0 == null) {
+            if (m1 != null) {
                 cloneCheckFail();
             }
-        } else if (m1 == null || m1.isEmpty()) {
+        } else if (m1 == null) {
             cloneCheckFail();
         } else {
             for (K k : m0.keySet()) {
