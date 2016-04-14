@@ -396,8 +396,8 @@
     </copy>
 
     <symlink overwrite="true"
-             link="index.html"
-             resource="${deploy-dir}/annotation-file-utilities.html"/>
+             link="${deploy-dir}/index.html"
+             resource="annotation-file-utilities.html"/>
   </target>
 
   <target name="annotation-file-format-clean"
