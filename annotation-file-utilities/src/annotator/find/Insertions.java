@@ -533,6 +533,7 @@ public class Insertions implements Iterable<Insertion> {
             tins = new NewInsertion(type, criteria, inners);
             tins.setInserted(true);
             map.put(rec, tins);
+            break;
           default:
             break;
           }
@@ -602,7 +603,7 @@ public class Insertions implements Iterable<Insertion> {
             node = TypeTree.fromType(csym.type);
             break;
           }
-          // fall through
+          throw new RuntimeException();
         default:
           throw new RuntimeException();
         }
@@ -1141,7 +1142,7 @@ loop:
 
     @Override
     public E put(ASTRecord key, E value) {
-      ASTRecord rec = (ASTRecord) key;
+      ASTRecord rec = key;
       SortedMap<ASTPath, E> map = getMap(rec);
       return map == null ? null : map.put(rec.astPath, value);
     }

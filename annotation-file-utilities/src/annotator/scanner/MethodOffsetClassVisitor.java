@@ -138,7 +138,7 @@ public class MethodOffsetClassVisitor extends ClassWriter {
       case Opcodes.INVOKEVIRTUAL:
         MethodCallScanner.addMethodCallToMethod(methodName,
             labelOffset());
-        // fall through
+        break;
       default:
         break;
       }

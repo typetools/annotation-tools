@@ -383,9 +383,8 @@ public class ASTPathCriterion implements Criterion {
                 } else if (astNode.childSelectorIs(ASTPath.BOUND)) {
                   return arg < 0 ? clazz.getExtendsClause()
                           : clazz.getImplementsClause().get(arg);
-                } else {
-                    return null;
                 }
+                return null;
             }
             case CONDITIONAL_EXPRESSION: {
                 ConditionalExpressionTree conditionalExpression = (ConditionalExpressionTree) actualNode;
