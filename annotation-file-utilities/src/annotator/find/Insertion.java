@@ -528,6 +528,7 @@ public abstract class Insertion {
                 } else {
                     throw new RuntimeException("Incorrect type path.");
                 }
+                break;
             case UNBOUNDED_WILDCARD:
                 if (type.getKind() == Type.Kind.BOUNDED) {
                     BoundedType boundedType = (BoundedType) type;
