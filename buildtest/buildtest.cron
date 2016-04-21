@@ -1,5 +1,5 @@
-# This is the crontab for the nightly build test for Javarifier and
-# annotations (scene library, asm extension, file utilities).
+# This is the crontab for the nightly build test for
+# Annotation File Utilities (scene library, asm extension, AFU proper).
 #
 # This file needs to be installed before changes will take effect.
 # You can install this crontab by running:

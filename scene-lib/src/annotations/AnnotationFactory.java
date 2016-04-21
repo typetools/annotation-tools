@@ -2,7 +2,6 @@ package annotations;
 
 /*>>>
 import org.checkerframework.checker.nullness.qual.*;
-import org.checkerframework.checker.javari.qual.*;
 */
 
 import java.util.Map;
@@ -16,7 +15,7 @@ import annotations.el.AnnotationDef;
  * determines their definitions automatically from the fields supplied. Use the
  * singleton {@link #saf}.
  */
-public final /*@ReadOnly*/ class AnnotationFactory {
+public final class AnnotationFactory {
     private AnnotationFactory() {
     }
 

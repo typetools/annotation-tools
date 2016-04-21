@@ -5,11 +5,11 @@ import java.util.Date;
 import java.util.List;
 
 public class BoundMethodSimple {
-  public <T extends @java.lang.ReadOnly Date> void foo(T t) {
+  public <T extends @java.lang.Tainted Date> void foo(T t) {
     System.out.println(t);
   }
 
-  public <T extends @java.lang.ReadOnly Object> void foo2(T t) {
+  public <T extends @java.lang.Tainted Object> void foo2(T t) {
     System.out.println(t);
   }
 

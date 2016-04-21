@@ -7,7 +7,6 @@ import annotations.util.coll.VivifyingMap;
 
 /*>>>
 import org.checkerframework.checker.nullness.qual.*;
-import org.checkerframework.checker.javari.qual.*;
 */
 
 /** An annotated class */
@@ -123,14 +122,12 @@ public final class AClass extends ADeclaration {
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(/*>>> @ReadOnly AClass this,*/
-            /*@ReadOnly*/ Object o) {
+    public boolean equals(Object o) {
         return o instanceof AClass
-            && ((/*@ReadOnly*/ AClass) o).equalsClass(this);
+            && ((AClass) o).equalsClass(this);
     }
 
-    final boolean equalsClass(/*>>> @ReadOnly AClass this,*/
-            /*@ReadOnly*/ AClass o) {
+    final boolean equalsClass(AClass o) {
         return super.equals(o)
             && className.equals(o.className)
             && bounds.equals(o.bounds)
@@ -143,7 +140,7 @@ public final class AClass extends ADeclaration {
      * {@inheritDoc}
      */
     @Override
-    public int hashCode(/*>>> @ReadOnly AClass this*/) {
+    public int hashCode() {
         return super.hashCode() + bounds.hashCode()
             + methods.hashCode() + fields.hashCode()
             + staticInits.hashCode() + instanceInits.hashCode()

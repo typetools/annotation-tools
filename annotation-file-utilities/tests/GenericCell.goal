@@ -3,13 +3,13 @@ package annotator.tests;
 import java.util.List;
 
 public class GenericCell {
-  private @java.lang.ThisMutable List<@java.lang.ThisMutable IntCell> internalList;
+  private @java.lang.ThisUnderInitialization List<@java.lang.ThisUnderInitialization IntCell> internalList;
 
-  public GenericCell(@java.lang.Mutable List<@java.lang.Mutable IntCell> list) {
+  public GenericCell(@java.lang.UnderInitialization List<@java.lang.UnderInitialization IntCell> list) {
     internalList = list;
   }
 
-  public @java.lang.PolyRead List<@java.lang.PolyRead IntCell> getList(@java.lang.PolyRead GenericCell this) {
+  public @java.lang.PolyRaw List<@java.lang.PolyRaw IntCell> getList(@java.lang.PolyRaw GenericCell this) {
     return internalList;
   }
 
@@ -20,11 +20,11 @@ public class GenericCell {
       this.i = in;
     }
 
-    public void set(int in) /* mutable */ {
+    public void set(int in) {
       this.i = in;
     }
 
-    public int get() /* readonly */ {
+    public int get() {
       return i;
     }
   }

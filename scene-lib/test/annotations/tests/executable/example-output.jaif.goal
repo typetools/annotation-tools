@@ -1,5 +1,5 @@
 package :
-annotation @ReadOnly: @java.lang.annotation.Retention(value=RUNTIME)
+annotation @Tainted: @java.lang.annotation.Retention(value=RUNTIME)
 
 package org.checkerframework.checker.nullness.qual:
 annotation @NonNull: @java.lang.annotation.Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
@@ -12,7 +12,7 @@ class Bar:
 
     method getSomething(Ljava/lang/StringBuffer;)V:
         return:
-        receiver: @ReadOnly
+        receiver: @Tainted
         parameter #0:
             type: @org.checkerframework.checker.nullness.qual.NonNull
 

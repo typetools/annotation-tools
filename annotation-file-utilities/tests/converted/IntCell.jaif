@@ -1,17 +1,17 @@
 package java.lang:
-annotation @Mutable: @java.lang.annotation.Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+annotation @UnderInitialization: @java.lang.annotation.Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
 
 package java.lang:
-annotation @ReadOnly: @java.lang.annotation.Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+annotation @Tainted: @java.lang.annotation.Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
 
 package annotator.tests:
 class IntCell:
 
     method set(I)V:
         return:
-        insert-annotation Method.parameter -1: @java.lang.Mutable
+        insert-annotation Method.parameter -1: @java.lang.UnderInitialization
 
     method get()I:
         return:
-        insert-annotation Method.parameter -1: @java.lang.ReadOnly
+        insert-annotation Method.parameter -1: @java.lang.Tainted
 

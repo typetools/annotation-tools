@@ -4,7 +4,6 @@ import annotations.util.Hasher;
 
 /*>>>
 import org.checkerframework.checker.nullness.qual.*;
-import org.checkerframework.checker.javari.qual.ReadOnly;
 */
 
 /**
@@ -14,7 +13,7 @@ import org.checkerframework.checker.javari.qual.ReadOnly;
  * It would be better named "TypeParameterLocation", or the two uses could
  * be separated out.
  */
-public final /*@ReadOnly*/ class BoundLocation {
+public final class BoundLocation {
     /**
      * The index of the parameter to which the bound applies among all
      * type parameters of the class or method.
@@ -52,7 +51,7 @@ public final /*@ReadOnly*/ class BoundLocation {
      * and {@link #boundIndex}.
      */
     @Override
-    public boolean equals(/*@ReadOnly*/ Object o) {
+    public boolean equals(Object o) {
         return o instanceof BoundLocation
                 && equals((BoundLocation) o);
     }
@@ -61,7 +60,7 @@ public final /*@ReadOnly*/ class BoundLocation {
      * {@inheritDoc}
      */
     @Override
-    public int hashCode(/*>>> @ReadOnly BoundLocation this*/) {
+    public int hashCode() {
         Hasher h = new Hasher();
         h.mash(paramIndex);
         h.mash(boundIndex);

@@ -2,7 +2,6 @@ package annotations.tests.executable;
 
 /*>>>
 import org.checkerframework.checker.nullness.qual.*;
-import org.checkerframework.checker.javari.qual.ReadOnly;
 */
 
 import java.io.*;
@@ -20,7 +19,7 @@ import annotations.io.*;
 
 import plume.FileIOException;
 
-public /*@ReadOnly*/ class TestSceneLib extends TestCase {
+public class TestSceneLib extends TestCase {
     LineNumberReader openPackagedIndexFile(String name) {
         return new LineNumberReader(new InputStreamReader(
                 (InputStream) TestSceneLib.class.getResourceAsStream(name)));
@@ -62,7 +61,7 @@ public /*@ReadOnly*/ class TestSceneLib extends TestCase {
      */
     void doParseTest(String indexFileContents,
                      AScene s,
-                     /*@ReadOnly*/ AScene expectScene) {
+                     AScene expectScene) {
         try {
             IndexFileParser.parseString(indexFileContents, s);
         } catch (IOException e) {
@@ -87,7 +86,7 @@ public /*@ReadOnly*/ class TestSceneLib extends TestCase {
     }
 
     void doParseTest(String index,
-                     /*@NonNull*/ /*@ReadOnly*/ AScene expectScene) {
+                     /*@NonNull*/ AScene expectScene) {
         AScene s = newScene();
         doParseTest(index, s, expectScene);
     }
@@ -345,38 +344,6 @@ public /*@ReadOnly*/ class TestSceneLib extends TestCase {
         }
         return null;
     }
-
-    /*
-    private static boolean containsAnnotation(Set<Annotation> annos, String name) {
-        return getAnnotation(annos, name) != null;
-    }
-
-    private static boolean isReadOnly(AElement e) {
-        return e.lookup("ReadOnly") != null;
-    }
-    */
-
-    // I removed the filtering functionality, for lack of clients that use it. -MDE
-    // public void testFilter() throws Exception {
-    //     // Suppose we care only about @ReadOnly annotations
-    //     AScene s1 = new AScene();
-    //     // instead we have to put the definitions in the index file
-    //     // s1.annotationDefs.add(ready);
-    //     // s1.annotationDefs.add(author);
-    //
-    //     IndexFileParser.parseString(fooIndexContents, s1);
-    //
-    //     assertTrue(isReadOnly(s1.classes.get("Foo").fields.get("x")));
-    //     // we don't know whether elements on the way to the type argument
-    //     // were created, since the author annotation is not wanted
-    //     assertFalse(isReadOnly(s1.classes.get("Foo").methods.vivify("y()Z")));
-    //     AElement targ =
-    //             (AElement) s1.classes
-    //                     .get("Foo").methods.vivify("y()Z").parameters.vivify(5).innerTypes
-    //                     .vivify(new InnerTypeLocation(Arrays.asList(1, 2)));
-    //     // make sure author annotation was skipped
-    //     assertTrue(targ.lookup("Author") == null);
-    // }
 
     public void testEmptyArrayHack() throws Exception {
         AScene scene = newScene();

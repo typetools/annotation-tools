@@ -7,7 +7,7 @@ public class LocalGenericShadow {
   public List<String> foo = null;
 
   public void method() {
-    @java.lang.Mutable List<Integer> foo = null;
+    @java.lang.UnderInitialization List<Integer> foo = null;
     System.out.println(foo);
   }
 }

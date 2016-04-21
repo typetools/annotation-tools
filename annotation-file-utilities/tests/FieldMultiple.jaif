@@ -1,18 +1,18 @@
 package java.lang:
-annotation @ReadOnly: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+annotation @Tainted: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
 
 package annotator.tests:
 class FieldMultiple:
 
     field foo:
-        type: @java.lang.ReadOnly
+        type: @java.lang.Tainted
 
     field bar:
-        type: @java.lang.ReadOnly
+        type: @java.lang.Tainted
 
-    field i: @java.lang.ReadOnly
+    field i: @java.lang.Tainted
 
-    field d: @java.lang.ReadOnly
+    field d: @java.lang.Tainted
 
     method <init>()V:
 

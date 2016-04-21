@@ -2,7 +2,6 @@ package annotations.field;
 
 /*>>>
 import org.checkerframework.checker.nullness.qual.*;
-import org.checkerframework.checker.javari.qual.*;
 */
 
 import java.util.Collection;
@@ -10,7 +9,7 @@ import java.util.Collection;
 /**
  * An {@link ArrayAFT} represents an annotation field type that is an array.
  */
-public final /*@ReadOnly*/ class ArrayAFT extends AnnotationFieldType {
+public final class ArrayAFT extends AnnotationFieldType {
 
     /**
      * The element type of the array, or <code>null</code> if it is unknown

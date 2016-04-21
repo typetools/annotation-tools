@@ -2,7 +2,6 @@ package annotations.field;
 
 /*>>>
 import org.checkerframework.checker.nullness.qual.*;
-import org.checkerframework.checker.javari.qual.*;
 */
 
 import annotations.el.AnnotationDef;
@@ -15,7 +14,7 @@ import java.util.Map;
  * of an annotation field. Each subclass represents one kind of type allowed by
  * the Java language.
  */
-public abstract /*@ReadOnly*/ class AnnotationFieldType extends EqualByStringRepresentation {
+public abstract class AnnotationFieldType extends EqualByStringRepresentation {
 
     /**
      * Returns the string representation of the type that would appear in an

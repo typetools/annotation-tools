@@ -8,7 +8,6 @@ import annotations.util.coll.VivifyingMap;
 
 /*>>>
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.checkerframework.checker.javari.qual.ReadOnly;
 */
 
 /**
@@ -19,7 +18,7 @@ import org.checkerframework.checker.javari.qual.ReadOnly;
  * one inner type; {@link #innerTypes} maps locations to inner types.
  */
 public class ATypeElement extends AElement {
-    static <K extends /*@ReadOnly*/ Object> VivifyingMap<K, ATypeElement> newVivifyingLHMap_ATE() {
+    static <K extends Object> VivifyingMap<K, ATypeElement> newVivifyingLHMap_ATE() {
         return new VivifyingMap<K, ATypeElement>(
                 new LinkedHashMap<K, ATypeElement>()) {
             @Override
@@ -67,15 +66,13 @@ public class ATypeElement extends AElement {
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(/*>>> @ReadOnly ATypeElement this, */
-            /*@ReadOnly*/ AElement o) {
+    public boolean equals(AElement o) {
         return o instanceof ATypeElement
-            && ((/*@ReadOnly*/ ATypeElement) o).equalsTypeElement(this);
+            && ((ATypeElement) o).equalsTypeElement(this);
     }
 
     // note:  does not call super.equals, so does not check name
-    final boolean equalsTypeElement(/*>>> @ReadOnly ATypeElement this, */
-            /*@ReadOnly*/ ATypeElement o) {
+    final boolean equalsTypeElement(ATypeElement o) {
         return equalsElement(o) && o.innerTypes.equals(innerTypes)
             && (type == null ? o.type == null : o.type.equals(type));
     }
@@ -84,7 +81,7 @@ public class ATypeElement extends AElement {
      * {@inheritDoc}
      */
     @Override
-    public int hashCode(/*>>> @ReadOnly ATypeElement this*/) {
+    public int hashCode() {
         checkRep();
         return tlAnnotationsHere.hashCode() + innerTypes.hashCode();
     }

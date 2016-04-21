@@ -2,6 +2,6 @@ package annotator.tests;
 
 import java.util.Date;
 
-@java.lang.ReadOnly public class ClassSimple {
+@java.lang.Tainted public class ClassSimple {
   public Integer field;
 }

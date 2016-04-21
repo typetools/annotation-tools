@@ -2,7 +2,6 @@ package annotations.field;
 
 /*>>>
 import org.checkerframework.checker.nullness.qual.*;
-import org.checkerframework.checker.javari.qual.*;
 */
 
 import java.util.HashMap;
@@ -16,7 +15,7 @@ import com.google.common.escape.Escaper;
  * field type. Get one using {@link #forType(Class)}.
  */
 // should be an enum except they can't be generic and can't extend a class
-public final /*@ReadOnly*/ class BasicAFT extends ScalarAFT {
+public final class BasicAFT extends ScalarAFT {
     static final Escaper charEscaper =
         new CharEscaperBuilder()
             .addEscape('\b', "\\b")
@@ -53,7 +52,7 @@ public final /*@ReadOnly*/ class BasicAFT extends ScalarAFT {
      * Contains every BasicAFT.
      */
     // Disgusting reason for being public; need to fix.
-    public static final /*@ReadOnly*/ Map<Class<?>, BasicAFT> bafts;
+    public static final Map<Class<?>, BasicAFT> bafts;
 
     static {
         Map<Class<?>, BasicAFT> tempBafts =

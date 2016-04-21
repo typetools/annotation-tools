@@ -5,7 +5,7 @@ public class MethodMultiple {
     return null;
   }
 
-  public @java.lang.Mutable String foo(String s) {
+  public @java.lang.UnderInitialization String foo(String s) {
     return null;
   }
 }
