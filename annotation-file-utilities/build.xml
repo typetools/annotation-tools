@@ -511,6 +511,8 @@
             classpathref="libpath"
             classname="com.sun.tools.javac.Main">
           <jvmarg line="-Xbootclasspath/p:${annotations-compiler-absolute}/dist/lib/javac.jar"/>
+          <arg value="-Xlint:-options"/>
+          <arg value="-Werror"/>
           <arg value="-g"/>
           <arg line="-sourcepath src"/>
           <arg line="-d bin"/>
