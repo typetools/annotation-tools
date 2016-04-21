@@ -1,7 +1,7 @@
 package annotator.tests;
 
 public class ArrayReturnTypeSimple {
-  private @java.lang.Mutable Object[] foo() {
+  private @java.lang.UnderInitialization Object[] foo() {
     return null;
   }
 }

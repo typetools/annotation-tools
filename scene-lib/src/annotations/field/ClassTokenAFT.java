@@ -2,7 +2,6 @@ package annotations.field;
 
 /*>>>
 import org.checkerframework.checker.nullness.qual.*;
-import org.checkerframework.checker.javari.qual.*;
 */
 
 /**
@@ -13,7 +12,7 @@ import org.checkerframework.checker.javari.qual.*;
  * represents it as a plain {@link ClassTokenAFT}.  Use the singleton
  * {@link #ctaft}.
  */
-public final /*@ReadOnly*/ class ClassTokenAFT extends ScalarAFT {
+public final class ClassTokenAFT extends ScalarAFT {
 
     // On 2006.07.07 we decided against parameterizations because
     // class files that use annotations don't contain them.

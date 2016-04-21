@@ -9,10 +9,10 @@ public class LocalMultiple {
     List myList = null;
 
     if (myList.size() != 0) {
-      /* @Mutable*/ Set localVar = null;
+      /* @UnderInitialization*/ Set localVar = null;
       myList.add(localVar);
     } else {
-      /* @ReadOnly*/ Set localVar = null;
+      /* @Tainted*/ Set localVar = null;
       myList.add(localVar);
     }
     foo(o);

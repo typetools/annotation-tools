@@ -4,7 +4,6 @@ import java.util.*;
 
 /*>>>
 import org.checkerframework.checker.nullness.qual.*;
-import org.checkerframework.checker.javari.qual.*;
 */
 
 /**
@@ -39,7 +38,7 @@ public class LinkedHashKeyedSet<K, V> extends AbstractSet<V> implements KeyedSet
      * {@inheritDoc}
      */
     @Override
-    public boolean contains(/*>>> @ReadOnly LinkedHashKeyedSet<K, V> this, */ /*@ReadOnly*/ Object o) {
+    public boolean contains(Object o) {
         return theValues.contains(o);
     }
 
@@ -47,12 +46,12 @@ public class LinkedHashKeyedSet<K, V> extends AbstractSet<V> implements KeyedSet
         private final Iterator<V> itr = theValues.iterator();
 
         @Override
-        public boolean hasNext(/*>>> @ReadOnly KeyedSetIterator this*/) {
+        public boolean hasNext() {
             return itr.hasNext();
         }
 
         @Override
-        public V next(/*>>> @ReadOnly KeyedSetIterator this*/) {
+        public V next() {
             return itr.next();
         }
 
@@ -69,7 +68,7 @@ public class LinkedHashKeyedSet<K, V> extends AbstractSet<V> implements KeyedSet
      * {@inheritDoc}
      */
     @Override
-    public /*@PolyRead*/ Iterator<V> iterator(/*>>> @PolyRead LinkedHashKeyedSet<K, V> this*/) {
+    public Iterator<V> iterator() {
         return new KeyedSetIterator();
     }
 
@@ -77,7 +76,7 @@ public class LinkedHashKeyedSet<K, V> extends AbstractSet<V> implements KeyedSet
      * {@inheritDoc}
      */
     @Override
-    public /*@ReadOnly*/ Object[] toArray(/*>>> @ReadOnly LinkedHashKeyedSet<K, V> this*/) {
+    public Object[] toArray() {
         return theValues.toArray();
     }
 
@@ -85,7 +84,7 @@ public class LinkedHashKeyedSet<K, V> extends AbstractSet<V> implements KeyedSet
      * {@inheritDoc}
      */
     @Override
-    public <T> T[] toArray(/*>>> @ReadOnly LinkedHashKeyedSet<K, V> this, */ T[] a) {
+    public <T> T[] toArray(T[] a) {
         return theValues.toArray(a);
     }
 
@@ -103,7 +102,7 @@ public class LinkedHashKeyedSet<K, V> extends AbstractSet<V> implements KeyedSet
         }
     }
 
-    private static boolean eq(/*@ReadOnly*/ Object x, /*@ReadOnly*/ Object y) {
+    private static boolean eq(Object x, Object y) {
         return x == y || (x != null && x.equals(y));
     }
 
@@ -133,7 +132,7 @@ public class LinkedHashKeyedSet<K, V> extends AbstractSet<V> implements KeyedSet
      * {@inheritDoc}
      */
     @Override
-    public boolean remove(/*@ReadOnly*/ Object o) {
+    public boolean remove(Object o) {
         return theValues.remove(o);
     }
 
@@ -160,7 +159,7 @@ public class LinkedHashKeyedSet<K, V> extends AbstractSet<V> implements KeyedSet
      * {@inheritDoc}
      */
     @Override
-    public Keyer<? extends K, ? super V> getKeyer(/*>>> @ReadOnly LinkedHashKeyedSet<K, V> this*/) {
+    public Keyer<? extends K, ? super V> getKeyer() {
         return keyer;
     }
 

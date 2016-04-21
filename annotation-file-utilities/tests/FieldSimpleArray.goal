@@ -1,5 +1,5 @@
 package annotator.tests;
 
 public class FieldSimpleArray {
-  @java.lang.Mutable Integer @java.lang.ReadOnly [] field;
+  @java.lang.UnderInitialization Integer @java.lang.Tainted [] field;
 }

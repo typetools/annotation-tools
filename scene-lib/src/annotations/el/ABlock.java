@@ -1,9 +1,5 @@
 package annotations.el;
 
-/*>>>
-import org.checkerframework.checker.javari.qual.ReadOnly;
-*/
-
 import java.util.Map;
 
 import annotations.util.coll.VivifyingMap;
@@ -38,13 +34,12 @@ public class ABlock extends AExpression {
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(/*>>> @ReadOnly ABlock this,*/ /*@ReadOnly*/ AElement o) {
+    public boolean equals(AElement o) {
         return o instanceof ABlock &&
-            ((/*@ReadOnly*/ ABlock) o).equalsBlock(this);
+            ((ABlock) o).equalsBlock(this);
     }
 
-    protected boolean equalsBlock(/*>>> @ReadOnly ABlock this,*/
-            /*@ReadOnly*/ ABlock o) {
+    protected boolean equalsBlock(ABlock o) {
         return super.equalsExpression(o)
                 && o.locals.equals(locals);
     }
@@ -53,7 +48,7 @@ public class ABlock extends AExpression {
      * {@inheritDoc}
      */
     @Override
-    public int hashCode(/*>>> @ReadOnly ABlock this*/) {
+    public int hashCode() {
         return super.hashCode() + locals.hashCode();
     }
 

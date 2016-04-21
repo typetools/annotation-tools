@@ -1,6 +1,6 @@
 package java.lang:
 
-annotation @ReadOnly: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+annotation @Tainted: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
 
 // Note no @Target meta-annotation
 annotation @Nullable:
@@ -13,11 +13,11 @@ class ArrayParamSimple:
     method m1([Ljava/lang/Integer;)V:
         parameter #0:
 	    type:
-                inner-type 0, 0: @java.lang.ReadOnly
+                inner-type 0, 0: @java.lang.Tainted
 
     method m2([Ljava/lang/Integer;)V:
         parameter #0:
-	    type: @java.lang.ReadOnly
+	    type: @java.lang.Tainted
                 inner-type 0, 0:
 
     method m3([Ljava/lang/Integer;)V:

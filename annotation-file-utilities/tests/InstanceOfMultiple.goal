@@ -4,15 +4,15 @@ import java.util.List;
 
 public class InstanceOfMultiple {
   public void foo(Object o) {
-    if (o instanceof @java.lang.ReadOnly List) {
+    if (o instanceof @java.lang.Tainted List) {
       if (o instanceof InstanceOfMultiple) {
-        if (o instanceof @java.lang.Mutable Object) {
+        if (o instanceof @java.lang.UnderInitialization Object) {
           System.out.println(o);
         }
       }
     }
 
-    if (o instanceof @java.lang.Mutable List<@java.lang.ReadOnly ?>) {
+    if (o instanceof @java.lang.UnderInitialization List<@java.lang.Tainted ?>) {
       System.out.println(o);
     }
   }

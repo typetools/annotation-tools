@@ -1,8 +1,8 @@
 package java.lang:
-annotation @Mutable: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+annotation @UnderInitialization: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
 
 package java.lang:
-annotation @ReadOnly: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+annotation @Tainted: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
 
 package annotator.tests:
 class IntCell:
@@ -12,8 +12,8 @@ class IntCell:
     method <init>(I)V:
 
     method set(I)V:
-        receiver: @java.lang.Mutable
+        receiver: @java.lang.UnderInitialization
 
     method get()I:
-        receiver: @java.lang.ReadOnly
+        receiver: @java.lang.Tainted
 

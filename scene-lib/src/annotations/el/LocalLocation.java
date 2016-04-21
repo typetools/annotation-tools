@@ -4,14 +4,13 @@ import annotations.util.Hasher;
 
 /*>>>
 import org.checkerframework.checker.nullness.qual.*;
-import org.checkerframework.checker.javari.qual.*;
 */
 
 /**
  * A {@link LocalLocation} holds location information for a local
  * variable: slot index, scope start, and scope length.
  */
-public final /*@ReadOnly*/ class LocalLocation {
+public final class LocalLocation {
     /**
      * The slot index of the local variable.
      */
@@ -71,7 +70,7 @@ public final /*@ReadOnly*/ class LocalLocation {
      * {@link #scopeStart}, and {@link #scopeLength}.
      */
     @Override
-    public boolean equals(/*@ReadOnly*/ Object o) {
+    public boolean equals(Object o) {
         return o instanceof LocalLocation
                 && equals((LocalLocation) o);
     }
@@ -80,7 +79,7 @@ public final /*@ReadOnly*/ class LocalLocation {
      * {@inheritDoc}
      */
     @Override
-    public int hashCode(/*>>> @ReadOnly LocalLocation this*/) {
+    public int hashCode() {
         Hasher h = new Hasher();
         if (varName==null) {
             h.mash(index);

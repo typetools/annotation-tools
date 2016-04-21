@@ -34,8 +34,8 @@ public class ParamCriterion implements Criterion {
     }
 
     // no inner type location, want to annotate outermost type
-    // i.e.   @Readonly List list;
-    //        @Readonly List<String> list;
+    // i.e.   @Nullable List list;
+    //        @Nullable List<String> list;
     Tree leaf = path.getLeaf();
     if (leaf instanceof VariableTree) {
       Tree parent = path.getParentPath().getLeaf();

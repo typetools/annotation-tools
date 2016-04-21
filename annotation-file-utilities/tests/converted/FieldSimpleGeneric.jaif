@@ -1,13 +1,13 @@
 package java.lang:
-annotation @ReadOnly: @java.lang.annotation.Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+annotation @Tainted: @java.lang.annotation.Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
 
 package java.lang:
-annotation @Mutable: @java.lang.annotation.Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+annotation @UnderInitialization: @java.lang.annotation.Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
 
 package annotator.tests:
 class FieldSimpleGeneric:
 
     field field:
-        insert-annotation Variable.type, ParameterizedType.typeArgument 0: @java.lang.ReadOnly
-        insert-annotation Variable.type: @java.lang.Mutable
+        insert-annotation Variable.type, ParameterizedType.typeArgument 0: @java.lang.Tainted
+        insert-annotation Variable.type: @java.lang.UnderInitialization
 

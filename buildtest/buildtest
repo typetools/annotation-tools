@@ -5,7 +5,7 @@
 #   ./buildtest
 # This takes a long time to run.
 
-# Note: To only run tests on the annotations projects and not Javarifier,
+# Note: To only run tests on the annotations projects,
 # instead of executing this script, run:
 #     ant test-all-annotations
 # This will create a new directory, build-current-<today's date>, in the
@@ -28,7 +28,6 @@ ant build-all 2>&1 > build-all.log
 ant test-asmx 2>&1 > test-asmx.log
 ant test-annotation-scene-lib 2>&1 > test-annotation-scene-lib.log
 ant test-annotator 2>&1 > test-annotator.log
-ant test-javarifier 2>&1 > test-javarifier.log
 
 # TestWrapper examines all reports and only displays those files that contain
 # failing test cases.

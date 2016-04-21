@@ -1,18 +1,18 @@
 package java.lang:
-annotation @ReadOnly: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+annotation @Tainted: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
 
 package java.lang:
-annotation @Mutable: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+annotation @UnderInitialization: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
 
 package annotator.tests:
 class ConstructorParamMultiple:
 
     method <init>(Ljava/lang/Object;Ljava/util/List;I)V:
         parameter #0:
-            type: @java.lang.ReadOnly
+            type: @java.lang.Tainted
         parameter #1:
-            type: @java.lang.ReadOnly
-            inner-type 3, 0: @java.lang.Mutable
+            type: @java.lang.Tainted
+            inner-type 3, 0: @java.lang.UnderInitialization
         parameter #2:
-            type: @java.lang.ReadOnly
+            type: @java.lang.Tainted
 

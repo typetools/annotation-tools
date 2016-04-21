@@ -1,5 +1,5 @@
 package java.lang:
-annotation @Mutable: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+annotation @UnderInitialization: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
 
 package annotator.tests:
 class SameName:
@@ -8,5 +8,5 @@ class SameName:
 
     method m()V:
         local a *1:
-        type: @java.lang.Mutable
+        type: @java.lang.UnderInitialization
 

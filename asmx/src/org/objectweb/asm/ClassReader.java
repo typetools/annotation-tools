@@ -1175,7 +1175,6 @@ public class ClassReader {
 
                 // 2nd phase: visits each instruction
                 v = codeStart;
-                // pmv added for the Javarifier
                 PrecompiledMethodVisitor pmv =
                     (mv instanceof PrecompiledMethodVisitor)
                     ? (PrecompiledMethodVisitor) mv : null;

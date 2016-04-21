@@ -8,7 +8,6 @@ import annotations.util.coll.VivifyingMap;
 
 /*>>>
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.checkerframework.checker.javari.qual.ReadOnly;
 */
 
 /**
@@ -65,14 +64,12 @@ public abstract class ADeclaration extends AElement {
   }
 
   @Override
-  public boolean equals(/*>>> @ReadOnly ADeclaration this, */
-      /*@ReadOnly*/ Object o) {
+  public boolean equals(Object o) {
     return o instanceof ADeclaration
-        && ((/*@ReadOnly*/ ADeclaration) o).equalsDeclaration(this);
+        && ((ADeclaration) o).equalsDeclaration(this);
   }
 
-  private boolean equalsDeclaration(/*>>> @ReadOnly ADeclaration this, */
-      /*@ReadOnly*/ ADeclaration o) {
+  private boolean equalsDeclaration(ADeclaration o) {
     return super.equals(o)
             && insertAnnotations.equals(o.insertAnnotations)
             && insertTypecasts.equals(o.insertTypecasts);
@@ -82,7 +79,7 @@ public abstract class ADeclaration extends AElement {
    * {@inheritDoc}
    */
   @Override
-  public int hashCode(/*>>> @ReadOnly ADeclaration this*/) {
+  public int hashCode() {
     return super.hashCode()
         + (insertAnnotations == null ? 0 : insertAnnotations.hashCode())
         + (insertTypecasts == null ? 0 : insertTypecasts.hashCode());

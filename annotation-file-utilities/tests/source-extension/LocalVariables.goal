@@ -2,7 +2,7 @@ package annotator.tests;
 
 public class LocalVariables {
   public void foo() {
-    /*Mut*/ @java.lang.Mutable Object a = null;
+    /*Mut*/ @java.lang.UnderInitialization Object a = null;
     Object b = null;
     Object c = null;
   }

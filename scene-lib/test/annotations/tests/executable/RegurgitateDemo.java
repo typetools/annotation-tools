@@ -2,7 +2,6 @@ package annotations.tests.executable;
 
 /*>>>
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.javari.qual.*;
 */
 
 import java.io.*;
@@ -11,7 +10,7 @@ import annotations.el.*;
 import annotations.io.*;
 
 public class RegurgitateDemo {
-    public static void main(/*@NonNull*/ String /*@NonNull*/ /*@ReadOnly*/ [] args) {
+    public static void main(/*@NonNull*/ String /*@NonNull*/ [] args) {
         // String sampleIndexFile = "package pkg: annotation @A: int value class
         // foo: @pkg.A(value=dinglewompus)";
         /*@NonNull*/ AScene scene = new AScene();

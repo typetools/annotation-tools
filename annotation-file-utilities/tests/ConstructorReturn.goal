@@ -1,6 +1,6 @@
 package annotator.tests;
 
 class ConstructorReturn {
-   public @java.lang.ReadOnly ConstructorReturn() { }
+   public @java.lang.Tainted ConstructorReturn() { }
 }
 

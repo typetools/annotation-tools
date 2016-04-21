@@ -2,7 +2,6 @@ package annotations.field;
 
 /*>>>
 import org.checkerframework.checker.nullness.qual.*;
-import org.checkerframework.checker.javari.qual.*;
 */
 
 import annotations.Annotation;
@@ -12,7 +11,7 @@ import annotations.el.AnnotationDef;
  * An {@link AnnotationAFT} represents a subannotation as the type of an
  * annotation field and contains the definition of the subannotation.
  */
-public final /*@ReadOnly*/ class AnnotationAFT extends ScalarAFT {
+public final class AnnotationAFT extends ScalarAFT {
 
     /**
      * The definition of the subannotation.

@@ -11,7 +11,6 @@ import annotations.util.coll.VivifyingMap;
 
 /*>>>
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.checkerframework.checker.javari.qual.ReadOnly;
 */
 
 /**
@@ -47,8 +46,8 @@ import org.checkerframework.checker.javari.qual.ReadOnly;
  *
  * <pre>
  * m.annotationsHere.add(new Annotation(
- *     new AnnotationDef(readOnlyDef, RetentionPolicy.RUNTIME, true),
- *     new Annotation(readOnlyDef, Collections.emptyMap())
+ *     new AnnotationDef(taintedDef, RetentionPolicy.RUNTIME, true),
+ *     new Annotation(taintedDef, Collections.emptyMap())
  * ));
  * </pre>
  */
@@ -125,10 +124,9 @@ public final class AScene implements Cloneable {
      * also apply to {@link AScene#equals(Object)}.
      */
     @Override
-    public boolean equals(/*>>> @ReadOnly AScene this, */
-            /*@ReadOnly*/ Object o) {
+    public boolean equals(Object o) {
         return o instanceof AScene
-            && ((/*@ReadOnly*/ AScene) o).equals(this);
+            && ((AScene) o).equals(this);
     }
 
     /**
@@ -136,8 +134,7 @@ public final class AScene implements Cloneable {
      * slightly faster variant of {@link #equals(Object)} for when the argument
      * is statically known to be another nonnull {@link AScene}.
      */
-    public boolean equals(/*>>> @ReadOnly AScene this, */
-            /*@ReadOnly*/ AScene o) {
+    public boolean equals(AScene o) {
         return o.classes.equals(classes) && o.packages.equals(packages);
     }
 
@@ -145,7 +142,7 @@ public final class AScene implements Cloneable {
      * {@inheritDoc}
      */
     @Override
-    public int hashCode(/*>>> @ReadOnly AScene this*/) {
+    public int hashCode() {
         return classes.hashCode() + packages.hashCode();
     }
 
