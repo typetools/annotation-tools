@@ -44,7 +44,7 @@ public class SceneOps {
    * @throws IOException 
    */
   public static void main(String[] args) throws IOException {
-    if (args.length != 3 || "diff".equals(args[0])) {
+    if (args.length != 3 || !"diff".equals(args[0])) {
       System.err.println(
           "usage: java annotations.util.SceneOps diff first.jaif second.jaif");
       System.exit(1);
