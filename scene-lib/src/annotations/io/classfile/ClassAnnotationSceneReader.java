@@ -4,7 +4,7 @@
 package annotations.io.classfile;
 
 /*>>>
-import org.checkerframework.checker.nullness.qual.*;
+import afu.org.checkerframework.checker.nullness.qual.*;
 */
 
 import java.io.File;

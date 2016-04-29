@@ -1,7 +1,7 @@
 package annotations.io;
 
 /*>>>
-import org.checkerframework.checker.nullness.qual.*;
+import afu.org.checkerframework.checker.nullness.qual.*;
 */
 
 import static java.io.StreamTokenizer.TT_EOF;
@@ -60,9 +60,9 @@ import annotations.field.EnumAFT;
 import annotations.field.ScalarAFT;
 import annotations.util.coll.VivifyingMap;
 
-import plume.ArraysMDE;
-import plume.FileIOException;
-import plume.Pair;
+import afu.plume.ArraysMDE;
+import afu.plume.FileIOException;
+import afu.plume.Pair;
 
 import type.ArrayType;
 import type.BoundedType;

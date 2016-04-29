@@ -74,7 +74,7 @@ import annotator.Main;
 import annotator.scanner.CommonScanner;
 import annotator.specification.IndexFileSpecification;
 
-import plume.Pair;
+import afu.plume.Pair;
 
 import type.DeclaredType;
 import type.Type;

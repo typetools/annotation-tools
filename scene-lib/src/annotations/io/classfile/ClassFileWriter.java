@@ -1,7 +1,7 @@
 package annotations.io.classfile;
 
 /*>>>
-import org.checkerframework.checker.nullness.qual.*;
+import afu.org.checkerframework.checker.nullness.qual.*;
 */
 
 import java.io.*;
@@ -10,8 +10,8 @@ import com.sun.tools.javac.main.CommandLine;
 
 import org.objectweb.asm.ClassReader;
 
-import plume.Option;
-import plume.Options;
+import afu.plume.Option;
+import afu.plume.Options;
 
 import annotations.el.AScene;
 import annotations.io.IndexFileParser;

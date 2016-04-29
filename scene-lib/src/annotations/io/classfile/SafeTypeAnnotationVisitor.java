@@ -4,7 +4,7 @@
 package annotations.io.classfile;
 
 /*>>>
-import org.checkerframework.checker.nullness.qual.*;
+import afu.org.checkerframework.checker.nullness.qual.*;
 */
 
 import java.util.ArrayList;
@@ -140,7 +140,7 @@ implements TypeAnnotationVisitor {
 
   /**
    * {@inheritDoc}
-   * @see org.objectweb.asm.TypeAnnotationVisitor#visitXLocation(TypePathEntry)
+   * @see org.objectweb.asm.TypeAnnotationVisitor#visitXLocation(TypeAnnotationPosition.TypePathEntry)
    */
   @Override
   public void visitXLocation(TypePathEntry location) {

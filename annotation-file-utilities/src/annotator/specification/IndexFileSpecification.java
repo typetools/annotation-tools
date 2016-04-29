@@ -10,8 +10,8 @@ import java.util.Set;
 
 import org.objectweb.asm.ClassReader;
 
-import plume.FileIOException;
-import plume.Pair;
+import afu.plume.FileIOException;
+import afu.plume.Pair;
 import type.DeclaredType;
 import type.Type;
 import annotations.Annotation;

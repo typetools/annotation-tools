@@ -10,7 +10,7 @@ import annotations.io.ASTPath;
 import com.sun.source.tree.Tree;
 import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
 
-import plume.Pair;
+import afu.plume.Pair;
 import type.ArrayType;
 import type.DeclaredType;
 import type.Type;

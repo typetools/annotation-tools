@@ -8,7 +8,7 @@ import annotations.field.AnnotationAFT;
 import annotations.field.AnnotationFieldType;
 
 /*>>>
-import org.checkerframework.checker.nullness.qual.*;
+import afu.org.checkerframework.checker.nullness.qual.*;
 */
 
 /**

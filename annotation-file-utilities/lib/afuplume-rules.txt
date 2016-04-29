@@ -1,0 +1,7 @@
+rule com.** afu.com.@1
+rule de.** afu.de.@1
+rule edu.** afu.edu.@1
+rule net.** afu.net.@1
+rule nu.** afu.nu.@1
+rule org.** afu.org.@1
+rule plume.** afu.plume.@1

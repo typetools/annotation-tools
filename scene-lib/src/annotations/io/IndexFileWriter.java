@@ -1,7 +1,7 @@
 package annotations.io;
 
 /*>>>
-import org.checkerframework.checker.nullness.qual.*;
+import afu.org.checkerframework.checker.nullness.qual.*;
 */
 
 import java.io.FileWriter;
