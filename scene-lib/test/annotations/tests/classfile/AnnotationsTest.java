@@ -1,7 +1,7 @@
 package annotations.tests.classfile;
 
 /*>>>
-import org.checkerframework.checker.nullness.qual.*;
+import afu.org.checkerframework.checker.nullness.qual.*;
 */
 
 import java.io.File;
@@ -189,7 +189,7 @@ public class AnnotationsTest extends TestCase {
           new FileOutputStream(newFileName),
           overwrite);
     } catch (Throwable e) {
-      System.err.printf("caught exception in writeClass(%s, %s, ...): %n",
+      System.err.printf("caught exception in writeClass(oldFileName=%s, newFileName=%s, ...):%n",
                         oldFileName, newFileName);
       e.printStackTrace();
       fail();

@@ -6,7 +6,7 @@ import java.util.Date;
 public class InnerClassSimple {
   public Integer field;
 
-  @java.lang.ReadOnly @java.lang.DoesNotExist public class ActualInnerClass {
-    @java.lang.ReadOnly Date d;
+  @java.lang.Tainted @java.lang.DoesNotExist public class ActualInnerClass {
+    @java.lang.Tainted Date d;
   }
 }

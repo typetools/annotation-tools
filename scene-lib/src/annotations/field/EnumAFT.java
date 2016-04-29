@@ -1,15 +1,14 @@
 package annotations.field;
 
 /*>>>
-import org.checkerframework.checker.nullness.qual.*;
-import org.checkerframework.checker.javari.qual.*;
+import afu.org.checkerframework.checker.nullness.qual.*;
 */
 
 /**
  * An {@link EnumAFT} is the type of an annotation field that can hold an
  * constant from a certain enumeration type.
  */
-public final /*@ReadOnly*/ class EnumAFT extends ScalarAFT {
+public final class EnumAFT extends ScalarAFT {
 
     /**
      * The name of the enumeration type whose constants the annotation field

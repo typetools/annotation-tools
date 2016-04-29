@@ -10,7 +10,7 @@ import com.sun.tools.javac.tree.JCTree.JCMethodDecl;
 import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
 import com.sun.tools.javac.util.List;
 
-import plume.UtilMDE;
+import afu.plume.UtilMDE;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;

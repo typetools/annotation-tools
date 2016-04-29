@@ -4,12 +4,12 @@ import java.util.Map;
 
 public class InnerTypeResolution {
     @java.lang.annotation.Deprecated
-    Map.Entry method01(@java.lang.annotation.ReadOnly Map m) {
+    Map.Entry method01(@java.lang.annotation.Tainted Map m) {
         return null;
     }
 
     @java.lang.annotation.Deprecated
-    Map.Entry method02(java.util.Map<@java.lang.annotation.ReadOnly String, Object> m) {
+    Map.Entry method02(java.util.Map<@java.lang.annotation.Tainted String, Object> m) {
         return null;
     }
 }

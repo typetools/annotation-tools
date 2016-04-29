@@ -3,8 +3,7 @@ package annotations.util.coll;
 import java.util.Set;
 
 /*>>>
-import org.checkerframework.checker.nullness.qual.*;
-import org.checkerframework.checker.javari.qual.*;
+import afu.org.checkerframework.checker.nullness.qual.*;
 */
 
 /**
@@ -21,7 +20,7 @@ public interface KeyedSet<K, V> extends Set<V> {
      * @return the <code>Keyer</code> that this <code>KeyedSet</code> uses
      *         to obtain keys for elements
      */
-    public abstract Keyer<? extends K, ? super V> getKeyer(/*>>> @ReadOnly KeyedSet<K, V> this*/);
+    public abstract Keyer<? extends K, ? super V> getKeyer();
 
     /**
      * Calls
@@ -90,5 +89,5 @@ public interface KeyedSet<K, V> extends Set<V> {
      * @return the element with key <code>k</code>, or <code>null</code> if
      *         none
      */
-    public abstract V lookup(/*>>> @ReadOnly KeyedSet<K, V> this, */ K k);
+    public abstract V lookup(K k);
 }

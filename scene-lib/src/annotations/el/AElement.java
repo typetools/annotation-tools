@@ -8,8 +8,7 @@ import annotations.Annotation;
 import annotations.util.coll.VivifyingMap;
 
 /*>>>
-import org.checkerframework.checker.nullness.qual.Nullable;
-import org.checkerframework.checker.javari.qual.ReadOnly;
+import afu.org.checkerframework.checker.nullness.qual.Nullable;
 */
 
 /**
@@ -21,7 +20,7 @@ import org.checkerframework.checker.javari.qual.ReadOnly;
  * name should make this clear.
  */
 public class AElement implements Cloneable {
-    static <K extends /*@ReadOnly*/ Object> VivifyingMap<K, AElement> newVivifyingLHMap_AE() {
+    static <K extends Object> VivifyingMap<K, AElement> newVivifyingLHMap_AE() {
         return new VivifyingMap<K, AElement>(
                 new LinkedHashMap<K, AElement>()) {
             @Override
@@ -38,7 +37,7 @@ public class AElement implements Cloneable {
 
     // Different from the above in that the elements are guaranteed to
     // contain a non-null "type" field.
-    static <K extends /*@ReadOnly*/ Object> VivifyingMap<K, AElement> newVivifyingLHMap_AET() {
+    static <K extends Object> VivifyingMap<K, AElement> newVivifyingLHMap_AET() {
         return new VivifyingMap<K, AElement>(
                 new LinkedHashMap<K, AElement>()) {
             @Override
@@ -140,9 +139,9 @@ public class AElement implements Cloneable {
      */
     @Override
     // Was final.  Removed that so that AnnotationDef can redefine.
-    public boolean equals(/*>>> @ReadOnly AElement this, */ /*@ReadOnly*/ Object o) {
+    public boolean equals(Object o) {
         return o instanceof AElement
-            && ((/*@ReadOnly*/ AElement) o).equals(this);
+            && ((AElement) o).equals(this);
     }
 
     /**
@@ -157,13 +156,11 @@ public class AElement implements Cloneable {
      * it shall call ((S) y).equalsS(x), which checks that x is a T and then
      * compares fields.
      */
-    public boolean equals(/*>>> @ReadOnly AElement this, */
-            /*@ReadOnly*/ AElement o) {
+    public boolean equals(AElement o) {
         return o.equalsElement(this);
     }
 
-    final boolean equalsElement(/*>>> @ReadOnly AElement this, */
-            /*@ReadOnly*/ AElement o) {
+    final boolean equalsElement(AElement o) {
         return o.tlAnnotationsHere.equals(tlAnnotationsHere)
             && (o.type == null ? type == null : o.type.equals(type));
     }
@@ -172,7 +169,7 @@ public class AElement implements Cloneable {
      * {@inheritDoc}
      */
     @Override
-    public int hashCode(/*>>> @ReadOnly AElement this*/) {
+    public int hashCode() {
         return getClass().getName().hashCode() + tlAnnotationsHere.hashCode()
             + (type == null ? 0 : type.hashCode());
     }

@@ -84,7 +84,7 @@
       <pathelement location="${annotations-compiler}/bin"/>
       -->
       <pathelement location="${annotations-compiler}/dist/lib/javac.jar"/>
-      <pathelement location="${annotation-tools}/annotation-file-utilities/lib/plume.jar"/>
+      <pathelement location="${annotation-tools}/annotation-file-utilities/lib/afuplume.jar"/>
       <pathelement location="${annotation-tools}/annotation-file-utilities/lib/guava-15.0.jar"/>
       <pathelement location="${scene-lib}/bin"/>
       <pathelement location="${asmx}/bin"/>
@@ -157,7 +157,7 @@
         <srcfiles dir="${scene-lib}/bin" excludes="annotations-expected/**,annotations/tests/**"/>
       </uptodate>
       <uptodate property="annotations-compiler.uptodate" targetfile="annotation-file-utilities.jar" srcfile="${annotations-compiler}/dist/lib/javac.jar"/>
-      <uptodate property="plume.uptodate" targetfile="annotation-file-utilities.jar" srcfile="lib/plume.jar"/>
+      <uptodate property="plume.uptodate" targetfile="annotation-file-utilities.jar" srcfile="lib/afuplume.jar"/>
       <uptodate property="google-collect.uptodate" targetfile="annotation-file-utilities.jar" srcfile="lib/guava-15.0.jar"/>
 
       <condition property="jarfile.uptodate">
@@ -197,7 +197,7 @@
       <fileset dir="${scene-lib}/bin" excludes="annotations-expected/**,annotations/tests/**"/>
     </copy>
     <!-- Also need to get class files in libraries -->
-    <unjar src="lib/plume.jar" dest="${temp-jarfile}">
+    <unjar src="lib/afuplume.jar" dest="${temp-jarfile}">
       <patternset>
         <include name="**/*.class"/>
         <exclude name="META-INF/" />
@@ -396,8 +396,8 @@
     </copy>
 
     <symlink overwrite="true"
-             link="index.html"
-             resource="${deploy-dir}/annotation-file-utilities.html"/>
+             link="${deploy-dir}/index.html"
+             resource="annotation-file-utilities.html"/>
   </target>
 
   <target name="annotation-file-format-clean"
@@ -511,6 +511,8 @@
             classpathref="libpath"
             classname="com.sun.tools.javac.Main">
           <jvmarg line="-Xbootclasspath/p:${annotations-compiler-absolute}/dist/lib/javac.jar"/>
+          <arg value="-Xlint:-options"/>
+          <arg value="-Werror"/>
           <arg value="-g"/>
           <arg line="-sourcepath src"/>
           <arg line="-d bin"/>

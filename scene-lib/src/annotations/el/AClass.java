@@ -6,8 +6,7 @@ import annotations.Annotation;
 import annotations.util.coll.VivifyingMap;
 
 /*>>>
-import org.checkerframework.checker.nullness.qual.*;
-import org.checkerframework.checker.javari.qual.*;
+import afu.org.checkerframework.checker.nullness.qual.*;
 */
 
 /** An annotated class */
@@ -123,14 +122,12 @@ public final class AClass extends ADeclaration {
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(/*>>> @ReadOnly AClass this,*/
-            /*@ReadOnly*/ Object o) {
+    public boolean equals(Object o) {
         return o instanceof AClass
-            && ((/*@ReadOnly*/ AClass) o).equalsClass(this);
+            && ((AClass) o).equalsClass(this);
     }
 
-    final boolean equalsClass(/*>>> @ReadOnly AClass this,*/
-            /*@ReadOnly*/ AClass o) {
+    final boolean equalsClass(AClass o) {
         return super.equals(o)
             && className.equals(o.className)
             && bounds.equals(o.bounds)
@@ -143,7 +140,7 @@ public final class AClass extends ADeclaration {
      * {@inheritDoc}
      */
     @Override
-    public int hashCode(/*>>> @ReadOnly AClass this*/) {
+    public int hashCode() {
         return super.hashCode() + bounds.hashCode()
             + methods.hashCode() + fields.hashCode()
             + staticInits.hashCode() + instanceInits.hashCode()
@@ -183,31 +180,31 @@ public final class AClass extends ADeclaration {
         }
         sb.append(linePrefix);
         sb.append("Bounds:\n");
-        plume.UtilMDE.mapToString(sb, bounds, linePrefix + "  ");
+        afu.plume.UtilMDE.mapToString(sb, bounds, linePrefix + "  ");
         sb.append(linePrefix);
         sb.append("Extends/implements:\n");
-        plume.UtilMDE.mapToString(sb, extendsImplements, linePrefix + "  ");
+        afu.plume.UtilMDE.mapToString(sb, extendsImplements, linePrefix + "  ");
         sb.append(linePrefix);
         sb.append("Fields:\n");
-        plume.UtilMDE.mapToString(sb, fields, linePrefix + "  ");
+        afu.plume.UtilMDE.mapToString(sb, fields, linePrefix + "  ");
         sb.append(linePrefix);
         sb.append("Field Initializers:\n");
-        plume.UtilMDE.mapToString(sb, fieldInits, linePrefix + "  ");
+        afu.plume.UtilMDE.mapToString(sb, fieldInits, linePrefix + "  ");
         sb.append(linePrefix);
         sb.append("Static Initializers:\n");
-        plume.UtilMDE.mapToString(sb, staticInits, linePrefix + "  ");
+        afu.plume.UtilMDE.mapToString(sb, staticInits, linePrefix + "  ");
         sb.append(linePrefix);
         sb.append("Instance Initializers:\n");
-        plume.UtilMDE.mapToString(sb, instanceInits, linePrefix + "  ");
+        afu.plume.UtilMDE.mapToString(sb, instanceInits, linePrefix + "  ");
         sb.append(linePrefix);
         sb.append("AST Typecasts:\n");
-        plume.UtilMDE.mapToString(sb, insertTypecasts, linePrefix + "  ");
+        afu.plume.UtilMDE.mapToString(sb, insertTypecasts, linePrefix + "  ");
         sb.append(linePrefix);
         sb.append("AST Annotations:\n");
-        plume.UtilMDE.mapToString(sb, insertAnnotations, linePrefix + "  ");
+        afu.plume.UtilMDE.mapToString(sb, insertAnnotations, linePrefix + "  ");
         sb.append(linePrefix);
         sb.append("Methods:\n");
-        plume.UtilMDE.mapToString(sb, methods, linePrefix + "  ");
+        afu.plume.UtilMDE.mapToString(sb, methods, linePrefix + "  ");
         return sb.toString();
     }
 

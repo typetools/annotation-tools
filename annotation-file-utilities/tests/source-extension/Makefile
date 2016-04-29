@@ -1,6 +1,5 @@
-# Very rough testing framework for the annotator that is based on the
-# testing framework for the Javarifier.  Running 'make all' will look for
-# all myClass.goal files in this directory, run the annotator on the
+# Very rough testing framework for the annotator.  Running 'make all' will
+# look for all myClass.goal files in this directory, run the annotator on the
 # corresponding .jaif and .java files, and then output the difference in a
 # myClass.diff file in this directory.
 #
@@ -62,7 +61,7 @@ bin/annotator/tests/%.class: %.java
 # before the stock javac classes that the Mac OS includes on the bootclasspath
 # (other platforms do not make such inclusions)
 .PRECIOUS: %.output
-%.output: %.jaif %.java bin/annotator/tests/%.class ../../lib/plume.jar ../../bin ../../annotation-file-utilities.jar
+%.output: %.jaif %.java bin/annotator/tests/%.class ../../lib/afuplume.jar ../../bin ../../annotation-file-utilities.jar
 	$(JAVA) \
         -Xbootclasspath/p:../../bin:../../annotation-file-utilities.jar \
 	-cp bin \

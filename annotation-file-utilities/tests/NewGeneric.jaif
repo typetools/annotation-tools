@@ -1,8 +1,8 @@
 package java.lang:
-annotation @ReadOnly: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+annotation @Tainted: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
 
 package java.lang:
-annotation @Mutable: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+annotation @UnderInitialization: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
 
 package annotator.tests:
 class NewGeneric:
@@ -10,7 +10,7 @@ class NewGeneric:
     method <init>()V:
 
     method foo(Ljava/lang/Object;)V:
-        typecast #1: @java.lang.ReadOnly
-            inner-type 3, 0: @java.lang.Mutable
-        typecast #6: @java.lang.Mutable
+        typecast #1: @java.lang.Tainted
+            inner-type 3, 0: @java.lang.UnderInitialization
+        typecast #6: @java.lang.UnderInitialization
 

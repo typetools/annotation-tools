@@ -2,7 +2,7 @@
 // name.  Results should be the same whether _abbreviate_ is set to true
 // or to false.
 class Abbreviation {
-  public Abbreviation(@org.checkerframework.checker.igj.qual.ReadOnly @org.checkerframework.checker.javari.qual.ReadOnly Object o) {
+  public Abbreviation(@org.checkerframework.checker.tainting.qual.Tainted Object o) {
   }
 }
 

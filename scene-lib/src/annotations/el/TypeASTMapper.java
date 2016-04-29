@@ -1,8 +1,7 @@
 package annotations.el;
 
 /*>>>
-import org.checkerframework.checker.nullness.qual.*;
-import org.checkerframework.checker.javari.qual.*;
+import afu.org.checkerframework.checker.nullness.qual.*;
 */
 
 import java.util.ArrayList;
@@ -43,7 +42,7 @@ public abstract class TypeASTMapper<N> {
     }
 
     private static ATypeElement getInnerType(ATypeElement te,
-                                             /*@ReadOnly*/ List<TypePathEntry> ls) {
+                                             List<TypePathEntry> ls) {
         if (ls.isEmpty())
             return te;
         else

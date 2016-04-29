@@ -4,7 +4,7 @@ import java.util.List;
 
 public class LocalGeneric {
   public void foo() {
-    @java.lang.Mutable List<@java.lang.ReadOnly Integer> var = null;
+    @java.lang.UnderInitialization List<@java.lang.Tainted Integer> var = null;
     System.out.println(var);
   }
 }

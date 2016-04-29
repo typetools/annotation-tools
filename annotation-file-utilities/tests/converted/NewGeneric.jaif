@@ -1,15 +1,15 @@
 package java.lang:
-annotation @Mutable: @java.lang.annotation.Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+annotation @UnderInitialization: @java.lang.annotation.Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
 
 package java.lang:
-annotation @ReadOnly: @java.lang.annotation.Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+annotation @Tainted: @java.lang.annotation.Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
 
 package annotator.tests:
 class NewGeneric:
 
     method foo(Ljava/lang/Object;)V:
         return:
-        insert-annotation Method.body, Block.statement 0, Variable.initializer, TypeCast.type, ParameterizedType.typeArgument 0: @java.lang.Mutable
-        insert-annotation Method.body, Block.statement 0, Variable.initializer, TypeCast.type: @java.lang.ReadOnly
-        insert-annotation Method.body, Block.statement 1, Variable.initializer, TypeCast.type: @java.lang.Mutable
+        insert-annotation Method.body, Block.statement 0, Variable.initializer, TypeCast.type, ParameterizedType.typeArgument 0: @java.lang.UnderInitialization
+        insert-annotation Method.body, Block.statement 0, Variable.initializer, TypeCast.type: @java.lang.Tainted
+        insert-annotation Method.body, Block.statement 1, Variable.initializer, TypeCast.type: @java.lang.UnderInitialization
 

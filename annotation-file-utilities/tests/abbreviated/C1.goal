@@ -1,4 +1,4 @@
-import org.checkerframework.checker.nullness.qual.Nullable;
+import afu.org.checkerframework.checker.nullness.qual.Nullable;
 import javax.annotation.Resource;
 public class C1<T extends Object> {
   @Resource

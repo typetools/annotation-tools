@@ -5,12 +5,11 @@ import java.util.LinkedHashMap;
 import annotations.util.coll.VivifyingMap;
 
 /*>>>
-import org.checkerframework.checker.nullness.qual.Nullable;
-import org.checkerframework.checker.javari.qual.ReadOnly;
+import afu.org.checkerframework.checker.nullness.qual.Nullable;
 */
 
 public class AField extends ADeclaration {
-  static <K extends /*@ReadOnly*/ Object> VivifyingMap<K, AField>
+  static <K extends Object> VivifyingMap<K, AField>
   newVivifyingLHMap_AF() {
     return new VivifyingMap<K, AField>(
         new LinkedHashMap<K, AField>()) {
@@ -46,14 +45,12 @@ public class AField extends ADeclaration {
   }
 
   @Override
-  public boolean equals(/*>>> @ReadOnly AField this, */
-        /*@ReadOnly*/ Object o) {
+  public boolean equals(Object o) {
     return o instanceof AField
-        && ((/*@ReadOnly*/ AField) o).equalsField(this);
+        && ((AField) o).equalsField(this);
   }
 
-  final boolean equalsField(/*>>> @ReadOnly AField this, */
-      /*@ReadOnly*/ AField o) {
+  final boolean equalsField(AField o) {
     return super.equals(o);
   }
 

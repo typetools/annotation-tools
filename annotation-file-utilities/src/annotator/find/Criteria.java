@@ -337,7 +337,7 @@ public final class Criteria {
             return true;
           }
         }
-        // fall through
+        break;
       default:
         break;
       }

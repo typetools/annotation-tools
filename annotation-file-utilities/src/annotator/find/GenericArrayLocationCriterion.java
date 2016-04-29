@@ -168,9 +168,9 @@ public class GenericArrayLocationCriterion implements Criterion {
 
     if (location.isEmpty()) {
       // no inner type location, want to annotate outermost type
-      // e.g.,  @Readonly List list;
-      //        @Readonly List<String> list;
-      //        String @Readonly [] array;
+      // e.g.,  @Nullable List list;
+      //        @Nullable List<String> list;
+      //        String @Nullable [] array;
       leaf = path.getLeaf();
       Tree parent = path.getParentPath().getLeaf();
 
@@ -446,8 +446,8 @@ public class GenericArrayLocationCriterion implements Criterion {
     }
 
     // no (remaining) inner type location, want to annotate outermost type
-    // e.g.,  @Readonly List list;
-    //        @Readonly List<String> list;
+    // e.g.,  @Nullable List list;
+    //        @Nullable List<String> list;
     TreePath parentPath = pathRemaining.getParentPath();
     if (parentPath == null) {
       if (debug) {

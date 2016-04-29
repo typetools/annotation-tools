@@ -1,7 +1,7 @@
 package java.lang:
-annotation @ReadOnly: @java.lang.annotation.Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+annotation @Tainted: @java.lang.annotation.Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
 
 package annotator.tests:
 class BoundClassSimple:
-    insert-annotation Class.typeParameter 0, TypeParameter.bound 0: @java.lang.ReadOnly
+    insert-annotation Class.typeParameter 0, TypeParameter.bound 0: @java.lang.Tainted
 

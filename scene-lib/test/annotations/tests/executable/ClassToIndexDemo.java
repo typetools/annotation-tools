@@ -1,7 +1,7 @@
 package annotations.tests.executable;
 
 /*>>>
-import org.checkerframework.checker.nullness.qual.*;
+import afu.org.checkerframework.checker.nullness.qual.*;
 */
 
 import java.io.*;

@@ -2,7 +2,7 @@ package annotator.specification;
 
 import java.util.List;
 
-import plume.FileIOException;
+import afu.plume.FileIOException;
 import annotator.find.Insertion;
 // import annotations.io.FileIOException;
 

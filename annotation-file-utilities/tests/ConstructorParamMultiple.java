@@ -4,9 +4,9 @@ import java.util.List;
 
 public class ConstructorParamMultiple {
   public ConstructorParamMultiple(
-      /* @ReadOnly*/ Object a,
-      /* @ReadOnly*/ List</* @Mutable*/ Integer> b,
-      /* @ReadOnly*/ int c) {
+      /* @Tainted*/ Object a,
+      /* @Tainted*/ List</* @UnderInitialization*/ Integer> b,
+      /* @Tainted*/ int c) {
 
   }
 }

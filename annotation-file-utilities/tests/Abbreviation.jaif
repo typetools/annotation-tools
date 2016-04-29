@@ -1,12 +1,9 @@
-package org.checkerframework.checker.igj.qual:
-annotation @ReadOnly:
-
-package org.checkerframework.checker.javari.qual:
-annotation @ReadOnly:
+package org.checkerframework.checker.tainting.qual:
+annotation @Tainted:
 
 package :
 class Abbreviation:
     method <init>(Ljava/lang/Object;)V:
         parameter 0:
-            type: @org.checkerframework.checker.igj.qual.ReadOnly @org.checkerframework.checker.javari.qual.ReadOnly
+            type: @org.checkerframework.checker.tainting.qual.Tainted
 

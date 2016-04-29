@@ -10,7 +10,7 @@ import com.sun.source.tree.NewClassTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
 
-import plume.Pair;
+import afu.plume.Pair;
 
 /**
  * NewScanner scans the source tree and determines the index of a given new,

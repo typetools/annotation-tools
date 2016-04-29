@@ -1,0 +1,10 @@
+To create file afuplume.jar:
+
+
+
+(cd $pl/java && make clean && (unset JSR308; unset CHECKERFRAMEWORK; unset JAVACHECK; make jar))
+cp $pl/java/plume.jar .
+java -jar ~/java/jarjar-pantsbuild/dist/jarjar.jar process afuplume-rules.txt plume.jar afuplume.jar
+
+
+org/checkerframework

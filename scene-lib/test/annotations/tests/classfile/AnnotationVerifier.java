@@ -1,7 +1,7 @@
 package annotations.tests.classfile;
 
 /*>>>
-import org.checkerframework.checker.nullness.qual.*;
+import afu.org.checkerframework.checker.nullness.qual.*;
 */
 
 import java.util.ArrayList;
@@ -19,7 +19,7 @@ import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.commons.EmptyVisitor;
 
-import plume.UtilMDE;
+import afu.plume.UtilMDE;
 
 import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
 
