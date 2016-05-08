@@ -21,3 +21,6 @@ after_success:
         curl -LO https://raw.github.com/mernst/plume-lib/master/bin/trigger-travis.sh
         sh trigger-travis.sh typetools checker-framework $TRAVISTOKEN
       fi
+
+git:
+  depth: 3
