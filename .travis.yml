@@ -9,10 +9,6 @@ jdk:
 #  - oraclejdk7
   - openjdk7
 
-notifications:
-  email:
-    - annotation-tools-dev@googlegroups.com
-
 after_success:
   - |
       if [[ ($TRAVIS_BRANCH == master) &&
