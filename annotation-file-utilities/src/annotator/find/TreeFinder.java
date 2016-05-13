@@ -171,7 +171,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
    * character at or after the given position.  (Assumes position is not
    * inside a comment.)
    *
-   * {@see #getNthInstanceBetween(char, int, int, int, CompilationUnitTree)}
+   * @see #getNthInstanceBetween(char, int, int, int, CompilationUnitTree)
    */
   private int getFirstInstanceAfter(char c, int i) {
     return getNthInstanceInRange(c, i, Integer.MAX_VALUE, 1);
