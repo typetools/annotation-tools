@@ -68,12 +68,14 @@ public final class IndexFileWriter {
 
         @Override
         protected void visitAnnotationDef(AnnotationDef d) {
+          if (!d.name.contains("+")) {
             pw.println("package " + annotations.io.IOUtils.packagePart(d.name) + ":");
             pw.print("annotation @" + annotations.io.IOUtils.basenamePart(d.name) + ":");
             // TODO: We would only print Retention and Target annotations
             printAnnotations(requiredMetaannotations(d.tlAnnotationsHere));
             pw.println();
             printAnnotationDefBody(d);
+          }
         }
 
         private Collection<Annotation> requiredMetaannotations(
