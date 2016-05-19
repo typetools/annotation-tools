@@ -43,6 +43,9 @@ public abstract class Annotations {
     public static AnnotationDef adTarget;
     public static Annotation aTargetTypeUse;
 
+    public static AnnotationDef adDocumented;
+    public static Annotation aDocumented;
+
     public static AnnotationDef adNonNull;
     public static Annotation aNonNull;
 
@@ -117,6 +120,12 @@ public abstract class Annotations {
         asRetentionRuntime = Collections.singleton(aRetentionRuntime);
         asRetentionSource = Collections.singleton(aRetentionSource);
 
+        // Documented's definition is also self-meta-annotated.
+        adDocumented = new AnnotationDef("java.lang.annotation.Documented");
+        adDocumented.setFieldTypes(noFieldTypes);
+        aDocumented = new Annotation(adDocumented, noFieldValues);
+        adDocumented.tlAnnotationsHere.add(aDocumented);
+
         adTarget = createValueAnnotationDef("java.lang.annotation.Target",
                                             asRetentionRuntime,
                                             new ArrayAFT(new EnumAFT("java.lang.annotation.ElementType")));
@@ -144,6 +153,7 @@ public abstract class Annotations {
 
         standardDefs = new LinkedHashSet<AnnotationDef>();
         standardDefs.add(adTarget);
+        standardDefs.add(adDocumented);
         standardDefs.add(adRetention);
         // Because annotations can be read from classfiles, it isn't really
         // necessary to add any more here.
