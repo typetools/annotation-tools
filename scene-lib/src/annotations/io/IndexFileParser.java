@@ -1496,7 +1496,8 @@ public final class IndexFileParser {
                 matchChar(':');
             } else {
                 pkg = expectQualifiedName();
-                AElement p = scene.packages.vivify(pkg);
+                //AElement p = scene.packages.vivify(pkg);
+                AClass p = scene.classes.vivify(pkg + ".package-info");
                 expectChar(':');
                 parseAnnotations(p);
             }

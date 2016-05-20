@@ -147,7 +147,14 @@ public class IndexFileSpecification implements Specification {
 
     VivifyingMap<String, AClass> classes = scene.classes;
     for (Map.Entry<String, AClass> entry : classes.entrySet()) {
-      parseClass(clist, entry.getKey(), entry.getValue());
+      String key = entry.getKey();
+      AClass clazz = entry.getValue();
+      if (key.endsWith(".package-info")) {
+        // strip off suffix to get package name
+        parsePackage(clist, key.substring(0, key.length()-13), clazz);
+      } else {
+        parseClass(clist, key, clazz);
+      }
     }
   }
 
