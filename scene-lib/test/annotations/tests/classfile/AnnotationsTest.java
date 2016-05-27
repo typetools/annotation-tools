@@ -345,6 +345,22 @@ public class AnnotationsTest extends TestCase {
   }
 
   /**
+   * Runs a test on class files for package-info.
+   */
+  public void testcPackage() {
+    testAgainstClass(nameIndex("package-info.jaif"),
+        nameClass("package-info"));
+  }
+
+  /**
+   * Runs a test on index files for package-info.
+   */
+  public void testiPackage() {
+    testAgainstIndexFile(nameIndex("package-info.jaif"),
+        nameClass("package-info.class"));
+  }
+
+  /**
    * Runs a test on class files for TestClassEmpty.
    */
   public void testcClassEmpty() {

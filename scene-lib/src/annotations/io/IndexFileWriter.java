@@ -433,10 +433,19 @@ public final class IndexFileWriter {
             AClass c = ce.getValue();
             String pkg = annotations.io.IOUtils.packagePart(cname);
             String basename = annotations.io.IOUtils.basenamePart(cname);
-            pw.println("package " + pkg + ":");
-            pw.print("class " + basename + ":");
-            printAnnotations(c);
-            pw.println();
+            if ("package-info".equals(basename)) {
+              if (!c.tlAnnotationsHere.isEmpty()) {
+                pw.print("package " + pkg + ":");
+                printAnnotations(c);
+                pw.println();
+              }
+              continue;
+            } else {
+              pw.println("package " + pkg + ":");
+              pw.print("class " + basename + ":");
+              printAnnotations(c);
+              pw.println();
+            }
 
             printBounds(INDENT, c.bounds);
             printExtImpls(INDENT, c.extendsImplements);
