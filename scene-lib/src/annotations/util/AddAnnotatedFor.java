@@ -52,7 +52,7 @@ public class AddAnnotatedFor {
 //        annotatedForMetaAnnotations,
 //        Collections.<String, AnnotationFieldType>singletonMap("value",
 //            new ArrayAFT(BasicAFT.forType(String.class))));
-    adAnnotatedFor = AnnotationDef
+    //adAnnotatedFor = AnnotationDef
   }
 
   /**
