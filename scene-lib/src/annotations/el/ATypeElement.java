@@ -7,7 +7,7 @@ import annotations.Annotation;
 import annotations.util.coll.VivifyingMap;
 
 /*>>>
-import afu.org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 */
 
 /**

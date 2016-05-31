@@ -3,7 +3,7 @@ package annotations.util.coll;
 import java.util.*;
 
 /*>>>
-import afu.org.checkerframework.checker.nullness.qual.*;
+import org.checkerframework.checker.nullness.qual.*;
 */
 
 /**

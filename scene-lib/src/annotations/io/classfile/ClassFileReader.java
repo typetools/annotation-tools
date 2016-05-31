@@ -1,12 +1,12 @@
 package annotations.io.classfile;
 
 /*>>>
-import afu.org.checkerframework.checker.nullness.qual.*;
+import org.checkerframework.checker.nullness.qual.*;
 */
 
 import java.io.*;
 
-import afu.plume.*;
+import plume.*;
 
 import com.sun.tools.javac.main.CommandLine;
 

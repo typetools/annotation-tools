@@ -1,7 +1,7 @@
 package annotations.el;
 
 /*>>>
-import afu.org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 */
 
 import java.util.Map;

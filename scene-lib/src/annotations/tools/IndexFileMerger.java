@@ -12,7 +12,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
 import com.sun.tools.javac.main.CommandLine;
 
-import afu.plume.FileIOException;
+import plume.FileIOException;
 import annotations.Annotation;
 import annotations.Annotations;
 import annotations.el.ABlock;

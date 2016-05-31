@@ -3,7 +3,7 @@ package annotations.el;
 import annotations.util.Hasher;
 
 /*>>>
-import afu.org.checkerframework.checker.nullness.qual.*;
+import org.checkerframework.checker.nullness.qual.*;
 */
 
 /**

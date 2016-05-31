@@ -4,7 +4,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 /*>>>
-import afu.org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 */
 
 /**

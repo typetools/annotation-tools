@@ -19,12 +19,12 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import afu.plume.FileIOException;
-import afu.plume.Option;
-import afu.plume.OptionGroup;
-import afu.plume.Options;
-import afu.plume.Pair;
-import afu.plume.UtilMDE;
+import plume.FileIOException;
+import plume.Option;
+import plume.OptionGroup;
+import plume.Options;
+import plume.Pair;
+import plume.UtilMDE;
 import type.Type;
 import annotations.Annotation;
 import annotations.el.ABlock;

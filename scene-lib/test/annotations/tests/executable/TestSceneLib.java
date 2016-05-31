@@ -1,7 +1,7 @@
 package annotations.tests.executable;
 
 /*>>>
-import afu.org.checkerframework.checker.nullness.qual.*;
+import org.checkerframework.checker.nullness.qual.*;
 */
 
 import java.io.*;
@@ -17,7 +17,7 @@ import annotations.el.*;
 import annotations.field.*;
 import annotations.io.*;
 
-import afu.plume.FileIOException;
+import plume.FileIOException;
 
 public class TestSceneLib extends TestCase {
     LineNumberReader openPackagedIndexFile(String name) {

@@ -1,7 +1,7 @@
 package annotations.tools;
 
 /*>>>
-import afu.org.checkerframework.checker.nullness.qual.*;
+import org.checkerframework.checker.nullness.qual.*;
 */
 
 import java.io.*;
@@ -13,7 +13,7 @@ import annotations.io.IndexFileWriter;
 import annotations.io.JavapParser;
 import annotations.io.classfile.ClassFileReader;
 import annotations.io.classfile.ClassFileWriter;
-import afu.plume.FileIOException;
+import plume.FileIOException;
 
 /** Concatenates multiple descriptions of annotations into a single one. **/
 public class Anncat {

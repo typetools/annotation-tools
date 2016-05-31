@@ -5,7 +5,7 @@ import java.util.LinkedHashMap;
 import annotations.util.coll.VivifyingMap;
 
 /*>>>
-import afu.org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 */
 
 public class AField extends ADeclaration {

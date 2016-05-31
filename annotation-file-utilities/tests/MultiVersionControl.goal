@@ -1,12 +1,12 @@
-package afu.plume;
+package plume;
 
-import afu.org.tmatesoft.svn.core.wc.*;
-import afu.org.tmatesoft.svn.core.internal.io.dav.DAVRepositoryFactory;
-import afu.org.tmatesoft.svn.core.internal.io.fs.FSRepositoryFactory;
-import afu.org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
-import afu.org.tmatesoft.svn.core.auth.ISVNAuthenticationManager;
-import afu.org.tmatesoft.svn.core.*;
-import afu.org.ini4j.Ini;
+import org.tmatesoft.svn.core.wc.*;
+import org.tmatesoft.svn.core.internal.io.dav.DAVRepositoryFactory;
+import org.tmatesoft.svn.core.internal.io.fs.FSRepositoryFactory;
+import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
+import org.tmatesoft.svn.core.auth.ISVNAuthenticationManager;
+import org.tmatesoft.svn.core.*;
+import org.ini4j.Ini;
 
 import java.io.*;
 import java.util.*;

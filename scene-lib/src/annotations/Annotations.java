@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Set;
 
 /*>>>
-import afu.org.checkerframework.checker.nullness.qual.*;
+import org.checkerframework.checker.nullness.qual.*;
 */
 
 /**

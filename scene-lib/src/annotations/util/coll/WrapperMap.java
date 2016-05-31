@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.Set;
 
 /*>>>
-import afu.org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 */
 
 /**
