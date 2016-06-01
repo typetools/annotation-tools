@@ -6,8 +6,8 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/asmx"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/scene-lib"/>
 	<classpathentry kind="lib" path="lib/guava-15.0.jar"/>
-<!--	<classpathentry combineaccessrules="false" kind="src" path="/plume-lib"/> -->
-	<classpathentry kind="lib" path="/annotation-file-utilities/lib/afuplume.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+<!--   <classpathentry combineaccessrules="false" kind="src" path="/plume-lib"/> -->
+	<classpathentry kind="lib" path="lib/afuplume.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
