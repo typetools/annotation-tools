@@ -1499,6 +1499,7 @@ public final class IndexFileParser {
                 //AElement p = scene.packages.vivify(pkg);
                 AClass p = scene.classes.vivify(pkg + ".package-info");
                 expectChar(':');
+                p = scene.classes.vivify(pkg + ".package-info");
                 parseAnnotations(p);
             }
 
