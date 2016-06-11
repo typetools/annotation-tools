@@ -957,6 +957,10 @@ loop:
   /**
    * Scans this tree, using the list of insertions to generate the source
    * position to insertion text mapping.
+   * <p>
+   * When a match is found, this routine removes the insertion from p and
+   * adds it to the insertions map as a value, with a key that is a pair.
+   * On return, p contains only the insertions for which no match was found.
    */
   @Override
   public Void scan(Tree node, List<Insertion> p) {
