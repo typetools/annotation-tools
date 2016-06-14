@@ -1,0 +1,6 @@
+Test of bridge method inclusion/exclusion.  For the default target
+(created with "make all"), the extracted JAIF should contain a method
+entry for "compareTo(LC;)I" but no entry for
+"compareTo(Ljava/lang/Object;)I"; for the alternate target ("make alt"),
+the JAIF should contain both.
+
