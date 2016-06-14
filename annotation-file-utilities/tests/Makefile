@@ -32,11 +32,15 @@ DEBUG :=
 default : all
 
 .PHONY: all
-all : $(DIFFS) abbreviated system-test source-extension results
+all : $(DIFFS) abbreviated ad-hoc system-test source-extension results
 
 .PHONY: abbreviated
 abbreviated:
 	-${MAKE} -C abbreviated #The minus(-) indicates that the process should continue if there is a failure
+
+.PHONY: ad-hoc
+ad-hoc:
+	-${MAKE} -C ad-hoc #The minus(-) indicates that the process should continue if there is a failure
 
 .PHONY: source-extension
 source-extension:
@@ -103,3 +107,4 @@ clean :
 	rm -f *.log
 	rm -f *.output
 	(cd abbreviated && make clean)
+	(cd ad-hoc && make clean)
