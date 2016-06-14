@@ -1,5 +1,0 @@
-package :
-annotation @A:
-class C:
-    method compareTo(Ljava/lang/String;)I: @A
-
