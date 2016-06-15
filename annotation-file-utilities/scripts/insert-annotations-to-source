@@ -13,6 +13,7 @@ if [ "$1" = "--debug-script" ]; then
 fi
 
 AFU=${AFU:-$(dirname $0)/..}
+AFU=`cd \`dirname $0\`/.. && pwd`
 ANNOTATION_FILE_UTILS=${ANNOTATION_FILE_UTILS:-${AFU}/bin:${AFU}/../scene-lib/bin:${AFU}/../asmx/bin:${AFU}/annotation-file-utilities.jar}
 # Contains new version of java.lang.annotation.ElementType.
 LANGTOOLS=${LANGTOOLS:-${AFU}/../../jsr308-langtools}
@@ -25,7 +26,7 @@ if [ "$DEBUG" = "1" ]; then
   echo "LANGTOOLS=${LANGTOOLS}"
   echo "JAVAC_JAR=${JAVAC_JAR}"
   # Keep this in sync with the actual command below.
-  echo java -ea -Xbootclasspath/p:${JAVAC_JAR} -classpath ${ANNOTATION_FILE_UTILS}:${CLASSPATH} annotator.Main "$@"
+  echo java -ea -Xmx512m -Xbootclasspath/p:${JAVAC_JAR} -classpath ${ANNOTATION_FILE_UTILS}:${CLASSPATH} annotator.Main "$@"
   echo "--- end of insert-annotations-to-source debugging output"
 fi
 
