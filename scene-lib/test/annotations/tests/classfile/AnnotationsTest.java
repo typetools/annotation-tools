@@ -31,9 +31,12 @@ import annotations.tests.classfile.foo.A;
  * <ul>
  *  <li>add the class name to array {@link #allTests}
  *  <li>place two files in directory {@link #CLASS_FILE_BASE}:
- *    a .class file (for the base version of the class), an _Expected.class
- *    file (for the annotated version of the class)
- *  <li>place one file in directory {@link #INDEX_FILE_BASE}: a .jaif index file.
+ *    a .class file (for the unannotated version of the class),
+ *    an _Expected.class file (for the annotated version of the class).
+ *  <li>place two files in directory {@link #INDEX_FILE_BASE}:
+ *    a .java source file (this is not used by the tests -- it is only for
+ *      documentation, and is helpful when creating the test files),
+ *    a .jaif index file.
  *  <li>Add a <code>testc*()</code> method to test against class file and a
  *    <code>testi*()</code> method to test against index file; this is just so
  *     that JUnit has an accurate count of all tests.
@@ -41,12 +44,14 @@ import annotations.tests.classfile.foo.A;
  *
  * Two types of tests are performed:
  * <ul>
- *   <li>Read the annotations from <code>name.jaif</code>, insert them into
+ *   <li>"c" tests that call testAgainstClass:
+ *      Read the annotations from <code>name.jaif</code>, insert them into
  *      <code>name.class</code>, write the results to a temporary file
  *      (name_Generated.class), and compare this generated class file with
  *      <code>name_Expected.class</code>, asserting that they have the same
  *      annotations.
- *   <li>Read the annotations from the generated class file, and check them
+ *   <li>"i" tests that call testAgainstIndexFile:
+ *      Read the annotations from the generated class file, and check them
  *      against the annotations from the index file.
  * </ul>
  */
