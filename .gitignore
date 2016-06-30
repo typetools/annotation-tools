@@ -1,6 +1,7 @@
 bin
 # *.class
 *_Generated.class
+*_temp.class
 *~
 TAGS
 
