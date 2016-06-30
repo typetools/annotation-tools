@@ -78,6 +78,12 @@
     </target>
 
     <target name="tags" depends="tags-scene-lib,tags-afu">
+      <exec executable="etags" failonerror="true">
+	<arg value="-i"/>
+	<arg value="${scene-lib}/TAGS"/>
+	<arg value="-i"/>
+	<arg value="${afu}/TAGS"/>
+      </exec>
     </target>
 
   <target name="html-validate"
