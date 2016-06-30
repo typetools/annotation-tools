@@ -1,5 +1,6 @@
 bin
-*.class
+# *.class
+*_Generated.class
 *~
 TAGS
 
@@ -25,6 +26,8 @@ annotation-file-utilities/javadoc
 annotation-file-utilities/tests/abbreviated/*.diff
 annotation-file-utilities/tests/abbreviated/*.log
 annotation-file-utilities/tests/abbreviated/*.output
+annotation-file-utilities/tests/ad-hoc/bridge/A.class
+annotation-file-utilities/tests/ad-hoc/bridge/C.class
 annotation-file-utilities/tests/ad-hoc/bridge/C.jaif
 annotation-file-utilities/tests/source-extension/*.diff
 annotation-file-utilities/tests/source-extension/*.log

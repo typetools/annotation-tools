@@ -81,6 +81,7 @@ public class AnnotationsTest extends TestCase {
     "TestFieldSimple",
     "TestFieldGeneric",
     "TestLocalVariable",
+    "TestLocalVariableA",
     "TestLocalVariableGenericArray",
     "TestTypecast",
     "TestTypecastGenericArray",
@@ -443,6 +444,22 @@ public class AnnotationsTest extends TestCase {
   public void testiLocalVariable() {
     testAgainstIndexFile(nameIndex("TestLocalVariable.jaif"),
         nameClass("TestLocalVariable.class"));
+  }
+
+  /**
+   * Runs a test on class files for TestLocalVariableA.
+   */
+  public void testcLocalVariableA() {
+    testAgainstClass(nameIndex("TestLocalVariableA.jaif"),
+        nameClass("TestLocalVariableA"));
+  }
+
+  /**
+   * Runs a test on index files for TestLocalVariableA.
+   */
+  public void testiLocalVariableA() {
+    testAgainstIndexFile(nameIndex("TestLocalVariableA.jaif"),
+        nameClass("TestLocalVariableA.class"));
   }
 
   /**
