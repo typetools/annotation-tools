@@ -1,0 +1,10 @@
+# To create a new scene-lib test case, do something like the following with a properly-functioning version of AFU:
+
+cd $t/annotation-tools/scene-lib/test/annotations/tests/classfile/cases
+$ch/bin/javac -g TestLocalVariableA.java
+\mv -pf TestLocalVariableA.class $t/annotation-tools/scene-lib/test/annotations-expected/tests/classfile/cases
+(CLASSPATH=$t/scene-lib/test insert-annotations-to-source TestLocalVariableA.jaif TestLocalVariableA.java)
+cd annotated
+$ch/bin/javac -g -cp $t/annotation-tools/scene-lib/bin annotations/tests/classfile/cases/TestLocalVariableA.java
+\cp -p annotations/tests/classfile/cases/TestLocalVariableA.class $t/annotation-tools/scene-lib/test/annotations-expected/tests/classfile/cases/TestLocalVariableA_Expected.class
+
