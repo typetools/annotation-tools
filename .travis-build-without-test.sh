@@ -10,7 +10,7 @@ export SHELLOPTS
 if [ -d ../jsr308-langtools ] ; then
     (cd ../jsr308-langtools && hg pull && hg update)
 else
-    (cd .. && hg clone https://bitbucket.org/typetools/jsr308-langtools)
+    (cd .. && (hg clone https://bitbucket.org/typetools/jsr308-langtools || hg clone https://bitbucket.org/typetools/jsr308-langtools))
 fi
 (cd ../jsr308-langtools/ && ./.travis-build-without-test.sh)
 
