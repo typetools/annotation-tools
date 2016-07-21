@@ -36,20 +36,19 @@ all : $(DIFFS) abbreviated ad-hoc system-test source-extension results
 
 .PHONY: abbreviated
 abbreviated:
-	-${MAKE} -C abbreviated #The minus(-) indicates that the process should continue if there is a failure
+	${MAKE} -C abbreviated
 
 .PHONY: ad-hoc
 ad-hoc:
-	-${MAKE} -C ad-hoc #The minus(-) indicates that the process should continue if there is a failure
+	${MAKE} -C ad-hoc
 
 .PHONY: source-extension
 source-extension:
-	-${MAKE} -C source-extension #The minus(-) indicates that the process should continue if there is a failure
+	${MAKE} -C source-extension
 
 .PHONY: system-test
 system-test:
-	echo "system test temporarily disabled"
-#	-${MAKE} -C system-test      #The minus(-) indicates that the process should continue if there is a failure
+	${MAKE} -C system-test
 
 # Display results of all .diff files.
 .PHONY: results
