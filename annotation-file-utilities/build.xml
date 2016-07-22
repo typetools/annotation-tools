@@ -467,15 +467,6 @@
 
   <target name="run-tests" depends="init-properties"
           description="run tests for the annotator">
-    <!-- This does not work because some tests contain type annotations.
-         However, some tests create .class files that need to be run.
-         I need to work this out.
-    -->
-    <!--
-    <condition property="xjavac.args" value="-source 1.7 -target 7">
-      <contains string="${java.version}" substring="1.7"/>
-    </condition>
-    -->
     <exec dir="tests/" executable="make" failonerror="true">
         <env key="XJAVAC" value="${annotations-compiler-absolute}/dist/bin/javac -g ${xjavac.args}"/>
         <env key="JAVAC_JAR" value="${annotations-compiler-absolute}/dist/lib/javac.jar"/>

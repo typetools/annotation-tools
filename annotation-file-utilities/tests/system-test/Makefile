@@ -30,7 +30,6 @@ clean:
 # Step 1: Compile the source with annotations.
 out1:
 	mkdir out1
-	echo "JAVAVERSION = ${JAVAVERSION}"
 	${XJAVAC} ${XJAVACTARGET} -d out1 source-ann/AnnotationTest.java || (\rm -rf out1 && false)
 
 # Step 2: Convert the annotated class file to an annotation file.
