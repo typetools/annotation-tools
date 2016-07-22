@@ -1,6 +1,8 @@
 .PHONY: all
 all: bridge no-bridge
 
+XJAVAC?=javac
+
 .PHONY: bridge
 # Counting bridge methods, there should be 3 @A annotations.
 bridge: C.class
