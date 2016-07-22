@@ -13,9 +13,9 @@
 # your execution path.  Example from Makefile.user:
 #   JAVA=${JAVA_HOME}/bin/java
 #   JAVAC=${JAVA_HOME}/bin/javac
-JAVA?=java -ea
-JAVAC?=javac
-XJAVAC?=javac
+export JAVA?=java -ea
+export JAVAC?=javac
+export XJAVAC?=javac
 
 export SHELL=/bin/bash -o pipefail
 
