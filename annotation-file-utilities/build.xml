@@ -468,7 +468,10 @@
   <target name="run-tests" depends="init-properties"
           description="run tests for the annotator">
     <exec dir="tests/" executable="make" failonerror="true">
-        <env key="XJAVAC" value="${annotations-compiler-absolute}/dist/bin/javac"/>
+      <condition property="xjavac.args" value="-target 7">
+        <contains string="${java.version}" substring="1.7"/>
+      </condition>
+        <env key="XJAVAC" value="${annotations-compiler-absolute}/dist/bin/javac -g ${xjavac.args}"/>
         <env key="JAVAC_JAR" value="${annotations-compiler-absolute}/dist/lib/javac.jar"/>
     </exec>
   </target>
