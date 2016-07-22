@@ -5,7 +5,12 @@
 # possible location.
 
 ANNCAT ?= ../../../scene-lib/anncat
-XJAVAC ?= ../../../../jsr308-langtools/dist/bin/javac -g
+JAVAVERSION = $(shell $(JAVA) -version 2>&1)
+ifeq (1.7.,$(findstring 1.7.,$(JAVACVERSION)))
+  XJAVAC ?= ../../../../jsr308-langtools/dist/bin/javac -g -target 7
+else
+  XJAVAC ?= ../../../../jsr308-langtools/dist/bin/javac -g
+endif
 
 #Switch the lines below to deactivate this test
 all: clean results
