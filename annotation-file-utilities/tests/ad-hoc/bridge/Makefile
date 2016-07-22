@@ -1,7 +1,7 @@
 .PHONY: all
 all: bridge no-bridge
 
-XJAVAC?=javac
+JAVAC?=javac
 
 .PHONY: bridge
 # Counting bridge methods, there should be 3 @A annotations.
