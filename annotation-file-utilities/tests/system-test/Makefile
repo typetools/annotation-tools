@@ -6,7 +6,7 @@
 
 ANNCAT ?= ../../../scene-lib/anncat
 JAVAVERSION = $(shell $(JAVA) -version 2>&1)
-ifeq (1.7.,$(findstring 1.7.,$(JAVACVERSION)))
+ifeq (1.7.,$(findstring 1.7.,$(JAVAVERSION)))
   XJAVAC ?= ../../../../jsr308-langtools/dist/bin/javac -g source 7 -target 7
 else
   XJAVAC ?= ../../../../jsr308-langtools/dist/bin/javac -g
