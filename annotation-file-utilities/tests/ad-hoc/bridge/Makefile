@@ -9,10 +9,7 @@ JAVACVERSION = $(shell $(JAVAC) -version 2>&1)
 # Counting bridge methods, there should be 3 @A annotations.
 bridge: C.class
 	../../../scripts/extract-annotations C.class
-# skip test if using javac 1.7, which doesn't copy annotations to bridge methods
-ifneq (1.7.,$(findstring 1.7.,$(JAVACVERSION)))
 	test 3 -eq `grep -c -w '@A' C.jaif` || (echo "Didn't find 3 '@A' in C.jaif:" && cat C.jaif && false)
-endif
 
 .PHONY: no-bridge
 # Not counting bridge methods, there should be 2 @A annotations.
@@ -22,7 +19,7 @@ no-bridge: C.class
 	test 2 -eq `grep -c -w '@A' C.jaif` || (echo "Didn't find 2 '@A' in C.jaif:" && cat C.jaif && false)
 
 C.class: C.java
-	$(JAVAC) -g C.java
+	$(XJAVAC) -g C.java
 
 .PHONY: clean
 clean:
