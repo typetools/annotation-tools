@@ -7,7 +7,7 @@
 ANNCAT ?= ../../../scene-lib/anncat
 JAVAVERSION = $(shell $(JAVA) -version 2>&1)
 ifeq (1.7.,$(findstring 1.7.,$(JAVAVERSION)))
-  XJAVACTARGET = source 7 -target 7
+  XJAVACTARGET = -source 7 -target 7
 endif
 
 #Switch the lines below to deactivate this test
