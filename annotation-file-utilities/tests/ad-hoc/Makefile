@@ -3,9 +3,8 @@ all: bridge
 
 .PHONY: bridge
 bridge:
-	(cd bridge && make)
+	${MAKE} -C bridge
 
 .PHONY: clean
 clean:
-	(cd bridge && make clean)
-
+	${MAKE} -C bridge clean
