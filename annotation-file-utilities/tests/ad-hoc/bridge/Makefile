@@ -17,7 +17,7 @@ no-bridge: C.class
 	test 2 -eq `grep -c -w '@A' C.jaif` || (echo "Didn't find 2 '@A' in C.jaif:" && cat C.jaif && false)
 
 C.class: C.java
-	$(XJAVAC) -g C.java
+	$(JAVAC) -g C.java
 
 .PHONY: clean
 clean:
