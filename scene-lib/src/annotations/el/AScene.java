@@ -216,7 +216,7 @@ public final class AScene implements Cloneable {
 
     /**
      * Throw exception on visit if e0 == e1 or !e0.equals(e1).
-     * (See {@link checkClone(AScene, AScene)} for explanation.)
+     * (See {@link #checkClone(AScene, AScene)} for explanation.)
      */
     public static void checkElem(AElement e0, AElement e1) {
         checkObject(e0, e1);
@@ -230,7 +230,7 @@ public final class AScene implements Cloneable {
 
     /**
      * Throw exception on visit if !el.equals(arg) or !arg.equals(el).
-     * (See {@link checkClone(AScene, AScene)} for explanation.)
+     * (See {@link #checkClone(AScene, AScene)} for explanation.)
      */
     public static void checkObject(Object o0, Object o1) {
         if (o0 == null ? o1 != null
