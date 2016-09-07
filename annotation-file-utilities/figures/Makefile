@@ -5,10 +5,13 @@
 
 PNGFILES = corresp.png dataflow.png nocast.png typecast.png
 
-all: ${EPSFILES} ${PDFFILES} ${PNGFILES} png-copy
+all: ${EPSFILES} ${PDFFILES} ${PNGFILES} png-copy svg-copy
 
 png-copy: ${PNGFILES}
 	cp -pf ${PNGFILES} ..
+
+svg-copy:
+	cp -pf *.svg ..
 
 %.png : %.dot
 	dot -Tpng $< > `basename $< .dot`.png
