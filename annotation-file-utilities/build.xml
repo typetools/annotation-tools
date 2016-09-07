@@ -390,6 +390,7 @@
 
     <copy todir="${deploy-dir}/figures" flatten="true">
       <fileset dir="figures">
+          <include name="*.svg"/>
           <include name="*.png"/>
           <include name="*.gif"/>
       </fileset>
