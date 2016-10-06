@@ -24,4 +24,4 @@ after_script:
       fi
 
 git:
-  depth: 3
+  depth: 9
