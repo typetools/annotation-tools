@@ -1,5 +1,5 @@
 package java.lang:
-annotation @ReadOnly: @java.lang.annotation.Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+annotation @Tainted: @java.lang.annotation.Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
 
 package :
 annotation @NonNegative: @java.lang.annotation.Target(value={TYPE_USE})
@@ -11,7 +11,7 @@ package annotator.tests:
 class InnerClassAnonymous$1:
 
     field serialVersionUID:
-        insert-annotation Variable.type: @java.lang.ReadOnly
+        insert-annotation Variable.type: @java.lang.Tainted
 
 package annotator.tests:
 class InnerClassAnonymous$2:

@@ -1,6 +1,5 @@
 package org.objectweb.asm;
 
-// Added so that the Javarifier can get local variable ranges.
 /**
  * A visitor to visit a Java method in which the bytecode positions of the
  * instructions and labels are already known.  When an object that has these

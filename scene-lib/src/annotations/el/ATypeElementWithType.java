@@ -1,9 +1,5 @@
 package annotations.el;
 
-/*>>>
-import org.checkerframework.checker.javari.qual.ReadOnly;
-*/
-
 import java.util.LinkedHashMap;
 
 import type.Type;
@@ -26,7 +22,7 @@ public class ATypeElementWithType extends ATypeElement {
      * <p>
      * {@code ATEWT} stands for {@code ATypeElementWithType}.
      */
-    /*package-private*/ static <K extends /*@ReadOnly*/ Object> VivifyingMap<K, ATypeElementWithType> newVivifyingLHMap_ATEWT() {
+    /*package-private*/ static <K extends Object> VivifyingMap<K, ATypeElementWithType> newVivifyingLHMap_ATEWT() {
         return new VivifyingMap<K, ATypeElementWithType>(
                 new LinkedHashMap<K, ATypeElementWithType>()) {
             @Override
@@ -48,6 +44,16 @@ public class ATypeElementWithType extends ATypeElement {
 
     ATypeElementWithType(Object description) {
         super(description);
+    }
+
+    ATypeElementWithType(ATypeElementWithType elem) {
+        super(elem);
+        type = elem.type;
+    }
+
+    @Override
+    public ATypeElementWithType clone() {
+        return new ATypeElementWithType(this);
     }
 
     /**

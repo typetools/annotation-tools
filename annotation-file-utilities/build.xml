@@ -11,7 +11,7 @@
   <property name="java-version" value="8"/>
 
   <tstamp>
-      <format property="TIME" pattern="yy-MM-dd-hh-mm-ss-SS" />
+      <format property="TIME" pattern="yy-MM-dd-HH-mm-ss-SS" />
   </tstamp>
   <!-- Avoid conflicts between multiple users on the same computer. -->
   <property name="tmpdir" location="${java.io.tmpdir}/${user.name}/${TIME}" />
@@ -390,14 +390,15 @@
 
     <copy todir="${deploy-dir}/figures" flatten="true">
       <fileset dir="figures">
+          <include name="*.svg"/>
           <include name="*.png"/>
           <include name="*.gif"/>
       </fileset>
     </copy>
 
     <symlink overwrite="true"
-             link="index.html"
-             resource="${deploy-dir}/annotation-file-utilities.html"/>
+             link="${deploy-dir}/index.html"
+             resource="annotation-file-utilities.html"/>
   </target>
 
   <target name="annotation-file-format-clean"
@@ -468,7 +469,7 @@
   <target name="run-tests" depends="init-properties"
           description="run tests for the annotator">
     <exec dir="tests/" executable="make" failonerror="true">
-        <env key="XJAVAC" value="${annotations-compiler-absolute}/dist/bin/javac"/>
+        <env key="XJAVAC" value="${annotations-compiler-absolute}/dist/bin/javac -g ${xjavac.args}"/>
         <env key="JAVAC_JAR" value="${annotations-compiler-absolute}/build/javac.jar"/>
     </exec>
   </target>
@@ -513,6 +514,8 @@
           <!-- Option no longer exists in JDK 9.
           <jvmarg line="-Xbootclasspath/p:${annotations-compiler-absolute}/build/javac.jar"/>
           -->
+          <arg value="-Xlint:-options"/>
+          <arg value="-Werror"/>
           <arg value="-g"/>
           <arg line="-sourcepath src"/>
           <arg line="-d bin"/>

@@ -64,6 +64,9 @@ extends EmptyVisitor {
   // Whether to output error messages for unsupported cases
   private static final boolean strict = false;
 
+  // Whether to include annotations on compiler-generated methods
+  private final boolean ignoreBridgeMethods;
+
   // The scene into which this class will insert annotations.
   private final AScene scene;
 
@@ -94,10 +97,14 @@ extends EmptyVisitor {
    *
    * @param scene the annotation scene into which annotations this visits
    *  will be inserted
+   * @param ignoreBridgeMethods whether to omit annotations on
+   *  compiler-generated methods
    */
-  public ClassAnnotationSceneReader(ClassReader cr, AScene scene) {
+  public ClassAnnotationSceneReader(ClassReader cr, AScene scene,
+      boolean ignoreBridgeMethods) {
     this.cr = cr;
     this.scene = scene;
+    this.ignoreBridgeMethods = ignoreBridgeMethods;
   }
 
   /**
@@ -152,9 +159,10 @@ extends EmptyVisitor {
       String desc,
       String signature,
       String[] exceptions) {
+    if (ignoreBridgeMethods && (access & Opcodes.ACC_BRIDGE) != 0) {
+      return null;
+    }
     if (trace) { System.out.printf("visitMethod(%s, %s, %s, %s, %s) in %s (%s)%n", access, name, desc, signature, exceptions, this, this.getClass()); }
-    // uncomment below to omit implementation-dependent compiler-generated code
-    // if ((access & Opcodes.ACC_BRIDGE) != 0) { return null; }
     AMethod aMethod = aClass.methods.vivify(name+desc);
     return new MethodAnnotationSceneReader(name, desc, signature, aMethod);
   }
@@ -248,6 +256,10 @@ extends EmptyVisitor {
       } catch (ClassNotFoundException e) {
         System.out.printf("Could not find class: %s%n", e.getMessage());
         printClasspath();
+        if (annoTypeName.contains("+")) {
+          return Annotations.createValueAnnotationDef(annoTypeName,
+              Annotations.noAnnotations, BasicAFT.forType(int.class));
+        }
         throw new Error(e);
       }
 

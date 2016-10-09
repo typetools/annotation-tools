@@ -9,7 +9,6 @@ import annotations.util.coll.VivifyingMap;
 
 /*>>>
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.checkerframework.checker.javari.qual.ReadOnly;
 */
 
 /**
@@ -20,8 +19,8 @@ import org.checkerframework.checker.javari.qual.ReadOnly;
  * of <code>AElement</code> represents one kind of annotatable element; its
  * name should make this clear.
  */
-public class AElement {
-    static <K extends /*@ReadOnly*/ Object> VivifyingMap<K, AElement> newVivifyingLHMap_AE() {
+public class AElement implements Cloneable {
+    static <K extends Object> VivifyingMap<K, AElement> newVivifyingLHMap_AE() {
         return new VivifyingMap<K, AElement>(
                 new LinkedHashMap<K, AElement>()) {
             @Override
@@ -38,7 +37,7 @@ public class AElement {
 
     // Different from the above in that the elements are guaranteed to
     // contain a non-null "type" field.
-    static <K extends /*@ReadOnly*/ Object> VivifyingMap<K, AElement> newVivifyingLHMap_AET() {
+    static <K extends Object> VivifyingMap<K, AElement> newVivifyingLHMap_AET() {
         return new VivifyingMap<K, AElement>(
                 new LinkedHashMap<K, AElement>()) {
             @Override
@@ -51,6 +50,15 @@ public class AElement {
                 return v.prune();
             }
         };
+    }
+
+    @SuppressWarnings("unchecked")
+    <K, V extends AElement> void
+    copyMapContents(VivifyingMap<K, V> orig, VivifyingMap<K, V> copy) {
+        for (K key : orig.keySet()) {
+            V val = orig.get(key);
+            copy.put(key, (V) val.clone());
+        }
     }
 
     /**
@@ -72,17 +80,44 @@ public class AElement {
         return null;
     }
 
-    // general descrition of the element
-    private final Object description;
+    // general description of the element
+    final Object description;
 
     AElement(Object description) {
         this(description, false);
     }
 
     AElement(Object description, boolean hasType) {
+        this(description,
+            hasType ? new ATypeElement("type of " + description) : null);
+    }
+
+    AElement(Object description, ATypeElement type) {
         tlAnnotationsHere = new LinkedHashSet<Annotation>();
         this.description = description;
-        type = hasType ? new ATypeElement("type of " + description) : null;
+        this.type = type;
+    }
+
+    AElement(AElement elem) {
+        this(elem, elem.type);
+    }
+
+    AElement(AElement elem, ATypeElement type) {
+        this(elem.description,
+            type == null ? null : type.clone());
+        tlAnnotationsHere.addAll(elem.tlAnnotationsHere);
+    }
+
+    AElement(AElement elem, Object description) {
+        this(description, elem.type == null ? null : elem.type.clone());
+        tlAnnotationsHere.addAll(elem.tlAnnotationsHere);
+    }
+
+    // Q: Are there any fields other than elements and maps that can't be shared?
+
+    @Override
+    public AElement clone() {
+        return new AElement(this);
     }
 
     /**
@@ -104,9 +139,9 @@ public class AElement {
      */
     @Override
     // Was final.  Removed that so that AnnotationDef can redefine.
-    public boolean equals(/*>>> @ReadOnly AElement this, */ /*@ReadOnly*/ Object o) {
+    public boolean equals(Object o) {
         return o instanceof AElement
-            && ((/*@ReadOnly*/ AElement) o).equals(this);
+            && ((AElement) o).equals(this);
     }
 
     /**
@@ -121,13 +156,11 @@ public class AElement {
      * it shall call ((S) y).equalsS(x), which checks that x is a T and then
      * compares fields.
      */
-    public boolean equals(/*>>> @ReadOnly AElement this, */
-            /*@ReadOnly*/ AElement o) {
+    public boolean equals(AElement o) {
         return o.equalsElement(this);
     }
 
-    final boolean equalsElement(/*>>> @ReadOnly AElement this, */
-            /*@ReadOnly*/ AElement o) {
+    final boolean equalsElement(AElement o) {
         return o.tlAnnotationsHere.equals(tlAnnotationsHere)
             && (o.type == null ? type == null : o.type.equals(type));
     }
@@ -136,7 +169,7 @@ public class AElement {
      * {@inheritDoc}
      */
     @Override
-    public int hashCode(/*>>> @ReadOnly AElement this*/) {
+    public int hashCode() {
         return getClass().getName().hashCode() + tlAnnotationsHere.hashCode()
             + (type == null ? 0 : type.hashCode());
     }

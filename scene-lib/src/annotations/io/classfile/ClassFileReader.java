@@ -22,12 +22,15 @@ import annotations.io.IndexFileWriter;
 public class ClassFileReader {
 
   public static final String INDEX_UTILS_VERSION
-    = "Annotation File Utilities v3.6.27";
+    = "Annotation File Utilities v3.6.34";
+
+  @Option("-b omit annotations from bridge (compiler-created) methods")
+  public static boolean ignore_bridge_methods = false;
 
   @Option("-h print usage information and exit")
   public static boolean help = false;
 
-  @Option("print version information and exit")
+  @Option("-v print version information and exit")
   public static boolean version = false;
 
   private static String linesep = System.getProperty("line.separator");
@@ -196,7 +199,8 @@ public class ClassFileReader {
   }
 
   public static void read(AScene scene, ClassReader cr) {
-    ClassAnnotationSceneReader ca = new ClassAnnotationSceneReader(cr, scene);
+    ClassAnnotationSceneReader ca =
+        new ClassAnnotationSceneReader(cr, scene, ignore_bridge_methods);
     cr.accept(ca, true);
   }
 

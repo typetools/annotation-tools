@@ -2,7 +2,7 @@
 
 # Ad hoc script for merging annotated JDKs.  Arguments are JDK source
 # directories, assumed to be children of $js and identified by directory
-# name only (e.g. "merge-annotations igj javari nullness").
+# name only (e.g. "merge-annotations nullness").
 
 if [ $# -le 1 ]; then exit 0; fi
 

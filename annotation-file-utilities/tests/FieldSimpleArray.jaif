@@ -1,15 +1,15 @@
 package java.lang:
-annotation @ReadOnly: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+annotation @Tainted: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
 
 package java.lang:
-annotation @Mutable: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+annotation @UnderInitialization: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
 
 package annotator.tests:
 class FieldSimpleArray:
 
     field field:
-        type: @java.lang.ReadOnly
-        inner-type 0, 0: @java.lang.Mutable
+        type: @java.lang.Tainted
+        inner-type 0, 0: @java.lang.UnderInitialization
 
     method <init>()V:
 

@@ -2,7 +2,7 @@ package annotations.tests.executable;
 
 /*>>>
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.javari.qual.ReadOnly;
+import org.checkerframework.checker.tainting.qual.Tainted;
 */
 
 import java.io.*;
@@ -13,14 +13,14 @@ import annotations.el.*;
 import annotations.io.*;
 
 /**
- * Prints information about ReadOnly and NonNull annotations on a given class.
+ * Prints information about Tainted and NonNull annotations on a given class.
  * Invoke as:
  * <pre>
  * java Example <i>input.jaif</i> <i>ClassToProcess</i> <i>output.jaif</i>
  * </pre>
  **/
 public class Example {
-  public static void main(String /*@ReadOnly*/ [] args) {
+  public static void main(String [] args) {
     AScene scene;
 
     if (! new File(args[0]).exists()) {
@@ -53,7 +53,7 @@ public class Example {
     for (Map.Entry<String, AMethod> me : clazz.methods.entrySet()) {
       AMethod method = me.getValue();
 
-      Annotation rro = method.receiver.type.lookup("ReadOnly");
+      Annotation rro = method.receiver.type.lookup("Tainted");
       if (rro == null)
         System.out.println("Method " + me.getKey()
             + " might modify the receiver");

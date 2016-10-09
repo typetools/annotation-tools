@@ -2,7 +2,6 @@ package annotations.el;
 
 /*>>>
 import org.checkerframework.checker.nullness.qual.*;
-import org.checkerframework.checker.javari.qual.*;
 */
 
 import java.util.ArrayList;
@@ -17,7 +16,7 @@ import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
  * An {@link InnerTypeLocation} holds the location information for an
  * inner type (namely the location string) inside its {@link ATypeElement}.
  */
-public final /*@ReadOnly*/ class InnerTypeLocation {
+public final class InnerTypeLocation {
 
     /**
      * An {@link InnerTypeLocation} containing no locations.
@@ -31,7 +30,7 @@ public final /*@ReadOnly*/ class InnerTypeLocation {
      * in <code>Foo&lt;Bar&lt;Baz, &#064;X Baz&gt;&gt;</code> are
      * <code>{0, 1}</code>.
      */
-    public final /*@ReadOnly*/ List<TypePathEntry> location;
+    public final List<TypePathEntry> location;
 
     /**
      * Constructs an {@link InnerTypeLocation} from the given location string,
@@ -39,7 +38,7 @@ public final /*@ReadOnly*/ class InnerTypeLocation {
      * {@link ATypeElement} with zero-length location string is the
      * {@link ATypeElement} itself.)
      */
-    public InnerTypeLocation(/*@ReadOnly*/ List<TypePathEntry> location) {
+    public InnerTypeLocation(List<TypePathEntry> location) {
         this.location = Collections.unmodifiableList(
                 new ArrayList<TypePathEntry>(location));
     }
@@ -60,7 +59,7 @@ public final /*@ReadOnly*/ class InnerTypeLocation {
      * {@link #location}.
      */
     @Override
-    public boolean equals(/*@ReadOnly*/ Object o) {
+    public boolean equals(Object o) {
         return o instanceof InnerTypeLocation
                 && equals((InnerTypeLocation) o);
     }

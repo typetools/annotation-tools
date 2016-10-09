@@ -31,9 +31,12 @@ import annotations.tests.classfile.foo.A;
  * <ul>
  *  <li>add the class name to array {@link #allTests}
  *  <li>place two files in directory {@link #CLASS_FILE_BASE}:
- *    a .class file (for the base version of the class), an _Expected.class
- *    file (for the annotated version of the class)
- *  <li>place one file in directory {@link #INDEX_FILE_BASE}: a .jaif index file.
+ *    a .class file (for the unannotated version of the class),
+ *    an _Expected.class file (for the annotated version of the class).
+ *  <li>place two files in directory {@link #INDEX_FILE_BASE}:
+ *    a .java source file (this is not used by the tests -- it is only for
+ *      documentation, and is helpful when creating the test files),
+ *    a .jaif index file.
  *  <li>Add a <code>testc*()</code> method to test against class file and a
  *    <code>testi*()</code> method to test against index file; this is just so
  *     that JUnit has an accurate count of all tests.
@@ -41,12 +44,14 @@ import annotations.tests.classfile.foo.A;
  *
  * Two types of tests are performed:
  * <ul>
- *   <li>Read the annotations from <code>name.jaif</code>, insert them into
+ *   <li>"c" tests that call testAgainstClass:
+ *      Read the annotations from <code>name.jaif</code>, insert them into
  *      <code>name.class</code>, write the results to a temporary file
  *      (name_Generated.class), and compare this generated class file with
  *      <code>name_Expected.class</code>, asserting that they have the same
  *      annotations.
- *   <li>Read the annotations from the generated class file, and check them
+ *   <li>"i" tests that call testAgainstIndexFile:
+ *      Read the annotations from the generated class file, and check them
  *      against the annotations from the index file.
  * </ul>
  */
@@ -76,6 +81,7 @@ public class AnnotationsTest extends TestCase {
     "TestFieldSimple",
     "TestFieldGeneric",
     "TestLocalVariable",
+    "TestLocalVariableA",
     "TestLocalVariableGenericArray",
     "TestTypecast",
     "TestTypecastGenericArray",
@@ -189,7 +195,7 @@ public class AnnotationsTest extends TestCase {
           new FileOutputStream(newFileName),
           overwrite);
     } catch (Throwable e) {
-      System.err.printf("caught exception in writeClass(%s, %s, ...): %n",
+      System.err.printf("caught exception in writeClass(oldFileName=%s, newFileName=%s, ...):%n",
                         oldFileName, newFileName);
       e.printStackTrace();
       fail();
@@ -345,6 +351,22 @@ public class AnnotationsTest extends TestCase {
   }
 
   /**
+   * Runs a test on class files for package-info.
+   */
+  public void testcPackage() {
+    testAgainstClass(nameIndex("package-info.jaif"),
+        nameClass("package-info"));
+  }
+
+  /**
+   * Runs a test on index files for package-info.
+   */
+  public void testiPackage() {
+    testAgainstIndexFile(nameIndex("package-info.jaif"),
+        nameClass("package-info.class"));
+  }
+
+  /**
    * Runs a test on class files for TestClassEmpty.
    */
   public void testcClassEmpty() {
@@ -422,6 +444,22 @@ public class AnnotationsTest extends TestCase {
   public void testiLocalVariable() {
     testAgainstIndexFile(nameIndex("TestLocalVariable.jaif"),
         nameClass("TestLocalVariable.class"));
+  }
+
+  /**
+   * Runs a test on class files for TestLocalVariableA.
+   */
+  public void testcLocalVariableA() {
+    testAgainstClass(nameIndex("TestLocalVariableA.jaif"),
+        nameClass("TestLocalVariableA"));
+  }
+
+  /**
+   * Runs a test on index files for TestLocalVariableA.
+   */
+  public void testiLocalVariableA() {
+    testAgainstIndexFile(nameIndex("TestLocalVariableA.jaif"),
+        nameClass("TestLocalVariableA.class"));
   }
 
   /**

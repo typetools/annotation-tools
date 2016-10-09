@@ -9,7 +9,6 @@ import annotations.field.AnnotationFieldType;
 
 /*>>>
 import org.checkerframework.checker.nullness.qual.*;
-import org.checkerframework.checker.javari.qual.*;
 */
 
 /**
@@ -32,7 +31,7 @@ public abstract class DefCollector {
      * order.  If the scene contains two irreconcilable definitions of the
      * same annotation type, a {@link DefException} is thrown.
      */
-    public DefCollector(/*@ReadOnly*/ AScene s)
+    public DefCollector(AScene s)
             throws DefException {
         defs = new LinkedHashSet<AnnotationDef>();
         collect(s);
@@ -52,11 +51,11 @@ public abstract class DefCollector {
     }
 
 
-    private void collect(/*@ReadOnly*/ AScene s)
+    private void collect(AScene s)
             throws DefException {
-        for (/*@ReadOnly*/ AElement p : s.packages.values())
+        for (AElement p : s.packages.values())
             collect(p);
-        for (/*@ReadOnly*/ AClass c : s.classes.values())
+        for (AClass c : s.classes.values())
             collect(c);
     }
 
@@ -97,10 +96,10 @@ public abstract class DefCollector {
         // circular references (e.g. Documented and Retention).  When it is
         // fixed, uncomment it
         //
-        //collect((/*@ReadOnly*/ AElement)d);
+        //collect((AElement)d);
     }
 
-    private void collect(/*@ReadOnly*/ AElement e)
+    private void collect(AElement e)
             throws DefException {
         for (Annotation tla : e.tlAnnotationsHere) {
             AnnotationDef tld = tla.def;
@@ -119,33 +118,33 @@ public abstract class DefCollector {
 
     }
 
-    private void collect(/*@ReadOnly*/ ATypeElement e)
+    private void collect(ATypeElement e)
             throws DefException {
-        collect((/*@ReadOnly*/ AElement) e);
+        collect((AElement) e);
         for (AElement it : e.innerTypes.values())
             collect(it);
     }
 
-    private void collect(/*@ReadOnly*/ ADeclaration d)
+    private void collect(ADeclaration d)
             throws DefException {
-        collect((/*@ReadOnly*/ AElement) d);
+        collect((AElement) d);
         for (ATypeElement ia : d.insertAnnotations.values())
             collect(ia);
         for (ATypeElementWithType ic : d.insertTypecasts.values())
             collect(ic);
     }
 
-    private void collect(/*@ReadOnly*/ AField f)
+    private void collect(AField f)
             throws DefException {
-        collect((/*@ReadOnly*/ ADeclaration) f);
+        collect((ADeclaration) f);
     }
 
-    private void collect(/*@ReadOnly*/ AMethod m)
+    private void collect(AMethod m)
             throws DefException {
         for (ATypeElement b : m.bounds.values())
             collect(b);
-        collect((/*@ReadOnly*/ ADeclaration) m);
-        collect((/*@ReadOnly*/ ATypeElement) m.returnType);
+        collect((ADeclaration) m);
+        collect((ATypeElement) m.returnType);
         collect(m.receiver);
         for (AElement p : m.parameters.values())
             collect(p);
@@ -159,9 +158,9 @@ public abstract class DefCollector {
             collect(n);
     }
 
-    private void collect(/*@ReadOnly*/ AClass c)
+    private void collect(AClass c)
             throws DefException {
-        collect((/*@ReadOnly*/ ADeclaration) c);
+        collect((ADeclaration) c);
         for (ATypeElement b : c.bounds.values())
             collect(b);
         for (ATypeElement ei : c.extendsImplements.values())

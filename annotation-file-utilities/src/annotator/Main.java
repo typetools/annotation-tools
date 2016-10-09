@@ -502,7 +502,7 @@ public class Main {
     }
 
     Options options = new Options(
-        "Main [options] { ann-file | java-file | @arg-file } ...\n"
+        "Main [options] { jaif-file | java-file | @arg-file } ...\n"
             + "(Contents of argfiles are expanded into the argument list.)",
         Main.class);
     String[] file_args;

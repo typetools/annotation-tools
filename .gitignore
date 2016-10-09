@@ -1,5 +1,7 @@
 bin
-*.class
+# *.class
+*_Generated.class
+*_temp.class
 *~
 TAGS
 
@@ -25,10 +27,16 @@ annotation-file-utilities/javadoc
 annotation-file-utilities/tests/abbreviated/*.diff
 annotation-file-utilities/tests/abbreviated/*.log
 annotation-file-utilities/tests/abbreviated/*.output
+annotation-file-utilities/tests/ad-hoc/bridge/A.class
+annotation-file-utilities/tests/ad-hoc/bridge/C.class
+annotation-file-utilities/tests/ad-hoc/bridge/C.jaif
 annotation-file-utilities/tests/source-extension/*.diff
 annotation-file-utilities/tests/source-extension/*.log
 annotation-file-utilities/tests/source-extension/*.output
 annotation-file-utilities/tests/Makefile.user
+annotation-file-utilities/tests/system-test/out1
+annotation-file-utilities/tests/system-test/out3
+annotation-file-utilities/tests/system-test/out4.class
 annotation-file-utilities/tests/system-test/out2.diff
 annotation-file-utilities/tests/system-test/out2.jaif
 annotation-file-utilities/tests/system-test/out5.diff
@@ -37,6 +45,7 @@ annotation-file-utilities/tests/*.diff
 annotation-file-utilities/tests/*.log
 annotation-file-utilities/tests/*.output
 
+asmx/output
 
 scene-lib/javadoc
 scene-lib/reports

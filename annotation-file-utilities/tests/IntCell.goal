@@ -7,11 +7,11 @@ public class IntCell {
     this.i = in;
   }
 
-  public void set(@java.lang.Mutable IntCell this, int in) /* mutable */ {
+  public void set(@java.lang.UnderInitialization IntCell this, int in) {
     this.i = in;
   }
 
-  public int get(@java.lang.ReadOnly IntCell this) /* readonly */ {
+  public int get(@java.lang.Tainted IntCell this) {
     return i;
   }
 }

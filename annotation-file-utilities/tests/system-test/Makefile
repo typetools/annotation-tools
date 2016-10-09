@@ -5,7 +5,10 @@
 # possible location.
 
 ANNCAT ?= ../../../scene-lib/anncat
-XJAVAC ?= ../../../../jsr308-langtools/dist/bin/javac -g
+JAVAVERSION = $(shell $(JAVA) -version 2>&1)
+ifeq (1.7.,$(findstring 1.7.,$(JAVAVERSION)))
+  XJAVACTARGET = -source 7 -target 7
+endif
 
 #Switch the lines below to deactivate this test
 all: clean results
@@ -27,7 +30,7 @@ clean:
 # Step 1: Compile the source with annotations.
 out1:
 	mkdir out1
-	${XJAVAC} -d out1 source-ann/AnnotationTest.java || (\rm -rf out1 && false)
+	${XJAVAC} ${XJAVACTARGET} -d out1 source-ann/AnnotationTest.java || (\rm -rf out1 && false)
 
 # Step 2: Convert the annotated class file to an annotation file.
 # Do we get the right annotations?
@@ -45,7 +48,7 @@ check-out2: out2.diff
 # Step 3: Compile the source without annotations.
 out3:
 	mkdir out3
-	${XJAVAC} -d out3 source-plain/AnnotationTest.java || (\rm -rf out3 && false)
+	${XJAVAC} ${XJAVACTARGET} -d out3 source-plain/AnnotationTest.java || (\rm -rf out3 && false)
 
 # Step 4: Insert annotations into the class file.
 # Can debug with:  javap -v out4.class

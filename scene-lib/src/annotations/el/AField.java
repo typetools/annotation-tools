@@ -6,11 +6,10 @@ import annotations.util.coll.VivifyingMap;
 
 /*>>>
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.checkerframework.checker.javari.qual.ReadOnly;
 */
 
 public class AField extends ADeclaration {
-  static <K extends /*@ReadOnly*/ Object> VivifyingMap<K, AField>
+  static <K extends Object> VivifyingMap<K, AField>
   newVivifyingLHMap_AF() {
     return new VivifyingMap<K, AField>(
         new LinkedHashMap<K, AField>()) {
@@ -34,15 +33,24 @@ public class AField extends ADeclaration {
     this.fieldName = fieldName;
   }
 
-  @Override
-  public boolean equals(/*>>> @ReadOnly AField this, */
-        /*@ReadOnly*/ Object o) {
-    return o instanceof AField
-        && ((/*@ReadOnly*/ AField) o).equalsField(this);
+  AField(AField field) {
+    super(field.fieldName, field);
+    fieldName = field.fieldName;
+    init = field.init == null ? null : field.init.clone();
   }
 
-  final boolean equalsField(/*>>> @ReadOnly AField this, */
-      /*@ReadOnly*/ AField o) {
+  @Override
+  public AField clone() {
+    return new AField(this);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    return o instanceof AField
+        && ((AField) o).equalsField(this);
+  }
+
+  final boolean equalsField(AField o) {
     return super.equals(o);
   }
 

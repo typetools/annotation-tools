@@ -7,11 +7,11 @@ public class IntCell {
     this.i = in;
   }
 
-  public void set(int in) /* mutable */ {
+  public void set(int in) {
     this.i = in;
   }
 
-  public int get() /* readonly */ {
+  public int get() {
     return i;
   }
 }

@@ -2,7 +2,7 @@ package annotator.tests;
 
 public class LocalSimple {
   public void foo() {
-    @java.lang.ReadOnly Object o = null;
+    @java.lang.Tainted Object o = null;
     System.out.println(o);
   }
 }

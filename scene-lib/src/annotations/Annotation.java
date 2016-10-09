@@ -2,7 +2,6 @@ package annotations;
 
 /*>>>
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.checkerframework.checker.javari.qual.ReadOnly;
 */
 
 import annotations.el.AnnotationDef;
@@ -23,7 +22,7 @@ import java.lang.reflect.*;
  * {@link AnnotationFactory#saf}. Either way works, but if you construct
  * one directly, you must provide a matching {@link AnnotationDef} yourself.
  */
-public final /*@ReadOnly*/ class Annotation {
+public final class Annotation {
 
     /**
      * The annotation definition.
@@ -33,7 +32,7 @@ public final /*@ReadOnly*/ class Annotation {
     /**
      * An unmodifiable copy of the passed map of field values.
      */
-    public final /*@ReadOnly*/ Map<String, /*@ReadOnly*/ Object> fieldValues;
+    public final Map<String, Object> fieldValues;
 
     /** Check the representation, throw assertion failure if it is violated. */
     public void checkRep() {
@@ -95,10 +94,10 @@ public final /*@ReadOnly*/ class Annotation {
      * values.
      */
     public Annotation(AnnotationDef def,
-            /*@ReadOnly*/ Map<String, ? extends /*@ReadOnly*/ Object> fields) {
+            Map<String, ? extends Object> fields) {
         this.def = def;
         this.fieldValues = Collections.unmodifiableMap(
-                new LinkedHashMap<String, /*@ReadOnly*/ Object>(fields));
+                new LinkedHashMap<String, Object>(fields));
         checkRep();
     }
 
@@ -171,7 +170,7 @@ public final /*@ReadOnly*/ class Annotation {
      * elements.
      * </ul>
      */
-    public /*@ReadOnly*/ Object getFieldValue(String fieldName) {
+    public Object getFieldValue(String fieldName) {
         return fieldValues.get(fieldName);
     }
 
@@ -190,7 +189,7 @@ public final /*@ReadOnly*/ class Annotation {
      * even if they were created by different {@link AnnotationFactory}s.
      */
     @Override
-    public final boolean equals(/*>>> @ReadOnly Annotation this,*/ /*@ReadOnly*/ Object o) {
+    public final boolean equals(Object o) {
         return o instanceof Annotation && equals((Annotation) o);
     }
 
@@ -201,7 +200,7 @@ public final /*@ReadOnly*/ class Annotation {
      * override this with a hard-coded "&amp;&amp;" of field comparisons to improve
      * performance.
      */
-    public boolean equals(/*>>> @ReadOnly Annotation this,*/ Annotation o) {
+    public boolean equals(Annotation o) {
         return def.equals(o.def())
             && fieldValues.equals(o.fieldValues);
     }
@@ -212,7 +211,7 @@ public final /*@ReadOnly*/ class Annotation {
      * this with a hard-coded XOR/addition of fields to improve performance.
      */
     @Override
-    public int hashCode(/*>>> @ReadOnly Annotation this*/) {
+    public int hashCode() {
         return def.hashCode() + fieldValues.hashCode();
     }
 
@@ -224,7 +223,7 @@ public final /*@ReadOnly*/ class Annotation {
      * approximation to how the annotation would appear in source code.
      */
     @Override
-    public String toString(/*>>> @ReadOnly Annotation this*/) {
+    public String toString() {
         StringBuilder sb = new StringBuilder("@");
         sb.append(def.name);
         if (!fieldValues.isEmpty()) {
@@ -240,9 +239,7 @@ public final /*@ReadOnly*/ class Annotation {
 // package annotations;
 //
 // import org.checkerframework.checker.nullness.qual.Nullable;
-// import org.checkerframework.checker.javari.qual.*;
-// import org.checkerframework.checker.javari.qual.ReadOnly;
-//
+// 
 // import annotations.el.*;
 // import annotations.util.coll.Keyer;
 //
@@ -250,11 +247,11 @@ public final /*@ReadOnly*/ class Annotation {
 //  * A top-level annotation containing an ordinary annotation plus a retention
 //  * policy.  These are attached to {@link AElement}s.
 //  */
-// public final /*@ReadOnly*/ class Annotation {
+// public final class Annotation {
 //     public static final Keyer<String, Annotation> nameKeyer
 //         = new Keyer<String, Annotation>() {
 //         public String getKeyFor(
-//                 Annotation v) /*@ReadOnly*/ {
+//                 Annotation v) {
 //             return v.tldef.name;
 //         }
 //     };

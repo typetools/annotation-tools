@@ -2,7 +2,6 @@ package annotations.util;
 
 /*>>>
 import org.checkerframework.checker.nullness.qual.*;
-import org.checkerframework.checker.javari.qual.*;
 */
 
 /**
@@ -16,13 +15,13 @@ public abstract class EqualByStringRepresentation {
      * {@inheritDoc}
      */
     @Override
-    public abstract String toString(/*>>> @ReadOnly EqualByStringRepresentation this*/);
+    public abstract String toString();
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public final boolean equals(/*>>> @ReadOnly EqualByStringRepresentation this, */ /*@ReadOnly*/ Object that) {
+    public final boolean equals(Object that) {
         return that != null && this.getClass() == that.getClass()
                 && this.toString().equals(that.toString());
     }
@@ -31,7 +30,7 @@ public abstract class EqualByStringRepresentation {
      * {@inheritDoc}
      */
     @Override
-    public final int hashCode(/*>>> @ReadOnly EqualByStringRepresentation this*/) {
+    public final int hashCode() {
         return toString().hashCode();
     }
 }

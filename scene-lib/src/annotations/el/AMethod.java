@@ -2,7 +2,6 @@ package annotations.el;
 
 /*>>>
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.checkerframework.checker.javari.qual.ReadOnly;
 */
 
 import java.util.Map;
@@ -41,16 +40,33 @@ public final class AMethod extends ADeclaration {
       receiver = new AField("receiver parameter type of " + methodName);
     }
 
+    AMethod(AMethod method) {
+      super("method: " + method.methodName, method);
+      methodName = method.methodName;
+      body = method.body.clone();
+      returnType = method.returnType.clone();
+      receiver = method.receiver.clone();
+      copyMapContents(method.bounds, bounds);
+      copyMapContents(method.parameters, parameters);
+      copyMapContents(method.throwsException, throwsException);
+      copyMapContents(method.bounds, bounds);
+    }
+
+    @Override
+    public AMethod clone() {
+      return new AMethod(this);
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(/*>>> @ReadOnly AMethod this, */ /*@ReadOnly*/ AElement o) {
+    public boolean equals(AElement o) {
         return o instanceof AMethod &&
-            ((/*@ReadOnly*/ AMethod) o).equalsMethod(this);
+            ((AMethod) o).equalsMethod(this);
     }
 
-    boolean equalsMethod(/*>>> @ReadOnly AMethod this, */ /*@ReadOnly*/ AMethod o) {
+    boolean equalsMethod(AMethod o) {
         parameters.prune();
         o.parameters.prune();
 
@@ -68,7 +84,7 @@ public final class AMethod extends ADeclaration {
      * {@inheritDoc}
      */
     @Override
-    public int hashCode(/*>>> @ReadOnly AMethod this*/) {
+    public int hashCode() {
         return super.hashCode()
                 + bounds.hashCode() + receiver.hashCode()
                 + parameters.hashCode() + throwsException.hashCode()

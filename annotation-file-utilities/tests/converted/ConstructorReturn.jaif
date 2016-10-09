@@ -1,10 +1,10 @@
 package java.lang:
-annotation @ReadOnly: @java.lang.annotation.Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+annotation @Tainted: @java.lang.annotation.Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
 
 package annotator.tests:
 class ConstructorReturn:
 
     method <init>()V:
         return:
-        insert-annotation Method.type: @java.lang.ReadOnly
+        insert-annotation Method.type: @java.lang.Tainted
 

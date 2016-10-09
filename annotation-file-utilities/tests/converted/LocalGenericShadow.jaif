@@ -1,10 +1,10 @@
 package java.lang:
-annotation @Mutable: @java.lang.annotation.Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+annotation @UnderInitialization: @java.lang.annotation.Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
 
 package annotator.tests:
 class LocalGenericShadow:
 
     method method()V:
         return:
-        insert-annotation Method.body, Block.statement 0, Variable.type: @java.lang.Mutable
+        insert-annotation Method.body, Block.statement 0, Variable.type: @java.lang.UnderInitialization
 

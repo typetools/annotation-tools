@@ -1,6 +1,5 @@
-# Very rough testing framework for the annotator that is based on the
-# testing framework for the Javarifier.  Running 'make all' will look for
-# all myClass.goal files in this directory, run the annotator on the
+# Very rough testing framework for the annotator.  Running 'make all' will
+# look for all myClass.goal files in this directory, run the annotator on the
 # corresponding .jaif and .java files, and then output the difference in a
 # myClass.diff file in this directory.
 #
@@ -14,9 +13,9 @@
 # your execution path.  Example from Makefile.user:
 #   JAVA=${JAVA_HOME}/bin/java
 #   JAVAC=${JAVA_HOME}/bin/javac
-JAVA?=java -ea
-JAVAC?=javac
-XJAVAC?=javac
+export JAVA?=java -ea
+export JAVAC?=javac
+export XJAVAC?=javac
 
 export SHELL=/bin/bash -o pipefail
 
@@ -33,20 +32,23 @@ DEBUG :=
 default : all
 
 .PHONY: all
-all : $(DIFFS) abbreviated system-test source-extension results
+all : $(DIFFS) abbreviated ad-hoc system-test source-extension results
 
 .PHONY: abbreviated
 abbreviated:
-	-${MAKE} -C abbreviated #The minus(-) indicates that the process should continue if there is a failure
+	${MAKE} -C abbreviated
+
+.PHONY: ad-hoc
+ad-hoc:
+	${MAKE} -C ad-hoc
 
 .PHONY: source-extension
 source-extension:
-	-${MAKE} -C source-extension #The minus(-) indicates that the process should continue if there is a failure
+	${MAKE} -C source-extension
 
 .PHONY: system-test
 system-test:
-	echo "system test temporarily disabled"
-#	-${MAKE} -C system-test      #The minus(-) indicates that the process should continue if there is a failure
+	${MAKE} -C system-test
 
 # Display results of all .diff files.
 .PHONY: results
@@ -104,3 +106,4 @@ clean :
 	rm -f *.log
 	rm -f *.output
 	(cd abbreviated && make clean)
+	(cd ad-hoc && make clean)

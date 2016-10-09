@@ -17,7 +17,6 @@ import java.util.Set;
 
 /*>>>
 import org.checkerframework.checker.nullness.qual.*;
-import org.checkerframework.checker.javari.qual.*;
 */
 
 /**
@@ -43,6 +42,9 @@ public abstract class Annotations {
 
     public static AnnotationDef adTarget;
     public static Annotation aTargetTypeUse;
+
+    public static AnnotationDef adDocumented;
+    public static Annotation aDocumented;
 
     public static AnnotationDef adNonNull;
     public static Annotation aNonNull;
@@ -118,6 +120,12 @@ public abstract class Annotations {
         asRetentionRuntime = Collections.singleton(aRetentionRuntime);
         asRetentionSource = Collections.singleton(aRetentionSource);
 
+        // Documented's definition is also self-meta-annotated.
+        adDocumented = new AnnotationDef("java.lang.annotation.Documented");
+        adDocumented.setFieldTypes(noFieldTypes);
+        aDocumented = new Annotation(adDocumented, noFieldValues);
+        adDocumented.tlAnnotationsHere.add(aDocumented);
+
         adTarget = createValueAnnotationDef("java.lang.annotation.Target",
                                             asRetentionRuntime,
                                             new ArrayAFT(new EnumAFT("java.lang.annotation.ElementType")));
@@ -145,6 +153,7 @@ public abstract class Annotations {
 
         standardDefs = new LinkedHashSet<AnnotationDef>();
         standardDefs.add(adTarget);
+        standardDefs.add(adDocumented);
         standardDefs.add(adRetention);
         // Because annotations can be read from classfiles, it isn't really
         // necessary to add any more here.
@@ -161,7 +170,7 @@ public abstract class Annotations {
      * {@link AnnotationBuilder} created by <code>af</code> only accepts
      * subannotations built by <code>af</code>.
      */
-    private static /*@ReadOnly*/ Object convertAFV(ScalarAFT aft, /*@ReadOnly*/ Object x) {
+    private static Object convertAFV(ScalarAFT aft, Object x) {
         if (aft instanceof AnnotationAFT)
             return rebuild((Annotation) x);
         else
@@ -177,16 +186,16 @@ public abstract class Annotations {
     public static final Annotation rebuild(Annotation a) {
         AnnotationBuilder ab = AnnotationFactory.saf.beginAnnotation(a.def());
         if (ab != null) {
-            for (Map. /*@ReadOnly*/ Entry<String, AnnotationFieldType> fieldDef
+            for (Map. Entry<String, AnnotationFieldType> fieldDef
                     : a.def().fieldTypes.entrySet()) {
 
                 String fieldName = fieldDef.getKey();
                 AnnotationFieldType fieldType =
                         fieldDef.getValue();
-                /*@ReadOnly*/ Object fieldValue =
+                Object fieldValue =
                         a.getFieldValue(fieldName);
 
-                /*@ReadOnly*/ Object nnFieldValue;
+                Object nnFieldValue;
                 if (fieldValue != null)
                     nnFieldValue = fieldValue;
                 else throw new IllegalArgumentException(
@@ -197,15 +206,15 @@ public abstract class Annotations {
                             (ArrayAFT) fieldType;
                     ArrayBuilder arrb =
                             ab.beginArrayField(fieldName, aFieldType);
-                    /*@ReadOnly*/ List<? extends /*@ReadOnly*/ Object> l =
-                            (/*@ReadOnly*/ List<? extends /*@ReadOnly*/ Object>) fieldValue;
+                    List<? extends Object> l =
+                            (List<? extends Object>) fieldValue;
                     ScalarAFT nnElementType;
                     if (aFieldType.elementType != null)
                         nnElementType = aFieldType.elementType;
                     else
                         throw new IllegalArgumentException(
                                 "annotation field type is missing element type");
-                    for (/*@ReadOnly*/ Object o : l)
+                    for (Object o : l)
                         arrb.appendElement(convertAFV(
                                 nnElementType, o));
                     arrb.finish();

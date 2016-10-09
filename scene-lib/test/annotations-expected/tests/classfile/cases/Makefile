@@ -5,6 +5,7 @@ bless:
 bless-files: TestClassEmpty_Expected.class \
 	TestClassNonEmpty_Expected.class \
 	TestLocalVariable_Expected.class \
+	TestLocalVariableA_Expected.class \
 	TestLocalVariableGenericArray_Expected.class \
 	TestFieldSimple_Expected.class \
 	TestFieldGeneric_Expected.class \

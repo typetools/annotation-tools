@@ -2,7 +2,6 @@ package annotations;
 
 /*>>>
 import org.checkerframework.checker.nullness.qual.*;
-import org.checkerframework.checker.javari.qual.*;
 */
 
 import java.util.*;
@@ -42,8 +41,8 @@ public class AnnotationBuilder {
     private Map<String, AnnotationFieldType> fieldTypes =
         new LinkedHashMap<String, AnnotationFieldType>();
 
-    Map<String, /*@ReadOnly*/ Object> fieldValues =
-        new LinkedHashMap<String, /*@ReadOnly*/ Object>();
+    Map<String, Object> fieldValues =
+        new LinkedHashMap<String, Object>();
 
     public String typeName() {
         if (def != null) {
@@ -67,8 +66,8 @@ public class AnnotationBuilder {
         String fieldName;
         AnnotationFieldType aft; // the type for the elements
 
-        List</*@ReadOnly*/ Object> arrayElements =
-            new ArrayList</*@ReadOnly*/ Object>();
+        List<Object> arrayElements =
+            new ArrayList<Object>();
 
         SimpleArrayBuilder(String fieldName, AnnotationFieldType aft) {
             assert aft != null;
@@ -77,7 +76,7 @@ public class AnnotationBuilder {
             this.aft = aft;
         }
 
-        public void appendElement(/*@ReadOnly*/ Object x) {
+        public void appendElement(Object x) {
             if (!abActive)
                 throw new IllegalStateException("Array is finished");
             if (!aft.isValidValue(x)) {
@@ -118,7 +117,7 @@ public class AnnotationBuilder {
      * the built annotation and the given field does not exist in that
      * definition or has the wrong type.
      */
-    public void addScalarField(String fieldName, ScalarAFT aft, /*@ReadOnly*/ Object x) {
+    public void addScalarField(String fieldName, ScalarAFT aft, Object x) {
         checkAddField(fieldName);
         if (x instanceof Annotation && !(x instanceof Annotation))
             throw new IllegalArgumentException("All subannotations must be Annotations");

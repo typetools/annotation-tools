@@ -2,7 +2,6 @@ package annotations;
 
 /*>>>
 import org.checkerframework.checker.nullness.qual.*;
-import org.checkerframework.checker.javari.qual.*;
 */
 
 /**
@@ -17,7 +16,7 @@ public interface ArrayBuilder {
      * been created by the same factory as the annotation of which it is a
      * field.
      */
-    void appendElement(/*@ReadOnly*/ Object x);
+    void appendElement(Object x);
 
     /**
      * Finishes building the array. Call this method after all elements have

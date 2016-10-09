@@ -15,7 +15,6 @@
         <property name="annotations-disassembler" location="${builddir}/annotations/disassembler" />
         <property name="annotator" location="${builddir}/annotations/annotator" />
         <property name="annotated-jdk" location="${builddir}/qualifiers/annotated-jdk" />
-        <property name="javarifier" location="${builddir}/javari/javarifier" />
 
     </target>
 
@@ -47,15 +46,7 @@
         </exec>
     </target>
 
-    <target name="checkout-javarifier" depends="init">
-        <exec dir="${builddir}" executable="git" failonerror="true">
-            <arg value="clone"/>
-            <arg value="https://github.com/typetools/javarifier.git"/>
-            <arg value="javarifier"/>
-        </exec>
-    </target>
-
-    <target name="checkout-all" depends="checkout-jsr308-langtools, checkout-annotation-tools, checkout-checker-framework, checkout-javarifier"/>
+    <target name="checkout-all" depends="checkout-jsr308-langtools, checkout-annotation-tools, checkout-checker-framework"/>
 
     <!--
         Targets to build all the projects.
@@ -80,19 +71,12 @@
         <ant dir="${annotated-jdk}" inheritAll="false" target="bin"/>
     </target>
 
-    <target name="build-javarifier" depends="checkout-javari">
-        <ant dir="${javarifier}" inheritAll="false" target="bin"/>
-        <!--
-        <ant dir="${javarifier}" inheritAll="false" target="tests-compile"/>
-        -->
-    </target>
-
     <target name="build-annotator" depends="checkout-annotations">
         <ant dir="${annotator}" inheritAll="false" target="bin"/>
     </target>
     <target name="build-all" depends="build-asmx,
         build-scene-lib, build-annotations-compiler,
-        build-annotated-jdk, build-annotator, build-javarifier">
+        build-annotated-jdk, build-annotator">
     </target>
 
     <!--
@@ -128,21 +112,12 @@
         </exec>
     </target>
 
-    <!-- Runs the tests on the javarifier, including the unit tests, jolden
-         and the annotation scene library. -->
-    <target name="test-javarifier" depends="build-javarifier">
-        <exec dir="${javarifier}/tests" executable="make" failonerror="true"
-            output="./reports/test-javarifier.result">
-            <arg value="all"/>
-        </exec>
-    </target>
-
     <target name="test-all-annotations" depends="test-asmx, test-scene-lib, test-annotator"/>
 
-    <target name="test-all" depends="test-all-annotations, test-javarifier"/>
+    <target name="test-all" depends="test-all-annotations"/>
 
     <target name="help">
-        <echo message="Buildfile for the Extended Annotations/Javari project"/>
+        <echo message="Buildfile for the Annotation File Utilities"/>
         <echo message="Targets: "/>
         <echo message="checkout-all: Checkout all known projects from cvs or svn." />
         <echo message="build-all: Build all projects." />

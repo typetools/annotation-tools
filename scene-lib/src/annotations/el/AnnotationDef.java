@@ -2,7 +2,6 @@ package annotations.el;
 
 /*>>>
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.checkerframework.checker.javari.qual.ReadOnly;
 */
 
 import java.io.File;
@@ -22,7 +21,7 @@ import annotations.Annotations;
  * types. <code>AnnotationDef</code>s are immutable.  An AnnotationDef with
  * a non-null retention policy is called a "top-level annotation definition".
  */
-public final /*@ReadOnly*/ class AnnotationDef extends AElement {
+public final class AnnotationDef extends AElement {
 
     /**
      * The binary name of the annotation type, such as
@@ -35,7 +34,7 @@ public final /*@ReadOnly*/ class AnnotationDef extends AElement {
      * {@link AnnotationDef}s are immutable, attempting to modify this
      * map will result in an exception.
      */
-    public /*@ReadOnly*/ Map<String, AnnotationFieldType> fieldTypes;
+    public Map<String, AnnotationFieldType> fieldTypes;
 
     /**
      * Constructs an annotation definition with the given name.
@@ -45,6 +44,11 @@ public final /*@ReadOnly*/ class AnnotationDef extends AElement {
         super("annotation: " + name);
         assert name != null;
         this.name = name;
+    }
+
+    @Override
+    public AnnotationDef clone() {
+        throw new UnsupportedOperationException("can't duplicate AnnotationDefs");
     }
 
     // Problem:  I am not sure how to handle circularities (annotations meta-annotated with themselves)
@@ -94,7 +98,7 @@ public final /*@ReadOnly*/ class AnnotationDef extends AElement {
         }
     }
 
-    public AnnotationDef(String name, Set<Annotation> tlAnnotationsHere, /*@ReadOnly*/ Map<String, ? extends AnnotationFieldType> fieldTypes) {
+    public AnnotationDef(String name, Set<Annotation> tlAnnotationsHere, Map<String, ? extends AnnotationFieldType> fieldTypes) {
         this(name, tlAnnotationsHere);
         setFieldTypes(fieldTypes);
     }
@@ -106,7 +110,7 @@ public final /*@ReadOnly*/ class AnnotationDef extends AElement {
      * immutability of the annotation definition.
      * You MUST call setFieldTypes afterward, even if with an empty map.  (Yuck.)
      */
-    public void setFieldTypes(/*@ReadOnly*/ Map<String, ? extends AnnotationFieldType> fieldTypes) {
+    public void setFieldTypes(Map<String, ? extends AnnotationFieldType> fieldTypes) {
         this.fieldTypes = Collections.unmodifiableMap(
                 new LinkedHashMap<String, AnnotationFieldType>(fieldTypes)
                 );
@@ -148,8 +152,7 @@ public final /*@ReadOnly*/ class AnnotationDef extends AElement {
      * name with the same field names and types.
      */
     @Override
-    public boolean equals(/*>>> @ReadOnly AnnotationDef this, */
-            /*@ReadOnly*/ Object o) {
+    public boolean equals(Object o) {
         return o instanceof AnnotationDef
             && ((AnnotationDef) o).equals(this);
     }
@@ -159,7 +162,7 @@ public final /*@ReadOnly*/ class AnnotationDef extends AElement {
      * slightly faster variant of {@link #equals(Object)} for when the argument
      * is statically known to be another nonnull {@link AnnotationDef}.
      */
-    public boolean equals(/*>>> @ReadOnly AnnotationDef this, */ AnnotationDef o) {
+    public boolean equals(AnnotationDef o) {
         boolean sameName = name.equals(o.name);
         boolean sameMetaAnnotations = equalsElement(o);
         boolean sameFieldTypes = fieldTypes.equals(o.fieldTypes);
@@ -179,7 +182,7 @@ public final /*@ReadOnly*/ class AnnotationDef extends AElement {
      * {@inheritDoc}
      */
     @Override
-    public int hashCode(/*>>> @ReadOnly AnnotationDef this*/) {
+    public int hashCode() {
         return name.hashCode()
             // Omit tlAnnotationsHere, becase it should be unique and, more
             // importantly, including it causes an infinite loop.

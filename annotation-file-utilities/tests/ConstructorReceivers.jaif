@@ -5,8 +5,8 @@ annotation @C:
 annotation @Inner: @java.lang.annotation.Target(value={TYPE_USE})
     int value
 
-package checkers.igj.quals:
-annotation @ReadOnly: @java.lang.annotation.Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE,TYPE_PARAMETER})
+package checkers.tainting.quals:
+annotation @Tainted: @java.lang.annotation.Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE,TYPE_PARAMETER})
 
 package annotator.tests:
 class ConstructorReceivers:
@@ -20,11 +20,11 @@ class ConstructorReceivers$C0:
 
     method <init>()V:
         return:
-        receiver: @ReadOnly
+        receiver: @Tainted
 
     method <init>(I)V:
         return:
-        receiver: @ReadOnly
+        receiver: @Tainted
 
 class ConstructorReceivers$C1:
 
@@ -32,11 +32,11 @@ class ConstructorReceivers$C1:
 
     method <init>()V:
         return:
-        receiver: @ReadOnly
+        receiver: @Tainted
 
     method <init>(I)V:
         return:
-        receiver: @ReadOnly
+        receiver: @Tainted
 
 class ConstructorReceivers$C2:
 
@@ -44,7 +44,7 @@ class ConstructorReceivers$C2:
 
     method <init>()V:
         return:
-        receiver: @ReadOnly @A @B @C
+        receiver: @Tainted @A @B @C
 
 class ConstructorReceivers$C3:
 
@@ -52,7 +52,7 @@ class ConstructorReceivers$C3:
 
     method <init>()V:
         return:
-        receiver: @ReadOnly @A @B @C
+        receiver: @Tainted @A @B @C
 
 class ConstructorReceivers$P0$C4:
 
@@ -60,11 +60,11 @@ class ConstructorReceivers$P0$C4:
 
     method <init>()V:
         return:
-        receiver: @ReadOnly
+        receiver: @Tainted
 
     method <init>(I)V:
         return:
-        receiver: @ReadOnly
+        receiver: @Tainted
 
 class ConstructorReceivers$P0$C5:
 
@@ -72,11 +72,11 @@ class ConstructorReceivers$P0$C5:
 
     method <init>()V:
         return:
-        receiver: @ReadOnly
+        receiver: @Tainted
 
     method <init>(I)V:
         return:
-        receiver: @ReadOnly
+        receiver: @Tainted
 
 class ConstructorReceivers$P0$C6:
 
@@ -84,11 +84,11 @@ class ConstructorReceivers$P0$C6:
 
     method <init>()V:
         return:
-        receiver: @ReadOnly
+        receiver: @Tainted
 
     method <init>(Lannotator/tests/ConstructorReceivers$P0;)V:
         return:
-        receiver: @ReadOnly
+        receiver: @Tainted
             inner-type 1, 0, 3, 0: @Inner(0)
             inner-type 1, 0, 3, 1: @Inner(1)
 
@@ -98,11 +98,11 @@ class ConstructorReceivers$P0$C7:
 
     method <init>()V:
         return:
-        receiver: @ReadOnly
+        receiver: @Tainted
 
     method <init>(Lannotator/tests/ConstructorReceivers$P0;)V:
         return:
-        receiver: @ReadOnly
+        receiver: @Tainted
             inner-type 1, 0, 3, 0: @Inner(0)
             inner-type 1, 0, 3, 1: @Inner(1)
 
@@ -119,7 +119,7 @@ class ConstructorReceivers$P1$C8:
 
     method <init>()V:
         return:
-        receiver: @ReadOnly
+        receiver: @Tainted
             inner-type 1, 0, 3, 0: @Inner(0)
             inner-type 1, 0, 3, 1: @Inner(1)
 
@@ -129,7 +129,7 @@ class ConstructorReceivers$P1$C9:
 
     method <init>()V:
         return:
-        receiver: @ReadOnly
+        receiver: @Tainted
             inner-type 1, 0, 3, 0: @Inner(0)
             inner-type 1, 0, 3, 1: @Inner(1)
 

@@ -2,7 +2,6 @@ package annotations.io;
 
 /*>>>
 import org.checkerframework.checker.nullness.qual.*;
-import org.checkerframework.checker.javari.qual.*;
 */
 
 import static java.io.StreamTokenizer.TT_EOF;
@@ -117,12 +116,12 @@ public final class IndexFileParser {
     }
 
     /** True if the next thing from st is the given character. */
-    private boolean checkChar(/*>>> @ReadOnly IndexFileParser this, */ char c) {
+    private boolean checkChar(char c) {
         return st.ttype == c;
     }
 
     /** True if the next thing from st is the given string token. */
-    private boolean checkKeyword(/*>>> @ReadOnly IndexFileParser this, */ String s) {
+    private boolean checkKeyword(String s) {
         return st.ttype == TT_WORD && st.sval.equals(s);
     }
 
@@ -176,9 +175,9 @@ public final class IndexFileParser {
         }
     }
 
-    private static final /*@ReadOnly*/ Set<String> knownKeywords;
+    private static final Set<String> knownKeywords;
     static {
-        /*@ReadOnly*/ String[] knownKeywords_array =
+        String[] knownKeywords_array =
                 { "abstract", "assert", "boolean", "break", "byte", "case",
                         "catch", "char", "class", "const", "continue",
                         "default", "do", "double", "else", "enum", "extends",
@@ -193,7 +192,7 @@ public final class IndexFileParser {
         Collections.addAll(knownKeywords, knownKeywords_array);
     }
 
-    private boolean isValidIdentifier(/*>>> @ReadOnly IndexFileParser this, */ String x) {
+    private boolean isValidIdentifier(String x) {
         if (x.length() == 0 || !Character.isJavaIdentifierStart(x.charAt(0))
                 || knownKeywords.contains(x))
             return false;
@@ -203,7 +202,7 @@ public final class IndexFileParser {
         return true;
     }
 
-    private String checkIdentifier(/*>>> @ReadOnly IndexFileParser this*/) {
+    private String checkIdentifier() {
         if (st.sval == null)
             return null;
         else {
@@ -261,7 +260,7 @@ public final class IndexFileParser {
         return name;
     }
 
-    private int checkNNInteger(/*>>> @ReadOnly IndexFileParser this*/) {
+    private int checkNNInteger() {
         if (st.ttype == TT_NUMBER) {
             int x = (int) st.nval;
             if (x == st.nval && x >= -1) // shouldn't give us a huge number
@@ -283,7 +282,7 @@ public final class IndexFileParser {
     // class objects. Class.forName doesn't directly support these.
     // Using this map we can go from "void.class" to the correct
     // Class object.
-    private static final /*@ReadOnly*/ Map<String, Class<?>> primitiveTypes;
+    private static final Map<String, Class<?>> primitiveTypes;
     static {
         Map<String, Class<?>> pt = new LinkedHashMap<String, Class<?>>();
         pt.put("byte", byte.class);
@@ -300,9 +299,9 @@ public final class IndexFileParser {
 
     /** Parse scalar annotation value. */
     // HMMM can a (readonly) Integer be casted to a writable Object?
-    private /*@ReadOnly*/ Object parseScalarAFV(ScalarAFT aft) throws IOException, ParseException {
+    private Object parseScalarAFV(ScalarAFT aft) throws IOException, ParseException {
         if (aft instanceof BasicAFT) {
-            /*@ReadOnly*/ Object val;
+            Object val;
             BasicAFT baft = (BasicAFT) aft;
             Class<?> type = baft.type;
             if (type == boolean.class) {
@@ -475,7 +474,7 @@ public final class IndexFileParser {
                 parseAndAddArrayAFV(aaft, ab.beginArrayField(fieldName, aaft));
         } else if (aft instanceof ScalarAFT) {
             ScalarAFT saft = (ScalarAFT) aft;
-            /*@ReadOnly*/ Object value = parseScalarAFV(saft);
+            Object value = parseScalarAFV(saft);
             ab.addScalarField(fieldName, saft, value);
         } else
             throw new AssertionError();
@@ -526,7 +525,7 @@ public final class IndexFileParser {
                 // don't care about the result
                 // but need to skip over it anyway
                 @SuppressWarnings("unused")
-                /*@ReadOnly*/ Object trash = parseAnnotationBody(d, AnnotationFactory.saf
+                Object trash = parseAnnotationBody(d, AnnotationFactory.saf
                         .beginAnnotation(d));
             } else {
                 Annotation a = parseAnnotationBody(d, ab);
@@ -1497,8 +1496,10 @@ public final class IndexFileParser {
                 matchChar(':');
             } else {
                 pkg = expectQualifiedName();
-                AElement p = scene.packages.vivify(pkg);
+                //AElement p = scene.packages.vivify(pkg);
+                AClass p = scene.classes.vivify(pkg + ".package-info");
                 expectChar(':');
+                p = scene.classes.vivify(pkg + ".package-info");
                 parseAnnotations(p);
             }
 

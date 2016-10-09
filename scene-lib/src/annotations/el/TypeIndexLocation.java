@@ -2,7 +2,6 @@ package annotations.el;
 
 /*>>>
 import org.checkerframework.checker.nullness.qual.*;
-import org.checkerframework.checker.javari.qual.*;
 */
 
 import annotations.util.Hasher;
@@ -19,14 +18,14 @@ public class TypeIndexLocation {
   }
 
   @Override
-  public boolean equals(/*@ReadOnly*/ Object o) {
+  public boolean equals(Object o) {
       return o instanceof TypeIndexLocation
               && equals((TypeIndexLocation) o);
   }
 
   /** {@inheritDoc} */
   @Override
-  public int hashCode(/*>>> @ReadOnly TypeIndexLocation this*/) {
+  public int hashCode() {
       Hasher h = new Hasher();
       h.mash(typeIndex);
       return h.hash;

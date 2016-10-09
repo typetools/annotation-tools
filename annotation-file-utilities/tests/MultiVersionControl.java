@@ -160,7 +160,6 @@ import static java.lang.annotation.ElementType.TYPE_USE;
  * ~/research/testing/eclat
  *
  * SVNROOT: svn+ssh://login.csail.mit.edu/afs/csail/group/pag/projects/.SVNREPOS/
- * ~/research/typequals/igj
  * ~/research/typequals/annotations-papers
  *
  * SVNREPOS: svn+ssh://login.csail.mit.edu/afs/csail/group/pag/projects/abb/REPOS

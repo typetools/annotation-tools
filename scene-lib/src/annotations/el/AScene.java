@@ -1,14 +1,16 @@
 package annotations.el;
 
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+import annotations.Annotation;
+import annotations.io.IndexFileParser;
 import annotations.util.coll.VivifyingMap;
 
 /*>>>
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.checkerframework.checker.javari.qual.ReadOnly;
 */
 
 /**
@@ -44,12 +46,13 @@ import org.checkerframework.checker.javari.qual.ReadOnly;
  *
  * <pre>
  * m.annotationsHere.add(new Annotation(
- *     new AnnotationDef(readOnlyDef, RetentionPolicy.RUNTIME, true),
- *     new Annotation(readOnlyDef, Collections.emptyMap())
+ *     new AnnotationDef(taintedDef, RetentionPolicy.RUNTIME, true),
+ *     new Annotation(taintedDef, Collections.emptyMap())
  * ));
  * </pre>
  */
-public final class AScene {
+public final class AScene implements Cloneable {
+    private static boolean checkClones = true;
     public static boolean debugFoundMap = false;
 
     /** This scene's annotated packages; map key is package name */
@@ -87,15 +90,43 @@ public final class AScene {
     }
 
     /**
+     * Copy constructor for {@link AScene}.
+     */
+    public AScene(AScene scene) {
+        for (String key : scene.packages.keySet()) {
+            AElement val = scene.packages.get(key);
+            packages.put(key, val.clone());
+        }
+        for (String key : scene.imports.keySet()) {
+            // copy could in principle have different Set implementation
+            Set<String> value = scene.imports.get(key);
+            Set<String> copy = new LinkedHashSet<String>();
+            copy.addAll(value);
+            imports.put(key, copy);
+        }
+        for (String key : scene.classes.keySet()) {
+            AClass clazz = scene.classes.get(key);
+            classes.put(key, clazz.clone());
+        }
+        if (checkClones) {
+            checkClone(this, scene);
+        }
+    }
+
+    @Override
+    public AScene clone() {
+        return new AScene(this);
+    }
+
+    /**
      * Returns whether this {@link AScene} equals <code>o</code>; the
      * commentary and the cautionary remarks on {@link AElement#equals(Object)}
      * also apply to {@link AScene#equals(Object)}.
      */
     @Override
-    public boolean equals(/*>>> @ReadOnly AScene this, */
-            /*@ReadOnly*/ Object o) {
+    public boolean equals(Object o) {
         return o instanceof AScene
-            && ((/*@ReadOnly*/ AScene) o).equals(this);
+            && ((AScene) o).equals(this);
     }
 
     /**
@@ -103,8 +134,7 @@ public final class AScene {
      * slightly faster variant of {@link #equals(Object)} for when the argument
      * is statically known to be another nonnull {@link AScene}.
      */
-    public boolean equals(/*>>> @ReadOnly AScene this, */
-            /*@ReadOnly*/ AScene o) {
+    public boolean equals(AScene o) {
         return o.classes.equals(classes) && o.packages.equals(packages);
     }
 
@@ -112,7 +142,7 @@ public final class AScene {
      * {@inheritDoc}
      */
     @Override
-    public int hashCode(/*>>> @ReadOnly AScene this*/) {
+    public int hashCode() {
         return classes.hashCode() + packages.hashCode();
     }
 
@@ -142,5 +172,200 @@ public final class AScene {
     @Override
     public String toString() {
         return unparse();
+    }
+
+    /**
+     * Throws exception if the arguments 1) are the same reference;
+     * 2) are not equal() in both directions; or 3) contain
+     * corresponding elements that meet either of the preceding two
+     * conditions.
+     */
+    public static void checkClone(AScene s0, AScene s1) {
+        if (s0 == null) {
+            if (s1 != null) {
+                cloneCheckFail();
+            }
+        } else {
+            if (s1 == null) {
+                cloneCheckFail();
+            }
+            s0.prune();
+            s1.prune();
+            if (s0 == s1) {
+                cloneCheckFail();
+            }
+            checkElems(s0.packages, s1.packages);
+            checkElems(s0.classes, s1.classes);
+        }
+    }
+
+    public static <K, V extends AElement> void
+    checkElems(VivifyingMap<K, V> m0, VivifyingMap<K, V> m1) {
+        if (m0 == null) {
+            if (m1 != null) {
+                cloneCheckFail();
+            }
+        } else if (m1 == null) {
+            cloneCheckFail();
+        } else {
+            for (K k : m0.keySet()) {
+                checkElem(m0.get(k), m1.get(k));
+            }
+        }
+    }
+
+    /**
+     * Throw exception on visit if e0 == e1 or !e0.equals(e1).
+     * (See {@link #checkClone(AScene, AScene)} for explanation.)
+     */
+    public static void checkElem(AElement e0, AElement e1) {
+        checkObject(e0, e1);
+        if (e0 != null) {
+            if (e0 == e1) {
+                cloneCheckFail();
+            }
+            e0.accept(checkVisitor, e1);
+        }
+    }
+
+    /**
+     * Throw exception on visit if !el.equals(arg) or !arg.equals(el).
+     * (See {@link #checkClone(AScene, AScene)} for explanation.)
+     */
+    public static void checkObject(Object o0, Object o1) {
+        if (o0 == null ? o1 != null
+                : !(o0.equals(o1) && o1.equals(o0))) {  // ok if ==
+            throw new RuntimeException("clone check failed");
+        }
+    }
+
+    /**
+     * Throw exception on visit if el == arg or !el.equals(arg).
+     * (See {@link checkClone(AScene, AScene)} for explanation.)
+     */
+    private static ElementVisitor<Void, AElement> checkVisitor =
+        new ElementVisitor<Void, AElement>() {
+            @Override
+            public Void visitAnnotationDef(AnnotationDef el,
+                    AElement arg) {
+                return null;
+            }
+
+            @Override
+            public Void visitBlock(ABlock el, AElement arg) {
+                ABlock b = (ABlock) arg;
+                checkElems(el.locals, b.locals);
+                return null;
+            }
+
+            @Override
+            public Void visitClass(AClass el, AElement arg) {
+                AClass c = (AClass) arg;
+                checkElems(el.bounds, c.bounds);
+                checkElems(el.extendsImplements, c.extendsImplements);
+                checkElems(el.fieldInits, c.fieldInits);
+                checkElems(el.fields, c.fields);
+                checkElems(el.instanceInits, c.instanceInits);
+                checkElems(el.methods, c.methods);
+                checkElems(el.staticInits, c.staticInits);
+                return visitDeclaration(el, arg);
+            }
+
+            @Override
+            public Void visitDeclaration(ADeclaration el, AElement arg) {
+                ADeclaration d = (ADeclaration) arg;
+                checkElems(el.insertAnnotations, d.insertAnnotations);
+                checkElems(el.insertTypecasts, d.insertTypecasts);
+                return visitElement(el, arg);
+            }
+
+            @Override
+            public Void visitExpression(AExpression el, AElement arg) {
+                AExpression e = (AExpression) arg;
+                checkObject(el.id, e.id);
+                checkElems(el.calls, e.calls);
+                checkElems(el.funs, e.funs);
+                checkElems(el.instanceofs, e.instanceofs);
+                checkElems(el.news, e.news);
+                checkElems(el.refs, e.refs);
+                checkElems(el.typecasts, e.typecasts);
+                return visitElement(el, arg);
+            }
+
+            @Override
+            public Void visitField(AField el, AElement arg) {
+                AField f = (AField) arg;
+                checkElem(el.init, f.init);
+                return visitDeclaration(el, arg);
+            }
+
+            @Override
+            public Void visitMethod(AMethod el, AElement arg) {
+                AMethod m = (AMethod) arg;
+                checkObject(el.methodName, m.methodName);
+                checkElem(el.body, m.body);
+                checkElem(el.returnType, m.returnType);
+                checkElems(el.bounds, m.bounds);
+                checkElems(el.parameters, m.parameters);
+                checkElems(el.throwsException, m.throwsException);
+                return null;
+            }
+
+            @Override
+            public Void visitTypeElement(ATypeElement el, AElement arg) {
+                ATypeElement t = (ATypeElement) arg;
+                checkObject(el.description, t.description);
+                checkElems(el.innerTypes, t.innerTypes);
+                return null;
+            }
+
+            @Override
+            public Void visitTypeElementWithType(ATypeElementWithType el,
+                    AElement arg) {
+                ATypeElementWithType t = (ATypeElementWithType) arg;
+                checkObject(el.getType(), t.getType());
+                return visitTypeElement(el, arg);
+            }
+
+            @Override
+            public Void visitElement(AElement el, AElement arg) {
+                checkObject(el.description, arg.description);
+                if (el.tlAnnotationsHere.size() !=
+                        arg.tlAnnotationsHere.size()) {
+                    cloneCheckFail();
+                }
+                for (Annotation a : el.tlAnnotationsHere) {
+                    if (!arg.tlAnnotationsHere.contains(a)) {
+                        cloneCheckFail();
+                    }
+                }
+                checkElem(el.type, arg.type);
+                return null;
+            }
+        };
+
+    private static void cloneCheckFail() {
+        throw new RuntimeException("clone check failed");
+    }
+
+    // temporary main for easy testing on JAIFs
+    public static void main(String[] args) {
+        int status = 0;
+        checkClones = true;
+
+        for (int i = 0; i < args.length; i++) {
+            AScene s0 = new AScene();
+            System.out.print(args[i] + ": ");
+            try {
+                IndexFileParser.parseFile(args[i], s0);
+                s0.clone();
+                System.out.println("ok");
+            } catch (Throwable e) {
+                status = 1;
+                System.out.println("failed");
+                e.printStackTrace();
+            }
+        }
+        System.exit(status);
     }
 }

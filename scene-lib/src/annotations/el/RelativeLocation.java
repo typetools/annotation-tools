@@ -4,7 +4,6 @@ import annotations.util.Hasher;
 
 /*>>>
 import org.checkerframework.checker.nullness.qual.*;
-import org.checkerframework.checker.javari.qual.*;
 */
 
 /**
@@ -12,7 +11,7 @@ import org.checkerframework.checker.javari.qual.*;
  * instanceof, cast, or new: either the bytecode offset or the source code index.
  * I call instanceof, cast, or new "the construct".
  */
-public final /*@ReadOnly*/ class RelativeLocation implements Comparable<RelativeLocation> {
+public final class RelativeLocation implements Comparable<RelativeLocation> {
     /**
      * The bytecode offset of the construct.
      */
@@ -86,7 +85,7 @@ public final /*@ReadOnly*/ class RelativeLocation implements Comparable<Relative
      * <code>this</code> and <code>o</code> have equal {@link #offset} and {@link #index}.
      */
     @Override
-    public boolean equals(/*@ReadOnly*/ Object o) {
+    public boolean equals(Object o) {
         return o instanceof RelativeLocation
                 && equals((RelativeLocation) o);
     }
@@ -95,7 +94,7 @@ public final /*@ReadOnly*/ class RelativeLocation implements Comparable<Relative
      * {@inheritDoc}
      */
     @Override
-    public int hashCode(/*>>> @ReadOnly RelativeLocation this*/) {
+    public int hashCode() {
         Hasher h = new Hasher();
         h.mash(offset);
         h.mash(index);

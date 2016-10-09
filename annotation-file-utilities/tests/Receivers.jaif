@@ -5,8 +5,8 @@ annotation @C:
 annotation @Inner: @java.lang.annotation.Target(value={TYPE_USE})
     int value
 
-package checkers.igj.quals:
-annotation @ReadOnly: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+package checkers.tainting.quals:
+annotation @Tainted: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
 
 package checkers.inference.quals:
   annotation @VarAnnot:
@@ -21,90 +21,90 @@ package annotator.tests:
 class Receivers:
 
     method m()V:
-        receiver: @ReadOnly
+        receiver: @Tainted
 
     method spaces()V:
-        receiver: @ReadOnly
+        receiver: @Tainted
 
     method m(I)V:
-        receiver: @ReadOnly
+        receiver: @Tainted
 
     method spaces(I)V:
-        receiver: @ReadOnly
+        receiver: @Tainted
 
     method m(Ljava/lang/String;)V:
-        receiver: @ReadOnly
+        receiver: @Tainted
 
 class Receivers2:
 
     method m()V:
-        receiver: @ReadOnly
+        receiver: @Tainted
 
     method spaces()V:
-        receiver: @ReadOnly
+        receiver: @Tainted
 
     method m(I)V:
-        receiver: @ReadOnly
+        receiver: @Tainted
 
     method spaces(I)V:
-        receiver: @ReadOnly
+        receiver: @Tainted
 
 class Receivers3:
 
     method m()V:
-        receiver: @ReadOnly
+        receiver: @Tainted
             inner-type 3, 0: @Inner(0)
             inner-type 3, 1: @Inner(1)
 
     method m(I)V:
-        receiver: @ReadOnly
+        receiver: @Tainted
             inner-type 3, 0: @Inner(0)
             inner-type 3, 1: @Inner(1)
 
 class Receivers4:
 
     method m()V:
-        receiver: @ReadOnly
+        receiver: @Tainted
 
     method m(I)V:
-        receiver: @ReadOnly
+        receiver: @Tainted
 
 class Receivers5:
 
     method m()V:
-        receiver: @ReadOnly
+        receiver: @Tainted
 
 class Receivers6:
 
     method m()V:
-        receiver: @ReadOnly
+        receiver: @Tainted
 
 class Receivers7:
 
     method m()V:
-        receiver: @ReadOnly
+        receiver: @Tainted
             inner-type 3, 0: @Inner(0)
             inner-type 3, 1: @Inner(1)
 
 class Receivers8:
 
     method m()V:
-        receiver: @ReadOnly
+        receiver: @Tainted
 
 class Receivers9:
 
     method m()V:
-        receiver: @ReadOnly @A @B @C
+        receiver: @Tainted @A @B @C
 
 class Receivers10:
 
     method m()V:
-        receiver: @ReadOnly
+        receiver: @Tainted
             inner-type 3, 0: @annotation.A
             inner-type 3, 1: @annotation.B
 
     method m(Lannotator/tests/Receivers10;)V:
-        receiver: @ReadOnly
+        receiver: @Tainted
             inner-type 3, 0: @annotation.A
             inner-type 3, 1: @annotation.B
 

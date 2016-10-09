@@ -171,7 +171,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
    * character at or after the given position.  (Assumes position is not
    * inside a comment.)
    *
-   * {@see #getNthInstanceBetween(char, int, int, int, CompilationUnitTree)}
+   * @see #getNthInstanceBetween(char, int, int, int, CompilationUnitTree)
    */
   private int getFirstInstanceAfter(char c, int i) {
     return getNthInstanceInRange(c, i, Integer.MAX_VALUE, 1);
@@ -956,7 +956,15 @@ loop:
 
   /**
    * Scans this tree, using the list of insertions to generate the source
-   * position to insertion text mapping.
+   * position to insertion text mapping.  Insertions are removed from the
+   * list when positions are found for them.
+   *
+   * @param node AST node being considered for annotation insertions
+   * @param p list of insertions not yet placed
+   * <p>
+   * When a match is found, this routine removes the insertion from p and
+   * adds it to the insertions map as a value, with a key that is a pair.
+   * On return, p contains only the insertions for which no match was found.
    */
   @Override
   public Void scan(Tree node, List<Insertion> p) {
@@ -1030,6 +1038,7 @@ loop:
 
   // Find insertion position for Insertion whose criteria matched the
   // given TreePath.
+  // If no position is found, report an error and return null.
   Integer findPosition(TreePath path, Insertion i) {
     Tree node = path.getLeaf();
     try {
@@ -1217,6 +1226,7 @@ loop:
 
   // Find insertion position for Insertion whose criteria (including one
   // for the ASTPath) matched the given TreePath.
+  // If no position is found, report an error and return null.
   Integer findPositionByASTPath(ASTPath astPath, TreePath path, Insertion i) {
     Tree node = path.getLeaf();
     try {

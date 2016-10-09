@@ -184,6 +184,8 @@
                  A separate target could be added to check the qualifiers
                  and have them in the generated code. -->
             <compilerarg value="-XDTA:noannotationsincomments"/>
+            <compilerarg value="-Xlint:-options"/>
+            <compilerarg value="-Werror"/>
             <compilerarg value="-version"/>
             <classpath refid="libpath"/>
             <!-- TODO: how can we include just these two files in testpath? -->
@@ -207,7 +209,7 @@
 
     <target name="test-scene-lib" depends="init, bin">
         <mkdir dir="reports"/>
-        <junit printsummary="withOutAndErr" showoutput="true" fork="yes" dir="." haltonfailure="yes">
+        <junit printsummary="withOutAndErr" showoutput="true" fork="yes" dir="." haltonerror="yes" haltonfailure="yes">
             <!-- Option no longer exists in JDK 9.
             <jvmarg value="-Xbootclasspath/p:${toString:libpath}"/>
             -->
@@ -222,7 +224,7 @@
 
     <target name="test-classfile" depends="init, bin">
         <mkdir dir="reports"/>
-        <junit printsummary="withOutAndErr" showoutput="true" fork="yes" dir="." haltonfailure="yes">
+        <junit printsummary="withOutAndErr" showoutput="true" fork="yes" dir="." haltonerror="yes" haltonfailure="yes">
             <jvmarg value="-Xbootclasspath/p:${toString:libpath}"/>
             <classpath refid="libpath"/>
             <formatter type="plain"/>

@@ -1,8 +1,8 @@
 package java.lang:
-annotation @Mutable: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+annotation @UnderInitialization: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
 
 package java.lang:
-annotation @ReadOnly: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+annotation @Tainted: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
 
 package annotator.tests:
 class LocalSimpleMultiple:
@@ -11,11 +11,11 @@ class LocalSimpleMultiple:
 
     method foo()V:
         local 1 #2+20:
-            type: @java.lang.Mutable
+            type: @java.lang.UnderInitialization
         local 2 #11+11:
-            type: @java.lang.ReadOnly
+            type: @java.lang.Tainted
 
     method bar(Ljava/lang/Object;)V:
         local 2 #2+6:
-            type: @java.lang.ReadOnly
+            type: @java.lang.Tainted
 

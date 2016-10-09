@@ -1,9 +1,5 @@
 package annotations.el;
 
-/*>>>
-import org.checkerframework.checker.javari.qual.ReadOnly;
-*/
-
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -61,16 +57,32 @@ public class AExpression extends AElement {
         this.id = id;
     }
 
+    AExpression(AExpression expr) {
+        super(expr);
+        copyMapContents(expr.typecasts, typecasts);
+        copyMapContents(expr.instanceofs, instanceofs);
+        copyMapContents(expr.news, news);
+        copyMapContents(expr.calls, calls);
+        copyMapContents(expr.refs, refs);
+        copyMapContents(expr.funs, funs);
+        id = expr.id;
+    }
+
+    @Override
+    public AExpression clone() {
+        return new AExpression(this);
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(/*>>> @ReadOnly AExpression this, */ /*@ReadOnly*/ AElement o) {
+    public boolean equals(AElement o) {
         return o instanceof AExpression &&
-            ((/*@ReadOnly*/ AExpression) o).equalsExpression(this);
+            ((AExpression) o).equalsExpression(this);
     }
 
-    protected boolean equalsExpression(/*>>> @ReadOnly AExpression this, */ /*@ReadOnly*/ AExpression o) {
+    protected boolean equalsExpression(AExpression o) {
         return super.equals(o)
                 && typecasts.equals(o.typecasts)
                 && instanceofs.equals(o.instanceofs)
@@ -84,7 +96,7 @@ public class AExpression extends AElement {
      * {@inheritDoc}
      */
     @Override
-    public int hashCode(/*>>> @ReadOnly AExpression this*/) {
+    public int hashCode() {
         return super.hashCode() + typecasts.hashCode()
             + instanceofs.hashCode() + news.hashCode()
             + refs.hashCode() + calls.hashCode() + funs.hashCode();

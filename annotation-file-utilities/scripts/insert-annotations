@@ -4,10 +4,10 @@
 # For usage information, run: insert-annotations --help
 # See the Annotation File Utilities documentation for more information.
 
-# If the very first argument is "-d", debug this script (but don't pass the
-# -d to the underlying program; use "-d --debug" for that).
+# If the very first argument is "--debug-script", debug this script (but
+# don't pass --debug-script to the underlying program).
 DEBUG=0
-if [ "$1" = "-d" ]; then
+if [ "$1" = "--debug-script" ]; then
   DEBUG=1
   shift 1
 fi
