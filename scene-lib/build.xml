@@ -116,8 +116,7 @@
             <pathelement location="${annotation-tools}/annotation-file-utilities/lib/plume.jar"/>
             <pathelement location="${annotation-tools}/annotation-file-utilities/lib/guava-15.0.jar"/>
             <!-- remainder only for repository version -->
-            <pathelement location="${annotations-compiler}/dist/lib/java.compiler.jar"/>
-            <pathelement location="${annotations-compiler}/dist/lib/jdk.compiler.jar"/>
+            <pathelement location="${annotations-compiler}/build/javac.jar"/>
             <pathelement location="bin"/>
         </path>
     </target>
@@ -176,7 +175,7 @@
                classpath="${libpath}"
                includeantruntime="false"
                fork="true"
-               executable="${annotations-compiler}/dist/bin/javac">
+               executable="${annotations-compiler}/build/bin/javac">
             <src refid="sourcepath"/>
             <src refid="testpath"/>
             <compilerarg value="-Xbootclasspath/p:${toString:libpath}"/>
@@ -186,11 +185,6 @@
                  and have them in the generated code. -->
             <compilerarg value="-XDTA:noannotationsincomments"/>
             <compilerarg value="-version"/>
-            <!-- Make sure we only have Java 7 source code and generate Java 7 bytecode. -->
-            <compilerarg value="-source"/>
-            <compilerarg value="7"/>
-            <compilerarg value="-target"/>
-            <compilerarg value="7"/>
             <classpath refid="libpath"/>
             <!-- TODO: how can we include just these two files in testpath? -->
             <compilerarg value="test/annotations/tests/classfile/AnnotationsTest.java"/>
@@ -214,7 +208,9 @@
     <target name="test-scene-lib" depends="init, bin">
         <mkdir dir="reports"/>
         <junit printsummary="withOutAndErr" showoutput="true" fork="yes" dir="." haltonfailure="yes">
+            <!-- Option no longer exists in JDK 9.
             <jvmarg value="-Xbootclasspath/p:${toString:libpath}"/>
+            -->
             <classpath refid="libpath"/>
             <formatter type="plain"/>
             <test name="annotations.tests.executable.TestSceneLib" todir="reports"/>

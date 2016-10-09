@@ -83,7 +83,7 @@
       <!-- alternate for distribution:
       <pathelement location="${annotations-compiler}/bin"/>
       -->
-      <pathelement location="${annotations-compiler}/dist/lib/java.compiler.jar"/>
+      <pathelement location="${annotations-compiler}/build/javac.jar"/>
       <pathelement location="${annotation-tools}/annotation-file-utilities/lib/plume.jar"/>
       <pathelement location="${annotation-tools}/annotation-file-utilities/lib/guava-15.0.jar"/>
       <pathelement location="${scene-lib}/bin"/>
@@ -156,7 +156,7 @@
       <uptodate property="scene-lib.bin.uptodate" targetfile="annotation-file-utilities.jar">
         <srcfiles dir="${scene-lib}/bin" excludes="annotations-expected/**,annotations/tests/**"/>
       </uptodate>
-      <uptodate property="annotations-compiler.uptodate" targetfile="annotation-file-utilities.jar" srcfile="${annotations-compiler}/dist/lib/java.compiler.jar"/>
+      <uptodate property="annotations-compiler.uptodate" targetfile="annotation-file-utilities.jar" srcfile="${annotations-compiler}/build/javac.jar"/>
       <uptodate property="plume.uptodate" targetfile="annotation-file-utilities.jar" srcfile="lib/plume.jar"/>
       <uptodate property="google-collect.uptodate" targetfile="annotation-file-utilities.jar" srcfile="lib/guava-15.0.jar"/>
 
@@ -209,13 +209,7 @@
         <exclude name="META-INF/" />
       </patternset>
     </unjar>
-    <unjar src="${annotations-compiler}/dist/lib/java.compiler.jar" dest="${temp-jarfile}">
-      <patternset>
-        <include name="**/*.class"/>
-        <exclude name="META-INF/" />
-      </patternset>
-    </unjar>
-    <unjar src="${annotations-compiler}/dist/lib/jdk.compiler.jar" dest="${temp-jarfile}">
+    <unjar src="${annotations-compiler}/build/javac.jar" dest="${temp-jarfile}">
       <patternset>
         <include name="**/*.class"/>
         <exclude name="META-INF/" />
@@ -475,7 +469,7 @@
           description="run tests for the annotator">
     <exec dir="tests/" executable="make" failonerror="true">
         <env key="XJAVAC" value="${annotations-compiler-absolute}/dist/bin/javac"/>
-        <env key="JAVAC_JAR" value="${annotations-compiler-absolute}/dist/lib/jdk.compiler.jar"/>
+        <env key="JAVAC_JAR" value="${annotations-compiler-absolute}/build/javac.jar"/>
     </exec>
   </target>
 
@@ -516,7 +510,9 @@
             failonerror="true"
             classpathref="libpath"
             classname="com.sun.tools.javac.Main">
-          <jvmarg line="-Xbootclasspath/p:${annotations-compiler-absolute}/dist/lib/jdk.compiler.jar"/>
+          <!-- Option no longer exists in JDK 9.
+          <jvmarg line="-Xbootclasspath/p:${annotations-compiler-absolute}/build/javac.jar"/>
+          -->
           <arg value="-g"/>
           <arg line="-sourcepath src"/>
           <arg line="-d bin"/>
@@ -526,11 +522,6 @@
                Framework, ignore type annotations in comments here.
                Separate targets exist to check the qualifiers. -->
           <arg line="-XDTA:noannotationsincomments"/>
-          <!-- Make sure we only have Java 7 source code and generate Java 7 bytecode. -->
-          <arg value="-source"/>
-          <arg value="7"/>
-          <arg value="-target"/>
-          <arg value="7"/>
       </java>
 
   </target>
