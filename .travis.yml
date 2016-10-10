@@ -5,9 +5,7 @@ script: ./.travis-build.sh
 sudo: false
 
 jdk:
-  - oraclejdk8
-#  - oraclejdk7
-  - openjdk7
+  - oraclejdk9
 
 after_script:
   - |
