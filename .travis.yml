@@ -19,14 +19,7 @@ after_script:
         if [[ ($TRAVIS_BRANCH == master) &&
               ($TRAVIS_PULL_REQUEST == false) ]] ; then
           curl -LO https://raw.github.com/mernst/plume-lib/master/bin/trigger-travis.sh
-          # Split $TRAVIS_REPO_SLUG into the owner and repository parts
-          OIFS=$IFS
-          IFS='/'
-          read -r -a slugarray <<< "$TRAVIS_REPO_SLUG"
-          SLUGOWNER=${slugarray[0]}
-          SLUGREPO=${slugarray[1]}
-          IFS=$OIFS
-
+          SLUGOWNER=${TRAVIS_REPO_SLUG%/*}
           sh trigger-travis.sh ${SLUGOWNER} checker-framework $TRAVISTOKEN
         fi
       fi

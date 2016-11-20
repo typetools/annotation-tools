@@ -6,15 +6,7 @@ set -e
 
 export SHELLOPTS
 
-
-# Split $TRAVIS_REPO_SLUG into the owner and repository parts
-OIFS=$IFS
-IFS='/'
-read -r -a slugarray <<< "$TRAVIS_REPO_SLUG"
-SLUGOWNER=${slugarray[0]}
-SLUGREPO=${slugarray[1]}
-IFS=$OIFS
-
+SLUGOWNER=${TRAVIS_REPO_SLUG%/*}
 
 # jsr308-langtools
 if [ -d ../jsr308-langtools ] ; then
