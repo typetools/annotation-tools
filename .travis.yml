@@ -11,6 +11,7 @@ jdk:
 
 after_script:
   - |
+      set +e
       declare exitCode;
       curl -sSL https://raw.githubusercontent.com/mernst/travis-after-all/master/lib/travis-after-all.js | node
       exitCode=$?
