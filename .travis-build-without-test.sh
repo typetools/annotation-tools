@@ -12,7 +12,19 @@ SLUGOWNER=${TRAVIS_REPO_SLUG%/*}
 if [ -d ../jsr308-langtools ] ; then
     (cd ../jsr308-langtools && hg pull && hg update)
 else
-    (cd .. && (hg clone https://bitbucket.org/${SLUGOWNER}/jsr308-langtools || hg clone https://bitbucket.org/${SLUGOWNER}/jsr308-langtools))
+    set +e
+    echo "Running: hg identify https://bitbucket.org/${SLUGOWNER}/jsr308-langtools &>-"
+    hg identify https://bitbucket.org/${SLUGOWNER}/jsr308-langtools &>-
+    if [ "$?" -eq 0 ]; then
+        echo "Running:  (cd .. && hg clone https://bitbucket.org/${SLUGOWNER}/jsr308-langtools)"
+        (cd .. && (hg clone https://bitbucket.org/${SLUGOWNER}/jsr308-langtools || hg clone https://bitbucket.org/${SLUGOWNER}/jsr308-langtools))
+        echo "... done: (cd .. && hg clone https://bitbucket.org/${SLUGOWNER}/jsr308-langtools)"
+    else
+        echo "Running: (cd .. && hg clone https://bitbucket.org/typetools/jsr308-langtools)"
+        (cd .. && (hg clone https://bitbucket.org/typetools/jsr308-langtools || hg clone https://bitbucket.org/typetools/jsr308-langtools))
+        echo "... done: (cd .. && hg clone https://bitbucket.org/typetools/jsr308-langtools)"
+    fi
+    set -e
 fi
 (cd ../jsr308-langtools/ && ./.travis-build-without-test.sh)
 
