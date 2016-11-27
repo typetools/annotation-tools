@@ -16,4 +16,6 @@ else
 fi
 (cd ../jsr308-langtools/ && ./.travis-build-without-test.sh)
 
+## Compile
+echo "running \"ant compile\" for annotation-tools"
 ant compile
