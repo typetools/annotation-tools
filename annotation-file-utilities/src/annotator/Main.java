@@ -553,6 +553,8 @@ public class Main {
         new HashMap<String, Multimap<Insertion, Annotation>>();
     Map<Insertion, String> insertionOrigins = new HashMap<Insertion, String>();
     Map<String, AScene> scenes = new HashMap<String, AScene>();
+    // maintain imports info for annotations field
+    Map<String, Set<String>> annotationImports = new HashMap<>();
 
     IndexFileParser.setAbbreviate(abbreviate);
     for (String arg : file_args) {
@@ -625,6 +627,7 @@ public class Main {
           }
           System.exit(1);
         }
+        annotationImports.putAll(spec.annotationImports());
       } else {
         throw new Error("Unrecognized file extension: " + arg);
       }
@@ -678,6 +681,13 @@ public class Main {
 
       // Imports required to resolve annotations (when abbreviate==true).
       LinkedHashSet<String> imports = new LinkedHashSet<String>();
+      // add annotation imports first
+      if (!annotationImports.isEmpty()) {
+          for (Set<String> importSet : annotationImports.values()) {
+              imports.addAll(importSet);
+          }
+      }
+
       int num_insertions = 0;
       String pkg = "";
 

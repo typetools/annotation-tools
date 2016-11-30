@@ -569,7 +569,7 @@ public final class IndexFileParser {
                 }
                 if (set2 == null) {
                   set2 = new TreeSet<String>();
-                  scene.imports.put(name, set2);
+                  scene.imports.put(baseName, set2);
                 }
                 set1.add(name);
                 set2.add(name);
