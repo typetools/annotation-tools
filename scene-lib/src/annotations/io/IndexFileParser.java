@@ -561,18 +561,12 @@ public final class IndexFileParser {
               int i = name.lastIndexOf('.');
               if (i >= 0) {
                 String baseName = name.substring(i+1);
-                Set<String> set1 = scene.imports.get(name);
-                Set<String> set2 = scene.imports.get(baseName);
-                if (set1 == null) {
-                  set1 = new TreeSet<String>();
-                  scene.imports.put(name, set1);
+                Set<String> importSet = scene.imports.get(baseName);
+                if (importSet == null) {
+                  importSet = new TreeSet<String>();
+                  scene.imports.put(baseName, importSet);
                 }
-                if (set2 == null) {
-                  set2 = new TreeSet<String>();
-                  scene.imports.put(baseName, set2);
-                }
-                set1.add(name);
-                set2.add(name);
+                importSet.add(name);
                 name = baseName;
               }
             }
