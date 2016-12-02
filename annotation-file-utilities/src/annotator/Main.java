@@ -553,7 +553,14 @@ public class Main {
         new HashMap<String, Multimap<Insertion, Annotation>>();
     Map<Insertion, String> insertionOrigins = new HashMap<Insertion, String>();
     Map<String, AScene> scenes = new HashMap<String, AScene>();
+
     // maintain imports info for annotations field
+    // @Key: base name of an annotation. e.g. for <code>@com.foo.bar(x)</code>, the base name is <code>bar</code>
+    // @Value: names of packages this annotation needs
+    // Note: due to the consideration of efficiency, this map made an assumption:
+    // there is no conflict happens among the base names of annotations
+    // e.g. below situation is assumed will NEVER happened:
+    // there are two inserted annotations: "@com.foo(x)" and "@bar.foo(x)" which have the same base name "foo"
     Map<String, Set<String>> annotationImports = new HashMap<>();
 
     IndexFileParser.setAbbreviate(abbreviate);
@@ -681,10 +688,6 @@ public class Main {
 
       // Imports required to resolve annotations (when abbreviate==true).
       LinkedHashSet<String> imports = new LinkedHashSet<String>();
-      // add annotation imports first
-      for (Set<String> importSet : annotationImports.values()) {
-          imports.addAll(importSet);
-      }
 
       int num_insertions = 0;
       String pkg = "";
@@ -873,6 +876,11 @@ public class Main {
               dbug.debug("Need import %s%n  due to insertion %s%n",
                   packageNames, toInsert);
               imports.addAll(packageNames);
+            }
+            if (iToInsert instanceof AnnotationInsertion) {
+                AnnotationInsertion annoToInsert = (AnnotationInsertion) iToInsert;
+                Set<String> annoImports = annotationImports.get(annoToInsert.getAnnotationBaseName());
+                imports.addAll(annoImports);
             }
           }
         }
