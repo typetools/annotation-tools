@@ -688,7 +688,6 @@ public class Main {
 
       // Imports required to resolve annotations (when abbreviate==true).
       LinkedHashSet<String> imports = new LinkedHashSet<String>();
-
       int num_insertions = 0;
       String pkg = "";
 
