@@ -78,7 +78,6 @@ public class AnnotationInsertion extends Insertion {
         String result = annotation;
         if (abbreviate) {
             Pair<String, String> ps = removePackage(result);
-
             String packageName = ps.a;
             if (packageName != null) {
                 packageNames.add(packageName);
