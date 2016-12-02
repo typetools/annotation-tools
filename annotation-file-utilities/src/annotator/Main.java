@@ -682,10 +682,8 @@ public class Main {
       // Imports required to resolve annotations (when abbreviate==true).
       LinkedHashSet<String> imports = new LinkedHashSet<String>();
       // add annotation imports first
-      if (!annotationImports.isEmpty()) {
-          for (Set<String> importSet : annotationImports.values()) {
-              imports.addAll(importSet);
-          }
+      for (Set<String> importSet : annotationImports.values()) {
+          imports.addAll(importSet);
       }
 
       int num_insertions = 0;
