@@ -879,7 +879,9 @@ public class Main {
             if (iToInsert instanceof AnnotationInsertion) {
                 AnnotationInsertion annoToInsert = (AnnotationInsertion) iToInsert;
                 Set<String> annoImports = annotationImports.get(annoToInsert.getAnnotationBaseName());
-                imports.addAll(annoImports);
+                if (annoImports != null) {
+                    imports.addAll(annoImports);
+                }
             }
           }
         }
