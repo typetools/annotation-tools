@@ -32,15 +32,15 @@ DEBUG :=
 default : all
 
 .PHONY: all
-all : $(DIFFS) abbreviated enum-filed-imports ad-hoc system-test source-extension results
+all : $(DIFFS) abbreviated enum-field-imports ad-hoc system-test source-extension results
 
 .PHONY: abbreviated
 abbreviated:
 	${MAKE} -C abbreviated
 
-.PHONY: enum-filed-imports
-enum-filed-imports:
-	${MAKE} -C enum-filed-imports
+.PHONY: enum-field-imports
+enum-field-imports:
+	${MAKE} -C enum-field-imports
 
 .PHONY: ad-hoc
 ad-hoc:
@@ -110,5 +110,5 @@ clean :
 	rm -f *.log
 	rm -f *.output
 	(cd abbreviated && make clean)
-	(cd enum-filed-imports && make clean)
+	(cd enum-field-imports && make clean)
 	(cd ad-hoc && make clean)
