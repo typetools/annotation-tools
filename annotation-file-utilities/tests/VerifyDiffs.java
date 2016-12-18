@@ -1,3 +1,6 @@
+import java.io.*;
+import java.util.*;
+
 /**
  * Little program that checks to see if every file ending in .diff in
  * the current directory is empty.  For each file, displays whether or not
@@ -10,9 +13,6 @@
  * If --show_all is not used, and all tests pass, then there will be no
  * output.
  */
-import java.io.*;
-import java.util.*;
-
 public class VerifyDiffs {
     private static boolean show_all = false;
 
