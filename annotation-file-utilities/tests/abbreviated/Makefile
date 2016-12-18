@@ -19,7 +19,6 @@ JAVAC?=javac
 export SHELL=/bin/bash -o pipefail
 
 
-#filter-out reverses order, so use tac to reverse its input first
 DIFFS := $(wildcard *.goal)
 DISABLED := $(shell grep -le "@skip-test" $(DIFFS))
 FILTERED := $(filter-out $(DISABLED),$(DIFFS))
