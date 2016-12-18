@@ -64,7 +64,7 @@ public class AnnotationInsertion extends Insertion {
      * Gets the insertion text.
      *
      * @param comments
-     *            if true, the annotation will be surrounded by block comments.
+     *            if true, the annotation will be surrounded by block comments
      * @param abbreviate
      *            if true, the package name will be removed from the annotation.
      *            The package name can be retrieved again by calling the
@@ -103,7 +103,7 @@ public class AnnotationInsertion extends Insertion {
 
     /**
      * Gets the raw, unmodified annotation that was passed into the constructor.
-     * @return the annotation.
+     * @return the annotation
      */
     public String getAnnotation() {
         return annotation;

@@ -80,7 +80,7 @@ public class ASTPathCriterion implements Criterion {
      * arguments have been previously validated.
      *
      * @param astPath
-     *            The AST path to match.
+     *            The AST path to match
      */
     public ASTPathCriterion(ASTPath astPath) {
         this.astPath = astPath;
@@ -981,9 +981,9 @@ loop:       while (typeTree != null && i < astPath.size()) {
      * BinaryOperator.
      *
      * @param kind1
-     *            The first kind to match.
+     *            The first kind to match
      * @param kind2
-     *            The second kind to match.
+     *            The second kind to match
      * @return {@code true} if the kinds match as described above, {@code false}
      *         otherwise.
      */
@@ -1006,8 +1006,8 @@ loop:       while (typeTree != null && i < astPath.size()) {
      * Determines if the given kind is a binary operator.
      *
      * @param kind
-     *            The kind to test.
-     * @return true if the given kind is a binary operator.
+     *            The kind to test
+     * @return true if the given kind is a binary operator
      */
     public boolean isBinaryOperator(Tree.Kind kind) {
         return kind == Tree.Kind.MULTIPLY || kind == Tree.Kind.DIVIDE
@@ -1097,8 +1097,8 @@ loop:       while (typeTree != null && i < astPath.size()) {
      * Determines if the given kind is a wildcard.
      *
      * @param kind
-     *            The kind to test.
-     * @return true if the given kind is a wildcard.
+     *            The kind to test
+     * @return true if the given kind is a wildcard
      */
     private boolean isWildcard(Tree.Kind kind) {
         return kind == Tree.Kind.UNBOUNDED_WILDCARD

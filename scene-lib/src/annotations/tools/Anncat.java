@@ -15,7 +15,7 @@ import annotations.io.classfile.ClassFileReader;
 import annotations.io.classfile.ClassFileWriter;
 import plume.FileIOException;
 
-/** Concatenates multiple descriptions of annotations into a single one. **/
+/** Concatenates multiple descriptions of annotations into a single one. */
 public class Anncat {
     private static void usage() {
         System.err.print(

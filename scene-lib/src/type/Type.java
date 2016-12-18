@@ -32,7 +32,7 @@ public abstract class Type {
 
     /**
      * Adds an outer annotation to this type.
-     * @param annotation the annotation to add.
+     * @param annotation the annotation to add
      */
     public void addAnnotation(String annotation) {
         annotations.add(annotation);
@@ -40,7 +40,7 @@ public abstract class Type {
 
     /**
      * Replaces the annotations on this type with the given annotations.
-     * @param annotations the new annotations to be placed on this type.
+     * @param annotations the new annotations to be placed on this type
      */
     public void setAnnotations(List<String> annotations) {
         this.annotations = annotations;
@@ -48,8 +48,8 @@ public abstract class Type {
 
     /**
      * Gets an outer annotation on this type at the given index.
-     * @param index the index.
-     * @return the annotation.
+     * @param index the index
+     * @return the annotation
      */
     public String getAnnotation(int index) {
         return annotations.get(index);
@@ -58,7 +58,7 @@ public abstract class Type {
     /**
      * Gets a copy of the outer annotations on this type. This
      * will be empty if there are none.
-     * @return the annotations.
+     * @return the annotations
      */
     public List<String> getAnnotations() {
         return new ArrayList<String>(annotations);
@@ -73,7 +73,7 @@ public abstract class Type {
 
     /**
      * Gets the {@link Kind} of this {@link Type}.
-     * @return the kind.
+     * @return the kind
      */
     public abstract Kind getKind();
 }

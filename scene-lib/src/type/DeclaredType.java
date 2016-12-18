@@ -46,7 +46,7 @@ public class DeclaredType extends Type {
     /**
      * Creates a new declared type with no type parameters or inner type.
      * @param name the raw, un-annotated name of this type, or "?" for a
-     *             wildcard.
+     *             wildcard
      */
     public DeclaredType(String name) {
         super();
@@ -65,7 +65,7 @@ public class DeclaredType extends Type {
 
     /**
      * Sets the raw, un-annotated name of this type.
-     * @param name the name.
+     * @param name the name
      */
     public void setName(String name) {
         this.name = name;
@@ -73,7 +73,7 @@ public class DeclaredType extends Type {
 
     /**
      * Gets the raw, un-annotated name of this type.
-     * @return the name.
+     * @return the name
      */
     public String getName() {
         return name;
@@ -81,7 +81,7 @@ public class DeclaredType extends Type {
 
     /**
      * Adds the given type parameter to this type.
-     * @param typeParameter the type parameter.
+     * @param typeParameter the type parameter
      */
     public void addTypeParameter(Type typeParameter) {
         checkWildcard();
@@ -90,7 +90,7 @@ public class DeclaredType extends Type {
 
     /**
      * Sets the type parameters of this type.
-     * @param typeParameters the type parameters.
+     * @param typeParameters the type parameters
      */
     public void setTypeParameters(List<Type> typeParameters) {
         checkWildcard();
@@ -99,8 +99,8 @@ public class DeclaredType extends Type {
 
     /**
      * Gets the type parameter at the given index.
-     * @param index the index.
-     * @return the type parameter.
+     * @param index the index
+     * @return the type parameter
      */
     public Type getTypeParameter(int index) {
         checkWildcard();
@@ -110,7 +110,7 @@ public class DeclaredType extends Type {
     /**
      * Gets a copy of the type parameters of this type. This will
      * be empty if there are none.
-     * @return the type parameters.
+     * @return the type parameters
      */
     public List<Type> getTypeParameters() {
         checkWildcard();
@@ -119,7 +119,7 @@ public class DeclaredType extends Type {
 
     /**
      * Sets the inner type.
-     * @param innerType the inner type.
+     * @param innerType the inner type
      */
     public void setInnerType(DeclaredType innerType) {
         checkWildcard();

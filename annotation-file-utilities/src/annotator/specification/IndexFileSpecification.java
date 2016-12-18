@@ -293,9 +293,9 @@ public class IndexFileSpecification implements Specification {
 
   /**
    * Fill in this.insertions with insertion pairs.
-   * @param clist The criteria specifying the location of the insertions.
-   * @param element Holds the annotations to be inserted.
-   * @return A list of the {@link AnnotationInsertion}s that are created.
+   * @param clist the criteria specifying the location of the insertions
+   * @param element holds the annotations to be inserted
+   * @return a list of the {@link AnnotationInsertion}s that are created.
    */
   private List<Insertion> parseElement(CriterionList clist, AElement element) {
     return parseElement(clist, element, new ArrayList<Insertion>(), false);
@@ -303,11 +303,11 @@ public class IndexFileSpecification implements Specification {
 
   /**
    * Fill in this.insertions with insertion pairs.
-   * @param clist The criteria specifying the location of the insertions.
-   * @param element Holds the annotations to be inserted.
+   * @param clist the criteria specifying the location of the insertions
+   * @param element holds the annotations to be inserted
    * @param isCastInsertion {@code true} if this for a cast insertion, {@code false}
    *          otherwise.
-   * @return A list of the {@link AnnotationInsertion}s that are created.
+   * @return a list of the {@link AnnotationInsertion}s that are created.
    */
   private List<Insertion> parseElement(CriterionList clist, AElement element,
       boolean isCastInsertion) {
@@ -316,11 +316,11 @@ public class IndexFileSpecification implements Specification {
 
   /**
    * Fill in this.insertions with insertion pairs.
-   * @param clist The criteria specifying the location of the insertions.
-   * @param element Holds the annotations to be inserted.
+   * @param clist the criteria specifying the location of the insertions
+   * @param element holds the annotations to be inserted
    * @param add {@code true} if the create {@link AnnotationInsertion}s should
    *         be added to {@link #insertions}, {@code false} otherwise.
-   * @return A list of the {@link AnnotationInsertion}s that are created.
+   * @return a list of the {@link AnnotationInsertion}s that are created.
    */
   private List<Insertion> parseElement(CriterionList clist, AElement element,
       List<Insertion> innerTypeInsertions) {
@@ -329,14 +329,14 @@ public class IndexFileSpecification implements Specification {
 
   /**
    * Fill in this.insertions with insertion pairs.
-   * @param clist The criteria specifying the location of the insertions.
-   * @param element Holds the annotations to be inserted.
-   * @param innerTypeInsertions The insertions on the inner type of this
+   * @param clist the criteria specifying the location of the insertions
+   * @param element holds the annotations to be inserted
+   * @param innerTypeInsertions the insertions on the inner type of this
    *         element. This is only used for receiver and "new" insertions.
    *         See {@link ReceiverInsertion} for more details.
    * @param isCastInsertion {@code true} if this for a cast insertion, {@code false}
    *          otherwise.
-   * @return A list of the {@link AnnotationInsertion}s that are created.
+   * @return a list of the {@link AnnotationInsertion}s that are created.
    */
   private List<Insertion> parseElement(CriterionList clist, AElement element,
       List<Insertion> innerTypeInsertions, boolean isCastInsertion) {
@@ -511,14 +511,14 @@ public class IndexFileSpecification implements Specification {
    * Creates the {@link CastInsertion} and {@link CloseParenthesisInsertion}
    * for a cast insertion.
    *
-   * @param type The cast type to insert.
-   * @param annotationString The annotation on the outermost type, or
+   * @param type the cast type to insert
+   * @param annotationString the annotation on the outermost type, or
    *         {@code null} if none. With no outermost annotation this cast
    *         insertion will either be a cast without any annotations or a cast
    *         with annotations only on the compound types.
-   * @param innerTypeInsertions The annotations on the inner types.
-   * @param criteria The criteria for the location of this insertion.
-   * @return The {@link CastInsertion} and {@link CloseParenthesisInsertion}.
+   * @param innerTypeInsertions the annotations on the inner types
+   * @param criteria the criteria for the location of this insertion
+   * @return the {@link CastInsertion} and {@link CloseParenthesisInsertion}.
    */
   private Pair<CastInsertion, CloseParenthesisInsertion> createCastInsertion(
       Type type, String annotationString, List<Insertion> innerTypeInsertions,
@@ -535,8 +535,8 @@ public class IndexFileSpecification implements Specification {
 
   /**
    * Fill in this.insertions with insertion pairs for the outer and inner types.
-   * @param clist The criteria specifying the location of the insertions.
-   * @param typeElement Holds the annotations to be inserted.
+   * @param clist the criteria specifying the location of the insertions
+   * @param typeElement holds the annotations to be inserted
    */
   private void parseInnerAndOuterElements(CriterionList clist, ATypeElement typeElement) {
     parseInnerAndOuterElements(clist, typeElement, false);
@@ -544,8 +544,8 @@ public class IndexFileSpecification implements Specification {
 
   /**
    * Fill in this.insertions with insertion pairs for the outer and inner types.
-   * @param clist The criteria specifying the location of the insertions.
-   * @param typeElement Holds the annotations to be inserted.
+   * @param clist the criteria specifying the location of the insertions
+   * @param typeElement holds the annotations to be inserted
    * @param isCastInsertion {@code true} if this for a cast insertion, {@code false}
    *          otherwise.
    */

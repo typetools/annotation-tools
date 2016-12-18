@@ -18,7 +18,7 @@ import annotations.io.*;
  * <pre>
  * java Example <i>input.jaif</i> <i>ClassToProcess</i> <i>output.jaif</i>
  * </pre>
- **/
+ */
 public class Example {
   public static void main(String [] args) {
     AScene scene;

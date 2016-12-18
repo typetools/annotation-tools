@@ -82,7 +82,7 @@ public abstract class TypedInsertion extends Insertion {
 
   /**
    * Gets the inner type insertions associated with this insertion.
-   * @return a copy of the inner types.
+   * @return a copy of the inner types
    */
   public List<Insertion> getInnerTypeInsertions() {
       return innerTypeInsertions;

@@ -57,8 +57,8 @@ public class BoundedType extends Type {
     /**
      * Creates a new bounded type.
      * @param name the type variable name
-     * @param boundKind the bound kind.
-     * @param bound the bound.
+     * @param boundKind the bound kind
+     * @param bound the bound
      */
     public BoundedType(DeclaredType name, BoundKind boundKind, DeclaredType bound) {
         super();
@@ -80,7 +80,7 @@ public class BoundedType extends Type {
 
     /**
      * Gets the bound of this type.
-     * @return the bound.
+     * @return the bound
      */
     public Type getBound() {
         return bound;
@@ -88,7 +88,7 @@ public class BoundedType extends Type {
 
     /**
      * Gets the bound kind of this type.
-     * @return the bound kind.
+     * @return the bound kind
      */
     public BoundKind getBoundKind() {
         return boundKind;

@@ -1207,7 +1207,7 @@ public final class IndexFileParser {
 
     /**
      * Parses an AST path.
-     * @return the AST path.
+     * @return the AST path
      */
     private ASTPath parseASTPath() throws IOException, ParseException {
         ASTPath astPath = ASTPath.empty().extend(parseASTEntry());
@@ -1219,8 +1219,8 @@ public final class IndexFileParser {
 
     /**
      * Parses and returns the next AST entry.
-     * @return A new AST entry.
-     * @throws ParseException if the next entry type is invalid.
+     * @return a new AST entry
+     * @throws ParseException if the next entry type is invalid
      */
     private ASTPath.ASTEntry parseASTEntry() throws IOException, ParseException {
         ASTPath.ASTEntry entry;
@@ -1341,10 +1341,10 @@ public final class IndexFileParser {
      * constructs a while loop AST entry, where the valid child selectors are "condition" or
      * "statement".
      *
-     * @param kind The kind of this AST entry.
-     * @param legalChildSelectors A list of the legal child selectors for this AST entry.
-     * @return A new {@link ASTPath.ASTEntry}.
-     * @throws ParseException if an illegal argument is found.
+     * @param kind the kind of this AST entry
+     * @param legalChildSelectors a list of the legal child selectors for this AST entry
+     * @return a new {@link ASTPath.ASTEntry}.
+     * @throws ParseException if an illegal argument is found
      */
     private ASTPath.ASTEntry newASTEntry(Kind kind, String[] legalChildSelectors) throws IOException, ParseException {
         return newASTEntry(kind, legalChildSelectors, null);
@@ -1361,12 +1361,12 @@ public final class IndexFileParser {
      * "expression" or "statement" and the "statement" child selector requires
      * an argument.
      *
-     * @param kind The kind of this AST entry.
-     * @param legalChildSelectors A list of the legal child selectors for this AST entry.
-     * @param argumentChildSelectors A list of the child selectors that also require an argument.
+     * @param kind the kind of this AST entry
+     * @param legalChildSelectors a list of the legal child selectors for this AST entry
+     * @param argumentChildSelectors a list of the child selectors that also require an argument.
      *                               Entries here should also be in the legalChildSelectors list.
-     * @return A new {@link ASTPath.ASTEntry}.
-     * @throws ParseException if an illegal argument is found.
+     * @return a new {@link ASTPath.ASTEntry}
+     * @throws ParseException if an illegal argument is found
      */
     private ASTPath.ASTEntry newASTEntry(Kind kind, String[] legalChildSelectors, String[] argumentChildSelectors) throws IOException, ParseException {
         expectChar('.');
@@ -1679,8 +1679,8 @@ public final class IndexFileParser {
 
     /**
      * Parse the given text into a {@link Type}.
-     * @param text the text to parse.
-     * @return the type.
+     * @param text the text to parse
+     * @return the type
      */
     public static Type parseType(String text) {
         StringReader in = new StringReader(text);

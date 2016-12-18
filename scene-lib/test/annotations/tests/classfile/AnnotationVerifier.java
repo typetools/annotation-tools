@@ -77,7 +77,7 @@ public class AnnotationVerifier {
    * be called if both visitors have already visited a class.
    *
    * @throws AnnotationMismatchException if the two visitors have not visited
-   * two versions of the same class that contain idential annotations.
+   * two versions of the same class that contain idential annotations
    */
   public void verify() {
     if (!newVisitor.name.equals(originalVisitor.name)) {
@@ -598,7 +598,7 @@ public class AnnotationVerifier {
     /**
      * Constructs a new AnnotationMismatchException with the given error message.
      *
-     * @param msg the error as to why the annotations do not match.
+     * @param msg the error as to why the annotations do not match
      */
     public AnnotationMismatchException(String msg) {
       super(msg);
