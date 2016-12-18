@@ -1440,7 +1440,7 @@ public final class IndexFileParser {
 
     /**
      * Parses the next tokens as a bounded type.
-     * @param type the base type.
+     * @param type the name, which precedes "extends" or "super"
      */
     private BoundedType parseBoundedType(DeclaredType type) throws IOException, ParseException {
         BoundKind kind;

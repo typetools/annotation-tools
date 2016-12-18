@@ -330,7 +330,7 @@ public abstract class Insertion {
             break;
         case BOUNDED:
             BoundedType boundedType = (BoundedType) type;
-            result.append(typeToString(boundedType.getType(), comments, abbreviate));
+            result.append(typeToString(boundedType.getName(), comments, abbreviate));
             result.append(' ');
             result.append(boundedType.getBoundKind());
             result.append(' ');
@@ -472,7 +472,7 @@ public abstract class Insertion {
                 }
                 if (type.getKind() == Type.Kind.BOUNDED) {
                     // Annotations aren't allowed directly on the BoundedType, see BoundedType
-                    type = ((BoundedType) type).getType();
+                    type = ((BoundedType) type).getName();
                 }
                 type.addAnnotation(annos);
             } catch (Throwable e) {
@@ -547,7 +547,7 @@ public abstract class Insertion {
         }
         if (type.getKind() == Type.Kind.BOUNDED) {
             // Annotations aren't allowed directly on the BoundedType, see BoundedType
-            type = ((BoundedType) type).getType();
+            type = ((BoundedType) type).getName();
         }
         type.addAnnotation(annos);
     }

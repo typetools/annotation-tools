@@ -97,7 +97,7 @@ public abstract class TypedInsertion extends Insertion {
     case DECLARED:
       return (DeclaredType) type;
     case BOUNDED:
-      return getBaseType(((BoundedType) type).getType());
+      return getBaseType(((BoundedType) type).getName());
     case ARRAY:
       return getBaseType(((ArrayType) type).getComponentType());
     default:  // should never be reached
