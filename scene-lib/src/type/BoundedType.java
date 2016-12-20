@@ -12,7 +12,7 @@ import java.util.List;
  * Calling {@link #addAnnotation(String)}, {@link #getAnnotation(int)}, or
  * {@link #getAnnotations()} on a {@code BoundedType} will result in an
  * {@link UnsupportedOperationException}. Annotations should be added to the
- * {@code type} and {@code bound} of this {@code BoundedType}.
+ * {@code name} and {@code bound} of this {@code BoundedType}.
  */
 public class BoundedType extends Type {
 
@@ -34,12 +34,12 @@ public class BoundedType extends Type {
     }
 
     /**
-     * The base type. For example, 'K' in:
+     * The type name. For example, 'K' in:
      * <pre>
      *   K extends Object
      * </pre>
      */
-    private DeclaredType type;
+    private DeclaredType name;
 
     /**
      * The bound kind.
@@ -56,31 +56,31 @@ public class BoundedType extends Type {
 
     /**
      * Creates a new bounded type.
-     * @param type the name of the base type.
-     * @param boundKind the bound kind.
-     * @param bound the bound.
+     * @param name the type variable name
+     * @param boundKind the bound kind
+     * @param bound the bound
      */
-    public BoundedType(DeclaredType type, BoundKind boundKind, DeclaredType bound) {
+    public BoundedType(DeclaredType name, BoundKind boundKind, DeclaredType bound) {
         super();
-        this.type = type;
+        this.name = name;
         this.boundKind = boundKind;
         this.bound = bound;
     }
 
     /**
-     * Gets the name of the base type. For example, 'K' in:
+     * Gets the type variable name. For example, 'K' in:
      * <pre>
      *   K extends Object
      * </pre>
-     * @return the name of the base type.
+     * @return the type variable name
      */
-    public DeclaredType getType() {
-        return type;
+    public DeclaredType getName() {
+        return name;
     }
 
     /**
      * Gets the bound of this type.
-     * @return the bound.
+     * @return the bound
      */
     public Type getBound() {
         return bound;
@@ -88,7 +88,7 @@ public class BoundedType extends Type {
 
     /**
      * Gets the bound kind of this type.
-     * @return the bound kind.
+     * @return the bound kind
      */
     public BoundKind getBoundKind() {
         return boundKind;

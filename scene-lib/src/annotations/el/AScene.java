@@ -154,7 +154,7 @@ public final class AScene implements Cloneable {
         return classes.prune() & packages.prune();
     }
 
-    /** Returns a string representation. **/
+    /** Returns a string representation. */
     public String unparse() {
         StringBuilder sb = new StringBuilder();
         sb.append("packages:\n");

@@ -12,7 +12,7 @@ public class ArrayType extends Type {
 
     /**
      * Constructs a new array type.
-     * @param componentType the type of elements this array holds.
+     * @param componentType the type of elements this array holds
      */
     public ArrayType(Type componentType) {
         super();
@@ -21,7 +21,7 @@ public class ArrayType extends Type {
 
     /**
      * Gets the component type.
-     * @return the component type.
+     * @return the component type
      */
     public Type getComponentType() {
         return componentType;

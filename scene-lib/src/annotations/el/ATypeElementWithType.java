@@ -59,7 +59,7 @@ public class ATypeElementWithType extends ATypeElement {
     /**
      * Gets the un-annotated type.
      *
-     * @return The un-annotated type.
+     * @return the un-annotated type
      */
     public Type getType() {
         return type;
@@ -68,7 +68,7 @@ public class ATypeElementWithType extends ATypeElement {
     /**
      * Sets the un-annotated type.
      *
-     * @param type The un-annotated type.
+     * @param type the un-annotated type
      */
     public void setType(Type type) {
         this.type = type;
