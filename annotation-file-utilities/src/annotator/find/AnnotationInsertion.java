@@ -19,11 +19,10 @@ public class AnnotationInsertion extends Insertion {
     /**
      * Creates a new insertion.
      *
-     * @param annotation the annotation to insert
+     * @param annotation the annotation to insert, which starts with "@"
      * @param criteria where to insert the annotation
      * @param separateLine whether to insert the annotation on its own
      */
-
     public AnnotationInsertion(String annotation, Criteria criteria, boolean separateLine) {
         super(criteria, separateLine);
         this.annotation = annotation;
