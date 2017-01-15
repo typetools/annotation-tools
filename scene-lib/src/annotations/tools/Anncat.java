@@ -20,7 +20,7 @@ public class Anncat {
     private static void usage() {
         System.err.print(
                 "anncat, part of the Annotation File Utilities\n" +
-                "(http://checkerframework.org/annotation-file-utilities/)\n" +
+                "(http://checker-framework.com/annotation-file-utilities/)\n" +
                 "usage: anncat <inspec>* [ --out <outspec> ], where:\n" +
                 "    <inspec> ::=\n" +
                 "        ( --javap <in.javap> )\n" +
