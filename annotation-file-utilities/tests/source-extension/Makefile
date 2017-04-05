@@ -65,7 +65,7 @@ bin/annotator/tests/%.class: %.java
 # before the stock javac classes that the Mac OS includes on the bootclasspath
 # (other platforms do not make such inclusions)
 .PRECIOUS: %.output
-%.output: %.jaif %.java bin/annotator/tests/%.class ../../lib/plume.jar ../../bin ../../annotation-file-utilities.jar
+%.output: %.jaif %.java bin/annotator/tests/%.class ../../lib/plume-core.jar ../../bin ../../annotation-file-utilities.jar
 	$(JAVA) \
         -Xbootclasspath/p:../../bin:../../annotation-file-utilities.jar \
 	-cp bin \
