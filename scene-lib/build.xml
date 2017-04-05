@@ -114,7 +114,7 @@
             <pathelement location="${asmx}/bin"/>
             <pathelement location="${junit}"/>
             <pathelement location="${annotation-tools}/annotation-file-utilities/lib/plume.jar"/>
-            <pathelement location="${annotation-tools}/annotation-file-utilities/lib/guava-15.0.jar"/>
+            <pathelement location="${annotation-tools}/annotation-file-utilities/lib/guava-21.0.jar"/>
             <!-- remainder only for repository version -->
             <pathelement location="${annotations-compiler}/dist/lib/javac.jar"/>
             <pathelement location="${annotations-compiler}/dist/lib/javap.jar"/>
