@@ -85,7 +85,7 @@
       -->
       <pathelement location="${annotations-compiler}/dist/lib/javac.jar"/>
       <pathelement location="${annotation-tools}/annotation-file-utilities/lib/plume.jar"/>
-      <pathelement location="${annotation-tools}/annotation-file-utilities/lib/guava-21.0.jar"/>
+      <pathelement location="${annotation-tools}/annotation-file-utilities/lib/guava-20.0.jar"/>
       <pathelement location="${scene-lib}/bin"/>
       <pathelement location="${asmx}/bin"/>
       <!-- needed for optionsdoc target -->
@@ -158,7 +158,7 @@
       </uptodate>
       <uptodate property="annotations-compiler.uptodate" targetfile="annotation-file-utilities.jar" srcfile="${annotations-compiler}/dist/lib/javac.jar"/>
       <uptodate property="plume.uptodate" targetfile="annotation-file-utilities.jar" srcfile="lib/plume.jar"/>
-      <uptodate property="google-collect.uptodate" targetfile="annotation-file-utilities.jar" srcfile="lib/guava-21.0.jar"/>
+      <uptodate property="google-collect.uptodate" targetfile="annotation-file-utilities.jar" srcfile="lib/guava-20.0.jar"/>
 
       <condition property="jarfile.uptodate">
         <and>
@@ -203,7 +203,7 @@
         <exclude name="META-INF/" />
       </patternset>
     </unjar>
-    <unjar src="lib/guava-21.0.jar" dest="${temp-jarfile}">
+    <unjar src="lib/guava-20.0.jar" dest="${temp-jarfile}">
       <patternset>
         <include name="**/*.class"/>
         <exclude name="META-INF/" />
