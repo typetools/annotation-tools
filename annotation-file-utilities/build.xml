@@ -205,7 +205,9 @@
     </unjar>
     <unjar src="lib/guava-15.0.jar" dest="${temp-jarfile}">
       <patternset>
-        <include name="**/*.class"/>
+        <include name="com/google/common/base/**/*.class"/>
+        <include name="com/google/common/collect/**/*.class"/>
+        <include name="com/google/common/escape/**/*.class"/>
         <exclude name="META-INF/" />
       </patternset>
     </unjar>
