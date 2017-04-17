@@ -7,6 +7,10 @@ set -e
 export SHELLOPTS
 
 SLUGOWNER=${TRAVIS_REPO_SLUG%/*}
+if [[ "$SLUGOWNER" == "" ]]; then
+  SLUGOWNER=typetools
+fi
+
 
 # jsr308-langtools
 if [ -d ../jsr308-langtools ] ; then
