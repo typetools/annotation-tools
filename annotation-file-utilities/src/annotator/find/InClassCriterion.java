@@ -257,7 +257,7 @@ public final class InClassCriterion implements Criterion {
    * Always returns an array of length at least 1 (it might contain only the
    * empty string).
    * @see #split(String s, String delim)
-   **/
+   */
   /*
   private static List<String> split(String s, char delim) {
     List<String> result = new ArrayList<String>();

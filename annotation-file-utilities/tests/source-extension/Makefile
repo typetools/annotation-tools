@@ -23,6 +23,8 @@ DIFFS := $(wildcard *.goal)
 DISABLED := $(shell grep -le "@skip-test" $(DIFFS))
 FILTERED := $(filter-out $(DISABLED),$(DIFFS))
 DIFFS := $(patsubst %.goal, %.diff, $(FILTERED))
+SRC := $(patsubst %.goal, %.java, $(FILTERED))
+OUT := $(patsubst %.goal, %.output, $(FILTERED))
 
 DEBUG :=
 # Use this to enable some debugging.
@@ -46,14 +48,16 @@ results: ../bin/VerifyDiffs.class
 	@$(JAVAC) -g -cp ../../bincompile -d ../bin ../VerifyDiffs.java
 
 # Compiles all the test cases (be verbose about this).
-compile :
+.PHONY: compile
+compile : $(SRC)
 	mkdir -p bin
-	$(JAVAC) -g -cp ../../bin -d bin *.java
+	$(JAVAC) -g -cp ../../bin -d bin $(SRC)
 
+# Compiles just one test case
 .PRECIOUS : bin/annotator/tests/%.class
 bin/annotator/tests/%.class: %.java
 	mkdir -p bin
-	$(JAVAC) -g -cp bin:../../bin -d bin -sourcepath . $*.java
+	$(JAVAC) -g -cp bin:../../bin -d bin -sourcepath . $<
 
 # Actually runs the annotator to create the annotated java file.
 # We are required to put annotation-file-utilities.jar (and ../bin) on the
@@ -61,7 +65,7 @@ bin/annotator/tests/%.class: %.java
 # before the stock javac classes that the Mac OS includes on the bootclasspath
 # (other platforms do not make such inclusions)
 .PRECIOUS: %.output
-%.output: %.jaif %.java bin/annotator/tests/%.class ../../lib/plume.jar ../../bin ../../annotation-file-utilities.jar
+%.output: %.jaif %.java bin/annotator/tests/%.class ../../lib/plume-core.jar ../../bin ../../annotation-file-utilities.jar
 	$(JAVA) \
         -Xbootclasspath/p:../../bin:../../annotation-file-utilities.jar \
 	-cp bin \

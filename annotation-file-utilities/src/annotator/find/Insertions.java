@@ -1030,7 +1030,7 @@ outer:
         BoundedType bt1 = (BoundedType) t1;
         if (bt0.getBoundKind() != bt1.getBoundKind()) { break; }
         mergeTypes(bt0.getBound(), bt1.getBound());
-        mergeTypes(bt0.getType(), bt1.getType());
+        mergeTypes(bt0.getName(), bt1.getName());
         return;
       }
     case DECLARED:
@@ -1299,7 +1299,7 @@ loop:
       case BOUNDED:
         final BoundedType btype = (BoundedType) type;
         final BoundedType.BoundKind bk = btype.getBoundKind();
-        final String bname = btype.getType().getName();
+        final String bname = btype.getName().getName();
         final TypeTree bound = fromType(btype.getBound());
         return new Param(bname, bk, bound);
       case DECLARED:

@@ -99,7 +99,7 @@ public class JVMNames {
      * Array strings are built by recursively converting the component type.
      *
      * @param type the Type to convert to JVML
-     * @return The JVML representation of type
+     * @return the JVML representation of type
      */
     public static String typeToJvmlString(Type type) {
         if (type.getKind() == TypeKind.ARRAY) {
@@ -118,7 +118,7 @@ public class JVMNames {
      * Create a JVML string for an AST node representing a type.
      *
      * @param typeTree a Tree representing a type
-     * @return The JVML representation of type
+     * @return the JVML representation of type
      */
     private static String treeToJVMLString(Tree typeTree) {
         StringBuilder builder = new StringBuilder();

@@ -95,7 +95,7 @@ public class AnnotationsTest extends TestCase {
   /**
    * Constructs a new <code>AnnotationsTest</code> with the given name.
    *
-   * @param s the name of this test case.
+   * @param s the name of this test case
    */
   public AnnotationsTest(String s) {
     super(s);
@@ -167,7 +167,7 @@ public class AnnotationsTest extends TestCase {
    *
    * @param filename the class file to insert annotations into
    * @param scene the scene that contains annotations to be inserted
-   * @param overwrite whether to overwrite existing annotations.
+   * @param overwrite whether to overwrite existing annotations
    */
   private void writeClass(String filename,
       AScene scene, boolean overwrite) {
@@ -181,7 +181,7 @@ public class AnnotationsTest extends TestCase {
    * @param oldFileName the class file to read from
    * @param newFileName the class file to write to
    * @param scene the scene that contains annotations to be inserted
-   * @param overwrite whether to overwrite existing annotations.
+   * @param overwrite whether to overwrite existing annotations
    */
   private void writeClass(
       String oldFileName,

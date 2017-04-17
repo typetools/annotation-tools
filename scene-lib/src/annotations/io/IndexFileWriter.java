@@ -377,7 +377,7 @@ public final class IndexFileWriter {
             break;
         case BOUNDED:
             type.BoundedType b = (type.BoundedType) type;
-            printType(b.getType());
+            printType(b.getName());
             pw.print(" ");
             pw.print(b.getBoundKind());
             pw.print(" ");

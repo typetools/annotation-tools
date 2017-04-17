@@ -82,7 +82,7 @@ public abstract class TypedInsertion extends Insertion {
 
   /**
    * Gets the inner type insertions associated with this insertion.
-   * @return a copy of the inner types.
+   * @return a copy of the inner types
    */
   public List<Insertion> getInnerTypeInsertions() {
       return innerTypeInsertions;
@@ -97,7 +97,7 @@ public abstract class TypedInsertion extends Insertion {
     case DECLARED:
       return (DeclaredType) type;
     case BOUNDED:
-      return getBaseType(((BoundedType) type).getType());
+      return getBaseType(((BoundedType) type).getName());
     case ARRAY:
       return getBaseType(((ArrayType) type).getComponentType());
     default:  // should never be reached

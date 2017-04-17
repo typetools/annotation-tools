@@ -128,9 +128,9 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
      * the tree kind is "Block", the child selector is "statement", and the
      * argument is "3".
      *
-     * @param treeKind The kind of this AST entry.
-     * @param childSelector The child selector to this AST entry.
-     * @param argument The argument.
+     * @param treeKind the kind of this AST entry
+     * @param childSelector the child selector to this AST entry
+     * @param argument the argument
      */
     public ASTEntry(Tree.Kind treeKind, String childSelector, Integer argument) {
       this.treeKind = treeKind;
@@ -143,8 +143,8 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
      *
      * See {@link #ASTPath.ASTEntry(Tree.Kind, String, Integer)} for an example of the parameters.
      *
-     * @param treeKind The kind of this AST entry.
-     * @param childSelector The child selector to this AST entry.
+     * @param treeKind the kind of this AST entry
+     * @param childSelector the child selector to this AST entry
      */
     public ASTEntry(Tree.Kind treeKind, String childSelector) {
       this(treeKind, childSelector, null);
@@ -157,7 +157,7 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
      * Block.statement 3
      * }</pre>
      * "Block" is the tree kind.
-     * @return the tree kind.
+     * @return the tree kind
      */
     public Tree.Kind getTreeKind() {
       return treeKind;
@@ -180,7 +180,7 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
      * Determines if the given string is equal to this AST path entry's
      * child selector.
      *
-     * @param s the string to compare to.
+     * @param s the string to compare to
      * @return {@code true} if the string matches the child selector,
      *         {@code false} otherwise.
      */
@@ -195,8 +195,8 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
      * Block.statement 3
      * }</pre>
      * "3" is the argument.
-     * @return the argument.
-     * @throws IllegalStateException if this AST entry does not have an argument.
+     * @return the argument
+     * @throws IllegalStateException if this AST entry does not have an argument
      */
     public int getArgument() {
       if (argument >= (negativeAllowed() ? -1 : 0)) {
@@ -535,7 +535,7 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
 
     /**
      * Parses an AST path.
-     * @return the AST path.
+     * @return the AST path
      */
     ASTPath parseASTPath() throws ParseException {
       ASTPath astPath = new ASTPath().extend(parseASTEntry());
@@ -548,8 +548,8 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
 
     /**
      * Parses and returns the next AST entry.
-     * @return A new AST entry.
-     * @throws ParseException if the next entry type is invalid.
+     * @return a new AST entry
+     * @throws ParseException if the next entry type is invalid
      */
     ASTEntry parseASTEntry() throws ParseException {
       String s = strVal();
@@ -719,10 +719,10 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
      * constructs a while loop AST entry, where the valid child selectors are "condition" or
      * "statement".
      *
-     * @param kind The kind of this AST entry.
-     * @param legalChildSelectors A list of the legal child selectors for this AST entry.
-     * @return A new {@link ASTEntry}.
-     * @throws ParseException if an illegal argument is found.
+     * @param kind the kind of this AST entry
+     * @param legalChildSelectors a list of the legal child selectors for this AST entry
+     * @return a new {@link ASTEntry}.
+     * @throws ParseException if an illegal argument is found
      */
     private ASTEntry newASTEntry(Tree.Kind kind, String[] legalChildSelectors)
         throws ParseException {
@@ -740,12 +740,12 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
      * "expression" or "statement" and the "statement" child selector requires
      * an argument.
      *
-     * @param kind The kind of this AST entry.
-     * @param legalChildSelectors A list of the legal child selectors for this AST entry.
-     * @param argumentChildSelectors A list of the child selectors that also require an argument.
+     * @param kind the kind of this AST entry
+     * @param legalChildSelectors a list of the legal child selectors for this AST entry
+     * @param argumentChildSelectors a list of the child selectors that also require an argument.
      *                               Entries here should also be in the legalChildSelectors list.
-     * @return A new {@link ASTEntry}.
-     * @throws ParseException if an illegal argument is found.
+     * @return a new {@link ASTEntry}.
+     * @throws ParseException if an illegal argument is found
      */
     private ASTEntry newASTEntry(Tree.Kind kind, String[] legalChildSelectors,
         String[] argumentChildSelectors) throws ParseException {
@@ -1340,9 +1340,9 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
      * BinaryOperator.
      *
      * @param kind1
-     *            The first kind to match.
+     *            The first kind to match
      * @param kind2
-     *            The second kind to match.
+     *            The second kind to match
      * @return {@code true} if the kinds match as described above, {@code false}
      *         otherwise.
      */
@@ -1358,8 +1358,8 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
      * Determines if the given kind is a compound assignment.
      *
      * @param kind
-     *            The kind to test.
-     * @return true if the given kind is a compound assignment.
+     *            The kind to test
+     * @return true if the given kind is a compound assignment
      */
     private static boolean isCompoundAssignment(Tree.Kind kind) {
       return kind == Tree.Kind.PLUS_ASSIGNMENT
@@ -1379,8 +1379,8 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
      * Determines if the given kind is a unary operator.
      *
      * @param kind
-     *            The kind to test.
-     * @return true if the given kind is a unary operator.
+     *            The kind to test
+     * @return true if the given kind is a unary operator
      */
     private static boolean isUnaryOperator(Tree.Kind kind) {
       return kind == Tree.Kind.POSTFIX_INCREMENT
@@ -1397,8 +1397,8 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
      * Determines if the given kind is a binary operator.
      *
      * @param kind
-     *            The kind to test.
-     * @return true if the given kind is a binary operator.
+     *            The kind to test
+     * @return true if the given kind is a binary operator
      */
     private static boolean isBinaryOperator(Tree.Kind kind) {
       return kind == Tree.Kind.MULTIPLY
@@ -1426,8 +1426,8 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
      * Determines if the given kind is a wildcard.
      *
      * @param kind
-     *            The kind to test.
-     * @return true if the given kind is a wildcard.
+     *            The kind to test
+     * @return true if the given kind is a wildcard
      */
     private static boolean isWildcard(Tree.Kind kind) {
       return kind == Tree.Kind.UNBOUNDED_WILDCARD
@@ -1457,8 +1457,8 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
    * Determines if the given kind is a compound assignment.
    *
    * @param kind
-   *            The kind to test.
-   * @return true if the given kind is a compound assignment.
+   *            The kind to test
+   * @return true if the given kind is a compound assignment
    */
   public static boolean isCompoundAssignment(Tree.Kind kind) {
     return kind == Tree.Kind.PLUS_ASSIGNMENT
@@ -1478,8 +1478,8 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
    * Determines if the given kind is a unary operator.
    *
    * @param kind
-   *            The kind to test.
-   * @return true if the given kind is a unary operator.
+   *            The kind to test
+   * @return true if the given kind is a unary operator
    */
   public static boolean isUnaryOperator(Tree.Kind kind) {
     return kind == Tree.Kind.POSTFIX_INCREMENT
@@ -1496,8 +1496,8 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
    * Determines if the given kind is a binary operator.
    *
    * @param kind
-   *            The kind to test.
-   * @return true if the given kind is a binary operator.
+   *            The kind to test
+   * @return true if the given kind is a binary operator
    */
   public static boolean isBinaryOperator(Tree.Kind kind) {
     return kind == Tree.Kind.MULTIPLY || kind == Tree.Kind.DIVIDE
@@ -1574,8 +1574,8 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
    * Determines if the given kind is a wildcard.
    *
    * @param kind
-   *            The kind to test.
-   * @return true if the given kind is a wildcard.
+   *            The kind to test
+   * @return true if the given kind is a wildcard
    */
   public static boolean isWildcard(Tree.Kind kind) {
     return kind == Tree.Kind.UNBOUNDED_WILDCARD
@@ -1587,8 +1587,8 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
    * Determines if the given kind is a declaration.
    *
    * @param kind
-   *            The kind to test.
-   * @return true if the given kind is a declaration.
+   *            The kind to test
+   * @return true if the given kind is a declaration
    */
   public static boolean isDeclaration(Tree.Kind kind) {
     return kind == Tree.Kind.ANNOTATION
@@ -1604,7 +1604,7 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
    *  given kind.
    *
    * @param kind
-   *            The kind to test.
+   *            The kind to test
    * @return true if the given kind can be identified by an {@code ASTPath}.
    */
   public static boolean isHandled(Tree.Kind kind) {

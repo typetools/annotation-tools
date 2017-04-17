@@ -55,7 +55,7 @@ Create and post to the web the entire distribution:
   ant -e web
 
 Run
-  checklink -q -r http://types.cs.washington.edu/annotation-file-utilities/
+  checklink -q -r https://checkerframework.org/annotation-file-utilities/
 and if there are any problems, re-make the distribution.
 
 Tag the release, for example:

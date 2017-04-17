@@ -6,7 +6,7 @@ When distributed, this is known as the Annotation File Utilities, which is
 one of its components; see the annotation-file-utilities subdirectory.
 
 The Annotation File Utilities homepage is:
-  http://types.cs.washington.edu/annotation-file-utilities/
+  https://checkerframework.org/annotation-file-utilities/
 and it also appears in this directory as:
   annotation-file-utilities/annotation-file-utilities.html
 

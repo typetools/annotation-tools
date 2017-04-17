@@ -19,11 +19,10 @@ public class AnnotationInsertion extends Insertion {
     /**
      * Creates a new insertion.
      *
-     * @param annotation the annotation to insert
+     * @param annotation the annotation to insert, which starts with "@"
      * @param criteria where to insert the annotation
      * @param separateLine whether to insert the annotation on its own
      */
-
     public AnnotationInsertion(String annotation, Criteria criteria, boolean separateLine) {
         super(criteria, separateLine);
         this.annotation = annotation;
@@ -64,7 +63,7 @@ public class AnnotationInsertion extends Insertion {
      * Gets the insertion text.
      *
      * @param comments
-     *            if true, the annotation will be surrounded by block comments.
+     *            if true, the annotation will be surrounded by block comments
      * @param abbreviate
      *            if true, the package name will be removed from the annotation.
      *            The package name can be retrieved again by calling the
@@ -103,7 +102,7 @@ public class AnnotationInsertion extends Insertion {
 
     /**
      * Gets the raw, unmodified annotation that was passed into the constructor.
-     * @return the annotation.
+     * @return the annotation
      */
     public String getAnnotation() {
         return annotation;

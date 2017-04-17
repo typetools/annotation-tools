@@ -3,7 +3,7 @@
 
 \bibitem[Che]{CF}
 {Checker Framework} website.
-\newblock \url{http://types.cs.washington.edu/checker-framework/}.
+\newblock \url{https://checkerframework.org/}.
 
 \bibitem[DDE{\etalchar{+}}11]{DietlDEMS2011}
 Werner Dietl, Stephanie Dietzel, Michael~D. Ernst, K{\i}van{\c{c}} Mu{\c{s}}lu,
@@ -16,7 +16,7 @@ Werner Dietl, Stephanie Dietzel, Michael~D. Ernst, K{\i}van{\c{c}} Mu{\c{s}}lu,
 \bibitem[Ern11]{JSR308-webpage-201110}
 Michael~D. Ernst.
 \newblock {Type Annotations} specification ({JSR} 308).
-\newblock \url{http://types.cs.washington.edu/jsr308/}, October 2011.
+\newblock \url{https://types.cs.washington.edu/jsr308/}, October 2011.
 
 \bibitem[LBR06]{LeavensBR2006:JML}
 Gary~T. Leavens, Albert~L. Baker, and Clyde Ruby.

@@ -38,9 +38,9 @@ public class ReceiverInsertion extends TypedInsertion {
      * there is a parameter following the inserted receiver pass {@code true} to
      * {@link #setAddComma(boolean)} to add a comma to the end of the receiver.
      *
-     * @param type the type to use when inserting the receiver.
-     * @param criteria where to insert the text.
-     * @param innerTypeInsertions the inner types to go on this receiver.
+     * @param type the type to use when inserting the receiver
+     * @param criteria where to insert the text
+     * @param innerTypeInsertions the inner types to go on this receiver
      */
     public ReceiverInsertion(DeclaredType type, Criteria criteria, List<Insertion> innerTypeInsertions) {
         super(type, criteria, innerTypeInsertions);

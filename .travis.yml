@@ -11,6 +11,7 @@ jdk:
 
 after_script:
   - |
+      set +e
       declare exitCode;
       curl -sSL https://raw.githubusercontent.com/mernst/travis-after-all/master/lib/travis-after-all.js | node
       exitCode=$?
@@ -19,7 +20,8 @@ after_script:
         if [[ ($TRAVIS_BRANCH == master) &&
               ($TRAVIS_PULL_REQUEST == false) ]] ; then
           curl -LO https://raw.github.com/mernst/plume-lib/master/bin/trigger-travis.sh
-          sh trigger-travis.sh eisop checker-framework $TRAVISTOKEN
+          SLUGOWNER=${TRAVIS_REPO_SLUG%/*}
+          sh trigger-travis.sh ${SLUGOWNER} checker-framework $TRAVISTOKEN
         fi
       fi
 

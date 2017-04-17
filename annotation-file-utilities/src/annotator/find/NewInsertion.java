@@ -31,9 +31,9 @@ public class NewInsertion extends TypedInsertion {
    * This can be done either before calling this constructor, or by modifying
    * the return value of {@link #getType()}.
    *
-   * @param type the type to use when inserting the receiver.
-   * @param criteria where to insert the text.
-   * @param innerTypeInsertions the inner types to go on this receiver.
+   * @param type the type to use when inserting the receiver
+   * @param criteria where to insert the text
+   * @param innerTypeInsertions the inner types to go on this receiver
    */
   public NewInsertion(Type type, Criteria criteria,
       List<Insertion> innerTypeInsertions) {
