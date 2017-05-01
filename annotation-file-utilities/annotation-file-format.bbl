@@ -9,9 +9,8 @@
 Werner Dietl, Stephanie Dietzel, Michael~D. Ernst, K{\i}van{\c{c}} Mu{\c{s}}lu,
   and Todd Schiller.
 \newblock Building and using pluggable type-checkers.
-\newblock In {\em ICSE'11, Proceedings of the 33rd International Conference on
-  Software Engineering}, pages 681--690, Waikiki, Hawaii, USA, May~25--27,
-  2011.
+\newblock In {\em ICSE 2011, Proceedings of the 33rd International Conference
+  on Software Engineering}, pages 681--690, Waikiki, Hawaii, USA, May 2011.
 
 \bibitem[Ern11]{JSR308-webpage-201110}
 Michael~D. Ernst.
