@@ -555,12 +555,9 @@ public class Main {
     Map<String, AScene> scenes = new HashMap<String, AScene>();
 
     // maintain imports info for annotations field
-    // @Key: base name of an annotation. e.g. for <code>@com.foo.bar(x)</code>, the base name is <code>bar</code>
-    // @Value: names of packages this annotation needs
-    // Note: due to the consideration of efficiency, this map made an assumption:
-    // there is no conflict happens among the base names of annotations
-    // e.g. below situation is assumed will NEVER happened:
-    // there are two inserted annotations: "@com.foo(x)" and "@bar.foo(x)" which have the same base name "foo"
+    // Key: full qualified name of an annotation. e.g. for <code>@com.foo.Bar(x)</code>,
+    // the full qualified name is <code>com.foo.Bar</code>
+    // Value: names of packages this annotation needs
     Map<String, Set<String>> annotationImports = new HashMap<>();
 
     IndexFileParser.setAbbreviate(abbreviate);
@@ -611,6 +608,7 @@ public class Main {
                 parsedSpec.size(), arg);
           }
           insertions.addAll(parsedSpec);
+          annotationImports.putAll(spec.annotationImports());
         } catch (RuntimeException e) {
           if (e.getCause() != null
               && e.getCause() instanceof FileNotFoundException) {
@@ -634,7 +632,6 @@ public class Main {
           }
           System.exit(1);
         }
-        annotationImports.putAll(spec.annotationImports());
       } else {
         throw new Error("Unrecognized file extension: " + arg);
       }
@@ -878,7 +875,7 @@ public class Main {
             }
             if (iToInsert instanceof AnnotationInsertion) {
                 AnnotationInsertion annoToInsert = (AnnotationInsertion) iToInsert;
-                Set<String> annoImports = annotationImports.get(annoToInsert.getAnnotationBaseName());
+                Set<String> annoImports = annotationImports.get(annoToInsert.getAnnotationFullQualifiedName());
                 if (annoImports != null) {
                     imports.addAll(annoImports);
                 }
