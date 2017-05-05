@@ -62,9 +62,10 @@ public final class AScene implements Cloneable {
     /**
      * Contains for each annotation type a set of imports to be added to
      *  the source if the annotation is inserted with the "abbreviate"
-     *  option on.
-     *  Key: base name of an annotation. e.g. for <code>@com.foo.bar(x)</code>, the base name is <code>bar</code>
-     *  Value: names of packages this annotation needs
+     *  option on.<br>
+     *  <strong>Key</strong>: full qualified name of an annotation. e.g. for <code>@com.foo.Bar(x)</code>,
+     *  the full qualified name is <code>com.foo.Bar</code> <br>
+     *  <strong>Value</strong>: names of packages this annotation needs
      */
     public final Map<String, Set<String>> imports =
         new LinkedHashMap<String, Set<String>>();

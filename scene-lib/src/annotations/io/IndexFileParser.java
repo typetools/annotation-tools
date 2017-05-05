@@ -565,7 +565,15 @@ public final class IndexFileParser {
         }
     }
 
-    private ScalarAFT parseScalarAFT(String annotationBaseName) throws IOException, ParseException {
+    /**
+     * Parse {@link ScalarAFT} of current parsing annotation.<br>
+     * <br>
+     * @param annotationFullQualifiedName the full qualified name of current parsing annotation.
+     * @return the {@link ScalarAFT} of current parsing annotation.
+     * @throws IOException if any IOException happened.
+     * @throws ParseException if any ParseException happened.
+     */
+    private ScalarAFT parseScalarAFT(String annotationFullQualifiedName) throws IOException, ParseException {
         for (BasicAFT baft : BasicAFT.bafts.values()) {
             if (matchKeyword(baft.toString())) {
                 return baft;
@@ -579,13 +587,13 @@ public final class IndexFileParser {
             if (abbreviate) {
               int i = name.lastIndexOf('.');
               if (i >= 0) {
-                String baseName = name.substring(i+1);
-                Set<String> importSet = scene.imports.get(annotationBaseName);
+                Set<String> importSet = scene.imports.get(annotationFullQualifiedName);
                 if (importSet == null) {
                   importSet = new TreeSet<String>();
-                  scene.imports.put(annotationBaseName, importSet);
+                  scene.imports.put(annotationFullQualifiedName, importSet);
                 }
                 importSet.add(name);
+                String baseName = name.substring(i+1);
                 name = baseName;
               }
             }
@@ -605,7 +613,15 @@ public final class IndexFileParser {
         }
     }
 
-    private AnnotationFieldType parseAFT(String annotationBaseName) throws IOException,
+    /**
+     * Parse {@link AnnotationFieldType} of current parsing annotation.
+     *
+     * @param annotationFullQualifiedName the full qualified name of the annotation.
+     * @return {@link AnnotationFieldType} of current parsing annotation.
+     * @throws IOException if any IOException happened.
+     * @throws ParseException if any ParseException happened.
+     */
+    private AnnotationFieldType parseAFT(String annotationFullQualifiedName) throws IOException,
             ParseException {
         if (matchKeyword("unknown")) {
             // Handle unknown[]; see AnnotationBuilder#addEmptyArrayField
@@ -613,7 +629,7 @@ public final class IndexFileParser {
             expectChar(']');
             return new ArrayAFT(null);
         }
-        ScalarAFT baseAFT = parseScalarAFT(annotationBaseName);
+        ScalarAFT baseAFT = parseScalarAFT(annotationFullQualifiedName);
         // only one level of array is permitted
         if (matchChar('[')) {
             expectChar(']');
@@ -640,7 +656,7 @@ public final class IndexFileParser {
         // yuck; it would be nicer to do a positive match
         while (st.ttype != TT_EOF && !checkKeyword("annotation")
                && !checkKeyword("class") && !checkKeyword("package")) {
-            AnnotationFieldType type = parseAFT(basename);
+            AnnotationFieldType type = parseAFT(fullName);
             String name = expectIdentifier();
             if (fields.containsKey(name)) {
                 throw new ParseException("Duplicate definition of field "
