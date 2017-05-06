@@ -12,7 +12,7 @@ public class AnnotationInsertion extends Insertion {
      */
     private final String annotation;
     /**
-     * the fully-qualified name of the annotation to be inserted.
+     * The fully-qualified name of the annotation to be inserted.
      */
     private final String annotationFullyQualifiedName;
     private String type;
@@ -23,7 +23,7 @@ public class AnnotationInsertion extends Insertion {
     /**
      * Creates a new insertion.
      *
-     * @param annotation the annotation to insert
+     * @param annotation the annotation to insert; starts with "@"
      * @param criteria where to insert the annotation
      * @param separateLine whether to insert the annotation on its own
      */
@@ -107,18 +107,19 @@ public class AnnotationInsertion extends Insertion {
     }
 
     /**
-     * Extract the fully-qualified name of the <code>annotation</code>.
-     * @param annotation the string representation of the <code>annotation</code> passed to the constructor
-     * @return given <code>@com.foo.Bar(baz)</code> it returns the fully-qualified name of this annotation
-     *         <code>com.foo.Bar</code>.
+     * Returns the fully-qualified name of the annotation, given its string representation.
+     * For example, given "@com.foo.Bar(baz)", returns "com.foo.Bar".
+     *
+     * @param annotation the string representation of the annotation; starts with "@"
+     * @return the fully-qualified name of the annotation, given its string representation
      */
     private static String extractAnnotationFullyQualifiedName(String annotation) {
         assert annotation.startsWith("@");
-        // annotation always starts with "@", so annotation name begin at least at index 1 in the string.
+        // annotation always starts with "@", so annotation name begins at index 1
         int nameBegin = 1;
-        int nameEnd = annotation.indexOf("(");
 
-        // for the case @TA, name end at the last index
+        int nameEnd = annotation.indexOf("(");
+        // If no argument (no parenthesis in string representation), use whole annotation
         if (nameEnd == -1) {
             nameEnd = annotation.length();
         }

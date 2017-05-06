@@ -547,12 +547,10 @@ public final class IndexFileParser {
     }
 
     /**
-     * Parse {@link ScalarAFT} of current parsing annotation.<br>
-     * <br>
-     * @param annotationFullyQualifiedName the fully-qualified name of current parsing annotation.
-     * @return the {@link ScalarAFT} of current parsing annotation.
-     * @throws IOException if any IOException happened.
-     * @throws ParseException if any ParseException happened.
+     * Get the {@link ScalarAFT} for the annotation currenttly being parsed.
+     *
+     * @param annotationFullyQualifiedName the fully-qualified name of current parsing annotation
+     * @return the {@link ScalarAFT} of current parsing annotation
      */
     private ScalarAFT parseScalarAFT(String annotationFullyQualifiedName) throws IOException, ParseException {
         for (BasicAFT baft : BasicAFT.bafts.values()) {
