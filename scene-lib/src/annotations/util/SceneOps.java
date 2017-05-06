@@ -44,7 +44,7 @@ public class SceneOps {
    * successful, the diff subcommand writes the scene it calculates to
    * {@link System#out}.
    *
-   * @throws IOException 
+   * @throws IOException
    */
   public static void main(String[] args) throws IOException {
     if (args.length != 3 || !"diff".equals(args[0])) {
@@ -121,7 +121,7 @@ public class SceneOps {
 /**
  * Visitor for calculating "set difference" of scenes.
  * Visitor methods fill in a scene instead of returning one because an
- * {@link AElement} can be created only inside an {@link AScene}. 
+ * {@link AElement} can be created only inside an {@link AScene}.
  *
  * @author dbro
  */
