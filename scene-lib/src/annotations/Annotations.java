@@ -171,10 +171,11 @@ public abstract class Annotations {
      * subannotations built by <code>af</code>.
      */
     private static Object convertAFV(ScalarAFT aft, Object x) {
-        if (aft instanceof AnnotationAFT)
+        if (aft instanceof AnnotationAFT) {
             return rebuild((Annotation) x);
-        else
+        } else {
             return x;
+        }
     }
 
     /**
@@ -196,9 +197,9 @@ public abstract class Annotations {
                         a.getFieldValue(fieldName);
 
                 Object nnFieldValue;
-                if (fieldValue != null)
+                if (fieldValue != null) {
                     nnFieldValue = fieldValue;
-                else throw new IllegalArgumentException(
+                } else throw new IllegalArgumentException(
                         "annotation has no field value");
 
                 if (fieldType instanceof ArrayAFT) {
@@ -209,14 +210,16 @@ public abstract class Annotations {
                     List<? extends Object> l =
                             (List<? extends Object>) fieldValue;
                     ScalarAFT nnElementType;
-                    if (aFieldType.elementType != null)
+                    if (aFieldType.elementType != null) {
                         nnElementType = aFieldType.elementType;
-                    else
+                    } else {
                         throw new IllegalArgumentException(
                                 "annotation field type is missing element type");
-                    for (Object o : l)
+                    }
+                    for (Object o : l) {
                         arrb.appendElement(convertAFV(
                                 nnElementType, o));
+                    }
                     arrb.finish();
                 } else {
                     ScalarAFT sFieldType =
@@ -226,8 +229,9 @@ public abstract class Annotations {
                 }
             }
             return ab.finish();
-        } else
+        } else {
             return null;
+        }
     }
 
 }

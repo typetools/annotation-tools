@@ -31,8 +31,9 @@ final class NotInMethodCriterion implements Criterion {
   public boolean isSatisfiedBy(TreePath path) {
     do {
       Tree.Kind kind = path.getLeaf().getKind();
-      if (kind == Tree.Kind.METHOD)
+      if (kind == Tree.Kind.METHOD) {
         return false;
+      }
       if (ASTPath.isClassEquiv(kind)) {
         return true;
       }

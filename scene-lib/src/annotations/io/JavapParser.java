@@ -60,8 +60,9 @@ public final class JavapParser {
     }
 
     private void trim(String prefix) {
-        if (line.startsWith(prefix))
+        if (line.startsWith(prefix)) {
             line = line.substring(prefix.length());
+        }
     }
 
     private boolean inMember() {
@@ -117,8 +118,9 @@ public final class JavapParser {
         while (line.startsWith(fieldIndent)) {
             String line2 = line.substring(fieldIndent.length());
             // Let the caller deal with location information, if any
-            if (line2.startsWith("target") || line2.startsWith("parameter"))
+            if (line2.startsWith("target") || line2.startsWith("parameter")) {
                 break;
+            }
             String fieldName =
                 line2.substring(line2.indexOf("//") + "//".length());
             nextLine();
@@ -196,9 +198,9 @@ public final class JavapParser {
                 line.substring(line.indexOf("//") + "//".length());
             TargetType targetType;
             TargetType tt = TargetType.valueOf(targetTypeName);
-            if (tt != null)
+            if (tt != null) {
                 targetType = tt;
-            else throw new RuntimeException("null target type");
+            } else throw new RuntimeException("null target type");
             nextLine();
             ATypeElement subOuterType;
             AElement subElement;
@@ -373,10 +375,11 @@ public final class JavapParser {
                     : line.substring(0, line.indexOf(' '));
             String pp = annotations.io.IOUtils.packagePart(className), bp = annotations.io.IOUtils.basenamePart(className);
             nextLine();
-            if (bp.equals("package-info"))
+            if (bp.equals("package-info")) {
                 parseClass(scene.packages.vivify(pp));
-            else
+            } else {
                 parseClass(scene.classes.vivify(className));
+            }
         }
         } catch (RuntimeException e) {
             throw new RuntimeException("Line " + lineNo, e);

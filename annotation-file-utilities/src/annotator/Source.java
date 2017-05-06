@@ -49,15 +49,17 @@ public final class Source {
 
         // Get the JSR-199 compiler.
         this.compiler = javax.tools.ToolProvider.getSystemJavaCompiler();
-        if (compiler == null)
+        if (compiler == null) {
             throw new CompilerException("could not get compiler instance");
+        }
 
         diagnostics = new DiagnosticCollector<JavaFileObject>();
 
         // Get the file manager for locating input files.
         this.fileManager = compiler.getStandardFileManager(diagnostics, null, null);
-        if (fileManager == null)
+        if (fileManager == null) {
             throw new CompilerException("could not get file manager");
+        }
 
         Iterable<? extends JavaFileObject> fileObjs = fileManager
             .getJavaFileObjectsFromStrings(Collections.singletonList(src));
@@ -74,8 +76,9 @@ public final class Source {
         // This seems to require that the file names end in .java
         CompilationTask cTask =
             compiler.getTask(null, fileManager, diagnostics, optsList, null, fileObjs);
-        if (!(cTask instanceof JavacTask))
+        if (!(cTask instanceof JavacTask)) {
             throw new CompilerException("could not get a valid JavacTask: " + cTask.getClass());
+        }
         this.task = (JavacTask)cTask;
         this.types = Types.instance(((JavacTaskImpl)cTask).getContext());
 
@@ -109,8 +112,9 @@ public final class Source {
         try {
             Set<CompilationUnitTree> compUnits = new HashSet<CompilationUnitTree>();
 
-            for (CompilationUnitTree tree : task.parse())
+            for (CompilationUnitTree tree : task.parse()) {
                 compUnits.add(tree);
+            }
 
             List<Diagnostic<? extends JavaFileObject>> errors = diagnostics.getDiagnostics();
             if (!diagnostics.getDiagnostics().isEmpty()) {

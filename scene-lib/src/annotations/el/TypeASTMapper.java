@@ -43,10 +43,11 @@ public abstract class TypeASTMapper<N> {
 
     private static ATypeElement getInnerType(ATypeElement te,
                                              List<TypePathEntry> ls) {
-        if (ls.isEmpty())
+        if (ls.isEmpty()) {
             return te;
-        else
+        } else {
             return te.innerTypes.vivify(new InnerTypeLocation(ls));
+        }
     }
 
     /**

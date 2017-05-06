@@ -283,10 +283,11 @@ extends EmptyVisitor {
         AnnotationDef ad = getAnnotationDef(desc);
 
         AnnotationBuilder ab = AnnotationFactory.saf.beginAnnotation(ad);
-        if (ab == null)
+        if (ab == null) {
           throw new IllegalArgumentException("bad description: " + desc);
-        else
+        } else {
           this.annotationBuilder = ab;
+        }
       }
 
       // For legal annotations, and except for xLocationsArgs, these should

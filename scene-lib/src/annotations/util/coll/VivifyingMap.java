@@ -31,9 +31,9 @@ public abstract class VivifyingMap<K, V> extends WrapperMap<K, V> {
      * and returned.
      */
     public V vivify(K k) {
-        if (containsKey(k))
+        if (containsKey(k)) {
             return get(k);
-        else {
+        } else {
             V v = createValueFor(k);
             put(k, v);
             return v;
@@ -50,10 +50,11 @@ public abstract class VivifyingMap<K, V> extends WrapperMap<K, V> {
                 = entrySet().iterator(); ei.hasNext(); ) {
             Map.Entry<K, V> e = ei.next();
             boolean subEmpty = subPrune(e.getValue());
-            if (subEmpty)
+            if (subEmpty) {
                 ei.remove();
-            else
+            } else {
                 empty = false;
+            }
         }
         return empty;
     }

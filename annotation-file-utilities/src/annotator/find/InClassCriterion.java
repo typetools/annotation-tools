@@ -73,8 +73,9 @@ public final class InClassCriterion implements Criterion {
   }
 
   public static boolean isSatisfiedBy(TreePath path, String className, boolean exactMatch) {
-    if (path == null)
+    if (path == null) {
       return false;
+    }
 
     // However much of the class name remains to match.
     String cname = className;

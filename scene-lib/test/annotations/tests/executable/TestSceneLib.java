@@ -627,8 +627,9 @@ public class TestSceneLib extends TestCase {
         MyTASTMapper mapper = new MyTASTMapper();
         mapper.traverse(tast, myAFieldType);
 
-        for (int i = 0; i < 11; i++)
+        for (int i = 0; i < 11; i++) {
             assertTrue(mapper.saw[i]);
+        }
         // make sure it vivified #10 and our annotation stuck
         AElement e10 = myAFieldType.innerTypes.get(
                 new InnerTypeLocation(TypeAnnotationPosition.getTypePathFromBinary(Arrays.asList(TYPE_ARGUMENT, 1, TYPE_ARGUMENT, 3))));

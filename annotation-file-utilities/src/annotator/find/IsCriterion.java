@@ -37,13 +37,16 @@ final class IsCriterion implements Criterion {
   /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path) {
-    if (path == null)
+    if (path == null) {
       return false;
+    }
     Tree tree = path.getLeaf();
-    if (CommonScanner.hasClassKind(tree))
+    if (CommonScanner.hasClassKind(tree)) {
       return InClassCriterion.isSatisfiedBy(path, name, /*exactMatch=*/ true);
-    if (tree.getKind() != kind)
+    }
+    if (tree.getKind() != kind) {
       return false;
+    }
     switch (tree.getKind()) {
     case VARIABLE:
       String varName = ((VariableTree)tree).getName().toString();

@@ -43,8 +43,9 @@ final class PackageCriterion implements Criterion {
         ExpressionTree pn = cu.getPackageName();
         assert ((pn instanceof IdentifierTree)
                 || (pn instanceof MemberSelectTree));
-        if (this.name.equals(pn.toString()))
+        if (this.name.equals(pn.toString())) {
           return true;
+        }
       }
     }
     Criteria.dbug.debug("PackageCriterion.isSatisfiedBy => false%n");

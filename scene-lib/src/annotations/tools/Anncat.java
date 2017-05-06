@@ -77,8 +77,9 @@ public class Anncat {
                     System.err.println("Reading class file " + infile + "...");
                     ClassFileReader.read(theScene, infile);
                     System.err.println("Finished.");
-                } else
+                } else {
                     usageAssert(false);
+                }
             }
 
             // Write the scene
@@ -107,8 +108,9 @@ public class Anncat {
                         overwrite = true;
                         idx++;
                         usageAssert(idx < args.length);
-                    } else
+                    } else {
                         overwrite = false;
+                    }
                     String origfile = args[idx];
                     idx++;
                     if (idx < args.length) {
@@ -127,8 +129,9 @@ public class Anncat {
                         ClassFileWriter.insert(theScene, origfile, overwrite);
                         System.err.println("Finished.");
                     }
-                } else
+                } else {
                     usageAssert(false);
+                }
             }
 
         } catch (FileIOException e) {

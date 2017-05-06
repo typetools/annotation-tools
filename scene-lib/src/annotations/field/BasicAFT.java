@@ -92,10 +92,11 @@ public final class BasicAFT extends ScalarAFT {
      */
     @Override
     public String toString() {
-        if (type == String.class)
+        if (type == String.class) {
             return "String";
-        else
+        } else {
             return type.getName();
+        }
     }
 
     /**

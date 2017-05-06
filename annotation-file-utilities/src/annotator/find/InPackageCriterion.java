@@ -35,8 +35,9 @@ final class InPackageCriterion implements Criterion {
   /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path) {
-    if (path == null)
+    if (path == null) {
       return false;
+    }
 
     Criteria.dbug.debug("InPackageCriterion.isSatisfiedBy(%s); this=%s",
         Main.pathToString(path), this.toString());

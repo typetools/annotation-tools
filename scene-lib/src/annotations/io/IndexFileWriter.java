@@ -108,13 +108,15 @@ public final class IndexFileWriter {
                 // watch out--could be an empty array of unknown type
                 // (see AnnotationBuilder#addEmptyArrayField)
                 if (aaft.elementType == null) {
-                    if (l.size() != 0)
+                    if (l.size() != 0) {
                         throw new AssertionError();
+                    }
                 } else {
                     boolean first = true;
                     for (Object o2 : l) {
-                        if (!first)
+                        if (!first) {
                             pw.print(',');
+                        }
                         printValue(aaft.elementType, o2);
                         first = false;
                     }
@@ -137,8 +139,9 @@ public final class IndexFileWriter {
             boolean first = true;
             for (Map. Entry<String, Object> f
                     : a.fieldValues.entrySet()) {
-                if (!first)
+                if (!first) {
                     pw.print(',');
+                }
                 pw.print(f.getKey() + "=");
                 printValue(a.def().fieldTypes.get(f.getKey()), f.getValue());
                 first = false;
@@ -257,10 +260,11 @@ public final class IndexFileWriter {
             pw.print(indentation + INDENT + INDENT + "inner-type");
             boolean first = true;
             for (TypePathEntry l : loc.location) {
-                if (first)
+                if (first) {
                     pw.print(' ');
-                else
+                } else {
                     pw.print(',');
+                }
                 pw.print(typePathEntryToString(l));
                 first = false;
             }

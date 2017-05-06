@@ -18,10 +18,11 @@ public abstract class Strings {
      */
     public static String escape(String in) {
         StringBuilder out = new StringBuilder("\"");
-        for (int pos = 0; pos < in.length(); pos++)
+        for (int pos = 0; pos < in.length(); pos++) {
             switch (in.charAt(pos)) {
             case '\n':
                 out.append("\\n");
+            }
                 break;
             case '\t':
                 out.append("\\t");

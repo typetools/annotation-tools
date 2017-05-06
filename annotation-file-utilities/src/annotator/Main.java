@@ -970,8 +970,9 @@ public class Main {
   }
 
   public static String pathToString(TreePath path) {
-    if (path == null)
+    if (path == null) {
       return "null";
+    }
     return treeToString(path.getLeaf());
   }
 

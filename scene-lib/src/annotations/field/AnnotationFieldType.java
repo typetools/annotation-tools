@@ -66,25 +66,28 @@ public abstract class AnnotationFieldType extends EqualByStringRepresentation {
      * called to unify the sub-definitions recursively.
      */
     public static final AnnotationFieldType unify(AnnotationFieldType aft1, AnnotationFieldType aft2) {
-        if (aft1.equals(aft2))
+        if (aft1.equals(aft2)) {
             return aft1;
-        else if (aft1 instanceof ArrayAFT && aft2 instanceof ArrayAFT) {
-            if (((ArrayAFT) aft1).elementType == null)
+        } else if (aft1 instanceof ArrayAFT && aft2 instanceof ArrayAFT) {
+            if (((ArrayAFT) aft1).elementType == null) {
                 return aft2;
-            else if (((ArrayAFT) aft2).elementType == null)
+            } else if (((ArrayAFT) aft2).elementType == null) {
                 return aft1;
-            else
+            } else {
                 return null;
+            }
         } else if (aft1 instanceof AnnotationAFT && aft2 instanceof AnnotationAFT) {
             AnnotationDef ud = AnnotationDef.unify(
                     ((AnnotationAFT) aft1).annotationDef,
                     ((AnnotationAFT) aft2).annotationDef);
-            if (ud == null)
+            if (ud == null) {
                 return null;
-            else
+            } else {
                 return new AnnotationAFT(ud);
-        } else
+            }
+        } else {
             return null;
+        }
     }
 
     public abstract <R, T> R accept(AFTVisitor<R, T> v, T arg);

@@ -420,8 +420,9 @@ public class IsSigMethodCriterion implements Criterion {
     while (p != null) {
       Tree leaf = p.getLeaf();
       assert leaf != null; /*nninvariant*/
-      if (kinds.contains(leaf.getKind()))
+      if (kinds.contains(leaf.getKind())) {
         return (ClassTree) leaf;
+      }
       p = p.getParentPath();
     }
 

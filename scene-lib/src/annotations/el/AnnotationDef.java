@@ -219,8 +219,9 @@ public final class AnnotationDef extends AElement {
                 AnnotationFieldType uaft = AnnotationFieldType.unify(aft1, aft2);
                 if (uaft == null) {
                     return null;
+                } else {
+                    newFieldTypes.put(fieldName, uaft);
                 }
-                else newFieldTypes.put(fieldName, uaft);
             }
             return new AnnotationDef(def1.name, def1.tlAnnotationsHere, newFieldTypes);
         } else {
