@@ -22,7 +22,6 @@ public abstract class Strings {
             switch (in.charAt(pos)) {
             case '\n':
                 out.append("\\n");
-            }
                 break;
             case '\t':
                 out.append("\\t");
@@ -39,7 +38,8 @@ public abstract class Strings {
             default:
                 out.append(in.charAt(pos));
             }
-        out.append('\"');
-        return out.toString();
+            out.append('\"');
+            return out.toString();
+        }
     }
 }
