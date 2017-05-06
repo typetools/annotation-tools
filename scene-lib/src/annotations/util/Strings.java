@@ -38,8 +38,8 @@ public abstract class Strings {
             default:
                 out.append(in.charAt(pos));
             }
-            out.append('\"');
-            return out.toString();
         }
+        out.append('\"');
+        return out.toString();
     }
 }
