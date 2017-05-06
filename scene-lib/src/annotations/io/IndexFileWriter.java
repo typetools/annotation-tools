@@ -393,9 +393,9 @@ public final class IndexFileWriter {
             if (!d.isWildcard()) {
                 type.DeclaredType inner = d.getInnerType();
                 Iterator<type.Type> iter = d.getTypeParameters().iterator();
-                //for (String s : d.getAnnotations()) {
+                // for (String s : d.getAnnotations()) {
                 //    pw.print(s + " ");
-                //}
+                // }
                 if (iter.hasNext()) {
                     pw.print("<");
                     printType(iter.next());

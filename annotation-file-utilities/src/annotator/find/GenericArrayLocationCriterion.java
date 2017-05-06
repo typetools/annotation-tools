@@ -255,7 +255,7 @@ public class GenericArrayLocationCriterion implements Criterion {
         locationRemaining.remove(locationRemaining.size()-1);
         leaf = fieldAccess.selected;
         pathRemaining = parentPath;
-            //TreePath.getPath(pathRemaining.getCompilationUnit(), leaf);
+            // TreePath.getPath(pathRemaining.getCompilationUnit(), leaf);
       } else if (loc.tag == TypePathEntryKind.WILDCARD
           && leaf.getKind() == Tree.Kind.UNBOUNDED_WILDCARD) {
         // Check if the leaf is an unbounded wildcard instead of the parent, since unbounded
@@ -299,8 +299,8 @@ public class GenericArrayLocationCriterion implements Criterion {
         locationRemaining.remove(i--);
         while (inner.getKind() == Tree.Kind.MEMBER_SELECT
             && !isStatic((JCFieldAccess) inner)) {
-          //fieldAccess.type != null && fieldAccess.type.getKind() == TypeKind.DECLARED
-          //&& fieldAccess.type.tsym.isStatic()
+          // fieldAccess.type != null && fieldAccess.type.getKind() == TypeKind.DECLARED
+          // && fieldAccess.type.tsym.isStatic()
           // TODO: check whether MEMBER_SELECT indicates inner or qualifier?
           if (i < 0) { break; }
           if (locationRemaining.get(i).tag != TypePathEntryKind.INNER_TYPE) {

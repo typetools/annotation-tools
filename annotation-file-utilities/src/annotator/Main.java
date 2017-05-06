@@ -233,7 +233,7 @@ public class Main {
         ASTPath p = entry.getKey();
         ATypeElement e = entry.getValue();
         insertAnnotations.put(p, e);
-        //visitTypeElement(e, insertAnnotations.vivify(p));
+        // visitTypeElement(e, insertAnnotations.vivify(p));
       }
       for (Map.Entry<ASTPath, ATypeElementWithType> entry :
           el0.insertTypecasts.entrySet()) {
@@ -243,10 +243,10 @@ public class Main {
         if (type instanceof type.DeclaredType
             && ((type.DeclaredType) type).getName().isEmpty()) {
           insertAnnotations.put(p, e);
-          //visitTypeElement(e, insertAnnotations.vivify(p));
+          // visitTypeElement(e, insertAnnotations.vivify(p));
         } else {
           insertTypecasts.put(p, e);
-          //visitTypeElementWithType(e, insertTypecasts.vivify(p));
+          // visitTypeElementWithType(e, insertTypecasts.vivify(p));
         }
       }
       return null;
@@ -461,7 +461,7 @@ public class Main {
         if (ins instanceof TypedInsertion) {
           TypedInsertion ti = (TypedInsertion) ins;
           if (!rec.astPath.isEmpty()) {
-            //addInnerTypePaths(decl, rec, ti, insertionSources);
+            // addInnerTypePaths(decl, rec, ti, insertionSources);
           }
           for (Insertion inner : ti.getInnerTypeInsertions()) {
             Tree t = ASTIndex.getNode(tree, rec);
@@ -705,7 +705,7 @@ public class Main {
               AScene scene = scenes.get(arg);
               Multimap<Insertion, Annotation> insertionSources =
                   insertionIndex.get(arg);
-              //String text =
+              // String text =
               //  ins.getText(comments, abbreviate, false, 0, '\0');
 
               // TODO: adjust for missing end of path (?)

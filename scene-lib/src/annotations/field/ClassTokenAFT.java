@@ -29,9 +29,9 @@ public final class ClassTokenAFT extends ScalarAFT {
      */
     public static final ClassTokenAFT ctaft = new ClassTokenAFT();
 
-    //public ClassTokenAFT(/* String parameterization */) {
+    // public ClassTokenAFT(/* String parameterization */) {
     //    /* this.parameterization = parameterization; */
-    //}
+    // }
 
     /**
      * {@inheritDoc}

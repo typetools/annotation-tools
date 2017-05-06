@@ -1,5 +1,5 @@
-//This is a wrapper class around an TypeAnnotationVisitor that can be used
-//to verify the information it visits specifies a valid [extended] annotation.
+// This is a wrapper class around an TypeAnnotationVisitor that can be used
+// to verify the information it visits specifies a valid [extended] annotation.
 
 package annotations.io.classfile;
 

@@ -230,7 +230,7 @@ public class IsSigMethodCriterion implements Criterion {
         if (someImport.contains("*")) {
           // don't include the * in the prefix, should end in .
           // TODO: this is a real bug due to nonnull, though I discovered it manually
-          //importPrefix = someImport.substring(0, importPrefix.indexOf("*"));
+          // importPrefix = someImport.substring(0, importPrefix.indexOf("*"));
           importPrefix = someImport.substring(0, someImport.indexOf("*"));
         } else {
           // if you imported a specific class, you can only use that import
@@ -314,12 +314,12 @@ public class IsSigMethodCriterion implements Criterion {
           Main.pathToString(path));
       return false;
     }
-    //else if ((((JCMethodDecl) leaf).mods.flags & Flags.GENERATEDCONSTR) != 0) {
+    // else if ((((JCMethodDecl) leaf).mods.flags & Flags.GENERATEDCONSTR) != 0) {
     //  Criteria.dbug.debug(
     //      "IsSigMethodCriterion.isSatisfiedBy(%s) => false: generated constructor%n",
     //      Main.pathToString(path));
     //  return false;
-    //}
+    // }
 
     MethodTree mt = (MethodTree) leaf;
 

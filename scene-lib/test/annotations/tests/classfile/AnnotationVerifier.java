@@ -118,7 +118,7 @@ public class AnnotationVerifier {
     private Map<String, AnnotationRecorder> anns;
     private Map<String, AnnotationRecorder> xanns;
 
-    //method specific annotations
+    // method specific annotations
     private Set<AnnotationRecorder> danns; // default annotations
     private Map<ParameterDescription, AnnotationRecorder> panns; // parameter annotations
 

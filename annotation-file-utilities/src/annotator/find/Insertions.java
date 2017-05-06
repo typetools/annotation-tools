@@ -82,8 +82,8 @@ public class Insertions implements Iterable<Insertion> {
       return 2;
     case CAST:
         return 1;
-    //case ANNOTATION:
-    //case CLOSE_PARENTHESIS:
+    // case ANNOTATION:
+    // case CLOSE_PARENTHESIS:
     default:
       return 0;
     }
@@ -105,7 +105,7 @@ public class Insertions implements Iterable<Insertion> {
               p2 == null ? ASTPath.empty() : p2);
           int c = r1.compareTo(r2);
           if (c == 0) {
-            //c = o1.getKind().compareTo(o2.getKind());
+            // c = o1.getKind().compareTo(o2.getKind());
             c = Integer.compare(kindLevel(o2), kindLevel(o1));  // descending
             if (c == 0) { c = o1.toString().compareTo(o2.toString()); }
           }
@@ -363,11 +363,11 @@ public class Insertions implements Iterable<Insertion> {
                   rec = rec.replacePath(p.getParentPath());
 
                   Collections.fill(loc0, TypePathEntry.ARRAY);
-                  //irec = rec;
-                  //if (node.getKind() == Tree.Kind.NEW_ARRAY) {
+                  // irec = rec;
+                  // if (node.getKind() == Tree.Kind.NEW_ARRAY) {
                   rec0 = rec.extend(Tree.Kind.NEW_ARRAY,
                       ASTPath.TYPE, 0);
-                  //}
+                  // }
                 }
               }
 
@@ -449,10 +449,10 @@ public class Insertions implements Iterable<Insertion> {
         }
       }
     }
-    //if (map.isEmpty()) {
+    // if (map.isEmpty()) {
     //  organized.addAll(unorganized);
     //  return organized;
-    //}
+    // }
     Collections.sort(list, byASTRecord);
     unorganized.addAll(list);
 
@@ -787,9 +787,9 @@ public class Insertions implements Iterable<Insertion> {
 
       organized.add(ins);
       if (tpes.isEmpty()) {
-        //assert ap1.equals(ap0) && !map.containsKey(ap0);
+        // assert ap1.equals(ap0) && !map.containsKey(ap0);
 //        organized.add(ins);
-        //map.put(rec, (TypedInsertion) ins);
+        // map.put(rec, (TypedInsertion) ins);
       } else {
         criteria.add(new ASTPathCriterion(ap0));
         criteria.add(new GenericArrayLocationCriterion(
@@ -1411,13 +1411,13 @@ loop:
       case INT:
         type = new DeclaredType(jtype.tsym.name.toString());
         break;
-      //case ERROR:
-      //case EXECUTABLE:
-      //case NONE:
-      //case NULL:
-      //case OTHER:
-      //case PACKAGE:
-      //case VOID:
+      // case ERROR:
+      // case EXECUTABLE:
+      // case NONE:
+      // case NULL:
+      // case OTHER:
+      // case PACKAGE:
+      // case VOID:
       default:
         break;
       }
@@ -1557,8 +1557,8 @@ loop:
         case INT: return "int";
         case LONG: return "long";
         case SHORT: return "short";
-        //case VOID: return "void";
-        //case WILDCARD: return "?";
+        // case VOID: return "void";
+        // case WILDCARD: return "?";
         default:
           throw new IllegalArgumentException("unexpected type kind "
               + typeKind);

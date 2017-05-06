@@ -1,6 +1,6 @@
-//This class is a complete ClassVisitor with many hidden classes that do
-//the work of parsing an AScene and inserting them into a class file, as
-//the original class file is being read.
+// This class is a complete ClassVisitor with many hidden classes that do
+// the work of parsing an AScene and inserting them into a class file, as
+// the original class file is being read.
 
 package annotations.io.classfile;
 
@@ -1009,7 +1009,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
     private void ensureVisitReceiverAnnotations() {
       AField aReceiver = aMethod.receiver;
 
-      //for (Annotation tla : aReceiver.tlAnnotationsHere) {
+      // for (Annotation tla : aReceiver.tlAnnotationsHere) {
       //  if (shouldSkip(tla)) continue;
       //
       //  AnnotationVisitor av = visitTypeAnnotation(tla, false);  // FIXME
@@ -1017,7 +1017,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
       //  visitLocations(av, InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION);
       //  visitFields(av, tla);
       //  av.visitEnd();
-      //}
+      // }
 
       for (Annotation tla : aReceiver.type.tlAnnotationsHere) {
         if (shouldSkip(tla)) {
@@ -1165,8 +1165,8 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
           if (strict) { System.err.println("ClassAnnotationSceneWriter.ensureMemberReferenceAnnotations: no bytecode offset found!"); }
           continue;
         }
-        //int offset = entry.getKey().offset;
-        //int typeIndex = entry.getKey().type_index;
+        // int offset = entry.getKey().offset;
+        // int typeIndex = entry.getKey().type_index;
         AMethod aLambda = entry.getValue();
 
         for (Map.Entry<Integer, AField> e0 : aLambda.parameters.entrySet()) {
@@ -1190,8 +1190,8 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
 
             TypeAnnotationVisitor xav = visitTypeAnnotation(tla, false);
             visitTargetType(xav, TargetType.METHOD_FORMAL_PARAMETER);
-            //visitOffset(xav, offset);
-            //visitTypeIndex(xav, typeIndex);
+            // visitOffset(xav, offset);
+            // visitTypeIndex(xav, typeIndex);
             visitParameterIndex(xav, index);
             visitLocations(xav, InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION);
             visitFields(xav, tla);
@@ -1209,8 +1209,8 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
 
               TypeAnnotationVisitor xav = visitTypeAnnotation(tla, false);
               visitTargetType(xav, TargetType.METHOD_FORMAL_PARAMETER);
-              //visitOffset(xav, offset);
-              //visitTypeIndex(xav, typeIndex);
+              // visitOffset(xav, offset);
+              // visitTypeIndex(xav, typeIndex);
               visitParameterIndex(xav, index);
               visitLocations(xav, aParameterLocation);
               visitFields(xav, tla);

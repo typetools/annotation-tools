@@ -69,7 +69,7 @@ public final class Source {
         // "target value 1.8 is obsolete and will be removed in a future release"
         final String[] stringOpts = new String[] { "-g", "-Xlint:-options" };
             // "-XDTA:noannotationsincomments"
-          //TODO: figure out if these options are necessary? "-source", "1.6x"
+          // TODO: figure out if these options are necessary? "-source", "1.6x"
         List<String> optsList = Arrays.asList(stringOpts);
 
         // Create a task.

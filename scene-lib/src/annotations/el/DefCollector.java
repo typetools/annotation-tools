@@ -100,7 +100,7 @@ public abstract class DefCollector {
         // circular references (e.g. Documented and Retention).  When it is
         // fixed, uncomment it
         //
-        //collect((AElement)d);
+        // collect((AElement)d);
     }
 
     private void collect(AElement e)

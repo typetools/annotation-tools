@@ -86,7 +86,7 @@ public class AnonymousClassScanner extends TreePathScanner<Void, Integer> {
 
   @Override
   public Void visitNewClass(NewClassTree node, Integer level) {
-    //if (level < 2) {
+    // if (level < 2) {
       if (!found && anonclass.getKind() == Tree.Kind.NEW_CLASS) {
         if (anonclass == node) {
           found = true;
@@ -99,7 +99,7 @@ public class AnonymousClassScanner extends TreePathScanner<Void, Integer> {
         }
       }
       super.visitNewClass(node, level + 1);
-    //}
+    // }
     return null;
   }
 }

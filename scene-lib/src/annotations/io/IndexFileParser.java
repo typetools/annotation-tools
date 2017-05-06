@@ -503,11 +503,11 @@ public final class IndexFileParser {
         String name = expectQualifiedName();
         AnnotationDef d = defs.get(name);
         if (d == null) {
-            //System.err.println("No definition for annotation type " + name);
-            //System.err.printf("  defs contains %d entries%n", defs.size());
-            //for (Map.Entry<String,AnnotationDef> entry : defs.entrySet()) {
+            // System.err.println("No definition for annotation type " + name);
+            // System.err.printf("  defs contains %d entries%n", defs.size());
+            // for (Map.Entry<String,AnnotationDef> entry : defs.entrySet()) {
             //    System.err.printf("    defs entry: %s => %s%n", entry.getKey(), entry.getValue());
-            //}
+            // }
             throw new ParseException("No definition for annotation type " + name);
         }
         return d;
@@ -902,7 +902,7 @@ public final class IndexFileParser {
             }
         }
 
-        //parseBlock(m.body, true);
+        // parseBlock(m.body, true);
         parseASTInsertions(m);
     }
 
@@ -1108,9 +1108,9 @@ public final class IndexFileParser {
                 }
                 AMethod m = exp.funs.vivify(loc);
                 expectChar(':');
-                //parseAnnotations(m);
+                // parseAnnotations(m);
                 parseLambda(m);
-                //parseMethod(m);
+                // parseMethod(m);
             }
         }
         return evermatched;
@@ -1148,10 +1148,10 @@ public final class IndexFileParser {
                 i.setType(new DeclaredType());
                 parseInnerTypes(i);
             } else {
-                //astPath = fixNewArrayType(astPath);  // handle special case
-                //ATypeElement i = decl.insertAnnotations.vivify(astPath);
-                //parseAnnotations(i);
-                //parseInnerTypes(i);
+                // astPath = fixNewArrayType(astPath);  // handle special case
+                // ATypeElement i = decl.insertAnnotations.vivify(astPath);
+                // parseAnnotations(i);
+                // parseInnerTypes(i);
                 int offset = 0;
                 Pair<ASTPath, InnerTypeLocation> pair =
                         splitNewArrayType(astPath);  // handle special case
@@ -1515,7 +1515,7 @@ public final class IndexFileParser {
                 matchChar(':');
             } else {
                 pkg = expectQualifiedName();
-                //AElement p = scene.packages.vivify(pkg);
+                // AElement p = scene.packages.vivify(pkg);
                 AClass p = scene.classes.vivify(pkg + ".package-info");
                 expectChar(':');
                 p = scene.classes.vivify(pkg + ".package-info");

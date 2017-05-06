@@ -730,7 +730,7 @@ extends EmptyVisitor {
       if (xLocationsArgs.isEmpty()) {
         // TODO: resolve issue once classfile format is finalized
         if (aElement instanceof AClass) {
-          //handleFieldOnClass((AClass) aElement);
+          // handleFieldOnClass((AClass) aElement);
           if (strict) { System.err.println("Unhandled FIELD annotation for " + aElement); }
         } else if (aElement instanceof ATypeElement) {
           aElement.tlAnnotationsHere.add(makeAnnotation());
@@ -740,7 +740,7 @@ extends EmptyVisitor {
       } else {
         // TODO: resolve issue once classfile format is finalized
         if (aElement instanceof AClass) {
-          //handleFieldGenericArrayOnClass((AClass) aElement);
+          // handleFieldGenericArrayOnClass((AClass) aElement);
           if (strict) { System.err.println("Unhandled FIELD_COMPONENT annotation for " + aElement); }
         } else if (aElement instanceof ATypeElement) {
           ATypeElement aTypeElement = (ATypeElement) aElement;
@@ -909,8 +909,8 @@ extends EmptyVisitor {
 
     private void handleNewTypeArgument(AMethod aMethod) {
       if (xLocationsArgs.isEmpty()) {
-        //aMethod.news.vivify(makeOffset()).innerTypes.vivify();
-            //makeInnerTypeLocation()).tlAnnotationsHere.add(makeAnnotation());
+        // aMethod.news.vivify(makeOffset()).innerTypes.vivify();
+            // makeInnerTypeLocation()).tlAnnotationsHere.add(makeAnnotation());
         if (strict) { System.err.println("Unhandled handleNewTypeArgument on aMethod: " + aMethod); }
       } else {
         // if (strict) { System.err.println("Unhandled handleNewTypeArgumentGenericArray on aMethod: " + aMethod); }
@@ -951,7 +951,7 @@ extends EmptyVisitor {
     }
 
     private void handleMethodTypeParameter(AMethod aMethod) {
-      //TODO: throw new RuntimeException("METHOD_TYPE_PARAMETER: to do");
+      // TODO: throw new RuntimeException("METHOD_TYPE_PARAMETER: to do");
     }
 
     /*
@@ -1065,7 +1065,7 @@ extends EmptyVisitor {
       } else {
         Class<?> vc = value.getClass();
         aft = BasicAFT.forType(vc);
-        //or: aft = (ScalarAFT) AnnotationFieldType.fromClass(vc, null);
+        // or: aft = (ScalarAFT) AnnotationFieldType.fromClass(vc, null);
       }
       assert aft != null;
       prepareForElement(aft);

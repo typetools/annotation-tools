@@ -200,7 +200,9 @@ public final class JavapParser {
             TargetType tt = TargetType.valueOf(targetTypeName);
             if (tt != null) {
                 targetType = tt;
-            } else throw new RuntimeException("null target type");
+            } else {
+                throw new RuntimeException("null target type");
+            }
             nextLine();
             ATypeElement subOuterType;
             AElement subElement;
@@ -259,7 +261,7 @@ public final class JavapParser {
                 List<Integer> location = parseInnerTypeLocationNums();
                 InnerTypeLocation itl = new InnerTypeLocation(TypeAnnotationPosition.getTypePathFromBinary(location));
                 subElement = subOuterType.innerTypes.vivify(itl);
-            //} else
+            // } else
             //    subElement = subOuterType;
             return subElement;
         default:
