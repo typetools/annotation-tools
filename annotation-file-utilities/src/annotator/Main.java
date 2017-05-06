@@ -555,9 +555,8 @@ public class Main {
     Map<String, AScene> scenes = new HashMap<String, AScene>();
 
     // maintain imports info for annotations field
-    // Key: full qualified name of an annotation. e.g. for <code>@com.foo.Bar(x)</code>,
-    // the full qualified name is <code>com.foo.Bar</code>
-    // Value: names of packages this annotation needs
+    // Key: fully-qualified annotation name. e.g. "com.foo.Bar" for annotation @com.foo.Bar(x).
+    // Value: names of packages this annotation needs.
     Map<String, Set<String>> annotationImports = new HashMap<>();
 
     IndexFileParser.setAbbreviate(abbreviate);
@@ -875,7 +874,7 @@ public class Main {
             }
             if (iToInsert instanceof AnnotationInsertion) {
                 AnnotationInsertion annoToInsert = (AnnotationInsertion) iToInsert;
-                Set<String> annoImports = annotationImports.get(annoToInsert.getAnnotationFullQualifiedName());
+                Set<String> annoImports = annotationImports.get(annoToInsert.getAnnotationFullyQualifiedName());
                 if (annoImports != null) {
                     imports.addAll(annoImports);
                 }
