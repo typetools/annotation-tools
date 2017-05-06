@@ -312,8 +312,9 @@ public final class JavapParser {
                 System.out.println("Got unrecognized section " + secTitle);
                 nextLine();
                 // Skip the section
-                while (inData())
+                while (inData()) {
                     nextLine();
+                }
             }
         }
     }

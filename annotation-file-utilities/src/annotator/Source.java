@@ -88,8 +88,9 @@ public final class Source {
         FileInputStream in = new FileInputStream(src);
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         int c;
-        while ((c = in.read()) != -1)
+        while ((c = in.read()) != -1) {
             bytes.write(c);
+        }
         in.close();
         source.append(bytes.toString());
         bytes.close();

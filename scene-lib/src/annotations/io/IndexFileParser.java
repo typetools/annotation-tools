@@ -198,10 +198,11 @@ public final class IndexFileParser {
         if (x.length() == 0 || !Character.isJavaIdentifierStart(x.charAt(0))
                 || knownKeywords.contains(x))
             return false;
-        for (int i = 1; i < x.length(); i++)
+        for (int i = 1; i < x.length(); i++) {
             if (!Character.isJavaIdentifierPart(x.charAt(i))) {
                 return false;
             }
+        }
         return true;
     }
 
@@ -260,8 +261,9 @@ public final class IndexFileParser {
     // an identifier, or a sequence of dot-separated identifiers
     private String expectQualifiedName() throws IOException, ParseException {
         String name = expectIdentifier();
-        while (matchChar('.'))
+        while (matchChar('.')) {
             name += '.' + expectIdentifier();
+        }
         return name;
     }
 
@@ -516,8 +518,9 @@ public final class IndexFileParser {
     private Annotation parseAnnotationBody(AnnotationDef d, AnnotationBuilder ab) throws IOException, ParseException {
         if (matchChar('(')) {
             parseAnnotationField(d, ab);
-            while (matchChar(','))
+            while (matchChar(',')) {
                 parseAnnotationField(d, ab);
+            }
             expectChar(')');
         }
         Annotation ann = ab.finish();
@@ -705,8 +708,9 @@ public final class IndexFileParser {
             locNumbers.add(offset + expectNonNegative(matchNNInteger()));
             // TODO: currently, we simply read the binary representation.
             // Should we read a higher-level format?
-            while (matchChar(','))
+            while (matchChar(',')) {
                 locNumbers.add(expectNonNegative(matchNNInteger()));
+            }
             InnerTypeLocation loc;
             try {
                 loc = new InnerTypeLocation(TypeAnnotationPosition.getTypePathFromBinary(locNumbers));
@@ -1484,20 +1488,26 @@ public final class IndexFileParser {
         parseAnnotations(c);
         parseBounds(c.bounds);
 
-        while (checkKeyword("extends"))
+        while (checkKeyword("extends")) {
             parseExtends(c);
-        while (checkKeyword("implements"))
+        }
+        while (checkKeyword("implements")) {
             parseImplements(c);
+        }
         parseASTInsertions(c);
 
-        while (checkKeyword("field"))
+        while (checkKeyword("field")) {
             parseField(c);
-        while (checkKeyword("staticinit"))
+        }
+        while (checkKeyword("staticinit")) {
             parseStaticInit(c);
-        while (checkKeyword("instanceinit"))
+        }
+        while (checkKeyword("instanceinit")) {
             parseInstanceInit(c);
-        while (checkKeyword("method"))
+        }
+        while (checkKeyword("method")) {
             parseMethod(c);
+        }
         c.methods.prune();
     }
 
