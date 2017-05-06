@@ -12,9 +12,9 @@ public class AnnotationInsertion extends Insertion {
      */
     private final String annotation;
     /**
-     * the full qualified name of the annotation to be inserted.
+     * the fully-qualified name of the annotation to be inserted.
      */
-    private final String annotationFullQualifiedName;
+    private final String annotationFullyQualifiedName;
     private String type;
     private boolean generateBound;
     private boolean generateExtends;
@@ -30,7 +30,7 @@ public class AnnotationInsertion extends Insertion {
     public AnnotationInsertion(String annotation, Criteria criteria, boolean separateLine) {
         super(criteria, separateLine);
         this.annotation = annotation;
-        this.annotationFullQualifiedName = extractAnnotationFullQualifiedName(annotation);
+        this.annotationFullyQualifiedName = extractAnnotationFullyQualifiedName(annotation);
         type = null;
         generateBound = false;
         generateExtends = false;
@@ -106,12 +106,12 @@ public class AnnotationInsertion extends Insertion {
     }
 
     /**
-     * Extract the full qualified name of the <code>annotation</code>.
+     * Extract the fully-qualified name of the <code>annotation</code>.
      * @param annotation the string representation of the <code>annotation</code> passed to the constructor
-     * @return given <code>@com.foo.Bar(baz)</code> it returns the full qualified name of this annotation
+     * @return given <code>@com.foo.Bar(baz)</code> it returns the fully-qualified name of this annotation
      *         <code>com.foo.Bar</code>.
      */
-    private static String extractAnnotationFullQualifiedName(String annotation) {
+    private static String extractAnnotationFullyQualifiedName(String annotation) {
         assert annotation.startsWith("@");
         // annotation always starts with "@", so annotation name begin at least at index 1 in the string.
         int nameBegin = 1;
@@ -134,14 +134,14 @@ public class AnnotationInsertion extends Insertion {
     }
 
     /**
-     * Get the full qualified name of the annotation.<br>
-     * <br>
-     * E.g. given <code>@com.foo.Bar(baz)</code>, the full qualified name of this annotation
+     * Get the fully-qualified name of the annotation.
+     *
+     * <p>E.g. given <code>@com.foo.Bar(baz)</code>, the fully-qualified name of this annotation
      * is <code>com.foo.Bar</code>.
-     * @return the annotation full qualified name
+     * @return the annotation's fully-qualified name
      */
-    public String getAnnotationFullQualifiedName() {
-        return annotationFullQualifiedName;
+    public String getAnnotationFullyQualifiedName() {
+        return annotationFullyQualifiedName;
     }
 
     /** {@inheritDoc} */
