@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-//import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.IntFunction;
 import java.util.function.IntSupplier;
@@ -97,4 +96,3 @@ public class MemberReference<T> {
         .collect(java.util.stream.Collectors.joining(" ")));
   }
 }
-

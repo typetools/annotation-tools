@@ -50,7 +50,6 @@ import annotations.el.InnerTypeLocation;
 import annotations.el.LocalLocation;
 import annotations.el.RelativeLocation;
 import annotations.el.TypeIndexLocation;
-//import annotations.field.AFTVisitor;
 import annotations.field.AnnotationAFT;
 import annotations.field.AnnotationFieldType;
 import annotations.field.ArrayAFT;

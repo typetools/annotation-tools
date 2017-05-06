@@ -6,7 +6,6 @@ import java.util.List;
 import javax.lang.model.type.TypeKind;
 
 import annotations.el.InnerTypeLocation;
-//only used for debugging
 import annotator.Main;
 
 import com.sun.source.tree.AnnotatedTypeTree;
