@@ -378,7 +378,7 @@ public abstract class Insertion {
      * type, based on the insertion's type path.
      *
      * @param innerTypeInsertions
-     *          The insertions to add to the type. These must be inner type
+     *          the insertions to add to the type. These must be inner type
      *          insertions, meaning each of the insertions' {@link Criteria}
      *          must contain a {@link GenericArrayLocationCriterion} and
      *          {@link GenericArrayLocationCriterion#getLocation()} must return a

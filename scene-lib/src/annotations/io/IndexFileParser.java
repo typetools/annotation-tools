@@ -1362,7 +1362,7 @@ public final class IndexFileParser {
      *
      * @param kind the kind of this AST entry
      * @param legalChildSelectors a list of the legal child selectors for this AST entry
-     * @return a new {@link ASTPath.ASTEntry}.
+     * @return a new {@link ASTPath.ASTEntry}
      * @throws ParseException if an illegal argument is found
      */
     private ASTPath.ASTEntry newASTEntry(Kind kind, String[] legalChildSelectors) throws IOException, ParseException {

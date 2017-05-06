@@ -504,7 +504,7 @@ public class GenericArrayLocationCriterion implements Criterion {
   /**
    * Gets the type path location of this criterion.
    *
-   * @return an unmodifiable list of {@link TypePathEntry}s.
+   * @return an unmodifiable list of {@link TypePathEntry}s
    */
   public List<TypePathEntry> getLocation() {
     return Collections.unmodifiableList(location);
