@@ -565,7 +565,7 @@ public final class IndexFileParser {
         }
     }
 
-    private ScalarAFT parseScalarAFT() throws IOException, ParseException {
+    private ScalarAFT parseScalarAFT(String annotationBaseName) throws IOException, ParseException {
         for (BasicAFT baft : BasicAFT.bafts.values()) {
             if (matchKeyword(baft.toString())) {
                 return baft;
@@ -580,18 +580,12 @@ public final class IndexFileParser {
               int i = name.lastIndexOf('.');
               if (i >= 0) {
                 String baseName = name.substring(i+1);
-                Set<String> set1 = scene.imports.get(name);
-                Set<String> set2 = scene.imports.get(baseName);
-                if (set1 == null) {
-                  set1 = new TreeSet<String>();
-                  scene.imports.put(name, set1);
+                Set<String> importSet = scene.imports.get(annotationBaseName);
+                if (importSet == null) {
+                  importSet = new TreeSet<String>();
+                  scene.imports.put(annotationBaseName, importSet);
                 }
-                if (set2 == null) {
-                  set2 = new TreeSet<String>();
-                  scene.imports.put(name, set2);
-                }
-                set1.add(name);
-                set2.add(name);
+                importSet.add(name);
                 name = baseName;
               }
             }
@@ -611,7 +605,7 @@ public final class IndexFileParser {
         }
     }
 
-    private AnnotationFieldType parseAFT() throws IOException,
+    private AnnotationFieldType parseAFT(String annotationBaseName) throws IOException,
             ParseException {
         if (matchKeyword("unknown")) {
             // Handle unknown[]; see AnnotationBuilder#addEmptyArrayField
@@ -619,7 +613,7 @@ public final class IndexFileParser {
             expectChar(']');
             return new ArrayAFT(null);
         }
-        ScalarAFT baseAFT = parseScalarAFT();
+        ScalarAFT baseAFT = parseScalarAFT(annotationBaseName);
         // only one level of array is permitted
         if (matchChar('[')) {
             expectChar(']');
@@ -646,7 +640,7 @@ public final class IndexFileParser {
         // yuck; it would be nicer to do a positive match
         while (st.ttype != TT_EOF && !checkKeyword("annotation")
                && !checkKeyword("class") && !checkKeyword("package")) {
-            AnnotationFieldType type = parseAFT();
+            AnnotationFieldType type = parseAFT(basename);
             String name = expectIdentifier();
             if (fields.containsKey(name)) {
                 throw new ParseException("Duplicate definition of field "

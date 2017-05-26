@@ -11,6 +11,8 @@ public class AnnotationInsertion extends Insertion {
      * The annotation to insert.
      */
     private final String annotation;
+    // the base name of the annotation to be inserted
+    private final String annotationBaseName;
     private String type;
     private boolean generateBound;
     private boolean generateExtends;
@@ -26,6 +28,7 @@ public class AnnotationInsertion extends Insertion {
     public AnnotationInsertion(String annotation, Criteria criteria, boolean separateLine) {
         super(criteria, separateLine);
         this.annotation = annotation;
+        this.annotationBaseName = extractAnnotationBaseName(annotation);
         type = null;
         generateBound = false;
         generateExtends = false;
@@ -101,11 +104,45 @@ public class AnnotationInsertion extends Insertion {
     }
 
     /**
+     * Extract the base name of the <code>annotation</code>.
+     * @param annotation the string representation of the <code>annotation</code> passed to the constructor
+     * @return given <code>@com.foo.bar(baz)</code> it returns the base name of this annotation
+     *         <code>bar</code>.
+     */
+    private String extractAnnotationBaseName(String annotation) {
+        assert annotation.startsWith("@");
+        // annotation always starts with "@", so annotation name begin at least at index 1 in the string.
+        int nameBegin = 1;
+        int nameEnd = annotation.indexOf("(");
+        int dotIndex = annotation.lastIndexOf(".", nameEnd);
+
+        // for the case @TA, name end at the last index
+        if (nameEnd == -1) {
+            nameEnd = annotation.length();
+        }
+
+        // base name begin at the next index of the last "." in
+        // the annotation string representation (if there were any "." exists)
+        if (dotIndex != -1) {
+            nameBegin = dotIndex + 1;
+        }
+        return annotation.substring(nameBegin, nameEnd);
+    }
+
+    /**
      * Gets the raw, unmodified annotation that was passed into the constructor.
      * @return the annotation
      */
     public String getAnnotation() {
         return annotation;
+    }
+
+    /**
+     * Get the base name of the annotation.
+     * @return the annotation base name
+     */
+    public String getAnnotationBaseName() {
+        return annotationBaseName;
     }
 
     /** {@inheritDoc} */

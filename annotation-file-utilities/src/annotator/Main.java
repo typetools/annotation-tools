@@ -554,6 +554,15 @@ public class Main {
     Map<Insertion, String> insertionOrigins = new HashMap<Insertion, String>();
     Map<String, AScene> scenes = new HashMap<String, AScene>();
 
+    // maintain imports info for annotations field
+    // @Key: base name of an annotation. e.g. for <code>@com.foo.bar(x)</code>, the base name is <code>bar</code>
+    // @Value: names of packages this annotation needs
+    // Note: due to the consideration of efficiency, this map made an assumption:
+    // there is no conflict happens among the base names of annotations
+    // e.g. below situation is assumed will NEVER happened:
+    // there are two inserted annotations: "@com.foo(x)" and "@bar.foo(x)" which have the same base name "foo"
+    Map<String, Set<String>> annotationImports = new HashMap<>();
+
     IndexFileParser.setAbbreviate(abbreviate);
     for (String arg : file_args) {
       if (arg.endsWith(".java")) {
@@ -625,6 +634,7 @@ public class Main {
           }
           System.exit(1);
         }
+        annotationImports.putAll(spec.annotationImports());
       } else {
         throw new Error("Unrecognized file extension: " + arg);
       }
@@ -865,6 +875,13 @@ public class Main {
               dbug.debug("Need import %s%n  due to insertion %s%n",
                   packageNames, toInsert);
               imports.addAll(packageNames);
+            }
+            if (iToInsert instanceof AnnotationInsertion) {
+                AnnotationInsertion annoToInsert = (AnnotationInsertion) iToInsert;
+                Set<String> annoImports = annotationImports.get(annoToInsert.getAnnotationBaseName());
+                if (annoImports != null) {
+                    imports.addAll(annoImports);
+                }
             }
           }
         }
