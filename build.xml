@@ -1,93 +1,108 @@
 <project name="annotation-tools" default="all">
 
-    <property file="${user.home}/.annotations-tools.properties" />
-    <property file="build.properties" />
+  <property file="${user.home}/.annotations-tools.properties" />
+  <property file="build.properties" />
 
-    <!-- default location of projects, has effect only if not previously set -->
-    <property name="asmx" location="asmx"/>
-    <property name="scene-lib" location="scene-lib"/>
-    <property name="afu" location="annotation-file-utilities"/>
+  <!-- default location of projects, has effect only if not previously set -->
+  <property name="asmx" location="asmx"/>
+  <property name="scene-lib" location="scene-lib"/>
+  <property name="afu" location="annotation-file-utilities"/>
 
-    <target name="all" description="Compile, run Javadoc, and run tests"
-	depends="compile,javadoc,test"/>
+  <target name="prep" description="Create required directories/files">
+    <!-- Ant's copy task does not retain file permissions,
+         so use <exec executable="cp"> instead.
+    <copy file="bin-devel/git.pre-commit" tofile="../.git/hooks/pre-commit" preservelastmodified="true" />
+    -->
+<!-- TODO
+    <exec executable="cp">
+      <arg value="-p"/>
+      <arg value=".git.pre-commit"/>
+      <arg value=".git/hooks/pre-commit"/>
+    </exec>
+-->
+  </target>
 
-    <target name="compile" description="Compile all annotation tools"
-        depends="compile-all"/>
+  <target name="all" description="Compile, run Javadoc, and run tests"
+      depends="prep,compile,javadoc,test"/>
 
-    <target name="test" description="Test all the tools"
-        depends="test-all"/>
+  <target name="compile" description="Compile all annotation tools"
+      depends="compile-all"/>
 
-    <target name="clean" depends="clean-all"/>
+  <target name="test" description="Test all the tools"
+      depends="test-all"/>
 
-    <target name="compile-asmx">
-        <ant dir="${asmx}" target="compile">
-            <property name="product.noshrink" value="true"/>
-        </ant>
-    </target>
+  <target name="clean" depends="clean-all"/>
 
-    <!-- TODO: Get this working -->
-    <!-- Known to fail -->
-    <target name="test-asmx">
-        <ant dir="${asmx}" target="test"/>
-    </target>
+  <target name="compile-asmx">
+      <ant dir="${asmx}" target="compile">
+	  <property name="product.noshrink" value="true"/>
+      </ant>
+  </target>
 
-    <target name="compile-scene-lib">
-        <ant dir="${scene-lib}" target="bin"/>
-    </target>
+  <!-- TODO: Get this working -->
+  <!-- Known to fail -->
+  <target name="test-asmx">
+      <ant dir="${asmx}" target="test"/>
+  </target>
 
-    <target name="javadoc-scene-lib">
-        <ant dir="${scene-lib}" target="javadoc"/>
-    </target>
+  <target name="compile-scene-lib">
+      <ant dir="${scene-lib}" target="bin"/>
+  </target>
 
-    <target name="test-scene-lib">
-        <ant dir="${scene-lib}" target="test"/>
-    </target>
+  <target name="javadoc-scene-lib">
+      <ant dir="${scene-lib}" target="javadoc"/>
+  </target>
 
-    <target name="compile-afu">
-        <ant dir="${afu}" target="jarfile"/>
-    </target>
+  <target name="test-scene-lib">
+      <ant dir="${scene-lib}" target="test"/>
+  </target>
 
-    <target name="javadoc-afu">
-        <ant dir="${afu}" target="javadoc"/>
-    </target>
+  <target name="compile-afu">
+      <ant dir="${afu}" target="jarfile"/>
+  </target>
 
-    <target name="test-afu">
-        <ant dir="${afu}" target="run-tests"/>
-    </target>
+  <target name="javadoc-afu">
+      <ant dir="${afu}" target="javadoc"/>
+  </target>
 
-    <target name="compile-all"
-           depends="compile-asmx,compile-scene-lib,compile-afu"/>
-    <!-- TODO: Add asmx tests when they work -->
-    <target name="test-all"
-           depends="test-scene-lib,test-afu"/>
-    <target name="clean-all">
-      <ant dir="${asmx}" target="clean"/>
-      <ant dir="${scene-lib}" target="clean"/>
-      <ant dir="${afu}" target="clean"/>
-    </target>
+  <target name="test-afu">
+      <ant dir="${afu}" target="run-tests"/>
+  </target>
 
-    <target name="javadoc" depends="javadoc-scene-lib,javadoc-afu">
-    </target>
+  <target name="compile-all"
+	 depends="compile-asmx,compile-scene-lib,compile-afu"/>
+  <!-- TODO: Add asmx tests when they work -->
+  <target name="test-all"
+	 depends="test-scene-lib,test-afu"/>
+  <target name="clean-all">
+    <ant dir="${asmx}" target="clean"/>
+    <ant dir="${scene-lib}" target="clean"/>
+    <ant dir="${afu}" target="clean"/>
+  </target>
 
-    <target name="tags-scene-lib">
-        <ant dir="${scene-lib}" target="tags"/>
-    </target>
+  <target name="javadoc" depends="javadoc-scene-lib,javadoc-afu">
+  </target>
 
-    <target name="tags-afu">
-        <ant dir="${afu}" target="tags"/>
-    </target>
+  <target name="tags-scene-lib">
+      <ant dir="${scene-lib}" target="tags"/>
+  </target>
 
-    <target name="tags" depends="tags-scene-lib,tags-afu">
-      <exec executable="etags" failonerror="true">
-	<arg value="-i"/>
-	<arg value="${scene-lib}/TAGS"/>
-	<arg value="-i"/>
-	<arg value="${afu}/TAGS"/>
-      </exec>
-    </target>
+  <target name="tags-afu">
+      <ant dir="${afu}" target="tags"/>
+  </target>
+
+  <target name="tags" depends="tags-scene-lib,tags-afu">
+    <exec executable="etags" failonerror="true">
+      <arg value="-i"/>
+      <arg value="${scene-lib}/TAGS"/>
+      <arg value="-i"/>
+      <arg value="${afu}/TAGS"/>
+    </exec>
+  </target>
 
   <target name="html-validate"
-	  description="Validate that HTML files are well-formed; only works with JDK 8">
+	  description="Validate that HTML files are well-formed; only works with JDK 8"
+	  depends="prep">
     <exec executable="html5validator">
       <arg value="--ignore"/>
       <arg value="/api/"/>
@@ -102,7 +117,8 @@
   <property name="style.args2" value="--exclude-dir=.git --exclude-dir=api --exclude-dir=asmx --exclude-dir=javadoc --exclude='*.aux' --exclude='*.class' --exclude='*.dvi' --exclude='*.eps' --exclude='*.jaif' --exclude='*.jar' --exclude='*.jtr' --exclude='*.log' --exclude='*.patch' --exclude='*.pdf' --exclude='*.png' --exclude='*.sty' --exclude='*.zip' --exclude='*~' --exclude='CFLogo.ai' --exclude='logfile.log.rec.index' --exclude='annotation-file-format.html' ."/>
 
   <target name="check-style"
-	  description="Check basic style guidelines">
+	  description="Check basic style guidelines"
+	  depends="prep">
     <!-- There should be a way to templatize the following. -->
     <exec executable="grep" outputproperty="trailingwhitespace" failonerror="false">
       <arg line="${style.args1}"/>
@@ -129,6 +145,53 @@
 	</not>
       </condition>
     </fail>
+  </target>
+
+  <fileset id="formatted.java.files" dir="." includes="**/*.java" excludes="**/asmx/"/>
+
+  <target name="-run-google-java-format.check">
+    <condition property="run-google-java-format.exists">
+      <available file=".run-google-java-format" type="dir"/>
+    </condition>
+  </target>
+
+  <target name="-get-run-google-java-format"
+          description="Obtain the run-google-java-format project"
+          depends="-run-google-java-format.check"
+          unless="run-google-java-format.exists">
+    <exec executable="git"
+          dir=".">
+      <arg value="clone"/>
+      <arg value="-q"/>
+      <arg value="https://github.com/plume-lib/run-google-java-format.git"/>
+      <arg value=".run-google-java-format"/>
+    </exec>
+  </target>
+
+  <target name="-update-run-google-java-format"
+          description="Update the run-google-java-format project"
+          depends="-get-run-google-java-format">
+    <exec executable="git"
+          dir=".run-google-java-format">
+      <arg value="pull"/>
+      <arg value="-q"/>
+    </exec>
+  </target>
+
+  <target name="reformat" depends="-update-run-google-java-format"
+          description="Reformat Java code">
+    <apply executable="python" failonerror="true">
+      <arg value="./.run-google-java-format/run-google-java-format.py"/>
+      <fileset refid="formatted.java.files"/>
+    </apply>
+  </target>
+
+  <target name="check-format" depends="-update-run-google-java-format"
+          description="Check Java code formatting">
+    <apply executable="python" failonerror="true">
+      <arg value="./.run-google-java-format/check-google-java-format.py"/>
+      <fileset refid="formatted.java.files"/>
+    </apply>
   </target>
 
 </project>

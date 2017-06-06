@@ -53,17 +53,20 @@ public abstract class DefCollector {
 
     private void collect(AScene s)
             throws DefException {
-        for (AElement p : s.packages.values())
+        for (AElement p : s.packages.values()) {
             collect(p);
-        for (AClass c : s.classes.values())
+        }
+        for (AClass c : s.classes.values()) {
             collect(c);
+        }
     }
 
     private void addToDefs(AnnotationDef d) throws DefException {
         // TODO: this mimics the condition we have in collect, but
         // i don't know if we need it
-        if (defs.contains(d))
+        if (defs.contains(d)) {
             return;
+        }
         AnnotationDef oldD = getDef(d.name);
         if (oldD == null) {
             defs.add(d);
@@ -83,9 +86,11 @@ public abstract class DefCollector {
         }
 
         // define the fields first
-        for (AnnotationFieldType aft : d.fieldTypes.values())
-            if (aft instanceof AnnotationAFT)
+        for (AnnotationFieldType aft : d.fieldTypes.values()) {
+            if (aft instanceof AnnotationAFT) {
                 collect(((AnnotationAFT) aft).annotationDef);
+            }
+        }
 
         addToDefs(d);
 
@@ -96,7 +101,7 @@ public abstract class DefCollector {
         // circular references (e.g. Documented and Retention).  When it is
         // fixed, uncomment it
         //
-        //collect((AElement)d);
+        // collect((AElement)d);
     }
 
     private void collect(AElement e)
@@ -121,17 +126,20 @@ public abstract class DefCollector {
     private void collect(ATypeElement e)
             throws DefException {
         collect((AElement) e);
-        for (AElement it : e.innerTypes.values())
+        for (AElement it : e.innerTypes.values()) {
             collect(it);
+        }
     }
 
     private void collect(ADeclaration d)
             throws DefException {
         collect((AElement) d);
-        for (ATypeElement ia : d.insertAnnotations.values())
+        for (ATypeElement ia : d.insertAnnotations.values()) {
             collect(ia);
-        for (ATypeElementWithType ic : d.insertTypecasts.values())
+        }
+        for (ATypeElementWithType ic : d.insertTypecasts.values()) {
             collect(ic);
+        }
     }
 
     private void collect(AField f)
@@ -141,34 +149,44 @@ public abstract class DefCollector {
 
     private void collect(AMethod m)
             throws DefException {
-        for (ATypeElement b : m.bounds.values())
+        for (ATypeElement b : m.bounds.values()) {
             collect(b);
+        }
         collect((ADeclaration) m);
         collect((ATypeElement) m.returnType);
         collect(m.receiver);
-        for (AElement p : m.parameters.values())
+        for (AElement p : m.parameters.values()) {
             collect(p);
-        for (AField l : m.body.locals.values())
+        }
+        for (AField l : m.body.locals.values()) {
             collect(l);
-        for (ATypeElement tc : m.body.typecasts.values())
+        }
+        for (ATypeElement tc : m.body.typecasts.values()) {
             collect(tc);
-        for (ATypeElement i : m.body.instanceofs.values())
+        }
+        for (ATypeElement i : m.body.instanceofs.values()) {
             collect(i);
-        for (ATypeElement n : m.body.news.values())
+        }
+        for (ATypeElement n : m.body.news.values()) {
             collect(n);
+        }
     }
 
     private void collect(AClass c)
             throws DefException {
         collect((ADeclaration) c);
-        for (ATypeElement b : c.bounds.values())
+        for (ATypeElement b : c.bounds.values()) {
             collect(b);
-        for (ATypeElement ei : c.extendsImplements.values())
+        }
+        for (ATypeElement ei : c.extendsImplements.values()) {
             collect(ei);
-        for (AMethod m : c.methods.values())
+        }
+        for (AMethod m : c.methods.values()) {
             collect(m);
-        for (AField f : c.fields.values())
+        }
+        for (AField f : c.fields.values()) {
             collect(f);
+        }
     }
 
     /**

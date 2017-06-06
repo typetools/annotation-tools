@@ -125,12 +125,12 @@ public class IndexFileMerger {
 */
 
         for (Map.Entry<String, AClass> entry : scene.classes.entrySet()) {
-          //final String classname = entry.getKey();
+          // final String classname = entry.getKey();
 
           entry.getValue().accept(new ElementVisitor<Void, Void>() {
-            //Map<String, String> annoPkgs = new HashMap<String, String>();
+            // Map<String, String> annoPkgs = new HashMap<String, String>();
 
-            //Void process(AElement el) {
+            // Void process(AElement el) {
             //  for (Annotation anno : el.tlAnnotationsHere) {
             //    AnnotationDef def = anno.def();
             //    String[] a = def.name.split("\\.");
@@ -146,7 +146,7 @@ public class IndexFileMerger {
             //    }
             //  }
             //  return null;
-            //}
+            // }
 
             Void visit(AElement el) {
               if (el != null) { el.accept(this, null); }
@@ -162,11 +162,11 @@ public class IndexFileMerger {
 
             @Override
             public Void visitAnnotationDef(AnnotationDef d, Void v) {
-              //String[] a = d.name.split("\\.");
-              //if (a.length > 2 && a[a.length-2].matches("quals?")) {
+              // String[] a = d.name.split("\\.");
+              // if (a.length > 2 && a[a.length-2].matches("quals?")) {
               //  String s = a[a.length-1];
               //  annoPkgs.put(s, d.name.substring(0));
-              //}
+              // }
               return null;  // process(d);
             }
 

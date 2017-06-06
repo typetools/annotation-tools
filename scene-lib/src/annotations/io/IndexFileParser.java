@@ -50,7 +50,6 @@ import annotations.el.InnerTypeLocation;
 import annotations.el.LocalLocation;
 import annotations.el.RelativeLocation;
 import annotations.el.TypeIndexLocation;
-//import annotations.field.AFTVisitor;
 import annotations.field.AnnotationAFT;
 import annotations.field.AnnotationFieldType;
 import annotations.field.ArrayAFT;
@@ -109,10 +108,11 @@ public final class IndexFileParser {
     }
 
     private int expectNonNegative(int i) throws ParseException {
-        if (i >= 0)
+        if (i >= 0) {
             return i;
-        else
+        } else {
             throw new ParseException("Expected a nonnegative integer, got " + st);
+        }
     }
 
     /** True if the next thing from st is the given character. */
@@ -134,8 +134,9 @@ public final class IndexFileParser {
         if (checkChar(c)) {
             st.nextToken();
             return true;
-        } else
+        } else {
             return false;
+        }
     }
 
     /**
@@ -147,8 +148,9 @@ public final class IndexFileParser {
         if (checkKeyword(s)) {
             st.nextToken();
             return true;
-        } else
+        } else {
             return false;
+        }
     }
 
     /** Reads from st.  If the result is not c, throws an exception. */
@@ -196,21 +198,24 @@ public final class IndexFileParser {
         if (x.length() == 0 || !Character.isJavaIdentifierStart(x.charAt(0))
                 || knownKeywords.contains(x))
             return false;
-        for (int i = 1; i < x.length(); i++)
-            if (!Character.isJavaIdentifierPart(x.charAt(i)))
+        for (int i = 1; i < x.length(); i++) {
+            if (!Character.isJavaIdentifierPart(x.charAt(i))) {
                 return false;
+            }
+        }
         return true;
     }
 
     private String checkIdentifier() {
-        if (st.sval == null)
+        if (st.sval == null) {
             return null;
-        else {
+        } else {
             String val = st.sval;
-            if (st.ttype == TT_WORD && isValidIdentifier(val))
+            if (st.ttype == TT_WORD && isValidIdentifier(val)) {
                 return st.sval;
-            else
+            } else {
                 return null;
+            }
         }
     }
 
@@ -219,8 +224,9 @@ public final class IndexFileParser {
         if (x != null) {
             st.nextToken();
             return x;
-        } else
+        } else {
             return null;
+        }
     }
 
     private String expectIdentifier() throws IOException, ParseException {
@@ -255,8 +261,9 @@ public final class IndexFileParser {
     // an identifier, or a sequence of dot-separated identifiers
     private String expectQualifiedName() throws IOException, ParseException {
         String name = expectIdentifier();
-        while (matchChar('.'))
+        while (matchChar('.')) {
             name += '.' + expectIdentifier();
+        }
         return name;
     }
 
@@ -274,8 +281,9 @@ public final class IndexFileParser {
         if (x >= -1) {
             st.nextToken();
             return x;
-        } else
+        } else {
             return -1;
+        }
     }
 
     // Mapping from primitive types and void to their corresponding
@@ -305,23 +313,26 @@ public final class IndexFileParser {
             BasicAFT baft = (BasicAFT) aft;
             Class<?> type = baft.type;
             if (type == boolean.class) {
-                if (matchKeyword("true"))
+                if (matchKeyword("true")) {
                     val = true;
-                else if (matchKeyword("false"))
+                } else if (matchKeyword("false")) {
                     val = false;
-                else
+                } else {
                     throw new ParseException("Expected `true' or `false'");
+                }
             } else if (type == char.class) {
-                if (st.ttype == '\'' && st.sval.length() == 1)
+                if (st.ttype == '\'' && st.sval.length() == 1) {
                     val = st.sval.charAt(0);
-                else
+                } else {
                     throw new ParseException("Expected a character literal");
+                }
                 st.nextToken();
             } else if (type == String.class) {
-                if (st.ttype == '"')
+                if (st.ttype == '"') {
                     val = st.sval;
-                else
+                } else {
                     throw new ParseException("Expected a string literal");
+                }
                 st.nextToken();
             } else {
                 if (st.ttype == TT_NUMBER) {
@@ -329,24 +340,26 @@ public final class IndexFileParser {
                     // TODO validate the literal better
                     // HMMM StreamTokenizer can't handle all floating point
                     // numbers; in particular, scientific notation is a problem
-                    if (type == byte.class)
+                    if (type == byte.class) {
                         val = (byte) n;
-                    else if (type == short.class)
+                    } else if (type == short.class) {
                         val = (short) n;
-                    else if (type == int.class)
+                    } else if (type == int.class) {
                         val = (int) n;
-                    else if (type == long.class)
+                    } else if (type == long.class) {
                         val = (long) n;
-                    else if (type == float.class)
+                    } else if (type == float.class) {
                         val = (float) n;
-                    else if (type == double.class)
+                    } else if (type == double.class) {
                         val = n;
-                    else
+                    } else {
                         throw new AssertionError();
+                    }
                     st.nextToken();
-                } else
+                } else {
                     throw new ParseException(
                             "Expected a number literal");
+                }
             }
             assert aft.isValidValue(val);
             return val;
@@ -366,12 +379,13 @@ public final class IndexFileParser {
                 ++arrays;
             }
             while (!matchKeyword("class")) {
-                if (st.ttype >= 0)
+                if (st.ttype >= 0) {
                     type.append((char) st.ttype);
-                else if (st.ttype == TT_WORD)
+                } else if (st.ttype == TT_WORD) {
                     type.append(st.sval);
-                else
+                } else {
                     throw new ParseException("Found something that doesn't belong in a signature");
+                }
                 st.nextToken();
             }
 
@@ -424,16 +438,18 @@ public final class IndexFileParser {
 
     private void parseAndAddArrayAFV(ArrayAFT aaft, ArrayBuilder arrb) throws IOException, ParseException {
         ScalarAFT comp;
-        if (aaft.elementType != null)
+        if (aaft.elementType != null) {
             comp = aaft.elementType;
-        else
+        } else {
             throw new IllegalArgumentException("array AFT has null elementType");
+        }
         if (matchChar('{')) {
             // read an array
             while (!matchChar('}')) {
                 arrb.appendElement(parseScalarAFV(comp));
-                if (!checkChar('}'))
+                if (!checkChar('}')) {
                     expectChar(',');
+                }
             }
         } else {
             // not an array, so try reading just one value as an array
@@ -470,14 +486,16 @@ public final class IndexFileParser {
                 expectChar('{');
                 expectChar('}');
                 ab.addEmptyArrayField(fieldName);
-            } else
+            } else {
                 parseAndAddArrayAFV(aaft, ab.beginArrayField(fieldName, aaft));
+            }
         } else if (aft instanceof ScalarAFT) {
             ScalarAFT saft = (ScalarAFT) aft;
             Object value = parseScalarAFV(saft);
             ab.addScalarField(fieldName, saft, value);
-        } else
+        } else {
             throw new AssertionError();
+        }
     }
 
     // reads the "@A" part of an annotation such as "@A(f1=5, f2=10)".
@@ -487,11 +505,11 @@ public final class IndexFileParser {
         String name = expectQualifiedName();
         AnnotationDef d = defs.get(name);
         if (d == null) {
-            //System.err.println("No definition for annotation type " + name);
-            //System.err.printf("  defs contains %d entries%n", defs.size());
-            //for (Map.Entry<String,AnnotationDef> entry : defs.entrySet()) {
+            // System.err.println("No definition for annotation type " + name);
+            // System.err.printf("  defs contains %d entries%n", defs.size());
+            // for (Map.Entry<String,AnnotationDef> entry : defs.entrySet()) {
             //    System.err.printf("    defs entry: %s => %s%n", entry.getKey(), entry.getValue());
-            //}
+            // }
             throw new ParseException("No definition for annotation type " + name);
         }
         return d;
@@ -500,8 +518,9 @@ public final class IndexFileParser {
     private Annotation parseAnnotationBody(AnnotationDef d, AnnotationBuilder ab) throws IOException, ParseException {
         if (matchChar('(')) {
             parseAnnotationField(d, ab);
-            while (matchChar(','))
+            while (matchChar(',')) {
                 parseAnnotationField(d, ab);
+            }
             expectChar(')');
         }
         Annotation ann = ab.finish();
@@ -605,8 +624,9 @@ public final class IndexFileParser {
         if (matchChar('[')) {
             expectChar(']');
             return new ArrayAFT(baseAFT);
-        } else
+        } else {
             return baseAFT;
+        }
     }
 
     private void parseAnnotationDef() throws IOException, ParseException {
@@ -664,12 +684,13 @@ public final class IndexFileParser {
         defs.put(ad.name, ad);
         // Add short name; but if it's already there, remove it to avoid ambiguity.
         if (! basename.equals(ad.name)) {
-            if (defs.containsKey(basename))
+            if (defs.containsKey(basename)) {
                 // not "defs.remove(basename)" because then a subsequent
                 // one could get added, which would be wrong.
                 defs.put(basename, null);
-            else
+            } else {
                 defs.put(basename, ad);
+            }
         }
     }
 
@@ -687,8 +708,9 @@ public final class IndexFileParser {
             locNumbers.add(offset + expectNonNegative(matchNNInteger()));
             // TODO: currently, we simply read the binary representation.
             // Should we read a higher-level format?
-            while (matchChar(','))
+            while (matchChar(',')) {
                 locNumbers.add(expectNonNegative(matchNNInteger()));
+            }
             InnerTypeLocation loc;
             try {
                 loc = new InnerTypeLocation(TypeAnnotationPosition.getTypePathFromBinary(locNumbers));
@@ -815,12 +837,13 @@ public final class IndexFileParser {
         expectChar('(');
         key += '(';
         while (!matchChar(':')) {
-            if (st.ttype >= 0)
+            if (st.ttype >= 0) {
                 key += st.ttype == 46 ? '/' :(char) st.ttype;
-            else if (st.ttype == TT_WORD)
+            } else if (st.ttype == TT_WORD) {
                 key += st.sval;
-            else
+            } else {
                 throw new ParseException("Found something that doesn't belong in a signature");
+            }
             st.nextToken();
         }
 
@@ -883,7 +906,7 @@ public final class IndexFileParser {
             }
         }
 
-        //parseBlock(m.body, true);
+        // parseBlock(m.body, true);
         parseASTInsertions(m);
     }
 
@@ -1089,9 +1112,9 @@ public final class IndexFileParser {
                 }
                 AMethod m = exp.funs.vivify(loc);
                 expectChar(':');
-                //parseAnnotations(m);
+                // parseAnnotations(m);
                 parseLambda(m);
-                //parseMethod(m);
+                // parseMethod(m);
             }
         }
         return evermatched;
@@ -1129,10 +1152,10 @@ public final class IndexFileParser {
                 i.setType(new DeclaredType());
                 parseInnerTypes(i);
             } else {
-                //astPath = fixNewArrayType(astPath);  // handle special case
-                //ATypeElement i = decl.insertAnnotations.vivify(astPath);
-                //parseAnnotations(i);
-                //parseInnerTypes(i);
+                // astPath = fixNewArrayType(astPath);  // handle special case
+                // ATypeElement i = decl.insertAnnotations.vivify(astPath);
+                // parseAnnotations(i);
+                // parseInnerTypes(i);
                 int offset = 0;
                 Pair<ASTPath, InnerTypeLocation> pair =
                         splitNewArrayType(astPath);  // handle special case
@@ -1343,7 +1366,7 @@ public final class IndexFileParser {
      *
      * @param kind the kind of this AST entry
      * @param legalChildSelectors a list of the legal child selectors for this AST entry
-     * @return a new {@link ASTPath.ASTEntry}.
+     * @return a new {@link ASTPath.ASTEntry}
      * @throws ParseException if an illegal argument is found
      */
     private ASTPath.ASTEntry newASTEntry(Kind kind, String[] legalChildSelectors) throws IOException, ParseException {
@@ -1465,20 +1488,26 @@ public final class IndexFileParser {
         parseAnnotations(c);
         parseBounds(c.bounds);
 
-        while (checkKeyword("extends"))
+        while (checkKeyword("extends")) {
             parseExtends(c);
-        while (checkKeyword("implements"))
+        }
+        while (checkKeyword("implements")) {
             parseImplements(c);
+        }
         parseASTInsertions(c);
 
-        while (checkKeyword("field"))
+        while (checkKeyword("field")) {
             parseField(c);
-        while (checkKeyword("staticinit"))
+        }
+        while (checkKeyword("staticinit")) {
             parseStaticInit(c);
-        while (checkKeyword("instanceinit"))
+        }
+        while (checkKeyword("instanceinit")) {
             parseInstanceInit(c);
-        while (checkKeyword("method"))
+        }
+        while (checkKeyword("method")) {
             parseMethod(c);
+        }
         c.methods.prune();
     }
 
@@ -1496,28 +1525,30 @@ public final class IndexFileParser {
                 matchChar(':');
             } else {
                 pkg = expectQualifiedName();
-                //AElement p = scene.packages.vivify(pkg);
+                // AElement p = scene.packages.vivify(pkg);
                 AClass p = scene.classes.vivify(pkg + ".package-info");
                 expectChar(':');
                 p = scene.classes.vivify(pkg + ".package-info");
                 parseAnnotations(p);
             }
 
-            if (pkg != null)
+            if (pkg != null) {
                 curPkgPrefix = pkg + ".";
-            else
+            } else {
                 curPkgPrefix = "";
+            }
 
             for (;;) {
-                if (checkKeyword("annotation"))
+                if (checkKeyword("annotation")) {
                     parseAnnotationDef();
-                else if (checkKeyword("class"))
+                } else if (checkKeyword("class")) {
                     parseClass();
-                else if (checkKeyword("package") || st.ttype == TT_EOF)
+                } else if (checkKeyword("package") || st.ttype == TT_EOF) {
                     break;
-                else
+                } else {
                     throw new ParseException("Expected: `annotation', `class', or `package'. Found: `"
                             + st.sval + "', ttype:" + st.ttype);
+                }
             }
         }
 

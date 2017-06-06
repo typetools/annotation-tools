@@ -96,7 +96,7 @@ public class MethodOffsetClassVisitor extends ClassWriter {
       super.visitTypeInsn(opcode, desc);
       switch (opcode) {
       case Opcodes.CHECKCAST:
-        //CastScanner.addCastToMethod(methodName, labelOffset() + 1);
+        // CastScanner.addCastToMethod(methodName, labelOffset() + 1);
         CastScanner.addCastToMethod(methodName,
             coa.getMethodCodeOffset());
         break;

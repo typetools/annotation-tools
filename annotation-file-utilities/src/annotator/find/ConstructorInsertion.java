@@ -32,13 +32,13 @@ public class ConstructorInsertion extends TypedInsertion {
   protected String getText(boolean comments, boolean abbreviate) {
     StringBuilder b = new StringBuilder();
     if (annotationsOnly) {
-      //List<String> annotations = type.getAnnotations();
-      //if (annotations.isEmpty()) { return ""; }
-      //for (String a : annotations) {
+      // List<String> annotations = type.getAnnotations();
+      // if (annotations.isEmpty()) { return ""; }
+      // for (String a : annotations) {
       //  b.append(a);
       //  b.append(' ');
-      //}
-      //return new AnnotationInsertion(b.toString(), getCriteria(),
+      // }
+      // return new AnnotationInsertion(b.toString(), getCriteria(),
       //    getSeparateLine()).getText(comments, abbreviate);
       return "";
     } else {

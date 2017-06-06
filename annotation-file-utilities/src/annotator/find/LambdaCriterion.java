@@ -52,7 +52,7 @@ public class LambdaCriterion implements Criterion {
     }
 
     if (parent.getKind() == Tree.Kind.LAMBDA_EXPRESSION) {
-      //LambdaExpressionTree lambdaTree = (LambdaExpressionTree) parent;
+      // LambdaExpressionTree lambdaTree = (LambdaExpressionTree) parent;
 
       int indexInSource = LambdaScanner.indexOfLambdaExpressionTree(path, parent);
       Criteria.dbug.debug("return source: %d%n", indexInSource);

@@ -142,8 +142,9 @@ public class LinkedHashKeyedSet<K, V> extends AbstractSet<V> implements KeyedSet
     @Override
     public boolean addAll(Collection<? extends V> c) {
         boolean changed = false;
-        for (V o : c)
+        for (V o : c) {
             changed |= add(o);
+        }
         return changed;
     }
 

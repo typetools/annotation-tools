@@ -1315,8 +1315,7 @@ loop:
         Tree parent = path.getParentPath().getLeaf();
         insertRecord = insertRecord.extend(Tree.Kind.METHOD, ASTPath.PARAMETER, -1);
         pos = ((JCTree) parent).getEndPosition(tree.endPositions) - 1;
-      } else
-      if (node.getKind() == Tree.Kind.METHOD
+      } else if (node.getKind() == Tree.Kind.METHOD
           && entry.childSelectorIs(ASTPath.TYPE)) {
         JCMethodDecl jcnode = (JCMethodDecl) node;
         Tree returnType = jcnode.getReturnType();
@@ -1792,7 +1791,9 @@ loop:
     List<? extends Tree> typeDecls = node.getTypeDecls();
     for (Insertion i : uninserted) {
       InClassCriterion c = i.getCriteria().getInClass();
-      if (c == null) continue;
+      if (c == null) {
+        continue;
+      }
       for (Tree t : typeDecls) {
         if (c.isSatisfiedBy(TreePath.getPath(node, t))) {
           // Avoid warnings about synthetic generated methods.

@@ -32,12 +32,14 @@ final class EnclosedByCriterion implements Criterion {
   @Override
   public boolean isSatisfiedBy(TreePath path) {
 
-    if (path == null)
+    if (path == null) {
       return false;
+    }
 
     for (Tree tree : path) {
-      if (tree.getKind() == kind)
+      if (tree.getKind() == kind) {
         return true;
+      }
     }
     return false;
   }

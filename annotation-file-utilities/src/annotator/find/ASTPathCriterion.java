@@ -80,7 +80,7 @@ public class ASTPathCriterion implements Criterion {
      * arguments have been previously validated.
      *
      * @param astPath
-     *            The AST path to match
+     *            the AST path to match
      */
     public ASTPathCriterion(ASTPath astPath) {
         this.astPath = astPath;
@@ -141,9 +141,9 @@ public class ASTPathCriterion implements Criterion {
         int astPathLen = astPath.size();
         int actualPathLen = actualPath.size();
         if (astPathLen == 0 || actualPathLen == 0) { return false; }
-        //if (actualPathLen != astPathLen + (isOnNewArrayType ? 0 : 1)) {
+        // if (actualPathLen != astPathLen + (isOnNewArrayType ? 0 : 1)) {
         //    return false;
-        //}
+        // }
 
         Tree next = null;
         int i = 0;
@@ -180,7 +180,7 @@ public class ASTPathCriterion implements Criterion {
                 System.out.println("next: " + next);
             }
 
-            //if (++i >= astPathLen || i >= actualPathLen) { break; }
+            // if (++i >= astPathLen || i >= actualPathLen) { break; }
             if (++i >= astPathLen) { break; }
             if (i >= actualPathLen) {
               return checkNull(actualPath, i-1);
@@ -226,8 +226,8 @@ public class ASTPathCriterion implements Criterion {
                 public Boolean
                 visitIdentifier(IdentifierTree v, Tree t) {
                     return v == t;
-                    //IdentifierTree i2 = (IdentifierTree) t;
-                    //return i1.getName().toString()
+                    // IdentifierTree i2 = (IdentifierTree) t;
+                    // return i1.getName().toString()
                     //        .equals(i2.getName().toString());
                 }
 
@@ -239,12 +239,12 @@ public class ASTPathCriterion implements Criterion {
                             a2.getUnderlyingType());
                 }
 
-                //@Override
-                //public Boolean
-                //visitArrayType(ArrayTypeTree b1, Tree t) {
+                // @Override
+                // public Boolean
+                // visitArrayType(ArrayTypeTree b1, Tree t) {
                 //    ArrayTypeTree b2 = (ArrayTypeTree) t;
                 //    return matchNext(b1.getType(), b2.getType());
-                //}
+                // }
 
                 @Override
                 public Boolean
@@ -260,10 +260,10 @@ public class ASTPathCriterion implements Criterion {
                 public Boolean
                 visitWildcard(WildcardTree d1, Tree t) {
                     return d1 == (WildcardTree) t;
-                    //WildcardTree d2 = (WildcardTree) t;
-                    //Tree bound2 = d2.getBound();
-                    //Tree bound1 = d1.getBound();
-                    //return bound1 == bound2 || matchNext(bound1, bound2);
+                    // WildcardTree d2 = (WildcardTree) t;
+                    // Tree bound2 = d2.getBound();
+                    // Tree bound1 = d1.getBound();
+                    // return bound1 == bound2 || matchNext(bound1, bound2);
                 }
 
                 @Override
@@ -539,10 +539,10 @@ public class ASTPathCriterion implements Criterion {
                     int arg = astNode.getArgument();
                     if (arg == 0 && astPath.size() == ix+1) {
                         return newArray;
-                        //if (astPath.size() != ix+1) { return null; }
-                        //return typeTree;
-                        //return ((ArrayTypeTree) typeTree).getType();
-                        //return newArray;
+                        // if (astPath.size() != ix+1) { return null; }
+                        // return typeTree;
+                        // return ((ArrayTypeTree) typeTree).getType();
+                        // return newArray;
                     }
                     typeTree = ((NewArrayTree) typeTree).getType();
                     while (--arg > 0) {
@@ -737,8 +737,8 @@ public class ASTPathCriterion implements Criterion {
         Tree.Kind kind = entry.getTreeKind();
 
         switch (kind) {
-        //case ANNOTATION:
-        //case INTERFACE:
+        // case ANNOTATION:
+        // case INTERFACE:
         case CLASS:  // "extends" clause?
             return ASTPath.isClassEquiv(kind)
                     && ix == last && entry.getArgument() == -1
@@ -767,8 +767,8 @@ public class ASTPathCriterion implements Criterion {
                 if (ix == last) { return true; }
                 VariableTree rcvrParam = method.getReceiverParameter();
                 if (rcvrParam == null) {  // TODO
-                  //ClassTree clazz = methodReceiverType(path);
-                  //return checkReceiverType(ix,
+                  // ClassTree clazz = methodReceiverType(path);
+                  // return checkReceiverType(ix,
                   //    ((JCTree.JCClassDecl) clazz).type);
                 } else {
                   return checkTypePath(ix+1, rcvrParam.getType());
@@ -781,12 +781,12 @@ public class ASTPathCriterion implements Criterion {
             int arg = entry.getArgument();
             if (entry.childSelectorIs(ASTPath.TYPE)) {
                 if (ix == last) { return true; }
-                //Tree t = newArray.getType();
-                //int depth = 1;
-                //while (t.getKind() == Tree.Kind.ARRAY_TYPE) {
+                // Tree t = newArray.getType();
+                // int depth = 1;
+                // while (t.getKind() == Tree.Kind.ARRAY_TYPE) {
                 //    t = ((ArrayTypeTree) t).getType();
                 //    ++depth;
-                //}
+                // }
                 return arg == arrayDepth(newArray);
             } else {
                 List<? extends ExpressionTree> typeTrees =
@@ -981,9 +981,9 @@ loop:       while (typeTree != null && i < astPath.size()) {
      * BinaryOperator.
      *
      * @param kind1
-     *            The first kind to match
+     *            the first kind to match
      * @param kind2
-     *            The second kind to match
+     *            the second kind to match
      * @return {@code true} if the kinds match as described above, {@code false}
      *         otherwise.
      */
@@ -1006,7 +1006,7 @@ loop:       while (typeTree != null && i < astPath.size()) {
      * Determines if the given kind is a binary operator.
      *
      * @param kind
-     *            The kind to test
+     *            the kind to test
      * @return true if the given kind is a binary operator
      */
     public boolean isBinaryOperator(Tree.Kind kind) {
@@ -1097,7 +1097,7 @@ loop:       while (typeTree != null && i < astPath.size()) {
      * Determines if the given kind is a wildcard.
      *
      * @param kind
-     *            The kind to test
+     *            the kind to test
      * @return true if the given kind is a wildcard
      */
     private boolean isWildcard(Tree.Kind kind) {

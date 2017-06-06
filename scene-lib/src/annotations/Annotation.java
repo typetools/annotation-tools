@@ -239,7 +239,7 @@ public final class Annotation {
 // package annotations;
 //
 // import org.checkerframework.checker.nullness.qual.Nullable;
-// 
+//
 // import annotations.el.*;
 // import annotations.util.coll.Keyer;
 //
