@@ -105,7 +105,7 @@ declaration annotations and also the type annotations that are introduced by Jav
 The file format provides a simple syntax to represent the structure of a Java
 program. For annotations in method bodies of \code{.class} files the annotation
 file closely follows
-section ``Class File Format Extensions'' of the JSR 308 design document~\cite{JSR308-webpage-201110},
+section ``Class File Format Extensions'' of the JSR 308 design document~\cite{JSR308-webpage-201310},
 which explains how the annotations are stored in the \code{.class}
 file.
 In that sense, the current design is extremely low-level, and users
@@ -322,7 +322,7 @@ public class Class<K extends Number> {
 \bnfnt{typeparam-bound} ::= \\
 % The bound should really be a sub-element of the typeparam!
 \qquad    \bnfcmt The integers are respectively the parameter and bound indexes of \\
-\qquad    \bnfcmt the type parameter bound~\cite{JSR308-webpage-201110}. \\
+\qquad    \bnfcmt the type parameter bound~\cite{JSR308-webpage-201310}. \\
 \qquad    \bnflit{bound} \bnfnt{integer} \bnflit{\&} \bnfnt{integer} \bnflit{:} \bnfnt{type-annotation}* \lineend \\
 \qquad    \bnfnt{compound-type}*
 \end{tabbing}
@@ -598,7 +598,7 @@ The grammar uses \bnflit{\#} for bytecode offsets and \bnflit{*} for source code
 \qquad \= \kill
 \bnfnt{variable-location} ::= \\
 \qquad    \bnfcmt Bytecode offset: the integers are respectively the index, start, and length \\
-\qquad    \bnfcmt fields of the annotations on this variable~\cite{JSR308-webpage-201110}. \\
+\qquad    \bnfcmt fields of the annotations on this variable~\cite{JSR308-webpage-201310}. \\
 \qquad    (\bnfnt{integer} \bnflit{\#} \bnfnt{integer} \bnflit{+} \bnfnt{integer}) \\
 \qquad    \bnfcmt Source code index: the \bnfnt{name} is the identifier of the local variable. \\
 \qquad    \bnfcmt The \bnfnt{integer} is the optional zero-based index of the intended local \\
@@ -614,12 +614,12 @@ The grammar uses \bnflit{\#} for bytecode offsets and \bnflit{*} for source code
 \\
 \bnfnt{typecast-location} ::= \\
 \qquad    \bnfcmt Bytecode offset: the first integer is the offset field and the optional \\
-\qquad    \bnfcmt second integer is the type index of an intersection type~\cite{JSR308-webpage-201110}. \\
+\qquad    \bnfcmt second integer is the type index of an intersection type~\cite{JSR308-webpage-201310}. \\
 \qquad    \bnfcmt The type index defaults to zero if not specified. \\
 \qquad    (\bnflit{\#} \bnfnt{integer} [ \bnflit{,} \bnfnt{integer} ]) \\
 \qquad    \bnfcmt Source code index: the first integer is the zero-based index of the typecast \\
 \qquad    \bnfcmt within the method and the optional second integer is the type index of an \\
-\qquad    \bnfcmt intersection type~\cite{JSR308-webpage-201110}. The type index defaults to zero if not specified. \\
+\qquad    \bnfcmt intersection type~\cite{JSR308-webpage-201310}. The type index defaults to zero if not specified. \\
 \qquad    \bnfor{} (\bnflit{*} \bnfnt{integer} [ \bnflit{,} \bnfnt{integer} ]) \\
 \\
 \bnfnt{typecast} ::= \\
@@ -627,7 +627,7 @@ The grammar uses \bnflit{\#} for bytecode offsets and \bnflit{*} for source code
 \qquad    \bnfnt{compound-type}* \\
 \\
 \bnfnt{instanceof-location} ::= \\
-\qquad    \bnfcmt Bytecode offset: the integer is the offset field of the annotation~\cite{JSR308-webpage-201110}. \\
+\qquad    \bnfcmt Bytecode offset: the integer is the offset field of the annotation~\cite{JSR308-webpage-201310}. \\
 \qquad    (\bnflit{\#} \bnfnt{integer}) \\
 \qquad    \bnfcmt Source code index: the integer is the zero-based index of the \code{instanceof} \\
 \qquad    \bnfcmt within the method. \\
@@ -638,7 +638,7 @@ The grammar uses \bnflit{\#} for bytecode offsets and \bnflit{*} for source code
 \qquad    \bnfnt{compound-type}* \\
 \\
 \bnfnt{new-location} ::= \\
-\qquad    \bnfcmt Bytecode offset: the integer is the offset field of the annotation~\cite{JSR308-webpage-201110}. \\
+\qquad    \bnfcmt Bytecode offset: the integer is the offset field of the annotation~\cite{JSR308-webpage-201310}. \\
 \qquad    (\bnflit{\#} \bnfnt{integer}) \\
 \qquad    \bnfcmt Source code index: the integer is the zero-based index of the object or array \\
 \qquad    \bnfcmt creation within the method. \\
@@ -649,7 +649,7 @@ The grammar uses \bnflit{\#} for bytecode offsets and \bnflit{*} for source code
 \qquad    \bnfnt{compound-type}*
 \\
 \bnfnt{call-location} ::= \\
-\qquad    \bnfcmt Bytecode offset: the integer is the offset field of the annotation~\cite{JSR308-webpage-201110}. \\
+\qquad    \bnfcmt Bytecode offset: the integer is the offset field of the annotation~\cite{JSR308-webpage-201310}. \\
 \qquad    (\bnflit{\#} \bnfnt{integer}) \\
 \qquad    \bnfcmt Source code index: the integer is the zero-based index of the method call \\
 \qquad    \bnfcmt within the field or method definition. \\
@@ -660,10 +660,10 @@ The grammar uses \bnflit{\#} for bytecode offsets and \bnflit{*} for source code
 \qquad    \bnfnt{typearg-definition}* \\
 \\
 \bnfnt{reference-location} ::= \\
-\qquad    \bnfcmt Bytecode offset: the integer is the offset field of the annotation~\cite{JSR308-webpage-201110}. \\
+\qquad    \bnfcmt Bytecode offset: the integer is the offset field of the annotation~\cite{JSR308-webpage-201310}. \\
 \qquad    (\bnflit{\#} \bnfnt{integer}) \\
 \qquad    \bnfcmt Source code index: the integer is the zero-based index of the member \\
-\qquad    \bnfcmt reference~\cite{JSR308-webpage-201110}. \\
+\qquad    \bnfcmt reference~\cite{JSR308-webpage-201310}. \\
 \qquad    \bnfor{} (\bnflit{*} \bnfnt{integer}) \\
 \\
 \bnfnt{reference} ::= \\
@@ -672,10 +672,10 @@ The grammar uses \bnflit{\#} for bytecode offsets and \bnflit{*} for source code
 \qquad    \bnfnt{typearg-definition}* \\
 \\
 \bnfnt{lambda-location} ::= \\
-\qquad    \bnfcmt Bytecode offset: the integer is the offset field of the annotation~\cite{JSR308-webpage-201110}. \\
+\qquad    \bnfcmt Bytecode offset: the integer is the offset field of the annotation~\cite{JSR308-webpage-201310}. \\
 \qquad    (\bnflit{\#} \bnfnt{integer}) \\
 \qquad    \bnfcmt Source code index: the integer is the zero-based index of the lambda \\
-\qquad    \bnfcmt expression~\cite{JSR308-webpage-201110}. \\
+\qquad    \bnfcmt expression~\cite{JSR308-webpage-201310}. \\
 \qquad    \bnfor{} (\bnflit{*} \bnfnt{integer}) \\
 \\
 \bnfnt{lambda} ::= \\
@@ -1087,7 +1087,7 @@ variables. Type annotations can be written on any use of a type, and on type
 parameter declarations. Type annotations must be meta-annotated
 with \code{ElementType.TYPE\_USE} and/or \code{ElementType.TYPE\_PARAMETER}.
 These meta-annotations are described in more detail in the JSR 308
-specification~\cite{JSR308-webpage-201110}.
+specification~\cite{JSR308-webpage-201310}.
 
 The previous rules have used two productions for annotation uses in an
 annotation file: \bnfnt{decl-annotation} and \bnfnt{type-annotation}.
