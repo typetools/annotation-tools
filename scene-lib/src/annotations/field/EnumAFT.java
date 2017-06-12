@@ -49,7 +49,7 @@ public final class EnumAFT extends ScalarAFT {
         String fieldValue = o.toString();
         if (!fieldValue.contains(".")) {
             // If fieldValue is not qualified, prepend the typeName
-            return typeName + fieldValue;
+            return typeName + "." + fieldValue;
         }
         return fieldValue;
     }
