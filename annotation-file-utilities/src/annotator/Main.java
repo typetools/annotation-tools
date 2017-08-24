@@ -873,11 +873,11 @@ public class Main {
               imports.addAll(packageNames);
             }
             if (iToInsert instanceof AnnotationInsertion) {
-                AnnotationInsertion annoToInsert = (AnnotationInsertion) iToInsert;
-                Set<String> annoImports = annotationImports.get(annoToInsert.getAnnotationFullyQualifiedName());
-                if (annoImports != null) {
-                    imports.addAll(annoImports);
-                }
+              AnnotationInsertion annoToInsert = (AnnotationInsertion) iToInsert;
+              Set<String> annoImports = annotationImports.get(annoToInsert.getAnnotationFullyQualifiedName());
+              if (annoImports != null) {
+                imports.addAll(annoImports);
+              }
             }
           }
         }
