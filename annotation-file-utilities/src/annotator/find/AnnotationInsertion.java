@@ -8,13 +8,18 @@ import plume.Pair;
 public class AnnotationInsertion extends Insertion {
 
     /**
-     * The annotation to insert.
+     * The annotation text to be inserted into source code, always starts with "@".
+     *
+     * E.g. An example would be <code>com.foo.Bar(baz)</code>
      */
-    private final String fullyQualifiedAnnotation;
+    private final String fullyQualifiedAnnotationText;
     /**
      * The fully-qualified name of the annotation to be inserted.
+     *
+     * E.g. Given an annotation <code>com.foo.Bar(baz)</code>,
+     * it's fully quailified name would be <code>com.foo.Bar</code>.
      */
-    private final String annotationFullyQualifiedName;
+    private final String fullyQualifiedAnnotationName;
 
     private String type;
     private boolean generateBound;
@@ -24,15 +29,16 @@ public class AnnotationInsertion extends Insertion {
     /**
      * Creates a new insertion.
      *
-     * @param fullyQualifiedAnnotation the annotation to insert; starts with "@", and must be a fully-qualified name
+     * @param fullyQualifiedAnnotationText the annotation text to be inserted into source code;
+     *        starts with "@", and must be a fully-qualified name
      * @param criteria where to insert the annotation
      * @param separateLine whether to insert the annotation on its own
      */
-    public AnnotationInsertion(String fullyQualifiedAnnotation, Criteria criteria, boolean separateLine) {
+    public AnnotationInsertion(String fullyQualifiedAnnotationText, Criteria criteria, boolean separateLine) {
         super(criteria, separateLine);
-        assert(fullyQualifiedAnnotation.startsWith("@") && fullyQualifiedAnnotation.contains("."));
-        this.fullyQualifiedAnnotation = fullyQualifiedAnnotation;
-        this.annotationFullyQualifiedName = extractAnnotationFullyQualifiedName();
+        assert(fullyQualifiedAnnotationText.startsWith("@") && fullyQualifiedAnnotationText.contains("."));
+        this.fullyQualifiedAnnotationText = fullyQualifiedAnnotationText;
+        this.fullyQualifiedAnnotationName = extractAnnotationFullyQualifiedName();
         type = null;
         generateBound = false;
         generateExtends = false;
@@ -78,7 +84,7 @@ public class AnnotationInsertion extends Insertion {
      * @return the text to insert
      */
     protected String getText(boolean comments, boolean abbreviate) {
-        String result = fullyQualifiedAnnotation;
+        String result = fullyQualifiedAnnotationText;
         if (abbreviate) {
             Pair<String, String> ps = removePackage(result);
             String packageName = ps.a;
@@ -115,25 +121,25 @@ public class AnnotationInsertion extends Insertion {
      * @return the fully-qualified name of the annotation, given its string representation
      */
     private String extractAnnotationFullyQualifiedName() {
-        assert fullyQualifiedAnnotation.startsWith("@");
+        assert fullyQualifiedAnnotationText.startsWith("@");
         // annotation always starts with "@", so annotation name begins at index 1
         int nameBegin = 1;
 
-        int nameEnd = fullyQualifiedAnnotation.indexOf("(");
+        int nameEnd = fullyQualifiedAnnotationText.indexOf("(");
         // If no argument (no parenthesis in string representation), use whole annotation
         if (nameEnd == -1) {
-            nameEnd = fullyQualifiedAnnotation.length();
+            nameEnd = fullyQualifiedAnnotationText.length();
         }
 
-        return fullyQualifiedAnnotation.substring(nameBegin, nameEnd);
+        return fullyQualifiedAnnotationText.substring(nameBegin, nameEnd);
     }
 
     /**
      * Gets the raw, unmodified annotation that was passed into the constructor.
-     * @return the annotation.
+     * @return the annotation
      */
     public String getAnnotation() {
-        return fullyQualifiedAnnotation;
+        return fullyQualifiedAnnotationText;
     }
 
     /**
@@ -144,7 +150,7 @@ public class AnnotationInsertion extends Insertion {
      * @return the annotation's fully-qualified name
      */
     public String getAnnotationFullyQualifiedName() {
-        return annotationFullyQualifiedName;
+        return fullyQualifiedAnnotationName;
     }
 
     /** {@inheritDoc} */
@@ -171,7 +177,7 @@ public class AnnotationInsertion extends Insertion {
     }
 
     public String toString() {
-        return fullyQualifiedAnnotation + " " + super.toString();
+        return fullyQualifiedAnnotationText + " " + super.toString();
     }
 
     public void setType(String s) {
