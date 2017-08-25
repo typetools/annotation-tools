@@ -12,10 +12,10 @@ Werner Dietl, Stephanie Dietzel, Michael~D. Ernst, K{\i}van{\c{c}} Mu{\c{s}}lu,
 \newblock In {\em ICSE 2011, Proceedings of the 33rd International Conference
   on Software Engineering}, pages 681--690, Waikiki, Hawaii, USA, May 2011.
 
-\bibitem[Ern11]{JSR308-webpage-201110}
+\bibitem[Ern13]{JSR308-webpage-201310}
 Michael~D. Ernst.
 \newblock {Type Annotations} specification ({JSR} 308).
-\newblock \url{https://types.cs.washington.edu/jsr308/}, October 2011.
+\newblock \url{https://checkerframework.org/jsr308/}, October 2013.
 
 \bibitem[LBR06]{LeavensBR2006:JML}
 Gary~T. Leavens, Albert~L. Baker, and Clyde Ruby.

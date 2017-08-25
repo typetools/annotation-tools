@@ -14,7 +14,6 @@ fi
 
 AFU=${AFU:-$(dirname $0)/..}
 ANNOTATION_FILE_UTILS=${AFU}/bin:${AFU}/../scene-lib/bin:${AFU}/../asmx/bin:${AFU}/annotation-file-utilities.jar
-# Contains new version of java.lang.annotation.ElementType.
 LANGTOOLS=${LANGTOOLS:-${AFU}/../../jsr308-langtools}
 JAVAC_JAR=${JAVAC_JAR:-${LANGTOOLS}/dist/lib/javac.jar}
 
@@ -25,9 +24,9 @@ if [ "$DEBUG" = "1" ]; then
   echo "LANGTOOLS=${LANGTOOLS}"
   echo "JAVAC_JAR=${JAVAC_JAR}"
   # Keep this in sync with the actual command below.
-  echo java -Xbootclasspath/p:${JAVAC_JAR} -ea -cp ${AFU}/lib/plume-core.jar:${ANNOTATION_FILE_UTILS}:${CLASSPATH} annotations.io.classfile.ClassFileReader "$@"
+  echo java -ea -cp ${JAVAC_JAR}:${AFU}/lib/plume-core.jar:${ANNOTATION_FILE_UTILS}:${CLASSPATH} annotations.io.classfile.ClassFileReader "$@"
   echo "--- end of extract-annotations debugging output"
 fi
 
 # Needs CLASSPATH to find user files
-java -Xbootclasspath/p:${JAVAC_JAR} -ea -cp ${AFU}/lib/plume-core.jar:${ANNOTATION_FILE_UTILS}:${CLASSPATH} annotations.io.classfile.ClassFileReader "$@"
+java -ea -cp ${JAVAC_JAR}:${AFU}/lib/plume-core.jar:${ANNOTATION_FILE_UTILS}:${CLASSPATH} annotations.io.classfile.ClassFileReader "$@"
