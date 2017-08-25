@@ -5,9 +5,8 @@
 set ANNOTATION_FILE_UTILS=%~d0
 set ANNOTATION_FILE_UTILS=%ANNOTATION_FILE_UTILS%%~p0
 set ANNOTATION_FILE_UTILS=%ANNOTATION_FILE_UTILS%\..\annotation-file-utilities.jar
-:: Contains new version of java.lang.annotation.ElementType.
 set JAVAC_JAR=%~d0
 set JAVAC_JAR=%ANNOTATION_FILE_UTILS%%~p0
 set JAVAC_JAR=%JAVAC_JAR%..\..\..\jsr308-langtools\dist\lib\javac.jar
 
-java -ea "-Xbootclasspath/p:%ANNOTATION_FILE_UTILS%;%JAVAC_JAR%" -Xbootclasspath/p:"%ANNOTATION_FILE_UTILS%" -cp "%ANNOTATION_FILE_UTILS%;%CLASSPATH%" annotator.Main %*
+java -ea -cp "%JAVAC_JAR%;%ANNOTATION_FILE_UTILS%;%CLASSPATH%" annotator.Main %*
