@@ -141,7 +141,7 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
     /**
      * Constructs a new AST entry, without an argument.
      *
-     * See {@link #ASTPath.ASTEntry(Tree.Kind, String, Integer)} for an example of the parameters.
+     * See {@link #ASTEntry(Tree.Kind, String, Integer)} for an example of the parameters.
      *
      * @param treeKind the kind of this AST entry
      * @param childSelector the child selector to this AST entry

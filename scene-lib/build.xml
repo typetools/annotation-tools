@@ -178,7 +178,6 @@
                executable="${annotations-compiler}/build/bin/javac">
             <src refid="sourcepath"/>
             <src refid="testpath"/>
-            <compilerarg value="-Xbootclasspath/p:${toString:libpath}"/>
             <!-- To prevent a cyclic dependency with the Checker
                  Framework, ignore type annotations in comments here.
                  A separate target could be added to check the qualifiers
@@ -210,9 +209,6 @@
     <target name="test-scene-lib" depends="init, bin">
         <mkdir dir="reports"/>
         <junit printsummary="withOutAndErr" showoutput="true" fork="yes" dir="." haltonerror="yes" haltonfailure="yes">
-            <!-- Option no longer exists in JDK 9.
-            <jvmarg value="-Xbootclasspath/p:${toString:libpath}"/>
-            -->
             <classpath refid="libpath"/>
             <formatter type="plain"/>
             <test name="annotations.tests.executable.TestSceneLib" todir="reports"/>
@@ -225,7 +221,6 @@
     <target name="test-classfile" depends="init, bin">
         <mkdir dir="reports"/>
         <junit printsummary="withOutAndErr" showoutput="true" fork="yes" dir="." haltonerror="yes" haltonfailure="yes">
-            <jvmarg value="-Xbootclasspath/p:${toString:libpath}"/>
             <classpath refid="libpath"/>
             <formatter type="plain"/>
             <test name="annotations.tests.classfile.AnnotationsTest" todir="reports"/>
@@ -299,6 +294,7 @@
                 destdir="javadoc"
                 access="public"
                 noqualifier="annotations:annotations.el:annotations.field:annotations.io:annotations.io.classfile:annotations.util:annotations.util.coll:java.lang"
+		failonerror="true"
                 />
     </target>
 

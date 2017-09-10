@@ -14,7 +14,6 @@ fi
 
 AFU=${AFU:-$(dirname $0)/..}
 ANNOTATION_FILE_UTILS=${AFU}/bin:${AFU}/../scene-lib/bin:${AFU}/../asmx/bin:${AFU}/annotation-file-utilities.jar
-# Contains new version of java.lang.annotation.ElementType.
 LANGTOOLS=${LANGTOOLS:-${AFU}/../../jsr308-langtools}
 JAVAC_JAR=${JAVAC_JAR:-${LANGTOOLS}/dist/lib/javac.jar}
 
@@ -25,12 +24,9 @@ if [ "$DEBUG" = "1" ]; then
   echo "LANGTOOLS=${LANGTOOLS}"
   echo "JAVAC_JAR=${JAVAC_JAR}"
   # Keep this in sync with the actual command below.
-  echo "java -ea -Xbootclasspath/p:${ANNOTATION_FILE_UTILS}:${JAVAC_JAR}:${CLASSPATH} -cp ${AFU}/lib/plume-lib.jar:${ANNOTATION_FILE_UTILS}:${CLASSPATH} annotations.io.classfile.ClassFileWriter $@"
+  echo "java -ea -cp ${JAVAC_JAR}:${AFU}/lib/plume-lib.jar:${ANNOTATION_FILE_UTILS}:${CLASSPATH} annotations.io.classfile.ClassFileWriter $@"
   echo "--- end of insert-annotations debugging output"
 fi
 
 # Needs CLASSPATH to find user files
-# TODO: It is not nice that the CLASSPATH has to be on the bootclasspath!
-# Without it, e.g. building the Checker Framework annotated JDK does
-# not work.
-java -ea -Xbootclasspath/p:${AFU}/lib/plume-lib.jar:${ANNOTATION_FILE_UTILS}:${JAVAC_JAR}:${CLASSPATH} -cp ${AFU}/lib/plume-lib.jar:${ANNOTATION_FILE_UTILS}:${CLASSPATH} annotations.io.classfile.ClassFileWriter "$@"
+java -ea -cp ${JAVAC_JAR}:${AFU}/lib/plume-lib.jar:${ANNOTATION_FILE_UTILS}:${CLASSPATH} annotations.io.classfile.ClassFileWriter "$@"
