@@ -169,34 +169,50 @@
             <fileset dir="src" excludes="**/*.java"/>
             <fileset dir="test" excludes="**/*.java"/>
         </copy>
-        <javac
-               destdir="bin"
-               debug="true"
-               classpathref="libpath"
+        <pathconvert pathsep=" " property="src.files.spaceseparated">
+            <path>
+                <fileset dir="src">
+                    <include name="**/*.java"/>
+                </fileset>
+                <fileset dir="test">
+                    <include name="**/*.java"/>
+                </fileset>
+            </path>
+        </pathconvert>
+        <java classpathref="libpath"
                classpath="${libpath}"
-               includeantruntime="false"
                fork="true"
-               executable="${annotations-compiler}/dist/bin/javac">
-            <src refid="sourcepath"/>
-            <src refid="testpath"/>
+               failonerror="true"
+               classname="com.sun.tools.javac.Main">
+            <arg value="-g"/>
+            <arg value="-sourcepath"/>
+            <!-- TODO: How can we convert a path to a variable?
+              <arg value="${sourcepath}:${testpath}"/>
+            -->
+            <!-- TODO: Note how this target puts source and test files
+                 into the same output directory and then in
+                 annotation-file-utilities/build.xml we need to filter
+                 out test files. -->
+            <arg value="src:test"/>
+            <arg value="-d"/>
+            <arg value="bin"/>
             <!-- To prevent a cyclic dependency with the Checker
                  Framework, ignore type annotations in comments here.
                  A separate target could be added to check the qualifiers
                  and have them in the generated code. -->
-            <compilerarg value="-XDTA:noannotationsincomments"/>
-            <compilerarg value="-Xlint:-options"/>
-            <compilerarg value="-Werror"/>
-            <compilerarg value="-version"/>
-            <!-- Make sure we only have Java 7 source code and generate Java 7 bytecode. -->
-            <compilerarg value="-source"/>
-            <compilerarg value="7"/>
-            <compilerarg value="-target"/>
-            <compilerarg value="7"/>
-            <classpath refid="libpath"/>
-            <!-- TODO: how can we include just these two files in testpath? -->
-            <compilerarg value="test/annotations/tests/classfile/AnnotationsTest.java"/>
-            <compilerarg value="test/annotations/tests/classfile/AnnotationVerifier.java"/>
-        </javac>
+            <arg value="-XDTA:noannotationsincomments"/>
+            <arg value="-Werror"/>
+            <arg value="-version"/>
+            <!-- Make sure we only have Java 8 source code and generate Java 8 bytecode. -->
+            <arg value="-source"/>
+            <arg value="8"/>
+            <arg value="-target"/>
+            <arg value="8"/>
+            <!-- To not get a warning about missing bootstrap
+                 classpath for Java 8 (once we use Java 9). -->
+            <arg value="-Xlint:-options"/>
+            <arg line="${src.files.spaceseparated}"/>
+        </java>
 <!--
        <pathconvert property="libpath" refid="libpath"/>
        <pathconvert property="source.files.java.spaceseparated" refid="source.files.java" pathsep=" "/>
@@ -300,7 +316,7 @@
                 destdir="javadoc"
                 access="public"
                 noqualifier="annotations:annotations.el:annotations.field:annotations.io:annotations.io.classfile:annotations.util:annotations.util.coll:java.lang"
-		failonerror="true"
+                failonerror="true"
                 />
     </target>
 
