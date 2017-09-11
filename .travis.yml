@@ -2,9 +2,7 @@ language: java
 
 script: ./.travis-build.sh
 
-sudo: required
-dist: trusty
-group: edge
+sudo: false
 
 jdk:
   - oraclejdk8
