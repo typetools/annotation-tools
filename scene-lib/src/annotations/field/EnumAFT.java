@@ -46,7 +46,12 @@ public final class EnumAFT extends ScalarAFT {
      */
     @Override
     public String format(Object o) {
-        return typeName + "." + o.toString();
+        String fieldValue = o.toString();
+        if (!fieldValue.contains(".")) {
+            // If fieldValue is not qualified, prepend the typeName
+            return typeName + "." + fieldValue;
+        }
+        return fieldValue;
     }
 
 

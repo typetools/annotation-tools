@@ -554,6 +554,11 @@ public class Main {
     Map<Insertion, String> insertionOrigins = new HashMap<Insertion, String>();
     Map<String, AScene> scenes = new HashMap<String, AScene>();
 
+    // maintain imports info for annotations field
+    // Key: fully-qualified annotation name. e.g. "com.foo.Bar" for annotation @com.foo.Bar(x).
+    // Value: names of packages this annotation needs.
+    Map<String, Set<String>> annotationImports = new HashMap<>();
+
     IndexFileParser.setAbbreviate(abbreviate);
     for (String arg : file_args) {
       if (arg.endsWith(".java")) {
@@ -602,6 +607,7 @@ public class Main {
                 parsedSpec.size(), arg);
           }
           insertions.addAll(parsedSpec);
+          annotationImports.putAll(spec.annotationImports());
         } catch (RuntimeException e) {
           if (e.getCause() != null
               && e.getCause() instanceof FileNotFoundException) {
@@ -865,6 +871,13 @@ public class Main {
               dbug.debug("Need import %s%n  due to insertion %s%n",
                   packageNames, toInsert);
               imports.addAll(packageNames);
+            }
+            if (iToInsert instanceof AnnotationInsertion) {
+              AnnotationInsertion annoToInsert = (AnnotationInsertion) iToInsert;
+              Set<String> annoImports = annotationImports.get(annoToInsert.getAnnotationFullyQualifiedName());
+              if (annoImports != null) {
+                imports.addAll(annoImports);
+              }
             }
           }
         }
