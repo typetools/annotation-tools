@@ -17,7 +17,7 @@ public class AnnotationInsertion extends Insertion {
      * The fully-qualified name of the annotation to be inserted.
      *
      * E.g. Given an annotation <code>com.foo.Bar(baz)</code>,
-     * it's fully quailified name would be <code>com.foo.Bar</code>.
+     * its fully quailified name would be <code>com.foo.Bar</code>.
      */
     private final String fullyQualifiedAnnotationName;
 
