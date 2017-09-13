@@ -10,6 +10,7 @@ env:
     - THIS_REPO=checker-framework
   matrix:
     - JDKVER=jdk8
+    - JDKVER=jdk22
 
 before_script:
 - docker pull mdernst/ubuntu-for-cf-$JDKVER
