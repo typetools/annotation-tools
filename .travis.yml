@@ -18,6 +18,7 @@ before_script:
 # with no error (!).
 script:
 - REMOTE_ORIGIN_URL=`git config --get remote.origin.url`
+- echo "THIS_REPO=${THIS_REPO}"
 - echo "JDKVER=${JDKVER}"
 - echo "TRAVIS_BRANCH=${TRAVIS_BRANCH}"
 - echo "REMOTE_ORIGIN_URL=${REMOTE_ORIGIN_URL}"
