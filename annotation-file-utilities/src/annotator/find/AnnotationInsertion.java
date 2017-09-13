@@ -36,7 +36,9 @@ public class AnnotationInsertion extends Insertion {
      */
     public AnnotationInsertion(String fullyQualifiedAnnotationText, Criteria criteria, boolean separateLine) {
         super(criteria, separateLine);
-        assert fullyQualifiedAnnotationText.startsWith("@") && fullyQualifiedAnnotationText.contains(".") : fullyQualifiedAnnotationText;
+        assert fullyQualifiedAnnotationText.startsWith("@") : fullyQualifiedAnnotationText;
+        // A fully-qualified name in the default package does not contain a period
+        // assert fullyQualifiedAnnotationText.contains(".") : fullyQualifiedAnnotationText;
         this.fullyQualifiedAnnotationText = fullyQualifiedAnnotationText;
         this.fullyQualifiedAnnotationName = extractAnnotationFullyQualifiedName();
         type = null;
