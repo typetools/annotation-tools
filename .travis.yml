@@ -8,9 +8,10 @@ services:
 env:
   global:
     - THIS_REPO=checker-framework
-  matrix:
+# "matrix" only seems to work if there is more than one item specified!
+# Reinstate when we have more than one configuration to test.
+#   matrix:
     - JDKVER=jdk8
-    - JDKVER=jdk22
 
 before_script:
 - docker pull mdernst/ubuntu-for-cf-$JDKVER
