@@ -1,14 +1,16 @@
 language: java
 
-script: ./.travis-build.sh
+# For an unknown reason, this isn't getting executed and I need to put it in the
+# jobs:include stages explicitly.
+# script: ./.travis-build.sh
 
 sudo: false
 
-jdk:
-  - oraclejdk8
-
 jobs:
   include:
+    - stage: test
+      jdk: oraclejdk8
+      script: echo "annotation-tools travis-build.sh script starting" && ./.travis-build.sh
     - stage: trigger-downstream
       jdk: oraclejdk8
       script: |
