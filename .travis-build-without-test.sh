@@ -31,4 +31,4 @@ fi
 
 ## Compile
 echo "running \"ant compile\" for annotation-tools"
-ant compile
+ant -d compile
