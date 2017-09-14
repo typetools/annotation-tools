@@ -7,11 +7,6 @@ export SHELLOPTS
 
 ./.travis-build-without-test.sh
 
-# For debugging
-echo "running: ant -d compile-scene-lib"
-ant -d compile-scene-lib
-echo "done running: ant -d compile-scene-lib"
-
 ant all
 
 ant check-style

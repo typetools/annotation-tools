@@ -107,6 +107,9 @@
     <exec executable="which">
       <arg value="html5validator"/>
     </exec>
+    <exec executable="echo">
+      <arg value="$PATH"/>
+    </exec>
     <exec executable="/usr/local/bin/html5validator">
       <arg value="--ignore"/>
       <arg value="/api/"/>
