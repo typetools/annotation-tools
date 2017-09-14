@@ -14,7 +14,9 @@ env:
   matrix:
     - JDKVER=jdk8
     - JDKVER=jdk22
-    allow_failures:
+
+matrix:
+  allow_failures:
     - JDKVER: jdk22
 
 before_script:
