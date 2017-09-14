@@ -31,4 +31,5 @@ fi
 
 ## Compile
 echo "running \"ant compile\" for annotation-tools"
+pwd
 ant -d compile
