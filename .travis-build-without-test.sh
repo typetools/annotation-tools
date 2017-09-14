@@ -33,3 +33,4 @@ fi
 echo "running \"ant compile\" for annotation-tools"
 pwd
 ant -d compile
+echo "done running \"ant compile\" for annotation-tools"
