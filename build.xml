@@ -30,7 +30,7 @@
       depends="compile-all"/>
 
   <target name="test" description="Test all the tools"
-      depends="test-all"/>
+      depends="prep,compile,test-all"/>
 
   <target name="clean" depends="clean-all"/>
 
@@ -104,13 +104,7 @@
   <target name="html-validate"
 	  description="Validate that HTML files are well-formed; only works with JDK 8"
 	  depends="prep">
-    <exec executable="which">
-      <arg value="html5validator"/>
-    </exec>
-    <exec executable="echo">
-      <arg value="$PATH"/>
-    </exec>
-    <exec executable="/usr/local/bin/html5validator">
+    <exec executable="html5validator">
       <arg value="--ignore"/>
       <arg value="/api/"/>
       <arg value="/build/"/>

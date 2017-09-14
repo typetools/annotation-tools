@@ -10,14 +10,10 @@ env:
     - THIS_REPO=annotation-tools
 # "matrix" only seems to work if there is more than one item specified!
 # But, I don't want to have to put the long script within the jobs:include:
-# block.  So, use this gross hack.
+# block.  So, always use two jobs (use a dummy if necessary).
   matrix:
-    - JDKVER=jdk8
-    - JDKVER=jdk22
-
-matrix:
-  allow_failures:
-    - JDKVER: jdk22
+    - JDKVER=jdk8 GROUP=test
+    - JDKVER=jdkany GROUP=misc
 
 before_script:
 - docker pull mdernst/ubuntu-for-cf-$JDKVER
@@ -28,6 +24,7 @@ script:
 - REMOTE_ORIGIN_URL=`git config --get remote.origin.url`
 - echo "THIS_REPO=${THIS_REPO}"
 - echo "JDKVER=${JDKVER}"
+- echo "GROUP=${GROUP}"
 - echo "TRAVIS_BRANCH=${TRAVIS_BRANCH}"
 - echo "REMOTE_ORIGIN_URL=${REMOTE_ORIGIN_URL}"
 - echo "TRAVIS_EVENT_TYPE=${TRAVIS_EVENT_TYPE}"
@@ -54,7 +51,7 @@ script:
      javac -version &&
      export TRAVIS_REPO_SLUG=$TRAVIS_REPO_SLUG &&
      export TRAVIS_BUILD_DIR=$TRAVIS_BUILD_DIR &&
-     ./.travis-build.sh"
+     ./.travis-build.sh $GROUP"
 
 jobs:
   include:
