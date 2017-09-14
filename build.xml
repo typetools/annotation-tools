@@ -30,7 +30,7 @@
       depends="compile-all"/>
 
   <target name="test" description="Test all the tools"
-      depends="test-all"/>
+      depends="prep,compile,test-all"/>
 
   <target name="clean" depends="clean-all"/>
 

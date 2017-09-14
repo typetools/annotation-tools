@@ -4,6 +4,8 @@
 # source-ann/AnnotationTest.java that contains an annotation in every
 # possible location.
 
+JAVA?=java
+
 ANNCAT ?= ../../../scene-lib/anncat
 JAVAVERSION = $(shell $(JAVA) -version 2>&1)
 ifeq (1.7.,$(findstring 1.7.,$(JAVAVERSION)))
