@@ -5,7 +5,13 @@ set -e
 
 export SHELLOPTS
 
+# For debugging
+ant -d compile-scene-lib
+
 ./.travis-build-without-test.sh
+
+# For debugging
+ant -d compile-scene-lib
 
 ant all
 
