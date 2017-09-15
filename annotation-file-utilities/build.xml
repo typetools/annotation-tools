@@ -455,7 +455,7 @@
     </exec>
   </target>
 
-  <target name="clean" depends="annotation-file-format-clean,clean-tests"
+  <target name="clean" depends="annotation-file-format-clean,clean-tests,javadoc-clean"
           description="removes generated files (e.g., .jar, .zip)">
     <delete dir="bin"/>
 
