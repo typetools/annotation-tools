@@ -116,7 +116,7 @@
             <pathelement location="${annotation-tools}/annotation-file-utilities/lib/plume-core.jar"/>
             <pathelement location="${annotation-tools}/annotation-file-utilities/lib/guava-20.0.jar"/>
             <!-- remainder only for repository version -->
-            <pathelement location="${annotations-compiler}/build/javac.jar"/>
+            <pathelement location="${annotations-compiler-jar}"/>
             <pathelement location="bin"/>
         </path>
     </target>
@@ -183,6 +183,7 @@
                fork="true"
                failonerror="true"
                classname="com.sun.tools.javac.Main">
+            <jvmarg value="-Xbootclasspath/p:${annotations-compiler-jdk-jar}"/>
             <arg value="-g"/>
             <arg value="-sourcepath"/>
             <!-- TODO: How can we convert a path to a variable?

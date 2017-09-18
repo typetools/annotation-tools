@@ -126,7 +126,7 @@
     <javac destdir="${out.tmp}" debug="on" includeantruntime="false">
       <classpath>
         <pathelement location="${out.tmp}"/>
-        <pathelement path="${annotations-compiler}/build/javac.jar"/>
+        <pathelement path="${annotations-compiler-jar}"/>
       </classpath>
       <src path="${src}"/>
       <include name="**/*.java"/>

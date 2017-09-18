@@ -83,7 +83,7 @@
       <!-- alternate for distribution:
       <pathelement location="${annotations-compiler}/bin"/>
       -->
-      <pathelement location="${annotations-compiler}/dist/lib/javac.jar"/>
+      <pathelement location="${annotations-compiler-jar}"/>
       <pathelement location="${annotation-tools}/annotation-file-utilities/lib/plume-core.jar"/>
       <pathelement location="${annotation-tools}/annotation-file-utilities/lib/guava-20.0.jar"/>
       <pathelement location="${scene-lib}/bin"/>
@@ -156,7 +156,7 @@
       <uptodate property="scene-lib.bin.uptodate" targetfile="annotation-file-utilities.jar">
         <srcfiles dir="${scene-lib}/bin" excludes="annotations-expected/**,annotations/tests/**"/>
       </uptodate>
-      <uptodate property="annotations-compiler.uptodate" targetfile="annotation-file-utilities.jar" srcfile="${annotations-compiler}/dist/lib/javac.jar"/>
+      <uptodate property="annotations-compiler.uptodate" targetfile="annotation-file-utilities.jar" srcfile="${annotations-compiler-jar}"/>
       <uptodate property="plume.uptodate" targetfile="annotation-file-utilities.jar" srcfile="lib/plume-core.jar"/>
       <uptodate property="google-collect.uptodate" targetfile="annotation-file-utilities.jar" srcfile="lib/guava-20.0.jar"/>
 
@@ -211,7 +211,7 @@
         <exclude name="META-INF/" />
       </patternset>
     </unjar>
-    <unjar src="${annotations-compiler}/build/javac.jar" dest="${temp-jarfile}">
+    <unjar src="${annotations-compiler-jar}" dest="${temp-jarfile}">
       <patternset>
         <include name="**/*.class"/>
         <exclude name="META-INF/" />
@@ -506,13 +506,21 @@
             failonerror="true"
             classpathref="libpath"
             classname="com.sun.tools.javac.Main">
-          <arg value="-Xlint:-options"/>
+          <jvmarg value="-Xbootclasspath/p:${annotations-compiler-jdk-jar}"/>
           <arg value="-Werror"/>
           <arg value="-g"/>
           <arg line="-sourcepath src"/>
           <arg line="-d bin"/>
           <arg line="${cmdTxts}"/>
           <arg line="-version"/>
+          <!-- Make sure we only have Java 8 source code and generate Java 8 bytecode. -->
+          <arg value="-source"/>
+          <arg value="8"/>
+          <arg value="-target"/>
+          <arg value="8"/>
+          <!-- To not get a warning about missing bootstrap
+               classpath for Java 8 (once we use Java 9). -->
+          <arg value="-Xlint:-options"/>
           <!-- To prevent a cyclic dependency with the Checker
                Framework, ignore type annotations in comments here.
                Separate targets exist to check the qualifiers. -->
