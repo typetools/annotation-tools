@@ -17,7 +17,7 @@ public class AnnotationInsertion extends Insertion {
      * The fully-qualified name of the annotation to be inserted.
      *
      * E.g. Given an annotation <code>com.foo.Bar(baz)</code>,
-     * it's fully quailified name would be <code>com.foo.Bar</code>.
+     * its fully quailified name would be <code>com.foo.Bar</code>.
      */
     private final String fullyQualifiedAnnotationName;
 
@@ -36,7 +36,9 @@ public class AnnotationInsertion extends Insertion {
      */
     public AnnotationInsertion(String fullyQualifiedAnnotationText, Criteria criteria, boolean separateLine) {
         super(criteria, separateLine);
-        assert(fullyQualifiedAnnotationText.startsWith("@") && fullyQualifiedAnnotationText.contains("."));
+        assert fullyQualifiedAnnotationText.startsWith("@") : fullyQualifiedAnnotationText;
+        // A fully-qualified name in the default package does not contain a period
+        // assert fullyQualifiedAnnotationText.contains(".") : fullyQualifiedAnnotationText;
         this.fullyQualifiedAnnotationText = fullyQualifiedAnnotationText;
         this.fullyQualifiedAnnotationName = extractAnnotationFullyQualifiedName();
         type = null;

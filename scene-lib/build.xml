@@ -161,7 +161,7 @@
     </target>
 
     <target name="bin" depends="init, bin-check-uptodate" unless="bin.uptodate">
-        <echo message="Running bin"/>
+        <echo message="Running bin in scene-lib"/>
         <mkdir dir="bin"/>
         <!-- Copy non-java files to bin.  These are mostly .jaif files. -->
         <copy todir="bin">
