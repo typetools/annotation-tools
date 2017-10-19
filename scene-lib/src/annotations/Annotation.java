@@ -92,6 +92,9 @@ public final class Annotation {
      * {@link Annotation#getFieldValue} and that subannotations are also
      * {@link Annotation}s; this constructor does not validate the
      * values.
+     *
+     * @param def the definition for the constructed annotation
+     * @param fields the fields for the constructed annotation
      */
     public Annotation(AnnotationDef def,
             Map<String, ? extends Object> fields) {
@@ -101,7 +104,9 @@ public final class Annotation {
         checkRep();
     }
 
-    /** Use adefs to look up (or insert into it) missing AnnotationDefs. */
+    /**
+     * Use adefs to look up (or insert into it) missing AnnotationDefs.
+     */
     public Annotation(java.lang.annotation.Annotation ja, Map<String, AnnotationDef> adefs) {
         Class<? extends java.lang.annotation.Annotation> jaType = ja.annotationType();
         String name = jaType.getName();
@@ -169,6 +174,9 @@ public final class Annotation {
      * {@link AnnotationBuilder#addEmptyArrayField}), the array must have zero
      * elements.
      * </ul>
+     *
+     * @param fieldName the name of the field whose value to return
+     * @return the value of the field named {@code fieldName}
      */
     public Object getFieldValue(String fieldName) {
         return fieldValues.get(fieldName);
@@ -177,6 +185,9 @@ public final class Annotation {
     /**
      * Returns the definition of the annotation type to which this annotation
      * belongs.
+     *
+     * @return the definition of the annotation type to which this annotation
+     * belongs
      */
     public final AnnotationDef def() {
         return def;
@@ -199,6 +210,9 @@ public final class Annotation {
      * known to be another nonnull {@link Annotation}. Subclasses may wish to
      * override this with a hard-coded "&amp;&amp;" of field comparisons to improve
      * performance.
+     *
+     * @param o the {@code Annotation} to compare to this
+     * @return true if this equals {@code o}
      */
     public boolean equals(Annotation o) {
         return def.equals(o.def())
