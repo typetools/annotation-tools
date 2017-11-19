@@ -27,6 +27,13 @@ annotation-file-utilities/javadoc
 annotation-file-utilities/tests/abbreviated/*.diff
 annotation-file-utilities/tests/abbreviated/*.log
 annotation-file-utilities/tests/abbreviated/*.output
+annotation-file-utilities/tests/converted/*.diff
+annotation-file-utilities/tests/converted/*.log
+annotation-file-utilities/tests/converted/*.output
+# ignore link to parent
+annotation-file-utilities/tests/converted/*.java
+# ignore link to parent
+annotation-file-utilities/tests/converted/*.goal
 annotation-file-utilities/tests/enum-imports/*.diff
 annotation-file-utilities/tests/enum-imports/*.log
 annotation-file-utilities/tests/enum-imports/*.output
