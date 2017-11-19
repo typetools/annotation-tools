@@ -5,6 +5,5 @@ package annotator.tests:
 class ConstructorReturn:
 
     method <init>()V:
-        return:
         insert-annotation Method.type: @java.lang.Tainted
 
