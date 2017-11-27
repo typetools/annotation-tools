@@ -495,7 +495,7 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
   }
 
   static class Parser {
-    // adapted from annotations.io.IndexFileParser
+    // adapted from scenelib.annotations.io.IndexFileParser
     // TODO: refactor IndexFileParser to use this class
 
     StreamTokenizer st;

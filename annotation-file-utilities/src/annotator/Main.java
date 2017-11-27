@@ -501,7 +501,7 @@ public class Main {
 
     if (verbose) {
       System.out.printf("insert-annotations-to-source (%s)",
-                        annotations.io.classfile.ClassFileReader.INDEX_UTILS_VERSION);
+                        scenelib.annotations.io.classfile.ClassFileReader.INDEX_UTILS_VERSION);
     }
 
     Options options = new Options(

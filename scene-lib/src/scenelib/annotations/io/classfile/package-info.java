@@ -1,5 +1,5 @@
 /**
- * <code> annotations.io.classfile </code> provides methods for writing
+ * <code> scenelib.annotations.io.classfile </code> provides methods for writing
  * {@link scenelib.annotations.el.AScene}s to Java class files and reading in annotations
  * from a Java class file into an {@link scenelib.annotations.el.AScene}.
  * This package requires the core ASM package (see
