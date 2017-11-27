@@ -181,7 +181,7 @@ extends EmptyVisitor {
   @SuppressWarnings("signature")
   String dummyDesc = "dummy";
 
-  /*
+  /**
    * Most of the complexity behind reading annotations from a class file into
    * a scene is in AnnotationSceneReader, which fully implements the
    * TypeAnnotationVisitor interface (and therefore also implements the
@@ -269,7 +269,7 @@ extends EmptyVisitor {
     }
 
 
-    /*
+    /**
      * Constructs a new AnnotationScene reader with the given description and
      * visibility.  Calling visitEnd() will ensure that this writes out the
      * annotation it visits into aElement.
@@ -359,7 +359,7 @@ extends EmptyVisitor {
 
     }
 
-    /*
+    /**
      * Method that accepts an Object whose actual type is c[], where c is a
      * primitive, and returns an equivalent List<Object> that contains
      * the same elements as in hiddenArray.
@@ -524,7 +524,7 @@ extends EmptyVisitor {
     public void visitXNameAndArgsSize() {
     }
 
-    /*
+    /**
      * Visits the end of the annotation, and actually writes out the
      *  annotation into aElement.
      *
@@ -648,7 +648,7 @@ extends EmptyVisitor {
     // The following are utility methods to facilitate creating all the
     // necessary data structures in the scene library.
 
-    /*
+    /**
      * Returns an annotation, ready to be placed into the scene, from
      *  the information visited.
      */
@@ -656,7 +656,7 @@ extends EmptyVisitor {
       return annotationBuilder.finish();
     }
 
-    /*
+    /**
      * Returns a LocalLocation for this annotation.
      */
     private LocalLocation makeLocalLocation() {
@@ -666,14 +666,14 @@ extends EmptyVisitor {
       return new LocalLocation(index, start, length);
     }
 
-    /*
+    /**
      * Returns an InnerTypeLocation for this annotation.
      */
     private InnerTypeLocation makeInnerTypeLocation() {
       return new InnerTypeLocation(xLocationsArgs);
     }
 
-    /*
+    /**
      * Returns the offset for this annotation.
      */
     private RelativeLocation makeOffset(boolean needTypeIndex) {
@@ -682,7 +682,7 @@ extends EmptyVisitor {
       return RelativeLocation.createOffset(offset, typeIndex);
     }
 
-    /*
+    /**
      * Returns the index for this annotation.
      */
     /*
@@ -691,7 +691,7 @@ extends EmptyVisitor {
     }
     */
 
-    /*
+    /**
      * Returns the bound location for this annotation.
      */
     private BoundLocation makeTypeParameterLocation() {
@@ -703,7 +703,7 @@ extends EmptyVisitor {
       }
     }
 
-    /*
+    /**
      * Returns the bound location for this annotation.
      * @see #makeTypeParameterLocation()
      */
@@ -723,7 +723,7 @@ extends EmptyVisitor {
 
     // TODO: makeExceptionIndexLocation?
 
-    /*
+    /**
      * Creates the inner annotation on aElement.innerTypes.
      */
     private void handleField(AElement aElement) {
@@ -753,7 +753,7 @@ extends EmptyVisitor {
       }
     }
 
-    /*
+    /**
      * Creates the method receiver annotation on aMethod.
      */
     private void handleMethodReceiver(AMethod aMethod) {
@@ -767,7 +767,7 @@ extends EmptyVisitor {
       }
     }
 
-    /*
+    /**
      * Creates the local variable annotation on aMethod.
      */
     private void handleMethodLocalVariable(AMethod aMethod) {
@@ -781,7 +781,7 @@ extends EmptyVisitor {
       }
     }
 
-    /*
+    /**
      * Creates the object creation annotation on aMethod.
      */
     private void handleMethodObjectCreation(AMethod aMethod) {
@@ -799,7 +799,7 @@ extends EmptyVisitor {
       return xParamIndexArgs.get(0);
     }
 
-    /*
+    /**
      * Creates the method parameter type generic/array annotation on aMethod.
      */
     private void handleMethodParameterType(AMethod aMethod) {
@@ -811,7 +811,7 @@ extends EmptyVisitor {
       }
     }
 
-    /*
+    /**
      * Creates the typecast annotation on aMethod.
      */
     private void handleMethodTypecast(AMethod aMethod) {
@@ -825,7 +825,7 @@ extends EmptyVisitor {
       }
     }
 
-    /*
+    /**
      * Creates the method return type generic/array annotation on aMethod.
      */
     private void handleMethodReturnType(AMethod aMethod) {
@@ -841,7 +841,7 @@ extends EmptyVisitor {
       }
     }
 
-    /*
+    /**
      * Creates the method instance of annotation on aMethod.
      */
     private void handleMethodInstanceOf(AMethod aMethod) {
@@ -855,7 +855,7 @@ extends EmptyVisitor {
       }
     }
 
-    /*
+    /**
      * Creates the class type parameter bound annotation on aClass.
      */
     private void handleClassTypeParameter(AClass aClass) {
@@ -863,7 +863,7 @@ extends EmptyVisitor {
           .tlAnnotationsHere.add(makeAnnotation());
     }
 
-    /*
+    /**
      * Creates the class type parameter bound annotation on aClass.
      */
     private void handleClassTypeParameterBound(AClass aClass) {
@@ -877,7 +877,7 @@ extends EmptyVisitor {
       }
     }
 
-    /*
+    /**
      * Creates the class type parameter bound annotation on aClass.
      */
     private void handleMethodTypeParameterBound(AMethod aMethod) {
@@ -954,7 +954,7 @@ extends EmptyVisitor {
       // TODO: throw new RuntimeException("METHOD_TYPE_PARAMETER: to do");
     }
 
-    /*
+    /**
      * Hook for NestedAnnotationSceneReader; overridden by
      * ArrayAnnotationSceneReader to add an array element instead of a field
      */
@@ -971,7 +971,7 @@ extends EmptyVisitor {
 
   }
 
-  /*
+  /**
    * A NestedAnnotationSceneReader is an AnnotationSceneReader
    * that will read in an entire annotation on a field (of type annotation)
    * of its parent, and once it has fully visited that annotation, it will
@@ -1003,7 +1003,7 @@ extends EmptyVisitor {
     }
   }
 
-  /*
+  /**
    * An ArrayAnnotationSceneReader is an AnnotationSceneReader
    * that reads all elements of an array field
    * of its parent, and once it has fully visited the array, it will
@@ -1114,7 +1114,7 @@ extends EmptyVisitor {
     }
   }
 
-  /*
+  /**
    * A FieldAnnotationSceneReader is a FieldVisitor that only cares about
    * visiting [extended]annotations.  Attributes are ignored and visitEnd() has
    * no effect.  An AnnotationSceneReader is returned for declaration and type
@@ -1160,7 +1160,7 @@ extends EmptyVisitor {
     }
   }
 
-  /*
+  /**
    * Similarly to FieldAnnotationSceneReader, this is a MethodVisitor that
    * only cares about visiting [extended]annotations.  Attributes other than
    * BootstrapMethods are ignored, all code is ignored, and visitEnd() has no

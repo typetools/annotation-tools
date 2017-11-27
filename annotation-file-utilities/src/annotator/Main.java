@@ -187,6 +187,9 @@ public class Main {
   @Option("Print error stack")
   public static boolean print_error_stack = false;
 
+  // TODO: remove this before committing.
+  public static boolean temporaryDebug = false;
+
   private static ElementVisitor<Void, AElement> classFilter =
       new ElementVisitor<Void, AElement>() {
     <K, V extends AElement>
@@ -844,7 +847,7 @@ public class Main {
                       precedingTextPlusChar.substring(0, toInsert.length()))
                   || toInsert.equals(precedingTextPlusChar.substring(1))) {
                 dbug.debug(
-                    "Inserting %s at %d in code of length %d with preceding text '%s'%n",
+                    "Inserting '%s' at %d in code of length %d with preceding text '%s'%n",
                     toInsert, pos, src.getString().length(),
                     precedingTextPlusChar);
                 dbug.debug("Already present, skipping%n");

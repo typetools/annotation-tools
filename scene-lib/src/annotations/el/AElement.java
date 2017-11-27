@@ -149,13 +149,11 @@ public class AElement implements Cloneable {
      * slightly faster variant of {@link #equals(Object)} for when the argument
      * is statically known to be another nonnull {@link AElement}.
      */
-    /*
-     * We need equals to be symmetric and operate correctly over the class
-     * hierarchy.  Let x and y be objects of subclasses S and T, respectively,
-     * of AElement.  x.equals((AElement) y) shall check that y is an S.  If so,
-     * it shall call ((S) y).equalsS(x), which checks that x is a T and then
-     * compares fields.
-     */
+    // We need equals to be symmetric and operate correctly over the class
+    // hierarchy.  Let x and y be objects of subclasses S and T, respectively,
+    // of AElement.  x.equals((AElement) y) shall check that y is an S.  If so,
+    // it shall call ((S) y).equalsS(x), which checks that x is a T and then
+    // compares fields.
     public boolean equals(AElement o) {
         return o.equalsElement(this);
     }

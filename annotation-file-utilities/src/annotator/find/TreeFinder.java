@@ -972,7 +972,10 @@ loop:
       return null;
     }
 
-    dbug.debug("SCANNING: %s %s%n", node.getKind(), node);
+    dbug.debug("SCANNING: %s %s (%d insertions)%n", node.getKind(), node, p.size());
+    if (annotator.Main.temporaryDebug) {
+      new Error("backtrace at scan()").printStackTrace();
+    }
     if (! handled(node)) {
       dbug.debug("Not handled, skipping (%s): %s%n", node.getClass(), node);
       // nothing to do
@@ -1001,18 +1004,20 @@ loop:
       }
     }
 
+    dbug.debug("Considering %d insertions.%n", p.size());
     for (Iterator<Insertion> it = p.iterator(); it.hasNext(); ) {
       Insertion i = it.next();
-      if (i.getInserted()) {
-        // Skip this insertion if it has already been inserted. See
-        // the ReceiverInsertion class for details.
-        it.remove();
-        continue;
-      }
       dbug.debug("Considering insertion at tree:%n");
       dbug.debug("  Insertion: %s%n", i);
       dbug.debug("  First line of node: %s%n", Main.firstLine(node.toString()));
       dbug.debug("  Type of node: %s%n", node.getClass());
+      if (i.getInserted()) {
+        // Skip this insertion if it has already been inserted. See
+        // the ReceiverInsertion class for details.
+        dbug.debug("  ... already inserted%n");
+        it.remove();
+        continue;
+      }
       if (!i.getCriteria().isSatisfiedBy(path, node)) {
         dbug.debug("  ... not satisfied%n");
         continue;
@@ -1834,12 +1839,28 @@ loop:
   getPositions(JCCompilationUnit node, Insertions insertions) {
     List<Insertion> list = new ArrayList<Insertion>();
     treePathCache.clear();
+    if (annotator.Main.temporaryDebug) {
+      System.out.println("insertions size: " + insertions.size());
+      System.out.println("insertions.forOuterClass(\"\") size: " + insertions.forOuterClass(node, "").size());
+      System.out.println("list pre-size: " + list.size());
+    }
     list.addAll(insertions.forOuterClass(node, ""));
+    if (annotator.Main.temporaryDebug) {
+      System.out.println("list post-size: " + list.size());
+    }
     for (JCTree decl : node.getTypeDecls()) {
       if (decl.getTag() == JCTree.Tag.CLASSDEF) {
         String name = ((JCClassDecl) decl).sym.className();
         Collection<Insertion> forClass = insertions.forOuterClass(node, name);
+        if (annotator.Main.temporaryDebug) {
+          System.out.println("insertions size: " + insertions.size());
+          System.out.println("insertions.forOuterClass("+name+") size: " + forClass.size());
+          System.out.println("list pre-size: " + list.size());
+        }
         list.addAll(forClass);
+        if (annotator.Main.temporaryDebug) {
+          System.out.println("list post-size: " + list.size());
+        }
       }
     }
     return getInsertionsByPosition(node, list);
