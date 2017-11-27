@@ -1,0 +1,7 @@
+package:
+  annotation @ADecl:
+
+package annotator.tests:
+
+class ConstructorReturnSmall:
+  method ConstructorReturnSmall()V: @ADecl
