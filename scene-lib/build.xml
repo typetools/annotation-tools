@@ -315,7 +315,7 @@
                 Overview="overview.html"
                 destdir="javadoc"
                 access="public"
-                noqualifier="annotations:annotations.el:annotations.field:annotations.io:annotations.io.classfile:annotations.util:annotations.util.coll:java.lang"
+                noqualifier="scenelib.annotations:scenelib.annotations.el:scenelib.annotations.field:scenelib.annotations.io:scenelib.annotations.io.classfile:scenelib.annotations.util:scenelib.annotations.util.coll:java.lang"
                 failonerror="true"
                 />
     </target>

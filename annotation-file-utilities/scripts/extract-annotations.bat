@@ -10,5 +10,5 @@ set JAVAC_JAR=%~d0
 set JAVAC_JAR=%ANNOTATION_FILE_UTILS%%~p0
 set JAVAC_JAR=%JAVAC_JAR%..\..\..\jsr308-langtools\dist\lib\javac.jar
 
-java -ea -cp "%JAVAC_JAR%;%ANNOTATION_FILE_UTILS%;%CLASSPATH%" annotations.io.classfile.ClassFileReader %*
+java -ea -cp "%JAVAC_JAR%;%ANNOTATION_FILE_UTILS%;%CLASSPATH%" scenelib.annotations.io.classfile.ClassFileReader %*
 

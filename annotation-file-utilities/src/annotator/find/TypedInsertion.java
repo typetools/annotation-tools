@@ -2,10 +2,10 @@ package annotator.find;
 
 import java.util.List;
 
-import type.ArrayType;
-import type.BoundedType;
-import type.DeclaredType;
-import type.Type;
+import scenelib.type.ArrayType;
+import scenelib.type.BoundedType;
+import scenelib.type.DeclaredType;
+import scenelib.type.Type;
 
 /**
  * Superclass for {@link Insertion} classes for which insertion may

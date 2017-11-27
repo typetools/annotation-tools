@@ -77,7 +77,7 @@ the proposed redesign will neither change them nor be influenced by
 them.  Of the classes in \texttt{annotator.specification},\ only
 \texttt{IndexFileSpecification},\ which extracts \texttt{Insertion}s
 from \texttt{scene-lib}'s JAIF representation
-(\texttt{annotations.el.AScene}), is relevant to the redesign.
+(\texttt{scenelib.annotations.el.AScene}), is relevant to the redesign.
 
 By far the largest and most complex package is \texttt{annotator.find}.
 The insertion logic is distributed among \texttt{TreeFinder} and
@@ -359,7 +359,7 @@ public abstract class AAST extends com.sun.source.Tree {
 }
 
 // main loop
-AAST insertAnnotations(annotations.el.AScene scene, AAST aast);
+AAST insertAnnotations(scenelib.annotations.el.AScene scene, AAST aast);
 \end{jcode}
 
 \newpage

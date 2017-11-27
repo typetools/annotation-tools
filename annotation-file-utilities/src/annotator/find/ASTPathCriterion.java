@@ -6,7 +6,7 @@ import java.util.List;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.type.TypeKind;
 
-import annotations.io.ASTPath;
+import scenelib.annotations.io.ASTPath;
 import annotator.Main;
 
 import com.sun.source.tree.AnnotatedTypeTree;

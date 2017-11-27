@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import type.DeclaredType;
-import type.Type;
+import scenelib.type.DeclaredType;
+import scenelib.type.Type;
 
 /**
  * @author dbro

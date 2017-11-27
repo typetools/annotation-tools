@@ -21,11 +21,14 @@ import java.util.TreeSet;
 import javax.lang.model.element.Name;
 import javax.lang.model.type.TypeKind;
 
-import annotations.el.InnerTypeLocation;
-import annotations.io.ASTIndex;
-import annotations.io.ASTPath;
-import annotations.io.ASTRecord;
-import type.*;
+import scenelib.annotations.el.InnerTypeLocation;
+import scenelib.annotations.io.ASTIndex;
+import scenelib.annotations.io.ASTPath;
+import scenelib.annotations.io.ASTRecord;
+import scenelib.type.ArrayType;
+import scenelib.type.BoundedType;
+import scenelib.type.DeclaredType;
+import scenelib.type.Type;
 
 import com.sun.source.tree.AnnotatedTypeTree;
 import com.sun.source.tree.AnnotationTree;
@@ -64,7 +67,7 @@ import com.sun.tools.javac.util.Pair;
  *
  * The class now serves a second purpose, which should probably be
  * separated out (according to OO dogma, at least): It attaches
- * {@link annotations.io.ASTPath}-based inner type {@link Insertion}s to
+ * {@link scenelib.annotations.io.ASTPath}-based inner type {@link Insertion}s to
  * a {@link TypedInsertion} on the outer type if one exists (see
  * {@link #organizeTypedInsertions(CompilationUnitTree, String, Collection)}.
  * Since getting these insertions right depends on this organization,
@@ -130,18 +133,25 @@ public class Insertions implements Iterable<Insertion> {
     size = 0;
   }
 
-  // auxiliary for following two methods
+  /** Side-effects {@code result} to add relevant {@link Insertion}s. */
   private void forClass(CompilationUnitTree cut,
       String qualifiedClassName, Set<Insertion> result) {
+    if (annotator.Main.temporaryDebug) {
+      System.out.printf("calling forClass(cut, %s, set of size %d)%n", qualifiedClassName, result.size());
+    }
     Pair<String, String> pair = nameSplit(qualifiedClassName);
     Map<String, Set<Insertion>> map = store.get(pair.fst);
     if (map != null) {
       Set<Insertion> set = new TreeSet<Insertion>(byASTRecord);
       set.addAll(map.get(pair.snd));
-      if (set != null) {
-        set = organizeTypedInsertions(cut, qualifiedClassName, set);
-        result.addAll(set);
+      if (annotator.Main.temporaryDebug) {
+        System.out.println("set size (2) = " + set.size());
       }
+      set = organizeTypedInsertions(cut, qualifiedClassName, set);
+      if (annotator.Main.temporaryDebug) {
+        System.out.println("set size (3) = " + set.size());
+      }
+      result.addAll(set);
     }
   }
 
@@ -166,7 +176,7 @@ public class Insertions implements Iterable<Insertion> {
    *
    * @param cut the current compilation unit
    * @param qualifiedOuterClassName the fully qualified outer class name
-   * @return {@link java.util.Set} of {@link Insertion}s with an
+   * @return set of {@link Insertion}s with an
    *          {@link InClassCriterion} for the given outer class or one
    *          of its local classes
    */
@@ -176,6 +186,9 @@ public class Insertions implements Iterable<Insertion> {
     if (map == null || map.isEmpty()) {
       return Collections.<Insertion>emptySet();
     } else {
+      if (annotator.Main.temporaryDebug) {
+        System.out.printf("forOuterClass(%s): map = %s%n", qualifiedOuterClassName, map);
+      }
       Set<Insertion> set = new LinkedHashSet<Insertion>();
       for (String key : map.keySet()) {
         String qualifiedClassName = qualifiedOuterClassName + key;
@@ -283,7 +296,7 @@ public class Insertions implements Iterable<Insertion> {
     return null;
   }
 
-  /*
+  /**
    * This method detects inner type relationships among ASTPath-based
    * insertion specifications and organizes the insertions accordingly.
    * This step is necessary because 1) insertion proceeds from the end to
