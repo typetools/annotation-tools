@@ -406,71 +406,13 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
     return s.peek();
   }
 
-  @Override
-  public int hashCode() {
-    // hacky fix: remove {Method,Class}.body for comparison
-    PersistentStack<ASTEntry> s = canonical(this);
-    int hash = 0;
-    while (!s.isEmpty()) {
-      hash = Integer.rotateRight(hash ^ s.peek().hashCode(), 1);
-      s = s.pop();
-    }
-    return hash;
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    return o instanceof ASTPath && equals((ASTPath) o);
-  }
-
-  public boolean equals(ASTPath astPath) {
-    return compareTo(astPath) == 0;
-  }
-
-  @Override
-  public int compareTo(ASTPath o) {
-    // hacky fix: remove {Method,Class}.body for comparison
-    PersistentStack<ASTEntry> s0 = canonical(this);
-    PersistentStack<ASTEntry> s1 = canonical(o);
-    Deque<ASTEntry> d0 = new LinkedList<ASTEntry>();
-    Deque<ASTEntry> d1 = new LinkedList<ASTEntry>();
-    int c = 0;
-    while (!s0.isEmpty()) {
-      d0.push(s0.peek());
-      s0 = s0.pop();
-    }
-    while (!s1.isEmpty()) {
-      d1.push(s1.peek());
-      s1 = s1.pop();
-    }
-    int n0 = d0.size();
-    int n1 = d1.size();
-    c = Integer.compare(n0, n1);
-    if (c == 0) {
-      Iterator<ASTEntry> i0 = d0.iterator();
-      Iterator<ASTEntry> i1 = d1.iterator();
-      while (i0.hasNext()) {
-        c = i0.next().compareTo(i1.next());
-        if (c != 0) { return c; }
-      }
-    }
-    return c;
+  public ASTEntry getLast() {
+    throw new Error("to implement");
   }
 
   private static ASTPath canonical(ASTPath astPath) {
     // TODO
     return astPath;
-  }
-
-  @Override
-  public String toString() {
-    if (isEmpty()) { return ""; }
-    Iterator<ASTEntry> iter = iterator();
-    StringBuilder sb = new StringBuilder().append(iter.next());
-    while (iter.hasNext()) {
-      sb = sb.append(", ").append(iter.next());
-    }
-    return sb.toString();
   }
 
   /**
@@ -1619,7 +1561,71 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
       return !isDeclaration(kind);
     }
   }  // TODO: need "isType"?
-}
+
+  @Override
+  public int hashCode() {
+    // hacky fix: remove {Method,Class}.body for comparison
+    PersistentStack<ASTEntry> s = canonical(this);
+    int hash = 0;
+    while (!s.isEmpty()) {
+      hash = Integer.rotateRight(hash ^ s.peek().hashCode(), 1);
+      s = s.pop();
+    }
+    return hash;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    return o instanceof ASTPath && equals((ASTPath) o);
+  }
+
+  public boolean equals(ASTPath astPath) {
+    return compareTo(astPath) == 0;
+  }
+
+  @Override
+  public int compareTo(ASTPath o) {
+    // hacky fix: remove {Method,Class}.body for comparison
+    PersistentStack<ASTEntry> s0 = canonical(this);
+    PersistentStack<ASTEntry> s1 = canonical(o);
+    Deque<ASTEntry> d0 = new LinkedList<ASTEntry>();
+    Deque<ASTEntry> d1 = new LinkedList<ASTEntry>();
+    int c = 0;
+    while (!s0.isEmpty()) {
+      d0.push(s0.peek());
+      s0 = s0.pop();
+    }
+    while (!s1.isEmpty()) {
+      d1.push(s1.peek());
+      s1 = s1.pop();
+    }
+    int n0 = d0.size();
+    int n1 = d1.size();
+    c = Integer.compare(n0, n1);
+    if (c == 0) {
+      Iterator<ASTEntry> i0 = d0.iterator();
+      Iterator<ASTEntry> i1 = d1.iterator();
+      while (i0.hasNext()) {
+        c = i0.next().compareTo(i1.next());
+        if (c != 0) { return c; }
+      }
+    }
+    return c;
+  }
+
+  @Override
+  public String toString() {
+    if (isEmpty()) { return ""; }
+    Iterator<ASTEntry> iter = iterator();
+    StringBuilder sb = new StringBuilder().append(iter.next());
+    while (iter.hasNext()) {
+      sb = sb.append(", ").append(iter.next());
+    }
+    return sb.toString();
+  }
+
+
+} // end of class ASTPath
 
 /**
  *
@@ -1689,4 +1695,4 @@ class ConsStack<E> implements PersistentStack<E> {
     }
     return "[]";
   }
-}
+} // end of class ConsStack

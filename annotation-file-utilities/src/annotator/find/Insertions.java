@@ -269,17 +269,18 @@ public class Insertions implements Iterable<Insertion> {
    */
   private Set<Insertion> organizeTypedInsertions(CompilationUnitTree cut,
       String className, Collection<Insertion> insertions) {
-    ASTRecordMap<TypedInsertion> map = new ASTRecordMap<TypedInsertion>();
+    ASTRecordMap<TypedInsertion> outerInsertions = new ASTRecordMap<TypedInsertion>();
+    Set<Insertion> innerInsertions = new LinkedHashSet<Insertion>();
+    List<Insertion> innerInsertionsList = new ArrayList<Insertion>();
     Set<Insertion> organized = new LinkedHashSet<Insertion>();
-    Set<Insertion> unorganized = new LinkedHashSet<Insertion>();
-    List<Insertion> list = new ArrayList<Insertion>();
 
-    // First divide the insertions into three buckets: TypedInsertions
-    // on outer types (map), ASTPath-based insertions on local types
-    // (unorganized -- built as list and then sorted, since building as
-    // a set spuriously removes "duplicates" according to the
-    // comparator), and everything else (organized -- where all
-    // eventually land).
+    // First divide the insertions into three buckets:
+    //  * TypedInsertions on outer types (`outerInsertions`)
+    //  * ASTPath-based insertions on local types
+    //    (`innerInsertions` -- built as list and then sorted, since building as
+    //    a set spuriously removes "duplicates" according to the
+    //    comparator), and
+    //  * everything else (`organized` -- where all eventually land).
     for (Insertion ins : insertions) {
       if (ins.isInserted()) { continue; }
       Criteria criteria = ins.getCriteria();
@@ -287,7 +288,7 @@ public class Insertions implements Iterable<Insertion> {
           criteria.getGenericArrayLocation();
       ASTPath p = criteria.getASTPath();
       if (p == null || p.isEmpty()
-          || galc != null && !galc.getLocation().isEmpty()
+          || (galc != null && !galc.getLocation().isEmpty())
           || ins instanceof CastInsertion
           || ins instanceof CloseParenthesisInsertion) {
         organized.add(ins);
@@ -295,13 +296,13 @@ public class Insertions implements Iterable<Insertion> {
         ASTRecord rec = new ASTRecord(cut, criteria.getClassName(),
             criteria.getMethodName(), criteria.getFieldName(), p);
         ASTPath.ASTEntry entry = rec.astPath.get(-1);
-        Tree node;
 
+        Tree node;
         if (entry.getTreeKind() == Tree.Kind.NEW_ARRAY
             && entry.childSelectorIs(ASTPath.TYPE)
             && entry.getArgument() == 0) {
-          ASTPath temp = rec.astPath.getParentPath();
-          node = ASTIndex.getNode(cut, rec.replacePath(temp));
+          ASTPath parentPath = rec.astPath.getParentPath();
+          node = ASTIndex.getNode(cut, rec.replacePath(parentPath));
           node = node instanceof JCTree.JCNewArray
               ? TypeTree.fromType(((JCTree.JCNewArray) node).type)
               : null;
@@ -310,7 +311,7 @@ public class Insertions implements Iterable<Insertion> {
         }
 
         if (ins instanceof TypedInsertion) {
-          TypedInsertion tins = map.get(rec);
+          TypedInsertion tins = outerInsertions.get(rec);
           if (ins instanceof NewInsertion) {
             NewInsertion nins = (NewInsertion) ins;
             if (entry.getTreeKind() == Tree.Kind.NEW_ARRAY
@@ -372,7 +373,7 @@ public class Insertions implements Iterable<Insertion> {
             }
           }
           if (tins == null) {
-            map.put(rec, (TypedInsertion) ins);
+            outerInsertions.put(rec, (TypedInsertion) ins);
           } else if (tins.getType().equals(((TypedInsertion) ins).getType())) {
             mergeTypedInsertions(tins, (TypedInsertion) ins);
           }
@@ -392,7 +393,7 @@ public class Insertions implements Iterable<Insertion> {
             temp = temp.extend(
                 new ASTPath.ASTEntry(Tree.Kind.NEW_ARRAY, ASTPath.TYPE, 0));
             if (node.toString().startsWith("{")) {
-              TypedInsertion tins = map.get(rec.replacePath(temp));
+              TypedInsertion tins = outerInsertions.get(rec.replacePath(temp));
               if (tins == null) {
                 // TODO
               } else {
@@ -422,20 +423,20 @@ public class Insertions implements Iterable<Insertion> {
               }
             }
           }
-          list.add(ins);
+          innerInsertionsList.add(ins);
         }
       }
     }
-    // if (map.isEmpty()) {
-    //  organized.addAll(unorganized);
+    // if (outerInsertions.isEmpty()) {
+    //  organized.addAll(innerInsertions);
     //  return organized;
     // }
-    Collections.sort(list, byASTRecord);
-    unorganized.addAll(list);
+    Collections.sort(innerInsertionsList, byASTRecord);
+    innerInsertions.addAll(innerInsertionsList);
 
-    // Each Insertion in unorganized gets attached to a TypedInsertion
-    // in map if possible; otherwise, it gets dumped into organized.
-    for (Insertion ins : unorganized) {
+    // Each Insertion in innerInsertions gets attached to a TypedInsertion
+    // in outerInsertions if possible; otherwise, it gets dumped into organized.
+    for (Insertion ins : innerInsertions) {
       Criteria criteria = ins.getCriteria();
       String methodName = criteria.getMethodName();
       String fieldName = criteria.getFieldName();
@@ -461,9 +462,9 @@ public class Insertions implements Iterable<Insertion> {
         ap0 = astack.pop();
         kind = ap0.get(-1).getTreeKind();
         rec = new ASTRecord(cut, className, methodName, fieldName, ap0);
-      } while (!(astack.isEmpty() || map.containsKey(rec)));
+      } while (!(astack.isEmpty() || outerInsertions.containsKey(rec)));
 
-      TypedInsertion tins = map.get(rec);
+      TypedInsertion tins = outerInsertions.get(rec);
       TreePath path = ASTIndex.getTreePath(cut, rec);
       Tree node = path == null ? null : path.getLeaf();
       if (node == null && ap0.isEmpty()) {
@@ -509,7 +510,7 @@ public class Insertions implements Iterable<Insertion> {
             inners.add(ins);
             tins = new NewInsertion(type, criteria, inners);
             tins.setInserted(true);
-            map.put(rec, tins);
+            outerInsertions.put(rec, tins);
             break;
           default:
             break;
@@ -764,9 +765,9 @@ public class Insertions implements Iterable<Insertion> {
 
       organized.add(ins);
       if (tpes.isEmpty()) {
-        // assert ap1.equals(ap0) && !map.containsKey(ap0);
+        // assert ap1.equals(ap0) && !outerInsertions.containsKey(ap0);
 //        organized.add(ins);
-        // map.put(rec, (TypedInsertion) ins);
+        // outerInsertions.put(rec, (TypedInsertion) ins);
       } else {
         criteria.add(new ASTPathCriterion(ap0));
         criteria.add(new GenericArrayLocationCriterion(
@@ -774,7 +775,7 @@ public class Insertions implements Iterable<Insertion> {
         tins.getInnerTypeInsertions().add(ins);
       }
     }
-    organized.addAll(map.values());
+    organized.addAll(outerInsertions.values());
     return organized;
   }
 
@@ -1132,7 +1133,7 @@ loop:
     }
   }
 
-  // Map from ASTRecord to the given type.
+  // Map from ASTRecord to the given type.  Internally also indexes by ASTPath.
   class ASTRecordMap<E> implements Map<ASTRecord, E> {
     Map<ASTRecord, SortedMap<ASTPath, E>> back;
 
