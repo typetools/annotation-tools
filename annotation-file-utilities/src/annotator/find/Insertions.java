@@ -143,7 +143,7 @@ public class Insertions implements Iterable<Insertion> {
     Map<String, Set<Insertion>> map = store.get(outerClass);
     if (map != null) {
       Set<Insertion> set = new TreeSet<Insertion>(byASTRecord);
-      set.addAll(map.get(outerClass));
+      set.addAll(map.get(innerClassName(qualifiedClassName)));
       if (annotator.Main.temporaryDebug) {
         System.out.println("set size (2) = " + set.size());
       }
