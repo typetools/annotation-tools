@@ -25,7 +25,10 @@ import scenelib.annotations.el.InnerTypeLocation;
 import scenelib.annotations.io.ASTIndex;
 import scenelib.annotations.io.ASTPath;
 import scenelib.annotations.io.ASTRecord;
-import scenelib.type.*;
+import scenelib.type.ArrayType;
+import scenelib.type.BoundedType;
+import scenelib.type.DeclaredType;
+import scenelib.type.Type;
 
 import com.sun.source.tree.AnnotatedTypeTree;
 import com.sun.source.tree.AnnotationTree;
