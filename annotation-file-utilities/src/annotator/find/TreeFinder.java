@@ -1011,7 +1011,7 @@ loop:
       dbug.debug("  Insertion: %s%n", i);
       dbug.debug("  First line of node: %s%n", Main.firstLine(node.toString()));
       dbug.debug("  Type of node: %s%n", node.getClass());
-      if (i.getInserted()) {
+      if (i.isInserted()) {
         // Skip this insertion if it has already been inserted. See
         // the ReceiverInsertion class for details.
         dbug.debug("  ... already inserted%n");
@@ -1192,7 +1192,7 @@ loop:
           // looking for the receiver or the declaration
           typeScan = i.getCriteria().isOnReceiver();
         } else if (CommonScanner.hasClassKind(node)) { // ClassTree
-          typeScan = ! i.getSeparateLine(); // hacky check
+          typeScan = ! i.isSeparateLine(); // hacky check
         }
         if (typeScan) {
           // looking for the type
@@ -1406,7 +1406,7 @@ loop:
           // looking for the receiver or the declaration
           typeScan = IndexFileSpecification.isOnReceiver(i.getCriteria());
         } else if (node.getKind() == Tree.Kind.CLASS) { // ClassTree
-          typeScan = ! i.getSeparateLine(); // hacky check
+          typeScan = ! i.isSeparateLine(); // hacky check
         }
         if (typeScan) {
           // looking for the type

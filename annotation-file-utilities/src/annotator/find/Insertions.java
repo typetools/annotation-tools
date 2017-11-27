@@ -58,15 +58,15 @@ import com.sun.tools.javac.util.Pair;
 /**
  * @author dbro
  *
- * An indexed collection (though not {@link java.util.Collection}, only
- * {@link java.lang.Iterable}) of {@link Insertion}s with methods to
- * select those specified for a given class or for an outer class along
- * with its local classes.  This class is especially useful when a
- * single JAIF stores annotations for many source files, as it reduces
- * the number of insertions to be considered for any AST node.
+ * A collection of {@link Insertion}s, indexed by outer class and inner
+ * class.  It has methods to select Insertions for a given class ({@link
+ * #forClass}) or for an outer class along with its local classes ({@link
+ * #forOuterClass}).  When a single JAIF stores annotations for many source
+ * files, this class reduces the number of insertions to be considered for
+ * any AST node.
  *
  * The class now serves a second purpose, which should probably be
- * separated out (according to OO dogma, at least): It attaches
+ * separated out: It attaches
  * {@link scenelib.annotations.io.ASTPath}-based inner type {@link Insertion}s to
  * a {@link TypedInsertion} on the outer type if one exists (see
  * {@link #organizeTypedInsertions(CompilationUnitTree, String, Collection)}.
@@ -75,84 +75,19 @@ import com.sun.tools.javac.util.Pair;
  * performance.
  */
 public class Insertions implements Iterable<Insertion> {
-  private static int kindLevel(Insertion i) {
-    // ordered so insertion that depends on another gets inserted after other
-    switch (i.getKind()) {
-    case CONSTRUCTOR:
-      return 3;
-    case NEW:
-    case RECEIVER:
-      return 2;
-    case CAST:
-        return 1;
-    // case ANNOTATION:
-    // case CLOSE_PARENTHESIS:
-    default:
-      return 0;
-    }
-  }
 
-  private static final Comparator<Insertion> byASTRecord =
-      new Comparator<Insertion>() {
-        @Override
-        public int compare(Insertion o1, Insertion o2) {
-          Criteria c1 = o1.getCriteria();
-          Criteria c2 = o2.getCriteria();
-          ASTPath p1 = c1.getASTPath();
-          ASTPath p2 = c2.getASTPath();
-          ASTRecord r1 = new ASTRecord(null,
-              c1.getClassName(), c1.getMethodName(), c1.getFieldName(),
-              p1 == null ? ASTPath.empty() : p1);
-          ASTRecord r2 = new ASTRecord(null,
-              c2.getClassName(), c2.getMethodName(), c2.getFieldName(),
-              p2 == null ? ASTPath.empty() : p2);
-          int c = r1.compareTo(r2);
-          if (c == 0) {
-            // c = o1.getKind().compareTo(o2.getKind());
-            c = Integer.compare(kindLevel(o2), kindLevel(o1));  // descending
-            if (c == 0) { c = o1.toString().compareTo(o2.toString()); }
-          }
-          return c;
-        }
-      };
-
-  // store indexes insertions by (qualified) outer class name and inner
-  // class path (if any)
+  /**
+   * First index is (qualified) outer class name, second index is inner
+   * class path (or "" if not within a nested class).
+   */
+  // TODO: Inner class name might itself contain "$"; this probably doesn't handle that case.
   private Map<String, Map<String, Set<Insertion>>> store;
+  /** The number of {@link Insertion}s in this collection. */
   private int size;
-
-  private Pair<String, String> nameSplit(String name) {
-    int i = name.indexOf('$');  // FIXME: don't split on '$' in source
-    return i < 0
-        ? Pair.of(name, "")
-        : Pair.of(name.substring(0, i), name.substring(i));
-  }
 
   public Insertions() {
     store = new HashMap<String, Map<String, Set<Insertion>>>();
     size = 0;
-  }
-
-  /** Side-effects {@code result} to add relevant {@link Insertion}s. */
-  private void forClass(CompilationUnitTree cut,
-      String qualifiedClassName, Set<Insertion> result) {
-    if (annotator.Main.temporaryDebug) {
-      System.out.printf("calling forClass(cut, %s, set of size %d)%n", qualifiedClassName, result.size());
-    }
-    Pair<String, String> pair = nameSplit(qualifiedClassName);
-    Map<String, Set<Insertion>> map = store.get(pair.fst);
-    if (map != null) {
-      Set<Insertion> set = new TreeSet<Insertion>(byASTRecord);
-      set.addAll(map.get(pair.snd));
-      if (annotator.Main.temporaryDebug) {
-        System.out.println("set size (2) = " + set.size());
-      }
-      set = organizeTypedInsertions(cut, qualifiedClassName, set);
-      if (annotator.Main.temporaryDebug) {
-        System.out.println("set size (3) = " + set.size());
-      }
-      result.addAll(set);
-    }
   }
 
   /**
@@ -198,30 +133,55 @@ public class Insertions implements Iterable<Insertion> {
     }
   }
 
+  /** Side-effects {@code result} to add {@link Insertion}s for {@code qualifiedClassName}. */
+  private void forClass(CompilationUnitTree cut,
+      String qualifiedClassName, Set<Insertion> result) {
+    if (annotator.Main.temporaryDebug) {
+      System.out.printf("calling forClass(cut, %s, set of size %d)%n", qualifiedClassName, result.size());
+    }
+    String outerClass = outerClassName(qualifiedClassName);
+    Map<String, Set<Insertion>> map = store.get(outerClass);
+    if (map != null) {
+      Set<Insertion> set = new TreeSet<Insertion>(byASTRecord);
+      set.addAll(map.get(outerClass));
+      if (annotator.Main.temporaryDebug) {
+        System.out.println("set size (2) = " + set.size());
+      }
+      set = organizeTypedInsertions(cut, qualifiedClassName, set);
+      if (annotator.Main.temporaryDebug) {
+        System.out.println("set size (3) = " + set.size());
+      }
+      result.addAll(set);
+    }
+  }
+
   /**
    * Add an {@link Insertion} to this collection.
    */
   public void add(Insertion ins) {
     InClassCriterion icc = ins.getCriteria().getInClass();
-    String k1 = "";
-    String k2 = "";
-    Map<String, Set<Insertion>> map;
-    Set<Insertion> set;
 
-    if (icc != null) {
-      Pair<String, String> triple = nameSplit(icc.className);
-      k1 = triple.fst;
-      k2 = triple.snd;
+    String outerClass;
+    String innerClass;
+    if (icc == null) {
+      // Not in a class.
+      outerClass = "";
+      innerClass = "";
+    } else {
+      outerClass = outerClassName(icc.className);
+      innerClass = innerClassName(icc.className);
     }
-    map = store.get(k1);
+
+    Map<String, Set<Insertion>> map = store.get(outerClass);
     if (map == null) {
       map = new HashMap<String, Set<Insertion>>();
-      store.put(k1, map);
+      store.put(outerClass, map);
     }
-    set = map.get(k2);
+
+    Set<Insertion> set = map.get(innerClass);
     if (set == null) {
       set = new LinkedHashSet<Insertion>();
-      map.put(k2, set);
+      map.put(innerClass, set);
     }
 
     size -= set.size();
@@ -230,8 +190,7 @@ public class Insertions implements Iterable<Insertion> {
   }
 
   /**
-   * Add all {@link Insertion}s in the given
-   * {@link java.util.Collection} to this collection.
+   * Add all the given {@link Insertion}s to this collection.
    */
   public void addAll(Collection<? extends Insertion> c) {
     for (Insertion ins : c) {
@@ -258,17 +217,16 @@ public class Insertions implements Iterable<Insertion> {
 
       @Override
       public boolean hasNext() {
-        if (iiter.hasNext()) { return true; }
-        while (siter.hasNext()) {
-          iiter = siter.next().iterator();
-          if (iiter.hasNext()) { return true; }
+        if (iiter.hasNext()) {
+          return true;
         }
-        while (miter.hasNext()) {
+        if (siter.hasNext()) {
+          iiter = siter.next().iterator();
+          return hasNext();
+        }
+        if (miter.hasNext()) {
           siter = miter.next().values().iterator();
-          while (siter.hasNext()) {
-            iiter = siter.next().iterator();
-            if (iiter.hasNext()) { return true; }
-          }
+          return hasNext();
         }
         return false;
       }
@@ -299,9 +257,15 @@ public class Insertions implements Iterable<Insertion> {
   /**
    * This method detects inner type relationships among ASTPath-based
    * insertion specifications and organizes the insertions accordingly.
+   * [TODO:  What is "accordingly"?]
    * This step is necessary because 1) insertion proceeds from the end to
    * the beginning of the source and 2) the insertion location does not
    * always exist prior to the top-level type insertion.
+   *
+   * This method attaches
+   * {@link scenelib.annotations.io.ASTPath}-based inner type {@link Insertion}s to
+   * a {@link TypedInsertion} on the outer type if one exists (see
+   * {@link #organizeTypedInsertions(CompilationUnitTree, String, Collection)}.
    */
   private Set<Insertion> organizeTypedInsertions(CompilationUnitTree cut,
       String className, Collection<Insertion> insertions) {
@@ -317,7 +281,7 @@ public class Insertions implements Iterable<Insertion> {
     // comparator), and everything else (organized -- where all
     // eventually land).
     for (Insertion ins : insertions) {
-      if (ins.getInserted()) { continue; }
+      if (ins.isInserted()) { continue; }
       Criteria criteria = ins.getCriteria();
       GenericArrayLocationCriterion galc =
           criteria.getGenericArrayLocation();
@@ -1097,7 +1061,78 @@ loop:
     return n;
   }
 
-  // Provides an additional level of indexing.
+  private static int kindLevel(Insertion i) {
+    // Ordered so insertion that depends on another gets inserted after other.
+    // TODO: could change to use natural order of the enumeration (reorder the enumeration).
+    switch (i.getKind()) {
+    case CONSTRUCTOR:
+      return 3;
+    case NEW:
+    case RECEIVER:
+      return 2;
+    case CAST:
+        return 1;
+    case ANNOTATION:
+    case CLOSE_PARENTHESIS:
+      return 0;
+    default:
+      throw new Error("unrecognized case");
+    }
+  }
+
+  /** Compare by AstRecord, then by kind, then by string representation. */
+  private static final Comparator<Insertion> byASTRecord =
+      new Comparator<Insertion>() {
+        @Override
+        public int compare(Insertion o1, Insertion o2) {
+          Criteria crit1 = o1.getCriteria();
+          Criteria crit2 = o2.getCriteria();
+          ASTPath p1 = crit1.getASTPath();
+          ASTPath p2 = crit2.getASTPath();
+          ASTRecord r1 = new ASTRecord(null,
+              crit1.getClassName(), crit1.getMethodName(), crit1.getFieldName(),
+              p1 == null ? ASTPath.empty() : p1);
+          ASTRecord r2 = new ASTRecord(null,
+              crit2.getClassName(), crit2.getMethodName(), crit2.getFieldName(),
+              p2 == null ? ASTPath.empty() : p2);
+          int cmp;
+          cmp = r1.compareTo(r2);
+          if (cmp != 0) {
+            return cmp;
+          }
+          // cmp = o1.getKind().compareTo(o2.getKind());
+          cmp = Integer.compare(kindLevel(o2), kindLevel(o1));  // descending
+          if (cmp != 0) {
+            return cmp;
+          }
+          cmp = o1.toString().compareTo(o2.toString());
+          return cmp;
+        }
+      };
+
+  /** Return the outer class part of the argument; that is, the part before '$'.
+   * Return the argument if it contains no '$'. */
+  private static String outerClassName(String className) {
+    int i = className.indexOf('$');  // FIXME: don't split on '$' in source
+    if (i == -1) {
+      return className;
+    } else {
+      return className.substring(0, i);
+    }
+  }
+
+  /** Return the inner class part of the argument; that is, the part after '$'.
+   * Return the empty string if there is no '$'. */
+  private static String innerClassName(String className) {
+    int i = className.indexOf('$');  // FIXME: don't split on '$' in source
+    if (i == -1) {
+      return "";
+    } else {
+      return className.substring(i);
+    }
+  }
+
+  // Map from ASTRecord to the given type.
   class ASTRecordMap<E> implements Map<ASTRecord, E> {
     Map<ASTRecord, SortedMap<ASTPath, E>> back;
 

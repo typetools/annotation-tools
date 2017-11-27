@@ -207,7 +207,7 @@ public abstract class Insertion {
      *
      * @return whether the insertion goes on a separate line
      */
-    public boolean getSeparateLine() {
+    public boolean isSeparateLine() {
         return separateLine;
     }
 
@@ -216,7 +216,7 @@ public abstract class Insertion {
      * @return {@code true} if this insertion has already been inserted,
      *         {@code false} otherwise.
      */
-    public boolean getInserted() {
+    public boolean isInserted() {
         return inserted;
     }
 

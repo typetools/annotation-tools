@@ -53,7 +53,7 @@ public class NewInsertion extends TypedInsertion {
         b.append(' ').append(a);  // initial space removed below
       }
       return new AnnotationInsertion(b.substring(1), getCriteria(),
-          getSeparateLine()).getText(comments, abbreviate);
+          isSeparateLine()).getText(comments, abbreviate);
     } else {
       DeclaredType baseType = getBaseType();
       boolean commentAnnotation = (comments && baseType.getName().isEmpty());

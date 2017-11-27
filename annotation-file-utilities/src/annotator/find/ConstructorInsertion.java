@@ -39,7 +39,7 @@ public class ConstructorInsertion extends TypedInsertion {
       //  b.append(' ');
       // }
       // return new AnnotationInsertion(b.toString(), getCriteria(),
-      //    getSeparateLine()).getText(comments, abbreviate);
+      //    isSeparateLine()).getText(comments, abbreviate);
       return "";
     } else {
       boolean commentAnnotation =
@@ -55,7 +55,7 @@ public class ConstructorInsertion extends TypedInsertion {
         }
       }
       b.append("public ").append(typeString).append("(");
-      if (receiverInsertion != null && !receiverInsertion.getInserted()) {
+      if (receiverInsertion != null && !receiverInsertion.isInserted()) {
         b.append(receiverInsertion.getText(comments, abbreviate));
       }
       b.append(") { super(); }");

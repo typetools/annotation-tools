@@ -529,7 +529,7 @@ public class IndexFileSpecification implements Specification {
     Insertion.decorateType(innerTypeInsertions, type, criteria.getASTPath());
     CastInsertion cast = new CastInsertion(criteria, type);
     CloseParenthesisInsertion closeParen = new CloseParenthesisInsertion(
-        criteria, cast.getSeparateLine());
+        criteria, cast.isSeparateLine());
     return new Pair<CastInsertion, CloseParenthesisInsertion>(cast, closeParen);
   }
 

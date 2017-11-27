@@ -766,8 +766,8 @@ public class Main {
             String trailingWhitespace = "";
             boolean gotSeparateLine = false;
             int pos = pair.a;  // reset each iteration in case of dyn adjustment
-            if (iToInsert.getSeparateLine()) {
-              // System.out.printf("getSeparateLine=true for insertion at pos %d: %s%n", pos, iToInsert);
+            if (iToInsert.isSeparateLine()) {
+              // System.out.printf("isSeparateLine=true for insertion at pos %d: %s%n", pos, iToInsert);
               int indentation = 0;
               while ((pos - indentation != 0)
                      // horizontal whitespace
@@ -858,7 +858,7 @@ public class Main {
             // TODO: Neither the above hack nor this check should be
             // necessary.  Find out why re-insertions still occur and
             // fix properly.
-            if (iToInsert.getInserted()) { continue; }
+            if (iToInsert.isInserted()) { continue; }
             src.insert(pos, toInsert);
             if (verbose && !debug) {
               System.out.print(".");
