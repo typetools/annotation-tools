@@ -66,18 +66,18 @@ import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
 import com.sun.tools.javac.tree.JCTree.JCWildcard;
 import com.sun.tools.javac.util.Position;
 
-import annotations.io.ASTIndex;
-import annotations.io.ASTPath;
-import annotations.io.ASTRecord;
-import annotations.io.DebugWriter;
+import scenelib.annotations.io.ASTIndex;
+import scenelib.annotations.io.ASTPath;
+import scenelib.annotations.io.ASTRecord;
+import scenelib.annotations.io.DebugWriter;
 import annotator.Main;
 import annotator.scanner.CommonScanner;
 import annotator.specification.IndexFileSpecification;
 
 import plume.Pair;
 
-import type.DeclaredType;
-import type.Type;
+import scenelib.type.DeclaredType;
+import scenelib.type.Type;
 
 /**
  * A {@link TreeScanner} that is able to locate program elements in an

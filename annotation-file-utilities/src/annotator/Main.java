@@ -25,29 +25,29 @@ import plume.OptionGroup;
 import plume.Options;
 import plume.Pair;
 import plume.UtilMDE;
-import type.Type;
-import annotations.Annotation;
-import annotations.el.ABlock;
-import annotations.el.AClass;
-import annotations.el.ADeclaration;
-import annotations.el.AElement;
-import annotations.el.AExpression;
-import annotations.el.AField;
-import annotations.el.AMethod;
-import annotations.el.AScene;
-import annotations.el.ATypeElement;
-import annotations.el.ATypeElementWithType;
-import annotations.el.AnnotationDef;
-import annotations.el.DefException;
-import annotations.el.ElementVisitor;
-import annotations.el.LocalLocation;
-import annotations.io.ASTIndex;
-import annotations.io.ASTPath;
-import annotations.io.ASTRecord;
-import annotations.io.DebugWriter;
-import annotations.io.IndexFileParser;
-import annotations.io.IndexFileWriter;
-import annotations.util.coll.VivifyingMap;
+import scenelib.type.Type;
+import scenelib.annotations.Annotation;
+import scenelib.annotations.el.ABlock;
+import scenelib.annotations.el.AClass;
+import scenelib.annotations.el.ADeclaration;
+import scenelib.annotations.el.AElement;
+import scenelib.annotations.el.AExpression;
+import scenelib.annotations.el.AField;
+import scenelib.annotations.el.AMethod;
+import scenelib.annotations.el.AScene;
+import scenelib.annotations.el.ATypeElement;
+import scenelib.annotations.el.ATypeElementWithType;
+import scenelib.annotations.el.AnnotationDef;
+import scenelib.annotations.el.DefException;
+import scenelib.annotations.el.ElementVisitor;
+import scenelib.annotations.el.LocalLocation;
+import scenelib.annotations.io.ASTIndex;
+import scenelib.annotations.io.ASTPath;
+import scenelib.annotations.io.ASTRecord;
+import scenelib.annotations.io.DebugWriter;
+import scenelib.annotations.io.IndexFileParser;
+import scenelib.annotations.io.IndexFileWriter;
+import scenelib.annotations.util.coll.VivifyingMap;
 import annotator.find.AnnotationInsertion;
 import annotator.find.CastInsertion;
 import annotator.find.ConstructorInsertion;
@@ -242,9 +242,9 @@ public class Main {
           el0.insertTypecasts.entrySet()) {
         ASTPath p = entry.getKey();
         ATypeElementWithType e = entry.getValue();
-        type.Type type = e.getType();
-        if (type instanceof type.DeclaredType
-            && ((type.DeclaredType) type).getName().isEmpty()) {
+        scenelib.type.Type type = e.getType();
+        if (type instanceof scenelib.type.DeclaredType
+            && ((scenelib.type.DeclaredType) type).getName().isEmpty()) {
           insertAnnotations.put(p, e);
           // visitTypeElement(e, insertAnnotations.vivify(p));
         } else {
@@ -451,7 +451,7 @@ public class Main {
         if (rec.astPath.isEmpty()) {
           el = decl;
         } else if (ins.getKind() == Insertion.Kind.CAST) {
-          annotations.el.ATypeElementWithType elem =
+          scenelib.annotations.el.ATypeElementWithType elem =
               decl.insertTypecasts.vivify(rec.astPath);
           elem.setType(((CastInsertion) ins).getType());
           el = elem;

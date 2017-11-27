@@ -2,7 +2,7 @@ package annotator.find;
 
 import java.util.List;
 
-import annotations.el.TypeIndexLocation;
+import scenelib.annotations.el.TypeIndexLocation;
 import annotator.scanner.CommonScanner;
 
 import com.sun.source.tree.ClassTree;

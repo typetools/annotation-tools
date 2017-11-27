@@ -2,8 +2,8 @@ package annotator.find;
 
 import java.util.List;
 
-import annotations.el.RelativeLocation;
-import annotations.io.ASTPath;
+import scenelib.annotations.el.RelativeLocation;
+import scenelib.annotations.io.ASTPath;
 
 import com.sun.source.tree.IntersectionTypeTree;
 import com.sun.source.tree.Tree;

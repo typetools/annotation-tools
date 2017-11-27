@@ -16,14 +16,14 @@ import junit.framework.TestSuite;
 
 import org.objectweb.asm.ClassReader;
 
-import annotations.Annotation;
-import annotations.AnnotationFactory;
-import annotations.el.AScene;
-import annotations.io.IndexFileParser;
-import annotations.io.IndexFileWriter;
-import annotations.io.classfile.ClassFileReader;
-import annotations.io.classfile.ClassFileWriter;
-import annotations.tests.classfile.foo.A;
+import scenelib.annotations.Annotation;
+import scenelib.annotations.AnnotationFactory;
+import scenelib.annotations.el.AScene;
+import scenelib.annotations.io.IndexFileParser;
+import scenelib.annotations.io.IndexFileWriter;
+import scenelib.annotations.io.classfile.ClassFileReader;
+import scenelib.annotations.io.classfile.ClassFileWriter;
+import scenelib.annotations.tests.classfile.foo.A;
 
 /**
  * This class is the testing framework for the class file/index file

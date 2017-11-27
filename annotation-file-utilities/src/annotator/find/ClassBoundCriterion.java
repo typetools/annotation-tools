@@ -1,6 +1,6 @@
 package annotator.find;
 
-import annotations.el.BoundLocation;
+import scenelib.annotations.el.BoundLocation;
 
 import com.sun.source.util.TreePath;
 import com.sun.source.tree.Tree;

@@ -2,7 +2,7 @@ package annotator.find;
 
 import java.util.List;
 
-import annotations.el.RelativeLocation;
+import scenelib.annotations.el.RelativeLocation;
 
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;

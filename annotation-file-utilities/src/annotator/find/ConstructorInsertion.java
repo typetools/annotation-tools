@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import type.Type;
+import scenelib.type.Type;
 
 public class ConstructorInsertion extends TypedInsertion {
   private ReceiverInsertion receiverInsertion = null;

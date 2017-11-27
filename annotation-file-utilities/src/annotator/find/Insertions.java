@@ -21,11 +21,11 @@ import java.util.TreeSet;
 import javax.lang.model.element.Name;
 import javax.lang.model.type.TypeKind;
 
-import annotations.el.InnerTypeLocation;
-import annotations.io.ASTIndex;
-import annotations.io.ASTPath;
-import annotations.io.ASTRecord;
-import type.*;
+import scenelib.annotations.el.InnerTypeLocation;
+import scenelib.annotations.io.ASTIndex;
+import scenelib.annotations.io.ASTPath;
+import scenelib.annotations.io.ASTRecord;
+import scenelib.type.*;
 
 import com.sun.source.tree.AnnotatedTypeTree;
 import com.sun.source.tree.AnnotationTree;
@@ -64,7 +64,7 @@ import com.sun.tools.javac.util.Pair;
  *
  * The class now serves a second purpose, which should probably be
  * separated out (according to OO dogma, at least): It attaches
- * {@link annotations.io.ASTPath}-based inner type {@link Insertion}s to
+ * {@link scenelib.annotations.io.ASTPath}-based inner type {@link Insertion}s to
  * a {@link TypedInsertion} on the outer type if one exists (see
  * {@link #organizeTypedInsertions(CompilationUnitTree, String, Collection)}.
  * Since getting these insertions right depends on this organization,

@@ -35,11 +35,11 @@ import java.lang.annotation.Annotation;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.tree.ClassNode;
 
-import annotations.ValueAttrAnnotation;
-import annotations.Values;
-import annotations.ValuesAnnotation;
-import annotations.ValuesDump;
-import annotations.ValuesEnum;
+import scenelib.annotations.ValueAttrAnnotation;
+import scenelib.annotations.Values;
+import scenelib.annotations.ValuesAnnotation;
+import scenelib.annotations.ValuesDump;
+import scenelib.annotations.ValuesEnum;
 
 import junit.framework.TestCase;
 

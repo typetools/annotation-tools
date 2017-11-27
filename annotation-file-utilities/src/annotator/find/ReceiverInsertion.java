@@ -2,7 +2,7 @@ package annotator.find;
 
 import java.util.List;
 
-import type.DeclaredType;
+import scenelib.type.DeclaredType;
 
 /**
  * An insertion for a method receiver. This supports inserting an

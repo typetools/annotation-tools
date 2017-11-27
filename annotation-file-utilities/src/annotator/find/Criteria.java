@@ -3,13 +3,13 @@ package annotator.find;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import annotations.el.BoundLocation;
-import annotations.el.InnerTypeLocation;
-import annotations.el.LocalLocation;
-import annotations.el.RelativeLocation;
-import annotations.el.TypeIndexLocation;
-import annotations.io.ASTPath;
-import annotations.io.DebugWriter;
+import scenelib.annotations.el.BoundLocation;
+import scenelib.annotations.el.InnerTypeLocation;
+import scenelib.annotations.el.LocalLocation;
+import scenelib.annotations.el.RelativeLocation;
+import scenelib.annotations.el.TypeIndexLocation;
+import scenelib.annotations.io.ASTPath;
+import scenelib.annotations.io.DebugWriter;
 import annotator.Main;
 
 import com.sun.source.tree.Tree;
