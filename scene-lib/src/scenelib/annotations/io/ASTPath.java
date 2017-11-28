@@ -1626,9 +1626,8 @@ public class ASTPath extends ImmutableStack<ASTPath.ASTEntry>
 
 } // end of class ASTPath
 
-// This class cannot be moved to (say) package
-// scenelib.annotations.util.PersistentStack, probably because of the
-// reflection cleverness.
+// This class cannot be moved to (say) package scenelib.annotations.util,
+// probably because of the reflection cleverness.
 /**
  * Immutable stack:  operations create new stacks rather than mutate the receiver.
  *
