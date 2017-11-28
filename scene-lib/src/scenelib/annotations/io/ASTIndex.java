@@ -68,8 +68,6 @@ import scenelib.annotations.util.coll.WrapperMap;
 
 /**
  * Cache of {@code ASTPath} data for the nodes of a compilation unit tree.
- *
- * @author dbro
  */
 public class ASTIndex extends WrapperMap<Tree, ASTRecord> {
   // single-item cache

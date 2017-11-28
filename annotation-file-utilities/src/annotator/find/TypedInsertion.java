@@ -25,8 +25,6 @@ import scenelib.type.Type;
  * labeled as "inserted" (with {@link Insertion#setInserted(boolean)})
  * so they are not inserted as the rest of the insertions list is
  * processed.
- *
- * @author dbro
  */
 public abstract class TypedInsertion extends Insertion {
   /**

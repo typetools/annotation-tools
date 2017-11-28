@@ -15,8 +15,6 @@ import com.sun.source.util.TreePath;
  * Structure bundling an {@link ASTPath} with information about its
  *  starting point. Necessary because the {@link ASTPath} structure
  *  does not include the declaration from which it originates.
- *
- * @author dbro
  */
 public class ASTRecord implements Comparable<ASTRecord> {
   /**

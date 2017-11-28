@@ -1150,30 +1150,31 @@ loop:
   }
 
   // Map from ASTRecord to the given type.  Internally also indexes by ASTPath.
+  // (The need to also index by ASTPath suggests that the ASTRecord equality test ignores
+  // its ASTPath.)
   class ASTRecordMap<E> implements Map<ASTRecord, E> {
-    Map<ASTRecord, SortedMap<ASTPath, E>> back;
+    Map<ASTRecord, SortedMap<ASTPath, E>> back = new HashMap<>();
 
     ASTRecordMap() {
-      back = new HashMap<ASTRecord, SortedMap<ASTPath, E>>();
     }
 
-    private SortedMap<ASTPath, E> getMap(ASTRecord rec) {
+    private SortedMap<ASTPath, E> getPathMap(ASTRecord rec) {
       ASTRecord key = rec.replacePath(ASTPath.empty());
-      SortedMap<ASTPath, E> map = back.get(key);
-      if (map == null) {
-        map = new TreeMap<ASTPath, E>();
-        back.put(key, map);
+      SortedMap<ASTPath, E> pathMap = back.get(key);
+      if (pathMap == null) {
+        pathMap = new TreeMap<ASTPath, E>();
+        back.put(key, pathMap);
       }
-      return map;
+      return pathMap;
     }
 
     @Override
     public int size() {
-      int n = 0;
-      for (SortedMap<ASTPath, E> map : back.values()) {
-        n += map.size();
+      int result = 0;
+      for (SortedMap<ASTPath, E> pathMap : back.values()) {
+        result += pathMap.size();
       }
-      return n;
+      return result;
     }
 
     @Override
@@ -1184,16 +1185,16 @@ loop:
     @Override
     public boolean containsKey(Object key) {
       ASTRecord rec = (ASTRecord) key;
-      SortedMap<ASTPath, E> m = getMap(rec);
-      return m != null && m.containsKey(rec.astPath);
+      SortedMap<ASTPath, E> m = getPathMap(rec);
+      return m.containsKey(rec.astPath);
     }
 
     @Override
     public boolean containsValue(Object value) {
       @SuppressWarnings("unchecked")
       E e = (E) value;
-      for (SortedMap<ASTPath, E> map : back.values()) {
-        if (map.containsValue(e)) { return true; }
+      for (SortedMap<ASTPath, E> pathMap : back.values()) {
+        if (pathMap.containsValue(e)) { return true; }
       }
       return false;
     }
@@ -1201,22 +1202,22 @@ loop:
     @Override
     public E get(Object key) {
       ASTRecord rec = (ASTRecord) key;
-      SortedMap<ASTPath, E> map = getMap(rec);
-      return map == null ? null : map.get(rec.astPath);
+      SortedMap<ASTPath, E> pathMap = getPathMap(rec);
+      return pathMap.get(rec.astPath);
     }
 
     @Override
     public E put(ASTRecord key, E value) {
       ASTRecord rec = key;
-      SortedMap<ASTPath, E> map = getMap(rec);
-      return map == null ? null : map.put(rec.astPath, value);
+      SortedMap<ASTPath, E> pathMap = getPathMap(rec);
+      return pathMap.put(rec.astPath, value);
     }
 
     @Override
     public E remove(Object key) {
       ASTRecord rec = (ASTRecord) key;
-      SortedMap<ASTPath, E> map = getMap(rec);
-      return map == null ? null : map.remove(rec.astPath);
+      SortedMap<ASTPath, E> pathMap = getPathMap(rec);
+      return pathMap.remove(rec.astPath);
     }
 
     @Override

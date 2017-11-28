@@ -30,8 +30,6 @@ import scenelib.annotations.util.coll.VivifyingMap;
  *
  * Also includes a {@link #main(String[])} method that lets these
  * operations be performed from the command line.
- *
- * @author dbro
  */
 public class SceneOps {
   private SceneOps() {}
@@ -122,8 +120,6 @@ public class SceneOps {
  * Visitor for calculating "set difference" of scenes.
  * Visitor methods fill in a scene instead of returning one because an
  * {@link AElement} can be created only inside an {@link AScene}.
- *
- * @author dbro
  */
 class DiffVisitor
 implements ElementVisitor<Void, Pair<AElement, AElement>> {
