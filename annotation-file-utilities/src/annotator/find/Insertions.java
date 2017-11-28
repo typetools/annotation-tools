@@ -987,57 +987,73 @@ outer:
     }
   }
 
-  // merge annotations, assuming types are structurally identical
-  private void mergeTypedInsertions(TypedInsertion ins0, TypedInsertion ins1) {
-    mergeTypes(ins0.getType(), ins1.getType());
+  /**
+   * Merge annotations, assuming types are structurally identical.
+   * Side-effects the first argument.
+   */
+  private void mergeTypedInsertions(TypedInsertion ins1, TypedInsertion ins2) {
+    mergeTypes(ins1.getType(), ins2.getType());
   }
 
-  private void mergeTypes(Type t0, Type t1) {
-    if (t0 == t1) { return; }
-    switch (t0.getKind()) {
+  /**
+   * Merge annotations, assuming types are structurally identical.
+   * Side-effects the first argument.
+   */
+  private void mergeTypes(Type t1, Type t2) {
+    // TODO: should this test for .equals too?
+    if (t1 == t2) { return; }
+    switch (t1.getKind()) {
     case ARRAY:
       {
-        ArrayType at0 = (ArrayType) t0;
         ArrayType at1 = (ArrayType) t1;
-        mergeTypes(at0.getComponentType(), at1.getComponentType());
+        ArrayType at2 = (ArrayType) t2;
+        mergeTypes(at1.getComponentType(), at2.getComponentType());
         return;
       }
     case BOUNDED:
       {
-        BoundedType bt0 = (BoundedType) t0;
         BoundedType bt1 = (BoundedType) t1;
-        if (bt0.getBoundKind() != bt1.getBoundKind()) { break; }
-        mergeTypes(bt0.getBound(), bt1.getBound());
-        mergeTypes(bt0.getName(), bt1.getName());
+        BoundedType bt2 = (BoundedType) t2;
+        if (bt1.getBoundKind() != bt2.getBoundKind()) {
+          throw new Error(String.format("Types have different bounds: %s %s", t1, t2));
+        }
+        mergeTypes(bt1.getBound(), bt2.getBound());
+        mergeTypes(bt1.getName(), bt2.getName());
         return;
       }
     case DECLARED:
       {
-        DeclaredType dt0 = (DeclaredType) t0;
         DeclaredType dt1 = (DeclaredType) t1;
-        List<Type> tps0 = dt0.getTypeParameters();
-        List<Type> tps1 = dt1.getTypeParameters();
-        int n = tps0.size();
-        if (tps1.size() != n) { break; }
-        mergeTypes(dt0.getInnerType(), dt1.getInnerType());
-        for (String anno : dt1.getAnnotations()) {
-          if (!dt0.getAnnotations().contains(anno)) {
-            dt0.addAnnotation(anno);
+        DeclaredType dt2 = (DeclaredType) t2;
+        List<Type> params1 = dt1.getTypeParameters();
+        List<Type> params2 = dt2.getTypeParameters();
+        int numParams = params1.size();
+        if (params2.size() != numParams) {
+          throw new Error(String.format("Types have different numbers of parameters: %s %s", t1, t2));
+        }
+        mergeTypes(dt1.getInnerType(), dt2.getInnerType());
+        for (String anno : dt2.getAnnotations()) {
+          if (!dt1.getAnnotations().contains(anno)) {
+            dt1.addAnnotation(anno);
           }
         }
-        for (int i = 0; i < n; i++) {
-          mergeTypes(tps0.get(i), tps1.get(i));
+        for (int i = 0; i < numParams; i++) {
+          mergeTypes(params1.get(i), params2.get(i));
         }
         return;
       }
+    default:
+      throw new RuntimeException();
     }
-    throw new RuntimeException();
   }
 
-  // Returns the depth of the innermost local type of a type AST.
+  /**
+   * Returns the depth of type nesting of the innermost nested type of a type AST.
+   * For example, both {@code A.B.C} and {@code A.B<D.E.F.G>.C} have depth 3.
+   */
   private int localDepth(Tree node) {
     Tree t = node;
-    int n = 0;
+    int result = 0;
 loop:
     while (t != null) {
       switch (t.getKind()) {
@@ -1053,13 +1069,13 @@ loop:
           }
         }
         t = ((MemberSelectTree) t).getExpression();
-        ++n;
+        ++result;
         break;
       default:
         break loop;
       }
     }
-    return n;
+    return result;
   }
 
   private static int kindLevel(Insertion i) {
