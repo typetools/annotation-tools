@@ -113,15 +113,7 @@ public class ASTRecord implements Comparable<ASTRecord> {
 
   @Override
   public int hashCode() {
-    return ast.hashCode()
-        ^ (className == null ? 0
-            : Integer.rotateRight(className.hashCode(), 3))
-        ^ (methodName == null ? 0
-            : Integer.rotateRight(methodName.hashCode(), 6))
-        ^ (varName == null ? 0
-            : Integer.rotateRight(varName.hashCode(), 9))
-        ^ (astPath == null ? 0
-            : Integer.rotateRight(astPath.hashCode(), 12));
+    return Objects.hash(ast, className, methodName, varName, astPath);
   }
 
   /**

@@ -252,9 +252,7 @@ public class ASTPath extends ImmutableStack<ASTPath.ASTEntry>
 
     @Override
     public int hashCode() {
-      int base = treeKind.hashCode() ^ childSelector.hashCode();
-      int shift = argument == null ? 0 : 2 + argument;
-      return Integer.rotateRight(base, shift);
+      return Objects.hash(treeKind, childSelector, argument);
     }
 
     @Override
