@@ -8,12 +8,13 @@ import scenelib.type.DeclaredType;
 import scenelib.type.Type;
 
 /**
- * Superclass for {@link Insertion} classes for which insertion may
+ * An insertion that may
  * result in code generation other than just annotations.
  * {@code TypedInsertion}s keep track of insertions on inner types.  If
  * there is no type given in the source, one may be generated (along
  * with other code necessary in the context) to serve as an insertion
  * site.
+ *
  * <p>
  * We don't know until the end of the whole insertion process whether
  * the type already exists or not.  To remedy this, we store a reference
@@ -24,8 +25,6 @@ import scenelib.type.Type;
  * labeled as "inserted" (with {@link Insertion#setInserted(boolean)})
  * so they are not inserted as the rest of the insertions list is
  * processed.
- *
- * @author dbro
  */
 public abstract class TypedInsertion extends Insertion {
   /**

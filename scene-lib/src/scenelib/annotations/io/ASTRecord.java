@@ -1,5 +1,6 @@
 package scenelib.annotations.io;
 
+import java.util.Objects;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
@@ -15,8 +16,6 @@ import com.sun.source.util.TreePath;
  * Structure bundling an {@link ASTPath} with information about its
  *  starting point. Necessary because the {@link ASTPath} structure
  *  does not include the declaration from which it originates.
- *
- * @author dbro
  */
 public class ASTRecord implements Comparable<ASTRecord> {
   /**
@@ -115,15 +114,7 @@ public class ASTRecord implements Comparable<ASTRecord> {
 
   @Override
   public int hashCode() {
-    return ast.hashCode()
-        ^ (className == null ? 0
-            : Integer.rotateRight(className.hashCode(), 3))
-        ^ (methodName == null ? 0
-            : Integer.rotateRight(methodName.hashCode(), 6))
-        ^ (varName == null ? 0
-            : Integer.rotateRight(varName.hashCode(), 9))
-        ^ (astPath == null ? 0
-            : Integer.rotateRight(astPath.hashCode(), 12));
+    return Objects.hash(ast, className, methodName, varName, astPath);
   }
 
   /**

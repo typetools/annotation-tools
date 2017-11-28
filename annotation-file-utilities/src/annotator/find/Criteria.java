@@ -331,7 +331,7 @@ public final class Criteria {
       case AST_PATH:
         ASTPath astPath = ((ASTPathCriterion) c).astPath;
         if (!astPath.isEmpty()) {
-          ASTPath.ASTEntry entry = astPath.get(-1);
+          ASTPath.ASTEntry entry = astPath.getLast();
           if (entry.childSelectorIs(ASTPath.BOUND)
               && entry.getArgument() == 0) {
             return true;

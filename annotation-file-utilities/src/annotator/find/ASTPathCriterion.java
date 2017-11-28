@@ -535,7 +535,7 @@ public class ASTPathCriterion implements Criterion {
                 NewArrayTree newArray = (NewArrayTree) actualNode;
                 if (astNode.childSelectorIs(ASTPath.TYPE)) {
                     Type type = ((JCTree.JCNewArray) newArray).type;
-                    Tree typeTree = Insertions.TypeTree.fromType(type);
+                    Tree typeTree = Insertions.TypeTree.fromJavacType(type);
                     int arg = astNode.getArgument();
                     if (arg == 0 && astPath.size() == ix+1) {
                         return newArray;

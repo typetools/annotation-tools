@@ -1011,7 +1011,7 @@ loop:
       dbug.debug("  Insertion: %s%n", i);
       dbug.debug("  First line of node: %s%n", Main.firstLine(node.toString()));
       dbug.debug("  Type of node: %s%n", node.getClass());
-      if (i.getInserted()) {
+      if (i.isInserted()) {
         // Skip this insertion if it has already been inserted. See
         // the ReceiverInsertion class for details.
         dbug.debug("  ... already inserted%n");
@@ -1192,7 +1192,7 @@ loop:
           // looking for the receiver or the declaration
           typeScan = i.getCriteria().isOnReceiver();
         } else if (CommonScanner.hasClassKind(node)) { // ClassTree
-          typeScan = ! i.getSeparateLine(); // hacky check
+          typeScan = ! i.isSeparateLine(); // hacky check
         }
         if (typeScan) {
           // looking for the type
@@ -1235,7 +1235,7 @@ loop:
   Integer findPositionByASTPath(ASTPath astPath, TreePath path, Insertion i) {
     Tree node = path.getLeaf();
     try {
-      ASTPath.ASTEntry entry = astPath.get(-1);
+      ASTPath.ASTEntry entry = astPath.getLast();
       // As per the JSR308 specification, receiver parameters are not allowed
       // on method declarations of anonymous inner classes.
       if (entry.getTreeKind() == Tree.Kind.METHOD
@@ -1373,7 +1373,7 @@ loop:
         Type t = ((CastInsertion) i).getType();
         JCTree jcTree = (JCTree) node;
         if (jcTree.getKind() == Tree.Kind.VARIABLE && !astPath.isEmpty()
-            && astPath.get(-1).childSelectorIs(ASTPath.INITIALIZER)) {
+            && astPath.getLast().childSelectorIs(ASTPath.INITIALIZER)) {
           node = ((JCVariableDecl) node).getInitializer();
           if (node == null) { return null; }
           jcTree = (JCTree) node;
@@ -1385,7 +1385,7 @@ loop:
               if (jcTree.type instanceof NullType) {
                 dt.setName("Object");
               } else {
-                t = Insertions.TypeTree.conv(jcTree.type);
+                t = Insertions.TypeTree.javacTypeToType(jcTree.type);
                 t.setAnnotations(dt.getAnnotations());
                 ((CastInsertion) i).setType(t);
               }
@@ -1394,7 +1394,7 @@ loop:
       } else if (i.getKind() == Insertion.Kind.CLOSE_PARENTHESIS) {
         JCTree jcTree = (JCTree) node;
         if (jcTree.getKind() == Tree.Kind.VARIABLE && !astPath.isEmpty()
-            && astPath.get(-1).childSelectorIs(ASTPath.INITIALIZER)) {
+            && astPath.getLast().childSelectorIs(ASTPath.INITIALIZER)) {
           node = ((JCVariableDecl) node).getInitializer();
           if (node == null) { return null; }
           jcTree = (JCTree) node;
@@ -1406,7 +1406,7 @@ loop:
           // looking for the receiver or the declaration
           typeScan = IndexFileSpecification.isOnReceiver(i.getCriteria());
         } else if (node.getKind() == Tree.Kind.CLASS) { // ClassTree
-          typeScan = ! i.getSeparateLine(); // hacky check
+          typeScan = ! i.isSeparateLine(); // hacky check
         }
         if (typeScan) {
           // looking for the type
@@ -1722,7 +1722,7 @@ loop:
     DeclaredType baseType = neu.getBaseType();
     if (baseType.getName().isEmpty()) {
       List<String> annotations = neu.getType().getAnnotations();
-      Type newType = Insertions.TypeTree.conv(
+      Type newType = Insertions.TypeTree.javacTypeToType(
           ((JCTree.JCNewArray) newArray).type);
       for (String ann : annotations) {
         newType.addAnnotation(ann);

@@ -477,7 +477,7 @@ public class IndexFileSpecification implements Specification {
     ASTPath astPath = criteria.getASTPath();
     if (astPath == null) { return criteria.isOnReceiver(); }
     if (astPath.isEmpty()) { return false; }
-    ASTPath.ASTEntry entry = astPath.get(-1);
+    ASTPath.ASTEntry entry = astPath.getLast();
     return entry.childSelectorIs(ASTPath.PARAMETER)
         && entry.getArgument() < 0;
   }
@@ -485,7 +485,7 @@ public class IndexFileSpecification implements Specification {
   public static boolean isOnNew(Criteria criteria) {
     ASTPath astPath = criteria.getASTPath();
     if (astPath == null || astPath.isEmpty()) { return criteria.isOnNew(); }
-    ASTPath.ASTEntry entry = astPath.get(-1);
+    ASTPath.ASTEntry entry = astPath.getLast();
     Tree.Kind kind = entry.getTreeKind();
     return kind == Tree.Kind.NEW_ARRAY
             && entry.childSelectorIs(ASTPath.TYPE)
@@ -529,7 +529,7 @@ public class IndexFileSpecification implements Specification {
     Insertion.decorateType(innerTypeInsertions, type, criteria.getASTPath());
     CastInsertion cast = new CastInsertion(criteria, type);
     CloseParenthesisInsertion closeParen = new CloseParenthesisInsertion(
-        criteria, cast.getSeparateLine());
+        criteria, cast.isSeparateLine());
     return new Pair<CastInsertion, CloseParenthesisInsertion>(cast, closeParen);
   }
 

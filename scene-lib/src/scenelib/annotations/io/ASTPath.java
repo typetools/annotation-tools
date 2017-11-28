@@ -1,5 +1,6 @@
 package scenelib.annotations.io;
 
+import java.util.Objects;
 import java.io.IOException;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
@@ -14,7 +15,6 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import plume.ArraysMDE;
-import scenelib.annotations.util.PersistentStack;
 
 import com.sun.source.tree.AnnotatedTypeTree;
 import com.sun.source.tree.AnnotationTree;
@@ -65,12 +65,12 @@ import com.sun.source.util.TreePath;
 /**
  * A path through the AST.
  */
-public class ASTPath extends ConsStack<ASTPath.ASTEntry>
-implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
+public class ASTPath extends ImmutableStack<ASTPath.ASTEntry>
+    implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
   private static final ASTPath EMPTY = new ASTPath();
   private static final String[] typeSelectors =
     { "bound", "identifier", "type", "typeAlternative", "typeArgument",
-    "typeParameter", "underlyingType" };
+      "typeParameter", "underlyingType" };
 
   // Constants for the various child selectors.
   public static final String ANNOTATION = "annotation";
@@ -117,6 +117,7 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
   public static class ASTEntry implements Comparable<ASTEntry> {
     private Tree.Kind treeKind;
     private String childSelector;
+    /* May be null. */
     private Integer argument;
 
     /**
@@ -133,13 +134,14 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
      * @param argument the argument
      */
     public ASTEntry(Tree.Kind treeKind, String childSelector, Integer argument) {
+      if (childSelector == null) { throw new NullPointerException(); }
       this.treeKind = treeKind;
       this.childSelector = childSelector;
       this.argument = argument;
     }
 
     /**
-     * Constructs a new AST entry, without an argument.
+     * Constructs a new AST entry, without a numeric argument.
      *
      * See {@link #ASTEntry(Tree.Kind, String, Integer)} for an example of the parameters.
      *
@@ -232,10 +234,6 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
     public int compareTo(ASTEntry o) {
       if (o == null) {
         return 1;
-      } else if (o.childSelector == null) {
-        if (childSelector != null) { return 1; }
-      } else if (childSelector == null) {
-        return -1;
       }
       int c = treeKind.compareTo(o.treeKind);
       if (c != 0) { return c; }
@@ -253,9 +251,7 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
 
     @Override
     public int hashCode() {
-      int base = treeKind.hashCode() ^ childSelector.hashCode();
-      int shift = argument == null ? 0 : 2 + argument;
-      return Integer.rotateRight(base, shift);
+      return Objects.hash(treeKind, childSelector, argument);
     }
 
     @Override
@@ -358,7 +354,7 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
   // TODO: replace w/ skip list?
   @Override
   public Iterator<ASTEntry> iterator() {
-    PersistentStack<ASTEntry> s = this;
+    ImmutableStack<ASTEntry> s = this;
     int n = size();
     ASTEntry[] a = new ASTEntry[n];
     while (--n >= 0) {
@@ -390,87 +386,13 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
     return (ASTPath) pop();
   }
 
-  public ASTEntry get(int index) {
-    PersistentStack<ASTEntry> s = this;
-    int n = size();
-    if (index >= n) {
-      throw new NoSuchElementException(Integer.toString(index));
-    }
-    if (index < 0) {
-      index += n;
-      if (index < 0) {
-        throw new IllegalArgumentException("negative index " + index);
-      }
-    }
-    while (--n > index) { s = s.pop(); }
-    return s.peek();
-  }
-
-  @Override
-  public int hashCode() {
-    // hacky fix: remove {Method,Class}.body for comparison
-    PersistentStack<ASTEntry> s = canonical(this);
-    int hash = 0;
-    while (!s.isEmpty()) {
-      hash = Integer.rotateRight(hash ^ s.peek().hashCode(), 1);
-      s = s.pop();
-    }
-    return hash;
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    return o instanceof ASTPath && equals((ASTPath) o);
-  }
-
-  public boolean equals(ASTPath astPath) {
-    return compareTo(astPath) == 0;
-  }
-
-  @Override
-  public int compareTo(ASTPath o) {
-    // hacky fix: remove {Method,Class}.body for comparison
-    PersistentStack<ASTEntry> s0 = canonical(this);
-    PersistentStack<ASTEntry> s1 = canonical(o);
-    Deque<ASTEntry> d0 = new LinkedList<ASTEntry>();
-    Deque<ASTEntry> d1 = new LinkedList<ASTEntry>();
-    int c = 0;
-    while (!s0.isEmpty()) {
-      d0.push(s0.peek());
-      s0 = s0.pop();
-    }
-    while (!s1.isEmpty()) {
-      d1.push(s1.peek());
-      s1 = s1.pop();
-    }
-    int n0 = d0.size();
-    int n1 = d1.size();
-    c = Integer.compare(n0, n1);
-    if (c == 0) {
-      Iterator<ASTEntry> i0 = d0.iterator();
-      Iterator<ASTEntry> i1 = d1.iterator();
-      while (i0.hasNext()) {
-        c = i0.next().compareTo(i1.next());
-        if (c != 0) { return c; }
-      }
-    }
-    return c;
+  public ASTEntry getLast() {
+    return peek();
   }
 
   private static ASTPath canonical(ASTPath astPath) {
     // TODO
     return astPath;
-  }
-
-  @Override
-  public String toString() {
-    if (isEmpty()) { return ""; }
-    Iterator<ASTEntry> iter = iterator();
-    StringBuilder sb = new StringBuilder().append(iter.next());
-    while (iter.hasNext()) {
-      sb = sb.append(", ").append(iter.next());
-    }
-    return sb.toString();
   }
 
   /**
@@ -1619,30 +1541,95 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
       return !isDeclaration(kind);
     }
   }  // TODO: need "isType"?
-}
 
+  @Override
+  public int hashCode() {
+    // hacky fix: remove {Method,Class}.body for comparison
+    ImmutableStack<ASTEntry> s = canonical(this);
+    int hash = 0;
+    while (!s.isEmpty()) {
+      hash = Integer.rotateRight(hash ^ s.peek().hashCode(), 1);
+      s = s.pop();
+    }
+    return hash;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    return o instanceof ASTPath && equals((ASTPath) o);
+  }
+
+  public boolean equals(ASTPath astPath) {
+    return compareTo(astPath) == 0;
+  }
+
+  @Override
+  public int compareTo(ASTPath o) {
+    // hacky fix: remove {Method,Class}.body for comparison
+    ImmutableStack<ASTEntry> s0 = canonical(this);
+    ImmutableStack<ASTEntry> s1 = canonical(o);
+    Deque<ASTEntry> d0 = new LinkedList<ASTEntry>();
+    Deque<ASTEntry> d1 = new LinkedList<ASTEntry>();
+    int c = 0;
+    while (!s0.isEmpty()) {
+      d0.push(s0.peek());
+      s0 = s0.pop();
+    }
+    while (!s1.isEmpty()) {
+      d1.push(s1.peek());
+      s1 = s1.pop();
+    }
+    int n0 = d0.size();
+    int n1 = d1.size();
+    c = Integer.compare(n0, n1);
+    if (c == 0) {
+      Iterator<ASTEntry> i0 = d0.iterator();
+      Iterator<ASTEntry> i1 = d1.iterator();
+      while (i0.hasNext()) {
+        c = i0.next().compareTo(i1.next());
+        if (c != 0) { return c; }
+      }
+    }
+    return c;
+  }
+
+  @Override
+  public String toString() {
+    if (isEmpty()) { return ""; }
+    Iterator<ASTEntry> iter = iterator();
+    StringBuilder sb = new StringBuilder().append(iter.next());
+    while (iter.hasNext()) {
+      sb = sb.append(", ").append(iter.next());
+    }
+    return sb.toString();
+  }
+
+
+} // end of class ASTPath
+
+// This class cannot be moved to (say) package scenelib.annotations.util,
+// probably because of the reflection cleverness.
 /**
- *
- * @author dbro
+ * Immutable stack:  operations create new stacks rather than mutate the receiver.
  *
  * @param <E> type of stack elements
  */
-class ConsStack<E> implements PersistentStack<E> {
-  private int size;
-  private E elem;
-  private PersistentStack<E> rest;
+class ImmutableStack<E> {
 
-  public ConsStack() {
-    size = 0;
-    elem = null;
-    rest = null;
+  // The stack is implemented as a linked list:
+  // each ImmutableStack consists of an element and the rest of the list.
+  private E elem = null;
+  private ImmutableStack<E> rest = null;
+  private int size = 0;
+
+  public ImmutableStack() {
   }
 
-  private static <T, S extends ConsStack<T>> S extend(T el, S s0) {
+  private static <T, S extends ImmutableStack<T>> S extend(T el, S s0) {
     try {
       @SuppressWarnings("unchecked")
       S s1 = (S) s0.getClass().newInstance();
-      ConsStack<T> cs = (ConsStack<T>) s1;
+      ImmutableStack<T> cs = (ImmutableStack<T>) s1;
       cs.size = 1 + s0.size();
       cs.elem = el;
       cs.rest = s0;
@@ -1654,34 +1641,47 @@ class ConsStack<E> implements PersistentStack<E> {
     }
   }
 
-  @Override
-  public boolean isEmpty() { return size == 0; }
+  public boolean isEmpty() {
+    return size == 0;
+  }
 
-  @Override
   public E peek() {
-    if (size > 0) { return elem; }
-    throw new IllegalStateException("peek() on empty stack");
+    if (isEmpty()) {
+      throw new IllegalStateException("peek() on empty stack");
+    }
+    return elem;
   }
 
-  @Override
-  public PersistentStack<E> pop() {
-    if (size > 0) { return rest; }
-    throw new IllegalStateException("pop() on empty stack");
+  public ImmutableStack<E> pop() {
+    if (isEmpty()) {
+      throw new IllegalStateException("pop() on empty stack");
+    }
+    return rest;
   }
 
-  @Override
-  public PersistentStack<E> push(E elem) {
+  public ImmutableStack<E> push(E elem) {
     return extend(elem, this);
   }
 
-  @Override
   public int size() { return size; }
 
-  @Override
+  /** Return the index-th element of this stack. */
+  public E get(int index) {
+    int n = size();
+
+    if (! (0 <= index && index < n)) {
+      throw new NoSuchElementException("Has " + n + " elements, asked for #" + index);
+    }
+
+    ImmutableStack<E> s = this;
+    while (--n > index) { s = s.pop(); }
+    return s.peek();
+  }
+
   public String toString() {
     if (size > 0) {
       StringBuilder sb = new StringBuilder("]").insert(0, peek());
-      for (PersistentStack<E> stack = pop(); !stack.isEmpty();
+      for (ImmutableStack<E> stack = pop(); !stack.isEmpty();
           stack = stack.pop()) {
         sb = sb.insert(0, ", ").insert(0, stack.peek());
       }
@@ -1689,4 +1689,5 @@ class ConsStack<E> implements PersistentStack<E> {
     }
     return "[]";
   }
-}
+} // end of class ImmutableStack
+

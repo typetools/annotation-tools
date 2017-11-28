@@ -13,8 +13,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 /**
  * A declaration, as opposed to an expression.  Base class for AClass,
  * AMethod, and AField.
- *
- * @author dbro
  */
 public abstract class ADeclaration extends AElement {
   /** The element's insert-annotation invocations; map key is the AST path to the insertion place */
