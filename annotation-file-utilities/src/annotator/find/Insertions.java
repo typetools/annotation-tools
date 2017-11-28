@@ -208,6 +208,7 @@ public class Insertions implements Iterable<Insertion> {
     return new Iterator<Insertion>() {
       private Iterator<Map<String, Set<Insertion>>> miter =
           store.values().iterator();
+      // These two fields are initially empty, but are set the first time that hasNext is called.
       private Iterator<Set<Insertion>> siter =
           Collections.<Set<Insertion>>emptySet().iterator();
       private Iterator<Insertion> iiter =
@@ -249,7 +250,7 @@ public class Insertions implements Iterable<Insertion> {
   public List<Insertion> toList() {
     List<Insertion> list = new ArrayList<Insertion>(size);
     for (Insertion ins : this) { list.add(ins); }
-    return null;
+    return list;
   }
 
   /**
@@ -1403,65 +1404,48 @@ loop:
 
     /** Create a javac Type from a scene-lib Type. */
     static Type javacTypeToType(final com.sun.tools.javac.code.Type jtype) {
-      Type type = null;
-      DeclaredType d;
-      com.sun.tools.javac.code.Type t;
       switch (jtype.getKind()) {
       case ARRAY:
-        t = ((com.sun.tools.javac.code.Type.ArrayType) jtype).elemtype;
-        type = new ArrayType(javacTypeToType(t));
-        break;
+        return new ArrayType(javacTypeToType(((com.sun.tools.javac.code.Type.ArrayType) jtype).elemtype));
       case DECLARED:
-        t = jtype;
-        d = null;
-        do {
-          DeclaredType d0 = d;
-          com.sun.tools.javac.code.Type.ClassType ct =
+        {
+          com.sun.tools.javac.code.Type t = jtype;
+          DeclaredType d = null;
+          do {
+            DeclaredType d0 = d;
+            com.sun.tools.javac.code.Type.ClassType ct =
               (com.sun.tools.javac.code.Type.ClassType) t;
-          d = new DeclaredType(ct.tsym.name.toString());
-          d.setInnerType(d0);
-          d0 = d;
-          for (com.sun.tools.javac.code.Type a : ct.getTypeArguments()) {
-            d.addTypeParameter(javacTypeToType(a));
-          }
-          t = ct.getEnclosingType();
-        } while (t.getKind() == TypeKind.DECLARED);
-        type = d;
-        break;
+            d = new DeclaredType(ct.tsym.name.toString());
+            d.setInnerType(d0);
+            d0 = d;
+            for (com.sun.tools.javac.code.Type a : ct.getTypeArguments()) {
+              d.addTypeParameter(javacTypeToType(a));
+            }
+            t = ct.getEnclosingType();
+          } while (t.getKind() == TypeKind.DECLARED);
+          return d;
+        }
       case WILDCARD:
-        BoundedType.BoundKind k;
-        t = ((com.sun.tools.javac.code.Type.WildcardType) jtype).bound;
-        switch (((com.sun.tools.javac.code.Type.WildcardType) jtype).kind) {
-        case EXTENDS:
-          k = BoundedType.BoundKind.EXTENDS;
-          break;
-        case SUPER:
-          k = BoundedType.BoundKind.SUPER;
-          break;
-        case UNBOUND:
-          k = null;
-          type = new DeclaredType("?");
-          break;
-        default:
-          throw new RuntimeException();
+        com.sun.tools.javac.code.Type.WildcardType wildcard
+          = ((com.sun.tools.javac.code.Type.WildcardType) jtype);
+        if (wildcard.kind == com.sun.tools.javac.code.BoundKind.UNBOUND) {
+          return new DeclaredType("?");
         }
-        if (k != null) {
-          d = new DeclaredType(jtype.tsym.name.toString());
-          type = new BoundedType(d, k, (DeclaredType) javacTypeToType(t));
-        }
-        break;
+        return new BoundedType(new DeclaredType(jtype.tsym.name.toString()),
+                               wildcard.kind,
+                               (DeclaredType) javacTypeToType(wildcard.bound));
       case TYPEVAR:
-        t = ((com.sun.tools.javac.code.Type.TypeVar) jtype).getUpperBound();
-        type = javacTypeToType(t);
-        if (type.getKind() == Type.Kind.DECLARED) {
-          type = new BoundedType(new DeclaredType(jtype.tsym.name.toString()),
-              BoundedType.BoundKind.EXTENDS, (DeclaredType) type);
-        }  // otherwise previous conv should have been here already
-        break;
+        {
+          Type upperBound = javacTypeToType(((com.sun.tools.javac.code.Type.TypeVar) jtype).getUpperBound());
+          if (upperBound.getKind() == Type.Kind.DECLARED) {
+            return new BoundedType(new DeclaredType(jtype.tsym.name.toString()),
+                                   BoundedType.BoundKind.EXTENDS, (DeclaredType) upperBound);
+          } else {
+            return upperBound;
+          }
+        }
       case INTERSECTION:
-        t = jtype.tsym.erasure_field;  // ???
-        type = new DeclaredType(t.tsym.name.toString());
-        break;
+        return new DeclaredType(jtype.tsym.erasure_field.tsym.name.toString());
       case UNION:
         // TODO
         throw new Error("UNION case not yet implemented");
@@ -1474,19 +1458,17 @@ loop:
       case SHORT:
       case FLOAT:
       case INT:
-        type = new DeclaredType(jtype.tsym.name.toString());
-        break;
-      // case ERROR:
-      // case EXECUTABLE:
-      // case NONE:
-      // case NULL:
-      // case OTHER:
-      // case PACKAGE:
-      // case VOID:
+        return new DeclaredType(jtype.tsym.name.toString());
+        // case ERROR:
+        // case EXECUTABLE:
+        // case NONE:
+        // case NULL:
+        // case OTHER:
+        // case PACKAGE:
+        // case VOID:
       default:
-        break;
+        throw new Error();
       }
-      return type;
     }
 
     /** Use prefix as a prefix for identifiers in t. For example, prefix may be a package or an outer type. */
