@@ -328,7 +328,7 @@ public class Main {
       switch (tpe.tag) {
       case ARRAY:
         if (!astPath.isEmpty()) {
-          entry = astPath.get(-1);
+          entry = astPath.getLast();
           if (entry.getTreeKind() == Tree.Kind.NEW_ARRAY
               && entry.childSelectorIs(ASTPath.TYPE)) {
             entry = new ASTPath.ASTEntry(Tree.Kind.NEW_ARRAY,

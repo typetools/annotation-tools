@@ -295,7 +295,7 @@ public class Insertions implements Iterable<Insertion> {
       } else {
         ASTRecord rec = new ASTRecord(cut, criteria.getClassName(),
             criteria.getMethodName(), criteria.getFieldName(), p);
-        ASTPath.ASTEntry entry = rec.astPath.get(-1);
+        ASTPath.ASTEntry entry = rec.astPath.getLast();
 
         Tree node;
         if (entry.getTreeKind() == Tree.Kind.NEW_ARRAY
@@ -460,7 +460,7 @@ public class Insertions implements Iterable<Insertion> {
       } while (!ap0.isEmpty());
       do {
         ap0 = astack.pop();
-        kind = ap0.get(-1).getTreeKind();
+        kind = ap0.getLast().getTreeKind();
         rec = new ASTRecord(cut, className, methodName, fieldName, ap0);
       } while (!(astack.isEmpty() || outerInsertions.containsKey(rec)));
 
@@ -486,7 +486,7 @@ public class Insertions implements Iterable<Insertion> {
           switch (t.getKind()) {
           case NEW_ARRAY:
             int d = 0;
-            ASTPath.ASTEntry e = ap1.get(-1);
+            ASTPath.ASTEntry e = ap1.getLast();
             List<TypePathEntry> loc = null;
             List<Insertion> inners = new ArrayList<Insertion>();
             Type type = TypeTree.conv(((JCTree.JCNewArray) t).type);
@@ -783,7 +783,7 @@ public class Insertions implements Iterable<Insertion> {
     int d = 0;
     if (path != null) {
       while (!path.isEmpty()) {
-        ASTPath.ASTEntry entry = path.get(-1);
+        ASTPath.ASTEntry entry = path.getLast();
         switch (entry.getTreeKind()) {
         case ANNOTATED_TYPE:
         case MEMBER_SELECT:
@@ -885,7 +885,7 @@ outer:
         if (d == 0 && tpe.tag == TypePathEntryKind.ARRAY) {
           int a = 0;
           if (!r.astPath.isEmpty()) {
-            ASTPath.ASTEntry e = r.astPath.get(-1);
+            ASTPath.ASTEntry e = r.astPath.getLast();
             if (e.getTreeKind() == Tree.Kind.NEW_ARRAY
                 && e.childSelectorIs(ASTPath.TYPE)) {
               a = 1 + e.getArgument();
@@ -922,7 +922,7 @@ outer:
       case NEW_ARRAY:
         if (d == 0) {
           if (!r.astPath.isEmpty()) {
-            ASTPath.ASTEntry e = r.astPath.get(-1);
+            ASTPath.ASTEntry e = r.astPath.getLast();
             if (e.getTreeKind() == Tree.Kind.NEW_ARRAY) {
               int a = 0;
               while (tpe.tag == TypePathEntryKind.ARRAY) {

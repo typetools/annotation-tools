@@ -1235,7 +1235,7 @@ loop:
   Integer findPositionByASTPath(ASTPath astPath, TreePath path, Insertion i) {
     Tree node = path.getLeaf();
     try {
-      ASTPath.ASTEntry entry = astPath.get(-1);
+      ASTPath.ASTEntry entry = astPath.getLast();
       // As per the JSR308 specification, receiver parameters are not allowed
       // on method declarations of anonymous inner classes.
       if (entry.getTreeKind() == Tree.Kind.METHOD
@@ -1373,7 +1373,7 @@ loop:
         Type t = ((CastInsertion) i).getType();
         JCTree jcTree = (JCTree) node;
         if (jcTree.getKind() == Tree.Kind.VARIABLE && !astPath.isEmpty()
-            && astPath.get(-1).childSelectorIs(ASTPath.INITIALIZER)) {
+            && astPath.getLast().childSelectorIs(ASTPath.INITIALIZER)) {
           node = ((JCVariableDecl) node).getInitializer();
           if (node == null) { return null; }
           jcTree = (JCTree) node;
@@ -1394,7 +1394,7 @@ loop:
       } else if (i.getKind() == Insertion.Kind.CLOSE_PARENTHESIS) {
         JCTree jcTree = (JCTree) node;
         if (jcTree.getKind() == Tree.Kind.VARIABLE && !astPath.isEmpty()
-            && astPath.get(-1).childSelectorIs(ASTPath.INITIALIZER)) {
+            && astPath.getLast().childSelectorIs(ASTPath.INITIALIZER)) {
           node = ((JCVariableDecl) node).getInitializer();
           if (node == null) { return null; }
           jcTree = (JCTree) node;

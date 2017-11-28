@@ -389,24 +389,8 @@ public class ASTPath extends ImmutableStack<ASTPath.ASTEntry>
     return (ASTPath) pop();
   }
 
-  public ASTEntry get(int index) {
-    ImmutableStack<ASTEntry> s = this;
-    int n = size();
-    if (index >= n) {
-      throw new NoSuchElementException(Integer.toString(index));
-    }
-    if (index < 0) {
-      index += n;
-      if (index < 0) {
-        throw new IllegalArgumentException("negative index " + index);
-      }
-    }
-    while (--n > index) { s = s.pop(); }
-    return s.peek();
-  }
-
   public ASTEntry getLast() {
-    throw new Error("to implement");
+    return peek();
   }
 
   private static ASTPath canonical(ASTPath astPath) {
@@ -1683,6 +1667,19 @@ class ImmutableStack<E> {
   }
 
   public int size() { return size; }
+
+  /** Return the index-th element of this stack. */
+  public E get(int index) {
+    int n = size();
+
+    if (! (0 <= index && index < n)) {
+      throw new NoSuchElementException("Has " + n + " elements, asked for #" + index);
+    }
+
+    ImmutableStack<E> s = this;
+    while (--n > index) { s = s.pop(); }
+    return s.peek();
+  }
 
   public String toString() {
     if (size > 0) {
