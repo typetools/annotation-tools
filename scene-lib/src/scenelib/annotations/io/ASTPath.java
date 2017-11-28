@@ -1,5 +1,6 @@
 package scenelib.annotations.io;
 
+import java.util.Objects;
 import java.io.IOException;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
@@ -116,6 +117,7 @@ public class ASTPath extends ImmutableStack<ASTPath.ASTEntry>
   public static class ASTEntry implements Comparable<ASTEntry> {
     private Tree.Kind treeKind;
     private String childSelector;
+    /* May be null. */
     private Integer argument;
 
     /**
@@ -132,13 +134,14 @@ public class ASTPath extends ImmutableStack<ASTPath.ASTEntry>
      * @param argument the argument
      */
     public ASTEntry(Tree.Kind treeKind, String childSelector, Integer argument) {
+      if (childSelector == null) { throw new NullPointerException(); }
       this.treeKind = treeKind;
       this.childSelector = childSelector;
       this.argument = argument;
     }
 
     /**
-     * Constructs a new AST entry, without an argument.
+     * Constructs a new AST entry, without a numeric argument.
      *
      * See {@link #ASTEntry(Tree.Kind, String, Integer)} for an example of the parameters.
      *
@@ -231,10 +234,6 @@ public class ASTPath extends ImmutableStack<ASTPath.ASTEntry>
     public int compareTo(ASTEntry o) {
       if (o == null) {
         return 1;
-      } else if (o.childSelector == null) {
-        if (childSelector != null) { return 1; }
-      } else if (childSelector == null) {
-        return -1;
       }
       int c = treeKind.compareTo(o.treeKind);
       if (c != 0) { return c; }

@@ -1,5 +1,6 @@
 package scenelib.annotations.io;
 
+import java.util.Objects;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
