@@ -56,8 +56,6 @@ import com.sun.tools.javac.tree.JCTree.JCExpression;
 import com.sun.tools.javac.util.Pair;
 
 /**
- * @author dbro
- *
  * A collection of {@link Insertion}s, indexed by outer class and inner
  * class.  It has methods to select Insertions for a given class ({@link
  * #forClass}) or for an outer class along with its local classes ({@link
@@ -210,6 +208,7 @@ public class Insertions implements Iterable<Insertion> {
     return new Iterator<Insertion>() {
       private Iterator<Map<String, Set<Insertion>>> miter =
           store.values().iterator();
+      // These two fields are initially empty, but are set the first time that hasNext is called.
       private Iterator<Set<Insertion>> siter =
           Collections.<Set<Insertion>>emptySet().iterator();
       private Iterator<Insertion> iiter =
@@ -251,7 +250,7 @@ public class Insertions implements Iterable<Insertion> {
   public List<Insertion> toList() {
     List<Insertion> list = new ArrayList<Insertion>(size);
     for (Insertion ins : this) { list.add(ins); }
-    return null;
+    return list;
   }
 
   /**
@@ -304,7 +303,7 @@ public class Insertions implements Iterable<Insertion> {
           ASTPath parentPath = rec.astPath.getParentPath();
           node = ASTIndex.getNode(cut, rec.replacePath(parentPath));
           node = node instanceof JCTree.JCNewArray
-              ? TypeTree.fromType(((JCTree.JCNewArray) node).type)
+              ? TypeTree.fromJavacType(((JCTree.JCNewArray) node).type)
               : null;
         } else {
           node = ASTIndex.getNode(cut, rec);
@@ -490,7 +489,7 @@ public class Insertions implements Iterable<Insertion> {
             ASTPath.ASTEntry e = localTypePath.getLast();
             List<TypePathEntry> loc = null;
             List<Insertion> inners = new ArrayList<Insertion>();
-            Type type = TypeTree.conv(((JCTree.JCNewArray) t).type);
+            Type type = TypeTree.javacTypeToType(((JCTree.JCNewArray) t).type);
             if (e.getTreeKind() == Tree.Kind.NEW_ARRAY) {
               d += e.getArgument();
             }
@@ -546,13 +545,13 @@ public class Insertions implements Iterable<Insertion> {
           if (node instanceof JCTree.JCMethodDecl) {
             MethodSymbol msym = ((JCTree.JCMethodDecl) node).sym;
             csym = (ClassSymbol) msym.owner;
-            node = TypeTree.fromType(csym.type);
+            node = TypeTree.fromJavacType(csym.type);
             break;
           } else if (node instanceof JCTree.JCClassDecl) {
             csym = ((JCTree.JCClassDecl) node).sym;
             if (csym.owner instanceof ClassSymbol) {
               csym = (ClassSymbol) csym.owner;
-              node = TypeTree.fromType(csym.type);
+              node = TypeTree.fromJavacType(csym.type);
               break;
             }
           }
@@ -560,7 +559,7 @@ public class Insertions implements Iterable<Insertion> {
         case NEW:
           if (node instanceof JCTree.JCNewArray) {
             if (node.toString().startsWith("{")) {
-              node = TypeTree.fromType(((JCTree.JCNewArray) node).type);
+              node = TypeTree.fromJavacType(((JCTree.JCNewArray) node).type);
               break;
             } else {
               organized.add(ins);
@@ -579,7 +578,7 @@ public class Insertions implements Iterable<Insertion> {
             csym = ((JCTree.JCClassDecl) node).sym;
           }
           if (csym != null) {
-            node = TypeTree.fromType(csym.type);
+            node = TypeTree.fromJavacType(csym.type);
             break;
           }
           throw new RuntimeException();
@@ -701,7 +700,7 @@ public class Insertions implements Iterable<Insertion> {
                 }
                 if (arg > 0) { throw new RuntimeException(); }
               } else {
-                node = TypeTree.fromType(((JCTree.JCNewArray) node).type);
+                node = TypeTree.fromJavacType(((JCTree.JCNewArray) node).type);
               }
             } else {
               throw new RuntimeException("NYI");  // TODO
@@ -1301,7 +1300,8 @@ loop:
     }
   }
 
-  // Simple AST implementation used only in determining type paths.
+  // TODO: Why is a new implementation needed, rather than using an existing one?
+  /** Simple AST implementation used only in determining type paths. */
   static abstract class TypeTree implements ExpressionTree {
     private static Map<String, TypeTag> primTags =
         new HashMap<String, TypeTag>();
@@ -1324,21 +1324,21 @@ loop:
           return fromJCTree(
               ((JCTree.JCAnnotatedType) jt).getUnderlyingType());
         case IDENTIFIER:
-          return new IdenT(
+          return new IdentifierTT(
               ((JCTree.JCIdent) jt).sym.getSimpleName().toString());
         case ARRAY_TYPE:
-          return new ArrT(
+          return new ArrayTT(
               fromJCTree(((JCTree.JCArrayTypeTree) jt).getType()));
         case MEMBER_SELECT:
-          return new LocT(
+          return new MemberSelectTT(
               fromJCTree(((JCTree.JCFieldAccess) jt).getExpression()),
               ((JCTree.JCFieldAccess) jt).getIdentifier());
         case EXTENDS_WILDCARD:
         case SUPER_WILDCARD:
-          return new WildT(kind,
+          return new WildcardTT(kind,
               fromJCTree(((JCTree.JCWildcard) jt).getBound()));
         case UNBOUNDED_WILDCARD:
-          return new WildT();
+          return new WildcardTT();
         case PARAMETERIZED_TYPE:
           com.sun.tools.javac.util.List<JCExpression> typeArgs =
             ((JCTree.JCTypeApply) jt).getTypeArguments();
@@ -1346,7 +1346,7 @@ loop:
           for (JCTree.JCExpression typeArg : typeArgs) {
             args.add(fromJCTree(typeArg));
           }
-          return new ParT(
+          return new ParameterizedTypeTT(
               fromJCTree(((JCTree.JCTypeApply) jt).getType()),
               args);
         default:
@@ -1356,39 +1356,40 @@ loop:
       return null;
     }
 
+    /** Create a TypeTree from a scene-lib Type. */
     static TypeTree fromType(final Type type) {
       switch (type.getKind()) {
       case ARRAY:
         final ArrayType atype = (ArrayType) type;
         final TypeTree componentType = fromType(atype.getComponentType());
-        return new ArrT(componentType);
+        return new ArrayTT(componentType);
       case BOUNDED:
         final BoundedType btype = (BoundedType) type;
         final BoundedType.BoundKind bk = btype.getBoundKind();
         final String bname = btype.getName().getName();
         final TypeTree bound = fromType(btype.getBound());
-        return new Param(bname, bk, bound);
+        return new TypeParameterTT(bname, bk, bound);
       case DECLARED:
         final DeclaredType dtype = (DeclaredType) type;
         if (dtype.isWildcard()) {
-          return new WildT();
+          return new WildcardTT();
         } else {
           final String dname = dtype.getName();
           TypeTag typeTag = primTags.get(dname);
           if (typeTag == null) {
-            final TypeTree base = new IdenT(dname);
+            final TypeTree base = new IdentifierTT(dname);
             TypeTree ret = base;
             List<Type> params = dtype.getTypeParameters();
             DeclaredType inner = dtype.getInnerType();
             if (!params.isEmpty()) {
               final List<Tree> typeArgs = new ArrayList<Tree>(params.size());
               for (Type t : params) { typeArgs.add(fromType(t)); }
-              ret = new ParT(base, typeArgs);
+              ret = new ParameterizedTypeTT(base, typeArgs);
             }
-            return inner == null ? ret : meld(fromType(inner), ret);
+            return inner == null ? ret : addPrefix(fromType(inner), ret);
           } else {
             final TypeKind typeKind = typeTag.getPrimitiveTypeKind();
-            return new PrimT(typeKind);
+            return new PrimitiveTypeTT(typeKind);
           }
         }
       default:
@@ -1396,74 +1397,55 @@ loop:
       }
     }
 
-    static TypeTree fromType(final com.sun.tools.javac.code.Type type) {
-      return fromType(conv(type));
+    /** Create a TypeTree from a javac Type. */
+    static TypeTree fromJavacType(final com.sun.tools.javac.code.Type type) {
+      return fromType(javacTypeToType(type));
     }
 
-    /**
-     * @param jtype
-     * @return
-     */
-    static Type conv(final com.sun.tools.javac.code.Type jtype) {
-      Type type = null;
-      DeclaredType d;
-      com.sun.tools.javac.code.Type t;
+    /** Create a javac Type from a scene-lib Type. */
+    static Type javacTypeToType(final com.sun.tools.javac.code.Type jtype) {
       switch (jtype.getKind()) {
       case ARRAY:
-        t = ((com.sun.tools.javac.code.Type.ArrayType) jtype).elemtype;
-        type = new ArrayType(conv(t));
-        break;
+        return new ArrayType(javacTypeToType(((com.sun.tools.javac.code.Type.ArrayType) jtype).elemtype));
       case DECLARED:
-        t = jtype;
-        d = null;
-        do {
-          DeclaredType d0 = d;
-          com.sun.tools.javac.code.Type.ClassType ct =
+        {
+          com.sun.tools.javac.code.Type t = jtype;
+          DeclaredType d = null;
+          do {
+            DeclaredType d0 = d;
+            com.sun.tools.javac.code.Type.ClassType ct =
               (com.sun.tools.javac.code.Type.ClassType) t;
-          d = new DeclaredType(ct.tsym.name.toString());
-          d.setInnerType(d0);
-          d0 = d;
-          for (com.sun.tools.javac.code.Type a : ct.getTypeArguments()) {
-            d.addTypeParameter(conv(a));
-          }
-          t = ct.getEnclosingType();
-        } while (t.getKind() == TypeKind.DECLARED);
-        type = d;
-        break;
+            d = new DeclaredType(ct.tsym.name.toString());
+            d.setInnerType(d0);
+            d0 = d;
+            for (com.sun.tools.javac.code.Type a : ct.getTypeArguments()) {
+              d.addTypeParameter(javacTypeToType(a));
+            }
+            t = ct.getEnclosingType();
+          } while (t.getKind() == TypeKind.DECLARED);
+          return d;
+        }
       case WILDCARD:
-        BoundedType.BoundKind k;
-        t = ((com.sun.tools.javac.code.Type.WildcardType) jtype).bound;
-        switch (((com.sun.tools.javac.code.Type.WildcardType) jtype).kind) {
-        case EXTENDS:
-          k = BoundedType.BoundKind.EXTENDS;
-          break;
-        case SUPER:
-          k = BoundedType.BoundKind.SUPER;
-          break;
-        case UNBOUND:
-          k = null;
-          type = new DeclaredType("?");
-          break;
-        default:
-          throw new RuntimeException();
+        com.sun.tools.javac.code.Type.WildcardType wildcard
+          = ((com.sun.tools.javac.code.Type.WildcardType) jtype);
+        if (wildcard.kind == com.sun.tools.javac.code.BoundKind.UNBOUND) {
+          return new DeclaredType("?");
         }
-        if (k != null) {
-          d = new DeclaredType(jtype.tsym.name.toString());
-          type = new BoundedType(d, k, (DeclaredType) conv(t));
-        }
-        break;
+        return new BoundedType(new DeclaredType(jtype.tsym.name.toString()),
+                               wildcard.kind,
+                               (DeclaredType) javacTypeToType(wildcard.bound));
       case TYPEVAR:
-        t = ((com.sun.tools.javac.code.Type.TypeVar) jtype).getUpperBound();
-        type = conv(t);
-        if (type.getKind() == Type.Kind.DECLARED) {
-          type = new BoundedType(new DeclaredType(jtype.tsym.name.toString()),
-              BoundedType.BoundKind.EXTENDS, (DeclaredType) type);
-        }  // otherwise previous conv should have been here already
-        break;
+        {
+          Type upperBound = javacTypeToType(((com.sun.tools.javac.code.Type.TypeVar) jtype).getUpperBound());
+          if (upperBound.getKind() == Type.Kind.DECLARED) {
+            return new BoundedType(new DeclaredType(jtype.tsym.name.toString()),
+                                   BoundedType.BoundKind.EXTENDS, (DeclaredType) upperBound);
+          } else {
+            return upperBound;
+          }
+        }
       case INTERSECTION:
-        t = jtype.tsym.erasure_field;  // ???
-        type = new DeclaredType(t.tsym.name.toString());
-        break;
+        return new DeclaredType(jtype.tsym.erasure_field.tsym.name.toString());
       case UNION:
         // TODO
         throw new Error("UNION case not yet implemented");
@@ -1476,41 +1458,40 @@ loop:
       case SHORT:
       case FLOAT:
       case INT:
-        type = new DeclaredType(jtype.tsym.name.toString());
-        break;
-      // case ERROR:
-      // case EXECUTABLE:
-      // case NONE:
-      // case NULL:
-      // case OTHER:
-      // case PACKAGE:
-      // case VOID:
+        return new DeclaredType(jtype.tsym.name.toString());
+        // case ERROR:
+        // case EXECUTABLE:
+        // case NONE:
+        // case NULL:
+        // case OTHER:
+        // case PACKAGE:
+        // case VOID:
       default:
-        break;
+        throw new Error();
       }
-      return type;
     }
 
-    private static TypeTree meld(final TypeTree t0, final TypeTree t1) {
-      switch (t0.getKind()) {
+    /** Use prefix as a prefix for identifiers in t. For example, prefix may be a package or an outer type. */
+    private static TypeTree addPrefix(final TypeTree t, final TypeTree prefix) {
+      switch (t.getKind()) {
       case IDENTIFIER:
-        IdenT it = (IdenT) t0;
-        return new LocT(t1, it.getName());
+        IdentifierTT it = (IdentifierTT) t;
+        return new MemberSelectTT(prefix, it.getName());
       case MEMBER_SELECT:
-        LocT lt = (LocT) t0;
-        return new LocT(meld(lt.getExpression(), t1), lt.getIdentifier());
+        MemberSelectTT lt = (MemberSelectTT) t;
+        return new MemberSelectTT(addPrefix(lt.getExpression(), prefix), lt.getIdentifier());
       case PARAMETERIZED_TYPE:
-        ParT pt = (ParT) t0;
-        return new ParT(meld(pt.getType(), t1), pt.getTypeArguments());
+        ParameterizedTypeTT pt = (ParameterizedTypeTT) t;
+        return new ParameterizedTypeTT(addPrefix(pt.getType(), prefix), pt.getTypeArguments());
       default:
-        throw new IllegalArgumentException("unexpected type " + t0);
+        throw new IllegalArgumentException("unexpected type " + t);
       }
     }
 
-    static final class ArrT extends TypeTree implements ArrayTypeTree {
+    static final class ArrayTT extends TypeTree implements ArrayTypeTree {
       private final TypeTree componentType;
 
-      ArrT(TypeTree componentType) {
+      ArrayTT(TypeTree componentType) {
         this.componentType = componentType;
       }
 
@@ -1529,11 +1510,11 @@ loop:
       public String toString() { return componentType + "[]"; }
     }
 
-    static final class LocT extends TypeTree implements MemberSelectTree {
+    static final class MemberSelectTT extends TypeTree implements MemberSelectTree {
       private final TypeTree expr;
       private final Name name;
 
-      LocT(TypeTree expr, Name name) {
+      MemberSelectTT(TypeTree expr, Name name) {
         this.expr = expr;
         this.name = name;
       }
@@ -1556,11 +1537,11 @@ loop:
       public String toString() { return expr + "." + name; }
     }
 
-    static final class ParT extends TypeTree implements ParameterizedTypeTree {
+    static final class ParameterizedTypeTT extends TypeTree implements ParameterizedTypeTree {
       private final TypeTree base;
       private final List<? extends Tree> typeArgs;
 
-      ParT(TypeTree base, List<? extends Tree> typeArgs) {
+      ParameterizedTypeTT(TypeTree base, List<? extends Tree> typeArgs) {
         this.base = base;
         this.typeArgs = typeArgs;
       }
@@ -1595,10 +1576,10 @@ loop:
       }
     }
 
-    static final class PrimT extends TypeTree implements PrimitiveTypeTree {
+    static final class PrimitiveTypeTT extends TypeTree implements PrimitiveTypeTree {
       private final TypeKind typeKind;
 
-      PrimT(TypeKind typeKind) {
+      PrimitiveTypeTT(TypeKind typeKind) {
         this.typeKind = typeKind;
       }
 
@@ -1633,10 +1614,10 @@ loop:
       }
     }
 
-    static final class IdenT extends TypeTree implements IdentifierTree {
+    static final class IdentifierTT extends TypeTree implements IdentifierTree {
       private final String name;
 
-      IdenT(String dname) {
+      IdentifierTT(String dname) {
         this.name = dname;
       }
 
@@ -1655,22 +1636,22 @@ loop:
       public String toString() { return name; }
     }
 
-    static final class WildT extends TypeTree implements WildcardTree {
+    static final class WildcardTT extends TypeTree implements WildcardTree {
       private final TypeTree bound;
       private final Kind kind;
 
-      WildT() {
+      WildcardTT() {
         this(Kind.UNBOUNDED_WILDCARD, null);
       }
 
-      WildT(TypeTree bound, BoundedType.BoundKind bk) {
+      WildcardTT(TypeTree bound, BoundedType.BoundKind bk) {
         this(bk == BoundedType.BoundKind.SUPER
                 ? Kind.SUPER_WILDCARD
                 : Kind.EXTENDS_WILDCARD,
             bound);
       }
 
-      WildT(Kind kind, TypeTree bound) {
+      WildcardTT(Kind kind, TypeTree bound) {
         this.kind = kind;
         this.bound = bound;
       }
@@ -1690,12 +1671,12 @@ loop:
       public String toString() { return "?"; }
     }
 
-    static final class Param extends TypeTree implements TypeParameterTree {
+    static final class TypeParameterTT extends TypeTree implements TypeParameterTree {
       private final String bname;
       private final BoundedType.BoundKind bk;
       private final Tree bound;
 
-      Param(String bname, BoundedType.BoundKind bk, TypeTree bound) {
+      TypeParameterTT(String bname, BoundedType.BoundKind bk, TypeTree bound) {
         this.bname = bname;
         this.bk = bk;
         this.bound = bound;
@@ -1736,10 +1717,14 @@ loop:
       }
 
       @Override
-      public int length() { return str.length(); }
+      public int length() {
+        return str.length();
+      }
 
       @Override
-      public char charAt(int index) { return str.charAt(index); }
+      public char charAt(int index) {
+        return str.charAt(index);
+      }
 
       @Override
       public CharSequence subSequence(int start, int end) {
@@ -1748,16 +1733,7 @@ loop:
 
       @Override
       public boolean contentEquals(CharSequence cs) {
-        if (cs != null) {
-          int n = length();
-          if (cs.length() == n) {
-            for (int i = 0; i < n; i++) {
-              if (charAt(i) != cs.charAt(i)) { return false; }
-            }
-            return true;
-          }
-        }
-        return false;
+        return str.contentEquals(cs);
       }
 
       @Override

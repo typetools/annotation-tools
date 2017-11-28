@@ -1385,7 +1385,7 @@ loop:
               if (jcTree.type instanceof NullType) {
                 dt.setName("Object");
               } else {
-                t = Insertions.TypeTree.conv(jcTree.type);
+                t = Insertions.TypeTree.javacTypeToType(jcTree.type);
                 t.setAnnotations(dt.getAnnotations());
                 ((CastInsertion) i).setType(t);
               }
@@ -1722,7 +1722,7 @@ loop:
     DeclaredType baseType = neu.getBaseType();
     if (baseType.getName().isEmpty()) {
       List<String> annotations = neu.getType().getAnnotations();
-      Type newType = Insertions.TypeTree.conv(
+      Type newType = Insertions.TypeTree.javacTypeToType(
           ((JCTree.JCNewArray) newArray).type);
       for (String ann : annotations) {
         newType.addAnnotation(ann);

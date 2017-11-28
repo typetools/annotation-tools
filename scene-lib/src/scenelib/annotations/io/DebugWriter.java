@@ -3,9 +3,6 @@ package scenelib.annotations.io;
 import java.io.PrintWriter;
 import java.util.logging.Level;
 
-/**
- * @author dbro
- */
 public class DebugWriter {
   private PrintWriter out = new PrintWriter(System.out);
   private Level level = Level.WARNING;

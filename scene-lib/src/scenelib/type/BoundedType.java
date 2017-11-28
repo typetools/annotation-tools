@@ -67,6 +67,27 @@ public class BoundedType extends Type {
         this.bound = bound;
     }
 
+    private static BoundKind javacBoundKindToBoundKind(com.sun.tools.javac.code.BoundKind boundKind) {
+        switch (boundKind) {
+        case EXTENDS:
+            return BoundKind.EXTENDS;
+        case SUPER:
+            return BoundKind.SUPER;
+        default:
+            throw new RuntimeException();
+        }
+    }
+
+    /**
+     * Creates a new bounded type.
+     * @param name the type variable name
+     * @param boundKind the bound kind
+     * @param bound the bound
+     */
+    public BoundedType(DeclaredType name, com.sun.tools.javac.code.BoundKind boundKind, DeclaredType bound) {
+        this(name, javacBoundKindToBoundKind(boundKind), bound);
+    }
+
     /**
      * Gets the type variable name. For example, 'K' in:
      * <pre>

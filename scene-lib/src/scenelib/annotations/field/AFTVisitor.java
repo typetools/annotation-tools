@@ -1,8 +1,5 @@
 package scenelib.annotations.field;
 
-/**
- * @author dbro
- */
 public interface AFTVisitor<R, T> {
   R visitAnnotationAFT(AnnotationAFT aft, T arg);
   R visitArrayAFT(ArrayAFT aft, T arg);
