@@ -1,8 +1,5 @@
 package scenelib.annotations.el;
 
-/**
- * @author dbro
- */
 public interface ElementVisitor<R, T> {
   R visitAnnotationDef(AnnotationDef el, T arg);
   R visitBlock(ABlock el, T arg);

@@ -7,10 +7,6 @@ import java.util.regex.Pattern;
 import scenelib.type.DeclaredType;
 import scenelib.type.Type;
 
-/**
- * @author dbro
- *
- */
 public class NewInsertion extends TypedInsertion {
   private final static Pattern qualifiers = Pattern.compile("(?:\\w++\\.)*+");
 
