@@ -389,6 +389,7 @@ public class Insertions implements Iterable<Insertion> {
             }
             if (node == null) {
               // TODO: ???
+              throw new Error("node == null case not yet implemented");
             }
             temp = temp.extend(
                 new ASTPath.ASTEntry(Tree.Kind.NEW_ARRAY, ASTPath.TYPE, 0));
@@ -396,6 +397,7 @@ public class Insertions implements Iterable<Insertion> {
               TypedInsertion tins = outerInsertions.get(rec.replacePath(temp));
               if (tins == null) {
                 // TODO
+                throw new Error("tins == null case not yet implemented");
               } else {
                 tins.getInnerTypeInsertions().add(ins);
                 ins.setInserted(true);
@@ -440,34 +442,33 @@ public class Insertions implements Iterable<Insertion> {
       Criteria criteria = ins.getCriteria();
       String methodName = criteria.getMethodName();
       String fieldName = criteria.getFieldName();
-      ASTPath ap1 = criteria.getASTPath();
+      ASTPath localTypePath = criteria.getASTPath();
       List<TypePathEntry> tpes = new ArrayList<TypePathEntry>();
-      if (ap1 == null) {
+      if (localTypePath == null) {
           // || methodName == null && fieldName == null)
         organized.add(ins);
         continue;
       }
 
       // First find the relevant "top-level" insertion, if any.
-      // ap0: path to top-level type; ap1: path to local type
+      Deque<ASTPath> astack = new ArrayDeque<ASTPath>(localTypePath.size());
+      ASTPath topLevelTypePath = localTypePath;
+      do {
+        astack.push(topLevelTypePath);
+        topLevelTypePath = topLevelTypePath.getParentPath();
+      } while (!topLevelTypePath.isEmpty());
       ASTRecord rec;
       Tree.Kind kind;
-      Deque<ASTPath> astack = new ArrayDeque<ASTPath>(ap1.size());
-      ASTPath ap0 = ap1;
       do {
-        astack.push(ap0);
-        ap0 = ap0.getParentPath();
-      } while (!ap0.isEmpty());
-      do {
-        ap0 = astack.pop();
-        kind = ap0.getLast().getTreeKind();
-        rec = new ASTRecord(cut, className, methodName, fieldName, ap0);
+        topLevelTypePath = astack.pop();
+        kind = topLevelTypePath.getLast().getTreeKind();
+        rec = new ASTRecord(cut, className, methodName, fieldName, topLevelTypePath);
       } while (!(astack.isEmpty() || outerInsertions.containsKey(rec)));
 
       TypedInsertion tins = outerInsertions.get(rec);
       TreePath path = ASTIndex.getTreePath(cut, rec);
       Tree node = path == null ? null : path.getLeaf();
-      if (node == null && ap0.isEmpty()) {
+      if (node == null && topLevelTypePath.isEmpty()) {
         organized.add(ins);
         continue;
       }
@@ -486,7 +487,7 @@ public class Insertions implements Iterable<Insertion> {
           switch (t.getKind()) {
           case NEW_ARRAY:
             int d = 0;
-            ASTPath.ASTEntry e = ap1.getLast();
+            ASTPath.ASTEntry e = localTypePath.getLast();
             List<TypePathEntry> loc = null;
             List<Insertion> inners = new ArrayList<Insertion>();
             Type type = TypeTree.conv(((JCTree.JCNewArray) t).type);
@@ -526,7 +527,7 @@ public class Insertions implements Iterable<Insertion> {
       // MEMBER_SELECTs in the AST path that don't correspond to
       // existing nodes are part of a type use.
       if (node == null) {
-        ASTPath ap = ap0;
+        ASTPath ap = topLevelTypePath;
         if (!ap.isEmpty()) {
           do {
             ap = ap.getParentPath();
@@ -636,14 +637,14 @@ public class Insertions implements Iterable<Insertion> {
        * of the interfaces in com.sun.source.tree.Tree, which are
        * defined in the local class TypeTree.
        */
-      int i = ap0.size();
-      int n = ap1.size();
+      int i = topLevelTypePath.size();
+      int n = localTypePath.size();
       int actualDepth = 0;  // inner type levels seen
       int expectedDepth = 0;  // inner type levels anticipated
 
       // skip any declaration nodes
       while (i < n) {
-        ASTPath.ASTEntry entry = ap1.get(i);
+        ASTPath.ASTEntry entry = localTypePath.get(i);
         kind = entry.getTreeKind();
         if (kind != Tree.Kind.METHOD && kind != Tree.Kind.VARIABLE) {
           break;
@@ -653,7 +654,7 @@ public class Insertions implements Iterable<Insertion> {
 
       // now build up the type path in JVM's format
       while (i < n) {
-        ASTPath.ASTEntry entry = ap1.get(i);
+        ASTPath.ASTEntry entry = localTypePath.get(i);
         rec = rec.extend(entry);
         kind = entry.getTreeKind();
 
@@ -686,7 +687,7 @@ public class Insertions implements Iterable<Insertion> {
 
         case NEW_ARRAY:
           assert tpes.isEmpty();
-          ap0 = ap0.add(new ASTPath.ASTEntry(Tree.Kind.NEW_ARRAY,
+          topLevelTypePath = topLevelTypePath.add(new ASTPath.ASTEntry(Tree.Kind.NEW_ARRAY,
               ASTPath.TYPE, 0));
           if (expectedDepth == 0 && node.getKind() == kind) {
             if (node instanceof JCTree.JCNewArray) {
@@ -739,9 +740,9 @@ public class Insertions implements Iterable<Insertion> {
           if (ASTPath.isWildcard(node.getKind())) {
             if (expectedDepth == 0
                 && (i < 1
-                    || ap1.get(i-1).getTreeKind() != Tree.Kind.INSTANCE_OF)
+                    || localTypePath.get(i-1).getTreeKind() != Tree.Kind.INSTANCE_OF)
                 && (i < 2
-                    || ap1.get(i-2).getTreeKind() != Tree.Kind.ARRAY_TYPE)) {
+                    || localTypePath.get(i-2).getTreeKind() != Tree.Kind.ARRAY_TYPE)) {
               while (--actualDepth >= 0) {
                 tpes.add(TypePathEntry.INNER_TYPE);
               }
@@ -765,11 +766,11 @@ public class Insertions implements Iterable<Insertion> {
 
       organized.add(ins);
       if (tpes.isEmpty()) {
-        // assert ap1.equals(ap0) && !outerInsertions.containsKey(ap0);
+        // assert localTypePath.equals(topLevelTypePath) && !outerInsertions.containsKey(topLevelTypePath);
 //        organized.add(ins);
         // outerInsertions.put(rec, (TypedInsertion) ins);
       } else {
-        criteria.add(new ASTPathCriterion(ap0));
+        criteria.add(new ASTPathCriterion(topLevelTypePath));
         criteria.add(new GenericArrayLocationCriterion(
             new InnerTypeLocation(tpes)));
         tins.getInnerTypeInsertions().add(ins);
@@ -779,31 +780,30 @@ public class Insertions implements Iterable<Insertion> {
     return organized;
   }
 
+  // TODO: document this
   private int newArrayInnerTypeDepth(ASTPath path) {
-    int d = 0;
-    if (path != null) {
-      while (!path.isEmpty()) {
-        ASTPath.ASTEntry entry = path.getLast();
-        switch (entry.getTreeKind()) {
-        case ANNOTATED_TYPE:
-        case MEMBER_SELECT:
-        case PARAMETERIZED_TYPE:
-        case UNBOUNDED_WILDCARD:
-          d = 0;
-          break;
-        case ARRAY_TYPE:
-          ++d;
-          break;
-        case NEW_ARRAY:
-          if (entry.childSelectorIs(ASTPath.TYPE) && entry.hasArgument()) {
-            d += entry.getArgument();
-          }
-          return d;
-        default:
-          return 0;
+    int result = 0;
+    while (!path.isEmpty()) {
+      ASTPath.ASTEntry entry = path.getLast();
+      switch (entry.getTreeKind()) {
+      case ANNOTATED_TYPE:
+      case MEMBER_SELECT:
+      case PARAMETERIZED_TYPE:
+      case UNBOUNDED_WILDCARD:
+        result = 0;
+        break;
+      case ARRAY_TYPE:
+        ++result;
+        break;
+      case NEW_ARRAY:
+        if (entry.childSelectorIs(ASTPath.TYPE) && entry.hasArgument()) {
+          result += entry.getArgument();
         }
-        path = path.getParentPath();
+        return result;
+      default:
+        return 0;
       }
+      path = path.getParentPath();
     }
     return 0;
   }
@@ -1449,7 +1449,8 @@ loop:
         break;
       case UNION:
         // TODO
-        break;
+        throw new Error("UNION case not yet implemented");
+        // TODO: reinstate after replacing "throw new Error()": break;
       case BOOLEAN:
       case BYTE:
       case CHAR:
