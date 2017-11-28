@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import plume.ArraysMDE;
-import scenelib.annotations.util.PersistentStack;
+import scenelib.annotations.util.ImmutableStack;
 
 import com.sun.source.tree.AnnotatedTypeTree;
 import com.sun.source.tree.AnnotationTree;
@@ -358,7 +358,7 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
   // TODO: replace w/ skip list?
   @Override
   public Iterator<ASTEntry> iterator() {
-    PersistentStack<ASTEntry> s = this;
+    ImmutableStack<ASTEntry> s = this;
     int n = size();
     ASTEntry[] a = new ASTEntry[n];
     while (--n >= 0) {
@@ -391,7 +391,7 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
   }
 
   public ASTEntry get(int index) {
-    PersistentStack<ASTEntry> s = this;
+    ImmutableStack<ASTEntry> s = this;
     int n = size();
     if (index >= n) {
       throw new NoSuchElementException(Integer.toString(index));
@@ -1565,7 +1565,7 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
   @Override
   public int hashCode() {
     // hacky fix: remove {Method,Class}.body for comparison
-    PersistentStack<ASTEntry> s = canonical(this);
+    ImmutableStack<ASTEntry> s = canonical(this);
     int hash = 0;
     while (!s.isEmpty()) {
       hash = Integer.rotateRight(hash ^ s.peek().hashCode(), 1);
@@ -1586,8 +1586,8 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
   @Override
   public int compareTo(ASTPath o) {
     // hacky fix: remove {Method,Class}.body for comparison
-    PersistentStack<ASTEntry> s0 = canonical(this);
-    PersistentStack<ASTEntry> s1 = canonical(o);
+    ImmutableStack<ASTEntry> s0 = canonical(this);
+    ImmutableStack<ASTEntry> s1 = canonical(o);
     Deque<ASTEntry> d0 = new LinkedList<ASTEntry>();
     Deque<ASTEntry> d1 = new LinkedList<ASTEntry>();
     int c = 0;
@@ -1633,10 +1633,10 @@ implements Comparable<ASTPath>, Iterable<ASTPath.ASTEntry> {
  *
  * @param <E> type of stack elements
  */
-class ConsStack<E> implements PersistentStack<E> {
+class ConsStack<E> implements ImmutableStack<E> {
   private int size;
   private E elem;
-  private PersistentStack<E> rest;
+  private ImmutableStack<E> rest;
 
   public ConsStack() {
     size = 0;
@@ -1670,13 +1670,13 @@ class ConsStack<E> implements PersistentStack<E> {
   }
 
   @Override
-  public PersistentStack<E> pop() {
+  public ImmutableStack<E> pop() {
     if (size > 0) { return rest; }
     throw new IllegalStateException("pop() on empty stack");
   }
 
   @Override
-  public PersistentStack<E> push(E elem) {
+  public ImmutableStack<E> push(E elem) {
     return extend(elem, this);
   }
 
@@ -1687,7 +1687,7 @@ class ConsStack<E> implements PersistentStack<E> {
   public String toString() {
     if (size > 0) {
       StringBuilder sb = new StringBuilder("]").insert(0, peek());
-      for (PersistentStack<E> stack = pop(); !stack.isEmpty();
+      for (ImmutableStack<E> stack = pop(); !stack.isEmpty();
           stack = stack.pop()) {
         sb = sb.insert(0, ", ").insert(0, stack.peek());
       }

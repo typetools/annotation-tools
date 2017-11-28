@@ -6,10 +6,10 @@ package scenelib.annotations.util;
  * @author dbro
  * @param <E> type of stack elements
  */
-public interface PersistentStack<E> {
+public interface ImmutableStack<E> {
   public boolean isEmpty();
   public E peek();
-  public PersistentStack<E> pop();
-  public PersistentStack<E> push(E elem);
+  public ImmutableStack<E> pop();
+  public ImmutableStack<E> push(E elem);
   public int size();
 }
