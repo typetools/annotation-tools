@@ -5,7 +5,7 @@ package annotator.tests;
 
 @interface ADecl {}
 
-class ConstructorReturn {
+public class ConstructorReturn {
     public ConstructorReturn() {}
 }
 
