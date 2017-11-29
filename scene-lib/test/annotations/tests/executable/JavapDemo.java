@@ -8,8 +8,8 @@ import java.io.*;
 
 import plume.FileIOException;
 
-import annotations.el.*;
-import annotations.io.*;
+import scenelib.annotations.el.*;
+import scenelib.annotations.io.*;
 
 public class JavapDemo {
     public static void main(String[] args) throws IOException, FileIOException, DefException {

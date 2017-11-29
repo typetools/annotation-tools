@@ -6,8 +6,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.io.*;
 
-import annotations.el.*;
-import annotations.io.*;
+import scenelib.annotations.el.*;
+import scenelib.annotations.io.*;
 
 public class RegurgitateDemo {
     public static void main(/*@NonNull*/ String /*@NonNull*/ [] args) {

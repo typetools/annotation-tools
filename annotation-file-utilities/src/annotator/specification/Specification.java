@@ -4,7 +4,7 @@ import java.util.List;
 
 import plume.FileIOException;
 import annotator.find.Insertion;
-// import annotations.io.FileIOException;
+// import scenelib.annotations.io.FileIOException;
 
 /**
  * Represents a file containing a "specification" for placing annotations on

@@ -1,6 +1,6 @@
 package annotator.find;
 
-import type.Type;
+import scenelib.type.Type;
 
 /**
  * Specifies an insertion of a cast into a source file. Stores the type of cast

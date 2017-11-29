@@ -12,28 +12,28 @@ import org.objectweb.asm.ClassReader;
 
 import plume.FileIOException;
 import plume.Pair;
-import type.DeclaredType;
-import type.Type;
-import annotations.Annotation;
-import annotations.el.ABlock;
-import annotations.el.AClass;
-import annotations.el.AElement;
-import annotations.el.AExpression;
-import annotations.el.AField;
-import annotations.el.AMethod;
-import annotations.el.AScene;
-import annotations.el.ATypeElement;
-import annotations.el.ATypeElementWithType;
-import annotations.el.AnnotationDef;
-import annotations.el.BoundLocation;
-import annotations.el.InnerTypeLocation;
-import annotations.el.LocalLocation;
-import annotations.el.RelativeLocation;
-import annotations.el.TypeIndexLocation;
-import annotations.field.AnnotationFieldType;
-import annotations.io.ASTPath;
-import annotations.io.IndexFileParser;
-import annotations.util.coll.VivifyingMap;
+import scenelib.type.DeclaredType;
+import scenelib.type.Type;
+import scenelib.annotations.Annotation;
+import scenelib.annotations.el.ABlock;
+import scenelib.annotations.el.AClass;
+import scenelib.annotations.el.AElement;
+import scenelib.annotations.el.AExpression;
+import scenelib.annotations.el.AField;
+import scenelib.annotations.el.AMethod;
+import scenelib.annotations.el.AScene;
+import scenelib.annotations.el.ATypeElement;
+import scenelib.annotations.el.ATypeElementWithType;
+import scenelib.annotations.el.AnnotationDef;
+import scenelib.annotations.el.BoundLocation;
+import scenelib.annotations.el.InnerTypeLocation;
+import scenelib.annotations.el.LocalLocation;
+import scenelib.annotations.el.RelativeLocation;
+import scenelib.annotations.el.TypeIndexLocation;
+import scenelib.annotations.field.AnnotationFieldType;
+import scenelib.annotations.io.ASTPath;
+import scenelib.annotations.io.IndexFileParser;
+import scenelib.annotations.util.coll.VivifyingMap;
 import annotator.find.AnnotationInsertion;
 import annotator.find.CastInsertion;
 import annotator.find.CloseParenthesisInsertion;
@@ -477,7 +477,7 @@ public class IndexFileSpecification implements Specification {
     ASTPath astPath = criteria.getASTPath();
     if (astPath == null) { return criteria.isOnReceiver(); }
     if (astPath.isEmpty()) { return false; }
-    ASTPath.ASTEntry entry = astPath.get(-1);
+    ASTPath.ASTEntry entry = astPath.getLast();
     return entry.childSelectorIs(ASTPath.PARAMETER)
         && entry.getArgument() < 0;
   }
@@ -485,7 +485,7 @@ public class IndexFileSpecification implements Specification {
   public static boolean isOnNew(Criteria criteria) {
     ASTPath astPath = criteria.getASTPath();
     if (astPath == null || astPath.isEmpty()) { return criteria.isOnNew(); }
-    ASTPath.ASTEntry entry = astPath.get(-1);
+    ASTPath.ASTEntry entry = astPath.getLast();
     Tree.Kind kind = entry.getTreeKind();
     return kind == Tree.Kind.NEW_ARRAY
             && entry.childSelectorIs(ASTPath.TYPE)
@@ -529,7 +529,7 @@ public class IndexFileSpecification implements Specification {
     Insertion.decorateType(innerTypeInsertions, type, criteria.getASTPath());
     CastInsertion cast = new CastInsertion(criteria, type);
     CloseParenthesisInsertion closeParen = new CloseParenthesisInsertion(
-        criteria, cast.getSeparateLine());
+        criteria, cast.isSeparateLine());
     return new Pair<CastInsertion, CloseParenthesisInsertion>(cast, closeParen);
   }
 

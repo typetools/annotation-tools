@@ -12,10 +12,10 @@ import com.sun.tools.classfile.TypeAnnotation.Position.TypePathEntryKind;
 import com.sun.tools.javac.code.TypeAnnotationPosition;
 
 import junit.framework.*;
-import annotations.*;
-import annotations.el.*;
-import annotations.field.*;
-import annotations.io.*;
+import scenelib.annotations.*;
+import scenelib.annotations.el.*;
+import scenelib.annotations.field.*;
+import scenelib.annotations.io.*;
 
 import plume.FileIOException;
 

@@ -24,9 +24,9 @@ if [ "$DEBUG" = "1" ]; then
   echo "LANGTOOLS=${LANGTOOLS}"
   echo "JAVAC_JAR=${JAVAC_JAR}"
   # Keep this in sync with the actual command below.
-  echo "java -ea -cp ${JAVAC_JAR}:${AFU}/lib/plume-lib.jar:${ANNOTATION_FILE_UTILS}:${CLASSPATH} annotations.io.classfile.ClassFileWriter $@"
+  echo "java -ea -cp ${JAVAC_JAR}:${AFU}/lib/plume-lib.jar:${ANNOTATION_FILE_UTILS}:${CLASSPATH} scenelib.annotations.io.classfile.ClassFileWriter $@"
   echo "--- end of insert-annotations debugging output"
 fi
 
 # Needs CLASSPATH to find user files
-java -ea -cp ${JAVAC_JAR}:${AFU}/lib/plume-lib.jar:${ANNOTATION_FILE_UTILS}:${CLASSPATH} annotations.io.classfile.ClassFileWriter "$@"
+java -ea -cp ${JAVAC_JAR}:${AFU}/lib/plume-lib.jar:${ANNOTATION_FILE_UTILS}:${CLASSPATH} scenelib.annotations.io.classfile.ClassFileWriter "$@"

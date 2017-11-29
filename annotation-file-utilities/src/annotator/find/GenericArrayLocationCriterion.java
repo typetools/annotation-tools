@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import javax.lang.model.type.TypeKind;
 
-import annotations.el.InnerTypeLocation;
+import scenelib.annotations.el.InnerTypeLocation;
 import annotator.Main;
 
 import com.sun.source.tree.AnnotatedTypeTree;

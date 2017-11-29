@@ -8,9 +8,9 @@ import org.checkerframework.checker.tainting.qual.Tainted;
 import java.io.*;
 import java.util.*;
 
-import annotations.*;
-import annotations.el.*;
-import annotations.io.*;
+import scenelib.annotations.*;
+import scenelib.annotations.el.*;
+import scenelib.annotations.io.*;
 
 /**
  * Prints information about Tainted and NonNull annotations on a given class.

@@ -2,7 +2,7 @@ package annotator.find;
 
 import java.util.List;
 
-import annotations.el.LocalLocation;
+import scenelib.annotations.el.LocalLocation;
 import annotator.scanner.LocalVariableScanner;
 
 import com.sun.source.tree.MethodTree;
