@@ -466,6 +466,9 @@ public class IndexFileSpecification {
         this.insertions.add(cast);
         this.insertions.add(closeParen);
     }
+    if (constructorInsertion != null) {
+        constructorInsertion.setInserted(false);
+    }
     return annotationInsertions;
   }
 

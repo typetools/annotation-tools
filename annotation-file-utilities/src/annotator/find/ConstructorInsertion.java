@@ -99,4 +99,19 @@ public class ConstructorInsertion extends TypedInsertion {
   public Kind getKind() {
     return Kind.CONSTRUCTOR;
   }
+
+  /**
+   * Sets whether this insertion has already been inserted into source code.
+   * @param inserted {@code true} if this insertion has already been inserted,
+   *         {@code false} otherwise.
+   */
+  public void setInserted(boolean inserted) {
+    super.setInserted(false);
+    if (receiverInsertion != null) {
+      receiverInsertion.setInserted(false);
+    }
+    for (Insertion insertion : declarationInsertions) {
+      insertion.setInserted(false);
+    }
+  }
 }
