@@ -972,9 +972,9 @@ loop:
       return null;
     }
 
-    dbug.debug("SCANNING: %s %s (%d insertions)%n", node.getKind(), node, p.size());
+    dbug.debug("TreeFinder.scan(%s, %d insertions):%n%s%n", node.getKind(), p.size(), node);
     if (annotator.Main.temporaryDebug) {
-      new Error("backtrace at scan()").printStackTrace();
+      new Error("backtrace at TreeFinder.scan()").printStackTrace();
     }
     if (! handled(node)) {
       dbug.debug("Not handled, skipping (%s): %s%n", node.getClass(), node);

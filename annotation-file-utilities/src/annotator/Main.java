@@ -571,6 +571,12 @@ public class Main {
         IndexFileSpecification spec = new IndexFileSpecification(arg);
         try {
           List<Insertion> parsedSpec = spec.parse();
+          if (temporaryDebug) {
+            System.out.printf("parsedSpec (size %d):%n", parsedSpec.size());
+            for (Insertion insertion : parsedSpec) {
+              System.out.printf("  %s, isInserted=%s%n", insertion, insertion.isInserted());
+            }
+          }
           AScene scene = spec.getScene();
           Collections.sort(parsedSpec, new Comparator<Insertion>() {
             @Override
@@ -640,11 +646,12 @@ public class Main {
     }
 
     if (dbug.isEnabled()) {
+      dbug.debug("In annotator.Main:%n");
       dbug.debug("%d insertions, %d .java files%n",
           insertions.size(), javafiles.size());
       dbug.debug("Insertions:%n");
       for (Insertion insertion : insertions) {
-        dbug.debug("  %s%n", insertion);
+        dbug.debug("  %s, isInserted=%s%n", insertion, insertion.isInserted());
       }
     }
 
@@ -699,12 +706,16 @@ public class Main {
         TreeFinder finder = new TreeFinder(tree);
         SetMultimap<Pair<Integer, ASTPath>, Insertion> positions =
             finder.getPositions(tree, insertions);
+        if (dbug.isEnabled()) {
+          dbug.debug("In annotator.Main:%n");
+          dbug.debug("positions (for %d insertions) = %s%n",
+                     insertions.size(), positions);
+        }
 
         if (convert_jaifs) {
           // program used only for JAIF conversion; execute following
           // block and then skip remainder of loop
-          Multimap<ASTRecord, Insertion> astInsertions =
-              finder.getPaths();
+          Multimap<ASTRecord, Insertion> astInsertions = finder.getPaths();
           for (Map.Entry<ASTRecord, Collection<Insertion>> entry :
               astInsertions.asMap().entrySet()) {
             ASTRecord rec = entry.getKey();

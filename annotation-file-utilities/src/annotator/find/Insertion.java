@@ -226,6 +226,10 @@ public abstract class Insertion {
      *         {@code false} otherwise.
      */
     public void setInserted(boolean inserted) {
+        if (annotator.Main.temporaryDebug) {
+            System.out.printf("setInserted(%s) (previously %s) for %s%n", inserted, this.inserted, this);
+            new Error().printStackTrace();
+        }
         this.inserted = inserted;
     }
 
