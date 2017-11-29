@@ -93,11 +93,13 @@
   </target>
 
   <target name="tags" depends="tags-scene-lib,tags-afu">
+    <!-- To permit renaming this directory, ${scene-lib} and ${afu} must be
+         relative rather than absolute filenames. -->
     <exec executable="etags" failonerror="true">
       <arg value="-i"/>
-      <arg value="${scene-lib}/TAGS"/>
+      <arg value="scene-lib/TAGS"/>
       <arg value="-i"/>
-      <arg value="${afu}/TAGS"/>
+      <arg value="annotation-file-utilities/TAGS"/>
     </exec>
   </target>
 
