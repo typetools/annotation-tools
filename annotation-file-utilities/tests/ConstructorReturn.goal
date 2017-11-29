@@ -7,6 +7,7 @@ package annotator.tests;
 
 public class ConstructorReturn {
     public @java.lang.Tainted ConstructorReturn() {}
+}
 
 class ConstructorReturn_2_1 {
     @ADecl
