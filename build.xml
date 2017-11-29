@@ -5,9 +5,9 @@
   <property file="build.properties" />
 
   <!-- default location of projects, has effect only if not previously set -->
-  <property name="asmx" location="asmx"/>
-  <property name="scene-lib" location="scene-lib"/>
-  <property name="afu" location="annotation-file-utilities"/>
+  <property name="asmx" location="asmx" relative="true"/>
+  <property name="scene-lib" location="scene-lib" relative="true"/>
+  <property name="afu" location="annotation-file-utilities" relative="true"/>
 
   <target name="prep" description="Create required directories/files">
     <!-- Ant's copy task does not retain file permissions,
@@ -93,6 +93,8 @@
   </target>
 
   <target name="tags" depends="tags-scene-lib,tags-afu">
+    <!-- To permit renaming this directory, ${scene-lib} and ${afu} must be
+         relative rather than absolute filenames. -->
     <exec executable="etags" failonerror="true">
       <arg value="-i"/>
       <arg value="${scene-lib}/TAGS"/>
