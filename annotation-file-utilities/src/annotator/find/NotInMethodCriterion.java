@@ -1,6 +1,6 @@
 package annotator.find;
 
-import annotations.io.ASTPath;
+import scenelib.annotations.io.ASTPath;
 
 import com.sun.source.tree.*;
 import com.sun.source.util.TreePath;

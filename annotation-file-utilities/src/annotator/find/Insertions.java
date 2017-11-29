@@ -21,11 +21,14 @@ import java.util.TreeSet;
 import javax.lang.model.element.Name;
 import javax.lang.model.type.TypeKind;
 
-import annotations.el.InnerTypeLocation;
-import annotations.io.ASTIndex;
-import annotations.io.ASTPath;
-import annotations.io.ASTRecord;
-import type.*;
+import scenelib.annotations.el.InnerTypeLocation;
+import scenelib.annotations.io.ASTIndex;
+import scenelib.annotations.io.ASTPath;
+import scenelib.annotations.io.ASTRecord;
+import scenelib.type.ArrayType;
+import scenelib.type.BoundedType;
+import scenelib.type.DeclaredType;
+import scenelib.type.Type;
 
 import com.sun.source.tree.AnnotatedTypeTree;
 import com.sun.source.tree.AnnotationTree;
@@ -53,18 +56,16 @@ import com.sun.tools.javac.tree.JCTree.JCExpression;
 import com.sun.tools.javac.util.Pair;
 
 /**
- * @author dbro
- *
- * An indexed collection (though not {@link java.util.Collection}, only
- * {@link java.lang.Iterable}) of {@link Insertion}s with methods to
- * select those specified for a given class or for an outer class along
- * with its local classes.  This class is especially useful when a
- * single JAIF stores annotations for many source files, as it reduces
- * the number of insertions to be considered for any AST node.
+ * A collection of {@link Insertion}s, indexed by outer class and inner
+ * class.  It has methods to select Insertions for a given class ({@link
+ * #forClass}) or for an outer class along with its local classes ({@link
+ * #forOuterClass}).  When a single JAIF stores annotations for many source
+ * files, this class reduces the number of insertions to be considered for
+ * any AST node.
  *
  * The class now serves a second purpose, which should probably be
- * separated out (according to OO dogma, at least): It attaches
- * {@link annotations.io.ASTPath}-based inner type {@link Insertion}s to
+ * separated out: It attaches
+ * {@link scenelib.annotations.io.ASTPath}-based inner type {@link Insertion}s to
  * a {@link TypedInsertion} on the outer type if one exists (see
  * {@link #organizeTypedInsertions(CompilationUnitTree, String, Collection)}.
  * Since getting these insertions right depends on this organization,
@@ -72,77 +73,19 @@ import com.sun.tools.javac.util.Pair;
  * performance.
  */
 public class Insertions implements Iterable<Insertion> {
-  private static int kindLevel(Insertion i) {
-    // ordered so insertion that depends on another gets inserted after other
-    switch (i.getKind()) {
-    case CONSTRUCTOR:
-      return 3;
-    case NEW:
-    case RECEIVER:
-      return 2;
-    case CAST:
-        return 1;
-    // case ANNOTATION:
-    // case CLOSE_PARENTHESIS:
-    default:
-      return 0;
-    }
-  }
 
-  private static final Comparator<Insertion> byASTRecord =
-      new Comparator<Insertion>() {
-        @Override
-        public int compare(Insertion o1, Insertion o2) {
-          Criteria c1 = o1.getCriteria();
-          Criteria c2 = o2.getCriteria();
-          ASTPath p1 = c1.getASTPath();
-          ASTPath p2 = c2.getASTPath();
-          ASTRecord r1 = new ASTRecord(null,
-              c1.getClassName(), c1.getMethodName(), c1.getFieldName(),
-              p1 == null ? ASTPath.empty() : p1);
-          ASTRecord r2 = new ASTRecord(null,
-              c2.getClassName(), c2.getMethodName(), c2.getFieldName(),
-              p2 == null ? ASTPath.empty() : p2);
-          int c = r1.compareTo(r2);
-          if (c == 0) {
-            // c = o1.getKind().compareTo(o2.getKind());
-            c = Integer.compare(kindLevel(o2), kindLevel(o1));  // descending
-            if (c == 0) { c = o1.toString().compareTo(o2.toString()); }
-          }
-          return c;
-        }
-      };
-
-  // store indexes insertions by (qualified) outer class name and inner
-  // class path (if any)
+  /**
+   * First index is (qualified) outer class name, second index is inner
+   * class path (or "" if not within a nested class).
+   */
+  // TODO: Inner class name might itself contain "$"; this probably doesn't handle that case.
   private Map<String, Map<String, Set<Insertion>>> store;
+  /** The number of {@link Insertion}s in this collection. */
   private int size;
-
-  private Pair<String, String> nameSplit(String name) {
-    int i = name.indexOf('$');  // FIXME: don't split on '$' in source
-    return i < 0
-        ? Pair.of(name, "")
-        : Pair.of(name.substring(0, i), name.substring(i));
-  }
 
   public Insertions() {
     store = new HashMap<String, Map<String, Set<Insertion>>>();
     size = 0;
-  }
-
-  // auxiliary for following two methods
-  private void forClass(CompilationUnitTree cut,
-      String qualifiedClassName, Set<Insertion> result) {
-    Pair<String, String> pair = nameSplit(qualifiedClassName);
-    Map<String, Set<Insertion>> map = store.get(pair.fst);
-    if (map != null) {
-      Set<Insertion> set = new TreeSet<Insertion>(byASTRecord);
-      set.addAll(map.get(pair.snd));
-      if (set != null) {
-        set = organizeTypedInsertions(cut, qualifiedClassName, set);
-        result.addAll(set);
-      }
-    }
   }
 
   /**
@@ -166,7 +109,7 @@ public class Insertions implements Iterable<Insertion> {
    *
    * @param cut the current compilation unit
    * @param qualifiedOuterClassName the fully qualified outer class name
-   * @return {@link java.util.Set} of {@link Insertion}s with an
+   * @return set of {@link Insertion}s with an
    *          {@link InClassCriterion} for the given outer class or one
    *          of its local classes
    */
@@ -176,6 +119,9 @@ public class Insertions implements Iterable<Insertion> {
     if (map == null || map.isEmpty()) {
       return Collections.<Insertion>emptySet();
     } else {
+      if (annotator.Main.temporaryDebug) {
+        System.out.printf("forOuterClass(%s): map = %s%n", qualifiedOuterClassName, map);
+      }
       Set<Insertion> set = new LinkedHashSet<Insertion>();
       for (String key : map.keySet()) {
         String qualifiedClassName = qualifiedOuterClassName + key;
@@ -185,30 +131,55 @@ public class Insertions implements Iterable<Insertion> {
     }
   }
 
+  /** Side-effects {@code result} to add {@link Insertion}s for {@code qualifiedClassName}. */
+  private void forClass(CompilationUnitTree cut,
+      String qualifiedClassName, Set<Insertion> result) {
+    if (annotator.Main.temporaryDebug) {
+      System.out.printf("calling forClass(cut, %s, set of size %d)%n", qualifiedClassName, result.size());
+    }
+    String outerClass = outerClassName(qualifiedClassName);
+    Map<String, Set<Insertion>> map = store.get(outerClass);
+    if (map != null) {
+      Set<Insertion> set = new TreeSet<Insertion>(byASTRecord);
+      set.addAll(map.get(innerClassName(qualifiedClassName)));
+      if (annotator.Main.temporaryDebug) {
+        System.out.println("set size (2) = " + set.size());
+      }
+      set = organizeTypedInsertions(cut, qualifiedClassName, set);
+      if (annotator.Main.temporaryDebug) {
+        System.out.println("set size (3) = " + set.size());
+      }
+      result.addAll(set);
+    }
+  }
+
   /**
    * Add an {@link Insertion} to this collection.
    */
   public void add(Insertion ins) {
     InClassCriterion icc = ins.getCriteria().getInClass();
-    String k1 = "";
-    String k2 = "";
-    Map<String, Set<Insertion>> map;
-    Set<Insertion> set;
 
-    if (icc != null) {
-      Pair<String, String> triple = nameSplit(icc.className);
-      k1 = triple.fst;
-      k2 = triple.snd;
+    String outerClass;
+    String innerClass;
+    if (icc == null) {
+      // Not in a class.
+      outerClass = "";
+      innerClass = "";
+    } else {
+      outerClass = outerClassName(icc.className);
+      innerClass = innerClassName(icc.className);
     }
-    map = store.get(k1);
+
+    Map<String, Set<Insertion>> map = store.get(outerClass);
     if (map == null) {
       map = new HashMap<String, Set<Insertion>>();
-      store.put(k1, map);
+      store.put(outerClass, map);
     }
-    set = map.get(k2);
+
+    Set<Insertion> set = map.get(innerClass);
     if (set == null) {
       set = new LinkedHashSet<Insertion>();
-      map.put(k2, set);
+      map.put(innerClass, set);
     }
 
     size -= set.size();
@@ -217,8 +188,7 @@ public class Insertions implements Iterable<Insertion> {
   }
 
   /**
-   * Add all {@link Insertion}s in the given
-   * {@link java.util.Collection} to this collection.
+   * Add all the given {@link Insertion}s to this collection.
    */
   public void addAll(Collection<? extends Insertion> c) {
     for (Insertion ins : c) {
@@ -238,6 +208,7 @@ public class Insertions implements Iterable<Insertion> {
     return new Iterator<Insertion>() {
       private Iterator<Map<String, Set<Insertion>>> miter =
           store.values().iterator();
+      // These two fields are initially empty, but are set the first time that hasNext is called.
       private Iterator<Set<Insertion>> siter =
           Collections.<Set<Insertion>>emptySet().iterator();
       private Iterator<Insertion> iiter =
@@ -245,17 +216,16 @@ public class Insertions implements Iterable<Insertion> {
 
       @Override
       public boolean hasNext() {
-        if (iiter.hasNext()) { return true; }
-        while (siter.hasNext()) {
-          iiter = siter.next().iterator();
-          if (iiter.hasNext()) { return true; }
+        if (iiter.hasNext()) {
+          return true;
         }
-        while (miter.hasNext()) {
+        if (siter.hasNext()) {
+          iiter = siter.next().iterator();
+          return hasNext();
+        }
+        if (miter.hasNext()) {
           siter = miter.next().values().iterator();
-          while (siter.hasNext()) {
-            iiter = siter.next().iterator();
-            if (iiter.hasNext()) { return true; }
-          }
+          return hasNext();
         }
         return false;
       }
@@ -280,60 +250,67 @@ public class Insertions implements Iterable<Insertion> {
   public List<Insertion> toList() {
     List<Insertion> list = new ArrayList<Insertion>(size);
     for (Insertion ins : this) { list.add(ins); }
-    return null;
+    return list;
   }
 
-  /*
+  /**
    * This method detects inner type relationships among ASTPath-based
    * insertion specifications and organizes the insertions accordingly.
+   * [TODO:  What is "accordingly"?]
    * This step is necessary because 1) insertion proceeds from the end to
    * the beginning of the source and 2) the insertion location does not
    * always exist prior to the top-level type insertion.
+   *
+   * This method attaches
+   * {@link scenelib.annotations.io.ASTPath}-based inner type {@link Insertion}s to
+   * a {@link TypedInsertion} on the outer type if one exists (see
+   * {@link #organizeTypedInsertions(CompilationUnitTree, String, Collection)}.
    */
   private Set<Insertion> organizeTypedInsertions(CompilationUnitTree cut,
       String className, Collection<Insertion> insertions) {
-    ASTRecordMap<TypedInsertion> map = new ASTRecordMap<TypedInsertion>();
+    ASTRecordMap<TypedInsertion> outerInsertions = new ASTRecordMap<TypedInsertion>();
+    Set<Insertion> innerInsertions = new LinkedHashSet<Insertion>();
+    List<Insertion> innerInsertionsList = new ArrayList<Insertion>();
     Set<Insertion> organized = new LinkedHashSet<Insertion>();
-    Set<Insertion> unorganized = new LinkedHashSet<Insertion>();
-    List<Insertion> list = new ArrayList<Insertion>();
 
-    // First divide the insertions into three buckets: TypedInsertions
-    // on outer types (map), ASTPath-based insertions on local types
-    // (unorganized -- built as list and then sorted, since building as
-    // a set spuriously removes "duplicates" according to the
-    // comparator), and everything else (organized -- where all
-    // eventually land).
+    // First divide the insertions into three buckets:
+    //  * TypedInsertions on outer types (`outerInsertions`)
+    //  * ASTPath-based insertions on local types
+    //    (`innerInsertions` -- built as list and then sorted, since building as
+    //    a set spuriously removes "duplicates" according to the
+    //    comparator), and
+    //  * everything else (`organized` -- where all eventually land).
     for (Insertion ins : insertions) {
-      if (ins.getInserted()) { continue; }
+      if (ins.isInserted()) { continue; }
       Criteria criteria = ins.getCriteria();
       GenericArrayLocationCriterion galc =
           criteria.getGenericArrayLocation();
       ASTPath p = criteria.getASTPath();
       if (p == null || p.isEmpty()
-          || galc != null && !galc.getLocation().isEmpty()
+          || (galc != null && !galc.getLocation().isEmpty())
           || ins instanceof CastInsertion
           || ins instanceof CloseParenthesisInsertion) {
         organized.add(ins);
       } else {
         ASTRecord rec = new ASTRecord(cut, criteria.getClassName(),
             criteria.getMethodName(), criteria.getFieldName(), p);
-        ASTPath.ASTEntry entry = rec.astPath.get(-1);
-        Tree node;
+        ASTPath.ASTEntry entry = rec.astPath.getLast();
 
+        Tree node;
         if (entry.getTreeKind() == Tree.Kind.NEW_ARRAY
             && entry.childSelectorIs(ASTPath.TYPE)
             && entry.getArgument() == 0) {
-          ASTPath temp = rec.astPath.getParentPath();
-          node = ASTIndex.getNode(cut, rec.replacePath(temp));
+          ASTPath parentPath = rec.astPath.getParentPath();
+          node = ASTIndex.getNode(cut, rec.replacePath(parentPath));
           node = node instanceof JCTree.JCNewArray
-              ? TypeTree.fromType(((JCTree.JCNewArray) node).type)
+              ? TypeTree.fromJavacType(((JCTree.JCNewArray) node).type)
               : null;
         } else {
           node = ASTIndex.getNode(cut, rec);
         }
 
         if (ins instanceof TypedInsertion) {
-          TypedInsertion tins = map.get(rec);
+          TypedInsertion tins = outerInsertions.get(rec);
           if (ins instanceof NewInsertion) {
             NewInsertion nins = (NewInsertion) ins;
             if (entry.getTreeKind() == Tree.Kind.NEW_ARRAY
@@ -395,7 +372,7 @@ public class Insertions implements Iterable<Insertion> {
             }
           }
           if (tins == null) {
-            map.put(rec, (TypedInsertion) ins);
+            outerInsertions.put(rec, (TypedInsertion) ins);
           } else if (tins.getType().equals(((TypedInsertion) ins).getType())) {
             mergeTypedInsertions(tins, (TypedInsertion) ins);
           }
@@ -411,13 +388,15 @@ public class Insertions implements Iterable<Insertion> {
             }
             if (node == null) {
               // TODO: ???
+              throw new Error("node == null case not yet implemented");
             }
             temp = temp.extend(
                 new ASTPath.ASTEntry(Tree.Kind.NEW_ARRAY, ASTPath.TYPE, 0));
             if (node.toString().startsWith("{")) {
-              TypedInsertion tins = map.get(rec.replacePath(temp));
+              TypedInsertion tins = outerInsertions.get(rec.replacePath(temp));
               if (tins == null) {
                 // TODO
+                throw new Error("tins == null case not yet implemented");
               } else {
                 tins.getInnerTypeInsertions().add(ins);
                 ins.setInserted(true);
@@ -445,51 +424,50 @@ public class Insertions implements Iterable<Insertion> {
               }
             }
           }
-          list.add(ins);
+          innerInsertionsList.add(ins);
         }
       }
     }
-    // if (map.isEmpty()) {
-    //  organized.addAll(unorganized);
+    // if (outerInsertions.isEmpty()) {
+    //  organized.addAll(innerInsertions);
     //  return organized;
     // }
-    Collections.sort(list, byASTRecord);
-    unorganized.addAll(list);
+    Collections.sort(innerInsertionsList, byASTRecord);
+    innerInsertions.addAll(innerInsertionsList);
 
-    // Each Insertion in unorganized gets attached to a TypedInsertion
-    // in map if possible; otherwise, it gets dumped into organized.
-    for (Insertion ins : unorganized) {
+    // Each Insertion in innerInsertions gets attached to a TypedInsertion
+    // in outerInsertions if possible; otherwise, it gets dumped into organized.
+    for (Insertion ins : innerInsertions) {
       Criteria criteria = ins.getCriteria();
       String methodName = criteria.getMethodName();
       String fieldName = criteria.getFieldName();
-      ASTPath ap1 = criteria.getASTPath();
+      ASTPath localTypePath = criteria.getASTPath();
       List<TypePathEntry> tpes = new ArrayList<TypePathEntry>();
-      if (ap1 == null) {
+      if (localTypePath == null) {
           // || methodName == null && fieldName == null)
         organized.add(ins);
         continue;
       }
 
       // First find the relevant "top-level" insertion, if any.
-      // ap0: path to top-level type; ap1: path to local type
+      Deque<ASTPath> astack = new ArrayDeque<ASTPath>(localTypePath.size());
+      ASTPath topLevelTypePath = localTypePath;
+      do {
+        astack.push(topLevelTypePath);
+        topLevelTypePath = topLevelTypePath.getParentPath();
+      } while (!topLevelTypePath.isEmpty());
       ASTRecord rec;
       Tree.Kind kind;
-      Deque<ASTPath> astack = new ArrayDeque<ASTPath>(ap1.size());
-      ASTPath ap0 = ap1;
       do {
-        astack.push(ap0);
-        ap0 = ap0.getParentPath();
-      } while (!ap0.isEmpty());
-      do {
-        ap0 = astack.pop();
-        kind = ap0.get(-1).getTreeKind();
-        rec = new ASTRecord(cut, className, methodName, fieldName, ap0);
-      } while (!(astack.isEmpty() || map.containsKey(rec)));
+        topLevelTypePath = astack.pop();
+        kind = topLevelTypePath.getLast().getTreeKind();
+        rec = new ASTRecord(cut, className, methodName, fieldName, topLevelTypePath);
+      } while (!(astack.isEmpty() || outerInsertions.containsKey(rec)));
 
-      TypedInsertion tins = map.get(rec);
+      TypedInsertion tins = outerInsertions.get(rec);
       TreePath path = ASTIndex.getTreePath(cut, rec);
       Tree node = path == null ? null : path.getLeaf();
-      if (node == null && ap0.isEmpty()) {
+      if (node == null && topLevelTypePath.isEmpty()) {
         organized.add(ins);
         continue;
       }
@@ -508,10 +486,10 @@ public class Insertions implements Iterable<Insertion> {
           switch (t.getKind()) {
           case NEW_ARRAY:
             int d = 0;
-            ASTPath.ASTEntry e = ap1.get(-1);
+            ASTPath.ASTEntry e = localTypePath.getLast();
             List<TypePathEntry> loc = null;
             List<Insertion> inners = new ArrayList<Insertion>();
-            Type type = TypeTree.conv(((JCTree.JCNewArray) t).type);
+            Type type = TypeTree.javacTypeToType(((JCTree.JCNewArray) t).type);
             if (e.getTreeKind() == Tree.Kind.NEW_ARRAY) {
               d += e.getArgument();
             }
@@ -532,7 +510,7 @@ public class Insertions implements Iterable<Insertion> {
             inners.add(ins);
             tins = new NewInsertion(type, criteria, inners);
             tins.setInserted(true);
-            map.put(rec, tins);
+            outerInsertions.put(rec, tins);
             break;
           default:
             break;
@@ -548,7 +526,7 @@ public class Insertions implements Iterable<Insertion> {
       // MEMBER_SELECTs in the AST path that don't correspond to
       // existing nodes are part of a type use.
       if (node == null) {
-        ASTPath ap = ap0;
+        ASTPath ap = topLevelTypePath;
         if (!ap.isEmpty()) {
           do {
             ap = ap.getParentPath();
@@ -567,13 +545,13 @@ public class Insertions implements Iterable<Insertion> {
           if (node instanceof JCTree.JCMethodDecl) {
             MethodSymbol msym = ((JCTree.JCMethodDecl) node).sym;
             csym = (ClassSymbol) msym.owner;
-            node = TypeTree.fromType(csym.type);
+            node = TypeTree.fromJavacType(csym.type);
             break;
           } else if (node instanceof JCTree.JCClassDecl) {
             csym = ((JCTree.JCClassDecl) node).sym;
             if (csym.owner instanceof ClassSymbol) {
               csym = (ClassSymbol) csym.owner;
-              node = TypeTree.fromType(csym.type);
+              node = TypeTree.fromJavacType(csym.type);
               break;
             }
           }
@@ -581,7 +559,7 @@ public class Insertions implements Iterable<Insertion> {
         case NEW:
           if (node instanceof JCTree.JCNewArray) {
             if (node.toString().startsWith("{")) {
-              node = TypeTree.fromType(((JCTree.JCNewArray) node).type);
+              node = TypeTree.fromJavacType(((JCTree.JCNewArray) node).type);
               break;
             } else {
               organized.add(ins);
@@ -600,7 +578,7 @@ public class Insertions implements Iterable<Insertion> {
             csym = ((JCTree.JCClassDecl) node).sym;
           }
           if (csym != null) {
-            node = TypeTree.fromType(csym.type);
+            node = TypeTree.fromJavacType(csym.type);
             break;
           }
           throw new RuntimeException();
@@ -658,14 +636,14 @@ public class Insertions implements Iterable<Insertion> {
        * of the interfaces in com.sun.source.tree.Tree, which are
        * defined in the local class TypeTree.
        */
-      int i = ap0.size();
-      int n = ap1.size();
+      int i = topLevelTypePath.size();
+      int n = localTypePath.size();
       int actualDepth = 0;  // inner type levels seen
       int expectedDepth = 0;  // inner type levels anticipated
 
       // skip any declaration nodes
       while (i < n) {
-        ASTPath.ASTEntry entry = ap1.get(i);
+        ASTPath.ASTEntry entry = localTypePath.get(i);
         kind = entry.getTreeKind();
         if (kind != Tree.Kind.METHOD && kind != Tree.Kind.VARIABLE) {
           break;
@@ -675,7 +653,7 @@ public class Insertions implements Iterable<Insertion> {
 
       // now build up the type path in JVM's format
       while (i < n) {
-        ASTPath.ASTEntry entry = ap1.get(i);
+        ASTPath.ASTEntry entry = localTypePath.get(i);
         rec = rec.extend(entry);
         kind = entry.getTreeKind();
 
@@ -708,7 +686,7 @@ public class Insertions implements Iterable<Insertion> {
 
         case NEW_ARRAY:
           assert tpes.isEmpty();
-          ap0 = ap0.add(new ASTPath.ASTEntry(Tree.Kind.NEW_ARRAY,
+          topLevelTypePath = topLevelTypePath.add(new ASTPath.ASTEntry(Tree.Kind.NEW_ARRAY,
               ASTPath.TYPE, 0));
           if (expectedDepth == 0 && node.getKind() == kind) {
             if (node instanceof JCTree.JCNewArray) {
@@ -722,7 +700,7 @@ public class Insertions implements Iterable<Insertion> {
                 }
                 if (arg > 0) { throw new RuntimeException(); }
               } else {
-                node = TypeTree.fromType(((JCTree.JCNewArray) node).type);
+                node = TypeTree.fromJavacType(((JCTree.JCNewArray) node).type);
               }
             } else {
               throw new RuntimeException("NYI");  // TODO
@@ -761,9 +739,9 @@ public class Insertions implements Iterable<Insertion> {
           if (ASTPath.isWildcard(node.getKind())) {
             if (expectedDepth == 0
                 && (i < 1
-                    || ap1.get(i-1).getTreeKind() != Tree.Kind.INSTANCE_OF)
+                    || localTypePath.get(i-1).getTreeKind() != Tree.Kind.INSTANCE_OF)
                 && (i < 2
-                    || ap1.get(i-2).getTreeKind() != Tree.Kind.ARRAY_TYPE)) {
+                    || localTypePath.get(i-2).getTreeKind() != Tree.Kind.ARRAY_TYPE)) {
               while (--actualDepth >= 0) {
                 tpes.add(TypePathEntry.INNER_TYPE);
               }
@@ -787,45 +765,44 @@ public class Insertions implements Iterable<Insertion> {
 
       organized.add(ins);
       if (tpes.isEmpty()) {
-        // assert ap1.equals(ap0) && !map.containsKey(ap0);
+        // assert localTypePath.equals(topLevelTypePath) && !outerInsertions.containsKey(topLevelTypePath);
 //        organized.add(ins);
-        // map.put(rec, (TypedInsertion) ins);
+        // outerInsertions.put(rec, (TypedInsertion) ins);
       } else {
-        criteria.add(new ASTPathCriterion(ap0));
+        criteria.add(new ASTPathCriterion(topLevelTypePath));
         criteria.add(new GenericArrayLocationCriterion(
             new InnerTypeLocation(tpes)));
         tins.getInnerTypeInsertions().add(ins);
       }
     }
-    organized.addAll(map.values());
+    organized.addAll(outerInsertions.values());
     return organized;
   }
 
+  // TODO: document this
   private int newArrayInnerTypeDepth(ASTPath path) {
-    int d = 0;
-    if (path != null) {
-      while (!path.isEmpty()) {
-        ASTPath.ASTEntry entry = path.get(-1);
-        switch (entry.getTreeKind()) {
-        case ANNOTATED_TYPE:
-        case MEMBER_SELECT:
-        case PARAMETERIZED_TYPE:
-        case UNBOUNDED_WILDCARD:
-          d = 0;
-          break;
-        case ARRAY_TYPE:
-          ++d;
-          break;
-        case NEW_ARRAY:
-          if (entry.childSelectorIs(ASTPath.TYPE) && entry.hasArgument()) {
-            d += entry.getArgument();
-          }
-          return d;
-        default:
-          return 0;
+    int result = 0;
+    while (!path.isEmpty()) {
+      ASTPath.ASTEntry entry = path.getLast();
+      switch (entry.getTreeKind()) {
+      case ANNOTATED_TYPE:
+      case MEMBER_SELECT:
+      case PARAMETERIZED_TYPE:
+      case UNBOUNDED_WILDCARD:
+        result = 0;
+        break;
+      case ARRAY_TYPE:
+        ++result;
+        break;
+      case NEW_ARRAY:
+        if (entry.childSelectorIs(ASTPath.TYPE) && entry.hasArgument()) {
+          result += entry.getArgument();
         }
-        path = path.getParentPath();
+        return result;
+      default:
+        return 0;
       }
+      path = path.getParentPath();
     }
     return 0;
   }
@@ -907,7 +884,7 @@ outer:
         if (d == 0 && tpe.tag == TypePathEntryKind.ARRAY) {
           int a = 0;
           if (!r.astPath.isEmpty()) {
-            ASTPath.ASTEntry e = r.astPath.get(-1);
+            ASTPath.ASTEntry e = r.astPath.getLast();
             if (e.getTreeKind() == Tree.Kind.NEW_ARRAY
                 && e.childSelectorIs(ASTPath.TYPE)) {
               a = 1 + e.getArgument();
@@ -944,7 +921,7 @@ outer:
       case NEW_ARRAY:
         if (d == 0) {
           if (!r.astPath.isEmpty()) {
-            ASTPath.ASTEntry e = r.astPath.get(-1);
+            ASTPath.ASTEntry e = r.astPath.getLast();
             if (e.getTreeKind() == Tree.Kind.NEW_ARRAY) {
               int a = 0;
               while (tpe.tag == TypePathEntryKind.ARRAY) {
@@ -1009,57 +986,73 @@ outer:
     }
   }
 
-  // merge annotations, assuming types are structurally identical
-  private void mergeTypedInsertions(TypedInsertion ins0, TypedInsertion ins1) {
-    mergeTypes(ins0.getType(), ins1.getType());
+  /**
+   * Merge annotations, assuming types are structurally identical.
+   * Side-effects the first argument.
+   */
+  private void mergeTypedInsertions(TypedInsertion ins1, TypedInsertion ins2) {
+    mergeTypes(ins1.getType(), ins2.getType());
   }
 
-  private void mergeTypes(Type t0, Type t1) {
-    if (t0 == t1) { return; }
-    switch (t0.getKind()) {
+  /**
+   * Merge annotations, assuming types are structurally identical.
+   * Side-effects the first argument.
+   */
+  private void mergeTypes(Type t1, Type t2) {
+    // TODO: should this test for .equals too?
+    if (t1 == t2) { return; }
+    switch (t1.getKind()) {
     case ARRAY:
       {
-        ArrayType at0 = (ArrayType) t0;
         ArrayType at1 = (ArrayType) t1;
-        mergeTypes(at0.getComponentType(), at1.getComponentType());
+        ArrayType at2 = (ArrayType) t2;
+        mergeTypes(at1.getComponentType(), at2.getComponentType());
         return;
       }
     case BOUNDED:
       {
-        BoundedType bt0 = (BoundedType) t0;
         BoundedType bt1 = (BoundedType) t1;
-        if (bt0.getBoundKind() != bt1.getBoundKind()) { break; }
-        mergeTypes(bt0.getBound(), bt1.getBound());
-        mergeTypes(bt0.getName(), bt1.getName());
+        BoundedType bt2 = (BoundedType) t2;
+        if (bt1.getBoundKind() != bt2.getBoundKind()) {
+          throw new Error(String.format("Types have different bounds: %s %s", t1, t2));
+        }
+        mergeTypes(bt1.getBound(), bt2.getBound());
+        mergeTypes(bt1.getName(), bt2.getName());
         return;
       }
     case DECLARED:
       {
-        DeclaredType dt0 = (DeclaredType) t0;
         DeclaredType dt1 = (DeclaredType) t1;
-        List<Type> tps0 = dt0.getTypeParameters();
-        List<Type> tps1 = dt1.getTypeParameters();
-        int n = tps0.size();
-        if (tps1.size() != n) { break; }
-        mergeTypes(dt0.getInnerType(), dt1.getInnerType());
-        for (String anno : dt1.getAnnotations()) {
-          if (!dt0.getAnnotations().contains(anno)) {
-            dt0.addAnnotation(anno);
+        DeclaredType dt2 = (DeclaredType) t2;
+        List<Type> params1 = dt1.getTypeParameters();
+        List<Type> params2 = dt2.getTypeParameters();
+        int numParams = params1.size();
+        if (params2.size() != numParams) {
+          throw new Error(String.format("Types have different numbers of parameters: %s %s", t1, t2));
+        }
+        mergeTypes(dt1.getInnerType(), dt2.getInnerType());
+        for (String anno : dt2.getAnnotations()) {
+          if (!dt1.getAnnotations().contains(anno)) {
+            dt1.addAnnotation(anno);
           }
         }
-        for (int i = 0; i < n; i++) {
-          mergeTypes(tps0.get(i), tps1.get(i));
+        for (int i = 0; i < numParams; i++) {
+          mergeTypes(params1.get(i), params2.get(i));
         }
         return;
       }
+    default:
+      throw new RuntimeException();
     }
-    throw new RuntimeException();
   }
 
-  // Returns the depth of the innermost local type of a type AST.
+  /**
+   * Returns the depth of type nesting of the innermost nested type of a type AST.
+   * For example, both {@code A.B.C} and {@code A.B<D.E.F.G>.C} have depth 3.
+   */
   private int localDepth(Tree node) {
     Tree t = node;
-    int n = 0;
+    int result = 0;
 loop:
     while (t != null) {
       switch (t.getKind()) {
@@ -1075,40 +1068,112 @@ loop:
           }
         }
         t = ((MemberSelectTree) t).getExpression();
-        ++n;
+        ++result;
         break;
       default:
         break loop;
       }
     }
-    return n;
+    return result;
   }
 
-  // Provides an additional level of indexing.
+  private static int kindLevel(Insertion i) {
+    // Ordered so insertion that depends on another gets inserted after other.
+    // TODO: could change to use natural order of the enumeration (reorder the enumeration).
+    switch (i.getKind()) {
+    case CONSTRUCTOR:
+      return 3;
+    case NEW:
+    case RECEIVER:
+      return 2;
+    case CAST:
+        return 1;
+    case ANNOTATION:
+    case CLOSE_PARENTHESIS:
+      return 0;
+    default:
+      throw new Error("unrecognized case");
+    }
+  }
+
+  /** Compare by AstRecord, then by kind, then by string representation. */
+  private static final Comparator<Insertion> byASTRecord =
+      new Comparator<Insertion>() {
+        @Override
+        public int compare(Insertion o1, Insertion o2) {
+          Criteria crit1 = o1.getCriteria();
+          Criteria crit2 = o2.getCriteria();
+          ASTPath p1 = crit1.getASTPath();
+          ASTPath p2 = crit2.getASTPath();
+          ASTRecord r1 = new ASTRecord(null,
+              crit1.getClassName(), crit1.getMethodName(), crit1.getFieldName(),
+              p1 == null ? ASTPath.empty() : p1);
+          ASTRecord r2 = new ASTRecord(null,
+              crit2.getClassName(), crit2.getMethodName(), crit2.getFieldName(),
+              p2 == null ? ASTPath.empty() : p2);
+          int cmp;
+          cmp = r1.compareTo(r2);
+          if (cmp != 0) {
+            return cmp;
+          }
+          // cmp = o1.getKind().compareTo(o2.getKind());
+          cmp = Integer.compare(kindLevel(o2), kindLevel(o1));  // descending
+          if (cmp != 0) {
+            return cmp;
+          }
+          cmp = o1.toString().compareTo(o2.toString());
+          return cmp;
+        }
+      };
+
+  /** Return the outer class part of the argument; that is, the part before '$'.
+   * Return the argument if it contains no '$'. */
+  private static String outerClassName(String className) {
+    int i = className.indexOf('$');  // FIXME: don't split on '$' in source
+    if (i == -1) {
+      return className;
+    } else {
+      return className.substring(0, i);
+    }
+  }
+
+  /** Return the inner class part of the argument; that is, the part after '$'.
+   * Return the empty string if there is no '$'. */
+  private static String innerClassName(String className) {
+    int i = className.indexOf('$');  // FIXME: don't split on '$' in source
+    if (i == -1) {
+      return "";
+    } else {
+      return className.substring(i);
+    }
+  }
+
+  // Map from ASTRecord to the given type.  Internally also indexes by ASTPath.
+  // (The need to also index by ASTPath suggests that the ASTRecord equality test ignores
+  // its ASTPath.)
   class ASTRecordMap<E> implements Map<ASTRecord, E> {
-    Map<ASTRecord, SortedMap<ASTPath, E>> back;
+    Map<ASTRecord, SortedMap<ASTPath, E>> back = new HashMap<>();
 
     ASTRecordMap() {
-      back = new HashMap<ASTRecord, SortedMap<ASTPath, E>>();
     }
 
-    private SortedMap<ASTPath, E> getMap(ASTRecord rec) {
+    private SortedMap<ASTPath, E> getPathMap(ASTRecord rec) {
       ASTRecord key = rec.replacePath(ASTPath.empty());
-      SortedMap<ASTPath, E> map = back.get(key);
-      if (map == null) {
-        map = new TreeMap<ASTPath, E>();
-        back.put(key, map);
+      SortedMap<ASTPath, E> pathMap = back.get(key);
+      if (pathMap == null) {
+        pathMap = new TreeMap<ASTPath, E>();
+        back.put(key, pathMap);
       }
-      return map;
+      return pathMap;
     }
 
     @Override
     public int size() {
-      int n = 0;
-      for (SortedMap<ASTPath, E> map : back.values()) {
-        n += map.size();
+      int result = 0;
+      for (SortedMap<ASTPath, E> pathMap : back.values()) {
+        result += pathMap.size();
       }
-      return n;
+      return result;
     }
 
     @Override
@@ -1119,16 +1184,16 @@ loop:
     @Override
     public boolean containsKey(Object key) {
       ASTRecord rec = (ASTRecord) key;
-      SortedMap<ASTPath, E> m = getMap(rec);
-      return m != null && m.containsKey(rec.astPath);
+      SortedMap<ASTPath, E> m = getPathMap(rec);
+      return m.containsKey(rec.astPath);
     }
 
     @Override
     public boolean containsValue(Object value) {
       @SuppressWarnings("unchecked")
       E e = (E) value;
-      for (SortedMap<ASTPath, E> map : back.values()) {
-        if (map.containsValue(e)) { return true; }
+      for (SortedMap<ASTPath, E> pathMap : back.values()) {
+        if (pathMap.containsValue(e)) { return true; }
       }
       return false;
     }
@@ -1136,22 +1201,22 @@ loop:
     @Override
     public E get(Object key) {
       ASTRecord rec = (ASTRecord) key;
-      SortedMap<ASTPath, E> map = getMap(rec);
-      return map == null ? null : map.get(rec.astPath);
+      SortedMap<ASTPath, E> pathMap = getPathMap(rec);
+      return pathMap.get(rec.astPath);
     }
 
     @Override
     public E put(ASTRecord key, E value) {
       ASTRecord rec = key;
-      SortedMap<ASTPath, E> map = getMap(rec);
-      return map == null ? null : map.put(rec.astPath, value);
+      SortedMap<ASTPath, E> pathMap = getPathMap(rec);
+      return pathMap.put(rec.astPath, value);
     }
 
     @Override
     public E remove(Object key) {
       ASTRecord rec = (ASTRecord) key;
-      SortedMap<ASTPath, E> map = getMap(rec);
-      return map == null ? null : map.remove(rec.astPath);
+      SortedMap<ASTPath, E> pathMap = getPathMap(rec);
+      return pathMap.remove(rec.astPath);
     }
 
     @Override
@@ -1235,7 +1300,8 @@ loop:
     }
   }
 
-  // Simple AST implementation used only in determining type paths.
+  // TODO: Why is a new implementation needed, rather than using an existing one?
+  /** Simple AST implementation used only in determining type paths. */
   static abstract class TypeTree implements ExpressionTree {
     private static Map<String, TypeTag> primTags =
         new HashMap<String, TypeTag>();
@@ -1258,21 +1324,21 @@ loop:
           return fromJCTree(
               ((JCTree.JCAnnotatedType) jt).getUnderlyingType());
         case IDENTIFIER:
-          return new IdenT(
+          return new IdentifierTT(
               ((JCTree.JCIdent) jt).sym.getSimpleName().toString());
         case ARRAY_TYPE:
-          return new ArrT(
+          return new ArrayTT(
               fromJCTree(((JCTree.JCArrayTypeTree) jt).getType()));
         case MEMBER_SELECT:
-          return new LocT(
+          return new MemberSelectTT(
               fromJCTree(((JCTree.JCFieldAccess) jt).getExpression()),
               ((JCTree.JCFieldAccess) jt).getIdentifier());
         case EXTENDS_WILDCARD:
         case SUPER_WILDCARD:
-          return new WildT(kind,
+          return new WildcardTT(kind,
               fromJCTree(((JCTree.JCWildcard) jt).getBound()));
         case UNBOUNDED_WILDCARD:
-          return new WildT();
+          return new WildcardTT();
         case PARAMETERIZED_TYPE:
           com.sun.tools.javac.util.List<JCExpression> typeArgs =
             ((JCTree.JCTypeApply) jt).getTypeArguments();
@@ -1280,7 +1346,7 @@ loop:
           for (JCTree.JCExpression typeArg : typeArgs) {
             args.add(fromJCTree(typeArg));
           }
-          return new ParT(
+          return new ParameterizedTypeTT(
               fromJCTree(((JCTree.JCTypeApply) jt).getType()),
               args);
         default:
@@ -1290,39 +1356,40 @@ loop:
       return null;
     }
 
+    /** Create a TypeTree from a scene-lib Type. */
     static TypeTree fromType(final Type type) {
       switch (type.getKind()) {
       case ARRAY:
         final ArrayType atype = (ArrayType) type;
         final TypeTree componentType = fromType(atype.getComponentType());
-        return new ArrT(componentType);
+        return new ArrayTT(componentType);
       case BOUNDED:
         final BoundedType btype = (BoundedType) type;
         final BoundedType.BoundKind bk = btype.getBoundKind();
         final String bname = btype.getName().getName();
         final TypeTree bound = fromType(btype.getBound());
-        return new Param(bname, bk, bound);
+        return new TypeParameterTT(bname, bk, bound);
       case DECLARED:
         final DeclaredType dtype = (DeclaredType) type;
         if (dtype.isWildcard()) {
-          return new WildT();
+          return new WildcardTT();
         } else {
           final String dname = dtype.getName();
           TypeTag typeTag = primTags.get(dname);
           if (typeTag == null) {
-            final TypeTree base = new IdenT(dname);
+            final TypeTree base = new IdentifierTT(dname);
             TypeTree ret = base;
             List<Type> params = dtype.getTypeParameters();
             DeclaredType inner = dtype.getInnerType();
             if (!params.isEmpty()) {
               final List<Tree> typeArgs = new ArrayList<Tree>(params.size());
               for (Type t : params) { typeArgs.add(fromType(t)); }
-              ret = new ParT(base, typeArgs);
+              ret = new ParameterizedTypeTT(base, typeArgs);
             }
-            return inner == null ? ret : meld(fromType(inner), ret);
+            return inner == null ? ret : addPrefix(fromType(inner), ret);
           } else {
             final TypeKind typeKind = typeTag.getPrimitiveTypeKind();
-            return new PrimT(typeKind);
+            return new PrimitiveTypeTT(typeKind);
           }
         }
       default:
@@ -1330,77 +1397,59 @@ loop:
       }
     }
 
-    static TypeTree fromType(final com.sun.tools.javac.code.Type type) {
-      return fromType(conv(type));
+    /** Create a TypeTree from a javac Type. */
+    static TypeTree fromJavacType(final com.sun.tools.javac.code.Type type) {
+      return fromType(javacTypeToType(type));
     }
 
-    /**
-     * @param jtype
-     * @return
-     */
-    static Type conv(final com.sun.tools.javac.code.Type jtype) {
-      Type type = null;
-      DeclaredType d;
-      com.sun.tools.javac.code.Type t;
+    /** Create a javac Type from a scene-lib Type. */
+    static Type javacTypeToType(final com.sun.tools.javac.code.Type jtype) {
       switch (jtype.getKind()) {
       case ARRAY:
-        t = ((com.sun.tools.javac.code.Type.ArrayType) jtype).elemtype;
-        type = new ArrayType(conv(t));
-        break;
+        return new ArrayType(javacTypeToType(((com.sun.tools.javac.code.Type.ArrayType) jtype).elemtype));
       case DECLARED:
-        t = jtype;
-        d = null;
-        do {
-          DeclaredType d0 = d;
-          com.sun.tools.javac.code.Type.ClassType ct =
+        {
+          com.sun.tools.javac.code.Type t = jtype;
+          DeclaredType d = null;
+          do {
+            DeclaredType d0 = d;
+            com.sun.tools.javac.code.Type.ClassType ct =
               (com.sun.tools.javac.code.Type.ClassType) t;
-          d = new DeclaredType(ct.tsym.name.toString());
-          d.setInnerType(d0);
-          d0 = d;
-          for (com.sun.tools.javac.code.Type a : ct.getTypeArguments()) {
-            d.addTypeParameter(conv(a));
-          }
-          t = ct.getEnclosingType();
-        } while (t.getKind() == TypeKind.DECLARED);
-        type = d;
-        break;
+            d = new DeclaredType(ct.tsym.name.toString());
+            d.setInnerType(d0);
+            d0 = d;
+            for (com.sun.tools.javac.code.Type a : ct.getTypeArguments()) {
+              d.addTypeParameter(javacTypeToType(a));
+            }
+            t = ct.getEnclosingType();
+          } while (t.getKind() == TypeKind.DECLARED);
+          return d;
+        }
       case WILDCARD:
-        BoundedType.BoundKind k;
-        t = ((com.sun.tools.javac.code.Type.WildcardType) jtype).bound;
-        switch (((com.sun.tools.javac.code.Type.WildcardType) jtype).kind) {
-        case EXTENDS:
-          k = BoundedType.BoundKind.EXTENDS;
-          break;
-        case SUPER:
-          k = BoundedType.BoundKind.SUPER;
-          break;
-        case UNBOUND:
-          k = null;
-          type = new DeclaredType("?");
-          break;
-        default:
-          throw new RuntimeException();
+        com.sun.tools.javac.code.Type.WildcardType wildcard
+          = ((com.sun.tools.javac.code.Type.WildcardType) jtype);
+        if (wildcard.kind == com.sun.tools.javac.code.BoundKind.UNBOUND) {
+          return new DeclaredType("?");
         }
-        if (k != null) {
-          d = new DeclaredType(jtype.tsym.name.toString());
-          type = new BoundedType(d, k, (DeclaredType) conv(t));
-        }
-        break;
+        return new BoundedType(new DeclaredType(jtype.tsym.name.toString()),
+                               wildcard.kind,
+                               (DeclaredType) javacTypeToType(wildcard.bound));
       case TYPEVAR:
-        t = ((com.sun.tools.javac.code.Type.TypeVar) jtype).getUpperBound();
-        type = conv(t);
-        if (type.getKind() == Type.Kind.DECLARED) {
-          type = new BoundedType(new DeclaredType(jtype.tsym.name.toString()),
-              BoundedType.BoundKind.EXTENDS, (DeclaredType) type);
-        }  // otherwise previous conv should have been here already
-        break;
+        {
+          Type upperBound = javacTypeToType(((com.sun.tools.javac.code.Type.TypeVar) jtype).getUpperBound());
+          if (upperBound.getKind() == Type.Kind.DECLARED) {
+            return new BoundedType(new DeclaredType(jtype.tsym.name.toString()),
+                                   BoundedType.BoundKind.EXTENDS, (DeclaredType) upperBound);
+          } else {
+            return upperBound;
+          }
+        }
       case INTERSECTION:
-        t = jtype.tsym.erasure_field;  // ???
-        type = new DeclaredType(t.tsym.name.toString());
-        break;
+        return new DeclaredType(jtype.tsym.erasure_field.tsym.name.toString());
       case UNION:
         // TODO
-        break;
+        throw new Error("UNION case not yet implemented");
+        // TODO: reinstate after replacing "throw new Error()": break;
       case BOOLEAN:
       case BYTE:
       case CHAR:
@@ -1409,41 +1458,40 @@ loop:
       case SHORT:
       case FLOAT:
       case INT:
-        type = new DeclaredType(jtype.tsym.name.toString());
-        break;
-      // case ERROR:
-      // case EXECUTABLE:
-      // case NONE:
-      // case NULL:
-      // case OTHER:
-      // case PACKAGE:
-      // case VOID:
+        return new DeclaredType(jtype.tsym.name.toString());
+        // case ERROR:
+        // case EXECUTABLE:
+        // case NONE:
+        // case NULL:
+        // case OTHER:
+        // case PACKAGE:
+        // case VOID:
       default:
-        break;
+        throw new Error();
       }
-      return type;
     }
 
-    private static TypeTree meld(final TypeTree t0, final TypeTree t1) {
-      switch (t0.getKind()) {
+    /** Use prefix as a prefix for identifiers in t. For example, prefix may be a package or an outer type. */
+    private static TypeTree addPrefix(final TypeTree t, final TypeTree prefix) {
+      switch (t.getKind()) {
       case IDENTIFIER:
-        IdenT it = (IdenT) t0;
-        return new LocT(t1, it.getName());
+        IdentifierTT it = (IdentifierTT) t;
+        return new MemberSelectTT(prefix, it.getName());
       case MEMBER_SELECT:
-        LocT lt = (LocT) t0;
-        return new LocT(meld(lt.getExpression(), t1), lt.getIdentifier());
+        MemberSelectTT lt = (MemberSelectTT) t;
+        return new MemberSelectTT(addPrefix(lt.getExpression(), prefix), lt.getIdentifier());
       case PARAMETERIZED_TYPE:
-        ParT pt = (ParT) t0;
-        return new ParT(meld(pt.getType(), t1), pt.getTypeArguments());
+        ParameterizedTypeTT pt = (ParameterizedTypeTT) t;
+        return new ParameterizedTypeTT(addPrefix(pt.getType(), prefix), pt.getTypeArguments());
       default:
-        throw new IllegalArgumentException("unexpected type " + t0);
+        throw new IllegalArgumentException("unexpected type " + t);
       }
     }
 
-    static final class ArrT extends TypeTree implements ArrayTypeTree {
+    static final class ArrayTT extends TypeTree implements ArrayTypeTree {
       private final TypeTree componentType;
 
-      ArrT(TypeTree componentType) {
+      ArrayTT(TypeTree componentType) {
         this.componentType = componentType;
       }
 
@@ -1462,11 +1510,11 @@ loop:
       public String toString() { return componentType + "[]"; }
     }
 
-    static final class LocT extends TypeTree implements MemberSelectTree {
+    static final class MemberSelectTT extends TypeTree implements MemberSelectTree {
       private final TypeTree expr;
       private final Name name;
 
-      LocT(TypeTree expr, Name name) {
+      MemberSelectTT(TypeTree expr, Name name) {
         this.expr = expr;
         this.name = name;
       }
@@ -1489,11 +1537,11 @@ loop:
       public String toString() { return expr + "." + name; }
     }
 
-    static final class ParT extends TypeTree implements ParameterizedTypeTree {
+    static final class ParameterizedTypeTT extends TypeTree implements ParameterizedTypeTree {
       private final TypeTree base;
       private final List<? extends Tree> typeArgs;
 
-      ParT(TypeTree base, List<? extends Tree> typeArgs) {
+      ParameterizedTypeTT(TypeTree base, List<? extends Tree> typeArgs) {
         this.base = base;
         this.typeArgs = typeArgs;
       }
@@ -1528,10 +1576,10 @@ loop:
       }
     }
 
-    static final class PrimT extends TypeTree implements PrimitiveTypeTree {
+    static final class PrimitiveTypeTT extends TypeTree implements PrimitiveTypeTree {
       private final TypeKind typeKind;
 
-      PrimT(TypeKind typeKind) {
+      PrimitiveTypeTT(TypeKind typeKind) {
         this.typeKind = typeKind;
       }
 
@@ -1566,10 +1614,10 @@ loop:
       }
     }
 
-    static final class IdenT extends TypeTree implements IdentifierTree {
+    static final class IdentifierTT extends TypeTree implements IdentifierTree {
       private final String name;
 
-      IdenT(String dname) {
+      IdentifierTT(String dname) {
         this.name = dname;
       }
 
@@ -1588,22 +1636,22 @@ loop:
       public String toString() { return name; }
     }
 
-    static final class WildT extends TypeTree implements WildcardTree {
+    static final class WildcardTT extends TypeTree implements WildcardTree {
       private final TypeTree bound;
       private final Kind kind;
 
-      WildT() {
+      WildcardTT() {
         this(Kind.UNBOUNDED_WILDCARD, null);
       }
 
-      WildT(TypeTree bound, BoundedType.BoundKind bk) {
+      WildcardTT(TypeTree bound, BoundedType.BoundKind bk) {
         this(bk == BoundedType.BoundKind.SUPER
                 ? Kind.SUPER_WILDCARD
                 : Kind.EXTENDS_WILDCARD,
             bound);
       }
 
-      WildT(Kind kind, TypeTree bound) {
+      WildcardTT(Kind kind, TypeTree bound) {
         this.kind = kind;
         this.bound = bound;
       }
@@ -1623,12 +1671,12 @@ loop:
       public String toString() { return "?"; }
     }
 
-    static final class Param extends TypeTree implements TypeParameterTree {
+    static final class TypeParameterTT extends TypeTree implements TypeParameterTree {
       private final String bname;
       private final BoundedType.BoundKind bk;
       private final Tree bound;
 
-      Param(String bname, BoundedType.BoundKind bk, TypeTree bound) {
+      TypeParameterTT(String bname, BoundedType.BoundKind bk, TypeTree bound) {
         this.bname = bname;
         this.bk = bk;
         this.bound = bound;
@@ -1669,10 +1717,14 @@ loop:
       }
 
       @Override
-      public int length() { return str.length(); }
+      public int length() {
+        return str.length();
+      }
 
       @Override
-      public char charAt(int index) { return str.charAt(index); }
+      public char charAt(int index) {
+        return str.charAt(index);
+      }
 
       @Override
       public CharSequence subSequence(int start, int end) {
@@ -1681,16 +1733,7 @@ loop:
 
       @Override
       public boolean contentEquals(CharSequence cs) {
-        if (cs != null) {
-          int n = length();
-          if (cs.length() == n) {
-            for (int i = 0; i < n; i++) {
-              if (charAt(i) != cs.charAt(i)) { return false; }
-            }
-            return true;
-          }
-        }
-        return false;
+        return str.contentEquals(cs);
       }
 
       @Override

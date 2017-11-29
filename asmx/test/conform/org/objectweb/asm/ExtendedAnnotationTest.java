@@ -40,11 +40,11 @@ import junit.framework.TestCase;
 
 import org.objectweb.asm.tree.ClassNode;
 
-import annotations.ExtendedValuesDump;
-import annotations.ValueAttrAnnotation;
-import annotations.Values;
-import annotations.ValuesAnnotation;
-import annotations.ValuesEnum;
+import scenelib.annotations.ExtendedValuesDump;
+import scenelib.annotations.ValueAttrAnnotation;
+import scenelib.annotations.Values;
+import scenelib.annotations.ValuesAnnotation;
+import scenelib.annotations.ValuesEnum;
 
 public class TypeAnnotationTest extends TestCase {
 
