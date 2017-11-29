@@ -449,7 +449,6 @@ public class IndexFileSpecification {
             ((DeclaredType) constructorInsertion.getType()).addAnnotation(annotationString);
           } else if (isDeclarationAnnotation) {
             constructorInsertion.addDeclarationInsertion(i);
-            i.setInserted(true);
           } else {
             annotationInsertions.add(i);
           }
