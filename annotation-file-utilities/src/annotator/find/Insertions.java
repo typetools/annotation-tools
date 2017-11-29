@@ -65,7 +65,7 @@ import com.sun.tools.javac.util.Pair;
  *
  * The class now serves a second purpose, which should probably be
  * separated out: It attaches
- * {@link scenelib.annotations.io.ASTPath}-based inner type {@link Insertion}s to
+ * {@link ASTPath}-based inner type {@link Insertion}s to
  * a {@link TypedInsertion} on the outer type if one exists (see
  * {@link #organizeTypedInsertions(CompilationUnitTree, String, Collection)}.
  * Since getting these insertions right depends on this organization,
@@ -262,9 +262,8 @@ public class Insertions implements Iterable<Insertion> {
    * always exist prior to the top-level type insertion.
    *
    * This method attaches
-   * {@link scenelib.annotations.io.ASTPath}-based inner type {@link Insertion}s to
-   * a {@link TypedInsertion} on the outer type if one exists (see
-   * {@link #organizeTypedInsertions(CompilationUnitTree, String, Collection)}.
+   * {@link ASTPath}-based inner type {@link Insertion}s to
+   * a {@link TypedInsertion} on the outer type if one exists.
    */
   private Set<Insertion> organizeTypedInsertions(CompilationUnitTree cut,
       String className, Collection<Insertion> insertions) {
