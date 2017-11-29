@@ -59,12 +59,12 @@ public final class Criteria {
     assert path == null || path.getLeaf() == leaf;
     for (Criterion c : criteria.values()) {
       if (! c.isSatisfiedBy(path, leaf)) {
-        dbug.debug("UNsatisfied criterion:%n    %s%n    %s%n",
-            c, Main.pathToString(path));
+        dbug.debug("UNsatisfied criterion of type %s:%n    %s%n    %s%n",
+            c.getClass(), c, Main.pathToString(path));
         return false;
       } else {
-        dbug.debug("satisfied criterion:%n    %s%n    %s%n",
-            c, Main.pathToString(path));
+        dbug.debug("satisfied criterion of type %s:%n    %s%n    %s%n",
+            c.getClass(), c, Main.pathToString(path));
       }
     }
     return true;
