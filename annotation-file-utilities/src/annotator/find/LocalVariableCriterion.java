@@ -51,9 +51,14 @@ public class LocalVariableCriterion implements Criterion {
     }
 
     Tree parent = parentPath.getLeaf();
-    if ((parent instanceof VariableTree)
-        // Avoid matching formal parameters
-        && (! (parentPath.getParentPath().getLeaf() instanceof MethodTree))) {
+    if (parent instanceof VariableTree) {
+      // parent is a variable declaration
+
+      if (parentPath.getParentPath().getLeaf() instanceof MethodTree) {
+        // formal parameter, not local variable
+        return false;
+      }
+
       VariableTree vtt = (VariableTree) parent;
       String varName = vtt.getName().toString();
 
