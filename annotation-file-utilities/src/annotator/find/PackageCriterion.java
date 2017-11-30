@@ -35,7 +35,7 @@ final class PackageCriterion implements Criterion {
   public boolean isSatisfiedBy(TreePath path) {
     Tree tree = path.getLeaf();
     Criteria.dbug.debug("PackageCriterion.isSatisfiedBy(%s, %s); this=%s%n",
-        Main.pathToString(path), tree, this.toString());
+        Main.leafString(path), tree, this.toString());
 
     if (tree.getKind() == Tree.Kind.COMPILATION_UNIT) {
       CompilationUnitTree cu = (CompilationUnitTree)tree;

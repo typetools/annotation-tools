@@ -323,7 +323,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       JCVariableDecl jn = (JCVariableDecl) node;
       JCTree jt = jn.getType();
       Criteria criteria = ins.getCriteria();
-      dbug.debug("visitVariable: %s %s%n", jt, jt.getClass());
+      dbug.debug("TypePositionFinder.visitVariable: %s %s%n", jt, jt.getClass());
       if (name != null && criteria.isOnFieldDeclaration()) {
         return Pair.of(astRecord(node), jn.getStartPosition());
       }
@@ -957,18 +957,19 @@ loop:
   /**
    * Scans this tree, using the list of insertions to generate the source
    * position to insertion text mapping.  Insertions are removed from the
-   * list when positions are found for them.
+   * list when positions are found for them.  Thus, they are inserted at the
+   * first location (the one highest in the tree) that they match.
+   *
+   * <p>When a match is found, this routine removes the insertion from p and
+   * adds it to the insertions map as a value, with a key that is a pair.
+   * On return, p contains only the insertions for which no match was found.
    *
    * @param node AST node being considered for annotation insertions
    * @param p list of insertions not yet placed
-   * <p>
-   * When a match is found, this routine removes the insertion from p and
-   * adds it to the insertions map as a value, with a key that is a pair.
-   * On return, p contains only the insertions for which no match was found.
    */
   @Override
   public Void scan(Tree node, List<Insertion> p) {
-    if (node == null) {
+    if (node == null || p.isEmpty()) {
       return null;
     }
 
@@ -977,7 +978,11 @@ loop:
       new Error("backtrace at TreeFinder.scan()").printStackTrace();
     }
     if (! handled(node)) {
-      dbug.debug("Not handled, skipping (%s): %s%n", node.getClass(), node);
+      String nodeString = node.toString();
+      if (nodeString.equals("")) {
+        nodeString = "<empty>";
+      }
+      dbug.debug("TreeFinder.scan(%s) skipping, unhandled: %s%n", node.getClass(), node);
       // nothing to do
       return super.scan(node, p);
     }
@@ -1027,6 +1032,7 @@ loop:
         dbug.debug("    Type of node: %s%n", node.getClass());
 
         ASTPath astPath = i.getCriteria().getASTPath();
+        dbug.debug("    astPath = %s%n", astPath);
         Integer pos = astPath == null ? findPosition(path, i)
             : Main.convert_jaifs ? null  // already in correct form
             : findPositionByASTPath(astPath, path, i);
@@ -1196,13 +1202,13 @@ loop:
         }
         if (typeScan) {
           // looking for the type
-          dbug.debug("Calling tpf.scan(%s: %s)%n", node.getClass(), node);
+          dbug.debug("Calling tpf.scan(%s: %s, %s)%n", node.getClass(), node, i);
           Pair<ASTRecord, Integer> pair = tpf.scan(node, i);
           insertRecord = pair.a;
           pos = pair.b;
           assert handled(node);
-          dbug.debug("pos = %d at type: %s (%s)%n", pos,
-              node.toString(), node.getClass());
+          dbug.debug("pos = %d (insertRecord=%s) at type: %s (%s)%n",
+                     pos, insertRecord, node.toString(), node.getClass());
         } else if (node.getKind() == Tree.Kind.METHOD
             && i.getKind() == Insertion.Kind.CONSTRUCTOR
             && (((JCMethodDecl) node).mods.flags & Flags.GENERATEDCONSTR) != 0) {
@@ -1567,6 +1573,11 @@ loop:
       }
     }
 
+    if (annotator.Main.temporaryDebug) {
+      Tree leaf = path.getLeaf();
+      System.out.printf("alreadyPresent(%s, %s)%n  leaf (%s) = %s%n  => %s%n", path, ins, leaf.getKind(), leaf, alreadyPresent);
+    }
+
     if (alreadyPresent != null) {
       for (AnnotationTree at : alreadyPresent) {
         // Compare the to-be-inserted annotation to the existing
@@ -1778,7 +1789,6 @@ loop:
    *
    * <p>
    * <i>N.B.:</i> This method calls {@code scan()} internally.
-   * </p>
    *
    * @param node the tree to scan
    * @param p the list of insertion criteria

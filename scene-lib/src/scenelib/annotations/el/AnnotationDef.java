@@ -140,6 +140,8 @@ public final class AnnotationDef extends AElement {
      * with @Target(ElementType.TYPE_USE) or @TypeQualifier).
      */
     public boolean isTypeAnnotation() {
+        // TODO: It's enough to have @Target that includes TYPE_USE; the
+        // entire argument to @Target doesn't have to be exactly TYPE_USE.
         return (tlAnnotationsHere.contains(Annotations.aTargetTypeUse)
                 || tlAnnotationsHere.contains(Annotations.aTypeQualifier));
     }

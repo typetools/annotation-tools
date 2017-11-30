@@ -28,7 +28,10 @@ final class InPackageCriterion implements Criterion {
   /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path, Tree leaf) {
-    assert path == null || path.getLeaf() == leaf;
+    if (path == null) {
+      return false;
+    }
+    assert path.getLeaf() == leaf;
     return isSatisfiedBy(path);
   }
 
@@ -40,7 +43,7 @@ final class InPackageCriterion implements Criterion {
     }
 
     Criteria.dbug.debug("InPackageCriterion.isSatisfiedBy(%s); this=%s",
-        Main.pathToString(path), this.toString());
+        Main.leafString(path), this.toString());
 
     do {
       Tree tree = path.getLeaf();
