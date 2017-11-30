@@ -46,51 +46,47 @@ public class LocalVariableCriterion implements Criterion {
     }
 
     TreePath parentPath = path.getParentPath();
-    if (parentPath != null) {
-      Tree parent = parentPath.getLeaf();
-      if (parent != null) {
-        if ((parent instanceof VariableTree)
-            // Avoid matching formal parameters
-            && (! (parentPath.getParentPath().getLeaf() instanceof MethodTree))) {
-          VariableTree vtt = (VariableTree) parent;
-          String varName = vtt.getName().toString();
+    if (parentPath == null) {
+      return false;
+    }
 
-          if (loc.varName!=null && loc.varName.equals(varName)) {
-            int varIndex = LocalVariableScanner.indexOfVarTree(path, vtt, varName);
+    Tree parent = parentPath.getLeaf();
+    if ((parent instanceof VariableTree)
+        // Avoid matching formal parameters
+        && (! (parentPath.getParentPath().getLeaf() instanceof MethodTree))) {
+      VariableTree vtt = (VariableTree) parent;
+      String varName = vtt.getName().toString();
 
-            if (loc.varIndex==varIndex) {
-              // the location specifies a variable name and index and it matches the current variable
-              // -> hurray
-              return true;
-            }
-            return false;
-          }
+      if (Objects.equals(loc.varName, varName)) {
+        int varIndex = LocalVariableScanner.indexOfVarTree(path, vtt, varName);
+        return (loc.varIndex == varIndex);
+      }
 
-          Pair<String, Pair<Integer, Integer>> key =
-                  Pair.of(fullMethodName, Pair.of(loc.index, loc.scopeStart));
-          String potentialVarName =
-                  LocalVariableScanner.getFromMethodNameIndexMap(key);
-          if (potentialVarName != null) {
-            if (varName.equals(potentialVarName)) {
-              // now use methodNameCounter to ensure that if this is the
-              // i'th variable of this name, its offset is the i'th offset
-              // of all variables with this name
-              List<Integer> allOffsetsWithThisName =
-                      LocalVariableScanner.getFromMethodNameCounter(fullMethodName, potentialVarName);
+      Pair<String, Pair<Integer, Integer>> key =
+              Pair.of(fullMethodName, Pair.of(loc.index, loc.scopeStart));
+      String potentialVarName =
+              LocalVariableScanner.getFromMethodNameIndexMap(key);
+      if (potentialVarName != null) {
+        if (varName.equals(potentialVarName)) {
+          // now use methodNameCounter to ensure that if this is the
+          // i'th variable of this name, its offset is the i'th offset
+          // of all variables with this name
+          List<Integer> allOffsetsWithThisName =
+                  LocalVariableScanner.getFromMethodNameCounter(fullMethodName, potentialVarName);
           //      methodNameCounter.get(fullMethodName).get(potentialVarName);
-              Integer thisVariablesOffset =
-                      allOffsetsWithThisName.indexOf(loc.scopeStart);
+          Integer thisVariablesOffset =
+                  allOffsetsWithThisName.indexOf(loc.scopeStart);
 
-              // now you need to make sure that this is the
-              // thisVariablesOffset'th variable tree in the entire source
-              int i = LocalVariableScanner.indexOfVarTree(path, parent, potentialVarName);
+          // now you need to make sure that this is the
+          // thisVariablesOffset'th variable tree in the entire source
+          int i = LocalVariableScanner.indexOfVarTree(path, parent, potentialVarName);
 
-              if (i == thisVariablesOffset) {
-                return true;
-              }
-            }
+          if (i == thisVariablesOffset) {
+            return true;
           }
-        } else {
+        }
+      }
+    } else {
     // isSatisfiedBy should return true not just for the local variable itself, but for its type.
     // So, if this is part of a type, try its parent.
     // For example, return true for the tree for "Integer"
@@ -99,9 +95,7 @@ public class LocalVariableCriterion implements Criterion {
     // But, stop the search once it gets to certain types, such as MethodTree.
     // Is it OK to stop at ExpressionTree too?
 
-          return this.isSatisfiedBy(parentPath);
-        }
-      }
+      return this.isSatisfiedBy(parentPath);
     }
     return false;
   }
