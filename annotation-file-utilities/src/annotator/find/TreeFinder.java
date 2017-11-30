@@ -1526,6 +1526,8 @@ loop:
    */
   private boolean alreadyPresent(TreePath path, Insertion ins) {
     List<? extends AnnotationTree> alreadyPresent = null;
+    // non-null if the just-visited child of this was an ExpressionTree
+    ExpressionTree childExpression = null;
     if (path != null) {
       for (Tree n : path) {
         if (n.getKind() == Tree.Kind.CLASS) {
@@ -1535,7 +1537,11 @@ loop:
           alreadyPresent = ((MethodTree) n).getModifiers().getAnnotations();
           break;
         } else if (n.getKind() == Tree.Kind.VARIABLE) {
-          alreadyPresent = ((VariableTree) n).getModifiers().getAnnotations();
+          VariableTree vt = (VariableTree) n;
+          if (childExpression != null && vt.getInitializer() == childExpression) {
+            break;
+          }
+          alreadyPresent = vt.getModifiers().getAnnotations();
           break;
         } else if (n.getKind() == Tree.Kind.TYPE_CAST) {
           Tree type = ((TypeCastTree) n).getType();
@@ -1568,6 +1574,8 @@ loop:
         } else if (n.getKind() == Tree.Kind.ANNOTATED_TYPE) {
           alreadyPresent = ((AnnotatedTypeTree) n).getAnnotations();
           break;
+        } else if (n instanceof ExpressionTree) {
+          childExpression = (ExpressionTree) n;
         }
         // TODO: don't add cast insertion if it's already present.
       }
