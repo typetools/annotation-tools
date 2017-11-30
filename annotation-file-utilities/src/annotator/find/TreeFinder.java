@@ -1574,9 +1574,9 @@ loop:
         } else if (n.getKind() == Tree.Kind.ANNOTATED_TYPE) {
           alreadyPresent = ((AnnotatedTypeTree) n).getAnnotations();
           break;
-        } else if (n instanceof ExpressionTree) {
-          childExpression = (ExpressionTree) n;
         }
+
+        childExpression = (n instanceof ExpressionTree) ? (ExpressionTree) n : null;
         // TODO: don't add cast insertion if it's already present.
       }
     }
