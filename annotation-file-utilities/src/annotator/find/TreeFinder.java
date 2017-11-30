@@ -1526,7 +1526,7 @@ loop:
    */
   private boolean alreadyPresent(TreePath path, Insertion ins) {
     List<? extends AnnotationTree> alreadyPresent = null;
-    // non-null if the just-visited child of this was an ExpressionTree
+    // non-null if the previously-visited node was an ExpressionTree
     ExpressionTree childExpression = null;
     if (path != null) {
       for (Tree n : path) {
