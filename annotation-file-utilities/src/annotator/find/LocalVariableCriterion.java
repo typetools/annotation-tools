@@ -1,5 +1,6 @@
 package annotator.find;
 
+import java.util.Objects;
 import java.util.List;
 
 import scenelib.annotations.el.LocalLocation;
@@ -13,6 +14,9 @@ import com.sun.tools.javac.util.Pair;
 
 /**
  * Criterion for being a specific local variable.
+ *
+ * This matches the variable itself (in the local variable definition), and
+ * also anywhere in its type, but should not match in the initializer.
  */
 public class LocalVariableCriterion implements Criterion {
 
@@ -27,7 +31,10 @@ public class LocalVariableCriterion implements Criterion {
   /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path, Tree leaf) {
-    assert path == null || path.getLeaf() == leaf;
+    if (path == null) {
+      return false;
+    }
+    assert path.getLeaf() == leaf;
     return isSatisfiedBy(path);
   }
 
@@ -70,7 +77,7 @@ public class LocalVariableCriterion implements Criterion {
               // of all variables with this name
               List<Integer> allOffsetsWithThisName =
                       LocalVariableScanner.getFromMethodNameCounter(fullMethodName, potentialVarName);
-//                methodNameCounter.get(fullMethodName).get(potentialVarName);
+          //      methodNameCounter.get(fullMethodName).get(potentialVarName);
               Integer thisVariablesOffset =
                       allOffsetsWithThisName.indexOf(loc.scopeStart);
 
@@ -84,31 +91,15 @@ public class LocalVariableCriterion implements Criterion {
             }
           }
         } else {
-          // If present leaf does not yet satisfy the local variable
-          // criterion, note that it actually is the correct local variable
-          // if any of its parents satisfy this local variable criterion
-          // (and going all the way up past the top-level tree is taken
-          // care of by the check for null above.
-          //
-          // For example, if you have the tree for "Integer"
-          // for the local variable "List<Integer> foo;"
-          // the parent of the current leaf will satisfy the local variable
-          // criterion directly.  The fact that you will never return true
-          // for something that is not the correct local variable comes
-          // from the fact that you can't contain one local variable
-          // within another.  For example, you can't have
-          // List<Integer bar> foo;
-          // Thus, no local variable tree can contain another local
-          // variable tree.
-          // Another general example:
-          // List<Integer> foo = ...;
-          // If the tree for ... contains one local variable, there is no fear
-          // of a conflict with "List<Integer>", because "List<Integer> foo"
-          // is a subtree of "List<Integer> foo = ...;", so the two
-          // (possibly) conflicting local variable trees are both subtrees
-          // of the same tree, and neither is an ancestor of the other.
+    // isSatisfiedBy should return true not just for the local variable itself, but for its type.
+    // So, if this is part of a type, try its parent.
+    // For example, return true for the tree for "Integer"
+    // within the local variable "List<Integer> foo;"
+    //
+    // But, stop the search once it gets to certain types, such as MethodTree.
+    // Is it OK to stop at ExpressionTree too?
+
           return this.isSatisfiedBy(parentPath);
-          // To do: should stop this once it gets to method? or some other top level?
         }
       }
     }

@@ -279,10 +279,9 @@ public class Insertions implements Iterable<Insertion> {
 
     // First divide the insertions into three buckets:
     //  * TypedInsertions on outer types (`outerInsertions`)
-    //  * ASTPath-based insertions on local types
-    //    (`innerInsertions` -- built as list and then sorted, since building as
-    //    a set spuriously removes "duplicates" according to the
-    //    comparator), and
+    //  * ASTPath-based insertions on local types (`innerInsertions` --
+    //    built as list and then sorted, since building as a set spuriously
+    //    removes "duplicates" according to the comparator), and
     //  * everything else (`organized` -- where all eventually land).
     for (Insertion ins : insertions) {
       if (annotator.Main.temporaryDebug) {

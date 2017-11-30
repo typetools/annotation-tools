@@ -56,15 +56,18 @@ public final class Criteria {
    * false otherwise
    */
   public boolean isSatisfiedBy(TreePath path, Tree leaf) {
-    assert path == null || path.getLeaf() == leaf;
+    if (path == null) {
+      return false;
+    }
+    assert path.getLeaf() == leaf;
     for (Criterion c : criteria.values()) {
       if (! c.isSatisfiedBy(path, leaf)) {
-        dbug.debug("UNsatisfied criterion of type %s:%n    %s%n    %s%n",
-            c.getClass(), c, Main.pathToString(path));
+        dbug.debug("UNsatisfied criterion of type %s:%n    leaf=%s (%s)%n",
+            c, c.getClass(), Main.leafString(path));
         return false;
       } else {
-        dbug.debug("satisfied criterion of type %s:%n    %s%n    %s%n",
-            c.getClass(), c, Main.pathToString(path));
+        dbug.debug("satisfied criterion of type %s:%n    leaf=%s (%s)%n",
+            c, c.getClass(), Main.leafString(path));
       }
     }
     return true;
@@ -202,7 +205,7 @@ public final class Criteria {
   }
 
   /**
-   * Returns true if this Criteria is on the given method.
+   * Returns true if this Criteria is on a field declaration.
    */
   public boolean isOnFieldDeclaration() {
     for (Criterion c : criteria.values()) {
@@ -213,6 +216,19 @@ public final class Criteria {
     }
     return false;
   }
+
+  /**
+   * Determines whether this is the criteria on a variable declaration:  a
+   * local variable or a field declaration, but not a formal parameter
+   * declaration.
+   *
+   * @return true iff this is the criteria on a local variable
+   */
+  public boolean isOnVariableDeclaration() {
+    // Could fuse the loops for efficiency, but is it important to do so?
+    return isOnLocalVariable() || isOnFieldDeclaration();
+  }
+
 
   /**
    * Gives the AST path specified in the criteria, if any.
@@ -474,11 +490,10 @@ public final class Criteria {
   public final static Criterion param(String methodName, Integer pos) {
     return new ParamCriterion(methodName, pos);
   }
-//
+
 //  public final static Criterion param(String methodName, Integer pos, InnerTypeLocation loc) {
 //    return new ParamCriterion(methodName, pos, loc);
 //  }
-
 
   public final static Criterion local(String methodName, LocalLocation loc) {
     return new LocalVariableCriterion(methodName, loc);

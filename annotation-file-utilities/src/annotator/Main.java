@@ -187,7 +187,7 @@ public class Main {
   @Option("Print error stack")
   public static boolean print_error_stack = false;
 
-  // TODO: remove this before committing.
+  // TODO: remove this.
   public static boolean temporaryDebug = false;
 
   private static ElementVisitor<Void, AElement> classFilter =
@@ -996,13 +996,15 @@ public class Main {
     }
   }
 
-  public static String pathToString(TreePath path) {
+  /** Return the representation of the leaf of the path. */
+  public static String leafString(TreePath path) {
     if (path == null) {
       return "null";
     }
     return treeToString(path.getLeaf());
   }
 
+  /** Return the first non-empty line of the tree's printed representation. */
   public static String treeToString(Tree node) {
     String asString = node.toString();
     String oneLine = firstLine(asString);

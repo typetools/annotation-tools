@@ -32,7 +32,10 @@ final class InMethodCriterion implements Criterion {
   /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path, Tree leaf) {
-    assert path == null || path.getLeaf() == leaf;
+    if (path == null) {
+      return false;
+    }
+    assert path.getLeaf() == leaf;
     return isSatisfiedBy(path);
   }
 
@@ -40,7 +43,7 @@ final class InMethodCriterion implements Criterion {
   @Override
   public boolean isSatisfiedBy(TreePath path) {
     Criteria.dbug.debug("InMethodCriterion.isSatisfiedBy(%s); this=%s%n",
-        Main.pathToString(path), this.toString());
+        Main.leafString(path), this.toString());
 
     // true if in a variable declaration.
     boolean inDecl = false;
