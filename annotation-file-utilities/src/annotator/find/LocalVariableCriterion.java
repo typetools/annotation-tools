@@ -51,6 +51,7 @@ public class LocalVariableCriterion implements Criterion {
     }
 
     Tree parent = parentPath.getLeaf();
+    Tree leaf = path.getLeaf();
     if (parent instanceof VariableTree) {
       // parent is a variable declaration
 
@@ -60,6 +61,11 @@ public class LocalVariableCriterion implements Criterion {
       }
 
       VariableTree vtt = (VariableTree) parent;
+      if (leaf.equals(vtt.getInitializer())) {
+        // don't match in initializer
+        return false;
+      }
+
       String varName = vtt.getName().toString();
 
       if (Objects.equals(loc.varName, varName)) {
@@ -91,7 +97,8 @@ public class LocalVariableCriterion implements Criterion {
           }
         }
       }
-    } else {
+      return false;
+    }
     // isSatisfiedBy should return true not just for the local variable itself, but for its type.
     // So, if this is part of a type, try its parent.
     // For example, return true for the tree for "Integer"
@@ -99,10 +106,11 @@ public class LocalVariableCriterion implements Criterion {
     //
     // But, stop the search once it gets to certain types, such as MethodTree.
     // Is it OK to stop at ExpressionTree too?
-
+    else if (parent instanceof MethodTree) {
+      return false;
+    } else {
       return this.isSatisfiedBy(parentPath);
     }
-    return false;
   }
 
 
