@@ -61,18 +61,18 @@ public interface Criterion {
     /**
      * Determines if the given tree path is satisfied by this criterion.
      *
-     * @param path the tree path to check against
-     * @return true if this criterion is satisfied by the given path,
-     * false otherwise
+     * @param path the tree path to check against.  May be null (in which case the result is false),
+     *     for example in a call such as {@code this.isSatisfiedBy(path.getParentPath())}.
+     * @return true if this criterion is satisfied by the given path, false otherwise
      */
     public boolean isSatisfiedBy(TreePath path, Tree tree);
 
     /**
      * Determines if the given tree path is satisfied by this criterion.
      *
-     * @param path the tree path to check against
-     * @return true if this criterion is satisfied by the given path,
-     * false otherwise
+     * @param path the tree path to check against.  May be null (in which case the result is false),
+     *     for example in a call such as {@code this.isSatisfiedBy(path.getParentPath())}.
+     * @return true if this criterion is satisfied by the given path, false otherwise
      */
     public boolean isSatisfiedBy(TreePath path);
 

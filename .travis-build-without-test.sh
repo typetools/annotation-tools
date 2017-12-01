@@ -23,7 +23,7 @@ else
     fi
     set -e
     echo "Running:  (cd .. && hg clone https://bitbucket.org/${SLUGOWNER}/jsr308-langtools)"
-    (cd .. && (hg clone https://bitbucket.org/${SLUGOWNER}/jsr308-langtools || hg clone https://bitbucket.org/${SLUGOWNER}/jsr308-langtools))
+    (cd .. && (hg clone --insecure https://bitbucket.org/${SLUGOWNER}/jsr308-langtools || hg clone --insecure https://bitbucket.org/${SLUGOWNER}/jsr308-langtools))
     echo "... done: (cd .. && hg clone https://bitbucket.org/${SLUGOWNER}/jsr308-langtools)"
 fi
 (cd ../jsr308-langtools/ && ./.travis-build-without-test.sh)

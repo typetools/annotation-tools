@@ -22,7 +22,10 @@ public class ReturnTypeCriterion implements Criterion {
   /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path, Tree leaf) {
-    assert path == null || path.getLeaf() == leaf;
+    if (path == null) {
+      return false;
+    }
+    assert path.getLeaf() == leaf;
     return isSatisfiedBy(path);
   }
 
@@ -32,7 +35,7 @@ public class ReturnTypeCriterion implements Criterion {
     if (path == null) { return false; }
 
     Criteria.dbug.debug("ReturnTypeCriterion.isSatisfiedBy(%s); this=%n",
-        Main.pathToString(path), this.toString());
+        Main.leafString(path), this.toString());
 
     do {
       if (path.getLeaf().getKind() == Tree.Kind.METHOD) {

@@ -50,10 +50,12 @@ import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import com.sun.source.tree.Tree;
 
-public class IndexFileSpecification implements Specification {
+public class IndexFileSpecification {
   private final Multimap<Insertion, Annotation> insertionSources =
       LinkedHashMultimap.<Insertion, Annotation>create();
   private final List<Insertion> insertions = new ArrayList<Insertion>();
+  /** Is a member of insertions (if non-null). */
+  private ConstructorInsertion constructorInsertion = null;
   private final AScene scene;
   private final String indexFileName;
 
@@ -63,14 +65,11 @@ public class IndexFileSpecification implements Specification {
 
   private static boolean debug = false;
 
-  private ConstructorInsertion cons = null;
-
   public IndexFileSpecification(String indexFileName) {
     this.indexFileName = indexFileName;
     scene = new AScene();
   }
 
-  @Override
   public List<Insertion> parse() throws FileIOException {
     try {
       Map<String, AnnotationDef> annotationDefs =
@@ -172,7 +171,7 @@ public class IndexFileSpecification implements Specification {
    * @param className is fully qualified
    */
   private void parseClass(CriterionList clist, String className, AClass clazz) {
-    cons = null;  // 0 or 1 per class
+    constructorInsertion = null;  // 0 or 1 per class
     if (! noAsm) {
       //  load extra info using asm
       debug("parseClass(" + className + ")");
@@ -432,21 +431,24 @@ public class IndexFileSpecification implements Specification {
 
       // exclude expression annotations
       if (noTypePath(criteria) && isOnNullaryConstructor(criteria)) {
-        if (cons == null) {
+        if (constructorInsertion == null) {
           DeclaredType type = new DeclaredType(criteria.getClassName());
-          cons = new ConstructorInsertion(type, criteria,
+          constructorInsertion = new ConstructorInsertion(type, criteria,
               new ArrayList<Insertion>());
-          this.insertions.add(cons);
+          this.insertions.add(constructorInsertion);
+        } else {
+          if (annotator.Main.temporaryDebug) {
+            System.out.printf("Ignoring criteria=%s because constructorInsertion=%s%n", criteria, constructorInsertion);
+          }
         }
-        // no addInsertionSource, as cons is not explicit in scene
+        // no addInsertionSource, as constructorInsertion is not explicit in scene
         for (Insertion i : elementInsertions) {
           if (i.getKind() == Insertion.Kind.RECEIVER) {
-            cons.addReceiverInsertion((ReceiverInsertion) i);
+            constructorInsertion.addReceiverInsertion((ReceiverInsertion) i);
           } else if (criteria.isOnReturnType()) {
-            ((DeclaredType) cons.getType()).addAnnotation(annotationString);
+            ((DeclaredType) constructorInsertion.getType()).addAnnotation(annotationString);
           } else if (isDeclarationAnnotation) {
-            cons.addDeclarationInsertion(i);
-            i.setInserted(true);
+            constructorInsertion.addDeclarationInsertion(i);
           } else {
             annotationInsertions.add(i);
           }
@@ -463,6 +465,9 @@ public class IndexFileSpecification implements Specification {
     if (cast != null) {
         this.insertions.add(cast);
         this.insertions.add(closeParen);
+    }
+    if (constructorInsertion != null) {
+        constructorInsertion.setInserted(false);
     }
     return annotationInsertions;
   }
@@ -609,7 +614,7 @@ public class IndexFileSpecification implements Specification {
     // elements inside the method body.
     clist = clist.add(Criteria.inMethod(methodName));
 
-    // parse declaration annotations
+    // parse declaration annotations, fill in this.insertions
     parseElement(clist, method);
 
     // parse receiver
