@@ -5,16 +5,16 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import annotations.io.ASTPath;
+import scenelib.annotations.io.ASTPath;
 
 import com.sun.source.tree.Tree;
 import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
 
 import plume.Pair;
-import type.ArrayType;
-import type.DeclaredType;
-import type.Type;
-import type.BoundedType;
+import scenelib.type.ArrayType;
+import scenelib.type.DeclaredType;
+import scenelib.type.Type;
+import scenelib.type.BoundedType;
 
 /**
  * Specifies something that needs to be inserted into a source file, including
@@ -207,7 +207,7 @@ public abstract class Insertion {
      *
      * @return whether the insertion goes on a separate line
      */
-    public boolean getSeparateLine() {
+    public boolean isSeparateLine() {
         return separateLine;
     }
 
@@ -216,7 +216,7 @@ public abstract class Insertion {
      * @return {@code true} if this insertion has already been inserted,
      *         {@code false} otherwise.
      */
-    public boolean getInserted() {
+    public boolean isInserted() {
         return inserted;
     }
 
@@ -226,6 +226,10 @@ public abstract class Insertion {
      *         {@code false} otherwise.
      */
     public void setInserted(boolean inserted) {
+        if (annotator.Main.temporaryDebug) {
+            System.out.printf("setInserted(%s) (previously %s) for %s%n", inserted, this.inserted, this);
+            new Error().printStackTrace();
+        }
         this.inserted = inserted;
     }
 

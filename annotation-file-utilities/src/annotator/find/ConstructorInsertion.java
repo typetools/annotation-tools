@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import type.Type;
+import scenelib.type.Type;
 
 public class ConstructorInsertion extends TypedInsertion {
   private ReceiverInsertion receiverInsertion = null;
@@ -39,7 +39,7 @@ public class ConstructorInsertion extends TypedInsertion {
       //  b.append(' ');
       // }
       // return new AnnotationInsertion(b.toString(), getCriteria(),
-      //    getSeparateLine()).getText(comments, abbreviate);
+      //    isSeparateLine()).getText(comments, abbreviate);
       return "";
     } else {
       boolean commentAnnotation =
@@ -55,7 +55,7 @@ public class ConstructorInsertion extends TypedInsertion {
         }
       }
       b.append("public ").append(typeString).append("(");
-      if (receiverInsertion != null && !receiverInsertion.getInserted()) {
+      if (receiverInsertion != null && !receiverInsertion.isInserted()) {
         b.append(receiverInsertion.getText(comments, abbreviate));
       }
       b.append(") { super(); }");
@@ -98,5 +98,20 @@ public class ConstructorInsertion extends TypedInsertion {
   @Override
   public Kind getKind() {
     return Kind.CONSTRUCTOR;
+  }
+
+  /**
+   * Sets whether this insertion has already been inserted into source code.
+   * @param inserted {@code true} if this insertion has already been inserted,
+   *         {@code false} otherwise.
+   */
+  public void setInserted(boolean inserted) {
+    super.setInserted(false);
+    if (receiverInsertion != null) {
+      receiverInsertion.setInserted(false);
+    }
+    for (Insertion insertion : declarationInsertions) {
+      insertion.setInserted(false);
+    }
   }
 }

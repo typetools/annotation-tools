@@ -2,7 +2,7 @@ package annotator.find;
 
 import java.util.List;
 
-import annotations.el.RelativeLocation;
+import scenelib.annotations.el.RelativeLocation;
 
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
@@ -20,7 +20,10 @@ public class TypeArgumentCriterion implements Criterion {
   /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path, Tree leaf) {
-    assert path == null || path.getLeaf() == leaf;
+    if (path == null) {
+      return false;
+    }
+    assert path.getLeaf() == leaf;
     return isSatisfiedBy(path);
   }
 

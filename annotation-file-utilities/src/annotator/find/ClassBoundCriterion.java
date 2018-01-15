@@ -1,6 +1,6 @@
 package annotator.find;
 
-import annotations.el.BoundLocation;
+import scenelib.annotations.el.BoundLocation;
 
 import com.sun.source.util.TreePath;
 import com.sun.source.tree.Tree;
@@ -22,7 +22,10 @@ public class ClassBoundCriterion implements Criterion {
   /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path, Tree leaf) {
-    assert path == null || path.getLeaf() == leaf;
+    if (path == null) {
+      return false;
+    }
+    assert path.getLeaf() == leaf;
     return isSatisfiedBy(path);
   }
 

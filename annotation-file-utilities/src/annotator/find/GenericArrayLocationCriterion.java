@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import javax.lang.model.type.TypeKind;
 
-import annotations.el.InnerTypeLocation;
+import scenelib.annotations.el.InnerTypeLocation;
 import annotator.Main;
 
 import com.sun.source.tree.AnnotatedTypeTree;
@@ -67,7 +67,10 @@ public class GenericArrayLocationCriterion implements Criterion {
   /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path, Tree leaf) {
-    assert path == null || path.getLeaf() == leaf;
+    if (path == null) {
+      return false;
+    }
+    assert path.getLeaf() == leaf;
     return isSatisfiedBy(path);
   }
 

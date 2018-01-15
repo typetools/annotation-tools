@@ -2,7 +2,7 @@ package annotator.find;
 
 import java.util.List;
 
-import type.DeclaredType;
+import scenelib.type.DeclaredType;
 
 /**
  * An insertion for a method receiver. This supports inserting an
@@ -82,7 +82,7 @@ public class ReceiverInsertion extends TypedInsertion {
             b.append(' ');
         }
         return new AnnotationInsertion(b.toString(), getCriteria(),
-                getSeparateLine()).getText(comments, abbreviate);
+                isSeparateLine()).getText(comments, abbreviate);
       } else {
         DeclaredType baseType = getBaseType();
         boolean commentAnnotation = (comments && baseType.getName().isEmpty());

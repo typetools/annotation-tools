@@ -216,13 +216,11 @@ public class IsSigMethodCriterion implements Criterion {
       }
     }
 
-    /*
-     * From Java 7 language definition 6.5.5.2 (Qualified Types):
-     * If a type name is of the form Q.Id, then Q must be either a type
-     * name or a package name.  If Id names exactly one accessible type
-     * that is a member of the type or package denoted by Q, then the
-     * qualified type name denotes that type.
-     */
+    // From Java 7 language definition 6.5.5.2 (Qualified Types):
+    // If a type name is of the form Q.Id, then Q must be either a type
+    // name or a package name.  If Id names exactly one accessible type
+    // that is a member of the type or package denoted by Q, then the
+    // qualified type name denotes that type.
     if (!matchable) {
       // match with any of the imports
       for (String someImport : context.imports) {
@@ -293,7 +291,10 @@ public class IsSigMethodCriterion implements Criterion {
   /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path, Tree leaf) {
-    assert path == null || path.getLeaf() == leaf;
+    if (path == null) {
+      return false;
+    }
+    assert path.getLeaf() == leaf;
     return isSatisfiedBy(path);
   }
 
@@ -311,13 +312,13 @@ public class IsSigMethodCriterion implements Criterion {
     if (leaf.getKind() != Tree.Kind.METHOD) {
       Criteria.dbug.debug(
           "IsSigMethodCriterion.isSatisfiedBy(%s) => false: not a METHOD tree%n",
-          Main.pathToString(path));
+          Main.leafString(path));
       return false;
     }
     // else if ((((JCMethodDecl) leaf).mods.flags & Flags.GENERATEDCONSTR) != 0) {
     //  Criteria.dbug.debug(
     //      "IsSigMethodCriterion.isSatisfiedBy(%s) => false: generated constructor%n",
-    //      Main.pathToString(path));
+    //      Main.leafString(path));
     //  return false;
     // }
 

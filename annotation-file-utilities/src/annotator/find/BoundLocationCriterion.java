@@ -2,7 +2,7 @@ package annotator.find;
 
 import java.util.List;
 
-import annotations.el.BoundLocation;
+import scenelib.annotations.el.BoundLocation;
 
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.MethodTree;
@@ -37,7 +37,10 @@ public class BoundLocationCriterion implements Criterion {
   /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path, Tree leaf) {
-    assert path == null || path.getLeaf() == leaf;
+    if (path == null) {
+      return false;
+    }
+    assert path.getLeaf() == leaf;
     return isSatisfiedBy(path);
   }
 

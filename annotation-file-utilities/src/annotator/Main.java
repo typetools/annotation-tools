@@ -25,29 +25,29 @@ import plume.OptionGroup;
 import plume.Options;
 import plume.Pair;
 import plume.UtilMDE;
-import type.Type;
-import annotations.Annotation;
-import annotations.el.ABlock;
-import annotations.el.AClass;
-import annotations.el.ADeclaration;
-import annotations.el.AElement;
-import annotations.el.AExpression;
-import annotations.el.AField;
-import annotations.el.AMethod;
-import annotations.el.AScene;
-import annotations.el.ATypeElement;
-import annotations.el.ATypeElementWithType;
-import annotations.el.AnnotationDef;
-import annotations.el.DefException;
-import annotations.el.ElementVisitor;
-import annotations.el.LocalLocation;
-import annotations.io.ASTIndex;
-import annotations.io.ASTPath;
-import annotations.io.ASTRecord;
-import annotations.io.DebugWriter;
-import annotations.io.IndexFileParser;
-import annotations.io.IndexFileWriter;
-import annotations.util.coll.VivifyingMap;
+import scenelib.type.Type;
+import scenelib.annotations.Annotation;
+import scenelib.annotations.el.ABlock;
+import scenelib.annotations.el.AClass;
+import scenelib.annotations.el.ADeclaration;
+import scenelib.annotations.el.AElement;
+import scenelib.annotations.el.AExpression;
+import scenelib.annotations.el.AField;
+import scenelib.annotations.el.AMethod;
+import scenelib.annotations.el.AScene;
+import scenelib.annotations.el.ATypeElement;
+import scenelib.annotations.el.ATypeElementWithType;
+import scenelib.annotations.el.AnnotationDef;
+import scenelib.annotations.el.DefException;
+import scenelib.annotations.el.ElementVisitor;
+import scenelib.annotations.el.LocalLocation;
+import scenelib.annotations.io.ASTIndex;
+import scenelib.annotations.io.ASTPath;
+import scenelib.annotations.io.ASTRecord;
+import scenelib.annotations.io.DebugWriter;
+import scenelib.annotations.io.IndexFileParser;
+import scenelib.annotations.io.IndexFileWriter;
+import scenelib.annotations.util.coll.VivifyingMap;
 import annotator.find.AnnotationInsertion;
 import annotator.find.CastInsertion;
 import annotator.find.ConstructorInsertion;
@@ -187,6 +187,9 @@ public class Main {
   @Option("Print error stack")
   public static boolean print_error_stack = false;
 
+  // TODO: remove this.
+  public static boolean temporaryDebug = false;
+
   private static ElementVisitor<Void, AElement> classFilter =
       new ElementVisitor<Void, AElement>() {
     <K, V extends AElement>
@@ -239,9 +242,9 @@ public class Main {
           el0.insertTypecasts.entrySet()) {
         ASTPath p = entry.getKey();
         ATypeElementWithType e = entry.getValue();
-        type.Type type = e.getType();
-        if (type instanceof type.DeclaredType
-            && ((type.DeclaredType) type).getName().isEmpty()) {
+        scenelib.type.Type type = e.getType();
+        if (type instanceof scenelib.type.DeclaredType
+            && ((scenelib.type.DeclaredType) type).getName().isEmpty()) {
           insertAnnotations.put(p, e);
           // visitTypeElement(e, insertAnnotations.vivify(p));
         } else {
@@ -325,7 +328,7 @@ public class Main {
       switch (tpe.tag) {
       case ARRAY:
         if (!astPath.isEmpty()) {
-          entry = astPath.get(-1);
+          entry = astPath.getLast();
           if (entry.getTreeKind() == Tree.Kind.NEW_ARRAY
               && entry.childSelectorIs(ASTPath.TYPE)) {
             entry = new ASTPath.ASTEntry(Tree.Kind.NEW_ARRAY,
@@ -448,7 +451,7 @@ public class Main {
         if (rec.astPath.isEmpty()) {
           el = decl;
         } else if (ins.getKind() == Insertion.Kind.CAST) {
-          annotations.el.ATypeElementWithType elem =
+          scenelib.annotations.el.ATypeElementWithType elem =
               decl.insertTypecasts.vivify(rec.astPath);
           elem.setType(((CastInsertion) ins).getType());
           el = elem;
@@ -498,7 +501,7 @@ public class Main {
 
     if (verbose) {
       System.out.printf("insert-annotations-to-source (%s)",
-                        annotations.io.classfile.ClassFileReader.INDEX_UTILS_VERSION);
+                        scenelib.annotations.io.classfile.ClassFileReader.INDEX_UTILS_VERSION);
     }
 
     Options options = new Options(
@@ -568,6 +571,12 @@ public class Main {
         IndexFileSpecification spec = new IndexFileSpecification(arg);
         try {
           List<Insertion> parsedSpec = spec.parse();
+          if (temporaryDebug) {
+            System.out.printf("parsedSpec (size %d):%n", parsedSpec.size());
+            for (Insertion insertion : parsedSpec) {
+              System.out.printf("  %s, isInserted=%s%n", insertion, insertion.isInserted());
+            }
+          }
           AScene scene = spec.getScene();
           Collections.sort(parsedSpec, new Comparator<Insertion>() {
             @Override
@@ -637,11 +646,12 @@ public class Main {
     }
 
     if (dbug.isEnabled()) {
+      dbug.debug("In annotator.Main:%n");
       dbug.debug("%d insertions, %d .java files%n",
           insertions.size(), javafiles.size());
       dbug.debug("Insertions:%n");
       for (Insertion insertion : insertions) {
-        dbug.debug("  %s%n", insertion);
+        dbug.debug("  %s, isInserted=%s%n", insertion, insertion.isInserted());
       }
     }
 
@@ -696,12 +706,16 @@ public class Main {
         TreeFinder finder = new TreeFinder(tree);
         SetMultimap<Pair<Integer, ASTPath>, Insertion> positions =
             finder.getPositions(tree, insertions);
+        if (dbug.isEnabled()) {
+          dbug.debug("In annotator.Main:%n");
+          dbug.debug("positions (for %d insertions) = %s%n",
+                     insertions.size(), positions);
+        }
 
         if (convert_jaifs) {
           // program used only for JAIF conversion; execute following
           // block and then skip remainder of loop
-          Multimap<ASTRecord, Insertion> astInsertions =
-              finder.getPaths();
+          Multimap<ASTRecord, Insertion> astInsertions = finder.getPaths();
           for (Map.Entry<ASTRecord, Collection<Insertion>> entry :
               astInsertions.asMap().entrySet()) {
             ASTRecord rec = entry.getKey();
@@ -763,8 +777,8 @@ public class Main {
             String trailingWhitespace = "";
             boolean gotSeparateLine = false;
             int pos = pair.a;  // reset each iteration in case of dyn adjustment
-            if (iToInsert.getSeparateLine()) {
-              // System.out.printf("getSeparateLine=true for insertion at pos %d: %s%n", pos, iToInsert);
+            if (iToInsert.isSeparateLine()) {
+              // System.out.printf("isSeparateLine=true for insertion at pos %d: %s%n", pos, iToInsert);
               int indentation = 0;
               while ((pos - indentation != 0)
                      // horizontal whitespace
@@ -844,7 +858,7 @@ public class Main {
                       precedingTextPlusChar.substring(0, toInsert.length()))
                   || toInsert.equals(precedingTextPlusChar.substring(1))) {
                 dbug.debug(
-                    "Inserting %s at %d in code of length %d with preceding text '%s'%n",
+                    "Inserting '%s' at %d in code of length %d with preceding text '%s'%n",
                     toInsert, pos, src.getString().length(),
                     precedingTextPlusChar);
                 dbug.debug("Already present, skipping%n");
@@ -855,7 +869,7 @@ public class Main {
             // TODO: Neither the above hack nor this check should be
             // necessary.  Find out why re-insertions still occur and
             // fix properly.
-            if (iToInsert.getInserted()) { continue; }
+            if (iToInsert.isInserted()) { continue; }
             src.insert(pos, toInsert);
             if (verbose && !debug) {
               System.out.print(".");
@@ -982,13 +996,15 @@ public class Main {
     }
   }
 
-  public static String pathToString(TreePath path) {
+  /** Return the representation of the leaf of the path. */
+  public static String leafString(TreePath path) {
     if (path == null) {
       return "null";
     }
     return treeToString(path.getLeaf());
   }
 
+  /** Return the first non-empty line of the tree's printed representation. */
   public static String treeToString(Tree node) {
     String asString = node.toString();
     String oneLine = firstLine(asString);

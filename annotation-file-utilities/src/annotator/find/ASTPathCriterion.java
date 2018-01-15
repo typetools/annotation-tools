@@ -6,7 +6,7 @@ import java.util.List;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.type.TypeKind;
 
-import annotations.io.ASTPath;
+import scenelib.annotations.io.ASTPath;
 import annotator.Main;
 
 import com.sun.source.tree.AnnotatedTypeTree;
@@ -89,7 +89,10 @@ public class ASTPathCriterion implements Criterion {
     /** {@inheritDoc} */
     @Override
     public boolean isSatisfiedBy(TreePath path, Tree leaf) {
-        assert path == null || path.getLeaf() == leaf;
+        if (path == null) {
+            return false;
+        }
+        assert path.getLeaf() == leaf;
         return isSatisfiedBy(path);
     }
 
@@ -535,7 +538,7 @@ public class ASTPathCriterion implements Criterion {
                 NewArrayTree newArray = (NewArrayTree) actualNode;
                 if (astNode.childSelectorIs(ASTPath.TYPE)) {
                     Type type = ((JCTree.JCNewArray) newArray).type;
-                    Tree typeTree = Insertions.TypeTree.fromType(type);
+                    Tree typeTree = Insertions.TypeTree.fromJavacType(type);
                     int arg = astNode.getArgument();
                     if (arg == 0 && astPath.size() == ix+1) {
                         return newArray;

@@ -34,7 +34,7 @@ for aj in $* ; do
 done
 fi
 
-find $td -type f -print | xargs java -cp "$cp" annotations.tools.IndexFileMerger $td | sed 's/(value={\[/({/g' | sed 's/\]}/}/g' > "./$jj" &&\
+find $td -type f -print | xargs java -cp "$cp" scenelib.annotations.tools.IndexFileMerger $td | sed 's/(value={\[/({/g' | sed 's/\]}/}/g' > "./$jj" &&\
 find "$js" -name "*\.java" -print | CLASSPATH="$cp" xargs insert-annotations-to-source --print-error-stack "$jj" &&\
 rm -rf $td
 

@@ -4,13 +4,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import type.DeclaredType;
-import type.Type;
+import scenelib.type.DeclaredType;
+import scenelib.type.Type;
 
-/**
- * @author dbro
- *
- */
 public class NewInsertion extends TypedInsertion {
   private final static Pattern qualifiers = Pattern.compile("(?:\\w++\\.)*+");
 
@@ -53,7 +49,7 @@ public class NewInsertion extends TypedInsertion {
         b.append(' ').append(a);  // initial space removed below
       }
       return new AnnotationInsertion(b.substring(1), getCriteria(),
-          getSeparateLine()).getText(comments, abbreviate);
+          isSeparateLine()).getText(comments, abbreviate);
     } else {
       DeclaredType baseType = getBaseType();
       boolean commentAnnotation = (comments && baseType.getName().isEmpty());
