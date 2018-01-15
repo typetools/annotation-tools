@@ -143,13 +143,13 @@ public class Insertions implements Iterable<Insertion> {
       Set<Insertion> set = new TreeSet<Insertion>(byASTRecord);
       set.addAll(map.get(innerClassName(qualifiedClassName)));
       if (annotator.Main.temporaryDebug) {
-        System.out.println("set size (2) = " + set.size());
+        System.out.println("organizeTypedInsertions argument set size = " + set.size());
       }
-      set = organizeTypedInsertions(cut, qualifiedClassName, set);
+      Set<Insertion> organized = organizeTypedInsertions(cut, qualifiedClassName, set);
       if (annotator.Main.temporaryDebug) {
-        System.out.println("set size (3) = " + set.size());
+        System.out.println("organizeTypedInsertions result set size = " + organized.size());
       }
-      result.addAll(set);
+      result.addAll(organized);
     }
   }
 
@@ -268,19 +268,25 @@ public class Insertions implements Iterable<Insertion> {
    */
   private Set<Insertion> organizeTypedInsertions(CompilationUnitTree cut,
       String className, Collection<Insertion> insertions) {
-    ASTRecordMap<TypedInsertion> outerInsertions = new ASTRecordMap<TypedInsertion>();
+    Map<ASTRecord,TypedInsertion> outerInsertions = new HashMap<ASTRecord,TypedInsertion>();
     Set<Insertion> innerInsertions = new LinkedHashSet<Insertion>();
     List<Insertion> innerInsertionsList = new ArrayList<Insertion>();
     Set<Insertion> organized = new LinkedHashSet<Insertion>();
 
+    if (annotator.Main.temporaryDebug) {
+      System.out.printf("organizeTypedInsertions (1): insertions.size()= %d%n", insertions.size());
+    }
+
     // First divide the insertions into three buckets:
     //  * TypedInsertions on outer types (`outerInsertions`)
-    //  * ASTPath-based insertions on local types
-    //    (`innerInsertions` -- built as list and then sorted, since building as
-    //    a set spuriously removes "duplicates" according to the
-    //    comparator), and
+    //  * ASTPath-based insertions on local types (`innerInsertions` --
+    //    built as list and then sorted, since building as a set spuriously
+    //    removes "duplicates" according to the comparator), and
     //  * everything else (`organized` -- where all eventually land).
     for (Insertion ins : insertions) {
+      if (annotator.Main.temporaryDebug) {
+        System.out.printf("Considering insertion %s (isInserted=%s)%n", ins, ins.isInserted());
+      }
       if (ins.isInserted()) { continue; }
       Criteria criteria = ins.getCriteria();
       GenericArrayLocationCriterion galc =
@@ -290,7 +296,13 @@ public class Insertions implements Iterable<Insertion> {
           || (galc != null && !galc.getLocation().isEmpty())
           || ins instanceof CastInsertion
           || ins instanceof CloseParenthesisInsertion) {
+        if (annotator.Main.temporaryDebug) {
+          System.out.printf("Adding to organized (size %d): %s%n", organized.size(), ins);
+        }
         organized.add(ins);
+        if (annotator.Main.temporaryDebug) {
+          System.out.printf("  organized now has size %d%n", organized.size());
+        }
       } else {
         ASTRecord rec = new ASTRecord(cut, criteria.getClassName(),
             criteria.getMethodName(), criteria.getFieldName(), p);
@@ -364,7 +376,13 @@ public class Insertions implements Iterable<Insertion> {
                     icriteria.add(new GenericArrayLocationCriterion());
                     icriteria.add(new ASTPathCriterion(rec1.astPath));
                     inner.setInserted(false);
+                    if (annotator.Main.temporaryDebug) {
+                      System.out.printf("Adding to organized (size %d): %s%n", organized.size(), ins);
+                    }
                     organized.add(inner);
+                    if (annotator.Main.temporaryDebug) {
+                      System.out.printf("  organized now has size %d%n", organized.size());
+                    }
                   }
                 }
                 nins.getInnerTypeInsertions().clear();
@@ -432,8 +450,23 @@ public class Insertions implements Iterable<Insertion> {
     //  organized.addAll(innerInsertions);
     //  return organized;
     // }
+    if (annotator.Main.temporaryDebug) {
+      System.out.printf("organized.size() (1) = %d%n", organized.size());
+    }
+    if (annotator.Main.temporaryDebug) {
+      System.out.printf("innerInsertionsList size (1) = %d%n", innerInsertionsList.size());
+    }
     Collections.sort(innerInsertionsList, byASTRecord);
+    if (annotator.Main.temporaryDebug) {
+      System.out.printf("innerInsertionsList size (2) = %d%n", innerInsertionsList.size());
+    }
+    if (annotator.Main.temporaryDebug) {
+      System.out.printf("innerInsertions size (1) = %d%n", innerInsertions.size());
+    }
     innerInsertions.addAll(innerInsertionsList);
+    if (annotator.Main.temporaryDebug) {
+      System.out.printf("innerInsertions size (2) = %d%n", innerInsertions.size());
+    }
 
     // Each Insertion in innerInsertions gets attached to a TypedInsertion
     // in outerInsertions if possible; otherwise, it gets dumped into organized.
@@ -775,7 +808,13 @@ public class Insertions implements Iterable<Insertion> {
         tins.getInnerTypeInsertions().add(ins);
       }
     }
+    if (annotator.Main.temporaryDebug) {
+      System.out.printf("organized.size() (2) = %d%n", organized.size());
+    }
     organized.addAll(outerInsertions.values());
+    if (annotator.Main.temporaryDebug) {
+      System.out.printf("organized.size() (3) = %d%n", organized.size());
+    }
     return organized;
   }
 
@@ -1145,158 +1184,6 @@ loop:
       return "";
     } else {
       return className.substring(i);
-    }
-  }
-
-  // Map from ASTRecord to the given type.  Internally also indexes by ASTPath.
-  // (The need to also index by ASTPath suggests that the ASTRecord equality test ignores
-  // its ASTPath.)
-  class ASTRecordMap<E> implements Map<ASTRecord, E> {
-    Map<ASTRecord, SortedMap<ASTPath, E>> back = new HashMap<>();
-
-    ASTRecordMap() {
-    }
-
-    private SortedMap<ASTPath, E> getPathMap(ASTRecord rec) {
-      ASTRecord key = rec.replacePath(ASTPath.empty());
-      SortedMap<ASTPath, E> pathMap = back.get(key);
-      if (pathMap == null) {
-        pathMap = new TreeMap<ASTPath, E>();
-        back.put(key, pathMap);
-      }
-      return pathMap;
-    }
-
-    @Override
-    public int size() {
-      int result = 0;
-      for (SortedMap<ASTPath, E> pathMap : back.values()) {
-        result += pathMap.size();
-      }
-      return result;
-    }
-
-    @Override
-    public boolean isEmpty() {
-      return size() == 0;
-    }
-
-    @Override
-    public boolean containsKey(Object key) {
-      ASTRecord rec = (ASTRecord) key;
-      SortedMap<ASTPath, E> m = getPathMap(rec);
-      return m.containsKey(rec.astPath);
-    }
-
-    @Override
-    public boolean containsValue(Object value) {
-      @SuppressWarnings("unchecked")
-      E e = (E) value;
-      for (SortedMap<ASTPath, E> pathMap : back.values()) {
-        if (pathMap.containsValue(e)) { return true; }
-      }
-      return false;
-    }
-
-    @Override
-    public E get(Object key) {
-      ASTRecord rec = (ASTRecord) key;
-      SortedMap<ASTPath, E> pathMap = getPathMap(rec);
-      return pathMap.get(rec.astPath);
-    }
-
-    @Override
-    public E put(ASTRecord key, E value) {
-      ASTRecord rec = key;
-      SortedMap<ASTPath, E> pathMap = getPathMap(rec);
-      return pathMap.put(rec.astPath, value);
-    }
-
-    @Override
-    public E remove(Object key) {
-      ASTRecord rec = (ASTRecord) key;
-      SortedMap<ASTPath, E> pathMap = getPathMap(rec);
-      return pathMap.remove(rec.astPath);
-    }
-
-    @Override
-    public void putAll(Map<? extends ASTRecord, ? extends E> m) {
-      for (Map.Entry<? extends ASTRecord, ? extends E> entry : m.entrySet()) {
-        put(entry.getKey(), entry.getValue());
-      }
-    }
-
-    @Override
-    public void clear() {
-      back.clear();
-    }
-
-    @Override
-    public Set<ASTRecord> keySet() {
-      return back.keySet();
-    }
-
-    @Override
-    public Collection<E> values() {
-      Set<E> ret = new LinkedHashSet<E>();
-      for (SortedMap<ASTPath, E> m : back.values()) {
-        ret.addAll(m.values());
-      }
-      return ret;
-    }
-
-    @Override
-    public Set<Map.Entry<ASTRecord, E>> entrySet() {
-      final int size = size();
-      return new AbstractSet<Map.Entry<ASTRecord, E>>() {
-        @Override
-        public Iterator<Map.Entry<ASTRecord, E>> iterator() {
-          return new Iterator<Map.Entry<ASTRecord, E>>() {
-            Iterator<Map.Entry<ASTRecord, SortedMap<ASTPath, E>>> iter0 =
-                back.entrySet().iterator();
-            Iterator<Map.Entry<ASTPath, E>> iter1 =
-                Collections.<Map.Entry<ASTPath, E>>emptyIterator();
-            ASTRecord rec = null;
-
-            @Override
-            public boolean hasNext() {
-              if (iter1.hasNext()) { return true; }
-              while (iter0.hasNext()) {
-                Map.Entry<ASTRecord, SortedMap<ASTPath, E>> entry =
-                    iter0.next();
-                rec = entry.getKey();
-                iter1 = entry.getValue().entrySet().iterator();
-                if (iter1.hasNext()) { return true; }
-              }
-              iter1 = Collections.<Map.Entry<ASTPath, E>>emptyIterator();
-              return false;
-            }
-
-            @Override
-            public Map.Entry<ASTRecord, E> next() {
-              if (!hasNext()) { throw new NoSuchElementException(); }
-              final Map.Entry<ASTPath, E> e0 = iter1.next();
-              return new Map.Entry<ASTRecord, E>() {
-                final ASTRecord key = rec.replacePath(e0.getKey());
-                final E val = e0.getValue();
-                @Override public ASTRecord getKey() { return key; }
-                @Override public E getValue() { return val; }
-                @Override public E setValue(E value) {
-                  throw new UnsupportedOperationException();
-                }
-              };
-            }
-
-            @Override
-            public void remove() {
-              throw new UnsupportedOperationException();
-            }
-          };
-        }
-
-        @Override
-        public int size() { return size; }
-      };
     }
   }
 

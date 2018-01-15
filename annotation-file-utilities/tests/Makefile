@@ -20,7 +20,7 @@ export XJAVAC?=javac
 export SHELL=/bin/bash -o pipefail
 
 
-DIFFS := $(wildcard *.goal)
+DIFFS := $(sort $(wildcard *.goal))
 DISABLED := $(shell grep -le "@skip-test" $(DIFFS))
 FILTERED := $(filter-out $(DISABLED),$(DIFFS))
 DIFFS := $(patsubst %.goal, %.diff, $(FILTERED))

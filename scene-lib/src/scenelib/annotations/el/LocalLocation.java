@@ -27,6 +27,9 @@ public final class LocalLocation {
      */
     public final int scopeLength;
 
+    public final String varName;
+    public final int varIndex;
+
     /**
      * Constructs a new {@link LocalLocation}; the arguments are assigned to
      * the fields of the same names.
@@ -38,9 +41,6 @@ public final class LocalLocation {
         this.varName = null;
         this.varIndex = -1;
     }
-
-    public final String varName;
-    public final int varIndex;
 
     public LocalLocation(String varName, int varIndex) {
         this.index = -1;

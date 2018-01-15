@@ -291,7 +291,10 @@ public class IsSigMethodCriterion implements Criterion {
   /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path, Tree leaf) {
-    assert path == null || path.getLeaf() == leaf;
+    if (path == null) {
+      return false;
+    }
+    assert path.getLeaf() == leaf;
     return isSatisfiedBy(path);
   }
 
@@ -309,13 +312,13 @@ public class IsSigMethodCriterion implements Criterion {
     if (leaf.getKind() != Tree.Kind.METHOD) {
       Criteria.dbug.debug(
           "IsSigMethodCriterion.isSatisfiedBy(%s) => false: not a METHOD tree%n",
-          Main.pathToString(path));
+          Main.leafString(path));
       return false;
     }
     // else if ((((JCMethodDecl) leaf).mods.flags & Flags.GENERATEDCONSTR) != 0) {
     //  Criteria.dbug.debug(
     //      "IsSigMethodCriterion.isSatisfiedBy(%s) => false: generated constructor%n",
-    //      Main.pathToString(path));
+    //      Main.leafString(path));
     //  return false;
     // }
 

@@ -22,7 +22,10 @@ public class IntersectionTypeLocationCriterion implements Criterion {
   /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path, Tree leaf) {
-    assert path == null || path.getLeaf() == leaf;
+    if (path == null) {
+      return false;
+    }
+    assert path.getLeaf() == leaf;
     return isSatisfiedBy(path);
   }
 
@@ -31,8 +34,7 @@ public class IntersectionTypeLocationCriterion implements Criterion {
     TreePath parentPath = path.getParentPath();
     if (parentPath != null) {
       Tree parent = parentPath.getLeaf();
-      if (parentPath != null
-          && parent.getKind() == Tree.Kind.INTERSECTION_TYPE) {
+      if (parent.getKind() == Tree.Kind.INTERSECTION_TYPE) {
         IntersectionTypeTree itt = (IntersectionTypeTree) parent;
         List<? extends Tree> bounds = itt.getBounds();
         Tree leaf = path.getLeaf();
