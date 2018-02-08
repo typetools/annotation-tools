@@ -84,6 +84,7 @@
       <pathelement location="${annotations-compiler}/bin"/>
       -->
       <pathelement location="${annotations-compiler}/dist/lib/javac.jar"/>
+      <pathelement location="${annotation-tools}/annotation-file-utilities/lib/options-all-0.3.1.jar"/>
       <pathelement location="${annotation-tools}/annotation-file-utilities/lib/plume-core.jar"/>
       <pathelement location="${annotation-tools}/annotation-file-utilities/lib/guava-20.0.jar"/>
       <pathelement location="${scene-lib}/bin"/>
@@ -157,6 +158,7 @@
         <srcfiles dir="${scene-lib}/bin" excludes="annotations-expected/**,annotations/tests/**"/>
       </uptodate>
       <uptodate property="annotations-compiler.uptodate" targetfile="annotation-file-utilities.jar" srcfile="${annotations-compiler}/dist/lib/javac.jar"/>
+      <uptodate property="plume.uptodate" targetfile="annotation-file-utilities.jar" srcfile="lib/options-all-0.3.1.jar"/>
       <uptodate property="plume.uptodate" targetfile="annotation-file-utilities.jar" srcfile="lib/plume-core.jar"/>
       <uptodate property="google-collect.uptodate" targetfile="annotation-file-utilities.jar" srcfile="lib/guava-20.0.jar"/>
 
@@ -197,6 +199,12 @@
       <fileset dir="${scene-lib}/bin" excludes="annotations-expected/**,annotations/tests/**"/>
     </copy>
     <!-- Also need to get class files in libraries -->
+    <unjar src="lib/options-all-0.3.1.jar" dest="${temp-jarfile}">
+      <patternset>
+        <include name="**/*.class"/>
+        <exclude name="META-INF/" />
+      </patternset>
+    </unjar>
     <unjar src="lib/plume-core.jar" dest="${temp-jarfile}">
       <patternset>
         <include name="**/*.class"/>

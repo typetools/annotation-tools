@@ -19,10 +19,10 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.plumelib.options.Option;
+import org.plumelib.options.OptionGroup;
+import org.plumelib.options.Options;
 import plume.FileIOException;
-import plume.Option;
-import plume.OptionGroup;
-import plume.Options;
 import plume.Pair;
 import plume.UtilMDE;
 import scenelib.type.Type;
@@ -511,7 +511,7 @@ public class Main {
     String[] file_args;
     try {
       String[] cl_args = CommandLine.parse(args);
-      file_args = options.parse_or_usage(cl_args);
+      file_args = options.parse(true, cl_args);
     } catch (IOException ex) {
       System.err.println(ex);
       System.err.println("(For non-argfile beginning with \"@\", use \"@@\" for initial \"@\".");
@@ -532,17 +532,19 @@ public class Main {
     Criteria.dbug.setEnabled(debug);
 
     if (help) {
-      options.print_usage();
+      options.printUsage();
       System.exit(0);
     }
 
     if (in_place && outdir != "annotated/") { // interned
-      options.print_usage("The --outdir and --in-place options are mutually exclusive.");
+      System.out.println("The --outdir and --in-place options are mutually exclusive.");
+      options.printUsage();
       System.exit(1);
     }
 
     if (file_args.length < 2) {
-      options.print_usage("Supplied %d arguments, at least 2 needed%n", file_args.length);
+      System.out.printf("Supplied %d arguments, at least 2 needed%n", file_args.length);
+      options.printUsage();
       System.exit(1);
     }
 

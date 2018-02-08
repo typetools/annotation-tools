@@ -118,6 +118,8 @@
             <!-- remainder only for repository version -->
             <pathelement location="${annotations-compiler}/dist/lib/javac.jar"/>
             <pathelement location="${annotations-compiler}/dist/lib/javap.jar"/>
+            <!-- options-all-0.3.1.jar contains javac, so must come late on the path -->
+            <pathelement location="${annotation-tools}/annotation-file-utilities/lib/options-all-0.3.1.jar"/>
             <pathelement location="bin"/>
         </path>
     </target>
