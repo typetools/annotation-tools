@@ -39,6 +39,7 @@ import com.sun.source.tree.IfTree;
 import com.sun.source.tree.InstanceOfTree;
 import com.sun.source.tree.LabeledStatementTree;
 import com.sun.source.tree.LambdaExpressionTree;
+import com.sun.source.tree.LiteralTree;
 import com.sun.source.tree.MemberReferenceTree;
 import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.MethodInvocationTree;
@@ -257,79 +258,7 @@ public class ASTPath extends ImmutableStack<ASTPath.ASTEntry>
     @Override
     public String toString() {
       StringBuilder b = new StringBuilder();
-      switch (treeKind) {
-      case CLASS:
-      case ENUM:
-      case INTERFACE:
-        b.append("Class");
-        break;
-      case AND:
-      case CONDITIONAL_AND:
-      case CONDITIONAL_OR:
-      case DIVIDE:
-      case EQUAL_TO:
-      case GREATER_THAN:
-      case GREATER_THAN_EQUAL:
-      case LEFT_SHIFT:
-      case LESS_THAN:
-      case LESS_THAN_EQUAL:
-      case MINUS:
-      case MULTIPLY:
-      case NOT_EQUAL_TO:
-      case OR:
-      case PLUS:
-      case REMAINDER:
-      case RIGHT_SHIFT:
-      case XOR:
-        b.append("Binary");
-        break;
-      case LOGICAL_COMPLEMENT:
-      case POSTFIX_DECREMENT:
-      case POSTFIX_INCREMENT:
-      case PREFIX_DECREMENT:
-      case PREFIX_INCREMENT:
-      case UNARY_MINUS:
-      case UNARY_PLUS:
-      case UNSIGNED_RIGHT_SHIFT:
-        b.append("Unary");
-        break;
-      case AND_ASSIGNMENT:
-      case DIVIDE_ASSIGNMENT:
-      case LEFT_SHIFT_ASSIGNMENT:
-      case MINUS_ASSIGNMENT:
-      case MULTIPLY_ASSIGNMENT:
-      case OR_ASSIGNMENT:
-      case PLUS_ASSIGNMENT:
-      case REMAINDER_ASSIGNMENT:
-      case RIGHT_SHIFT_ASSIGNMENT:
-      case UNSIGNED_RIGHT_SHIFT_ASSIGNMENT:
-      case XOR_ASSIGNMENT:
-        b.append("CompoundAssignment");
-        break;
-      case EXTENDS_WILDCARD:
-      case SUPER_WILDCARD:
-      case UNBOUNDED_WILDCARD:
-        b.append("Wildcard");
-        break;
-      case ANNOTATION:
-      case TYPE_ANNOTATION:
-        b.append("Annotation");
-        break;
-      default:
-        String s = treeKind.toString();
-        int n = s.length();
-        boolean cap = true;  // capitalize next character
-        for (int i = 0; i < n; i++) {
-          char c = s.charAt(i);
-          if (c == '_') {
-            cap = true;
-          } else {
-            b.append(cap ? Character.toUpperCase(c)
-                : Character.toLowerCase(c));
-            cap = false;
-          }
-        }
-      }
+      b.append(treeKind.asInterface().getSimpleName().replace("Tree", ""));
       b.append(".").append(childSelector);
       if (argument != null) { b.append(" ").append(argument); }
       return b.toString();
@@ -1275,87 +1204,6 @@ public class ASTPath extends ImmutableStack<ASTPath.ASTEntry>
           || (isBinaryOperator(kind1) && isBinaryOperator(kind2))
           || (isWildcard(kind1) && isWildcard(kind2));
     }
-
-    /**
-     * Determines if the given kind is a compound assignment.
-     *
-     * @param kind
-     *            the kind to test
-     * @return true if the given kind is a compound assignment
-     */
-    private static boolean isCompoundAssignment(Tree.Kind kind) {
-      return kind == Tree.Kind.PLUS_ASSIGNMENT
-          || kind == Tree.Kind.MINUS_ASSIGNMENT
-          || kind == Tree.Kind.MULTIPLY_ASSIGNMENT
-          || kind == Tree.Kind.DIVIDE_ASSIGNMENT
-          || kind == Tree.Kind.OR_ASSIGNMENT
-          || kind == Tree.Kind.AND_ASSIGNMENT
-          || kind == Tree.Kind.REMAINDER_ASSIGNMENT
-          || kind == Tree.Kind.LEFT_SHIFT_ASSIGNMENT
-          || kind == Tree.Kind.RIGHT_SHIFT
-          || kind == Tree.Kind.UNSIGNED_RIGHT_SHIFT_ASSIGNMENT
-          || kind == Tree.Kind.XOR_ASSIGNMENT;
-    }
-
-    /**
-     * Determines if the given kind is a unary operator.
-     *
-     * @param kind
-     *            the kind to test
-     * @return true if the given kind is a unary operator
-     */
-    private static boolean isUnaryOperator(Tree.Kind kind) {
-      return kind == Tree.Kind.POSTFIX_INCREMENT
-          || kind == Tree.Kind.POSTFIX_DECREMENT
-          || kind == Tree.Kind.PREFIX_INCREMENT
-          || kind == Tree.Kind.PREFIX_DECREMENT
-          || kind == Tree.Kind.UNARY_PLUS
-          || kind == Tree.Kind.UNARY_MINUS
-          || kind == Tree.Kind.BITWISE_COMPLEMENT
-          || kind == Tree.Kind.LOGICAL_COMPLEMENT;
-    }
-
-    /**
-     * Determines if the given kind is a binary operator.
-     *
-     * @param kind
-     *            the kind to test
-     * @return true if the given kind is a binary operator
-     */
-    private static boolean isBinaryOperator(Tree.Kind kind) {
-      return kind == Tree.Kind.MULTIPLY
-          || kind == Tree.Kind.DIVIDE
-          || kind == Tree.Kind.REMAINDER
-          || kind == Tree.Kind.PLUS
-          || kind == Tree.Kind.MINUS
-          || kind == Tree.Kind.LEFT_SHIFT
-          || kind == Tree.Kind.RIGHT_SHIFT
-          || kind == Tree.Kind.UNSIGNED_RIGHT_SHIFT
-          || kind == Tree.Kind.LESS_THAN
-          || kind == Tree.Kind.GREATER_THAN
-          || kind == Tree.Kind.LESS_THAN_EQUAL
-          || kind == Tree.Kind.GREATER_THAN_EQUAL
-          || kind == Tree.Kind.EQUAL_TO
-          || kind == Tree.Kind.NOT_EQUAL_TO
-          || kind == Tree.Kind.AND
-          || kind == Tree.Kind.XOR
-          || kind == Tree.Kind.OR
-          || kind == Tree.Kind.CONDITIONAL_AND
-          || kind == Tree.Kind.CONDITIONAL_OR;
-    }
-
-    /**
-     * Determines if the given kind is a wildcard.
-     *
-     * @param kind
-     *            the kind to test
-     * @return true if the given kind is a wildcard
-     */
-    private static boolean isWildcard(Tree.Kind kind) {
-      return kind == Tree.Kind.UNBOUNDED_WILDCARD
-          || kind == Tree.Kind.EXTENDS_WILDCARD
-          || kind == Tree.Kind.SUPER_WILDCARD;
-    }
   }
 
   public static boolean isTypeSelector(String selector) {
@@ -1364,15 +1212,7 @@ public class ASTPath extends ImmutableStack<ASTPath.ASTEntry>
   }
 
   public static boolean isClassEquiv(Tree.Kind kind) {
-    switch (kind) {
-      case CLASS:
-      case INTERFACE:
-      case ENUM:
-      case ANNOTATION_TYPE:
-        return true;
-      default:
-        return false;
-    }
+    return kind.asInterface().equals(ClassTree.class);
   }
 
   /**
@@ -1383,17 +1223,7 @@ public class ASTPath extends ImmutableStack<ASTPath.ASTEntry>
    * @return true if the given kind is a compound assignment
    */
   public static boolean isCompoundAssignment(Tree.Kind kind) {
-    return kind == Tree.Kind.PLUS_ASSIGNMENT
-        || kind == Tree.Kind.MINUS_ASSIGNMENT
-        || kind == Tree.Kind.MULTIPLY_ASSIGNMENT
-        || kind == Tree.Kind.DIVIDE_ASSIGNMENT
-        || kind == Tree.Kind.OR_ASSIGNMENT
-        || kind == Tree.Kind.AND_ASSIGNMENT
-        || kind == Tree.Kind.REMAINDER_ASSIGNMENT
-        || kind == Tree.Kind.LEFT_SHIFT_ASSIGNMENT
-        || kind == Tree.Kind.RIGHT_SHIFT_ASSIGNMENT
-        || kind == Tree.Kind.UNSIGNED_RIGHT_SHIFT_ASSIGNMENT
-        || kind == Tree.Kind.XOR_ASSIGNMENT;
+    return kind.asInterface().equals(CompoundAssignmentTree.class);
   }
 
   /**
@@ -1404,14 +1234,7 @@ public class ASTPath extends ImmutableStack<ASTPath.ASTEntry>
    * @return true if the given kind is a unary operator
    */
   public static boolean isUnaryOperator(Tree.Kind kind) {
-    return kind == Tree.Kind.POSTFIX_INCREMENT
-        || kind == Tree.Kind.POSTFIX_DECREMENT
-        || kind == Tree.Kind.PREFIX_INCREMENT
-        || kind == Tree.Kind.PREFIX_DECREMENT
-        || kind == Tree.Kind.UNARY_PLUS
-        || kind == Tree.Kind.UNARY_MINUS
-        || kind == Tree.Kind.BITWISE_COMPLEMENT
-        || kind == Tree.Kind.LOGICAL_COMPLEMENT;
+    return kind.asInterface().equals(UnaryTree.class);
   }
 
   /**
@@ -1422,58 +1245,11 @@ public class ASTPath extends ImmutableStack<ASTPath.ASTEntry>
    * @return true if the given kind is a binary operator
    */
   public static boolean isBinaryOperator(Tree.Kind kind) {
-    return kind == Tree.Kind.MULTIPLY || kind == Tree.Kind.DIVIDE
-        || kind == Tree.Kind.REMAINDER || kind == Tree.Kind.PLUS
-        || kind == Tree.Kind.MINUS || kind == Tree.Kind.LEFT_SHIFT
-        || kind == Tree.Kind.RIGHT_SHIFT
-        || kind == Tree.Kind.UNSIGNED_RIGHT_SHIFT
-        || kind == Tree.Kind.LESS_THAN
-        || kind == Tree.Kind.GREATER_THAN
-        || kind == Tree.Kind.LESS_THAN_EQUAL
-        || kind == Tree.Kind.GREATER_THAN_EQUAL
-        || kind == Tree.Kind.EQUAL_TO || kind == Tree.Kind.NOT_EQUAL_TO
-        || kind == Tree.Kind.AND || kind == Tree.Kind.XOR
-        || kind == Tree.Kind.OR || kind == Tree.Kind.CONDITIONAL_AND
-        || kind == Tree.Kind.CONDITIONAL_OR;
+    return kind.asInterface().equals(BinaryTree.class);
   }
 
   public static boolean isLiteral(Tree.Kind kind) {
-    switch (kind) {
-    case INT_LITERAL:
-    case LONG_LITERAL:
-    case FLOAT_LITERAL:
-    case DOUBLE_LITERAL:
-    case BOOLEAN_LITERAL:
-    case CHAR_LITERAL:
-    case STRING_LITERAL:
-    case NULL_LITERAL:
-      return true;
-    default:
-      return false;
-    }
-  }
-
-  public static boolean isExpression(Tree.Kind kind) {
-    switch (kind) {
-    case ARRAY_ACCESS:
-    case ASSIGNMENT:
-    case CONDITIONAL_EXPRESSION:
-    case EXPRESSION_STATEMENT:
-    case MEMBER_SELECT:
-    case MEMBER_REFERENCE:
-    case IDENTIFIER:
-    case INSTANCE_OF:
-    case METHOD_INVOCATION:
-    case NEW_ARRAY:
-    case NEW_CLASS:
-    case LAMBDA_EXPRESSION:
-    case PARENTHESIZED:
-    case TYPE_CAST:
-      return true;
-    default:
-      return isUnaryOperator(kind) || isBinaryOperator(kind)
-          || isCompoundAssignment(kind) || isLiteral(kind);
-    }
+    return kind.asInterface().equals(LiteralTree.class);
   }
 
   public static boolean isTypeKind(Tree.Kind kind) {
@@ -1500,9 +1276,7 @@ public class ASTPath extends ImmutableStack<ASTPath.ASTEntry>
    * @return true if the given kind is a wildcard
    */
   public static boolean isWildcard(Tree.Kind kind) {
-    return kind == Tree.Kind.UNBOUNDED_WILDCARD
-        || kind == Tree.Kind.EXTENDS_WILDCARD
-        || kind == Tree.Kind.SUPER_WILDCARD;
+    return kind.asInterface().equals(WildcardTree.class);
   }
 
   /**
