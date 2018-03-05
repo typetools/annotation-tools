@@ -54,11 +54,6 @@
       message="File ${user.build.properties} file not found."/>
     <property file="${user.build.properties}"/>
 
-    <echo message="annotations-compiler: ${annotations-compiler}"/>
-
-    <!-- convert relative to absolute pathname -->
-    <property name="annotations-compiler-absolute" location="${annotations-compiler}" />
-
   </target>
 
   <!-- Compiles all the subparts of the Annotation File Utilities. -->
@@ -68,9 +63,6 @@
         <property name="product.noshrink" value="true"/>
       </ant>
       <ant dir="${scene-lib}" target="bin"/>
-      <!-- repository version only: -->
-      <!-- I don't see the need for this. -->
-      <!-- <ant dir="${annotations-compiler}" antfile="make/build.xml" target="build"/> -->
   </target>
 
   <target name="init"
@@ -80,10 +72,7 @@
     </fileset>
 
     <path id="libpath">
-      <!-- alternate for distribution:
-      <pathelement location="${annotations-compiler}/bin"/>
-      -->
-      <pathelement location="${annotations-compiler}/dist/lib/javac.jar"/>
+      <pathelement location="${java-tools}"/>
       <pathelement location="${annotation-tools}/annotation-file-utilities/lib/options-all-0.3.1.jar"/>
       <pathelement location="${annotation-tools}/annotation-file-utilities/lib/plume-core.jar"/>
       <pathelement location="${annotation-tools}/annotation-file-utilities/lib/guava-20.0.jar"/>
@@ -157,7 +146,6 @@
       <uptodate property="scene-lib.bin.uptodate" targetfile="annotation-file-utilities.jar">
         <srcfiles dir="${scene-lib}/bin" excludes="annotations-expected/**,annotations/tests/**"/>
       </uptodate>
-      <uptodate property="annotations-compiler.uptodate" targetfile="annotation-file-utilities.jar" srcfile="${annotations-compiler}/dist/lib/javac.jar"/>
       <uptodate property="plume.uptodate" targetfile="annotation-file-utilities.jar" srcfile="lib/options-all-0.3.1.jar"/>
       <uptodate property="plume.uptodate" targetfile="annotation-file-utilities.jar" srcfile="lib/plume-core.jar"/>
       <uptodate property="google-collect.uptodate" targetfile="annotation-file-utilities.jar" srcfile="lib/guava-20.0.jar"/>
@@ -167,7 +155,6 @@
           <isset property="bin.uptodate"/>
           <isset property="asmx.bin.uptodate"/>
           <isset property="scene-lib.bin.uptodate"/>
-          <isset property="annotations-compiler.uptodate"/>
           <isset property="plume.uptodate"/>
           <isset property="google-collect.uptodate"/>
         </and>
@@ -176,7 +163,6 @@
       <echo message="bin.uptodate: ${bin.uptodate}"/>
       <echo message="asmx.bin.uptodate: ${asmx.bin.uptodate}"/>
       <echo message="scene-lib.bin.uptodate: ${scene-lib.bin.uptodate}"/>
-      <echo message="annotations-compiler.uptodate: ${annotations-compiler.uptodate}"/>
       <echo message="plume.uptodate: ${plume.uptodate}"/>
       <echo message="google-collect.uptodate: ${google-collect.uptodate}"/>
       <echo message="jarfile.uptodate: ${jarfile.uptodate}"/>
@@ -219,7 +205,7 @@
         <exclude name="META-INF/" />
       </patternset>
     </unjar>
-    <unjar src="${annotations-compiler}/dist/lib/javac.jar" dest="${temp-jarfile}">
+    <unjar src="${java-tools}" dest="${temp-jarfile}">
       <patternset>
         <include name="**/*.class"/>
         <exclude name="META-INF/" />
@@ -479,8 +465,7 @@
   <target name="run-tests" depends="init-properties"
           description="run tests for the annotator">
     <exec dir="tests/" executable="make" failonerror="true">
-        <env key="XJAVAC" value="${annotations-compiler-absolute}/dist/bin/javac -g ${xjavac.args}"/>
-        <env key="JAVAC_JAR" value="${annotations-compiler-absolute}/dist/lib/javac.jar"/>
+        <env key="XJAVAC" value="javac -g ${xjavac.args}"/>
     </exec>
   </target>
 
@@ -510,27 +495,18 @@
     </fileset>
     <pathconvert property="cmdTxts" refid="javacSrc" pathsep=" " />
 
-      <java fork="true"
+      <javac
+            srcdir="src"
+            destdir="bin"
+            source="8"
+            target="8"
             failonerror="true"
-            classpathref="libpath"
-            classname="com.sun.tools.javac.Main">
-          <arg value="-Xlint:-options"/>
-          <arg value="-Werror"/>
-          <arg value="-g"/>
-          <arg line="-sourcepath src"/>
-          <arg line="-d bin"/>
-          <arg line="${cmdTxts}"/>
-          <arg line="-version"/>
-          <!-- To prevent a cyclic dependency with the Checker
-               Framework, ignore type annotations in comments here.
-               Separate targets exist to check the qualifiers. -->
-          <arg line="-XDTA:noannotationsincomments"/>
-          <!-- Make sure we only have Java 7 source code and generate Java 7 bytecode. -->
-          <arg value="-source"/>
-          <arg value="7"/>
-          <arg value="-target"/>
-          <arg value="7"/>
-      </java>
+            classpathref="libpath">
+          <compilerarg value="-Xlint:-options"/>
+          <compilerarg value="-Werror"/>
+          <compilerarg value="-g"/>
+          <compilerarg line="${cmdTxts}"/>
+      </javac>
 
   </target>
 

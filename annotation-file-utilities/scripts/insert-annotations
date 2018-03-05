@@ -14,19 +14,18 @@ fi
 
 AFU=${AFU:-$(dirname $0)/..}
 ANNOTATION_FILE_UTILS=${AFU}/bin:${AFU}/../scene-lib/bin:${AFU}/../asmx/bin:${AFU}/annotation-file-utilities.jar
-LANGTOOLS=${LANGTOOLS:-${AFU}/../../jsr308-langtools}
-JAVAC_JAR=${JAVAC_JAR:-${LANGTOOLS}/dist/lib/javac.jar}
+TOOLS_JAR=${TOOLS_JAR:-${JAVA_HOME}/lib/tools.jar}
 
 if [ "$DEBUG" = "1" ]; then
   echo "--- start of insert-annotations debugging output"
   echo "AFU=${AFU}"
   echo "ANNOTATION_FILE_UTILS=${ANNOTATION_FILE_UTILS}"
   echo "LANGTOOLS=${LANGTOOLS}"
-  echo "JAVAC_JAR=${JAVAC_JAR}"
+  echo "TOOLS_JAR=${TOOLS_JAR}"
   # Keep this in sync with the actual command below.
-  echo "java -ea -cp ${JAVAC_JAR}:${AFU}/lib/plume-lib.jar:${ANNOTATION_FILE_UTILS}:${CLASSPATH} scenelib.annotations.io.classfile.ClassFileWriter $@"
+  echo "java -ea -cp ${TOOLS_JAR}:${AFU}/lib/plume-lib.jar:${ANNOTATION_FILE_UTILS}:${CLASSPATH} scenelib.annotations.io.classfile.ClassFileWriter $@"
   echo "--- end of insert-annotations debugging output"
 fi
 
 # Needs CLASSPATH to find user files
-java -ea -cp ${JAVAC_JAR}:${AFU}/lib/plume-lib.jar:${ANNOTATION_FILE_UTILS}:${CLASSPATH} scenelib.annotations.io.classfile.ClassFileWriter "$@"
+java -ea -cp ${TOOLS_JAR}:${AFU}/lib/plume-lib.jar:${ANNOTATION_FILE_UTILS}:${CLASSPATH} scenelib.annotations.io.classfile.ClassFileWriter "$@"

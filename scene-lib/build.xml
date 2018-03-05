@@ -68,11 +68,6 @@
         <!--
         <ant dir="${asmx}" inheritAll="false" target="bin"/>
         -->
-        <!-- Next 2 lines only for repository version. -->
-        <!--
-        <ant dir="${annotations-compiler}" antfile="make/build.xml" inheritAll="false" target="build"/>
-        <ant dir="${checkers}" inheritAll="false" target="build"/>
-        -->
     </target>
 
     <target name="init-paths">
@@ -115,9 +110,7 @@
             <pathelement location="${junit}"/>
             <pathelement location="${annotation-tools}/annotation-file-utilities/lib/plume-core.jar"/>
             <pathelement location="${annotation-tools}/annotation-file-utilities/lib/guava-20.0.jar"/>
-            <!-- remainder only for repository version -->
-            <pathelement location="${annotations-compiler}/dist/lib/javac.jar"/>
-            <pathelement location="${annotations-compiler}/dist/lib/javap.jar"/>
+            <pathelement location="${java-tools}"/>
             <!-- options-all-0.3.1.jar contains javac, so must come late on the path -->
             <pathelement location="${annotation-tools}/annotation-file-utilities/lib/options-all-0.3.1.jar"/>
             <pathelement location="bin"/>

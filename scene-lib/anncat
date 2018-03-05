@@ -6,7 +6,7 @@ SCENE_LIB=$(dirname $0)
 WORKSPACE=$SCENE_LIB/..
 ASMX=$WORKSPACE/asmx
 
-JAVAC_JAR=${JAVAC_JAR:-${SCENE_LIB}/../../jsr308-langtools/dist/lib/javac.jar}
+TOOLS_JAR=${TOOLS_JAR:-${JAVA_HOME}/lib/tools.jar}
 
-export CLASSPATH=${JAVAC_JAR}:$SCENE_LIB/bin:$ASMX/bin:$WORKSPACE/annotation-file-utilities/lib/plume-core.jar:$CLASSPATH
+export CLASSPATH=${TOOLS_JAR}:$SCENE_LIB/bin:$ASMX/bin:$WORKSPACE/annotation-file-utilities/lib/plume-core.jar:$CLASSPATH
 java scenelib.annotations.tools.Anncat "$@"
