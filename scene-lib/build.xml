@@ -110,7 +110,7 @@
             <pathelement location="${junit}"/>
             <pathelement location="${annotation-tools}/annotation-file-utilities/lib/plume-core.jar"/>
             <pathelement location="${annotation-tools}/annotation-file-utilities/lib/guava-20.0.jar"/>
-            <pathelement location="${java-tools}"/>
+            <pathelement location="${env.JAVA_HOME}/lib/tools.jar"/>
             <!-- options-all-0.3.1.jar contains javac, so must come late on the path -->
             <pathelement location="${annotation-tools}/annotation-file-utilities/lib/options-all-0.3.1.jar"/>
             <pathelement location="bin"/>

@@ -3,6 +3,7 @@
 
   <property file="${user.home}/.annotations-tools.properties" />
   <property file="build.properties" />
+  <property environment="env"/>
 
   <!-- default location of projects, has effect only if not previously set -->
   <property name="asmx" location="asmx"/>
