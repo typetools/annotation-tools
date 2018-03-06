@@ -146,8 +146,9 @@ The current release is Annotation File Utilities version
 <li>
   Creade a directory named
   <code>annotation-tools</code> by
-  unpacking the distribution zipfile (a standard place to do this is in a
-  directory <code>~/jsr308/</code>):
+  unpacking the distribution zipfile.
+  (You will typically make <code>annotation-tools/</code> a sibling of
+  <code>checker-framework/</code>.)
 
   <pre><code>unzip annotation-tools-3.6.51.zip</code></pre>
 
@@ -437,8 +438,9 @@ into source code.</p>
 <p>The <code>asmx</code> sub-project provides methods for reading and
 writing class files.  <code>asmx</code> is based on an old version
 (2.2.2) of the <a href="http://asm.ow2.org/">ASM Framework</a>. It has been modified to
-allow it to read and write <a href="https://checkerframework.org/jsr308/specification/java-annotation-design.html">JSR 308</a>
-annotations in bytecode.  However, it is far behind the current ASM
+allow it to read and write <a href="https://checkerframework.org/jsr308/specification/java-annotation-design.html">type
+    annotations</a>
+in bytecode.  However, it is far behind the current ASM
 version (5.0), which provides support for type annotations. We should
 discard the custom <code>asmx</code> in the Annotation File Utilities
 and adapt the Annotation File Utilities to use the official, supported

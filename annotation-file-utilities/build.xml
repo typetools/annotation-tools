@@ -510,7 +510,7 @@
 
   </target>
 
-  <!-- Boilerplate to set jsr308javac property. Is there a better way? -->
+  <!-- Boilerplate to set cfjavac property. Is there a better way? -->
   <property environment="env"/>
   <condition property="isUnix">
     <os family="unix" />
@@ -518,20 +518,20 @@
   <condition property="isWindows">
     <os family="windows" />
   </condition>
-  <target name="init-jsr308javac-unix" if="isUnix">
-    <property name="jsr308javac" value="${env.CHECKERFRAMEWORK}/checker/bin/javac" />
+  <target name="init-cfjavac-unix" if="isUnix">
+    <property name="cfjavac" value="${env.CHECKERFRAMEWORK}/checker/bin/javac" />
   </target>
-  <target name="init-jsr308javac-windows" if="isWindows">
-    <property name="jsr308javac" value="${env.CHECKERFRAMEWORK}/checker/bin/javac.bat" />
+  <target name="init-cfjavac-windows" if="isWindows">
+    <property name="cfjavac" value="${env.CHECKERFRAMEWORK}/checker/bin/javac.bat" />
   </target>
 
   <target name="check-nullness"
           description="Check for nullness errors."
-          depends="init,clean,init-jsr308javac-unix,init-jsr308javac-windows">
+          depends="init,clean,init-cfjavac-unix,init-cfjavac-windows">
     <mkdir dir="bin"/>
     <javac srcdir="src" destdir="bin" debug="true" encoding="8859_1"
            fork="yes"
-           executable="${jsr308javac}">
+           executable="${cfjavac}">
       <compilerarg value="-version"/>
       <compilerarg line="-target 5"/>
       <compilerarg line="-processor org.checkerframework.checker.nonnull.NonNullFbcChecker"/>
