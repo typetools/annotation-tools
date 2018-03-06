@@ -568,7 +568,7 @@ public class AnnotationVerifier {
       this.visible = visible;
     }
 
-    public boolean equals(/*@Nullable*/ Object o) {
+    public boolean equals(@Nullable Object o) {
       if (o instanceof ParameterDescription) {
         ParameterDescription p = (ParameterDescription) o;
         return this.parameter == p.parameter;

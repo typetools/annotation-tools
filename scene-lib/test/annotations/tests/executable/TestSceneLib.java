@@ -86,7 +86,7 @@ public class TestSceneLib extends TestCase {
     }
 
     void doParseTest(String index,
-                     /*@NonNull*/ AScene expectScene) {
+                     @NonNull AScene expectScene) {
         AScene s = newScene();
         doParseTest(index, s, expectScene);
     }

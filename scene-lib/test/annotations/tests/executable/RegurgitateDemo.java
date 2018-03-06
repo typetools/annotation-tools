@@ -10,10 +10,10 @@ import scenelib.annotations.el.*;
 import scenelib.annotations.io.*;
 
 public class RegurgitateDemo {
-    public static void main(/*@NonNull*/ String /*@NonNull*/ [] args) {
+    public static void main(@NonNull String @NonNull [] args) {
         // String sampleIndexFile = "package pkg: annotation @A: int value class
         // foo: @pkg.A(value=dinglewompus)";
-        /*@NonNull*/ AScene scene = new AScene();
+        @NonNull AScene scene = new AScene();
         try {
             LineNumberReader in = new LineNumberReader(new FileReader("test2-2.jaif"));
             IndexFileParser.parse(in, scene);
