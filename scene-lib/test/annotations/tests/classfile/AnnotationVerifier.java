@@ -1,8 +1,6 @@
 package annotations.tests.classfile;
 
-/*>>>
 import org.checkerframework.checker.nullness.qual.*;
-*/
 
 import java.util.ArrayList;
 import java.util.Arrays;
