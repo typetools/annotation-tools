@@ -24,7 +24,7 @@ import org.plumelib.options.OptionGroup;
 import org.plumelib.options.Options;
 import org.plumelib.util.FileIOException;
 import org.plumelib.util.UtilPlume;
-import plume.Pair;
+import org.plumelib.util.Pair;
 import scenelib.type.Type;
 import scenelib.annotations.Annotation;
 import scenelib.annotations.el.ABlock;

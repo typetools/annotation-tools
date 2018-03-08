@@ -61,7 +61,7 @@ import scenelib.annotations.util.coll.VivifyingMap;
 
 import plume.ArraysMDE;
 import org.plumelib.util.FileIOException;
-import plume.Pair;
+import org.plumelib.util.Pair;
 
 import scenelib.type.ArrayType;
 import scenelib.type.BoundedType;
