@@ -60,7 +60,7 @@ import scenelib.annotations.field.ScalarAFT;
 import scenelib.annotations.util.coll.VivifyingMap;
 
 import plume.ArraysMDE;
-import plume.FileIOException;
+import org.plumelib.util.FileIOException;
 import plume.Pair;
 
 import scenelib.type.ArrayType;
