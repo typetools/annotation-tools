@@ -59,7 +59,7 @@ import scenelib.annotations.field.EnumAFT;
 import scenelib.annotations.field.ScalarAFT;
 import scenelib.annotations.util.coll.VivifyingMap;
 
-import plume.ArraysMDE;
+import org.plumelib.util.ArraysPlume;
 import org.plumelib.util.FileIOException;
 import org.plumelib.util.Pair;
 
@@ -1403,7 +1403,7 @@ public final class IndexFileParser {
         expectChar('.');
         for (String arg : legalChildSelectors) {
             if (matchKeyword(arg)) {
-                if (argumentChildSelectors != null && ArraysMDE.indexOf(argumentChildSelectors, arg) >= 0) {
+                if (argumentChildSelectors != null && ArraysPlume.indexOf(argumentChildSelectors, arg) >= 0) {
                     int index = matchNNInteger();
                     return new ASTPath.ASTEntry(kind, arg, index);
                 } else {

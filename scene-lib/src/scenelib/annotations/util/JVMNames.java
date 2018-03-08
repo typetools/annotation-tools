@@ -10,7 +10,7 @@ import com.sun.tools.javac.tree.JCTree.JCMethodDecl;
 import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
 import com.sun.tools.javac.util.List;
 
-import plume.UtilMDE;
+import org.plumelib.util.UtilPlume;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
@@ -94,7 +94,7 @@ public class JVMNames {
 
     /**
      * Create a JVML string for a type.
-     * Uses {@link UtilMDE#binaryNameToFieldDescriptor(String)}
+     * Uses {@link UtilPlume#binaryNameToFieldDescriptor(String)}
      *
      * Array strings are built by recursively converting the component type.
      *
@@ -108,9 +108,9 @@ public class JVMNames {
             // replace w/erasure (== erasure of 1st conjunct)
             return typeToJvmlString(type.tsym.erasure_field);
         } else if (type.getKind() == TypeKind.VOID) {
-            return "V";  // special case since UtilMDE doesn't handle void
+            return "V";  // special case since UtilPlume doesn't handle void
         } else {
-            return UtilMDE.binaryNameToFieldDescriptor(type.tsym.flatName().toString());
+            return UtilPlume.binaryNameToFieldDescriptor(type.tsym.flatName().toString());
         }
     }
 
@@ -136,13 +136,13 @@ public class JVMNames {
         default:
             String str = typeTree.toString();
             builder.append("void".equals(str) ? "V"
-                : UtilMDE.binaryNameToFieldDescriptor(typeTree.toString()));
+                : UtilPlume.binaryNameToFieldDescriptor(typeTree.toString()));
             break;
         }
     }
 
     public static String jvmlStringToJavaTypeString(String str) {
         return str.equals("V") ? "void"
-                : UtilMDE.fieldDescriptorToBinaryName(str);
+                : UtilPlume.fieldDescriptorToBinaryName(str);
     }
 }
