@@ -5,6 +5,8 @@ import java.util.LinkedHashMap;
 import scenelib.annotations.Annotation;
 import scenelib.annotations.util.coll.VivifyingMap;
 
+import org.plumelib.util.UtilMDE;
+
 /*>>>
 import org.checkerframework.checker.nullness.qual.*;
 */
@@ -180,31 +182,31 @@ public final class AClass extends ADeclaration {
         }
         sb.append(linePrefix);
         sb.append("Bounds:\n");
-        plume.UtilMDE.mapToString(sb, bounds, linePrefix + "  ");
+        UtilPlume.mapToString(sb, bounds, linePrefix + "  ");
         sb.append(linePrefix);
         sb.append("Extends/implements:\n");
-        plume.UtilMDE.mapToString(sb, extendsImplements, linePrefix + "  ");
+        UtilPlume.mapToString(sb, extendsImplements, linePrefix + "  ");
         sb.append(linePrefix);
         sb.append("Fields:\n");
-        plume.UtilMDE.mapToString(sb, fields, linePrefix + "  ");
+        UtilPlume.mapToString(sb, fields, linePrefix + "  ");
         sb.append(linePrefix);
         sb.append("Field Initializers:\n");
-        plume.UtilMDE.mapToString(sb, fieldInits, linePrefix + "  ");
+        UtilPlume.mapToString(sb, fieldInits, linePrefix + "  ");
         sb.append(linePrefix);
         sb.append("Static Initializers:\n");
-        plume.UtilMDE.mapToString(sb, staticInits, linePrefix + "  ");
+        UtilPlume.mapToString(sb, staticInits, linePrefix + "  ");
         sb.append(linePrefix);
         sb.append("Instance Initializers:\n");
-        plume.UtilMDE.mapToString(sb, instanceInits, linePrefix + "  ");
+        UtilPlume.mapToString(sb, instanceInits, linePrefix + "  ");
         sb.append(linePrefix);
         sb.append("AST Typecasts:\n");
-        plume.UtilMDE.mapToString(sb, insertTypecasts, linePrefix + "  ");
+        UtilPlume.mapToString(sb, insertTypecasts, linePrefix + "  ");
         sb.append(linePrefix);
         sb.append("AST Annotations:\n");
-        plume.UtilMDE.mapToString(sb, insertAnnotations, linePrefix + "  ");
+        UtilPlume.mapToString(sb, insertAnnotations, linePrefix + "  ");
         sb.append(linePrefix);
         sb.append("Methods:\n");
-        plume.UtilMDE.mapToString(sb, methods, linePrefix + "  ");
+        UtilPlume.mapToString(sb, methods, linePrefix + "  ");
         return sb.toString();
     }
 
