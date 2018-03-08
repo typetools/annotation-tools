@@ -113,7 +113,6 @@
         <path id="libpath">
             <pathelement location="${asmx}/bin"/>
             <pathelement location="${junit}"/>
-            <pathelement location="${annotation-tools}/annotation-file-utilities/lib/plume-core.jar"/>
             <pathelement location="${annotation-tools}/annotation-file-utilities/lib/plume-util-0.0.1.jar"/>
             <pathelement location="${annotation-tools}/annotation-file-utilities/lib/guava-20.0.jar"/>
             <!-- remainder only for repository version -->

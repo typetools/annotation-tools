@@ -1,6 +1,6 @@
 package annotator.find;
 
-import plume.Pair;
+import org.plumelib.util.Pair;
 
 /**
  * Specifies an annotation to be inserted into a source file.

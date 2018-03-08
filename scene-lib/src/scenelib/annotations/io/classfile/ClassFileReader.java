@@ -6,9 +6,10 @@ import org.checkerframework.checker.nullness.qual.*;
 
 import java.io.*;
 
-import plume.*;
-
 import com.sun.tools.javac.main.CommandLine;
+
+import org.plumelib.options.Option;
+import org.plumelib.options.Options;
 
 import org.objectweb.asm.ClassReader;
 
@@ -69,7 +70,7 @@ public class ClassFileReader {
 
     try {
       String[] cl_args = CommandLine.parse(args);
-      file_args = options.parse_or_usage(cl_args);
+      file_args = options.parse(true, cl_args);
     } catch (IOException ex) {
       System.err.println(ex);
       System.err.println("(For non-argfile beginning with \"@\", use \"@@\" for initial \"@\".");
@@ -83,14 +84,15 @@ public class ClassFileReader {
       System.out.printf("extract-annotations (%s)", INDEX_UTILS_VERSION);
     }
     if (help) {
-      options.print_usage();
+      options.printUsage();
     }
     if (version || help) {
       System.exit(-1);
     }
 
     if (file_args.length == 0) {
-      options.print_usage("No arguments given.");
+      System.out.println("No arguments given.");
+      options.printUsage();
       System.exit(-1);
     }
 

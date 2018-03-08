@@ -10,8 +10,8 @@ import java.util.Set;
 
 import org.objectweb.asm.ClassReader;
 
-import plume.FileIOException;
-import plume.Pair;
+import org.plumelib.util.FileIOException;
+import org.plumelib.util.Pair;
 import scenelib.type.DeclaredType;
 import scenelib.type.Type;
 import scenelib.annotations.Annotation;

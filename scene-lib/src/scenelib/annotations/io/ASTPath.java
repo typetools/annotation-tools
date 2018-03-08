@@ -14,7 +14,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import plume.ArraysMDE;
+import org.plumelib.util.ArraysPlume;
 
 import com.sun.source.tree.AnnotatedTypeTree;
 import com.sun.source.tree.AnnotationTree;
@@ -681,7 +681,7 @@ public class ASTPath extends ImmutableStack<ASTPath.ASTEntry>
       for (String arg : legalChildSelectors) {
         if (s.equals(arg)) {
           if (argumentChildSelectors != null
-              && ArraysMDE.indexOf(argumentChildSelectors, arg) >= 0) {
+              && ArraysPlume.indexOf(argumentChildSelectors, arg) >= 0) {
             getTok();
             return new ASTEntry(kind, arg, intVal());
           } else {
