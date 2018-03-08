@@ -5,7 +5,7 @@ import java.util.LinkedHashMap;
 import scenelib.annotations.Annotation;
 import scenelib.annotations.util.coll.VivifyingMap;
 
-import org.plumelib.util.UtilMDE;
+import org.plumelib.util.UtilPlume;
 
 /*>>>
 import org.checkerframework.checker.nullness.qual.*;
