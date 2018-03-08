@@ -22,9 +22,9 @@ import java.util.regex.Pattern;
 import org.plumelib.options.Option;
 import org.plumelib.options.OptionGroup;
 import org.plumelib.options.Options;
-import plume.FileIOException;
+import org.plumelib.util.FileIOException;
+import org.plumelib.util.UtilPlume;
 import plume.Pair;
-import plume.UtilMDE;
 import scenelib.type.Type;
 import scenelib.annotations.Annotation;
 import scenelib.annotations.el.ABlock;
@@ -683,7 +683,7 @@ public class Main {
       // Get the source file, and use it to obtain parse trees.
       try {
         // fileLineSep is set here so that exceptions can be caught
-        fileLineSep = UtilMDE.inferLineSeparator(javafilename);
+        fileLineSep = UtilPlume.inferLineSeparator(javafilename);
         src = new Source(javafilename);
         verb.debug("Parsed %s%n", javafilename);
       } catch (Source.CompilerException e) {
