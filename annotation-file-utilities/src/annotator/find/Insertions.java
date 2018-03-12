@@ -1347,7 +1347,10 @@ loop:
       case FLOAT:
       case INT:
         return new DeclaredType(jtype.tsym.name.toString());
-        // case ERROR:
+      case ERROR:
+        // Return a fake declared type that corresponds to the error.
+        // This ignores setup problems where some classes can't be found.
+        return new DeclaredType(jtype.toString());
         // case EXECUTABLE:
         // case NONE:
         // case NULL:
