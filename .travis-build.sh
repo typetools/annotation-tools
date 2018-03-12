@@ -8,7 +8,7 @@ if [[ "${GROUP}" == "" ]]; then
   export GROUP=all
 fi
 
-if [[ "${GROUP}" != "all" && "${GROUP}" != "test" && "${GROUP}" != "misc" && "${GROUP}" != "downstream" ]]; then
+if [[ "${GROUP}" != "all" && "${GROUP}" != "test" && "${GROUP}" != "misc" && "${GROUP}" != "cftest" && "${GROUP}" != "downstream" ]]; then
   echo "Bad argument '${GROUP}'; should be omitted or one of: all, test, misc."
   exit 1
 fi
@@ -55,20 +55,29 @@ if [[ "${GROUP}" == "misc" || "${GROUP}" == "all" ]]; then
   ant javadoc
 fi
 
-if [[ "${GROUP}" == "downstream" || "${GROUP}" == "all" ]]; then
-  # checker-framework and its downstream tests
-  set +e
-  echo "Running: git ls-remote https://github.com/${SLUGOWNER}/checker-framework.git &>-"
-  git ls-remote https://github.com/${SLUGOWNER}/checker-framework.git &>-
-  if [ "$?" -ne 0 ]; then
-    CFSLUGOWNER=typetools
-  else
-    CFSLUGOWNER=${SLUGOWNER}
-  fi
-  set -e
-  echo "Running:  (cd .. && git clone --depth 1 https://github.com/${CFSLUGOWNER}/checker-framework.git)"
-  (cd .. && git clone --depth 1 https://github.com/${CFSLUGOWNER}/checker-framework.git) || (cd .. && git clone --depth 1 https://github.com/${CFISLUGOWNER}/checker-framework.git)
-  echo "... done: (cd .. && git clone --depth 1 https://github.com/${CFSLUGOWNER}/checker-framework.git)"
+# $1 is the group to execute in checker-framework/.travis-build.sh
+function checker_framework_test () {
+    # checker-framework and its downstream tests
+    set +e
+    echo "Running: git ls-remote https://github.com/${SLUGOWNER}/checker-framework.git &>-"
+    git ls-remote https://github.com/${SLUGOWNER}/checker-framework.git &>-
+    if [ "$?" -ne 0 ]; then
+        CFSLUGOWNER=typetools
+    else
+        CFSLUGOWNER=${SLUGOWNER}
+    fi
+    set -e
+    echo "Running:  (cd .. && git clone --depth 1 https://github.com/${CFSLUGOWNER}/checker-framework.git)"
+    (cd .. && git clone --depth 1 https://github.com/${CFSLUGOWNER}/checker-framework.git) || (cd .. && git clone --depth 1 https://github.com/${CFISLUGOWNER}/checker-framework.git)
+    echo "... done: (cd .. && git clone --depth 1 https://github.com/${CFSLUGOWNER}/checker-framework.git)"
 
-  (cd ../checker-framework && ./.travis-build.sh all-tests downloadjdk && ./.travis-build.sh downstream downloadjdk)
+    (cd ../checker-framework && ./.travis-build.sh $1 downloadjdk)
+}
+
+if [[ "${GROUP}" == "cftest" || "${GROUP}" == "all" ]]; then
+    checker_framework_test all-tests
+fi
+
+if [[ "${GROUP}" == "downstream" || "${GROUP}" == "all" ]]; then
+    checker_framework_test downstream
 fi
