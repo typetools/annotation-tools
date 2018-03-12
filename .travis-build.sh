@@ -70,7 +70,9 @@ if [[ "${GROUP}" == "downstream" || "${GROUP}" == "all" ]]; then
     (cd .. && git clone --depth 1 https://github.com/${CFISLUGOWNER}/checker-framework-inference.git) || (cd .. && git clone --depth 1 https://github.com/${CFISLUGOWNER}/checker-framework-inference.git)
     echo "... done: (cd .. && git clone --depth 1 https://github.com/${CFISLUGOWNER}/checker-framework-inference.git)"
 
-    (cd ../checker-framework-inference && ./.travis-build-without-test.sh)
+    cd ../checker-framework-inference
+    . ./.travis-build-without-test.sh
+
     (cd ../checker-framework/framework && ant whole-program-inference-tests)
     (cd ../checker-framework-inference && ant -f tests.xml run-tests)
 fi
