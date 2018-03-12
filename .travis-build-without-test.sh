@@ -5,6 +5,15 @@ set -e
 
 export SHELLOPTS
 
+export JAVA_HOME=${JAVA_HOME:-$(dirname $(dirname $(dirname $(readlink -f $(/usr/bin/which java)))))}
+
+export JSR308=..
+export AFU=../annotation-tools/annotation-file-utilities
+export CHECKERFRAMEWORK=../checker-framework
+
+export PATH=$AFU/scripts:$JAVA_HOME/bin:$PATH
+
+
 SLUGOWNER=${TRAVIS_REPO_SLUG%/*}
 if [[ "$SLUGOWNER" == "" ]]; then
   SLUGOWNER=typetools
