@@ -15,7 +15,6 @@ env:
   matrix:
     - JDKVER=jdk8 GROUP=test
     - JDKVER=jdkany GROUP=misc
-    - JDKVER=jdk8 GROUP=cftest
     - JDKVER=jdk8 GROUP=downstream
 
 # The "docker run" command will pull if needed.

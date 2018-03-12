@@ -55,29 +55,23 @@ if [[ "${GROUP}" == "misc" || "${GROUP}" == "all" ]]; then
   ant javadoc
 fi
 
-# $1 is the group to execute in checker-framework/.travis-build.sh
-function checker_framework_test () {
-    # checker-framework and its downstream tests
-    set +e
-    echo "Running: git ls-remote https://github.com/${SLUGOWNER}/checker-framework.git &>-"
-    git ls-remote https://github.com/${SLUGOWNER}/checker-framework.git &>-
-    if [ "$?" -ne 0 ]; then
-        CFSLUGOWNER=typetools
-    else
-        CFSLUGOWNER=${SLUGOWNER}
-    fi
-    set -e
-    echo "Running:  (cd .. && git clone --depth 1 https://github.com/${CFSLUGOWNER}/checker-framework.git)"
-    (cd .. && git clone --depth 1 https://github.com/${CFSLUGOWNER}/checker-framework.git) || (cd .. && git clone --depth 1 https://github.com/${CFISLUGOWNER}/checker-framework.git)
-    echo "... done: (cd .. && git clone --depth 1 https://github.com/${CFSLUGOWNER}/checker-framework.git)"
-
-    (cd ../checker-framework && ./.travis-build.sh $1 downloadjdk)
-}
-
-if [[ "${GROUP}" == "cftest" || "${GROUP}" == "all" ]]; then
-    checker_framework_test all-tests
-fi
-
 if [[ "${GROUP}" == "downstream" || "${GROUP}" == "all" ]]; then
     checker_framework_test downstream
+    # checker-framework and its downstream tests
+    set +e
+    echo "Running: git ls-remote https://github.com/${SLUGOWNER}/checker-framework-inference.git &>-"
+    git ls-remote https://github.com/${SLUGOWNER}/checker-framework-inference.git &>-
+    if [ "$?" -ne 0 ]; then
+        CFISLUGOWNER=typetools
+    else
+        CFISLUGOWNER=${SLUGOWNER}
+    fi
+    set -e
+    echo "Running:  (cd .. && git clone --depth 1 https://github.com/${CFISLUGOWNER}/checker-framework-inference.git)"
+    (cd .. && git clone --depth 1 https://github.com/${CFISLUGOWNER}/checker-framework-inference.git) || (cd .. && git clone --depth 1 https://github.com/${CFISLUGOWNER}/checker-framework-inference.git)
+    echo "... done: (cd .. && git clone --depth 1 https://github.com/${CFISLUGOWNER}/checker-framework-inference.git)"
+
+    (cd ../checker-framework-inference && ./.travis-build-without-test.sh)
+    (cd ../checker-framework/framework && ant whole-program-inference-tests)
+    (cd ../checker-framework-inference && ant -f tests.xml run-tests)
 fi
