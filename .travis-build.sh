@@ -8,7 +8,7 @@ if [[ "${GROUP}" == "" ]]; then
   export GROUP=all
 fi
 
-if [[ "${GROUP}" != "all" && "${GROUP}" != "test" && "${GROUP}" != "misc" && "${GROUP}" != "cftest" && "${GROUP}" != "downstream" ]]; then
+if [[ "${GROUP}" != "all" && "${GROUP}" != "test" && "${GROUP}" != "misc" && "${GROUP}" != "downstream" ]]; then
   echo "Bad argument '${GROUP}'; should be omitted or one of: all, test, misc."
   exit 1
 fi
@@ -56,7 +56,6 @@ if [[ "${GROUP}" == "misc" || "${GROUP}" == "all" ]]; then
 fi
 
 if [[ "${GROUP}" == "downstream" || "${GROUP}" == "all" ]]; then
-    checker_framework_test downstream
     # checker-framework and its downstream tests
     set +e
     echo "Running: git ls-remote https://github.com/${SLUGOWNER}/checker-framework-inference.git &>-"
