@@ -70,5 +70,5 @@ if [[ "${GROUP}" == "downstream" || "${GROUP}" == "all" ]]; then
   (cd .. && git clone --depth 1 https://github.com/${CFSLUGOWNER}/checker-framework.git) || (cd .. && git clone --depth 1 https://github.com/${CFISLUGOWNER}/checker-framework.git)
   echo "... done: (cd .. && git clone --depth 1 https://github.com/${CFSLUGOWNER}/checker-framework.git)"
 
-  (cd ../checker-framework && .travis-build.sh all-tests downloadjdk && .travis-build.sh downstream downloadjdk)
+  (cd ../checker-framework && ./.travis-build.sh all-tests downloadjdk && ./.travis-build.sh downstream downloadjdk)
 fi
