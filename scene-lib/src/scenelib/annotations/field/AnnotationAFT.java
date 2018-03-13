@@ -51,36 +51,11 @@ public final class AnnotationAFT extends ScalarAFT {
     /**
      * {@inheritDoc}
      */
-    // TODO: reduce duplication with annotator.specification.IndexFileSpecification.getElementAnnotations(AElement)
     @Override
     public String format(Object o) {
+        // Ensure the argument is an Annotation.
         Annotation anno = (Annotation) o;
-        StringBuilder result = new StringBuilder();
-        // TODO: figure out how to consider abbreviated annotation names.
-        // See annotator.find.AnnotationInsertion.getText(boolean, boolean)
-        result.append("@" + annotationDef.name);
-        if (anno.fieldValues.size() == 1 && anno.fieldValues.containsKey("value")) {
-            AnnotationFieldType fieldType = annotationDef.fieldTypes.get("value");
-            result.append('(');
-            result.append(fieldType.format(anno.fieldValues.get(anno.fieldValues.get("value"))));
-            result.append(')');
-        } else if (anno.fieldValues.size() > 0) {
-            result.append('(');
-            boolean notfirst = false;
-            for (Entry<String, Object> field : anno.fieldValues.entrySet()) {
-                // parameters of the annotation
-                if (notfirst) {
-                    result.append(", ");
-                } else {
-                    notfirst = true;
-                }
-                result.append(field.getKey() + "=");
-                AnnotationFieldType fieldType = annotationDef.fieldTypes.get(field.getKey());
-                result.append(fieldType.format(field.getValue()));
-            }
-            result.append(')');
-        }
-        return result.toString();
+        return anno.toString();
     }
 
     @Override
