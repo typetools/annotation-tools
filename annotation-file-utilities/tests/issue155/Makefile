@@ -1,3 +1,7 @@
+# To test Issue #155 this version of the Makefile does not
+# compile the .java input. This allows us to test with an
+# invalid setup.
+
 # Very rough testing framework for the annotator.  Running 'make all' will
 # look for all myClass.goal files in this directory, run the annotator on the
 # corresponding .jaif and .java files, and then output the difference in a
@@ -7,15 +11,14 @@
 
 # Put user-specific changes in your own Makefile.user.
 # Make will silently continue if that file does not exist.
--include Makefile.user
+-include ../Makefile.user
 
 # Override these in Makefile.user if the java and javac commands are not on
 # your execution path.  Example from Makefile.user:
 #   JAVA=${JAVA_HOME}/bin/java
 #   JAVAC=${JAVA_HOME}/bin/javac
-export JAVA?=java -ea
-export JAVAC?=javac
-export XJAVAC?=javac
+JAVA?=java
+JAVAC?=javac
 
 export SHELL=/bin/bash -o pipefail
 
@@ -32,64 +35,29 @@ DEBUG :=
 default : all
 
 .PHONY: all
-all : $(DIFFS) abbreviated enum-imports ad-hoc issue155 system-test source-extension results
-
-.PHONY: abbreviated
-abbreviated:
-	${MAKE} -C abbreviated
-
-.PHONY: enum-imports
-enum-imports:
-	${MAKE} -C enum-imports
-
-.PHONY: ad-hoc
-ad-hoc:
-	${MAKE} -C ad-hoc
-
-.PHONY: issue155
-issue155:
-	${MAKE} -C issue155
-
-.PHONY: source-extension
-source-extension:
-	${MAKE} -C source-extension
-
-.PHONY: system-test
-system-test:
-	${MAKE} -C system-test
+all : $(DIFFS) results
 
 # Display results of all .diff files.
 .PHONY: results
-results: bin/VerifyDiffs.class
+results: ../bin/VerifyDiffs.class
+	@rm -rf output
 	@echo ""
 	@echo "=== RESULTS ==="
 	@echo ""
-	@$(JAVA) -cp bin VerifyDiffs --show_all
+	@$(JAVA) -cp bin:../bin VerifyDiffs --show_all
 
 # Remakes the little java program that checks and compares diffs
-bin/VerifyDiffs.class : VerifyDiffs.java
-	@$(JAVAC) -g -cp ../bincompile -d bin VerifyDiffs.java
-
-# Compiles all the test cases (be verbose about this).
-compile :
-	mkdir -p bin
-	$(XJAVAC) -g -cp ../bin -d bin *.java
-
-.PRECIOUS : bin/annotator/tests/%.class
-bin/annotator/tests/%.class: %.java
-	mkdir -p bin
-# Added "-Xlint:-options" to see if it permits Jenkins job to succeed, due to
-# problem "target value 1.8 is obsolete and will be removed in a future release"
-	$(XJAVAC) -Xlint:-options -g -cp bin:../annotation-file-utilities.jar -d bin -sourcepath . $*.java
+../bin/VerifyDiffs.class : ../VerifyDiffs.java
+	@$(JAVAC) -g -cp ../../bincompile -d ../bin ../VerifyDiffs.java
 
 # Actually runs the annotator to create the annotated java file.
 .PRECIOUS: %.output
-%.output: %.jaif %.java bin/annotator/tests/%.class ../lib/options-all-0.3.1.jar ../lib/plume-util-0.0.1.jar ../bin ../annotation-file-utilities.jar
+%.output: %.jaif %.java ../../lib/options-all-0.3.1.jar ../../lib/plume-util-0.0.1.jar ../../bin ../../annotation-file-utilities.jar
 	$(JAVA) \
-	-cp ../bin:../annotation-file-utilities.jar:bin \
+	-cp ../../bin:../bin:../../annotation-file-utilities.jar:bin \
 	annotator.Main \
 	${DEBUG} \
-	--abbreviate=false \
+	--abbreviate=true \
 	-d $*-output \
 	$*.jaif \
 	$*.java \
@@ -108,7 +76,3 @@ clean :
 	rm -f *.diff
 	rm -f *.log
 	rm -f *.output
-	(cd abbreviated && make clean)
-	(cd enum-imports && make clean)
-	(cd ad-hoc && make clean)
-	(cd issue155 && make clean)
