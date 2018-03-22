@@ -73,6 +73,6 @@ if [[ "${GROUP}" == "downstream" || "${GROUP}" == "all" ]]; then
     cd ../checker-framework-inference
     . ./.travis-build-without-test.sh
 
-    (cd ../checker-framework/framework && ant whole-program-inference-tests)
+    (cd ../checker-framework/framework && ../gradlew wholeProgramInferenceTests)
     (cd ../checker-framework-inference && ./gradlew dist && ./gradlew test)
 fi
