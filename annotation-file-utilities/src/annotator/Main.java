@@ -89,42 +89,46 @@ import com.sun.tools.javac.tree.JCTree;
  *
  * The <a name="command-line-options">command-line options</a> are as follows:
  * <!-- start options doc (DO NOT EDIT BY HAND) -->
+ *
  * <ul>
  *   <li id="optiongroup:General-options">General options
- *     <ul>
- *       <li id="option:outdir"><b>-d</b> <b>--outdir=</b><i>directory</i>. Directory in which output files are written. [default annotated/]</li>
- *       <li id="option:in-place"><b>-i</b> <b>--in-place=</b><i>boolean</i>. If true, overwrite original source files (making a backup first).
- *  Furthermore, if the backup files already exist, they are used instead
- *  of the .java files.  This behavior permits a user to tweak the .jaif
- *  file and re-run the annotator.
- *  <p>
- *
- *  Note that if the user runs the annotator with --in-place, makes edits,
- *  and then re-runs the annotator with this --in-place option, those
- *  edits are lost.  Similarly, if the user runs the annotator twice in a
- *  row with --in-place, only the last set of annotations will appear in
- *  the codebase at the end.
- *  <p>
- *
- *  To preserve changes when using the --in-place option, first remove the
- *  backup files.  Or, use the <tt>-d .</tt> option, which makes (and
- *  reads) no backup, instead of --in-place. [default false]</li>
- *       <li id="option:abbreviate"><b>-a</b> <b>--abbreviate=</b><i>boolean</i>. Abbreviate annotation names [default true]</li>
- *       <li id="option:comments"><b>-c</b> <b>--comments=</b><i>boolean</i>. Insert annotations in comments [default false]</li>
- *       <li id="option:omit-annotation"><b>-o</b> <b>--omit-annotation=</b><i>string</i>. Omit given annotation</li>
- *       <li id="option:nowarn"><b>--nowarn=</b><i>boolean</i>. Suppress warnings about disallowed insertions [default false]</li>
- *       <li id="option:convert-jaifs"><b>--convert-jaifs=</b><i>boolean</i>. Convert JAIFs to new format [default false]</li>
- *       <li id="option:help"><b>-h</b> <b>--help=</b><i>boolean</i>. Print usage information and exit [default false]</li>
- *     </ul>
- *   </li>
+ *       <ul>
+ *         <li id="option:outdir"><b>-d</b> <b>--outdir=</b><i>directory</i>. Directory in which
+ *             output files are written. [default annotated/]
+ *         <li id="option:in-place"><b>-i</b> <b>--in-place=</b><i>boolean</i>. If true, overwrite
+ *             original source files (making a backup first). Furthermore, if the backup files
+ *             already exist, they are used instead of the .java files. This behavior permits a user
+ *             to tweak the {@code .jaif} file and re-run the annotator. <p> Note that if the user
+ *             runs the annotator with --in-place, makes edits, and then re-runs the annotator with
+ *             this --in-place option, those edits are lost. Similarly, if the user runs the
+ *             annotator twice in a row with --in-place, only the last set of annotations will
+ *             appear in the codebase at the end. <p> To preserve changes when using the --in-place
+ *             option, first remove the backup files. Or, use the <tt>-d .</tt> option, which makes
+ *             (and reads) no backup, instead of --in-place. [default false]
+ *         <li id="option:abbreviate"><b>-a</b> <b>--abbreviate=</b><i>boolean</i>. Abbreviate
+ *             annotation names [default true]
+ *         <li id="option:comments"><b>-c</b> <b>--comments=</b><i>boolean</i>. Insert annotations
+ *             in comments [default false]
+ *         <li id="option:omit-annotation"><b>-o</b> <b>--omit-annotation=</b><i>string</i>. Omit
+ *             given annotation
+ *         <li id="option:nowarn"><b>--nowarn=</b><i>boolean</i>. Suppress warnings about disallowed
+ *             insertions [default false]
+ *         <li id="option:convert-jaifs"><b>--convert-jaifs=</b><i>boolean</i>. Convert JAIFs to AST
+ *             Path format [default false]
+ *         <li id="option:help"><b>-h</b> <b>--help=</b><i>boolean</i>. Print usage information and
+ *             exit [default false]
+ *       </ul>
  *   <li id="optiongroup:Debugging-options">Debugging options
- *     <ul>
- *       <li id="option:verbose"><b>-v</b> <b>--verbose=</b><i>boolean</i>. Verbose (print progress information) [default false]</li>
- *       <li id="option:debug"><b>--debug=</b><i>boolean</i>. Debug (print debug information) [default false]</li>
- *       <li id="option:print-error-stack"><b>--print-error-stack=</b><i>boolean</i>. Print error stack [default false]</li>
- *     </ul>
- *   </li>
+ *       <ul>
+ *         <li id="option:verbose"><b>-v</b> <b>--verbose=</b><i>boolean</i>. Verbose (print
+ *             progress information) [default false]
+ *         <li id="option:debug"><b>--debug=</b><i>boolean</i>. Debug (print debug information)
+ *             [default false]
+ *         <li id="option:print-error-stack"><b>--print-error-stack=</b><i>boolean</i>. Print error
+ *             stack [default false]
+ *       </ul>
  * </ul>
+ *
  * <!-- end options doc -->
  */
 public class Main {
@@ -137,7 +141,7 @@ public class Main {
   /**
    * If true, overwrite original source files (making a backup first).
    * Furthermore, if the backup files already exist, they are used instead
-   * of the .java files.  This behavior permits a user to tweak the .jaif
+   * of the .java files.  This behavior permits a user to tweak the {@code .jaif}
    * file and re-run the annotator.
    * <p>
    *

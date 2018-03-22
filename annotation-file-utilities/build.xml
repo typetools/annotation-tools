@@ -125,7 +125,7 @@
         docletpathref="libpath"
         failonerror="true"
         >
-      <doclet name="plume.OptionsDoclet">
+      <doclet name="org.plumelib.options.OptionsDoclet">
         <param name="-format" value="javadoc"/>
         <param name="-i"/>
         <param name="-docfile" value="src/annotator/Main.java"/>
@@ -138,7 +138,7 @@
         docletpathref="libpath"
         failonerror="true"
         >
-      <doclet name="plume.OptionsDoclet">
+      <doclet name="org.plumelib.options.OptionsDoclet">
         <param name="-format" value="html"/>
         <param name="-i"/>
         <param name="-docfile" value="annotation-file-utilities.html"/>
