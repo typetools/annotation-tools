@@ -8,7 +8,7 @@ if [[ "${GROUP}" == "" ]]; then
   export GROUP=all
 fi
 
-if [[ "${GROUP}" != "all" && "${GROUP}" != "test" && "${GROUP}" != "misc" ]]; then
+if [[ "${GROUP}" != "all" && "${GROUP}" != "test" && "${GROUP}" != "misc" && "${GROUP}" != "downstream" ]]; then
   echo "Bad argument '${GROUP}'; should be omitted or one of: all, test, misc."
   exit 1
 fi
@@ -53,4 +53,26 @@ if [[ "${GROUP}" == "misc" || "${GROUP}" == "all" ]]; then
   ant html-validate
 
   ant javadoc
+fi
+
+if [[ "${GROUP}" == "downstream" || "${GROUP}" == "all" ]]; then
+    # checker-framework and its downstream tests
+    set +e
+    echo "Running: git ls-remote https://github.com/${SLUGOWNER}/checker-framework-inference.git &>-"
+    git ls-remote https://github.com/${SLUGOWNER}/checker-framework-inference.git &>-
+    if [ "$?" -ne 0 ]; then
+        CFISLUGOWNER=typetools
+    else
+        CFISLUGOWNER=${SLUGOWNER}
+    fi
+    set -e
+    echo "Running:  (cd .. && git clone --depth 1 https://github.com/${CFISLUGOWNER}/checker-framework-inference.git)"
+    (cd .. && git clone --depth 1 https://github.com/${CFISLUGOWNER}/checker-framework-inference.git) || (cd .. && git clone --depth 1 https://github.com/${CFISLUGOWNER}/checker-framework-inference.git)
+    echo "... done: (cd .. && git clone --depth 1 https://github.com/${CFISLUGOWNER}/checker-framework-inference.git)"
+
+    cd ../checker-framework-inference
+    . ./.travis-build-without-test.sh
+
+    (cd ../checker-framework/framework && ../gradlew wholeProgramInferenceTests)
+    (cd ../checker-framework-inference && ./gradlew dist && ./gradlew test)
 fi

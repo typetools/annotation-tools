@@ -6,6 +6,7 @@
 	<classpathentry kind="lib" path="junit.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/asmx"/>
 	<classpathentry kind="lib" path="/annotation-file-utilities/lib/guava-20.0.jar"/>
-	<classpathentry kind="lib" path="/annotation-file-utilities/lib/plume-core.jar"/>
+	<classpathentry kind="lib" path="/annotation-file-utilities/lib/options-all-0.3.1.jar"/>
+	<classpathentry kind="lib" path="/annotation-file-utilities/lib/plume-util-0.0.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

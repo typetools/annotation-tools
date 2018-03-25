@@ -20,7 +20,7 @@ import scenelib.annotations.el.*;
 import com.sun.tools.javac.code.TargetType;
 import com.sun.tools.javac.code.TypeAnnotationPosition;
 
-import plume.FileIOException;
+import org.plumelib.util.FileIOException;
 
 /**
  * <code>JavapParser</code> provides a static method that parses a class dump

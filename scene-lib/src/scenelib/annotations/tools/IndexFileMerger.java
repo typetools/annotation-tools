@@ -12,7 +12,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
 import com.sun.tools.javac.main.CommandLine;
 
-import plume.FileIOException;
+import org.plumelib.util.FileIOException;
 import scenelib.annotations.Annotation;
 import scenelib.annotations.Annotations;
 import scenelib.annotations.el.ABlock;

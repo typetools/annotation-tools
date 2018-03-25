@@ -63,10 +63,13 @@ public final class ArrayAFT extends AnnotationFieldType {
     public String format(Object o) {
         Collection<?> asCollection = (Collection<?>)o;
         StringBuilder result = new StringBuilder();
+        boolean notfirst = false;
         result.append("{");
         for (Object elt : asCollection) {
-            if (result.length() > 1) {
-                result.append(",");
+            if (notfirst) {
+                result.append(", ");
+            } else {
+                notfirst = true;
             }
             result.append(elementType.format(elt));
         }

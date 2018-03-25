@@ -109,7 +109,7 @@ to read and write annotation files.
 </ul>
 
 <p>
-A diagram showing the interactions betweeen these tools is below.
+A diagram showing the interactions between these tools is below.
 </p>
 
 <div>
@@ -134,22 +134,22 @@ The following instructions assume either a Linux or Windows system using a comma
 
 <p>
 The current release is Annotation File Utilities version
-<!-- afu-version -->3.6.49, 02 Jan 2018<!-- /afu-version -->.
+<!-- afu-version -->3.6.51, 01 Mar 2018<!-- /afu-version -->.
 </p>
 
 <ol>
 <li>
   Download
-  <a href="annotation-tools-3.6.49.zip"><!-- annotation-tools-zip-version -->annotation-tools-3.6.49.zip<!-- /annotation-tools-zip-version --></a>.
+  <a href="annotation-tools-3.6.51.zip"><!-- annotation-tools-zip-version -->annotation-tools-3.6.51.zip<!-- /annotation-tools-zip-version --></a>.
 </li>
 
 <li>
-  Creade a directory named
+  Create a directory named
   <code>annotation-tools</code> by
   unpacking the distribution zipfile (a standard place to do this is in a
   directory <code>~/jsr308/</code>):
 
-  <pre><code>unzip annotation-tools-3.6.49.zip</code></pre>
+  <pre><code>unzip annotation-tools-3.6.51.zip</code></pre>
 
   The <code>annotation-tools</code> directory must be a sibling of the <code>jsr308-langtools</code>
   directory (available at <a href="https://checkerframework.org/jsr308/">https://checkerframework.org/jsr308/</a>).
@@ -383,11 +383,13 @@ The command-line options are as follows:
 <!-- start options doc (DO NOT EDIT BY HAND) -->
 <ul>
   <li id="optiongroup:General-options">General options
-    <ul>
-      <li id="option:outdir"><b>-d</b> <b>--outdir=</b><i>directory</i>. Directory in which output files are written. [default annotated/]</li>
-      <li id="option:in-place"><b>-i</b> <b>--in-place=</b><i>boolean</i>. If true, overwrite original source files (making a backup first).
+      <ul>
+            <li id="option:outdir"><b>-d</b> <b>--outdir=</b><i>directory</i>.
+             Directory in which output files are written. [default annotated/]
+            <li id="option:in-place"><b>-i</b> <b>--in-place=</b><i>boolean</i>.
+             If true, overwrite original source files (making a backup first).
  Furthermore, if the backup files already exist, they are used instead
- of the .java files.  This behavior permits a user to tweak the .jaif
+ of the .java files.  This behavior permits a user to tweak the <code>.jaif</code>
  file and re-run the annotator.
  <p>
 
@@ -399,23 +401,30 @@ The command-line options are as follows:
  <p>
 
  To preserve changes when using the --in-place option, first remove the
- backup files.  Or, use the <code>-d .</code> option, which makes (and
- reads) no backup, instead of --in-place. [default false]</li>
-      <li id="option:abbreviate"><b>-a</b> <b>--abbreviate=</b><i>boolean</i>. Abbreviate annotation names [default true]</li>
-      <li id="option:comments"><b>-c</b> <b>--comments=</b><i>boolean</i>. Insert annotations in comments [default false]</li>
-      <li id="option:omit-annotation"><b>-o</b> <b>--omit-annotation=</b><i>string</i>. Omit given annotation</li>
-      <li id="option:nowarn"><b>--nowarn=</b><i>boolean</i>. Suppress warnings about disallowed insertions [default false]</li>
-      <li id="option:convert-jaifs"><b>--convert-jaifs=</b><i>boolean</i>. Convert JAIFs to new format [default false]</li>
-      <li id="option:help"><b>-h</b> <b>--help=</b><i>boolean</i>. Print usage information and exit [default false]</li>
-    </ul>
-  </li>
+ backup files.  Or, use the <tt>-d .</tt> option, which makes (and
+ reads) no backup, instead of --in-place. [default false]
+            <li id="option:abbreviate"><b>-a</b> <b>--abbreviate=</b><i>boolean</i>.
+             Abbreviate annotation names [default true]
+            <li id="option:comments"><b>-c</b> <b>--comments=</b><i>boolean</i>.
+             Insert annotations in comments [default false]
+            <li id="option:omit-annotation"><b>-o</b> <b>--omit-annotation=</b><i>string</i>.
+             Omit given annotation
+            <li id="option:nowarn"><b>--nowarn=</b><i>boolean</i>.
+             Suppress warnings about disallowed insertions [default false]
+            <li id="option:convert-jaifs"><b>--convert-jaifs=</b><i>boolean</i>.
+             Convert JAIFs to AST Path format [default false]
+            <li id="option:help"><b>-h</b> <b>--help=</b><i>boolean</i>.
+             Print usage information and exit [default false]
+      </ul>
   <li id="optiongroup:Debugging-options">Debugging options
-    <ul>
-      <li id="option:verbose"><b>-v</b> <b>--verbose=</b><i>boolean</i>. Verbose (print progress information) [default false]</li>
-      <li id="option:debug"><b>--debug=</b><i>boolean</i>. Debug (print debug information) [default false]</li>
-      <li id="option:print-error-stack"><b>--print-error-stack=</b><i>boolean</i>. Print error stack [default false]</li>
-    </ul>
-  </li>
+      <ul>
+            <li id="option:verbose"><b>-v</b> <b>--verbose=</b><i>boolean</i>.
+             Verbose (print progress information) [default false]
+            <li id="option:debug"><b>--debug=</b><i>boolean</i>.
+             Debug (print debug information) [default false]
+            <li id="option:print-error-stack"><b>--print-error-stack=</b><i>boolean</i>.
+             Print error stack [default false]
+      </ul>
 </ul>
 <!-- end options doc -->
 
@@ -638,5 +647,11 @@ The <a href="changelog.html">changelog</a> describes what is new in each release
 </body>
 </html>
 
-<!--  LocalWords:  utils bashrc tcsh tcshrc cshrc classpath
+<!--  LocalWords:  utils bashrc tcsh tcshrc cshrc classpath Asmx zipfile
+ -->
+<!--  LocalWords:  MacOS argfile JAIFs nl GenericArrayLocationCriterion un
+ -->
+<!--  LocalWords:  pushNonezeroRing nullary outdir boolean jaif nowarn ASM
+ -->
+<!--  LocalWords:  jaifs classfile afu
  -->

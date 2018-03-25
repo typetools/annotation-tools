@@ -24,9 +24,9 @@ if [ "$DEBUG" = "1" ]; then
   echo "LANGTOOLS=${LANGTOOLS}"
   echo "JAVAC_JAR=${JAVAC_JAR}"
   # Keep this in sync with the actual command below.
-  echo java -ea -cp ${JAVAC_JAR}:${AFU}/lib/plume-core.jar:${ANNOTATION_FILE_UTILS}:${CLASSPATH} scenelib.annotations.io.classfile.ClassFileReader "$@"
+  echo java -ea -cp ${JAVAC_JAR}:${AFU}/lib/options-all-0.3.1.jar:${AFU}/lib/plume-util-0.0.1.jar:${ANNOTATION_FILE_UTILS}:${CLASSPATH} scenelib.annotations.io.classfile.ClassFileReader "$@"
   echo "--- end of extract-annotations debugging output"
 fi
 
 # Needs CLASSPATH to find user files
-java -ea -cp ${JAVAC_JAR}:${AFU}/lib/plume-core.jar:${ANNOTATION_FILE_UTILS}:${CLASSPATH} scenelib.annotations.io.classfile.ClassFileReader "$@"
+java -ea -cp ${JAVAC_JAR}:${AFU}/lib/options-all-0.3.1.jar:${AFU}/lib/plume-util-0.0.1.jar:${ANNOTATION_FILE_UTILS}:${CLASSPATH} scenelib.annotations.io.classfile.ClassFileReader "$@"

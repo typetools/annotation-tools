@@ -1293,7 +1293,8 @@ loop:
     static Type javacTypeToType(final com.sun.tools.javac.code.Type jtype) {
       switch (jtype.getKind()) {
       case ARRAY:
-        return new ArrayType(javacTypeToType(((com.sun.tools.javac.code.Type.ArrayType) jtype).elemtype));
+        com.sun.tools.javac.code.Type.ArrayType arraytype = (com.sun.tools.javac.code.Type.ArrayType) jtype;
+        return new ArrayType(javacTypeToType(arraytype.elemtype));
       case DECLARED:
         {
           com.sun.tools.javac.code.Type t = jtype;
@@ -1346,7 +1347,10 @@ loop:
       case FLOAT:
       case INT:
         return new DeclaredType(jtype.tsym.name.toString());
-        // case ERROR:
+      case ERROR:
+        // Return a fake declared type that corresponds to the error.
+        // This ignores setup problems where some classes can't be found.
+        return new DeclaredType(jtype.toString());
         // case EXECUTABLE:
         // case NONE:
         // case NULL:
@@ -1354,7 +1358,7 @@ loop:
         // case PACKAGE:
         // case VOID:
       default:
-        throw new Error();
+        throw new Error("Found unknown type: " + jtype + " (" + jtype.getKind() + "). Check your setup.");
       }
     }
 

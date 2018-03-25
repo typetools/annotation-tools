@@ -74,7 +74,7 @@ import annotator.Main;
 import annotator.scanner.CommonScanner;
 import annotator.specification.IndexFileSpecification;
 
-import plume.Pair;
+import org.plumelib.util.Pair;
 
 import scenelib.type.DeclaredType;
 import scenelib.type.Type;

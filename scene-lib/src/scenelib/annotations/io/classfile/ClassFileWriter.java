@@ -10,8 +10,8 @@ import com.sun.tools.javac.main.CommandLine;
 
 import org.objectweb.asm.ClassReader;
 
-import plume.Option;
-import plume.Options;
+import org.plumelib.options.Option;
+import org.plumelib.options.Options;
 
 import scenelib.annotations.el.AScene;
 import scenelib.annotations.io.IndexFileParser;
@@ -68,7 +68,7 @@ public class ClassFileWriter {
 
     try {
       String[] cl_args = CommandLine.parse(args);
-      file_args = options.parse_or_usage(cl_args);
+      file_args = options.parse(true, cl_args);
     } catch (IOException ex) {
       System.err.println(ex);
       System.err.println("(For non-argfile beginning with \"@\", use \"@@\" for initial \"@\".");
@@ -83,18 +83,20 @@ public class ClassFileWriter {
                         ClassFileReader.INDEX_UTILS_VERSION);
     }
     if (help) {
-      options.print_usage();
+      options.printUsage();
     }
     if (version || help) {
       System.exit(-1);
     }
 
     if (file_args.length == 0) {
-      options.print_usage("No arguments given.");
+      System.out.println("No arguments given.");
+      options.printUsage();
       System.exit(-1);
     }
     if (file_args.length % 2 == 1) {
-      options.print_usage("Must supply an even number of arguments.");
+      System.out.println("Must supply an even number of arguments.");
+      options.printUsage();
       System.exit(-1);
     }
 

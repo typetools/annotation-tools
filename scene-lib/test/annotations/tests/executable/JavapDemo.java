@@ -6,7 +6,7 @@ import org.checkerframework.checker.nullness.qual.*;
 
 import java.io.*;
 
-import plume.FileIOException;
+import org.plumelib.util.FileIOException;
 
 import scenelib.annotations.el.*;
 import scenelib.annotations.io.*;

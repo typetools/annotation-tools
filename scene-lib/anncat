@@ -8,5 +8,5 @@ ASMX=$WORKSPACE/asmx
 
 JAVAC_JAR=${JAVAC_JAR:-${SCENE_LIB}/../../jsr308-langtools/dist/lib/javac.jar}
 
-export CLASSPATH=${JAVAC_JAR}:$SCENE_LIB/bin:$ASMX/bin:$WORKSPACE/annotation-file-utilities/lib/plume-core.jar:$CLASSPATH
+export CLASSPATH=${JAVAC_JAR}:$SCENE_LIB/bin:$ASMX/bin:$WORKSPACE/annotation-file-utilities/lib/plume-util-0.0.1.jar:$CLASSPATH
 java scenelib.annotations.tools.Anncat "$@"

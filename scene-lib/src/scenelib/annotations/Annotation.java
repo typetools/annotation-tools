@@ -8,6 +8,7 @@ import scenelib.annotations.el.AnnotationDef;
 import scenelib.annotations.field.AnnotationFieldType;
 
 import java.util.*;
+import java.util.Map.Entry;
 import java.lang.reflect.*;
 
 
@@ -230,22 +231,38 @@ public final class Annotation {
     }
 
     /**
-     * Returns a string representation of this for
-     * debugging purposes.  For now, this method relies on
-     * {@link AbstractMap#toString} and the {@link Object#toString toString}
-     * methods of the field values, so the representation is only a first
-     * approximation to how the annotation would appear in source code.
+     * Returns a string representation of this annotation, using
+     * valid Java syntax.
      */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("@");
-        sb.append(def.name);
-        if (!fieldValues.isEmpty()) {
-            sb.append('(');
-            sb.append(fieldValues.toString());
-            sb.append(')');
+        // TODO: reduce duplication with annotator.specification.IndexFileSpecification.getElementAnnotations(AElement)
+        StringBuilder result = new StringBuilder();
+        // TODO: figure out how to consider abbreviated annotation names.
+        // See annotator.find.AnnotationInsertion.getText(boolean, boolean)
+        result.append("@" + def.name);
+        if (fieldValues.size() == 1 && fieldValues.containsKey("value")) {
+            AnnotationFieldType fieldType = def.fieldTypes.get("value");
+            result.append('(');
+            result.append(fieldType.format(fieldValues.get("value")));
+            result.append(')');
+        } else if (fieldValues.size() > 0) {
+            result.append('(');
+            boolean notfirst = false;
+            for (Entry<String, Object> field : fieldValues.entrySet()) {
+                // parameters of the annotation
+                if (notfirst) {
+                    result.append(", ");
+                } else {
+                    notfirst = true;
+                }
+                result.append(field.getKey() + "=");
+                AnnotationFieldType fieldType = def.fieldTypes.get(field.getKey());
+                result.append(fieldType.format(field.getValue()));
+            }
+            result.append(')');
         }
-        return sb.toString();
+        return result.toString();
     }
 
 }
