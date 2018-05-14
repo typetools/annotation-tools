@@ -66,18 +66,18 @@ import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
 import com.sun.tools.javac.tree.JCTree.JCWildcard;
 import com.sun.tools.javac.util.Position;
 
-import annotations.io.ASTIndex;
-import annotations.io.ASTPath;
-import annotations.io.ASTRecord;
-import annotations.io.DebugWriter;
+import scenelib.annotations.io.ASTIndex;
+import scenelib.annotations.io.ASTPath;
+import scenelib.annotations.io.ASTRecord;
+import scenelib.annotations.io.DebugWriter;
 import annotator.Main;
 import annotator.scanner.CommonScanner;
 import annotator.specification.IndexFileSpecification;
 
-import plume.Pair;
+import org.plumelib.util.Pair;
 
-import type.DeclaredType;
-import type.Type;
+import scenelib.type.DeclaredType;
+import scenelib.type.Type;
 
 /**
  * A {@link TreeScanner} that is able to locate program elements in an
@@ -323,7 +323,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       JCVariableDecl jn = (JCVariableDecl) node;
       JCTree jt = jn.getType();
       Criteria criteria = ins.getCriteria();
-      dbug.debug("visitVariable: %s %s%n", jt, jt.getClass());
+      dbug.debug("TypePositionFinder.visitVariable: %s %s%n", jt, jt.getClass());
       if (name != null && criteria.isOnFieldDeclaration()) {
         return Pair.of(astRecord(node), jn.getStartPosition());
       }
@@ -957,24 +957,32 @@ loop:
   /**
    * Scans this tree, using the list of insertions to generate the source
    * position to insertion text mapping.  Insertions are removed from the
-   * list when positions are found for them.
+   * list when positions are found for them.  Thus, they are inserted at the
+   * first location (the one highest in the tree) that they match.
+   *
+   * <p>When a match is found, this routine removes the insertion from p and
+   * adds it to the insertions map as a value, with a key that is a pair.
+   * On return, p contains only the insertions for which no match was found.
    *
    * @param node AST node being considered for annotation insertions
    * @param p list of insertions not yet placed
-   * <p>
-   * When a match is found, this routine removes the insertion from p and
-   * adds it to the insertions map as a value, with a key that is a pair.
-   * On return, p contains only the insertions for which no match was found.
    */
   @Override
   public Void scan(Tree node, List<Insertion> p) {
-    if (node == null) {
+    if (node == null || p.isEmpty()) {
       return null;
     }
 
-    dbug.debug("SCANNING: %s %s%n", node.getKind(), node);
+    dbug.debug("TreeFinder.scan(%s, %d insertions):%n%s%n", node.getKind(), p.size(), node);
+    if (annotator.Main.temporaryDebug) {
+      new Error("backtrace at TreeFinder.scan()").printStackTrace();
+    }
     if (! handled(node)) {
-      dbug.debug("Not handled, skipping (%s): %s%n", node.getClass(), node);
+      String nodeString = node.toString();
+      if (nodeString.equals("")) {
+        nodeString = "<empty>";
+      }
+      dbug.debug("TreeFinder.scan(%s) skipping, unhandled: %s%n", node.getClass(), node);
       // nothing to do
       return super.scan(node, p);
     }
@@ -1001,18 +1009,20 @@ loop:
       }
     }
 
+    dbug.debug("Considering %d insertions.%n", p.size());
     for (Iterator<Insertion> it = p.iterator(); it.hasNext(); ) {
       Insertion i = it.next();
-      if (i.getInserted()) {
-        // Skip this insertion if it has already been inserted. See
-        // the ReceiverInsertion class for details.
-        it.remove();
-        continue;
-      }
       dbug.debug("Considering insertion at tree:%n");
       dbug.debug("  Insertion: %s%n", i);
       dbug.debug("  First line of node: %s%n", Main.firstLine(node.toString()));
       dbug.debug("  Type of node: %s%n", node.getClass());
+      if (i.isInserted()) {
+        // Skip this insertion if it has already been inserted. See
+        // the ReceiverInsertion class for details.
+        dbug.debug("  ... already inserted%n");
+        it.remove();
+        continue;
+      }
       if (!i.getCriteria().isSatisfiedBy(path, node)) {
         dbug.debug("  ... not satisfied%n");
         continue;
@@ -1022,6 +1032,7 @@ loop:
         dbug.debug("    Type of node: %s%n", node.getClass());
 
         ASTPath astPath = i.getCriteria().getASTPath();
+        dbug.debug("    astPath = %s%n", astPath);
         Integer pos = astPath == null ? findPosition(path, i)
             : Main.convert_jaifs ? null  // already in correct form
             : findPositionByASTPath(astPath, path, i);
@@ -1187,17 +1198,17 @@ loop:
           // looking for the receiver or the declaration
           typeScan = i.getCriteria().isOnReceiver();
         } else if (CommonScanner.hasClassKind(node)) { // ClassTree
-          typeScan = ! i.getSeparateLine(); // hacky check
+          typeScan = ! i.isSeparateLine(); // hacky check
         }
         if (typeScan) {
           // looking for the type
-          dbug.debug("Calling tpf.scan(%s: %s)%n", node.getClass(), node);
+          dbug.debug("Calling tpf.scan(%s: %s, %s)%n", node.getClass(), node, i);
           Pair<ASTRecord, Integer> pair = tpf.scan(node, i);
           insertRecord = pair.a;
           pos = pair.b;
           assert handled(node);
-          dbug.debug("pos = %d at type: %s (%s)%n", pos,
-              node.toString(), node.getClass());
+          dbug.debug("pos = %d (insertRecord=%s) at type: %s (%s)%n",
+                     pos, insertRecord, node.toString(), node.getClass());
         } else if (node.getKind() == Tree.Kind.METHOD
             && i.getKind() == Insertion.Kind.CONSTRUCTOR
             && (((JCMethodDecl) node).mods.flags & Flags.GENERATEDCONSTR) != 0) {
@@ -1230,7 +1241,7 @@ loop:
   Integer findPositionByASTPath(ASTPath astPath, TreePath path, Insertion i) {
     Tree node = path.getLeaf();
     try {
-      ASTPath.ASTEntry entry = astPath.get(-1);
+      ASTPath.ASTEntry entry = astPath.getLast();
       // As per the JSR308 specification, receiver parameters are not allowed
       // on method declarations of anonymous inner classes.
       if (entry.getTreeKind() == Tree.Kind.METHOD
@@ -1368,7 +1379,7 @@ loop:
         Type t = ((CastInsertion) i).getType();
         JCTree jcTree = (JCTree) node;
         if (jcTree.getKind() == Tree.Kind.VARIABLE && !astPath.isEmpty()
-            && astPath.get(-1).childSelectorIs(ASTPath.INITIALIZER)) {
+            && astPath.getLast().childSelectorIs(ASTPath.INITIALIZER)) {
           node = ((JCVariableDecl) node).getInitializer();
           if (node == null) { return null; }
           jcTree = (JCTree) node;
@@ -1380,7 +1391,7 @@ loop:
               if (jcTree.type instanceof NullType) {
                 dt.setName("Object");
               } else {
-                t = Insertions.TypeTree.conv(jcTree.type);
+                t = Insertions.TypeTree.javacTypeToType(jcTree.type);
                 t.setAnnotations(dt.getAnnotations());
                 ((CastInsertion) i).setType(t);
               }
@@ -1389,7 +1400,7 @@ loop:
       } else if (i.getKind() == Insertion.Kind.CLOSE_PARENTHESIS) {
         JCTree jcTree = (JCTree) node;
         if (jcTree.getKind() == Tree.Kind.VARIABLE && !astPath.isEmpty()
-            && astPath.get(-1).childSelectorIs(ASTPath.INITIALIZER)) {
+            && astPath.getLast().childSelectorIs(ASTPath.INITIALIZER)) {
           node = ((JCVariableDecl) node).getInitializer();
           if (node == null) { return null; }
           jcTree = (JCTree) node;
@@ -1401,7 +1412,7 @@ loop:
           // looking for the receiver or the declaration
           typeScan = IndexFileSpecification.isOnReceiver(i.getCriteria());
         } else if (node.getKind() == Tree.Kind.CLASS) { // ClassTree
-          typeScan = ! i.getSeparateLine(); // hacky check
+          typeScan = ! i.isSeparateLine(); // hacky check
         }
         if (typeScan) {
           // looking for the type
@@ -1515,6 +1526,8 @@ loop:
    */
   private boolean alreadyPresent(TreePath path, Insertion ins) {
     List<? extends AnnotationTree> alreadyPresent = null;
+    // non-null if the previously-visited node was an ExpressionTree
+    ExpressionTree childExpression = null;
     if (path != null) {
       for (Tree n : path) {
         if (n.getKind() == Tree.Kind.CLASS) {
@@ -1524,7 +1537,11 @@ loop:
           alreadyPresent = ((MethodTree) n).getModifiers().getAnnotations();
           break;
         } else if (n.getKind() == Tree.Kind.VARIABLE) {
-          alreadyPresent = ((VariableTree) n).getModifiers().getAnnotations();
+          VariableTree vt = (VariableTree) n;
+          if (childExpression != null && vt.getInitializer() == childExpression) {
+            break;
+          }
+          alreadyPresent = vt.getModifiers().getAnnotations();
           break;
         } else if (n.getKind() == Tree.Kind.TYPE_CAST) {
           Tree type = ((TypeCastTree) n).getType();
@@ -1558,8 +1575,15 @@ loop:
           alreadyPresent = ((AnnotatedTypeTree) n).getAnnotations();
           break;
         }
+
+        childExpression = (n instanceof ExpressionTree) ? (ExpressionTree) n : null;
         // TODO: don't add cast insertion if it's already present.
       }
+    }
+
+    if (annotator.Main.temporaryDebug) {
+      Tree leaf = path.getLeaf();
+      System.out.printf("alreadyPresent(%s, %s)%n  leaf (%s) = %s%n  => %s%n", path, ins, leaf.getKind(), leaf, alreadyPresent);
     }
 
     if (alreadyPresent != null) {
@@ -1717,7 +1741,7 @@ loop:
     DeclaredType baseType = neu.getBaseType();
     if (baseType.getName().isEmpty()) {
       List<String> annotations = neu.getType().getAnnotations();
-      Type newType = Insertions.TypeTree.conv(
+      Type newType = Insertions.TypeTree.javacTypeToType(
           ((JCTree.JCNewArray) newArray).type);
       for (String ann : annotations) {
         newType.addAnnotation(ann);
@@ -1773,7 +1797,6 @@ loop:
    *
    * <p>
    * <i>N.B.:</i> This method calls {@code scan()} internally.
-   * </p>
    *
    * @param node the tree to scan
    * @param p the list of insertion criteria
@@ -1834,12 +1857,28 @@ loop:
   getPositions(JCCompilationUnit node, Insertions insertions) {
     List<Insertion> list = new ArrayList<Insertion>();
     treePathCache.clear();
+    if (annotator.Main.temporaryDebug) {
+      System.out.println("insertions size: " + insertions.size());
+      System.out.println("insertions.forOuterClass(\"\") size: " + insertions.forOuterClass(node, "").size());
+      System.out.println("list pre-size: " + list.size());
+    }
     list.addAll(insertions.forOuterClass(node, ""));
+    if (annotator.Main.temporaryDebug) {
+      System.out.println("list post-size: " + list.size());
+    }
     for (JCTree decl : node.getTypeDecls()) {
       if (decl.getTag() == JCTree.Tag.CLASSDEF) {
         String name = ((JCClassDecl) decl).sym.className();
         Collection<Insertion> forClass = insertions.forOuterClass(node, name);
+        if (annotator.Main.temporaryDebug) {
+          System.out.println("insertions size: " + insertions.size());
+          System.out.println("insertions.forOuterClass("+name+") size: " + forClass.size());
+          System.out.println("list pre-size: " + list.size());
+        }
         list.addAll(forClass);
+        if (annotator.Main.temporaryDebug) {
+          System.out.println("list post-size: " + list.size());
+        }
       }
     }
     return getInsertionsByPosition(node, list);

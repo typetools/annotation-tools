@@ -6,9 +6,9 @@ import org.checkerframework.checker.nullness.qual.*;
 
 import java.io.*;
 
-import annotations.el.*;
-import annotations.io.*;
-import annotations.io.classfile.*;
+import scenelib.annotations.el.*;
+import scenelib.annotations.io.*;
+import scenelib.annotations.io.classfile.*;
 
 /**
  * A(n) <code>ClassToIndexDemo</code> is/represents ...

@@ -2,7 +2,7 @@ package annotator.find;
 
 import java.util.List;
 
-import annotations.el.TypeIndexLocation;
+import scenelib.annotations.el.TypeIndexLocation;
 import annotator.scanner.CommonScanner;
 
 import com.sun.source.tree.ClassTree;
@@ -30,7 +30,10 @@ public class ExtImplsLocationCriterion implements Criterion {
   /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path, Tree leaf) {
-    assert path == null || path.getLeaf() == leaf;
+    if (path == null) {
+      return false;
+    }
+    assert path.getLeaf() == leaf;
     return isSatisfiedBy(path);
   }
 

@@ -19,35 +19,35 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import plume.FileIOException;
-import plume.Option;
-import plume.OptionGroup;
-import plume.Options;
-import plume.Pair;
-import plume.UtilMDE;
-import type.Type;
-import annotations.Annotation;
-import annotations.el.ABlock;
-import annotations.el.AClass;
-import annotations.el.ADeclaration;
-import annotations.el.AElement;
-import annotations.el.AExpression;
-import annotations.el.AField;
-import annotations.el.AMethod;
-import annotations.el.AScene;
-import annotations.el.ATypeElement;
-import annotations.el.ATypeElementWithType;
-import annotations.el.AnnotationDef;
-import annotations.el.DefException;
-import annotations.el.ElementVisitor;
-import annotations.el.LocalLocation;
-import annotations.io.ASTIndex;
-import annotations.io.ASTPath;
-import annotations.io.ASTRecord;
-import annotations.io.DebugWriter;
-import annotations.io.IndexFileParser;
-import annotations.io.IndexFileWriter;
-import annotations.util.coll.VivifyingMap;
+import org.plumelib.options.Option;
+import org.plumelib.options.OptionGroup;
+import org.plumelib.options.Options;
+import org.plumelib.util.FileIOException;
+import org.plumelib.util.UtilPlume;
+import org.plumelib.util.Pair;
+import scenelib.type.Type;
+import scenelib.annotations.Annotation;
+import scenelib.annotations.el.ABlock;
+import scenelib.annotations.el.AClass;
+import scenelib.annotations.el.ADeclaration;
+import scenelib.annotations.el.AElement;
+import scenelib.annotations.el.AExpression;
+import scenelib.annotations.el.AField;
+import scenelib.annotations.el.AMethod;
+import scenelib.annotations.el.AScene;
+import scenelib.annotations.el.ATypeElement;
+import scenelib.annotations.el.ATypeElementWithType;
+import scenelib.annotations.el.AnnotationDef;
+import scenelib.annotations.el.DefException;
+import scenelib.annotations.el.ElementVisitor;
+import scenelib.annotations.el.LocalLocation;
+import scenelib.annotations.io.ASTIndex;
+import scenelib.annotations.io.ASTPath;
+import scenelib.annotations.io.ASTRecord;
+import scenelib.annotations.io.DebugWriter;
+import scenelib.annotations.io.IndexFileParser;
+import scenelib.annotations.io.IndexFileWriter;
+import scenelib.annotations.util.coll.VivifyingMap;
 import annotator.find.AnnotationInsertion;
 import annotator.find.CastInsertion;
 import annotator.find.ConstructorInsertion;
@@ -89,42 +89,46 @@ import com.sun.tools.javac.tree.JCTree;
  *
  * The <a name="command-line-options">command-line options</a> are as follows:
  * <!-- start options doc (DO NOT EDIT BY HAND) -->
+ *
  * <ul>
  *   <li id="optiongroup:General-options">General options
- *     <ul>
- *       <li id="option:outdir"><b>-d</b> <b>--outdir=</b><i>directory</i>. Directory in which output files are written. [default annotated/]</li>
- *       <li id="option:in-place"><b>-i</b> <b>--in-place=</b><i>boolean</i>. If true, overwrite original source files (making a backup first).
- *  Furthermore, if the backup files already exist, they are used instead
- *  of the .java files.  This behavior permits a user to tweak the .jaif
- *  file and re-run the annotator.
- *  <p>
- *
- *  Note that if the user runs the annotator with --in-place, makes edits,
- *  and then re-runs the annotator with this --in-place option, those
- *  edits are lost.  Similarly, if the user runs the annotator twice in a
- *  row with --in-place, only the last set of annotations will appear in
- *  the codebase at the end.
- *  <p>
- *
- *  To preserve changes when using the --in-place option, first remove the
- *  backup files.  Or, use the <tt>-d .</tt> option, which makes (and
- *  reads) no backup, instead of --in-place. [default false]</li>
- *       <li id="option:abbreviate"><b>-a</b> <b>--abbreviate=</b><i>boolean</i>. Abbreviate annotation names [default true]</li>
- *       <li id="option:comments"><b>-c</b> <b>--comments=</b><i>boolean</i>. Insert annotations in comments [default false]</li>
- *       <li id="option:omit-annotation"><b>-o</b> <b>--omit-annotation=</b><i>string</i>. Omit given annotation</li>
- *       <li id="option:nowarn"><b>--nowarn=</b><i>boolean</i>. Suppress warnings about disallowed insertions [default false]</li>
- *       <li id="option:convert-jaifs"><b>--convert-jaifs=</b><i>boolean</i>. Convert JAIFs to new format [default false]</li>
- *       <li id="option:help"><b>-h</b> <b>--help=</b><i>boolean</i>. Print usage information and exit [default false]</li>
- *     </ul>
- *   </li>
+ *       <ul>
+ *         <li id="option:outdir"><b>-d</b> <b>--outdir=</b><i>directory</i>. Directory in which
+ *             output files are written. [default annotated/]
+ *         <li id="option:in-place"><b>-i</b> <b>--in-place=</b><i>boolean</i>. If true, overwrite
+ *             original source files (making a backup first). Furthermore, if the backup files
+ *             already exist, they are used instead of the .java files. This behavior permits a user
+ *             to tweak the {@code .jaif} file and re-run the annotator. <p> Note that if the user
+ *             runs the annotator with --in-place, makes edits, and then re-runs the annotator with
+ *             this --in-place option, those edits are lost. Similarly, if the user runs the
+ *             annotator twice in a row with --in-place, only the last set of annotations will
+ *             appear in the codebase at the end. <p> To preserve changes when using the --in-place
+ *             option, first remove the backup files. Or, use the <tt>-d .</tt> option, which makes
+ *             (and reads) no backup, instead of --in-place. [default false]
+ *         <li id="option:abbreviate"><b>-a</b> <b>--abbreviate=</b><i>boolean</i>. Abbreviate
+ *             annotation names [default true]
+ *         <li id="option:comments"><b>-c</b> <b>--comments=</b><i>boolean</i>. Insert annotations
+ *             in comments [default false]
+ *         <li id="option:omit-annotation"><b>-o</b> <b>--omit-annotation=</b><i>string</i>. Omit
+ *             given annotation
+ *         <li id="option:nowarn"><b>--nowarn=</b><i>boolean</i>. Suppress warnings about disallowed
+ *             insertions [default false]
+ *         <li id="option:convert-jaifs"><b>--convert-jaifs=</b><i>boolean</i>. Convert JAIFs to AST
+ *             Path format [default false]
+ *         <li id="option:help"><b>-h</b> <b>--help=</b><i>boolean</i>. Print usage information and
+ *             exit [default false]
+ *       </ul>
  *   <li id="optiongroup:Debugging-options">Debugging options
- *     <ul>
- *       <li id="option:verbose"><b>-v</b> <b>--verbose=</b><i>boolean</i>. Verbose (print progress information) [default false]</li>
- *       <li id="option:debug"><b>--debug=</b><i>boolean</i>. Debug (print debug information) [default false]</li>
- *       <li id="option:print-error-stack"><b>--print-error-stack=</b><i>boolean</i>. Print error stack [default false]</li>
- *     </ul>
- *   </li>
+ *       <ul>
+ *         <li id="option:verbose"><b>-v</b> <b>--verbose=</b><i>boolean</i>. Verbose (print
+ *             progress information) [default false]
+ *         <li id="option:debug"><b>--debug=</b><i>boolean</i>. Debug (print debug information)
+ *             [default false]
+ *         <li id="option:print-error-stack"><b>--print-error-stack=</b><i>boolean</i>. Print error
+ *             stack [default false]
+ *       </ul>
  * </ul>
+ *
  * <!-- end options doc -->
  */
 public class Main {
@@ -137,7 +141,7 @@ public class Main {
   /**
    * If true, overwrite original source files (making a backup first).
    * Furthermore, if the backup files already exist, they are used instead
-   * of the .java files.  This behavior permits a user to tweak the .jaif
+   * of the .java files.  This behavior permits a user to tweak the {@code .jaif}
    * file and re-run the annotator.
    * <p>
    *
@@ -186,6 +190,9 @@ public class Main {
 
   @Option("Print error stack")
   public static boolean print_error_stack = false;
+
+  // TODO: remove this.
+  public static boolean temporaryDebug = false;
 
   private static ElementVisitor<Void, AElement> classFilter =
       new ElementVisitor<Void, AElement>() {
@@ -239,9 +246,9 @@ public class Main {
           el0.insertTypecasts.entrySet()) {
         ASTPath p = entry.getKey();
         ATypeElementWithType e = entry.getValue();
-        type.Type type = e.getType();
-        if (type instanceof type.DeclaredType
-            && ((type.DeclaredType) type).getName().isEmpty()) {
+        scenelib.type.Type type = e.getType();
+        if (type instanceof scenelib.type.DeclaredType
+            && ((scenelib.type.DeclaredType) type).getName().isEmpty()) {
           insertAnnotations.put(p, e);
           // visitTypeElement(e, insertAnnotations.vivify(p));
         } else {
@@ -325,7 +332,7 @@ public class Main {
       switch (tpe.tag) {
       case ARRAY:
         if (!astPath.isEmpty()) {
-          entry = astPath.get(-1);
+          entry = astPath.getLast();
           if (entry.getTreeKind() == Tree.Kind.NEW_ARRAY
               && entry.childSelectorIs(ASTPath.TYPE)) {
             entry = new ASTPath.ASTEntry(Tree.Kind.NEW_ARRAY,
@@ -448,7 +455,7 @@ public class Main {
         if (rec.astPath.isEmpty()) {
           el = decl;
         } else if (ins.getKind() == Insertion.Kind.CAST) {
-          annotations.el.ATypeElementWithType elem =
+          scenelib.annotations.el.ATypeElementWithType elem =
               decl.insertTypecasts.vivify(rec.astPath);
           elem.setType(((CastInsertion) ins).getType());
           el = elem;
@@ -498,7 +505,7 @@ public class Main {
 
     if (verbose) {
       System.out.printf("insert-annotations-to-source (%s)",
-                        annotations.io.classfile.ClassFileReader.INDEX_UTILS_VERSION);
+                        scenelib.annotations.io.classfile.ClassFileReader.INDEX_UTILS_VERSION);
     }
 
     Options options = new Options(
@@ -508,7 +515,7 @@ public class Main {
     String[] file_args;
     try {
       String[] cl_args = CommandLine.parse(args);
-      file_args = options.parse_or_usage(cl_args);
+      file_args = options.parse(true, cl_args);
     } catch (IOException ex) {
       System.err.println(ex);
       System.err.println("(For non-argfile beginning with \"@\", use \"@@\" for initial \"@\".");
@@ -529,17 +536,19 @@ public class Main {
     Criteria.dbug.setEnabled(debug);
 
     if (help) {
-      options.print_usage();
+      options.printUsage();
       System.exit(0);
     }
 
     if (in_place && outdir != "annotated/") { // interned
-      options.print_usage("The --outdir and --in-place options are mutually exclusive.");
+      System.out.println("The --outdir and --in-place options are mutually exclusive.");
+      options.printUsage();
       System.exit(1);
     }
 
     if (file_args.length < 2) {
-      options.print_usage("Supplied %d arguments, at least 2 needed%n", file_args.length);
+      System.out.printf("Supplied %d arguments, at least 2 needed%n", file_args.length);
+      options.printUsage();
       System.exit(1);
     }
 
@@ -568,6 +577,12 @@ public class Main {
         IndexFileSpecification spec = new IndexFileSpecification(arg);
         try {
           List<Insertion> parsedSpec = spec.parse();
+          if (temporaryDebug) {
+            System.out.printf("parsedSpec (size %d):%n", parsedSpec.size());
+            for (Insertion insertion : parsedSpec) {
+              System.out.printf("  %s, isInserted=%s%n", insertion, insertion.isInserted());
+            }
+          }
           AScene scene = spec.getScene();
           Collections.sort(parsedSpec, new Comparator<Insertion>() {
             @Override
@@ -637,11 +652,12 @@ public class Main {
     }
 
     if (dbug.isEnabled()) {
+      dbug.debug("In annotator.Main:%n");
       dbug.debug("%d insertions, %d .java files%n",
           insertions.size(), javafiles.size());
       dbug.debug("Insertions:%n");
       for (Insertion insertion : insertions) {
-        dbug.debug("  %s%n", insertion);
+        dbug.debug("  %s, isInserted=%s%n", insertion, insertion.isInserted());
       }
     }
 
@@ -671,7 +687,7 @@ public class Main {
       // Get the source file, and use it to obtain parse trees.
       try {
         // fileLineSep is set here so that exceptions can be caught
-        fileLineSep = UtilMDE.inferLineSeparator(javafilename);
+        fileLineSep = UtilPlume.inferLineSeparator(javafilename);
         src = new Source(javafilename);
         verb.debug("Parsed %s%n", javafilename);
       } catch (Source.CompilerException e) {
@@ -696,12 +712,16 @@ public class Main {
         TreeFinder finder = new TreeFinder(tree);
         SetMultimap<Pair<Integer, ASTPath>, Insertion> positions =
             finder.getPositions(tree, insertions);
+        if (dbug.isEnabled()) {
+          dbug.debug("In annotator.Main:%n");
+          dbug.debug("positions (for %d insertions) = %s%n",
+                     insertions.size(), positions);
+        }
 
         if (convert_jaifs) {
           // program used only for JAIF conversion; execute following
           // block and then skip remainder of loop
-          Multimap<ASTRecord, Insertion> astInsertions =
-              finder.getPaths();
+          Multimap<ASTRecord, Insertion> astInsertions = finder.getPaths();
           for (Map.Entry<ASTRecord, Collection<Insertion>> entry :
               astInsertions.asMap().entrySet()) {
             ASTRecord rec = entry.getKey();
@@ -763,8 +783,8 @@ public class Main {
             String trailingWhitespace = "";
             boolean gotSeparateLine = false;
             int pos = pair.a;  // reset each iteration in case of dyn adjustment
-            if (iToInsert.getSeparateLine()) {
-              // System.out.printf("getSeparateLine=true for insertion at pos %d: %s%n", pos, iToInsert);
+            if (iToInsert.isSeparateLine()) {
+              // System.out.printf("isSeparateLine=true for insertion at pos %d: %s%n", pos, iToInsert);
               int indentation = 0;
               while ((pos - indentation != 0)
                      // horizontal whitespace
@@ -844,7 +864,7 @@ public class Main {
                       precedingTextPlusChar.substring(0, toInsert.length()))
                   || toInsert.equals(precedingTextPlusChar.substring(1))) {
                 dbug.debug(
-                    "Inserting %s at %d in code of length %d with preceding text '%s'%n",
+                    "Inserting '%s' at %d in code of length %d with preceding text '%s'%n",
                     toInsert, pos, src.getString().length(),
                     precedingTextPlusChar);
                 dbug.debug("Already present, skipping%n");
@@ -855,7 +875,7 @@ public class Main {
             // TODO: Neither the above hack nor this check should be
             // necessary.  Find out why re-insertions still occur and
             // fix properly.
-            if (iToInsert.getInserted()) { continue; }
+            if (iToInsert.isInserted()) { continue; }
             src.insert(pos, toInsert);
             if (verbose && !debug) {
               System.out.print(".");
@@ -982,13 +1002,15 @@ public class Main {
     }
   }
 
-  public static String pathToString(TreePath path) {
+  /** Return the representation of the leaf of the path. */
+  public static String leafString(TreePath path) {
     if (path == null) {
       return "null";
     }
     return treeToString(path.getLeaf());
   }
 
+  /** Return the first non-empty line of the tree's printed representation. */
   public static String treeToString(Tree node) {
     String asString = node.toString();
     String oneLine = firstLine(asString);

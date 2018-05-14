@@ -12,7 +12,7 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.TypeAnnotationVisitor;
 import org.objectweb.asm.TypePath;
 
-import annotations.io.classfile.CodeOffsetAdapter;
+import scenelib.annotations.io.classfile.CodeOffsetAdapter;
 
 import com.sun.tools.javac.util.Pair;
 

@@ -113,11 +113,13 @@
         <path id="libpath">
             <pathelement location="${asmx}/bin"/>
             <pathelement location="${junit}"/>
-            <pathelement location="${annotation-tools}/annotation-file-utilities/lib/plume-core.jar"/>
+            <pathelement location="${annotation-tools}/annotation-file-utilities/lib/plume-util-0.0.1.jar"/>
             <pathelement location="${annotation-tools}/annotation-file-utilities/lib/guava-20.0.jar"/>
             <!-- remainder only for repository version -->
             <pathelement location="${annotations-compiler}/dist/lib/javac.jar"/>
             <pathelement location="${annotations-compiler}/dist/lib/javap.jar"/>
+            <!-- options-all-0.3.1.jar contains javac, so must come late on the path -->
+            <pathelement location="${annotation-tools}/annotation-file-utilities/lib/options-all-0.3.1.jar"/>
             <pathelement location="bin"/>
         </path>
     </target>
@@ -315,7 +317,7 @@
                 Overview="overview.html"
                 destdir="javadoc"
                 access="public"
-                noqualifier="annotations:annotations.el:annotations.field:annotations.io:annotations.io.classfile:annotations.util:annotations.util.coll:java.lang"
+                noqualifier="scenelib.annotations:scenelib.annotations.el:scenelib.annotations.field:scenelib.annotations.io:scenelib.annotations.io.classfile:scenelib.annotations.util:scenelib.annotations.util.coll:java.lang"
                 failonerror="true"
                 />
     </target>

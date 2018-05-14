@@ -32,7 +32,10 @@ final class InMethodCriterion implements Criterion {
   /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path, Tree leaf) {
-    assert path == null || path.getLeaf() == leaf;
+    if (path == null) {
+      return false;
+    }
+    assert path.getLeaf() == leaf;
     return isSatisfiedBy(path);
   }
 
@@ -40,25 +43,30 @@ final class InMethodCriterion implements Criterion {
   @Override
   public boolean isSatisfiedBy(TreePath path) {
     Criteria.dbug.debug("InMethodCriterion.isSatisfiedBy(%s); this=%s%n",
-        Main.pathToString(path), this.toString());
-    boolean staticDecl = false;
-    boolean result = false;
+        Main.leafString(path), this.toString());
 
+    // true if in a variable declaration.
+    boolean inDecl = false;
+    // Ignore the value if inDecl==false.  Otherwise:
+    // true if in a static variable declaration, false if in a member variable declaration.
+    boolean staticDecl = false;
     do {
       if (path.getLeaf().getKind() == Tree.Kind.METHOD) {
         boolean b = sigMethodCriterion.isSatisfiedBy(path);
         Criteria.dbug.debug("%s%n", "InMethodCriterion.isSatisfiedBy => b");
         return b;
       }
-      if (path.getLeaf().getKind() == Tree.Kind.VARIABLE) {
+      if (path.getLeaf().getKind() == Tree.Kind.VARIABLE) { // variable declaration
         ModifiersTree mods = ((VariableTree) path.getLeaf()).getModifiers();
+        inDecl = true;
         staticDecl = mods.getFlags().contains(Modifier.STATIC);
       }
       path = path.getParentPath();
     } while (path != null && path.getLeaf() != null);
 
-    result = (staticDecl ? "<clinit>()V" : "<init>()V").equals(name);
-
+    // We didn't find the method.  Return true if in a varable declarator,
+    // which is initialization code that will go in <init> or <clinit>.
+    boolean result = inDecl && (staticDecl ? "<clinit>()V" : "<init>()V").equals(name);
     Criteria.dbug.debug("InMethodCriterion.isSatisfiedBy => %s%n", result);
     return result;
   }

@@ -1,6 +1,6 @@
 package annotator.find;
 
-import annotations.io.ASTPath;
+import scenelib.annotations.io.ASTPath;
 
 import com.sun.source.tree.*;
 import com.sun.source.util.TreePath;
@@ -22,7 +22,10 @@ final class NotInMethodCriterion implements Criterion {
   /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path, Tree leaf) {
-    assert path == null || path.getLeaf() == leaf;
+    if (path == null) {
+      return false;
+    }
+    assert path.getLeaf() == leaf;
     return isSatisfiedBy(path);
   }
 

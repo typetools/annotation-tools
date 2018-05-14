@@ -8,8 +8,6 @@ import com.sun.source.util.TreePath;
 
 /**
  * Criterion for being within a specific initializer.
- *
- * @author dbro
  */
 public class InInitBlockCriterion implements Criterion {
   public final int blockID;
@@ -25,7 +23,10 @@ public class InInitBlockCriterion implements Criterion {
   /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path, Tree leaf) {
-    assert path == null || path.getLeaf() == leaf;
+    if (path == null) {
+      return false;
+    }
+    assert path.getLeaf() == leaf;
     return isSatisfiedBy(path);
   }
 

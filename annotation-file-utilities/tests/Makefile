@@ -20,7 +20,7 @@ export XJAVAC?=javac
 export SHELL=/bin/bash -o pipefail
 
 
-DIFFS := $(wildcard *.goal)
+DIFFS := $(sort $(wildcard *.goal))
 DISABLED := $(shell grep -le "@skip-test" $(DIFFS))
 FILTERED := $(filter-out $(DISABLED),$(DIFFS))
 DIFFS := $(patsubst %.goal, %.diff, $(FILTERED))
@@ -32,7 +32,7 @@ DEBUG :=
 default : all
 
 .PHONY: all
-all : $(DIFFS) abbreviated converted enum-imports ad-hoc system-test source-extension results
+all : $(DIFFS) abbreviated converted enum-imports ad-hoc issue155 system-test source-extension results
 
 .PHONY: abbreviated
 abbreviated:
@@ -49,6 +49,10 @@ enum-imports:
 .PHONY: ad-hoc
 ad-hoc:
 	${MAKE} -C ad-hoc
+
+.PHONY: issue155
+issue155:
+	${MAKE} -C issue155
 
 .PHONY: source-extension
 source-extension:
@@ -84,7 +88,7 @@ bin/annotator/tests/%.class: %.java
 
 # Actually runs the annotator to create the annotated java file.
 .PRECIOUS: %.output
-%.output: %.jaif %.java bin/annotator/tests/%.class ../lib/plume-core.jar ../bin ../annotation-file-utilities.jar
+%.output: %.jaif %.java bin/annotator/tests/%.class ../lib/options-all-0.3.1.jar ../lib/plume-util-0.0.1.jar ../bin ../annotation-file-utilities.jar
 	$(JAVA) \
 	-cp ../bin:../annotation-file-utilities.jar:bin \
 	annotator.Main \
@@ -112,3 +116,4 @@ clean :
 	(cd converted && make clean)
 	(cd enum-imports && make clean)
 	(cd ad-hoc && make clean)
+	(cd issue155 && make clean)

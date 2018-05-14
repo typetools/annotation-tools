@@ -10,30 +10,30 @@ import java.util.Set;
 
 import org.objectweb.asm.ClassReader;
 
-import plume.FileIOException;
-import plume.Pair;
-import type.DeclaredType;
-import type.Type;
-import annotations.Annotation;
-import annotations.el.ABlock;
-import annotations.el.AClass;
-import annotations.el.AElement;
-import annotations.el.AExpression;
-import annotations.el.AField;
-import annotations.el.AMethod;
-import annotations.el.AScene;
-import annotations.el.ATypeElement;
-import annotations.el.ATypeElementWithType;
-import annotations.el.AnnotationDef;
-import annotations.el.BoundLocation;
-import annotations.el.InnerTypeLocation;
-import annotations.el.LocalLocation;
-import annotations.el.RelativeLocation;
-import annotations.el.TypeIndexLocation;
-import annotations.field.AnnotationFieldType;
-import annotations.io.ASTPath;
-import annotations.io.IndexFileParser;
-import annotations.util.coll.VivifyingMap;
+import org.plumelib.util.FileIOException;
+import org.plumelib.util.Pair;
+import scenelib.type.DeclaredType;
+import scenelib.type.Type;
+import scenelib.annotations.Annotation;
+import scenelib.annotations.el.ABlock;
+import scenelib.annotations.el.AClass;
+import scenelib.annotations.el.AElement;
+import scenelib.annotations.el.AExpression;
+import scenelib.annotations.el.AField;
+import scenelib.annotations.el.AMethod;
+import scenelib.annotations.el.AScene;
+import scenelib.annotations.el.ATypeElement;
+import scenelib.annotations.el.ATypeElementWithType;
+import scenelib.annotations.el.AnnotationDef;
+import scenelib.annotations.el.BoundLocation;
+import scenelib.annotations.el.InnerTypeLocation;
+import scenelib.annotations.el.LocalLocation;
+import scenelib.annotations.el.RelativeLocation;
+import scenelib.annotations.el.TypeIndexLocation;
+import scenelib.annotations.field.AnnotationFieldType;
+import scenelib.annotations.io.ASTPath;
+import scenelib.annotations.io.IndexFileParser;
+import scenelib.annotations.util.coll.VivifyingMap;
 import annotator.find.AnnotationInsertion;
 import annotator.find.CastInsertion;
 import annotator.find.CloseParenthesisInsertion;
@@ -50,10 +50,12 @@ import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import com.sun.source.tree.Tree;
 
-public class IndexFileSpecification implements Specification {
+public class IndexFileSpecification {
   private final Multimap<Insertion, Annotation> insertionSources =
       LinkedHashMultimap.<Insertion, Annotation>create();
   private final List<Insertion> insertions = new ArrayList<Insertion>();
+  /** Is a member of insertions (if non-null). */
+  private ConstructorInsertion constructorInsertion = null;
   private final AScene scene;
   private final String indexFileName;
 
@@ -63,14 +65,11 @@ public class IndexFileSpecification implements Specification {
 
   private static boolean debug = false;
 
-  private ConstructorInsertion cons = null;
-
   public IndexFileSpecification(String indexFileName) {
     this.indexFileName = indexFileName;
     scene = new AScene();
   }
 
-  @Override
   public List<Insertion> parse() throws FileIOException {
     try {
       Map<String, AnnotationDef> annotationDefs =
@@ -172,7 +171,7 @@ public class IndexFileSpecification implements Specification {
    * @param className is fully qualified
    */
   private void parseClass(CriterionList clist, String className, AClass clazz) {
-    cons = null;  // 0 or 1 per class
+    constructorInsertion = null;  // 0 or 1 per class
     if (! noAsm) {
       //  load extra info using asm
       debug("parseClass(" + className + ")");
@@ -432,21 +431,24 @@ public class IndexFileSpecification implements Specification {
 
       // exclude expression annotations
       if (noTypePath(criteria) && isOnNullaryConstructor(criteria)) {
-        if (cons == null) {
+        if (constructorInsertion == null) {
           DeclaredType type = new DeclaredType(criteria.getClassName());
-          cons = new ConstructorInsertion(type, criteria,
+          constructorInsertion = new ConstructorInsertion(type, criteria,
               new ArrayList<Insertion>());
-          this.insertions.add(cons);
+          this.insertions.add(constructorInsertion);
+        } else {
+          if (annotator.Main.temporaryDebug) {
+            System.out.printf("Ignoring criteria=%s because constructorInsertion=%s%n", criteria, constructorInsertion);
+          }
         }
-        // no addInsertionSource, as cons is not explicit in scene
+        // no addInsertionSource, as constructorInsertion is not explicit in scene
         for (Insertion i : elementInsertions) {
           if (i.getKind() == Insertion.Kind.RECEIVER) {
-            cons.addReceiverInsertion((ReceiverInsertion) i);
+            constructorInsertion.addReceiverInsertion((ReceiverInsertion) i);
           } else if (criteria.isOnReturnType()) {
-            ((DeclaredType) cons.getType()).addAnnotation(annotationString);
+            ((DeclaredType) constructorInsertion.getType()).addAnnotation(annotationString);
           } else if (isDeclarationAnnotation) {
-            cons.addDeclarationInsertion(i);
-            i.setInserted(true);
+            constructorInsertion.addDeclarationInsertion(i);
           } else {
             annotationInsertions.add(i);
           }
@@ -464,6 +466,9 @@ public class IndexFileSpecification implements Specification {
         this.insertions.add(cast);
         this.insertions.add(closeParen);
     }
+    if (constructorInsertion != null) {
+        constructorInsertion.setInserted(false);
+    }
     return annotationInsertions;
   }
 
@@ -477,7 +482,7 @@ public class IndexFileSpecification implements Specification {
     ASTPath astPath = criteria.getASTPath();
     if (astPath == null) { return criteria.isOnReceiver(); }
     if (astPath.isEmpty()) { return false; }
-    ASTPath.ASTEntry entry = astPath.get(-1);
+    ASTPath.ASTEntry entry = astPath.getLast();
     return entry.childSelectorIs(ASTPath.PARAMETER)
         && entry.getArgument() < 0;
   }
@@ -485,7 +490,7 @@ public class IndexFileSpecification implements Specification {
   public static boolean isOnNew(Criteria criteria) {
     ASTPath astPath = criteria.getASTPath();
     if (astPath == null || astPath.isEmpty()) { return criteria.isOnNew(); }
-    ASTPath.ASTEntry entry = astPath.get(-1);
+    ASTPath.ASTEntry entry = astPath.getLast();
     Tree.Kind kind = entry.getTreeKind();
     return kind == Tree.Kind.NEW_ARRAY
             && entry.childSelectorIs(ASTPath.TYPE)
@@ -529,7 +534,7 @@ public class IndexFileSpecification implements Specification {
     Insertion.decorateType(innerTypeInsertions, type, criteria.getASTPath());
     CastInsertion cast = new CastInsertion(criteria, type);
     CloseParenthesisInsertion closeParen = new CloseParenthesisInsertion(
-        criteria, cast.getSeparateLine());
+        criteria, cast.isSeparateLine());
     return new Pair<CastInsertion, CloseParenthesisInsertion>(cast, closeParen);
   }
 
@@ -609,7 +614,7 @@ public class IndexFileSpecification implements Specification {
     // elements inside the method body.
     clist = clist.add(Criteria.inMethod(methodName));
 
-    // parse declaration annotations
+    // parse declaration annotations, fill in this.insertions
     parseElement(clist, method);
 
     // parse receiver

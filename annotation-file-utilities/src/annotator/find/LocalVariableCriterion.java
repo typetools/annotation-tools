@@ -1,8 +1,9 @@
 package annotator.find;
 
+import java.util.Objects;
 import java.util.List;
 
-import annotations.el.LocalLocation;
+import scenelib.annotations.el.LocalLocation;
 import annotator.scanner.LocalVariableScanner;
 
 import com.sun.source.tree.MethodTree;
@@ -13,6 +14,9 @@ import com.sun.tools.javac.util.Pair;
 
 /**
  * Criterion for being a specific local variable.
+ *
+ * This matches the variable itself (in the local variable definition), and
+ * also anywhere in its type, but should not match in the initializer.
  */
 public class LocalVariableCriterion implements Criterion {
 
@@ -27,7 +31,10 @@ public class LocalVariableCriterion implements Criterion {
   /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path, Tree leaf) {
-    assert path == null || path.getLeaf() == leaf;
+    if (path == null) {
+      return false;
+    }
+    assert path.getLeaf() == leaf;
     return isSatisfiedBy(path);
   }
 
@@ -39,80 +46,71 @@ public class LocalVariableCriterion implements Criterion {
     }
 
     TreePath parentPath = path.getParentPath();
-    if (parentPath != null) {
-      Tree parent = parentPath.getLeaf();
-      if (parent != null) {
-        if ((parent instanceof VariableTree)
-            // Avoid matching formal parameters
-            && (! (parentPath.getParentPath().getLeaf() instanceof MethodTree))) {
-          VariableTree vtt = (VariableTree) parent;
-          String varName = vtt.getName().toString();
+    if (parentPath == null) {
+      return false;
+    }
 
-          if (loc.varName!=null && loc.varName.equals(varName)) {
-            int varIndex = LocalVariableScanner.indexOfVarTree(path, vtt, varName);
+    Tree parent = parentPath.getLeaf();
+    Tree leaf = path.getLeaf();
+    if (parent instanceof VariableTree) {
+      // parent is a variable declaration
 
-            if (loc.varIndex==varIndex) {
-              // the location specifies a variable name and index and it matches the current variable
-              // -> hurray
-              return true;
-            }
-            return false;
+      if (parentPath.getParentPath().getLeaf() instanceof MethodTree) {
+        // formal parameter, not local variable
+        return false;
+      }
+
+      VariableTree vtt = (VariableTree) parent;
+      if (leaf.equals(vtt.getInitializer())) {
+        // don't match in initializer
+        return false;
+      }
+
+      String varName = vtt.getName().toString();
+
+      if (Objects.equals(loc.varName, varName)) {
+        int varIndex = LocalVariableScanner.indexOfVarTree(path, vtt, varName);
+        return (loc.varIndex == varIndex);
+      }
+
+      Pair<String, Pair<Integer, Integer>> key =
+              Pair.of(fullMethodName, Pair.of(loc.index, loc.scopeStart));
+      String potentialVarName =
+              LocalVariableScanner.getFromMethodNameIndexMap(key);
+      if (potentialVarName != null) {
+        if (varName.equals(potentialVarName)) {
+          // now use methodNameCounter to ensure that if this is the
+          // i'th variable of this name, its offset is the i'th offset
+          // of all variables with this name
+          List<Integer> allOffsetsWithThisName =
+                  LocalVariableScanner.getFromMethodNameCounter(fullMethodName, potentialVarName);
+          //      methodNameCounter.get(fullMethodName).get(potentialVarName);
+          Integer thisVariablesOffset =
+                  allOffsetsWithThisName.indexOf(loc.scopeStart);
+
+          // now you need to make sure that this is the
+          // thisVariablesOffset'th variable tree in the entire source
+          int i = LocalVariableScanner.indexOfVarTree(path, parent, potentialVarName);
+
+          if (i == thisVariablesOffset) {
+            return true;
           }
-
-          Pair<String, Pair<Integer, Integer>> key =
-                  Pair.of(fullMethodName, Pair.of(loc.index, loc.scopeStart));
-          String potentialVarName =
-                  LocalVariableScanner.getFromMethodNameIndexMap(key);
-          if (potentialVarName != null) {
-            if (varName.equals(potentialVarName)) {
-              // now use methodNameCounter to ensure that if this is the
-              // i'th variable of this name, its offset is the i'th offset
-              // of all variables with this name
-              List<Integer> allOffsetsWithThisName =
-                      LocalVariableScanner.getFromMethodNameCounter(fullMethodName, potentialVarName);
-//                methodNameCounter.get(fullMethodName).get(potentialVarName);
-              Integer thisVariablesOffset =
-                      allOffsetsWithThisName.indexOf(loc.scopeStart);
-
-              // now you need to make sure that this is the
-              // thisVariablesOffset'th variable tree in the entire source
-              int i = LocalVariableScanner.indexOfVarTree(path, parent, potentialVarName);
-
-              if (i == thisVariablesOffset) {
-                return true;
-              }
-            }
-          }
-        } else {
-          // If present leaf does not yet satisfy the local variable
-          // criterion, note that it actually is the correct local variable
-          // if any of its parents satisfy this local variable criterion
-          // (and going all the way up past the top-level tree is taken
-          // care of by the check for null above.
-          //
-          // For example, if you have the tree for "Integer"
-          // for the local variable "List<Integer> foo;"
-          // the parent of the current leaf will satisfy the local variable
-          // criterion directly.  The fact that you will never return true
-          // for something that is not the correct local variable comes
-          // from the fact that you can't contain one local variable
-          // within another.  For example, you can't have
-          // List<Integer bar> foo;
-          // Thus, no local variable tree can contain another local
-          // variable tree.
-          // Another general example:
-          // List<Integer> foo = ...;
-          // If the tree for ... contains one local variable, there is no fear
-          // of a conflict with "List<Integer>", because "List<Integer> foo"
-          // is a subtree of "List<Integer> foo = ...;", so the two
-          // (possibly) conflicting local variable trees are both subtrees
-          // of the same tree, and neither is an ancestor of the other.
-          return this.isSatisfiedBy(parentPath);
-          // To do: should stop this once it gets to method? or some other top level?
         }
       }
+      return false;
     }
-    return false;
+    // isSatisfiedBy should return true not just for the local variable itself, but for its type.
+    // So, if this is part of a type, try its parent.
+    // For example, return true for the tree for "Integer"
+    // within the local variable "List<Integer> foo;"
+    //
+    // But, stop the search once it gets to certain types, such as MethodTree.
+    // Is it OK to stop at ExpressionTree too?
+    else if (parent instanceof MethodTree) {
+      return false;
+    } else {
+      return this.isSatisfiedBy(parentPath);
+    }
   }
 
 
