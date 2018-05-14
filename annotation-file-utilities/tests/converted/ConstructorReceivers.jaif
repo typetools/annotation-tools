@@ -1,3 +1,5 @@
+// @skip-test
+
 package checkers.tainting.quals:
 annotation @Tainted: @java.lang.annotation.Target(value={TYPE_USE,TYPE_PARAMETER}) @java.lang.annotation.Retention(value=RUNTIME)
 
