@@ -21,7 +21,9 @@ export XJAVAC?=javac
 export SHELL=/bin/bash -o pipefail
 
 
-DIFFS := $(wildcard *.jaif)
+# Use .jaif instead of .goal (which ../Makefile uses), b/c only
+# .jaif files are checked in this director.
+DIFFS := $(sort $(wildcard *.jaif))
 DISABLED := $(shell grep -le "@skip-test" $(DIFFS))
 FILTERED := $(filter-out $(DISABLED),$(DIFFS))
 DIFFS := $(patsubst %.jaif, %.diff, $(FILTERED))
@@ -34,7 +36,6 @@ default : all
 
 .PHONY: all
 all : $(DIFFS) results
-
 
 # Display results of all .diff files.
 .PHONY: results
@@ -77,7 +78,7 @@ bin/annotator/tests/%.class: %.java
 # TODO: added `-` to these commands to proceed past failures
 # The failures will still show up in the summary, but it might
 # be better to fail earlier.
-%.output: %.jaif %.java bin/annotator/tests/%.class ../../lib/plume-core.jar ../../bin ../../annotation-file-utilities.jar
+%.output: %.jaif %.java bin/annotator/tests/%.class ../../lib/options-all-0.3.1.jar ../../lib/plume-util-0.0.1.jar ../../bin ../../annotation-file-utilities.jar
 	- $(JAVA) \
 	    -cp ../../bin:../../annotation-file-utilities.jar:bin \
 	    annotator.Main \
