@@ -80,13 +80,19 @@ public class ATypeElementWithType extends ATypeElement {
             && ((ATypeElementWithType) o).equalsTypeElementWithType(this);
     }
 
+    // without this method a.equals(b) will result in a call to
+    // ATypeElement.equals, where a and b are ATypeElementWithType
+    public boolean equals(ATypeElementWithType o) {
+        return ((ATypeElementWithType) o).equalsTypeElementWithType(this);
+    }
     /**
      * Returns whether this {@link ATypeElementWithType} equals <code>o</code>; a
      * slightly faster variant of {@link #equals(Object)} for when the argument
      * is statically known to be another nonnull {@link ATypeElementWithType}.
      */
     public boolean equalsTypeElementWithType(ATypeElementWithType o) {
-        return super.equals(o) && o.type.equals(type);
+        return super.equals(o) &&
+                (type == null ? o.type == null : o.type.equals(type));
     }
 
     @Override
