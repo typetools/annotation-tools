@@ -877,8 +877,16 @@ extends EmptyVisitor {
       }
     }
 
+      /**
+       * Creates the method type parameter bound annotation on aMethod.
+       */
+      private void handleMethodTypeParameter(AMethod aMethod) {
+          aMethod.bounds.vivify(makeTypeParameterLocation())
+                  .tlAnnotationsHere.add(makeAnnotation());
+      }
+
     /**
-     * Creates the class type parameter bound annotation on aClass.
+     * Creates the method type parameter bound annotation on aMethod.
      */
     private void handleMethodTypeParameterBound(AMethod aMethod) {
       if (xLocationsArgs.isEmpty()) {
@@ -948,10 +956,6 @@ extends EmptyVisitor {
             .innerTypes.vivify(makeInnerTypeLocation())
             .tlAnnotationsHere.add(makeAnnotation());
       }
-    }
-
-    private void handleMethodTypeParameter(AMethod aMethod) {
-      // TODO: throw new RuntimeException("METHOD_TYPE_PARAMETER: to do");
     }
 
     /**
