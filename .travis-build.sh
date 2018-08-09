@@ -69,3 +69,5 @@ if [[ "${GROUP}" == "downstream" || "${GROUP}" == "all" ]]; then
     (cd ../checker-framework/framework && ../gradlew wholeProgramInferenceTests)
     (cd ../checker-framework-inference && ./gradlew dist && ./gradlew test)
 fi
+
+echo "Exiting annotation-tools/.travis-build.sh"

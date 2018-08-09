@@ -44,3 +44,5 @@ echo "running \"ant compile\" for annotation-tools"
 pwd
 ant compile
 echo "done running \"ant compile\" for annotation-tools"
+
+echo "Exiting annotation-tools/.travis-build-without-test.sh"
