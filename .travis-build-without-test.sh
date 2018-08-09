@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "Entering annotation-tools/.travis-build-without-test.sh"
+
 # Fail the whole script if any command fails
 set -e
 
