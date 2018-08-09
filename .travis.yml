@@ -61,6 +61,8 @@ script:
      javac -version &&
      export TRAVIS_REPO_SLUG=$TRAVIS_REPO_SLUG &&
      export TRAVIS_BUILD_DIR=$TRAVIS_BUILD_DIR &&
+     export TRAVIS_PULL_REQUEST_BRANCH=${TRAVIS_PULL_REQUEST_BRANCH} &&
+     export TRAVIS_BRANCH=${TRAVIS_BRANCH} &&
      ./.travis-build.sh $GROUP"
 
 jobs:
@@ -75,7 +77,7 @@ jobs:
               SLUGOWNER=typetools
             fi
 
-            curl -LO --retry 3 https://raw.github.com/mernst/plume-lib/master/bin/trigger-travis.sh
+            curl -LO --retry 3 https://raw.github.com/plume-lib/trigger-travis/master/trigger-travis.sh
 
             git ls-remote https://github.com/${SLUGOWNER}/checker-framework.git &>-
             if [ "$?" -eq 0 ]; then
