@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "Entering annotation-tools/.travis-build.sh"
+
 # Optional argument $1 is one of:
 #   all, test, misc
 # If it is omitted, this script does everything.
