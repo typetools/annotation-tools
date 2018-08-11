@@ -3,7 +3,7 @@
 echo "Entering annotation-tools/.travis-build.sh"
 
 # Optional argument $1 is one of:
-#   all, test, misc
+#   all, test, misc, downstream
 # If it is omitted, this script does everything.
 export GROUP=$1
 if [[ "${GROUP}" == "" ]]; then
@@ -11,7 +11,7 @@ if [[ "${GROUP}" == "" ]]; then
 fi
 
 if [[ "${GROUP}" != "all" && "${GROUP}" != "test" && "${GROUP}" != "misc" && "${GROUP}" != "downstream" ]]; then
-  echo "Bad argument '${GROUP}'; should be omitted or one of: all, test, misc."
+  echo "Bad argument '${GROUP}'; should be omitted or one of: all, test, misc, downstream."
   exit 1
 fi
 
