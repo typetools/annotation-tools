@@ -122,7 +122,7 @@
             <pathelement location="${annotations-compiler}/dist/lib/javap.jar"/>
             <pathelement location="bin"/>
             <!-- Checker Framework qualifiers should not go in generated .jar files -->
-            <pathelement location="../../checker-framework/checker/dist/checker-qual.jar"/>
+            <pathelement location="${annotation-tools}/annotation-file-utilities/lib/checker-qual-2.5.4.jar"/>
         </path>
     </target>
 

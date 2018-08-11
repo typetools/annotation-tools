@@ -91,7 +91,7 @@
       <pathelement location="${scene-lib}/bin"/>
       <pathelement location="${asmx}/bin"/>
       <!-- Checker Framework qualifiers should not go in generated .jar files -->
-      <pathelement location="../../checker-framework/checker/dist/checker-qual.jar"/>
+      <pathelement location="${annotation-tools}/annotation-file-utilities/lib/checker-qual-2.5.4.jar"/>
       <!-- needed for optionsdoc target -->
       <pathelement location="bin"/>
       <!-- additional for distribution:
