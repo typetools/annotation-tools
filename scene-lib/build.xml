@@ -121,20 +121,9 @@
             <pathelement location="${annotations-compiler}/dist/lib/javac.jar"/>
             <pathelement location="${annotations-compiler}/dist/lib/javap.jar"/>
             <pathelement location="bin"/>
-        </path>
-
-        <pathconvert property="libpathProp" refid="libpath"/>
-
-        <path id="libpath-with-quals">
-            <pathelement path="${libpathProp}"/>
+            <!-- Checker Framework qualifiers should not go in generated .jar files -->
             <pathelement location="../../checker-framework/checker/dist/checker-qual.jar"/>
         </path>
-
-        <!-- For debugging -->
-        <pathconvert property="libpath-with-quals-prop" refid="libpath-with-quals"/>
-        <echo>libpath is ${libpathProp}</echo>
-        <echo>libpath-with-quals is ${libpath-with-quals-prop}</echo>
-
     </target>
 
     <target name="init" depends="init-properties, init-dependencies, init-paths"/>
@@ -324,7 +313,7 @@
     <target name="javadoc" depends="javadoc-clean, init"
        description="Generate Javadoc API documentation">
         <javadoc sourcepathref="javadoc-sourcepath"
-                classpathref="libpath-with-quals"
+                classpathref="libpath"
                 packagenames="*"
                 excludepackagenames=""
                 Overview="overview.html"

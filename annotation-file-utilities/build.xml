@@ -90,18 +90,14 @@
       <pathelement location="${annotation-tools}/annotation-file-utilities/lib/guava-20.0.jar"/>
       <pathelement location="${scene-lib}/bin"/>
       <pathelement location="${asmx}/bin"/>
+      <!-- Checker Framework qualifiers should not go in generated .jar files -->
+      <pathelement location="../../checker-framework/checker/dist/checker-qual.jar"/>
       <!-- needed for optionsdoc target -->
       <pathelement location="bin"/>
       <!-- additional for distribution:
       <pathelement location="${jre1.6.0}"/>
       -->
     </path>
-    <pathconvert property="libpathProp" refid="libpath"/>
-
-     <path id="libpath-with-quals">
-         <pathelement path="${libpathProp}"/>
-         <pathelement location="../../checker-framework/checker/dist/checker-qual.jar"/>
-     </path>
   </target>
 
   <path id="javadoc-sourcepath">
@@ -114,7 +110,7 @@
 
   <target name="javadoc" depends="javadoc-clean, init">
       <javadoc sourcepathref="javadoc-sourcepath"
-          classpathref="libpath-with-quals"
+          classpathref="libpath"
           failonerror="true"
           packagenames="*"
           destdir="javadoc"
