@@ -27,8 +27,8 @@ if [ -d ../jsr308-langtools ] ; then
     (cd ../jsr308-langtools && hg pull && hg update)
 else
     set +e
-    echo "Running: hg identify https://bitbucket.org/${SLUGOWNER}/jsr308-langtools &>-"
-    hg identify https://bitbucket.org/${SLUGOWNER}/jsr308-langtools &>-
+    echo "Running: hg identify https://bitbucket.org/${SLUGOWNER}/jsr308-langtools"
+    hg identify https://bitbucket.org/${SLUGOWNER}/jsr308-langtools &>/dev/null
     if [ "$?" -ne 0 ]; then
         SLUGOWNER=typetools
     fi
