@@ -115,7 +115,7 @@
             <pathelement location="${junit}"/>
             <pathelement location="${annotation-tools}/annotation-file-utilities/lib/bcel-util-1.0.0.jar"/>
             <pathelement location="${annotation-tools}/annotation-file-utilities/lib/options-1.0.0.jar"/>
-            <pathelement location="${annotation-tools}/annotation-file-utilities/lib/plume-util-1.0.0.jar"/>
+            <pathelement location="${annotation-tools}/annotation-file-utilities/lib/plume-util-1.0.1.jar"/>
             <pathelement location="${annotation-tools}/annotation-file-utilities/lib/guava-20.0.jar"/>
             <!-- remainder only for repository version -->
             <pathelement location="${annotations-compiler}/dist/lib/javac.jar"/>
