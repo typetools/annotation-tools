@@ -7,7 +7,8 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/scene-lib"/>
 	<classpathentry kind="lib" path="lib/guava-20.0.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry kind="lib" path="lib/options-all-0.3.1.jar"/>
-	<classpathentry kind="lib" path="lib/plume-util-0.0.1.jar"/>
+	<classpathentry kind="lib" path="lib/bcel-util-1.0.0.jar"/>
+	<classpathentry kind="lib" path="lib/options-1.0.0.jar"/>
+	<classpathentry kind="lib" path="lib/plume-util-1.0.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
