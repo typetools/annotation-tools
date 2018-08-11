@@ -1,7 +1,9 @@
 #!/bin/bash
 
+echo "Entering annotation-tools/.travis-build.sh"
+
 # Optional argument $1 is one of:
-#   all, test, misc
+#   all, test, misc, downstream
 # If it is omitted, this script does everything.
 export GROUP=$1
 if [[ "${GROUP}" == "" ]]; then
@@ -9,7 +11,7 @@ if [[ "${GROUP}" == "" ]]; then
 fi
 
 if [[ "${GROUP}" != "all" && "${GROUP}" != "test" && "${GROUP}" != "misc" && "${GROUP}" != "downstream" ]]; then
-  echo "Bad argument '${GROUP}'; should be omitted or one of: all, test, misc."
+  echo "Bad argument '${GROUP}'; should be omitted or one of: all, test, misc, downstream."
   exit 1
 fi
 
@@ -57,22 +59,15 @@ fi
 
 if [[ "${GROUP}" == "downstream" || "${GROUP}" == "all" ]]; then
     # checker-framework and its downstream tests
-    set +e
-    echo "Running: git ls-remote https://github.com/${SLUGOWNER}/checker-framework-inference.git &>-"
-    git ls-remote https://github.com/${SLUGOWNER}/checker-framework-inference.git &>-
-    if [ "$?" -ne 0 ]; then
-        CFISLUGOWNER=typetools
-    else
-        CFISLUGOWNER=${SLUGOWNER}
-    fi
-    set -e
-    echo "Running:  (cd .. && git clone --depth 1 https://github.com/${CFISLUGOWNER}/checker-framework-inference.git)"
-    (cd .. && git clone --depth 1 https://github.com/${CFISLUGOWNER}/checker-framework-inference.git) || (cd .. && git clone --depth 1 https://github.com/${CFISLUGOWNER}/checker-framework-inference.git)
-    echo "... done: (cd .. && git clone --depth 1 https://github.com/${CFISLUGOWNER}/checker-framework-inference.git)"
+    (cd .. && git clone --depth 1 https://github.com/plume-lib/plume-scripts.git)
+    REPO=`../plume-scripts/git-find-fork ${SLUGOWNER} typetools checker-framework-inference`
+    BRANCH=`../plume-scripts/git-find-branch $REPO ${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH}`
+    (cd .. && git clone -b $BRANCH --single-branch --depth 1 $REPO) || (cd .. && git clone -b $BRANCH --single-branch --depth 1 $REPO)
 
-    cd ../checker-framework-inference
-    . ./.travis-build-without-test.sh
+    (cd ../checker-framework-inference && . ./.travis-build-without-test.sh)
 
     (cd ../checker-framework/framework && ../gradlew wholeProgramInferenceTests)
     (cd ../checker-framework-inference && ./gradlew dist && ./gradlew test)
 fi
+
+echo "Exiting annotation-tools/.travis-build.sh"
