@@ -96,6 +96,12 @@
       <pathelement location="${jre1.6.0}"/>
       -->
     </path>
+    <pathconvert property="libpathProp" refid="libpath"/>
+
+     <path id="libpath-with-quals">
+         <pathelement path="${libpathProp}"/>
+         <pathelement location="../../checker-framework/checker/dist/checker-qual.jar"/>
+     </path>
   </target>
 
   <path id="javadoc-sourcepath">
@@ -108,7 +114,7 @@
 
   <target name="javadoc" depends="javadoc-clean, init">
       <javadoc sourcepathref="javadoc-sourcepath"
-          classpathref="libpath"
+          classpathref="libpath-with-quals"
           failonerror="true"
           packagenames="*"
           destdir="javadoc"
