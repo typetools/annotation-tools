@@ -84,7 +84,7 @@ bin/annotator/tests/%.class: %.java
 
 # Actually runs the annotator to create the annotated java file.
 .PRECIOUS: %.output
-%.output: %.jaif %.java bin/annotator/tests/%.class ../lib/options-all-0.3.1.jar ../lib/plume-util-0.0.1.jar ../bin ../annotation-file-utilities.jar
+%.output: %.jaif %.java bin/annotator/tests/%.class ../bin ../annotation-file-utilities.jar
 	$(JAVA) \
 	-cp ../bin:../annotation-file-utilities.jar:bin \
 	annotator.Main \
