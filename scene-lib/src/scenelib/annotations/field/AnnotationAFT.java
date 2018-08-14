@@ -1,5 +1,7 @@
 package scenelib.annotations.field;
 
+import java.util.Map.Entry;
+
 /*>>>
 import org.checkerframework.checker.nullness.qual.*;
 */
@@ -51,7 +53,9 @@ public final class AnnotationAFT extends ScalarAFT {
      */
     @Override
     public String format(Object o) {
-        return o.toString();
+        // Ensure the argument is an Annotation.
+        Annotation anno = (Annotation) o;
+        return anno.toString();
     }
 
     @Override

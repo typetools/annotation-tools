@@ -8,5 +8,5 @@ ASMX=$WORKSPACE/asmx
 
 TOOLS_JAR=${TOOLS_JAR:-${JAVA_HOME}/lib/tools.jar}
 
-export CLASSPATH=${TOOLS_JAR}:$SCENE_LIB/bin:$ASMX/bin:$WORKSPACE/annotation-file-utilities/lib/plume-core.jar:$CLASSPATH
+export CLASSPATH=${TOOLS_JAR}:$SCENE_LIB/bin:$ASMX/bin:$WORKSPACE/annotation-file-utilities/lib/bcel-util-1.0.0.jar:$WORKSPACE/annotation-file-utilities/lib/options-1.0.0.jar:$WORKSPACE/annotation-file-utilities/lib/plume-util-1.0.1.jar:$CLASSPATH
 java scenelib.annotations.tools.Anncat "$@"

@@ -9,7 +9,7 @@ import scenelib.annotations.io.IndexFileWriter;
 import scenelib.annotations.io.JavapParser;
 import scenelib.annotations.io.classfile.ClassFileReader;
 import scenelib.annotations.io.classfile.ClassFileWriter;
-import plume.FileIOException;
+import org.plumelib.util.FileIOException;
 
 /** Concatenates multiple descriptions of annotations into a single one. */
 public class Anncat {

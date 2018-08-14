@@ -80,7 +80,7 @@ public class ATypeElementWithType extends ATypeElement {
             && ((ATypeElementWithType) o).equals(this);
     }
 
-    public boolean equalsTypeElementWithType(ATypeElementWithType o) {
+    public boolean equals(ATypeElementWithType o) {
         return super.equals(o) && o.type.equals(type);
     }
 

@@ -108,12 +108,14 @@
         <path id="libpath">
             <pathelement location="${asmx}/bin"/>
             <pathelement location="${junit}"/>
-            <pathelement location="${annotation-tools}/annotation-file-utilities/lib/plume-core.jar"/>
+            <pathelement location="${annotation-tools}/annotation-file-utilities/lib/bcel-util-1.0.0.jar"/>
+            <pathelement location="${annotation-tools}/annotation-file-utilities/lib/options-1.0.0.jar"/>
+            <pathelement location="${annotation-tools}/annotation-file-utilities/lib/plume-util-1.0.1.jar"/>
             <pathelement location="${annotation-tools}/annotation-file-utilities/lib/guava-20.0.jar"/>
             <pathelement location="${env.JAVA_HOME}/lib/tools.jar"/>
-            <!-- options-all-0.3.1.jar contains javac, so must come late on the path -->
-            <pathelement location="${annotation-tools}/annotation-file-utilities/lib/options-all-0.3.1.jar"/>
             <pathelement location="bin"/>
+            <!-- Checker Framework qualifiers should not go in generated .jar files -->
+            <pathelement location="${annotation-tools}/annotation-file-utilities/lib/checker-qual-2.5.4.jar"/>
         </path>
     </target>
 

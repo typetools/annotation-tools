@@ -10,7 +10,7 @@ import scenelib.annotations.io.ASTPath;
 import com.sun.source.tree.Tree;
 import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
 
-import plume.Pair;
+import org.plumelib.util.Pair;
 import scenelib.type.ArrayType;
 import scenelib.type.DeclaredType;
 import scenelib.type.Type;

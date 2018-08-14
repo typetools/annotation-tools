@@ -17,7 +17,7 @@ import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.commons.EmptyVisitor;
 
-import plume.UtilMDE;
+import org.plumelib.util.CollectionsPlume;
 
 import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
 
@@ -514,7 +514,7 @@ public class AnnotationVerifier {
       if (questionable.equals(correct)) {
         return;
       }
-      if (UtilMDE.deepEquals(questionable, correct)) {
+      if (CollectionsPlume.deepEquals(questionable, correct)) {
         return;
       }
 

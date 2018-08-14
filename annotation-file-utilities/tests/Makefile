@@ -32,7 +32,7 @@ DEBUG :=
 default : all
 
 .PHONY: all
-all : $(DIFFS) abbreviated enum-imports ad-hoc system-test source-extension results
+all : $(DIFFS) abbreviated enum-imports ad-hoc issue155 system-test source-extension results
 
 .PHONY: abbreviated
 abbreviated:
@@ -45,6 +45,10 @@ enum-imports:
 .PHONY: ad-hoc
 ad-hoc:
 	${MAKE} -C ad-hoc
+
+.PHONY: issue155
+issue155:
+	${MAKE} -C issue155
 
 .PHONY: source-extension
 source-extension:
@@ -80,7 +84,7 @@ bin/annotator/tests/%.class: %.java
 
 # Actually runs the annotator to create the annotated java file.
 .PRECIOUS: %.output
-%.output: %.jaif %.java bin/annotator/tests/%.class ../lib/options-all-0.3.1.jar ../lib/plume-core.jar ../bin ../annotation-file-utilities.jar
+%.output: %.jaif %.java bin/annotator/tests/%.class ../bin ../annotation-file-utilities.jar
 	$(JAVA) \
 	-cp ../bin:../annotation-file-utilities.jar:bin \
 	annotator.Main \
@@ -107,3 +111,4 @@ clean :
 	(cd abbreviated && make clean)
 	(cd enum-imports && make clean)
 	(cd ad-hoc && make clean)
+	(cd issue155 && make clean)
