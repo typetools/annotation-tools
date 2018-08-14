@@ -14,7 +14,7 @@ env:
 # block.  So, always use two jobs (use a dummy if necessary).
   matrix:
     - JDKVER=jdk8 GROUP=test
-    - JDKVER=jdk8 GROUP=misc
+    - JDKVER=jdkany GROUP=misc
     - JDKVER=jdk8 GROUP=downstream
 
 # The "docker run" command will pull if needed.
