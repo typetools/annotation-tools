@@ -1,9 +1,5 @@
 package scenelib.annotations.field;
 
-/*>>>
-import org.checkerframework.checker.nullness.qual.*;
-*/
-
 /**
  * A {@link ClassTokenAFT} is the type of an annotation field that holds a
  * class token (something like <code>{@link String}.class</code>).

@@ -116,25 +116,25 @@ import java.lang.annotation.*;
 @interface C12 {}
 @interface C13 {}
 
-public @AClass /*@CClass*/ class AnnotationTest<Foo extends /*A10*/ /*C10*/ Comparable</*A11*/ /*C11*/ Integer>> {
+public @AClass @CClass class AnnotationTest<Foo extends /*A10*/ /*C10*/ Comparable</*A11*/ /*C11*/ Integer>> {
     class Outer {
         class Inner<Baz> {
             int baz(Baz o) { return o.hashCode() ^ this.hashCode(); }
         }
     }
 
-    @A0E /*@C0E*/ Iterable<@A21 /*@C21*/ String @A20 /*@C20*/ []> field;
-    @A24 /*@C24*/ Outer.@A22 /*@C22*/ Inner<@A23 /*@C23*/ String> inner;
-    @A2B /*@C2B*/ Map.@A2C /*@C2C*/ Entry<@A2D /*@C2D*/ Integer, @A2E /*@C2E*/ ? extends @A2F /*@C2F*/ CharSequence> entry;
+    @A0E @C0E Iterable<@A21 @C21 String @A20 @C20 []> field;
+    @A24 @C24 Outer.@A22 @C22 Inner<@A23 @C23 String> inner;
+    @A2B @C2B Map.@A2C @C2C Entry<@A2D @C2D Integer, @A2E @C2E ? extends @A2F @C2F CharSequence> entry;
 
     // TODO: crash when A12, C12, A13, or C13 are annotations!
-    <Bar extends /*A12*/ /*C12*/ Comparable</*A13*/ /*C13*/ Integer>> @A0A /*@C0A*/ @A0AT /*@C0AT*/ HashSet<@A0B /*@C0B*/ Integer>
-        doSomething(@A06 /*@C06*/ AnnotationTest<Foo> this, @A0C /*@C0C*/ Set<@A0D /*@C0D*/ Integer> param) {
-        @A08 /*@C08*/ HashSet<@A09 /*@C09*/ Integer> local;
-        if (param instanceof @A02 /*@C02*/ HashSet)
-            local = (@A00 /*@C00*/ HashSet<@A01 /*@C01*/ Integer>) param;
+    <Bar extends /*A12*/ /*C12*/ Comparable</*A13*/ /*C13*/ Integer>> @A0A @C0A @A0AT @C0AT HashSet<@A0B @C0B Integer>
+        doSomething(@A06 @C06 AnnotationTest<Foo> this, @A0C @C0C Set<@A0D @C0D Integer> param) {
+        @A08 @C08 HashSet<@A09 @C09 Integer> local;
+        if (param instanceof @A02 @C02 HashSet)
+            local = (@A00 @C00 HashSet<@A01 @C01 Integer>) param;
         else
-            local = new @A04 /*@C04*/ HashSet<@A05 /*@C05*/ Integer>();
+            local = new @A04 @C04 HashSet<@A05 @C05 Integer>();
         return local;
     }
 }

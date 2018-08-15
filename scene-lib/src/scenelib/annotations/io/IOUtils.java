@@ -1,9 +1,5 @@
 package scenelib.annotations.io;
 
-/*>>>
-import org.checkerframework.checker.nullness.qual.*;
-*/
-
 /**
  * <code>IOUtils</code> has some static methods useful to scene I/O code.
  */
