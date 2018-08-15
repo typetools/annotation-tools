@@ -1,9 +1,5 @@
 package scenelib.annotations.io;
 
-/*>>>
-import org.checkerframework.checker.nullness.qual.*;
-*/
-
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;

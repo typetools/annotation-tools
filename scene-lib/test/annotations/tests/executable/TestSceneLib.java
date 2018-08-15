@@ -1,9 +1,5 @@
 package annotations.tests.executable;
 
-/*>>>
-import org.checkerframework.checker.nullness.qual.*;
-*/
-
 import java.io.*;
 import java.util.*;
 import java.lang.annotation.RetentionPolicy;
@@ -12,6 +8,9 @@ import com.sun.tools.classfile.TypeAnnotation.Position.TypePathEntryKind;
 import com.sun.tools.javac.code.TypeAnnotationPosition;
 
 import junit.framework.*;
+
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import scenelib.annotations.*;
 import scenelib.annotations.el.*;
 import scenelib.annotations.field.*;
@@ -86,7 +85,7 @@ public class TestSceneLib extends TestCase {
     }
 
     void doParseTest(String index,
-                     /*@NonNull*/ AScene expectScene) {
+                     @NonNull AScene expectScene) {
         AScene s = newScene();
         doParseTest(index, s, expectScene);
     }

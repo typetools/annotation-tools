@@ -2,10 +2,6 @@ package scenelib.annotations.el;
 
 import scenelib.annotations.util.Hasher;
 
-/*>>>
-import org.checkerframework.checker.nullness.qual.*;
-*/
-
 /**
  * A {@link RelativeLocation} holds location information for a
  * instanceof, cast, or new: either the bytecode offset or the source code index.

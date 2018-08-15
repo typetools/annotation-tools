@@ -1,9 +1,5 @@
 package scenelib.annotations.io;
 
-/*>>>
-import org.checkerframework.checker.nullness.qual.*;
-*/
-
 import static java.io.StreamTokenizer.TT_EOF;
 import static java.io.StreamTokenizer.TT_NUMBER;
 import static java.io.StreamTokenizer.TT_WORD;

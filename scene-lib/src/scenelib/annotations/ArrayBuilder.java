@@ -1,9 +1,5 @@
 package scenelib.annotations;
 
-/*>>>
-import org.checkerframework.checker.nullness.qual.*;
-*/
-
 /**
  * Builds an array that will serve as a field of an annotation; created by
  * {@link AnnotationBuilder#beginArrayField}.

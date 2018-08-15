@@ -10,10 +10,10 @@ public class DuplicateAnnotation {
   @java.lang.SuppressWarnings("B")
   void m2() { }
 
-  /*@SuppressWarnings("C")*/
+  @SuppressWarnings("C")
   void m3() { }
 
-  /*@java.lang.SuppressWarnings("D")*/
+  @java.lang.SuppressWarnings("D")
   void m4() { }
 
   void m5() { }
@@ -23,7 +23,7 @@ public class DuplicateAnnotation {
     Object o = new Object();
   }
 
-  int /*@annotator.tests.TA*/ [] i;
+  int @annotator.tests.TA [] i;
 }
 
 @java.lang.annotation.Target({java.lang.annotation.ElementType.TYPE_USE})
