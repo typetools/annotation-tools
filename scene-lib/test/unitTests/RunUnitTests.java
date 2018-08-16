@@ -1,30 +1,27 @@
 package unitTests;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import junit.framework.TestCase;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
-import scenelib.annotations.el.ATypeElement;
 import scenelib.annotations.el.ATypeElementWithType;
 import scenelib.type.ArrayType;
 import scenelib.type.DeclaredType;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
-import static org.junit.Assert.assertThat;
-
 public class RunUnitTests extends TestCase {
-
-
 
     public static void main(String[] args) {
         TestSuite suite = new TestSuite(RunUnitTests.class);
         TestResult result = new TestResult();
         suite.run(result);
         System.out.println(
-                "AnnotationsTests ran with " + result.failureCount() + " failures and "
-                        + result.errorCount() + " errors. (" + result.runCount()
+                "AnnotationsTests ran with "
+                        + result.failureCount()
+                        + " failures and "
+                        + result.errorCount()
+                        + " errors. ("
+                        + result.runCount()
                         + " successes.)");
     }
 
@@ -48,8 +45,8 @@ public class RunUnitTests extends TestCase {
         }
         ATypeElementWithType e = a.clone();
         assertTrue(a.equals(e));
-        a.setType( new ArrayType(new DeclaredType("hello")));
-        e.setType( new DeclaredType("hello"));
+        a.setType(new ArrayType(new DeclaredType("hello")));
+        e.setType(new DeclaredType("hello"));
         assertFalse(a.equals(e));
     }
 }
