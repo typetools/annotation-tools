@@ -95,7 +95,7 @@ public class ATypeElementWithType extends ATypeElement {
      */
     public boolean equalsTypeElementWithType(ATypeElementWithType o) {
         return super.equals(o) &&
-                (type == null ? o.type == null : o.type.equals(type));
+                (o.type == null ? type == null : o.type.equals(type));
     }
 
     @Override
