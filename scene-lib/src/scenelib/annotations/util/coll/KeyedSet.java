@@ -2,10 +2,6 @@ package scenelib.annotations.util.coll;
 
 import java.util.Set;
 
-/*>>>
-import org.checkerframework.checker.nullness.qual.*;
-*/
-
 /**
  * A <code>KeyedSet</code> is a set whose members have distinct <em>keys</em>
  * and can be looked up by key. A {@link Keyer} provides keys for the elements.

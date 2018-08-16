@@ -2,10 +2,6 @@ package scenelib.annotations.field;
 
 import java.util.Map.Entry;
 
-/*>>>
-import org.checkerframework.checker.nullness.qual.*;
-*/
-
 import scenelib.annotations.Annotation;
 import scenelib.annotations.el.AnnotationDef;
 

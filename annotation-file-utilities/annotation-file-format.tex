@@ -414,10 +414,13 @@ method header (return type, parameters, etc.), as well as the method body.
 \qquad        \bnfnt{expression-annotations}*
 \end{tabbing}
 
+\urldef\jvmsMethodDescriptors\url|https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.3.3|
+
 \noindent
 The annotations on the \bnflit{method} line are on the method declaration, not
-on the return value. The \bnfnt{method-key} consists of the name followed by the
-signature in JVML format. For example, the following method
+on the return value. The \bnfnt{method-key} consists of the simple name followed
+by a method descriptor, which is the signature in JVML format
+(see JVMS \S4.3.3, \jvmsMethodDescriptors). For example, the following method
 
 \begin{verbatim}
 boolean foo(int[] i, String s) {

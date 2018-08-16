@@ -1,9 +1,5 @@
 package scenelib.annotations.io;
 
-/*>>>
-import org.checkerframework.checker.nullness.qual.*;
-*/
-
 // Not package-private because it is used from the Scene Library.
 // But not intended for widespread use.
 

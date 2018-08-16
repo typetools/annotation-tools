@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "Entering annotation-tools/.travis-build-without-test.sh" in `pwd`
+
 # Fail the whole script if any command fails
 set -e
 
@@ -7,9 +9,9 @@ export SHELLOPTS
 
 export JAVA_HOME=${JAVA_HOME:-$(dirname $(dirname $(dirname $(readlink -f $(/usr/bin/which java)))))}
 
-export JSR308=${JSR308:-..}
-export AFU=${AFU:-../annotation-tools/annotation-file-utilities}
-export CHECKERFRAMEWORK=${CHECKERFRAMEWORK:-../checker-framework}
+export JSR308=`readlink -f ${JSR308:-..}`
+export AFU=`readlink -f ${AFU:-../annotation-tools/annotation-file-utilities}`
+export CHECKERFRAMEWORK=`readlink -f ${CHECKERFRAMEWORK:-../checker-framework}`
 
 export PATH=$AFU/scripts:$JAVA_HOME/bin:$PATH
 
@@ -25,8 +27,8 @@ if [ -d ../jsr308-langtools ] ; then
     (cd ../jsr308-langtools && hg pull && hg update)
 else
     set +e
-    echo "Running: hg identify https://bitbucket.org/${SLUGOWNER}/jsr308-langtools &>-"
-    hg identify https://bitbucket.org/${SLUGOWNER}/jsr308-langtools &>-
+    echo "Running: hg identify https://bitbucket.org/${SLUGOWNER}/jsr308-langtools"
+    hg identify https://bitbucket.org/${SLUGOWNER}/jsr308-langtools &>/dev/null
     if [ "$?" -ne 0 ]; then
         SLUGOWNER=typetools
     fi
@@ -42,3 +44,5 @@ echo "running \"ant compile\" for annotation-tools"
 pwd
 ant compile
 echo "done running \"ant compile\" for annotation-tools"
+
+echo "Exiting annotation-tools/.travis-build-without-test.sh" in `pwd`

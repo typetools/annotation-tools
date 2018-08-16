@@ -1,9 +1,5 @@
 package scenelib.annotations.io;
 
-/*>>>
-import org.checkerframework.checker.nullness.qual.*;
-*/
-
 import java.io.*;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;

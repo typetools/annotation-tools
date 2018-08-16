@@ -1,9 +1,5 @@
 package scenelib.annotations.el;
 
-/*>>>
-import org.checkerframework.checker.nullness.qual.*;
-*/
-
 import scenelib.annotations.util.Hasher;
 
 public class TypeIndexLocation {

@@ -1,9 +1,5 @@
 package scenelib.annotations.field;
 
-/*>>>
-import org.checkerframework.checker.nullness.qual.*;
-*/
-
 /**
  * An {@link EnumAFT} is the type of an annotation field that can hold an
  * constant from a certain enumeration type.

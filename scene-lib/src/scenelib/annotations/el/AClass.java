@@ -5,11 +5,7 @@ import java.util.LinkedHashMap;
 import scenelib.annotations.Annotation;
 import scenelib.annotations.util.coll.VivifyingMap;
 
-import org.plumelib.util.UtilPlume;
-
-/*>>>
-import org.checkerframework.checker.nullness.qual.*;
-*/
+import org.plumelib.util.CollectionsPlume;
 
 /** An annotated class */
 public final class AClass extends ADeclaration {
@@ -182,31 +178,31 @@ public final class AClass extends ADeclaration {
         }
         sb.append(linePrefix);
         sb.append("Bounds:\n");
-        UtilPlume.mapToString(sb, bounds, linePrefix + "  ");
+        CollectionsPlume.mapToString(sb, bounds, linePrefix + "  ");
         sb.append(linePrefix);
         sb.append("Extends/implements:\n");
-        UtilPlume.mapToString(sb, extendsImplements, linePrefix + "  ");
+        CollectionsPlume.mapToString(sb, extendsImplements, linePrefix + "  ");
         sb.append(linePrefix);
         sb.append("Fields:\n");
-        UtilPlume.mapToString(sb, fields, linePrefix + "  ");
+        CollectionsPlume.mapToString(sb, fields, linePrefix + "  ");
         sb.append(linePrefix);
         sb.append("Field Initializers:\n");
-        UtilPlume.mapToString(sb, fieldInits, linePrefix + "  ");
+        CollectionsPlume.mapToString(sb, fieldInits, linePrefix + "  ");
         sb.append(linePrefix);
         sb.append("Static Initializers:\n");
-        UtilPlume.mapToString(sb, staticInits, linePrefix + "  ");
+        CollectionsPlume.mapToString(sb, staticInits, linePrefix + "  ");
         sb.append(linePrefix);
         sb.append("Instance Initializers:\n");
-        UtilPlume.mapToString(sb, instanceInits, linePrefix + "  ");
+        CollectionsPlume.mapToString(sb, instanceInits, linePrefix + "  ");
         sb.append(linePrefix);
         sb.append("AST Typecasts:\n");
-        UtilPlume.mapToString(sb, insertTypecasts, linePrefix + "  ");
+        CollectionsPlume.mapToString(sb, insertTypecasts, linePrefix + "  ");
         sb.append(linePrefix);
         sb.append("AST Annotations:\n");
-        UtilPlume.mapToString(sb, insertAnnotations, linePrefix + "  ");
+        CollectionsPlume.mapToString(sb, insertAnnotations, linePrefix + "  ");
         sb.append(linePrefix);
         sb.append("Methods:\n");
-        UtilPlume.mapToString(sb, methods, linePrefix + "  ");
+        CollectionsPlume.mapToString(sb, methods, linePrefix + "  ");
         return sb.toString();
     }
 
