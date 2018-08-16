@@ -1,13 +1,11 @@
 package scenelib.annotations.el;
 
-/*>>>
-import org.checkerframework.checker.nullness.qual.Nullable;
-*/
-
 import java.io.File;
 import java.util.*;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.reflect.Method;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import scenelib.annotations.el.AElement;
 import scenelib.annotations.AnnotationBuilder;
@@ -123,7 +121,7 @@ public final class AnnotationDef extends AElement {
      * It may be null for annotations that are used only as a field of other
      * annotations.
      */
-    public /*@Nullable*/ RetentionPolicy retention() {
+    public @Nullable RetentionPolicy retention() {
         if (tlAnnotationsHere.contains(Annotations.aRetentionClass)) {
             return RetentionPolicy.CLASS;
         } else if (tlAnnotationsHere.contains(Annotations.aRetentionRuntime)) {

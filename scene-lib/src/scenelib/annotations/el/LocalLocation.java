@@ -2,10 +2,6 @@ package scenelib.annotations.el;
 
 import scenelib.annotations.util.Hasher;
 
-/*>>>
-import org.checkerframework.checker.nullness.qual.*;
-*/
-
 /**
  * A {@link LocalLocation} holds location information for a local
  * variable: slot index, scope start, and scope length.

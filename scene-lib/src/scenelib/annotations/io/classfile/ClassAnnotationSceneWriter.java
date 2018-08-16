@@ -4,10 +4,6 @@
 
 package scenelib.annotations.io.classfile;
 
-/*>>>
-import org.checkerframework.checker.nullness.qual.*;
-*/
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

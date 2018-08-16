@@ -7,10 +7,6 @@ import scenelib.annotations.Annotation;
 import scenelib.annotations.field.AnnotationAFT;
 import scenelib.annotations.field.AnnotationFieldType;
 
-/*>>>
-import org.checkerframework.checker.nullness.qual.*;
-*/
-
 /**
  * A DefCollector supplies a visitor for the annotation definitions in an
  * AScene.  First, call the DefCollector constructor passing the AScene.

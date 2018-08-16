@@ -1,9 +1,5 @@
 package annotations.tests.classfile;
 
-/*>>>
-import org.checkerframework.checker.nullness.qual.*;
-*/
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -12,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.TypeAnnotationVisitor;
@@ -19,7 +17,7 @@ import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.commons.EmptyVisitor;
 
-import org.plumelib.util.UtilPlume;
+import org.plumelib.util.CollectionsPlume;
 
 import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
 
@@ -516,7 +514,7 @@ public class AnnotationVerifier {
       if (questionable.equals(correct)) {
         return;
       }
-      if (UtilPlume.deepEquals(questionable, correct)) {
+      if (CollectionsPlume.deepEquals(questionable, correct)) {
         return;
       }
 
@@ -568,7 +566,7 @@ public class AnnotationVerifier {
       this.visible = visible;
     }
 
-    public boolean equals(/*@Nullable*/ Object o) {
+    public boolean equals(@Nullable Object o) {
       if (o instanceof ParameterDescription) {
         ParameterDescription p = (ParameterDescription) o;
         return this.parameter == p.parameter;

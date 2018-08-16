@@ -1,9 +1,5 @@
 package scenelib.annotations.util;
 
-/*>>>
-import org.checkerframework.checker.nullness.qual.*;
-*/
-
 /**
  * {@link EqualByStringRepresentation} is a "mix-in" class for objects that are
  * equal if and only if their {@link #toString toString} representations are

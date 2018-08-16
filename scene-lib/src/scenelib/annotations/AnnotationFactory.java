@@ -1,9 +1,5 @@
 package scenelib.annotations;
 
-/*>>>
-import org.checkerframework.checker.nullness.qual.*;
-*/
-
 import java.util.Map;
 import java.util.Set;
 

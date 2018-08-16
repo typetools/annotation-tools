@@ -1,9 +1,5 @@
 package scenelib.annotations.el;
 
-/*>>>
-import org.checkerframework.checker.nullness.qual.*;
-*/
-
 /**
  * Thrown by {@link DefCollector} if the scene contains two different
  * definitions of the same annotation type that cannot be

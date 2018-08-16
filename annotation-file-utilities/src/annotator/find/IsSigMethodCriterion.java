@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.plumelib.bcelutil.JvmUtil;
 import org.plumelib.util.UtilPlume;
 
 import com.sun.source.tree.AnnotatedTypeTree;
@@ -65,7 +66,7 @@ public class IsSigMethodCriterion implements Criterion {
     String returnTypeJvml = methodName.substring(methodName.indexOf(")") + 1);
     this.returnType = (returnTypeJvml.equals("V")
                        ? "void"
-                       : UtilPlume.fieldDescriptorToBinaryName(returnTypeJvml));
+                       : JvmUtil.fieldDescriptorToBinaryName(returnTypeJvml));
   }
 
   // params is in JVML format
@@ -74,7 +75,7 @@ public class IsSigMethodCriterion implements Criterion {
       // nextParam is in JVML format
       String nextParam = readNext(params);
       params = params.substring(nextParam.length());
-      fullyQualifiedParams.add(UtilPlume.fieldDescriptorToBinaryName(nextParam));
+      fullyQualifiedParams.add(JvmUtil.fieldDescriptorToBinaryName(nextParam));
     }
   }
 

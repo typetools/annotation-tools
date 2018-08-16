@@ -1,9 +1,5 @@
 package scenelib.annotations.util;
 
-/*>>>
-import org.checkerframework.checker.nullness.qual.*;
-*/
-
 /**
  * {@link Strings} provides useful static methods related to strings.
  */

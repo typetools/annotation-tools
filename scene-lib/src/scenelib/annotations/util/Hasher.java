@@ -1,9 +1,5 @@
 package scenelib.annotations.util;
 
-/*>>>
-import org.checkerframework.checker.nullness.qual.*;
-*/
-
 /**
  * A simple class to mash a lot of data into a hash code for use in
  * implementing {@link Object#hashCode}.  The mashing algorithm currently is
