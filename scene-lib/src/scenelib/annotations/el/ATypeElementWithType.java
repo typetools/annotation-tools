@@ -80,11 +80,14 @@ public class ATypeElementWithType extends ATypeElement {
             && ((ATypeElementWithType) o).equalsTypeElementWithType(this);
     }
 
-    // without this method a.equals(b) will result in a call to
-    // ATypeElement.equals, where a and b are ATypeElementWithType
+    /** Returns true if this object equals the argument.
+     * Overload of standard equals method, to avoid calling
+     * ATypeElement.equals on two objects of class ATypeElementWithType.
+     */
     public boolean equals(ATypeElementWithType o) {
         return ((ATypeElementWithType) o).equalsTypeElementWithType(this);
     }
+
     /**
      * Returns whether this {@link ATypeElementWithType} equals <code>o</code>; a
      * slightly faster variant of {@link #equals(Object)} for when the argument
