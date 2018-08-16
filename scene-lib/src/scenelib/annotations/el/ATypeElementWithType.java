@@ -80,7 +80,8 @@ public class ATypeElementWithType extends ATypeElement {
             && ((ATypeElementWithType) o).equalsTypeElementWithType(this);
     }
 
-    /** Returns true if this object equals the argument.
+    /**
+     * Returns true if this object equals the argument.
      * Overload of standard equals method, to avoid calling
      * ATypeElement.equals on two objects of class ATypeElementWithType.
      */
