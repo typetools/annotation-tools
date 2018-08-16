@@ -1,8 +1,8 @@
-# Very rough testing framework for the annotator.  Running 'make all'
-# will look for all myClass.goal files in the parent directory, run
-# the annotator on the corresponding .jaif in this directory and the
-# .java file in the parent directory, and then output the difference
-# in a myClass.diff file in this directory.
+# Very rough testing framework for the annotator.  Running 'make all' will
+# look for all myClass.goal files in the parent directory, run the annotator on the
+# corresponding .jaif in this directory and the .java file in the parent directory,
+# and then output the difference in a
+# myClass.diff file in this directory.
 #
 # To test just one file, use (for example) 'make myClass.diff'.
 
@@ -21,8 +21,8 @@ export XJAVAC?=javac
 export SHELL=/bin/bash -o pipefail
 
 
-# Use .jaif instead of .goal (which ../Makefile uses), b/c only
-# .jaif files are checked in this director.
+# Use .jaif instead of .goal (which ../Makefile uses), because only
+# .jaif files are checked in this directory.
 DIFFS := $(sort $(wildcard *.jaif))
 DISABLED := $(shell grep -le "@skip-test" $(DIFFS))
 FILTERED := $(filter-out $(DISABLED),$(DIFFS))
@@ -45,7 +45,7 @@ results: ../bin/VerifyDiffs.class
 	@echo ""
 	@$(JAVA) -cp ../bin VerifyDiffs --show_all
 
-# Remakes the little java program that checks and compares diffs
+# Remakes the little Java program that checks and compares diffs.
 ../bin/VerifyDiffs.class : ../VerifyDiffs.java
 	@$(JAVAC) -g -cp ../../bincompile -d ../bin ../VerifyDiffs.java
 
@@ -61,13 +61,13 @@ bin/annotator/tests/%.class: %.java
 # problem "target value 1.8 is obsolete and will be removed in a future release"
 	$(XJAVAC) -Xlint:-options -g -cp bin:../annotation-file-utilities.jar -d bin -sourcepath . $*.java
 
-# Create a symbolic link for a java file
+# Create a symbolic link for a .java file.
 .PRECIOUS: %.java
 %.java:
 	- rm $*.java
 	ln -s ../$*.java $*.java
 
-# Create a symbolic link for a goal file
+# Create a symbolic link for a .goal file.
 .PRECIOUS: %.goal
 %.goal:
 	- rm $*.goal
@@ -78,8 +78,8 @@ bin/annotator/tests/%.class: %.java
 # TODO: added `-` to these commands to proceed past failures
 # The failures will still show up in the summary, but it might
 # be better to fail earlier.
-%.output: %.jaif %.java bin/annotator/tests/%.class ../../lib/options-all-0.3.1.jar ../../lib/plume-util-0.0.1.jar ../../bin ../../annotation-file-utilities.jar
-	- $(JAVA) \
+%.output: %.jaif %.java bin/annotator/tests/%.class
+	-$(JAVA) \
 	    -cp ../../bin:../../annotation-file-utilities.jar:bin \
 	    annotator.Main \
 	    ${DEBUG} \
@@ -88,8 +88,8 @@ bin/annotator/tests/%.class: %.java
 	    $*.jaif \
 	    $*.java \
 	    2>&1 | tee $*.log
-	- find "$*-output" -name '*.java' -print | xargs cat > "$*.output"
-	- rm -rf $*-output
+	-find "$*-output" -name '*.java' -print | xargs cat > "$*.output"
+	-rm -rf $*-output
 
 # Compare the output of the annotator and the goal file.
 %.diff: %.goal %.output

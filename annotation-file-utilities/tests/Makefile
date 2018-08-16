@@ -70,7 +70,7 @@ results: bin/VerifyDiffs.class
 	@echo ""
 	@$(JAVA) -cp bin VerifyDiffs --show_all
 
-# Remakes the little java program that checks and compares diffs
+# Remakes the little Java program that checks and compares diffs.
 bin/VerifyDiffs.class : VerifyDiffs.java
 	@$(JAVAC) -g -cp ../bincompile -d bin VerifyDiffs.java
 
