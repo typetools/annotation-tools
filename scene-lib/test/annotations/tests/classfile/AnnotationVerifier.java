@@ -1,7 +1,5 @@
 package annotations.tests.classfile;
 
-import org.checkerframework.checker.nullness.qual.*;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -9,6 +7,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassVisitor;

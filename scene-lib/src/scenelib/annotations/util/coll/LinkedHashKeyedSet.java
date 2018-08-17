@@ -2,10 +2,6 @@ package scenelib.annotations.util.coll;
 
 import java.util.*;
 
-/*>>>
-import org.checkerframework.checker.nullness.qual.*;
-*/
-
 /**
  * A simple implementation of {@link KeyedSet} backed by an insertion-order
  * {@link java.util.LinkedHashMap} and its

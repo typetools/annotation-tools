@@ -1,8 +1,8 @@
 package annotations.tests.executable;
 
-import org.checkerframework.checker.nullness.qual.*;
-
 import java.io.*;
+
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import scenelib.annotations.el.*;
 import scenelib.annotations.io.*;

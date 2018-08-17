@@ -2,6 +2,8 @@ package scenelib.annotations.tools;
 
 import java.io.*;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import scenelib.annotations.el.AScene;
 import scenelib.annotations.el.DefException;
 import scenelib.annotations.io.IndexFileParser;
@@ -47,7 +49,7 @@ public class Anncat {
 
             int idx = 0;
 
-            AScene theScene =
+            @NonNull AScene theScene =
                 new AScene();
 
             // Read the scene

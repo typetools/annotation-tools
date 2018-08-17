@@ -7,10 +7,6 @@ import scenelib.annotations.util.coll.VivifyingMap;
 
 import org.plumelib.util.CollectionsPlume;
 
-/*>>>
-import org.checkerframework.checker.nullness.qual.*;
-*/
-
 /** An annotated class */
 public final class AClass extends ADeclaration {
     /** The class's annotated type parameter bounds */

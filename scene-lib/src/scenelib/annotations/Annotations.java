@@ -15,10 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/*>>>
-import org.checkerframework.checker.nullness.qual.*;
-*/
-
 /**
  * This noninstantiable class provides useful static methods related to
  * annotations, following the convention of {@link java.util.Collections}.

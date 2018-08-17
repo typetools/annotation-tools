@@ -1,11 +1,11 @@
 package scenelib.annotations.el;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.io.File;
 import java.util.*;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.reflect.Method;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import scenelib.annotations.el.AElement;
 import scenelib.annotations.AnnotationBuilder;
