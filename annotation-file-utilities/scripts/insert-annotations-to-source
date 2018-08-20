@@ -14,7 +14,7 @@ fi
 
 AFU=${AFU:-$(dirname $0)/..}
 AFU=`cd \`dirname $0\`/.. && pwd`
-ANNOTATION_FILE_UTILS=${ANNOTATION_FILE_UTILS:-${AFU}/bin:${AFU}/../scene-lib/bin:${AFU}/../asmx/bin:${AFU}/annotation-file-utilities.jar}
+ANNOTATION_FILE_UTILS=${ANNOTATION_FILE_UTILS:-${AFU}/bin:${AFU}/../scene-lib/bin:${AFU}/../asmx/bin:${AFU}/annotation-file-utilities-all.jar}
 LANGTOOLS=${LANGTOOLS:-${AFU}/../../jsr308-langtools}
 JAVAC_JAR=${JAVAC_JAR:-${LANGTOOLS}/dist/lib/javac.jar}
 
