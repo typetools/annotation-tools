@@ -511,7 +511,6 @@
   <target name="run-tests" depends="init-properties"
           description="run tests for the annotator">
     <exec dir="tests/" executable="make" failonerror="true">
-        <env key="XJAVAC" value="javac -g ${xjavac.args}"/>
     </exec>
   </target>
 

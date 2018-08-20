@@ -1053,7 +1053,7 @@ loop:
   Integer findPosition(TreePath path, Insertion i) {
     Tree node = path.getLeaf();
     try {
-      // As per the JSR308 specification, receiver parameters are not allowed
+      // As per the type annotations specification, receiver parameters are not allowed
       // on method declarations of anonymous inner classes.
       if (i.getCriteria().isOnReceiver()
           && path.getParentPath().getParentPath().getLeaf().getKind() == Tree.Kind.NEW_CLASS) {
@@ -1242,7 +1242,7 @@ loop:
     Tree node = path.getLeaf();
     try {
       ASTPath.ASTEntry entry = astPath.getLast();
-      // As per the JSR308 specification, receiver parameters are not allowed
+      // As per the type annotations specification, receiver parameters are not allowed
       // on method declarations of anonymous inner classes.
       if (entry.getTreeKind() == Tree.Kind.METHOD
           && entry.childSelectorIs(ASTPath.PARAMETER)

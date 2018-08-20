@@ -447,8 +447,9 @@ into source code.</p>
 <p>The <code>asmx</code> sub-project provides methods for reading and
 writing class files.  <code>asmx</code> is based on an old version
 (2.2.2) of the <a href="https://asm.ow2.io/">ASM Framework</a>. It has been modified to
-allow it to read and write <a href="https://checkerframework.org/jsr308/specification/java-annotation-design.html">JSR 308</a>
-annotations in bytecode.  However, it is far behind the current ASM
+allow it to read and
+write <a href="https://checkerframework.org/jsr308/specification/java-annotation-design.html">type
+annotations</a> in \<.class> files.  However, it is far behind the current ASM
 version (5.0), which provides support for type annotations. We should
 discard the custom <code>asmx</code> in the Annotation File Utilities
 and adapt the Annotation File Utilities to use the official, supported
