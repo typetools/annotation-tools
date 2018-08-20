@@ -10,12 +10,12 @@ import java.util.Set;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.TypeAnnotationVisitor;
-import org.objectweb.asm.FieldVisitor;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.commons.EmptyVisitor;
+import org.objectweb.asmx.AnnotationVisitor;
+import org.objectweb.asmx.ClassVisitor;
+import org.objectweb.asmx.TypeAnnotationVisitor;
+import org.objectweb.asmx.FieldVisitor;
+import org.objectweb.asmx.MethodVisitor;
+import org.objectweb.asmx.commons.EmptyVisitor;
 
 import org.plumelib.util.CollectionsPlume;
 

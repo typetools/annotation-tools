@@ -1,5 +1,5 @@
 package annotations;
-import org.objectweb.asm.*;
+import org.objectweb.asmx.*;
 public class ValuesDump implements Opcodes {
 
 public static byte[] dump () throws Exception {

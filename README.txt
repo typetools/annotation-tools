@@ -17,7 +17,7 @@ asmx
 asmx contains modifications to asm to allow it to read and write JSR
 308 annotations to/from class files.
 
-The most modified classes are (in org.objectweb.asm):
+The most modified classes are (in org.objectweb.asmx):
  * ClassReader
  * ClassWriter
  * ExtendedAnnotationVisitor
@@ -35,4 +35,4 @@ files.
 
 The diffs are complicated by the fact that in a few cases, a post-2.2.2
 version of a file was added to asmx.
-One example is file src/org/objectweb/asm/optimizer/shrink.properties.
+One example is file src/org/objectweb/asmx/optimizer/shrink.properties.
