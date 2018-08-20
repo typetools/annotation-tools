@@ -502,7 +502,7 @@ classfile directly before the <code>.jaif</code> file in the argument
 list.</p><p>First, each <code>.jaif</code> file is parsed into an
 <code>AScene</code> (as described in
 <a href="#scene-lib">Scene-lib</a>). Then,
-<code>asmx/src/org/objectweb/asm/ClassReader.java</code> parses the
+<code>asmx/src/org/objectweb/asmx/ClassReader.java</code> parses the
 classfile.  As it is parsing the classfile, it passes the parsed
 bytecode off to the
 <code>scene-lib/src/annotations/io/classfile/ClassAnnotationSceneWriter.java</code>
@@ -520,7 +520,7 @@ script. This script takes one or more class names as arguments and
 outputs the annotations found in those classes to <code>.jaif</code>
 files.</p><p>First, an empty <code>AScene</code> is constructed to store
 the annotations.
-<code>asmx/src/org/objectweb/asm/ClassReader.java</code> parses the
+<code>asmx/src/org/objectweb/asmx/ClassReader.java</code> parses the
 classfile and passes the parsed bytecode off to the
 <code>scene-lib/src/annotations/io/classfile/ClassAnnotationSceneReader.java</code>
 class. This class filters out the annotations in the bytecode and adds

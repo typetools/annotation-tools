@@ -4,7 +4,7 @@ import java.io.*;
 
 import com.sun.tools.javac.main.CommandLine;
 
-import org.objectweb.asm.ClassReader;
+import org.objectweb.asmx.ClassReader;
 
 import org.plumelib.options.Option;
 import org.plumelib.options.Options;

@@ -7,7 +7,7 @@ import com.sun.tools.javac.main.CommandLine;
 import org.plumelib.options.Option;
 import org.plumelib.options.Options;
 
-import org.objectweb.asm.ClassReader;
+import org.objectweb.asmx.ClassReader;
 
 import scenelib.annotations.el.AScene;
 import scenelib.annotations.io.IndexFileWriter;

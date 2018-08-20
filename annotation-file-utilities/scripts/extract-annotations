@@ -13,7 +13,7 @@ if [ "$1" = "--debug-script" ]; then
 fi
 
 AFU=${AFU:-$(dirname $0)/..}
-ANNOTATION_FILE_UTILS=${AFU}/bin:${AFU}/../scene-lib/bin:${AFU}/../asmx/bin:${AFU}/annotation-file-utilities.jar
+ANNOTATION_FILE_UTILS=${AFU}/bin:${AFU}/../scene-lib/bin:${AFU}/../asmx/bin:${AFU}/annotation-file-utilities-all.jar
 
 if [ "$DEBUG" = "1" ]; then
   echo "--- start of extract-annotations debugging output"

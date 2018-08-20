@@ -72,8 +72,7 @@
     </fileset>
 
     <path id="libpath">
-      <pathelement location="${env.JAVA_HOME}/lib/tools.jar"/>
-      <pathelement location="${annotations-compiler}/dist/lib/javac.jar"/>
+      <pathelement location="${annotation-tools}/annotation-file-utilities/lib/compiler-2.4.0.jar"/>
       <pathelement location="${annotation-tools}/annotation-file-utilities/lib/bcel-util-1.0.0.jar"/>
       <pathelement location="${annotation-tools}/annotation-file-utilities/lib/options-1.0.0.jar"/>
       <pathelement location="${annotation-tools}/annotation-file-utilities/lib/plume-util-1.0.1.jar"/>
@@ -175,9 +174,14 @@
   </target>
 
   <target name="jarfile"
+          depends="jarfile-fat,jarfile-skinny"
+          description="create the jarfiles annotation-file-utilities*.jar">
+  </target>
+
+  <target name="jarfile-fat"
           depends="init,build,jarfile.check.uptodate"
           unless="jarfile.uptodate"
-          description="create the class library annotation-file-utilities.jar">
+          description="create the class library annotation-file-utilities-all.jar">
 
     <echo message="Using temporary directory: ${temp-jarfile}"/>
     <delete dir="${temp-jarfile}"/>
@@ -218,12 +222,40 @@
         <exclude name="META-INF/" />
       </patternset>
     </unjar>
-    <unjar src="${env.JAVA_HOME}/lib/tools.jar" dest="${temp-jarfile}">
+    <unjar src="${annotation-tools}/annotation-file-utilities/lib/compiler-2.4.0.jar" dest="${temp-jarfile}">
       <patternset>
         <include name="**/*.class"/>
         <exclude name="META-INF/" />
       </patternset>
     </unjar>
+
+    <!-- Actually create a single .jar file of all the class files,
+         scripts and documentation -->
+    <echo message="Creating jarfile annotation-file-utilities-all.jar"/>
+    <jar destfile="annotation-file-utilities-all.jar">
+      <fileset dir="${temp-jarfile}"/>
+    </jar>
+
+    <!-- Delete class files copied over -->
+    <echo message="Deleting temporary directory: ${temp-jarfile}"/>
+    <delete dir="${temp-jarfile}"/>
+  </target>
+
+  <target name="jarfile-skinny"
+          depends="init,build,jarfile.check.uptodate"
+          unless="jarfile.uptodate"
+          description="create the class library annotation-file-utilities.jar">
+
+    <echo message="Using temporary directory: ${temp-jarfile}"/>
+    <delete dir="${temp-jarfile}"/>
+    <mkdir dir="${temp-jarfile}"/>
+
+    <echo message="Copying .class files to ${temp-jarfile}"/>
+    <copy todir="${temp-jarfile}">
+      <fileset dir="bin" />
+      <fileset dir="${asmx}/bin" excludes="tmp/**"/>
+      <fileset dir="${scene-lib}/bin" excludes="annotations-expected/**,annotations/tests/**"/>
+    </copy>
 
     <!-- Actually create a single .jar file of all the class files,
          scripts and documentation -->
@@ -471,6 +503,7 @@
     <delete dir="${temp-annotation-file-utilities}"/>
 
     <!-- <echo message="Deleting previous distribution:  annotation-file-utilities.{jar,zip}"/> -->
+    <delete file="annotation-file-utilities-all.jar"/>
     <delete file="annotation-file-utilities.jar"/>
     <delete file="annotation-tools.zip"/>
   </target>

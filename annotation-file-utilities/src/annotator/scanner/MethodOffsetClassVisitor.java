@@ -1,16 +1,16 @@
 package annotator.scanner;
 
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.Attribute;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.Handle;
-import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodAdapter;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.TypeAnnotationVisitor;
-import org.objectweb.asm.TypePath;
+import org.objectweb.asmx.AnnotationVisitor;
+import org.objectweb.asmx.Attribute;
+import org.objectweb.asmx.ClassReader;
+import org.objectweb.asmx.ClassWriter;
+import org.objectweb.asmx.Handle;
+import org.objectweb.asmx.Label;
+import org.objectweb.asmx.MethodAdapter;
+import org.objectweb.asmx.MethodVisitor;
+import org.objectweb.asmx.Opcodes;
+import org.objectweb.asmx.TypeAnnotationVisitor;
+import org.objectweb.asmx.TypePath;
 
 import scenelib.annotations.io.classfile.CodeOffsetAdapter;
 

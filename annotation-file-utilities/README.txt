@@ -16,7 +16,7 @@ annotation-file-format.{html,pdf}
 scripts/
   Contains Unix and Windows programs for transferring annotations among
   Java, class, and annotation files.
-annotation-file-utilities.jar
+annotation-file-utilities-all.jar
   Java library used by the programs.
 build.xml, src/, lib/, tests/
   For developers only:  buildfile, source code, libraries, tests.

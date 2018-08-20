@@ -127,7 +127,7 @@
     <javac destdir="${out.tmp}" debug="on" includeantruntime="false" source="8" target="8">
       <classpath>
         <pathelement location="${out.tmp}"/>
-        <pathelement path="${env.JAVA_HOME}/lib/tools.jar"/>
+        <pathelement location="${annotation-tools}/annotation-file-utilities/lib/compiler-2.4.0.jar"/>
       </classpath>
       <src path="${src}"/>
       <include name="**/*.java"/>
@@ -136,11 +136,11 @@
 
   <target name="shrink" depends="compile-debug" if="product.shrink">
     <echo message="Shrinking"/>
-    <java classname="org.objectweb.asm.optimizer.Shrinker">
+    <java classname="org.objectweb.asmx.optimizer.Shrinker">
       <classpath>
         <pathelement location="${out.tmp}"/>
       </classpath>
-      <arg value="${src}/org/objectweb/asm/optimizer/shrink.properties"/>
+      <arg value="${src}/org/objectweb/asmx/optimizer/shrink.properties"/>
       <arg value="${out.tmp}"/>
       <arg value="${out.build}"/>
     </java>
@@ -264,7 +264,7 @@
 
   <target name="jar" depends="dist.init,dist.version,compile,shrink">
     <multipleAnt dir="${archive}"/>
-    <java classname="org.objectweb.asm.optimizer.JarOptimizer">
+    <java classname="org.objectweb.asmx.optimizer.JarOptimizer">
       <classpath refid="classpath"/>
       <arg value="${out.dist.lib}"/>
     </java>
@@ -336,7 +336,7 @@
       <manifest>
         <attribute name="Bundle-ManifestVersion" value="2"/>
         <attribute name="Bundle-Name" value="ASM Framework"/>
-        <attribute name="Bundle-SymbolicName" value="org.objectweb.asm;singleton:=true"/>
+        <attribute name="Bundle-SymbolicName" value="org.objectweb.asmx;singleton:=true"/>
         <attribute name="Bundle-Version" value="${plugin.artifact}"/>
         <attribute name="Bundle-ClassPath" value="output/dist/lib/asm-${product.artifact}.jar,
 output/dist/lib/asm-tree-${product.artifact}.jar,
@@ -347,13 +347,13 @@ output/dist/lib/asm-util-${product.artifact}.jar"/>
         <attribute name="Bundle-Vendor" value="ObjectWeb.org"/>
         <attribute name="Bundle-Localization" value="plugin"/>
         <attribute name="Export-Package" value="org.objectweb.asm,
-org.objectweb.asm.attrs,
-org.objectweb.asm.commons,
-org.objectweb.asm.signature,
-org.objectweb.asm.tree,
-org.objectweb.asm.tree.analysis,
-org.objectweb.asm.util,
-org.objectweb.asm.xml"/>
+org.objectweb.asmx.attrs,
+org.objectweb.asmx.commons,
+org.objectweb.asmx.signature,
+org.objectweb.asmx.tree,
+org.objectweb.asmx.tree.analysis,
+org.objectweb.asmx.util,
+org.objectweb.asmx.xml"/>
         <attribute name="Eclipse-AutoStart" value="true"/>
       </manifest>
     </jar>
@@ -361,7 +361,7 @@ org.objectweb.asm.xml"/>
 
   <target name="eclipse.feature" depends="eclipse.plugin">
     <echo file="${out}/feature.xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
-<feature id="org.objectweb.asm.feature" label="ASM Framework"
+<feature id="org.objectweb.asmx.feature" label="ASM Framework"
       version="${plugin.artifact}" provider-name="ObjectWeb.org">
 
    <description url="http://asm.objectweb.org/eclipse/asm/index.html">
@@ -396,7 +396,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 </feature>]]></echo>
 
-    <jar jarfile="${out}/org.objectweb.asm.feature_${plugin.artifact}.jar">
+    <jar jarfile="${out}/org.objectweb.asmx.feature_${plugin.artifact}.jar">
       <fileset file="${out}/feature.xml"/>
     </jar>
   </target>
@@ -408,7 +408,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
       ASM Framework
    </description>
 
-   <feature url="features/org.objectweb.asm.feature_${plugin.artifact}.jar" id="org.objectweb.asm.feature" version="${plugin.artifact}">
+   <feature url="features/org.objectweb.asmx.feature_${plugin.artifact}.jar" id="org.objectweb.asmx.feature" version="${plugin.artifact}">
       <category name="asm"/>
    </feature>
 
@@ -417,9 +417,9 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
    <archive path="plugins/org.objectweb.asm_${plugin.artifact}.jar" url="http://download.forge.objectweb.org/asm/org.objectweb.asm_${plugin.artifact}.jar"/>
 </site>]]></echo>
 
-    <zip zipfile="${out}/org.objectweb.asm.update_${plugin.artifact}.zip">
+    <zip zipfile="${out}/org.objectweb.asmx.update_${plugin.artifact}.zip">
       <zipfileset dir="${out}" includes="site.xml"/>
-      <zipfileset dir="${out}" includes="org.objectweb.asm.feature_${plugin.artifact}.jar" prefix="features"/>
+      <zipfileset dir="${out}" includes="org.objectweb.asmx.feature_${plugin.artifact}.jar" prefix="features"/>
       <zipfileset dir="${out}" includes="org.objectweb.asm_${plugin.artifact}.jar"  prefix="plugins"/>
     </zip>
   </target>

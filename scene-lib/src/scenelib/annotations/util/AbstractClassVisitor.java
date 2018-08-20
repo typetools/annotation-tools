@@ -1,14 +1,14 @@
 package scenelib.annotations.util;
 
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.Attribute;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.FieldVisitor;
-import org.objectweb.asm.Handle;
-import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.TypeAnnotationVisitor;
-import org.objectweb.asm.TypePath;
+import org.objectweb.asmx.AnnotationVisitor;
+import org.objectweb.asmx.Attribute;
+import org.objectweb.asmx.ClassVisitor;
+import org.objectweb.asmx.FieldVisitor;
+import org.objectweb.asmx.Handle;
+import org.objectweb.asmx.Label;
+import org.objectweb.asmx.MethodVisitor;
+import org.objectweb.asmx.TypeAnnotationVisitor;
+import org.objectweb.asmx.TypePath;
 
 import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
 
