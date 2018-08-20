@@ -1,13 +1,13 @@
 package scenelib.annotations.io.classfile;
 
-import org.objectweb.asm.ClassAdapter;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.Handle;
-import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodAdapter;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
+import org.objectweb.asmx.ClassAdapter;
+import org.objectweb.asmx.ClassReader;
+import org.objectweb.asmx.ClassVisitor;
+import org.objectweb.asmx.Handle;
+import org.objectweb.asmx.Label;
+import org.objectweb.asmx.MethodAdapter;
+import org.objectweb.asmx.MethodVisitor;
+import org.objectweb.asmx.Opcodes;
 
 import scenelib.annotations.io.DebugWriter;
 import scenelib.annotations.util.AbstractClassVisitor;

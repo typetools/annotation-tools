@@ -1,11 +1,11 @@
 package scenelib.annotations.io.classfile;
 
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.Handle;
-import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodAdapter;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
+import org.objectweb.asmx.ClassReader;
+import org.objectweb.asmx.Handle;
+import org.objectweb.asmx.Label;
+import org.objectweb.asmx.MethodAdapter;
+import org.objectweb.asmx.MethodVisitor;
+import org.objectweb.asmx.Opcodes;
 
 class MethodCodeOffsetAdapter extends MethodAdapter {
   private final ClassReader cr;

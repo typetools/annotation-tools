@@ -1,6 +1,6 @@
 <project name="perf" default="test">
   <target name="test">
-    <java classname="org.objectweb.asm.ASMMemTest" fork="yes">
+    <java classname="org.objectweb.asmx.ASMMemTest" fork="yes">
       <classpath>
         <pathelement location="${out.build}"/>
         <pathelement location="${out.test}"/>

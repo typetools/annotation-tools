@@ -10,7 +10,7 @@ import junit.framework.TestCase;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
-import org.objectweb.asm.ClassReader;
+import org.objectweb.asmx.ClassReader;
 
 import scenelib.annotations.Annotation;
 import scenelib.annotations.AnnotationFactory;
