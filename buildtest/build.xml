@@ -11,7 +11,6 @@
 
         <property name="asmx" location="${builddir}/annotations/asmx" />
         <property name="scene-lib" location="${builddir}/annotations/scene-lib" />
-        <property name="annotations-compiler" location="${builddir}/jsr308-langtools/src/share/opensource/javac" />
         <property name="annotations-disassembler" location="${builddir}/annotations/disassembler" />
         <property name="annotator" location="${builddir}/annotations/annotator" />
         <property name="annotated-jdk" location="${builddir}/qualifiers/annotated-jdk" />
@@ -21,14 +20,6 @@
     <!--
         Targets to checkout all the projects.
     -->
-
-    <target name="checkout-jsr308-langtools" depends="init">
-        <exec dir="${builddir}" executable="hg" failonerror="true">
-            <arg value="clone"/>
-            <arg value="https://bitbucket.org/typetools/jsr308-langtools"/>
-            <arg value="jsr308-langtools"/>
-        </exec>
-    </target>
 
     <target name="checkout-annotation-tools" depends="init">
         <exec dir="${builddir}" executable="git" failonerror="true">
@@ -46,7 +37,7 @@
         </exec>
     </target>
 
-    <target name="checkout-all" depends="checkout-jsr308-langtools, checkout-annotation-tools, checkout-checker-framework"/>
+    <target name="checkout-all" depends="checkout-annotation-tools, checkout-checker-framework"/>
 
     <!--
         Targets to build all the projects.
@@ -59,9 +50,6 @@
         <ant dir="${scene-lib}" inheritAll="false" target="bin"/>
     </target>
 
-    <target name="build-annotations-compiler" depends="checkout-annotations">
-        <ant dir="${annotations-compiler}" inheritAll="false" target="build"/>
-    </target>
 
     <target name="build-annotations-disassembler" depends="checkout-annotations">
         <ant dir="${annotations-disassembler}" inheritAll="false" target="bin"/>
@@ -75,7 +63,7 @@
         <ant dir="${annotator}" inheritAll="false" target="bin"/>
     </target>
     <target name="build-all" depends="build-asmx,
-        build-scene-lib, build-annotations-compiler,
+        build-scene-lib,
         build-annotated-jdk, build-annotator">
     </target>
 

@@ -68,11 +68,6 @@
         <!--
         <ant dir="${asmx}" inheritAll="false" target="bin"/>
         -->
-        <!-- Next 2 lines only for repository version. -->
-        <!--
-        <ant dir="${annotations-compiler}" antfile="make/build.xml" inheritAll="false" target="build"/>
-        <ant dir="${checkers}" inheritAll="false" target="build"/>
-        -->
     </target>
 
     <target name="init-paths">
@@ -117,9 +112,8 @@
             <pathelement location="${annotation-tools}/annotation-file-utilities/lib/options-1.0.0.jar"/>
             <pathelement location="${annotation-tools}/annotation-file-utilities/lib/plume-util-1.0.1.jar"/>
             <pathelement location="${annotation-tools}/annotation-file-utilities/lib/guava-20.0.jar"/>
-            <!-- remainder only for repository version -->
-            <pathelement location="${annotations-compiler}/dist/lib/javac.jar"/>
-            <pathelement location="${annotations-compiler}/dist/lib/javap.jar"/>
+            <!-- Can't use jsr308 javac.jar, because javap.jar is also required. -->
+            <pathelement location="${env.JAVA_HOME}/lib/tools.jar"/>
             <pathelement location="bin"/>
             <!-- Checker Framework qualifiers should not go in generated .jar files -->
             <pathelement location="${annotation-tools}/annotation-file-utilities/lib/checker-qual-2.5.4.jar"/>
