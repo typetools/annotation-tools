@@ -9,3 +9,9 @@ plume-util: https://repo.maven.apache.org/maven2/org/plumelib/plume-util/
 
 checker-qual: https://repo.maven.apache.org/maven2/org/checkerframework/checker-qual/
   wget https://repo.maven.apache.org/maven2/org/checkerframework/checker-qual/2.5.4/checker-qual-2.5.4.jar
+
+# Use jsr308-langtools javac.jar rather than tools.jar, because some versions
+# of tools.jar contain bugs that have been fixed in new versions.  Also, we
+# have permission to distribute this jar.
+compiler: https://repo.maven.apache.org/maven2/org/checkerframework/compiler/
+  wget https://repo.maven.apache.org/maven2/org/checkerframework/compiler/2.4.0/compiler-2.4.0.jar
