@@ -80,13 +80,13 @@ bin/annotator/tests/%.class: %.java
 	mkdir -p bin
 # Added "-Xlint:-options" to see if it permits Jenkins job to succeed, due to
 # problem "target value 1.8 is obsolete and will be removed in a future release"
-	$(XJAVAC) -Xlint:-options -g -cp bin:../annotation-file-utilities.jar -d bin -sourcepath . $*.java
+	$(XJAVAC) -Xlint:-options -g -cp bin:../annotation-file-utilities-all.jar -d bin -sourcepath . $*.java
 
 # Actually runs the annotator to create the annotated java file.
 .PRECIOUS: %.output
-%.output: %.jaif %.java bin/annotator/tests/%.class ../bin ../annotation-file-utilities.jar
+%.output: %.jaif %.java bin/annotator/tests/%.class ../bin ../annotation-file-utilities-all.jar
 	$(JAVA) \
-	-cp ../bin:../annotation-file-utilities.jar:bin \
+	-cp ../bin:../annotation-file-utilities-all.jar:bin \
 	annotator.Main \
 	${DEBUG} \
 	--abbreviate=false \

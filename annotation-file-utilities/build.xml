@@ -517,6 +517,7 @@
     <delete dir="${temp-annotation-file-utilities}"/>
 
     <!-- <echo message="Deleting previous distribution:  annotation-file-utilities.{jar,zip}"/> -->
+    <delete file="annotation-file-utilities-all.jar"/>
     <delete file="annotation-file-utilities.jar"/>
     <delete file="annotation-tools.zip"/>
   </target>
