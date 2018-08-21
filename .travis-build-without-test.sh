@@ -20,10 +20,12 @@ if [[ "$SLUGOWNER" == "" ]]; then
   SLUGOWNER=typetools
 fi
 
+set -e
+
 ## Compile
-echo "running \"ant compile\" for annotation-tools"
-pwd
+echo "About to run \"ant compile\" for annotation-tools" in `pwd`
+which ant
 ant compile
-echo "done running \"ant compile\" for annotation-tools"
+echo "Finished running \"ant compile\" for annotation-tools"
 
 echo "Exiting annotation-tools/.travis-build-without-test.sh" in `pwd`
