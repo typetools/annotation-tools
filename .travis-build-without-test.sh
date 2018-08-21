@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "Entering annotation-tools/.travis-build-without-test.sh" in `pwd`
+echo Entering `pwd`/.travis-build-without-test.sh
 
 # Fail the whole script if any command fails
 set -e
@@ -28,4 +28,4 @@ which ant
 ant compile
 echo "Finished running \"ant compile\" for annotation-tools"
 
-echo "Exiting annotation-tools/.travis-build-without-test.sh" in `pwd`
+echo Entering `pwd`/.travis-build-without-test.sh

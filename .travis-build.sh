@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "Entering annotation-tools/.travis-build.sh, GROUP=$1, in" `pwd`
+echo Entering `pwd`/.travis-build.sh, GROUP=$1
 
 # Optional argument $1 is one of:
 #   all, test, misc, downstream
@@ -70,4 +70,4 @@ if [[ "${GROUP}" == "downstream" || "${GROUP}" == "all" ]]; then
     (cd ../checker-framework-inference && ./gradlew dist && ./gradlew test)
 fi
 
-echo "Exiting annotation-tools/.travis-build.sh, GROUP=$GROUP, in" `pwd`
+echo Exiting `pwd`/.travis-build.sh, GROUP=$1
