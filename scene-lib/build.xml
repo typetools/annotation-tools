@@ -238,6 +238,19 @@
         </junit>
     </target>
 
+
+    <target name="unit-tests" depends="init, bin">
+        <mkdir dir="reports"/>
+        <junit printsummary="withOutAndErr" showoutput="true" fork="yes" dir="." haltonerror="yes" haltonfailure="yes">
+            <classpath refid="libpath"/>
+            <formatter type="plain"/>
+            <test name="unitTests.RunUnitTests" todir="reports"/>
+            <assertions>
+              <enable/>
+            </assertions>
+        </junit>
+    </target>
+
     <target name="test-classfile" depends="init, bin">
         <mkdir dir="reports"/>
         <junit printsummary="withOutAndErr" showoutput="true" fork="yes" dir="." haltonerror="yes" haltonfailure="yes">
