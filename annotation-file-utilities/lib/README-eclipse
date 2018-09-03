@@ -32,5 +32,5 @@ mklink tools.jar <your\path\to\jre>\lib\tools.jar
 mklink src.zip <your\path\to\jre>\src.zip
 
 Windows (other file systems) :
-copy <your\path\to\jre>\lib\tools.jar 
+copy <your\path\to\jre>\lib\tools.jar
 copy <your\path\to\jre>\src.zip
