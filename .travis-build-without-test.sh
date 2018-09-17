@@ -28,4 +28,4 @@ which ant
 ant compile
 echo "Finished running \"ant compile\" for annotation-tools"
 
-echo Entering `pwd`/.travis-build-without-test.sh
+echo Exiting `pwd`/.travis-build-without-test.sh
