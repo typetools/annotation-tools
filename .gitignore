@@ -59,7 +59,7 @@ annotation-file-utilities/tests/system-test/out4.class
 annotation-file-utilities/tests/system-test/out5.diff
 annotation-file-utilities/tests/system-test/out5.jaif
 
-# ignore symbolic link to JRE/lib/tools.jar and JRE/src.zip
+# ignore symbolic links to JDK files
 annotation-file-utilities/lib/tools.jar
 annotation-file-utilities/lib/src.zip
 
