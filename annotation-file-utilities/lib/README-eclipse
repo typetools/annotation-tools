@@ -1,6 +1,9 @@
-If you are developing annotation-tools or checker-framework using eclipse,
-you'll need to add symbolic links in this (annotation-file-utilities/lib)
-directory pointing to JRE tools.jar and src.zip
+If you are developing annotation-tools or checker-framework using Eclipse,
+you need to add symbolic links in this (annotation-file-utilities/lib)
+directory pointing to the JDK tools.jar and src.zip files.
+This is necessary to have access to javac and its source code, without
+having to edit the .classpath files (there is no way to refer to these
+files as part of the JRE_CONTAINER).
 
 1) Downloading JDK src.zip:
 
@@ -16,8 +19,8 @@ brew, check that it exists in directory
 Windows :
 re-run the JDK install wizard and in the custom setup panel, ensure
 "Source Code" is selected for installation.
-then check that it exists in C:\Program Files\Java\jdk1.8.0_181 or wherever you
-chose to install your JDK
+Then check that it exists in C:\Program Files\Java\jdk1.8.0_181 or wherever you
+chose to install your JDK.
 
 
 2) Creating symbolic links:
