@@ -3,6 +3,6 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="config/ow_util_ant_tasks.jar"/>
-	<classpathentry kind="lib" path="/annotation-file-utilities/lib/tools.jar" sourcepath="/annotation-file-utilities/lib/src.zip" exported="true"/>
+	<classpathentry kind="lib" path="/annotation-file-utilities/lib/tools.jar" sourcepath="/annotation-file-utilities/lib/jdk-src.zip" exported="true"/>
 	<classpathentry kind="output" path="output/build"/>
 </classpath>

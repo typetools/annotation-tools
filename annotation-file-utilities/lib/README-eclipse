@@ -26,14 +26,14 @@ chose to install your JDK.
 2) Creating symbolic links:
 
 Linux / Mac :
-ln -s <your/path/to/jre>/lib/tools.jar
-ln -s <your/path/to/jre>/src.zip
+ln -s <your/path/to/jdk>/lib/tools.jar
+ln -s <your/path/to/jdk>/src.zip jdk-src.zip
 
 Windows (NTFS file system) :
 In a command prompt with administrative priviliges, issue:
-mklink tools.jar <your\path\to\jre>\lib\tools.jar
-mklink src.zip <your\path\to\jre>\src.zip
+mklink tools.jar <your\path\to\jdk>\lib\tools.jar
+mklink jdk-src.zip <your\path\to\jdk>\src.zip
 
 Windows (other file systems) :
-copy <your\path\to\jre>\lib\tools.jar
-copy <your\path\to\jre>\src.zip
+copy <your\path\to\jdk>\lib\tools.jar
+copy <your\path\to\jdk>\src.zip jdk-src.zip

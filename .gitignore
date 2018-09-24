@@ -61,7 +61,7 @@ annotation-file-utilities/tests/system-test/out5.jaif
 
 # ignore symbolic links to JDK files
 annotation-file-utilities/lib/tools.jar
-annotation-file-utilities/lib/src.zip
+annotation-file-utilities/lib/jdk-src.zip
 
 asmx/output
 
