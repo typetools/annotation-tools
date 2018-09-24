@@ -1,0 +1,39 @@
+If you are developing annotation-tools or checker-framework using Eclipse,
+you need to add symbolic links in this (annotation-file-utilities/lib)
+directory pointing to the JDK tools.jar and src.zip files.
+This is necessary to have access to javac and its source code, without
+having to edit the .classpath files (there is no way to refer to these
+files as part of the JRE_CONTAINER).
+
+1) Downloading JDK src.zip:
+
+Linux :
+sudo apt-get -qqy install openjdk-8-source
+then check that it exists in /usr/lib/jvm/java-8-openjdk-amd64
+
+Mac:
+src.zip should already be included in your java distribution if installed via
+brew, check that it exists in directory
+/Library/Java/JavaVirtualMachines/jdk1.8.0_<version>.jdk/Contents/Home
+
+Windows :
+re-run the JDK install wizard and in the custom setup panel, ensure
+"Source Code" is selected for installation.
+Then check that it exists in C:\Program Files\Java\jdk1.8.0_181 or wherever you
+chose to install your JDK.
+
+
+2) Creating symbolic links:
+
+Linux / Mac :
+ln -s <your/path/to/jdk>/lib/tools.jar
+ln -s <your/path/to/jdk>/src.zip jdk-src.zip
+
+Windows (NTFS file system) :
+In a command prompt with administrative priviliges, issue:
+mklink tools.jar <your\path\to\jdk>\lib\tools.jar
+mklink jdk-src.zip <your\path\to\jdk>\src.zip
+
+Windows (other file systems) :
+copy <your\path\to\jdk>\lib\tools.jar
+copy <your\path\to\jdk>\src.zip jdk-src.zip
