@@ -544,12 +544,7 @@
     </fileset>
     <pathconvert property="cmdTxts" refid="javacSrc" pathsep=" " />
 
-      <javac
-            srcdir="src"
-            destdir="bin"
-            source="8"
-            target="8"
-            failonerror="true"
+      <java
             classpathref="libpath"
             classname="com.sun.tools.javac.Main">
           <jvmarg value="-Xbootclasspath/p:${annotations-compiler-jdk-jar}"/>
