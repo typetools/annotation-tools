@@ -23,7 +23,7 @@ DIFFS := $(wildcard *.goal)
 DISABLED := $(shell grep -le "@skip-test" $(DIFFS))
 FILTERED := $(filter-out $(DISABLED),$(DIFFS))
 DIFFS := $(patsubst %.goal, %.diff, $(FILTERED))
-AFU_JARS := ../../lib/options-all-0.3.1.jar ../../lib/plume-util-0.0.1.jar ../../annotation-file-utilities.jar
+AFU_JARS := ../../annotation-file-utilities-all.jar
 JAIF := C.jaif
 SRC := $(patsubst %.goal, %.java, $(FILTERED))
 OUT := $(patsubst %.goal, %.output, $(FILTERED))
@@ -59,7 +59,7 @@ compile : $(SRC)
 # Actually runs the annotator to create the annotated java file.
 output: compile $(JAIF) ../../bin $(AFU_JARS)
 	$(JAVA) \
-	-cp ../../bin:../../annotation-file-utilities.jar:bin \
+	-cp ../../bin:../../annotation-file-utilities-all.jar:bin \
 	annotator.Main \
 	${DEBUG} \
 	--abbreviate=true \

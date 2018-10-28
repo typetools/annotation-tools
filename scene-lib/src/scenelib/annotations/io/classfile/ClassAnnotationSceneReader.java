@@ -3,22 +3,18 @@
 // an AScene.
 package scenelib.annotations.io.classfile;
 
-/*>>>
-import org.checkerframework.checker.nullness.qual.*;
-*/
-
 import java.io.File;
 import java.util.*;
 
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.Label;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.TypeAnnotationVisitor;
-import org.objectweb.asm.FieldVisitor;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Type;
-import org.objectweb.asm.commons.EmptyVisitor;
+import org.objectweb.asmx.AnnotationVisitor;
+import org.objectweb.asmx.ClassReader;
+import org.objectweb.asmx.Label;
+import org.objectweb.asmx.Opcodes;
+import org.objectweb.asmx.TypeAnnotationVisitor;
+import org.objectweb.asmx.FieldVisitor;
+import org.objectweb.asmx.MethodVisitor;
+import org.objectweb.asmx.Type;
+import org.objectweb.asmx.commons.EmptyVisitor;
 
 import scenelib.annotations.*;
 import scenelib.annotations.el.*;
@@ -29,7 +25,7 @@ import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
 
 /**
  * A <code> ClassAnnotationSceneReader </code> is a
- * {@link org.objectweb.asm.ClassVisitor} that will insert all annotations it
+ * {@link org.objectweb.asmx.ClassVisitor} that will insert all annotations it
  * encounters while visiting a class into a given {@link AScene}.
  *
  * The "read" in <code> ClassAnnotationSceneReader </code> refers to a class
@@ -40,15 +36,15 @@ import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
  * The proper usage of this class is to construct a
  * <code>ClassAnnotationSceneReader}</code> with an {@link AScene} into which
  * annotations should be inserted, then pass this as a
- * {@link org.objectweb.asm.ClassVisitor} to
- * {@link org.objectweb.asm.ClassReader#accept}
+ * {@link org.objectweb.asmx.ClassVisitor} to
+ * {@link org.objectweb.asmx.ClassReader#accept}
  *
  * <p>
  *
  * All other methods are intended to be called only by
- * {@link org.objectweb.asm.ClassReader#accept},
+ * {@link org.objectweb.asmx.ClassReader#accept},
  * and should not be called anywhere else, due to the order in which
- * {@link org.objectweb.asm.ClassVisitor} methods should be called.
+ * {@link org.objectweb.asmx.ClassVisitor} methods should be called.
  */
 public class ClassAnnotationSceneReader
 extends EmptyVisitor {
@@ -108,7 +104,7 @@ extends EmptyVisitor {
   }
 
   /**
-   * @see org.objectweb.asm.commons.EmptyVisitor#visit(int, int, java.lang.String, java.lang.String, java.lang.String, java.lang.String[])
+   * @see org.objectweb.asmx.commons.EmptyVisitor#visit(int, int, java.lang.String, java.lang.String, java.lang.String, java.lang.String[])
    */
   @Override
   public void visit(int version, int access, String name, String signature,
@@ -117,7 +113,7 @@ extends EmptyVisitor {
   }
 
   /**
-   * @see org.objectweb.asm.commons.EmptyVisitor#visitAnnotation(java.lang.String, boolean)
+   * @see org.objectweb.asmx.commons.EmptyVisitor#visitAnnotation(java.lang.String, boolean)
    */
   @Override
   public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
@@ -126,7 +122,7 @@ extends EmptyVisitor {
   }
 
   /**
-   * @see org.objectweb.asm.commons.EmptyVisitor#visitTypeAnnotation(java.lang.String, boolean, boolean)
+   * @see org.objectweb.asmx.commons.EmptyVisitor#visitTypeAnnotation(java.lang.String, boolean, boolean)
    */
   @Override
   public TypeAnnotationVisitor visitTypeAnnotation(String desc, boolean visible, boolean inCode) {
@@ -135,7 +131,7 @@ extends EmptyVisitor {
   }
 
   /**
-   * @see org.objectweb.asm.commons.EmptyVisitor#visitField(int, java.lang.String, java.lang.String, java.lang.String, java.lang.Object)
+   * @see org.objectweb.asmx.commons.EmptyVisitor#visitField(int, java.lang.String, java.lang.String, java.lang.String, java.lang.Object)
    */
   @Override
   public FieldVisitor visitField(
@@ -150,7 +146,7 @@ extends EmptyVisitor {
   }
 
   /**
-   * @see org.objectweb.asm.commons.EmptyVisitor#visitMethod(int, java.lang.String, java.lang.String, java.lang.String, java.lang.String[])
+   * @see org.objectweb.asmx.commons.EmptyVisitor#visitMethod(int, java.lang.String, java.lang.String, java.lang.String, java.lang.String[])
    */
   @Override
   public MethodVisitor visitMethod(
@@ -306,7 +302,7 @@ extends EmptyVisitor {
     }
 
     /*
-     * @see org.objectweb.asm.AnnotationVisitor#visit(java.lang.String, java.lang.Object)
+     * @see org.objectweb.asmx.AnnotationVisitor#visit(java.lang.String, java.lang.Object)
      */
     @Override
     public void visit(String name, Object value) {
@@ -406,7 +402,7 @@ extends EmptyVisitor {
     }
 
     /*
-     * @see org.objectweb.asm.AnnotationVisitor#visitEnum(java.lang.String, java.lang.String, java.lang.String)
+     * @see org.objectweb.asmx.AnnotationVisitor#visitEnum(java.lang.String, java.lang.String, java.lang.String)
      */
     @Override
     public void visitEnum(String name, String desc, String value) {
@@ -415,7 +411,7 @@ extends EmptyVisitor {
     }
 
     /*
-     * @see org.objectweb.asm.AnnotationVisitor#visitAnnotation(java.lang.String, java.lang.String)
+     * @see org.objectweb.asmx.AnnotationVisitor#visitAnnotation(java.lang.String, java.lang.String)
      */
     @Override
     public AnnotationVisitor visitAnnotation(String name, String desc) {
@@ -424,7 +420,7 @@ extends EmptyVisitor {
     }
 
     /*
-     * @see org.objectweb.asm.AnnotationVisitor#visitArray(java.lang.String)
+     * @see org.objectweb.asmx.AnnotationVisitor#visitArray(java.lang.String)
      */
     @Override
     public AnnotationVisitor visitArray(String name) {
@@ -435,7 +431,7 @@ extends EmptyVisitor {
     }
 
     /*
-     * @see org.objectweb.asm.TypeAnnotationVisitor#visitXTargetType(int)
+     * @see org.objectweb.asmx.TypeAnnotationVisitor#visitXTargetType(int)
      */
     @Override
     public void visitXTargetType(int target_type) {
@@ -443,7 +439,7 @@ extends EmptyVisitor {
     }
 
     /*
-     * @see org.objectweb.asm.TypeAnnotationVisitor#visitXIndex(int)
+     * @see org.objectweb.asmx.TypeAnnotationVisitor#visitXIndex(int)
      */
     @Override
     public void visitXIndex(int index) {
@@ -451,7 +447,7 @@ extends EmptyVisitor {
     }
 
     /*
-     * @see org.objectweb.asm.TypeAnnotationVisitor#visitXLength(int)
+     * @see org.objectweb.asmx.TypeAnnotationVisitor#visitXLength(int)
      */
     @Override
     public void visitXLength(int length) {
@@ -459,7 +455,7 @@ extends EmptyVisitor {
     }
 
     /*
-     * @see org.objectweb.asm.TypeAnnotationVisitor#visitXLocation(TypePathEntry)
+     * @see org.objectweb.asmx.TypeAnnotationVisitor#visitXLocation(TypePathEntry)
      */
     @Override
     public void visitXLocation(TypePathEntry location) {
@@ -467,7 +463,7 @@ extends EmptyVisitor {
     }
 
     /*
-     * @see org.objectweb.asm.TypeAnnotationVisitor#visitXLocationLength(int)
+     * @see org.objectweb.asmx.TypeAnnotationVisitor#visitXLocationLength(int)
      */
     @Override
     public void visitXLocationLength(int location_length) {
@@ -475,7 +471,7 @@ extends EmptyVisitor {
     }
 
     /*
-     * @see org.objectweb.asm.TypeAnnotationVisitor#visitXOffset(int)
+     * @see org.objectweb.asmx.TypeAnnotationVisitor#visitXOffset(int)
      */
     @Override
     public void visitXOffset(int offset) {
@@ -487,7 +483,7 @@ extends EmptyVisitor {
     }
 
     /*
-     * @see org.objectweb.asm.TypeAnnotationVisitor#visitXStartPc(int)
+     * @see org.objectweb.asmx.TypeAnnotationVisitor#visitXStartPc(int)
      */
     @Override
     public void visitXStartPc(int start_pc) {
@@ -495,7 +491,7 @@ extends EmptyVisitor {
     }
 
     /*
-     * @see org.objectweb.asm.TypeAnnotationVisitor#visitXBoundIndex(int)
+     * @see org.objectweb.asmx.TypeAnnotationVisitor#visitXBoundIndex(int)
      */
     @Override
     public void visitXParamIndex(int param_index) {
@@ -503,7 +499,7 @@ extends EmptyVisitor {
     }
 
     /*
-     * @see org.objectweb.asm.TypeAnnotationVisitor#visitXBoundIndex(int)
+     * @see org.objectweb.asmx.TypeAnnotationVisitor#visitXBoundIndex(int)
      */
     @Override
     public void visitXBoundIndex(int bound_index) {
@@ -528,7 +524,7 @@ extends EmptyVisitor {
      * Visits the end of the annotation, and actually writes out the
      *  annotation into aElement.
      *
-     * @see org.objectweb.asm.TypeAnnotationVisitor#visitEnd()
+     * @see org.objectweb.asmx.TypeAnnotationVisitor#visitEnd()
      */
     @Override
     public void visitEnd() {
@@ -1058,11 +1054,11 @@ extends EmptyVisitor {
     public void visit(String name, Object value) {
       if (trace) { System.out.printf("visit(%s, %s) (%s) in %s (%s)%n", name, value, value.getClass(), this, this.getClass()); }
       ScalarAFT aft;
-      if (value.getClass().equals(org.objectweb.asm.Type.class)) {
+      if (value.getClass().equals(org.objectweb.asmx.Type.class)) {
         // What if it's an annotation?
         aft = ClassTokenAFT.ctaft;
         try {
-          value = Class.forName(((org.objectweb.asm.Type) value).getClassName());
+          value = Class.forName(((org.objectweb.asmx.Type) value).getClassName());
         } catch (ClassNotFoundException e) {
           throw new RuntimeException("Could not load Class for Type: " + value, e);
         }

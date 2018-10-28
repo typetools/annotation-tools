@@ -4,10 +4,6 @@
 
 package scenelib.annotations.io.classfile;
 
-/*>>>
-import org.checkerframework.checker.nullness.qual.*;
-*/
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,17 +12,17 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.lang.annotation.RetentionPolicy;
 
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.Attribute;
-import org.objectweb.asm.ClassAdapter;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.Handle;
-import org.objectweb.asm.TypeAnnotationVisitor;
-import org.objectweb.asm.FieldVisitor;
-import org.objectweb.asm.MethodAdapter;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.commons.EmptyVisitor;
+import org.objectweb.asmx.AnnotationVisitor;
+import org.objectweb.asmx.Attribute;
+import org.objectweb.asmx.ClassAdapter;
+import org.objectweb.asmx.ClassReader;
+import org.objectweb.asmx.ClassWriter;
+import org.objectweb.asmx.Handle;
+import org.objectweb.asmx.TypeAnnotationVisitor;
+import org.objectweb.asmx.FieldVisitor;
+import org.objectweb.asmx.MethodAdapter;
+import org.objectweb.asmx.MethodVisitor;
+import org.objectweb.asmx.commons.EmptyVisitor;
 
 import com.sun.tools.javac.code.TargetType;
 import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
@@ -36,7 +32,7 @@ import scenelib.annotations.el.*;
 import scenelib.annotations.field.*;
 
 /**
- * A ClassAnnotationSceneWriter is a {@link org.objectweb.asm.ClassVisitor}
+ * A ClassAnnotationSceneWriter is a {@link org.objectweb.asmx.ClassVisitor}
  * that can be used to write a class file that is the combination of an
  * existing class file and annotations in an {@link AScene}.  The "write"
  * in <code> ClassAnnotationSceneWriter </code> refers to a class file
@@ -48,16 +44,16 @@ import scenelib.annotations.field.*;
  * The proper usage of this class is to construct a
  * <code>ClassAnnotationSceneWriter</code> with a {@link AScene} that
  * already contains all its annotations, pass this as a {@link
- * org.objectweb.asm.ClassVisitor} to {@link
- * org.objectweb.asm.ClassReader#accept}, and then obtain the resulting
+ * org.objectweb.asmx.ClassVisitor} to {@link
+ * org.objectweb.asmx.ClassReader#accept}, and then obtain the resulting
  * class, ready to be written to a file, with {@link #toByteArray}.  </p>
  *
  * <p>
  *
  * All other methods are intended to be called only by
- * {@link org.objectweb.asm.ClassReader#accept},
+ * {@link org.objectweb.asmx.ClassReader#accept},
  * and should not be called anywhere else, due to the order in which
- * {@link org.objectweb.asm.ClassVisitor} methods should be called.
+ * {@link org.objectweb.asmx.ClassVisitor} methods should be called.
  *
  * <p>
  *
@@ -152,7 +148,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
    * from merging all the annotations in the scene into the class file
    * this has visited.  This method may only be called once this has already
    * completely visited a class, which is done by calling
-   * {@link org.objectweb.asm.ClassReader#accept}.
+   * {@link org.objectweb.asmx.ClassReader#accept}.
    *
    * @return a byte array of the merged class file
    */
@@ -162,7 +158,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
 
   /**
    * {@inheritDoc}
-   * @see org.objectweb.asm.ClassAdapter#visit(int, int, java.lang.String, java.lang.String, java.lang.String, java.lang.String[])
+   * @see org.objectweb.asmx.ClassAdapter#visit(int, int, java.lang.String, java.lang.String, java.lang.String, java.lang.String[])
    */
   @Override
   public void visit(int version, int access, String name,
@@ -176,7 +172,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
 
   /**
    * {@inheritDoc}
-   * @see org.objectweb.asm.ClassAdapter#visitInnerClass(java.lang.String, java.lang.String, java.lang.String, int)
+   * @see org.objectweb.asmx.ClassAdapter#visitInnerClass(java.lang.String, java.lang.String, java.lang.String, int)
    */
   @Override
   public void visitInnerClass(String name, String outerName, String innerName, int access ) {
@@ -186,7 +182,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
 
   /**
    * {@inheritDoc}
-   * @see org.objectweb.asm.ClassAdapter#visitField(int, java.lang.String, java.lang.String, java.lang.String, java.lang.Object)
+   * @see org.objectweb.asmx.ClassAdapter#visitField(int, java.lang.String, java.lang.String, java.lang.String, java.lang.Object)
    */
   @Override
   public FieldVisitor visitField(int access, String name, String desc,
@@ -200,7 +196,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
 
   /**
    * {@inheritDoc}
-   * @see org.objectweb.asm.ClassAdapter#visitMethod(int, java.lang.String, java.lang.String, java.lang.String, java.lang.String[])
+   * @see org.objectweb.asmx.ClassAdapter#visitMethod(int, java.lang.String, java.lang.String, java.lang.String, java.lang.String[])
    */
   @Override
   public MethodVisitor visitMethod(int access, String name, String desc,
@@ -216,7 +212,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
 
   /**
    * {@inheritDoc}
-   * @see org.objectweb.asm.ClassAdapter#visitEnd()
+   * @see org.objectweb.asmx.ClassAdapter#visitEnd()
    */
   @Override
   public void visitEnd() {
@@ -226,7 +222,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
 
   /**
    * {@inheritDoc}
-   * @see org.objectweb.asm.ClassAdapter#visitAnnotation(java.lang.String, boolean)
+   * @see org.objectweb.asmx.ClassAdapter#visitAnnotation(java.lang.String, boolean)
    */
   @Override
   public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
@@ -242,7 +238,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
 
   /**
    * {@inheritDoc}
-   * @see org.objectweb.asm.ClassAdapter#visitTypeAnnotation(java.lang.String, boolean, boolean)
+   * @see org.objectweb.asmx.ClassAdapter#visitTypeAnnotation(java.lang.String, boolean, boolean)
    */
   @Override
   public TypeAnnotationVisitor visitTypeAnnotation(String desc, boolean visible, boolean inCode) {
@@ -417,7 +413,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
       } else if (aft instanceof EnumAFT) {
         av.visitEnum(fieldName, ((EnumAFT) aft).typeName, value.toString());
       } else if (aft instanceof ClassTokenAFT) {
-        av.visit(fieldName, org.objectweb.asm.Type.getType((Class<?>)value));
+        av.visit(fieldName, org.objectweb.asmx.Type.getType((Class<?>)value));
       } else {
         // everything else is a string
         av.visit(fieldName, value);
@@ -515,7 +511,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
 
     /**
      * {@inheritDoc}
-     * @see org.objectweb.asm.FieldVisitor#visitAnnotation(java.lang.String, boolean)
+     * @see org.objectweb.asmx.FieldVisitor#visitAnnotation(java.lang.String, boolean)
      */
     @Override
     public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
@@ -532,7 +528,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
 
     /**
      * {@inheritDoc}
-     * @see org.objectweb.asm.FieldVisitor#visitTypeAnnotation(java.lang.String, boolean)
+     * @see org.objectweb.asmx.FieldVisitor#visitTypeAnnotation(java.lang.String, boolean)
      */
     @Override
     public TypeAnnotationVisitor visitTypeAnnotation(String desc, boolean visible, boolean inCode) {
@@ -549,7 +545,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
     }
 
     /** {@inheritDoc}
-     * @see org.objectweb.asm.FieldVisitor#visitAttribute(org.objectweb.asm.Attribute)
+     * @see org.objectweb.asmx.FieldVisitor#visitAttribute(org.objectweb.asmx.Attribute)
      */
     @Override
     public void visitAttribute(Attribute attr) {
@@ -560,7 +556,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
      * Tells this to visit the end of the field in the class file,
      * and also ensures that this visits all its annotations in the scene.
      *
-     * @see org.objectweb.asm.FieldVisitor#visitEnd()
+     * @see org.objectweb.asmx.FieldVisitor#visitEnd()
      */
     @Override
     public void visitEnd() {
@@ -658,7 +654,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
 
     /**
      * {@inheritDoc}
-     * @see org.objectweb.asm.MethodAdapter#visitCode()
+     * @see org.objectweb.asmx.MethodAdapter#visitCode()
      */
     @Override
     public void visitCode() {
@@ -668,7 +664,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
 
     /**
      * {@inheritDoc}
-     * @see org.objectweb.asm.MethodAdapter#visitEnd()
+     * @see org.objectweb.asmx.MethodAdapter#visitEnd()
      */
     @Override
     public void visitEnd() {
@@ -678,7 +674,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
 
     /**
      * {@inheritDoc}
-     * @see org.objectweb.asm.MethodAdapter#visitAnnotation(java.lang.String, boolean)
+     * @see org.objectweb.asmx.MethodAdapter#visitAnnotation(java.lang.String, boolean)
      */
     @Override
     public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
@@ -694,7 +690,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
 
     /**
      * {@inheritDoc}
-     * @see org.objectweb.asm.MethodAdapter#visitTypeAnnotation(java.lang.String, boolean)
+     * @see org.objectweb.asmx.MethodAdapter#visitTypeAnnotation(java.lang.String, boolean)
      */
     @Override
     public TypeAnnotationVisitor visitTypeAnnotation(String desc, boolean visible, boolean inCode) {

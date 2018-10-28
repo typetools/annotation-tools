@@ -1,9 +1,5 @@
 package annotations.tests.classfile;
 
-/*>>>
-import org.checkerframework.checker.nullness.qual.*;
-*/
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -14,7 +10,7 @@ import junit.framework.TestCase;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
-import org.objectweb.asm.ClassReader;
+import org.objectweb.asmx.ClassReader;
 
 import scenelib.annotations.Annotation;
 import scenelib.annotations.AnnotationFactory;

@@ -52,9 +52,9 @@ results: ../bin/VerifyDiffs.class
 
 # Actually runs the annotator to create the annotated java file.
 .PRECIOUS: %.output
-%.output: %.jaif %.java ../../lib/options-all-0.3.1.jar ../../lib/plume-util-0.0.1.jar ../../bin ../../annotation-file-utilities.jar
+%.output: %.jaif %.java ../../bin ../../annotation-file-utilities-all.jar
 	$(JAVA) \
-	-cp ../../bin:../bin:../../annotation-file-utilities.jar:bin \
+	-cp ../../bin:../bin:../../annotation-file-utilities-all.jar:bin \
 	annotator.Main \
 	${DEBUG} \
 	--abbreviate=true \

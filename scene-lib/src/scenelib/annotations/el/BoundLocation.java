@@ -2,10 +2,6 @@ package scenelib.annotations.el;
 
 import scenelib.annotations.util.Hasher;
 
-/*>>>
-import org.checkerframework.checker.nullness.qual.*;
-*/
-
 /**
  * A {@link BoundLocation} holds location information for a bound of a type
  * parameter of a class or method: parameter index and bound index.

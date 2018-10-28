@@ -24,7 +24,7 @@ DIFFS := $(wildcard *.goal)
 DISABLED := $(shell grep -le "@skip-test" $(DIFFS))
 FILTERED := $(filter-out $(DISABLED),$(DIFFS))
 DIFFS := $(patsubst %.goal, %.diff, $(FILTERED))
-AFU_JARS := ../../lib/options-all-0.3.1.jar ../../lib/plume-util-0.0.1.jar ../../lib/plume-util-0.0.1.jar ../../annotation-file-utilities.jar
+AFU_JARS := ../../annotation-file-utilities-all.jar
 JAIF := C.jaif
 SRC := $(patsubst %.goal, %.java, $(FILTERED))
 OUT := $(patsubst %.goal, %.output, $(FILTERED))
@@ -58,13 +58,13 @@ compile : $(SRC)
 	$(JAVAC) -g -cp bin:../../bin -d bin -sourcepath . $(SRC)
 
 # Actually runs the annotator to create the annotated java file.
-# We are required to put annotation-file-utilities.jar (and ../bin) on the
+# We are required to put annotation-file-utilities-all.jar (and ../bin) on the
 # bootclasspath so that the JSR 308 javac classes bundled therein are found
 # before the stock javac classes that the Mac OS includes on the bootclasspath
 # (other platforms do not make such inclusions)
 output: compile $(JAIF) ../../bin $(AFU_JARS)
 	$(JAVA) \
-        -Xbootclasspath/p:../../bin:../../annotation-file-utilities.jar \
+        -Xbootclasspath/p:../../bin:../../annotation-file-utilities-all.jar \
 	-cp bin \
 	annotator.Main \
 	${DEBUG} \

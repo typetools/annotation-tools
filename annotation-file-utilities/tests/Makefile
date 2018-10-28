@@ -15,7 +15,6 @@
 #   JAVAC=${JAVA_HOME}/bin/javac
 export JAVA?=java -ea
 export JAVAC?=javac
-export XJAVAC?=javac
 
 export SHELL=/bin/bash -o pipefail
 
@@ -32,11 +31,15 @@ DEBUG :=
 default : all
 
 .PHONY: all
-all : $(DIFFS) abbreviated enum-imports ad-hoc issue155 system-test source-extension results
+all : $(DIFFS) abbreviated converted enum-imports ad-hoc issue155 system-test source-extension results
 
 .PHONY: abbreviated
 abbreviated:
 	${MAKE} -C abbreviated
+
+.PHONY: converted
+converted:
+	${MAKE} -C converted
 
 .PHONY: enum-imports
 enum-imports:
@@ -66,27 +69,27 @@ results: bin/VerifyDiffs.class
 	@echo ""
 	@$(JAVA) -cp bin VerifyDiffs --show_all
 
-# Remakes the little java program that checks and compares diffs
+# Remakes the little Java program that checks and compares diffs.
 bin/VerifyDiffs.class : VerifyDiffs.java
 	@$(JAVAC) -g -cp ../bincompile -d bin VerifyDiffs.java
 
 # Compiles all the test cases (be verbose about this).
 compile :
 	mkdir -p bin
-	$(XJAVAC) -g -cp ../bin -d bin *.java
+	$(JAVAC) -g -cp ../bin -d bin *.java
 
 .PRECIOUS : bin/annotator/tests/%.class
 bin/annotator/tests/%.class: %.java
 	mkdir -p bin
 # Added "-Xlint:-options" to see if it permits Jenkins job to succeed, due to
 # problem "target value 1.8 is obsolete and will be removed in a future release"
-	$(XJAVAC) -Xlint:-options -g -cp bin:../annotation-file-utilities.jar -d bin -sourcepath . $*.java
+	$(JAVAC) -Xlint:-options -g -cp bin:../annotation-file-utilities-all.jar -d bin -sourcepath . $*.java
 
 # Actually runs the annotator to create the annotated java file.
 .PRECIOUS: %.output
-%.output: %.jaif %.java bin/annotator/tests/%.class ../lib/options-all-0.3.1.jar ../lib/plume-util-0.0.1.jar ../bin ../annotation-file-utilities.jar
+%.output: %.jaif %.java bin/annotator/tests/%.class ../bin ../annotation-file-utilities-all.jar
 	$(JAVA) \
-	-cp ../bin:../annotation-file-utilities.jar:bin \
+	-cp ../bin:../annotation-file-utilities-all.jar:bin \
 	annotator.Main \
 	${DEBUG} \
 	--abbreviate=false \
@@ -109,6 +112,7 @@ clean :
 	rm -f *.log
 	rm -f *.output
 	(cd abbreviated && make clean)
+	(cd converted && make clean)
 	(cd enum-imports && make clean)
 	(cd ad-hoc && make clean)
 	(cd issue155 && make clean)

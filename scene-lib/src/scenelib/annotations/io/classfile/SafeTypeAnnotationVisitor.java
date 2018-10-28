@@ -3,15 +3,11 @@
 
 package scenelib.annotations.io.classfile;
 
-/*>>>
-import org.checkerframework.checker.nullness.qual.*;
-*/
-
 import java.util.ArrayList;
 import java.util.List;
 
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.TypeAnnotationVisitor;
+import org.objectweb.asmx.AnnotationVisitor;
+import org.objectweb.asmx.TypeAnnotationVisitor;
 
 import com.sun.tools.javac.code.TargetType;
 import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
@@ -84,7 +80,7 @@ implements TypeAnnotationVisitor {
 
   /**
    * {@inheritDoc}
-   * @see org.objectweb.asm.AnnotationVisitor#visit(java.lang.String, java.lang.Object)
+   * @see org.objectweb.asmx.AnnotationVisitor#visit(java.lang.String, java.lang.Object)
    */
   @Override
   public void visit(String name, Object value) {
@@ -93,7 +89,7 @@ implements TypeAnnotationVisitor {
 
   /**
    * {@inheritDoc}
-   * @see org.objectweb.asm.AnnotationVisitor#visitAnnotation(java.lang.String, java.lang.String)
+   * @see org.objectweb.asmx.AnnotationVisitor#visitAnnotation(java.lang.String, java.lang.String)
    */
   @Override
   public AnnotationVisitor visitAnnotation(String name, String desc) {
@@ -102,7 +98,7 @@ implements TypeAnnotationVisitor {
 
   /**
    * {@inheritDoc}
-   * @see org.objectweb.asm.AnnotationVisitor#visitArray(java.lang.String)
+   * @see org.objectweb.asmx.AnnotationVisitor#visitArray(java.lang.String)
    */
   @Override
   public AnnotationVisitor visitArray(String name) {
@@ -111,7 +107,7 @@ implements TypeAnnotationVisitor {
 
   /**
    * {@inheritDoc}
-   * @see org.objectweb.asm.AnnotationVisitor#visitEnum(java.lang.String, java.lang.String, java.lang.String)
+   * @see org.objectweb.asmx.AnnotationVisitor#visitEnum(java.lang.String, java.lang.String, java.lang.String)
    */
   @Override
   public void visitEnum(String name, String desc, String value) {
@@ -120,7 +116,7 @@ implements TypeAnnotationVisitor {
 
   /**
    * {@inheritDoc}
-   * @see org.objectweb.asm.TypeAnnotationVisitor#visitXIndex(int)
+   * @see org.objectweb.asmx.TypeAnnotationVisitor#visitXIndex(int)
    */
   @Override
   public void visitXIndex(int index) {
@@ -130,7 +126,7 @@ implements TypeAnnotationVisitor {
 
   /**
    * {@inheritDoc}
-   * @see org.objectweb.asm.TypeAnnotationVisitor#visitXLength(int)
+   * @see org.objectweb.asmx.TypeAnnotationVisitor#visitXLength(int)
    */
   @Override
   public void visitXLength(int length) {
@@ -140,7 +136,7 @@ implements TypeAnnotationVisitor {
 
   /**
    * {@inheritDoc}
-   * @see org.objectweb.asm.TypeAnnotationVisitor#visitXLocation(TypePathEntry)
+   * @see org.objectweb.asmx.TypeAnnotationVisitor#visitXLocation(TypePathEntry)
    */
   @Override
   public void visitXLocation(TypePathEntry location) {
@@ -150,7 +146,7 @@ implements TypeAnnotationVisitor {
 
   /**
    * {@inheritDoc}
-   * @see org.objectweb.asm.TypeAnnotationVisitor#visitXLocationLength(int)
+   * @see org.objectweb.asmx.TypeAnnotationVisitor#visitXLocationLength(int)
    */
   @Override
   public void visitXLocationLength(int location_length) {
@@ -160,7 +156,7 @@ implements TypeAnnotationVisitor {
 
   /**
    * {@inheritDoc}
-   * @see org.objectweb.asm.TypeAnnotationVisitor#visitXOffset(int)
+   * @see org.objectweb.asmx.TypeAnnotationVisitor#visitXOffset(int)
    */
   @Override
   public void visitXOffset(int offset) {
@@ -174,7 +170,7 @@ implements TypeAnnotationVisitor {
 
   /**
    * {@inheritDoc}
-   * @see org.objectweb.asm.TypeAnnotationVisitor#visitXStartPc(int)
+   * @see org.objectweb.asmx.TypeAnnotationVisitor#visitXStartPc(int)
    */
   @Override
   public void visitXStartPc(int start_pc) {
@@ -184,7 +180,7 @@ implements TypeAnnotationVisitor {
 
   /**
    * {@inheritDoc}
-   * @see org.objectweb.asm.TypeAnnotationVisitor#visitXTargetType(int)
+   * @see org.objectweb.asmx.TypeAnnotationVisitor#visitXTargetType(int)
    */
   @Override
   public void visitXTargetType(int target_type) {
@@ -194,7 +190,7 @@ implements TypeAnnotationVisitor {
 
   /**
    * {@inheritDoc}
-   * @see org.objectweb.asm.TypeAnnotationVisitor#visitXParamIndex(int)
+   * @see org.objectweb.asmx.TypeAnnotationVisitor#visitXParamIndex(int)
    */
   @Override
   public void visitXParamIndex(int param_index) {
@@ -204,7 +200,7 @@ implements TypeAnnotationVisitor {
 
   /**
    * {@inheritDoc}
-   * @see org.objectweb.asm.TypeAnnotationVisitor#visitXBoundIndex(int)
+   * @see org.objectweb.asmx.TypeAnnotationVisitor#visitXBoundIndex(int)
    */
   @Override
   public void visitXBoundIndex(int bound_index) {
@@ -240,7 +236,7 @@ implements TypeAnnotationVisitor {
    * {@inheritDoc}
    * @throws InvalidTypeAnnotationException if the information this
    *  has visited does not specify a legal extended annotation
-   * @see org.objectweb.asm.AnnotationVisitor#visitEnd()
+   * @see org.objectweb.asmx.AnnotationVisitor#visitEnd()
    */
   @Override
   public void visitEnd() {

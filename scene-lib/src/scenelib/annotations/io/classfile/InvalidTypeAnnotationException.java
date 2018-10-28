@@ -1,9 +1,5 @@
 package scenelib.annotations.io.classfile;
 
-/*>>>
-import org.checkerframework.checker.nullness.qual.*;
-*/
-
 /**
  * An <code>InvalidTypeAnnotationException </code> indicates that an
  * extended annotation was created with invalid information.  For example,

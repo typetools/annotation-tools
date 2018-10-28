@@ -14,9 +14,8 @@ fi
 
 AFU=${AFU:-$(dirname $0)/..}
 AFU=`cd \`dirname $0\`/.. && pwd`
-ANNOTATION_FILE_UTILS=${ANNOTATION_FILE_UTILS:-${AFU}/bin:${AFU}/../scene-lib/bin:${AFU}/../asmx/bin:${AFU}/annotation-file-utilities.jar}
-LANGTOOLS=${LANGTOOLS:-${AFU}/../../jsr308-langtools}
-JAVAC_JAR=${JAVAC_JAR:-${LANGTOOLS}/dist/lib/javac.jar}
+ANNOTATION_FILE_UTILS=${ANNOTATION_FILE_UTILS:-${AFU}/bin:${AFU}/../scene-lib/bin:${AFU}/../asmx/bin:${AFU}/annotation-file-utilities-all.jar}
+JAVAC_JAR=${JAVAC_JAR:-${ANNOTATION_FILE_UTILS}/lib/compiler-2.4.0.jar}
 
 if [ "$DEBUG" = "1" ]; then
   echo "--- start of insert-annotations-to-source debugging output"
