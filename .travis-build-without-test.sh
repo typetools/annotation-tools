@@ -22,6 +22,23 @@ fi
 
 set -e
 
+# jsr308-langtools
+if [ -d ../jsr308-langtools ] ; then
+    (cd ../jsr308-langtools && hg pull && hg update)
+else
+    set +e
+    echo "Running: hg identify https://bitbucket.org/${SLUGOWNER}/jsr308-langtools"
+    hg identify https://bitbucket.org/${SLUGOWNER}/jsr308-langtools &>/dev/null
+    if [ "$?" -ne 0 ]; then
+        SLUGOWNER=typetools
+    fi
+    set -e
+    echo "Running:  (cd .. && hg clone https://bitbucket.org/${SLUGOWNER}/jsr308-langtools)"
+    (cd .. && (hg clone https://bitbucket.org/${SLUGOWNER}/jsr308-langtools || hg clone https://bitbucket.org/${SLUGOWNER}/jsr308-langtools))
+    echo "... done: (cd .. && hg clone https://bitbucket.org/${SLUGOWNER}/jsr308-langtools)"
+fi
+(cd ../jsr308-langtools/ && ./.travis-build-without-test.sh)
+
 ## Compile
 echo "About to run \"ant compile\" for annotation-tools" in `pwd`
 which ant
