@@ -544,29 +544,18 @@
     </fileset>
     <pathconvert property="cmdTxts" refid="javacSrc" pathsep=" " />
 
-      <java
-            classpathref="libpath"
-            classname="com.sun.tools.javac.Main">
-          <jvmarg value="-Xbootclasspath/p:${annotations-compiler-jdk-jar}"/>
-          <arg value="-Werror"/>
-          <arg value="-g"/>
-          <arg line="-sourcepath src"/>
-          <arg line="-d bin"/>
-          <arg line="${cmdTxts}"/>
-          <arg line="-version"/>
-          <!-- Make sure we only have Java 8 source code and generate Java 8 bytecode. -->
-          <arg value="-source"/>
-          <arg value="8"/>
-          <arg value="-target"/>
-          <arg value="8"/>
-          <!-- To not get a warning about missing bootstrap
-               classpath for Java 8 (once we use Java 9). -->
-          <arg value="-Xlint:-options"/>
-          <!-- To prevent a cyclic dependency with the Checker
-               Framework, ignore type annotations in comments here.
-               Separate targets exist to check the qualifiers. -->
-          <arg line="-XDTA:noannotationsincomments"/>
-      </java>
+    <javac
+            srcdir="src"
+            destdir="bin"
+            source="8"
+            target="8"
+            failonerror="true"
+            classpathref="libpath">
+          <compilerarg value="-Xlint:-options"/>
+          <compilerarg value="-Werror"/>
+          <compilerarg value="-g"/>
+          <compilerarg line="${cmdTxts}"/>
+    </javac>
   </target>
 
   <!-- Boilerplate to set cfjavac property. Is there a better way? -->
