@@ -29,24 +29,24 @@ public final class AnnotationDef extends AElement {
 
     /**
      * A map of the names of this annotation type's fields to their types. Since
-     * {@link AnnotationDef}s are immutable, attempting to modify this
-     * map will result in an exception.
+     * {@link AnnotationDef}s are immutable, clients should not modify this
+     * map, and doing so will result in an exception.
      */
     public Map<String, AnnotationFieldType> fieldTypes;
+
+    /** Where the annotation definition came from, such as a file name. */
+    public String source;
 
     /**
      * Constructs an annotation definition with the given name.
      * You MUST call setFieldTypes afterward, even if with an empty map.  (Yuck.)
      */
-    public AnnotationDef(String name) {
+    public AnnotationDef(String name, String source) {
         super("annotation: " + name);
         assert name != null;
+        assert source != null;
         this.name = name;
-    }
-
-    @Override
-    public AnnotationDef clone() {
-        throw new UnsupportedOperationException("can't duplicate AnnotationDefs");
+        this.source = source;
     }
 
     // Problem:  I am not sure how to handle circularities (annotations meta-annotated with themselves)
@@ -68,7 +68,7 @@ public final class AnnotationDef extends AElement {
             fieldTypes.put(m.getName(), aft);
         }
 
-        AnnotationDef result = new AnnotationDef(name, Annotations.noAnnotations, fieldTypes);
+        AnnotationDef result = new AnnotationDef(name, Annotations.noAnnotations, fieldTypes, "class " + annoType);
         adefs.put(name, result);
 
         // An annotation can be meta-annotated with itself, so add
@@ -87,18 +87,25 @@ public final class AnnotationDef extends AElement {
         return result;
     }
 
-    public AnnotationDef(String name, Set<Annotation> tlAnnotationsHere) {
+    public AnnotationDef(String name, Set<Annotation> tlAnnotationsHere, String source) {
         super("annotation: " + name);
         assert name != null;
+        assert source != null;
         this.name = name;
+        this.source = source;
         if (tlAnnotationsHere != null) {
             this.tlAnnotationsHere.addAll(tlAnnotationsHere);
         }
     }
 
-    public AnnotationDef(String name, Set<Annotation> tlAnnotationsHere, Map<String, ? extends AnnotationFieldType> fieldTypes) {
-        this(name, tlAnnotationsHere);
+    public AnnotationDef(String name, Set<Annotation> tlAnnotationsHere, Map<String, ? extends AnnotationFieldType> fieldTypes, String source) {
+        this(name, tlAnnotationsHere, source);
         setFieldTypes(fieldTypes);
+    }
+
+    @Override
+    public AnnotationDef clone() {
+        throw new UnsupportedOperationException("Can't duplicate an AnnotationDef");
     }
 
     /**
@@ -223,7 +230,8 @@ public final class AnnotationDef extends AElement {
                     newFieldTypes.put(fieldName, uaft);
                 }
             }
-            return new AnnotationDef(def1.name, def1.tlAnnotationsHere, newFieldTypes);
+            return new AnnotationDef(def1.name, def1.tlAnnotationsHere, newFieldTypes,
+                                     String.format("unify(%s, %s)", def1.source, def2.source));
         } else {
             return null;
         }

@@ -40,18 +40,21 @@ public class TestSceneLib extends TestCase {
     public static AnnotationDef adAuthor
       = Annotations.createValueAnnotationDef("Author",
                                              Annotations.asRetentionClass,
-                                             BasicAFT.forType(String.class));
+                                             BasicAFT.forType(String.class),
+                                             "TestSceneLib");
 
     static final AnnotationDef ready =
                     new AnnotationDef(
                             "Ready",
                             Annotations.asRetentionRuntime,
-                            Annotations.noFieldTypes);
+                            Annotations.noFieldTypes,
+                            "TestSceneLib.java");
     static final AnnotationDef readyClassRetention =
                     new AnnotationDef(
                             "Ready",
                             Annotations.asRetentionClass,
-                            Annotations.noFieldTypes);
+                            Annotations.noFieldTypes,
+                            "TestSceneLib.java");
 
 
     /**
@@ -59,10 +62,11 @@ public class TestSceneLib extends TestCase {
      * into s; the final state of s should equal expectScene.
      */
     void doParseTest(String indexFileContents,
+                     String indexFileName,
                      AScene s,
                      AScene expectScene) {
         try {
-            IndexFileParser.parseString(indexFileContents, s);
+            IndexFileParser.parseString(indexFileContents, indexFileName, s);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -85,9 +89,10 @@ public class TestSceneLib extends TestCase {
     }
 
     void doParseTest(String index,
+                     String filename,
                      @NonNull AScene expectScene) {
         AScene s = newScene();
-        doParseTest(index, s, expectScene);
+        doParseTest(index, filename, s, expectScene);
     }
 
     private Annotation createEmptyAnnotation(AnnotationDef def) {
@@ -136,7 +141,7 @@ public class TestSceneLib extends TestCase {
                                 Arrays.asList(new Integer[] { 0, 0, 3, 2 })))).tlAnnotationsHere
                 .add(myAuthor);
 
-        doParseTest(fooIndexContents, s1);
+        doParseTest(fooIndexContents, "fooIndexContents", s1);
     }
 
     private void checkConstructor(AMethod constructor) {
@@ -156,7 +161,7 @@ public class TestSceneLib extends TestCase {
     public void testParseRetrieve1() throws Exception {
         LineNumberReader fr = openPackagedIndexFile("test1.jaif");
         AScene s1 = newScene();
-        IndexFileParser.parse(fr, s1);
+        IndexFileParser.parse(fr, "test1.jaif", s1);
 
         AClass foo1 = s1.classes.get("p1.Foo");
         assertNotNull("Didn't find foo1", foo1);
@@ -212,7 +217,7 @@ public class TestSceneLib extends TestCase {
     public void testParseRetrieveTypes() throws Exception {
         LineNumberReader fr = openPackagedIndexFile("test1.jaif");
         AScene s1 = newScene();
-        IndexFileParser.parse(fr, s1);
+        IndexFileParser.parse(fr, "test1.jaif", s1);
 
         TestDefCollector tdc = new TestDefCollector(s1);
         tdc.visit();
@@ -247,7 +252,7 @@ public class TestSceneLib extends TestCase {
     public void testParseRetrieveValues() throws Exception {
         LineNumberReader fr = openPackagedIndexFile("test1.jaif");
         AScene s1 = newScene();
-        IndexFileParser.parse(fr, s1);
+        IndexFileParser.parse(fr, "test1.jaif", s1);
 
         // now look at Bar because it has some rather complex values
         Annotation a = s1.classes.get("p1.Bar").lookup("p2.E");
@@ -270,23 +275,23 @@ public class TestSceneLib extends TestCase {
         assertEquals("void", a2.fieldValues.get("fifth").toString());
     }
 
-    void doRewriteTest(LineNumberReader r) throws Exception {
+    void doRewriteTest(LineNumberReader r, String filename) throws Exception {
         AScene s1 = newScene(), s2 = newScene();
-        IndexFileParser.parse(r, s1);
+        IndexFileParser.parse(r, filename, s1);
         StringWriter sbw = new StringWriter();
         IndexFileWriter.write(s1, sbw);
-        IndexFileParser.parseString(sbw.toString(), s2);
+        IndexFileParser.parseString(sbw.toString(), "unparsed " + filename, s2);
         assertEquals(s1, s2);
     }
 
     public void testRewriteOne() throws Exception {
         LineNumberReader fr = openPackagedIndexFile("test1.jaif");
-        doRewriteTest(fr);
+        doRewriteTest(fr, "test1.jaif");
     }
 
     public void testRewriteTwo() throws Exception {
         LineNumberReader fr = openPackagedIndexFile("test2.jaif");
-        doRewriteTest(fr);
+        doRewriteTest(fr, "test2.jaif");
     }
 
     public void testConflictedDefinition() throws Exception {
@@ -311,7 +316,7 @@ public class TestSceneLib extends TestCase {
         String fileContents = "package p1:\n" + "annotation @A:\n"
                               + "class Foo @A";
         try {
-            IndexFileParser.parseString(fileContents, s1);
+            IndexFileParser.parseString(fileContents, "testParseErrorMissingColon()", s1);
             fail(); // an exception should have been thrown
         } catch (FileIOException e) {
             // TODO:  check line number
@@ -326,7 +331,7 @@ public class TestSceneLib extends TestCase {
           = "package p1:\n" + "annotation @AIsDefined:\n"
           + "class Foo:\n" + "@AIsDefined\n" + "@BIsNotDefined\n";
         try {
-            IndexFileParser.parseString(fileContents, s1);
+            IndexFileParser.parseString(fileContents, "testParseErrorMissingDefinition()", s1);
             fail(); // an exception should have been thrown
         } catch (FileIOException e) {
             // TODO: check line number
@@ -351,14 +356,14 @@ public class TestSceneLib extends TestCase {
 
         // One annotation with an empty array of unknown type...
         AnnotationBuilder ab1 =
-          AnnotationFactory.saf.beginAnnotation("foo.ArrayAnno", Annotations.asRetentionClass);
+            AnnotationFactory.saf.beginAnnotation("foo.ArrayAnno", Annotations.asRetentionClass, "testSceneLib");
         ab1.addEmptyArrayField("array");
         Annotation a1 = ab1.finish();
         Annotation tla1 = a1;
 
         // ... and another with an empty array of known type
         AnnotationBuilder ab2 =
-          AnnotationFactory.saf.beginAnnotation("foo.ArrayAnno", Annotations.asRetentionClass);
+            AnnotationFactory.saf.beginAnnotation("foo.ArrayAnno", Annotations.asRetentionClass, "TestSceneLib");
         ArrayBuilder ab2ab = ab2.beginArrayField("array",
                 new ArrayAFT(BasicAFT.forType(int.class)));
         ab2ab.finish();
@@ -368,7 +373,7 @@ public class TestSceneLib extends TestCase {
         // And they're both fields of another annotation to make sure that
         // unification works recursively.
         AnnotationBuilder ab3 =
-          AnnotationFactory.saf.beginAnnotation("foo.CombinedAnno", Annotations.asRetentionRuntime);
+          AnnotationFactory.saf.beginAnnotation("foo.CombinedAnno", Annotations.asRetentionRuntime, "testSceneLib");
         ab3.addScalarField("fieldOne", new AnnotationAFT(a1.def()), a1);
         ab3.addScalarField("fieldTwo", new AnnotationAFT(a2.def()), a2);
         Annotation a3 = ab3.finish();
@@ -380,7 +385,7 @@ public class TestSceneLib extends TestCase {
         IndexFileWriter.write(scene, sw);
 
         AScene sceneRead = newScene();
-        IndexFileParser.parseString(sw.toString(), sceneRead);
+        IndexFileParser.parseString(sw.toString(), "testEmptyArrayHack()", sceneRead);
 
         // the anomaly: see second "consequence" on IndexFileWriter#write
         assertFalse(scene.equals(sceneRead));
@@ -395,7 +400,7 @@ public class TestSceneLib extends TestCase {
 
         // Yet another annotation with an array of a different known type
         AnnotationBuilder ab4 =
-          AnnotationFactory.saf.beginAnnotation("foo.ArrayAnno", Annotations.asRetentionClass);
+          AnnotationFactory.saf.beginAnnotation("foo.ArrayAnno", Annotations.asRetentionClass, "testSceneLib");
         ArrayBuilder ab4ab = ab4.beginArrayField("array",
                 new ArrayAFT(BasicAFT.forType(double.class)));
         ab4ab.appendElement(5.0);
@@ -430,8 +435,7 @@ public class TestSceneLib extends TestCase {
             // we should have gotten an exception
             fail();
         } catch (DefException de) {
-            assertEquals("Conflicting definition of annotation type foo.ArrayAnno",
-                    de.getMessage());
+            assertTrue(de.getMessage().startsWith("Conflicting definitions of annotation type foo.ArrayAnno"));
             // success
         }
     }
@@ -441,14 +445,14 @@ public class TestSceneLib extends TestCase {
         String index1 = "package: annotation @Foo: @Retention(CLASS)\n  unknown[] arr\n" +
             "class Bar: @Foo(arr={})";
         AScene scene1 = newScene();
-        IndexFileParser.parseString(index1, scene1);
+        IndexFileParser.parseString(index1, "testEmptyArrayIO()", scene1);
 
         // should reject nonempty array
         String index2 = "package: annotation @Foo:  @Retention(CLASS)\n unknown[] arr\n" +
             "class Bar: @Foo(arr={1})";
         AScene scene2 = newScene();
         try {
-            IndexFileParser.parseString(index2, scene2);
+            IndexFileParser.parseString(index2, "testEmptyArrayIO()", scene2);
             // should have gotten an exception
             fail();
         } catch (FileIOException e) {
@@ -460,7 +464,7 @@ public class TestSceneLib extends TestCase {
         AClass clazz3 =
             scene3.classes.vivify("Bar");
         AnnotationBuilder ab =
-          AnnotationFactory.saf.beginAnnotation("Foo", Annotations.asRetentionClass);
+          AnnotationFactory.saf.beginAnnotation("Foo", Annotations.asRetentionClass, "testSceneLib");
         ab.addEmptyArrayField("arr");
         Annotation a = ab.finish();
         Annotation tla = a;
@@ -477,7 +481,7 @@ public class TestSceneLib extends TestCase {
 
         // can we read it back in and get the same thing?
         AScene scene4 = newScene();
-        IndexFileParser.parseString(index3, scene4);
+        IndexFileParser.parseString(index3, "testEmptyArrayIO()", scene4);
         assertEquals(scene3, scene4);
     }
 
@@ -491,7 +495,7 @@ public class TestSceneLib extends TestCase {
         assertTrue(s1.prune());
         assertTrue(s1.equals(s2));
 
-        Annotation sa = AnnotationFactory.saf.beginAnnotation("Anno", Annotations.asRetentionClass).finish();
+        Annotation sa = AnnotationFactory.saf.beginAnnotation("Anno", Annotations.asRetentionClass, "testSceneLib").finish();
         Annotation tla = sa;
 
         AClass clazz2 = s2.classes.vivify("Bar");
@@ -532,7 +536,8 @@ public class TestSceneLib extends TestCase {
     private static final AnnotationDef idAnnoTLDef =
       new AnnotationDef("IdAnno", Annotations.asRetentionClass,
                           Collections.singletonMap(
-                "id", BasicAFT.forType(int.class)));
+                              "id", BasicAFT.forType(int.class)),
+                        "TestSceneLib.java");
 
     static Annotation makeTLIdAnno(int id) {
         return new Annotation(idAnnoTLDef,

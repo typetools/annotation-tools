@@ -86,6 +86,7 @@ public final class IndexFileParser {
 
     // The input
     private final StreamTokenizer st;
+    private final String source; // filename or other source
 
     // The output
     private final AScene scene;
@@ -419,7 +420,7 @@ public final class IndexFileParser {
                     + " subannotation where an " + aaft.annotationDef.name
                     + " was expected");
             }
-            AnnotationBuilder ab = AnnotationFactory.saf.beginAnnotation(d);
+            AnnotationBuilder ab = AnnotationFactory.saf.beginAnnotation(d, source);
             // interested in this annotation,
             // so should be interested in subannotations
             assert ab != null;
@@ -535,13 +536,13 @@ public final class IndexFileParser {
             throws IOException, ParseException {
         while (checkChar('@')) {
             AnnotationDef d = parseAnnotationHead();
-            AnnotationBuilder ab = AnnotationFactory.saf.beginAnnotation(d);
+            AnnotationBuilder ab = AnnotationFactory.saf.beginAnnotation(d, source);
             if (ab == null) {
                 // don't care about the result
                 // but need to skip over it anyway
                 @SuppressWarnings("unused")
                 Object trash = parseAnnotationBody(d, AnnotationFactory.saf
-                        .beginAnnotation(d));
+                                                   .beginAnnotation(d, source));
             } else {
                 Annotation a = parseAnnotationBody(d, ab);
                 for (Annotation other : e.tlAnnotationsHere) {
@@ -640,7 +641,7 @@ public final class IndexFileParser {
         String basename = expectIdentifier();
         String fullName = curPkgPrefix + basename;
 
-        AnnotationDef ad = new AnnotationDef(fullName);
+        AnnotationDef ad = new AnnotationDef(fullName, source);
         expectChar(':');
         parseAnnotations(ad);
 
@@ -1608,7 +1609,8 @@ public final class IndexFileParser {
 */
     }
 
-    private IndexFileParser(Reader in, AScene scene) {
+    private IndexFileParser(Reader in, String source, AScene scene) {
+        this.source = source;
         defs = new LinkedHashMap<String, AnnotationDef>();
         for (AnnotationDef ad : Annotations.standardDefs) {
             try {
@@ -1663,9 +1665,9 @@ public final class IndexFileParser {
      * <p>
      * Caveat: Parsing of floating point numbers currently does not work.
      */
-    public static Map<String, AnnotationDef> parse(LineNumberReader in,
+    public static Map<String, AnnotationDef> parse(LineNumberReader in, String filename,
             AScene scene) throws IOException, ParseException {
-        IndexFileParser parser = new IndexFileParser(in, scene);
+        IndexFileParser parser = new IndexFileParser(in, filename, scene);
         // no filename is available in the exception messages
         return parseAndReturnAnnotationDefs(null, in, parser);
     }
@@ -1677,7 +1679,7 @@ public final class IndexFileParser {
     public static Map<String, AnnotationDef> parseFile(String filename,
             AScene scene) throws IOException {
         LineNumberReader in = new LineNumberReader(new FileReader(filename));
-        IndexFileParser parser = new IndexFileParser(in, scene);
+        IndexFileParser parser = new IndexFileParser(in, filename, scene);
         return parseAndReturnAnnotationDefs(filename, in, parser);
     }
 
@@ -1686,14 +1688,14 @@ public final class IndexFileParser {
      * them into <code>scene</code>; see {@link #parse(LineNumberReader, AScene)}.
      * Primarily for testing.
      */
-    public static Map<String, AnnotationDef> parseString(String fileContents,
+    public static Map<String, AnnotationDef> parseString(String fileContents, String source,
             AScene scene) throws IOException {
         String filename =
-            "While parsing string: \n----------------BEGIN----------------\n"
+            "While parsing string from "+source+": \n----------------BEGIN----------------\n"
                     + fileContents + "----------------END----------------\n";
         LineNumberReader in = new LineNumberReader(
             new StringReader(fileContents));
-        IndexFileParser parser = new IndexFileParser(in, scene);
+        IndexFileParser parser = new IndexFileParser(in, filename, scene);
         return parseAndReturnAnnotationDefs(filename, in, parser);
     }
 
@@ -1717,9 +1719,9 @@ public final class IndexFileParser {
      * @param text the text to parse
      * @return the type
      */
-    public static Type parseType(String text) {
+    public static Type parseType(String text, String filename) {
         StringReader in = new StringReader(text);
-        IndexFileParser parser = new IndexFileParser(in, null);
+        IndexFileParser parser = new IndexFileParser(in, filename, null);
         try {
             parser.st.nextToken();
             return parser.parseType();

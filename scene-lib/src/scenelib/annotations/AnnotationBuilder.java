@@ -29,6 +29,8 @@ public class AnnotationBuilder {
     private String typeName;
     Set<Annotation> tlAnnotationsHere;
 
+    String source;
+
     boolean arrayInProgress = false;
 
     boolean active = true;
@@ -196,7 +198,7 @@ public class AnnotationBuilder {
         active = false;
         if (def == null) {
             assert fieldTypes != null;
-            def = new AnnotationDef(typeName, tlAnnotationsHere, fieldTypes);
+            def = new AnnotationDef(typeName, tlAnnotationsHere, fieldTypes, source);
         } else {
             assert typeName == null;
             assert fieldTypes.isEmpty();
@@ -204,20 +206,26 @@ public class AnnotationBuilder {
         return new Annotation(def, fieldValues);
     }
 
-    AnnotationBuilder(AnnotationDef def) {
+    AnnotationBuilder(AnnotationDef def, String source) {
         assert def != null;
+        assert source != null;
         this.def = def;
+        this.source = source;
     }
 
     AnnotationBuilder(String typeName) {
         assert typeName != null;
+        assert source != null;
         this.typeName = typeName;
+        this.source = source;
     }
 
-    AnnotationBuilder(String typeName, Set<Annotation> tlAnnotationsHere) {
+    AnnotationBuilder(String typeName, Set<Annotation> tlAnnotationsHere, String source) {
         assert typeName != null;
+        assert source != null;
         this.typeName = typeName;
         this.tlAnnotationsHere = tlAnnotationsHere;
+        this.source = source;
     }
 
     public String toString() {

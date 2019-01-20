@@ -24,8 +24,8 @@ public final class AnnotationFactory {
      * Returns an {@link AnnotationBuilder} appropriate for building a
      * {@link Annotation} of the given type name.
      */
-    public AnnotationBuilder beginAnnotation(AnnotationDef def) {
-        return new AnnotationBuilder(def);
+    public AnnotationBuilder beginAnnotation(AnnotationDef def, String source) {
+        return new AnnotationBuilder(def, source);
     }
 
     /**
@@ -34,15 +34,15 @@ public final class AnnotationFactory {
      */
     public AnnotationBuilder beginAnnotation(java.lang.annotation.Annotation a, Map<String, AnnotationDef> adefs) {
         AnnotationDef def = AnnotationDef.fromClass(a.getClass(), adefs);
-        return new AnnotationBuilder(def);
+        return new AnnotationBuilder(def, "annotation " + a.getClass());
     }
 
     /**
      * Returns an {@link AnnotationBuilder} appropriate for building a
      * {@link Annotation} of the given type name.
      */
-    public AnnotationBuilder beginAnnotation(String typeName, Set<Annotation> tlAnnotationsHere) {
+    public AnnotationBuilder beginAnnotation(String typeName, Set<Annotation> tlAnnotationsHere, String source) {
         assert typeName != null;
-        return new AnnotationBuilder(typeName, tlAnnotationsHere);
+        return new AnnotationBuilder(typeName, tlAnnotationsHere, source);
     }
 }

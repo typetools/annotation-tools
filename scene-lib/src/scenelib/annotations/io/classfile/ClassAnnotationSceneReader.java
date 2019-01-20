@@ -254,7 +254,8 @@ extends EmptyVisitor {
         printClasspath();
         if (annoTypeName.contains("+")) {
           return Annotations.createValueAnnotationDef(annoTypeName,
-              Annotations.noAnnotations, BasicAFT.forType(int.class));
+              Annotations.noAnnotations, BasicAFT.forType(int.class),
+                                                      "Could not find class");
         }
         throw new Error(e);
       }
@@ -278,7 +279,11 @@ extends EmptyVisitor {
       if (desc != dummyDesc) {    // interned
         AnnotationDef ad = getAnnotationDef(desc);
 
-        AnnotationBuilder ab = AnnotationFactory.saf.beginAnnotation(ad);
+        AnnotationBuilder ab = AnnotationFactory.saf.beginAnnotation(ad,
+                                                                     // This method is not in ASMX
+                                                                     // "ClassReader " + cr.getClassName()
+                                                                     "TODO: ClassAnnotationSceneReader"
+                                                                     );
         if (ab == null) {
           throw new IllegalArgumentException("bad description: " + desc);
         } else {
