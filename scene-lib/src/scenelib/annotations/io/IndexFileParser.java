@@ -1691,7 +1691,7 @@ public final class IndexFileParser {
     public static Map<String, AnnotationDef> parseString(String fileContents, String source,
             AScene scene) throws IOException {
         String filename =
-            "While parsing string from "+source+": \n----------------BEGIN----------------\n"
+            "While parsing string from " + source + ": \n----------------BEGIN----------------\n"
                     + fileContents + "----------------END----------------\n";
         LineNumberReader in = new LineNumberReader(
             new StringReader(fileContents));

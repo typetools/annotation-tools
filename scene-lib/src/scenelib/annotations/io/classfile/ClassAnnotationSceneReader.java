@@ -255,7 +255,8 @@ extends EmptyVisitor {
         if (annoTypeName.contains("+")) {
           return Annotations.createValueAnnotationDef(annoTypeName,
               Annotations.noAnnotations, BasicAFT.forType(int.class),
-                                                      "Could not find class");
+                                                      String.format("Could not find class %s: %s",
+                                                                    jvmlClassName, e.getMessage()));
         }
         throw new Error(e);
       }
@@ -1218,7 +1219,7 @@ extends EmptyVisitor {
   }
 
   public static void printClasspath() {
-    System.out.println("\nClasspath:");
+    System.out.println("Classpath:");
     StringTokenizer tokenizer =
         new StringTokenizer(System.getProperty("java.class.path"),
             File.pathSeparator);

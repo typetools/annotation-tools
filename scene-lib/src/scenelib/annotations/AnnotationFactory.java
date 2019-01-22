@@ -34,7 +34,7 @@ public final class AnnotationFactory {
      */
     public AnnotationBuilder beginAnnotation(java.lang.annotation.Annotation a, Map<String, AnnotationDef> adefs) {
         AnnotationDef def = AnnotationDef.fromClass(a.getClass(), adefs);
-        return new AnnotationBuilder(def, "annotation " + a.getClass());
+        return new AnnotationBuilder(def, "Annotation " + a.getClass());
     }
 
     /**
