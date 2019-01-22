@@ -204,20 +204,19 @@ public final class AnnotationDef extends AElement {
      * {@linkplain AnnotationFieldType#unify unifies the field types}
      * to handle arrays of unknown element type, which can arise via
      * {@link AnnotationBuilder#addEmptyArrayField}.
+     * <p>
+     *
+     * As a special case, if one annotation has no elements, the other one's elements are used.
      */
     public static AnnotationDef unify(AnnotationDef def1,
             AnnotationDef def2) {
-        // if (def1.name.equals(def2.name)
-        //     && def1.fieldTypes.keySet().equals(def2.fieldTypes.keySet())
-        //     && ! def1.equalsElement(def2)) {
-        //     throw new Error(String.format("Unifiable except for meta-annotations:%n  %s%n  %s%n",
-        //                                   def1, def2));
-        // }
         if (def1.equals(def2)) {
             return def1;
         } else if (def1.name.equals(def2.name)
-                 && def1.equalsElement(def2)
-                 && def1.fieldTypes.keySet().equals(def2.fieldTypes.keySet())) {
+                   && def1.equalsElement(def2)) {
+            Set<String> ks1 = def1.fieldTypes.keySet();
+            Set<String> ks2 = def2.fieldTypes.keySet();
+            if (ks1.isEmpty() || ks2.isEmpty() || ks1.equals(ks2)) {
             Map<String, AnnotationFieldType> newFieldTypes
                 = new LinkedHashMap<String, AnnotationFieldType>();
             for (String fieldName : def1.fieldTypes.keySet()) {
@@ -232,9 +231,15 @@ public final class AnnotationDef extends AElement {
             }
             return new AnnotationDef(def1.name, def1.tlAnnotationsHere, newFieldTypes,
                                      String.format("unify(%s, %s)", def1.source, def2.source));
-        } else {
-            return null;
+            }
         }
+        // if (def1.name.equals(def2.name)
+        //     && def1.fieldTypes.keySet().equals(def2.fieldTypes.keySet())
+        //     && ! def1.equalsElement(def2)) {
+        //     throw new Error(String.format("Unifiable except for meta-annotations:%n  %s%n  %s%n",
+        //                                   def1, def2));
+        // }
+        return null;
     }
 
     @Override
