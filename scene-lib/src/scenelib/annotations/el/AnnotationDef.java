@@ -210,6 +210,7 @@ public final class AnnotationDef extends AElement {
      */
     public static AnnotationDef unify(AnnotationDef def1,
             AnnotationDef def2) {
+        System.out.printf("unify(%s, %s)%n", def1, def2);
         if (def1.equals(def2)) {
             return def1;
         } else if (def1.name.equals(def2.name)
@@ -217,20 +218,22 @@ public final class AnnotationDef extends AElement {
             Set<String> ks1 = def1.fieldTypes.keySet();
             Set<String> ks2 = def2.fieldTypes.keySet();
             if (ks1.isEmpty() || ks2.isEmpty() || ks1.equals(ks2)) {
-            Map<String, AnnotationFieldType> newFieldTypes
-                = new LinkedHashMap<String, AnnotationFieldType>();
-            for (String fieldName : def1.fieldTypes.keySet()) {
-                AnnotationFieldType aft1 = def1.fieldTypes.get(fieldName);
-                AnnotationFieldType aft2 = def2.fieldTypes.get(fieldName);
-                AnnotationFieldType uaft = AnnotationFieldType.unify(aft1, aft2);
-                if (uaft == null) {
-                    return null;
-                } else {
-                    newFieldTypes.put(fieldName, uaft);
+                Map<String, AnnotationFieldType> newFieldTypes
+                        = new LinkedHashMap<String, AnnotationFieldType>();
+                for (String fieldName : def1.fieldTypes.keySet()) {
+                    AnnotationFieldType aft1 = def1.fieldTypes.get(fieldName);
+                    AnnotationFieldType aft2 = def2.fieldTypes.get(fieldName);
+                    AnnotationFieldType uaft = aft1 == null ? aft2
+                                               : aft2 == null ? aft1
+                                               : AnnotationFieldType.unify(aft1, aft2);
+                    if (uaft == null) {
+                        return null;
+                    } else {
+                        newFieldTypes.put(fieldName, uaft);
+                    }
                 }
-            }
-            return new AnnotationDef(def1.name, def1.tlAnnotationsHere, newFieldTypes,
-                                     String.format("unify(%s, %s)", def1.source, def2.source));
+                return new AnnotationDef(def1.name, def1.tlAnnotationsHere, newFieldTypes,
+                                         String.format("unify(%s, %s)", def1.source, def2.source));
             }
         }
         // if (def1.name.equals(def2.name)
@@ -239,6 +242,11 @@ public final class AnnotationDef extends AElement {
         //     throw new Error(String.format("Unifiable except for meta-annotations:%n  %s%n  %s%n",
         //                                   def1, def2));
         // }
+        System.out.println("unify => null");
+        System.out.println("  " + def1);
+        System.out.println("  " + def2);
+        System.out.println("  " + def1.fieldTypes.keySet());
+        System.out.println("  " + def2.fieldTypes.keySet());
         return null;
     }
 
