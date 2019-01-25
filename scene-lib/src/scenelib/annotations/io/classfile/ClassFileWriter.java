@@ -122,12 +122,12 @@ public class ClassFileWriter {
       // into class file
       try {
         if (className.endsWith(".class")) {
-          System.out.printf("Adding annotations to class file %s%n", className);
+          // System.out.printf("Adding annotations to class file %s%n", className);
           insert(scene, className, true);
         } else {
           String outputFileName = className + ".class";
-          System.out.printf("Reading class file %s; writing with annotations to %s%n",
-                            className, outputFileName);
+          // System.out.printf("Reading class file %s; writing with annotations to %s%n",
+          //                   className, outputFileName);
           insert(scene, className, outputFileName, true);
         }
       } catch (IOException e) {
