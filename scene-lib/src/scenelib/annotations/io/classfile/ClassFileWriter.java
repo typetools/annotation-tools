@@ -122,7 +122,9 @@ public class ClassFileWriter {
       // into class file
       try {
         if (className.endsWith(".class")) {
-          // System.out.printf("Adding annotations to class file %s%n", className);
+          if(i % 10 == 0) {
+            System.out.printf("Adding annotations to class file %s%n", className);
+          }
           insert(scene, className, true);
         } else {
           String outputFileName = className + ".class";

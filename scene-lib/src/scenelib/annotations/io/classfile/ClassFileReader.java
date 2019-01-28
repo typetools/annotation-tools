@@ -99,8 +99,12 @@ public class ClassFileReader {
       }
     }
 
+    int fileNo = 0;
     for (String origName : file_args) {
-      // System.out.println("reading: " + origName);
+      fileNo++;
+      if (fileNo % 10 == 0) {
+          System.out.println("reading: " + origName);
+      }
       String className = origName;
       if (origName.endsWith(".class")) {
           origName = origName.replace(".class", "");
