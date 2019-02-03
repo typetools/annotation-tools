@@ -159,6 +159,7 @@ public class Main {
   @Option("-i Overwrite original source files")
   public static boolean in_place = false;
 
+  /** If true, insert {@code import} statements as necessary. */
   @Option("-a Abbreviate annotation names")
   public static boolean abbreviate = true;
 
@@ -719,8 +720,8 @@ public class Main {
         }
 
         if (convert_jaifs) {
-          // program used only for JAIF conversion; execute following
-          // block and then skip remainder of loop
+          // With --convert-jaifs command-line option, the program is used only for JAIF conversion.
+          // Execute the following block and then skip the remainder of the loop.
           Multimap<ASTRecord, Insertion> astInsertions = finder.getPaths();
           for (Map.Entry<ASTRecord, Collection<Insertion>> entry :
               astInsertions.asMap().entrySet()) {
@@ -760,11 +761,11 @@ public class Main {
                 public int compare(Pair<Integer, ASTPath> p1,
                     Pair<Integer, ASTPath> p2) {
                   int c = Integer.compare(p2.a, p1.a);
-                  if (c == 0) {
-                    c = p2.b == null ? p1.b == null ? 0 : -1
-                        : p1.b == null ? 1 : p2.b.compareTo(p1.b);
+                  if (c != 0) {
+                    return c;
                   }
-                  return c;
+                  return p2.b == null ? (p1.b == null ? 0 : -1)
+                    : (p1.b == null ? 1 : p2.b.compareTo(p1.b));
                 }
               });
         positionKeysSorted.addAll(positionKeysUnsorted);
@@ -850,7 +851,10 @@ public class Main {
 
             String toInsert = iToInsert.getText(comments, abbreviate,
                 gotSeparateLine, pos, precedingChar) + trailingWhitespace;
-            if (seen.contains(toInsert)) { continue; }  // eliminate duplicates
+            // eliminate duplicates
+            if (seen.contains(toInsert)) {
+              continue;
+            }
             seen.add(toInsert);
 
             // If it's already there, don't re-insert.  This is a hack!
