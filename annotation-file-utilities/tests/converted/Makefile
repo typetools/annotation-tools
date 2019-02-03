@@ -92,7 +92,7 @@ bin/annotator/tests/%.class: %.java
 
 # Compare the output of the annotator and the goal file.
 %.diff: %.goal %.output
-	-diff -u $*.goal $*.output >& $*.diff
+	-diff -u $*.goal $*.output 2>&1 | tee $*.diff
 
 # Remove all .diff, .log files from the tests directory.
 .PHONY: clean
