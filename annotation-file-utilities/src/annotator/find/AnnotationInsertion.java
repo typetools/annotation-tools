@@ -86,6 +86,7 @@ public class AnnotationInsertion extends Insertion {
      * @return the text to insert
      */
     protected String getText(boolean comments, boolean abbreviate) {
+        // The method body will build up the result by modifying this variable.
         String result = fullyQualifiedAnnotationText;
         if (abbreviate) {
             Pair<String, String> ps = removePackage(result);
