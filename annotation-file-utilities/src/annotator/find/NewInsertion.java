@@ -48,8 +48,13 @@ public class NewInsertion extends TypedInsertion {
       for (String a : annotations) {
         b.append(' ').append(a);  // initial space removed below
       }
-      return new AnnotationInsertion(b.substring(1), getCriteria(),
-          isSeparateLine()).getText(comments, abbreviate);
+      AnnotationInsertion aIns =  new AnnotationInsertion(b.substring(1), getCriteria(),
+                                                          isSeparateLine());
+      String result = aIns.getText(comments, abbreviate);
+      // This is a hack.  There might be other side effects that are needed too.
+      // We should avoid making temporary Insertions, due to the design of this program.
+      packageNames.addAll(aIns.getPackageNames());
+      return result;
     } else {
       DeclaredType baseType = getBaseType();
       boolean commentAnnotation = (comments && baseType.getName().isEmpty());

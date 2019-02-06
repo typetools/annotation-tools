@@ -101,15 +101,16 @@ to read and write annotation files.
 
 <ul>
   <li> <a href="#insert-annotations"><code>insert-annotations</code></a> reads annotations from an annotation file
-       and inserts them into a class file</li>
+       and inserts them into an existing class file</li>
   <li> <a href="#extract-annotations"><code>extract-annotations</code></a> reads annotations from a class file
-       and writes them out to an annotation file</li>
+       and writes them out to a new annotation file</li>
   <li> <a href="#insert-annotations-to-source"><code>insert-annotations-to-source</code></a> reads annotations from an
-       annotation file and inserts them into a Java source file</li>
+       annotation file and inserts them into an existing Java source file</li>
 </ul>
 
 <p>
-A diagram showing the interactions between these tools is below.
+The diagram below shows how each tool moves annotations from one file
+format to another.
 </p>
 
 <div>
@@ -134,13 +135,13 @@ The following instructions assume either a Linux or Windows system using a comma
 
 <p>
 The current release is Annotation File Utilities version
-<!-- afu-version -->3.8.2, 04 Nov 2018<!-- /afu-version -->.
+<!-- afu-version -->3.8.4, 03 Feb 2019<!-- /afu-version -->.
 </p>
 
 <ol>
 <li>
   Download
-  <a href="annotation-tools-3.8.2.zip"><!-- annotation-tools-zip-version -->annotation-tools-3.8.2.zip<!-- /annotation-tools-zip-version --></a>.
+  <a href="annotation-tools-3.8.4.zip"><!-- annotation-tools-zip-version -->annotation-tools-3.8.4.zip<!-- /annotation-tools-zip-version --></a>.
 </li>
 
 <li>
@@ -150,7 +151,7 @@ The current release is Annotation File Utilities version
   (You will typically make <code>annotation-tools/</code> a sibling of
   <code>checker-framework/</code>.)
 
-  <pre><code>unzip annotation-tools-3.8.2.zip</code></pre>
+  <pre><code>unzip annotation-tools-3.8.4.zip</code></pre>
 
 </li>
 

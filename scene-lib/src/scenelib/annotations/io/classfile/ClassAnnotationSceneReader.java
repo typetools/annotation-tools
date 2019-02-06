@@ -28,7 +28,7 @@ import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
  * {@link org.objectweb.asmx.ClassVisitor} that will insert all annotations it
  * encounters while visiting a class into a given {@link AScene}.
  *
- * The "read" in <code> ClassAnnotationSceneReader </code> refers to a class
+ * The "read" in <code>ClassAnnotationSceneReader</code> refers to a class
  * file being read into a scene.  Also see {@link ClassAnnotationSceneWriter}.
  *
  * <p>
@@ -66,7 +66,7 @@ extends EmptyVisitor {
   // The scene into which this class will insert annotations.
   private final AScene scene;
 
-  // The AClass that represents this class in scene.
+  // The AClass that represents this class in <code>scene</code>.
   private AClass aClass;
 
   private final ClassReader cr;
@@ -86,9 +86,9 @@ extends EmptyVisitor {
   }
 
   /**
-   * constructs a new <code> ClassAnnotationSceneReader </code> that will
+   * Constructs a new <code> ClassAnnotationSceneReader </code> that will
    * insert all the annotations in the class that it visits into
-   * <code> scene </code>
+   * <code>scene</code>.
    * @param cr
    *
    * @param scene the annotation scene into which annotations this visits
