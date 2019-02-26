@@ -110,12 +110,12 @@ class MethodWriter implements MethodVisitor {
     private ByteVector annd;
 
     /**
-     * The runtime visible annotations of this method. May be <tt>null</tt>.
+     * The runtime visible declaration annotations of this method. May be <tt>null</tt>.
      */
     private AnnotationWriter anns;
 
     /**
-     * The runtime invisible annotations of this method. May be <tt>null</tt>.
+     * The runtime invisible declaration annotations of this method. May be <tt>null</tt>.
      */
     private AnnotationWriter ianns;
 
@@ -621,6 +621,7 @@ class MethodWriter implements MethodVisitor {
         ByteVector bv = new ByteVector();
         TypeAnnotationWriter xaw = 
           new TypeAnnotationWriter(cw, true, bv, bv, desc);
+        // prepend xaw to the front of one of the four lists {c}{i}xanns.
         if (inCode) {
             if (visible) {
                 xaw.next = cxanns;
