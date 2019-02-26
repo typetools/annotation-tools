@@ -153,7 +153,7 @@ public class Main {
    * <p>
    *
    * To preserve changes when using the --in-place option, first remove the
-   * backup files.  Or, use the {@code-d .} option, which makes (and
+   * backup files.  Or, use the {@code -d .} option, which makes (and
    * reads) no backup, instead of --in-place.
    */
   @Option("-i Overwrite original source files")
