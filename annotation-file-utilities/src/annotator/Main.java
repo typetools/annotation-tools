@@ -75,8 +75,8 @@ import com.sun.tools.javac.tree.JCTree;
 
 /**
  * This is the main class for the annotator, which inserts annotations in
- * Java source code.  You can call it as <tt>java annotator.Main</tt> or by
- * using the shell script <tt>insert-annotations-to-source</tt>.
+ * Java source code.  You can call it as {@code java annotator.Main} or by
+ * using the shell script {@code insert-annotations-to-source}.
  * <p>
  *
  * It takes as input
@@ -103,7 +103,7 @@ import com.sun.tools.javac.tree.JCTree;
  *             this --in-place option, those edits are lost. Similarly, if the user runs the
  *             annotator twice in a row with --in-place, only the last set of annotations will
  *             appear in the codebase at the end. <p> To preserve changes when using the --in-place
- *             option, first remove the backup files. Or, use the <tt>-d .</tt> option, which makes
+ *             option, first remove the backup files. Or, use the {@code -d .} option, which makes
  *             (and reads) no backup, instead of --in-place. [default false]
  *         <li id="option:abbreviate"><b>-a</b> <b>--abbreviate=</b><i>boolean</i>. Abbreviate
  *             annotation names [default true]
@@ -153,7 +153,7 @@ public class Main {
    * <p>
    *
    * To preserve changes when using the --in-place option, first remove the
-   * backup files.  Or, use the <tt>-d .</tt> option, which makes (and
+   * backup files.  Or, use the {@code -d .} option, which makes (and
    * reads) no backup, instead of --in-place.
    */
   @Option("-i Overwrite original source files")
