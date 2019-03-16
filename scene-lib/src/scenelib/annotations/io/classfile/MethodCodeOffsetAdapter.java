@@ -1,22 +1,16 @@
 package scenelib.annotations.io.classfile;
 
-import org.objectweb.asmx.ClassReader;
-import org.objectweb.asmx.Handle;
-import org.objectweb.asmx.Label;
-import org.objectweb.asmx.MethodAdapter;
-import org.objectweb.asmx.MethodVisitor;
-import org.objectweb.asmx.Opcodes;
+import org.objectweb.asm.*;
 
-class MethodCodeOffsetAdapter extends MethodAdapter {
+class MethodCodeOffsetAdapter extends MethodVisitor {
   private final ClassReader cr;
   private final int methodStart;
   private int offset = 0;
   private int codeStart = 0;
   private int attrCount = 0;
 
-  public MethodCodeOffsetAdapter(ClassReader classReader,
-      MethodVisitor methodVisitor, int start) {
-    super(methodVisitor);
+  public MethodCodeOffsetAdapter(ClassReader classReader, MethodVisitor methodVisitor, int start) {
+    super(Opcodes.ASM7, methodVisitor);
     char[] buf = new char[classReader.header];
     this.methodStart = start;
     cr = classReader;
@@ -28,7 +22,9 @@ class MethodCodeOffsetAdapter extends MethodAdapter {
     codeStart += 8;
     while (attrCount > 0) {
       String attrName = classReader.readUTF8(codeStart, buf);
-      if ("Code".equals(attrName)) { break; }
+      if ("Code".equals(attrName)) {
+        break;
+      }
       codeStart += 6 + classReader.readInt(codeStart + 2);
       --attrCount;
     }
@@ -38,15 +34,20 @@ class MethodCodeOffsetAdapter extends MethodAdapter {
     return cr.readInt(codeStart + i);
   }
 
-  public int getMethodCodeStart() { return methodStart; }
+  public int getMethodCodeStart() {
+    return methodStart;
+  }
 
-  public int getMethodCodeOffset() { return offset; }
+  public int getMethodCodeOffset() {
+    return offset;
+  }
 
-  public int getClassCodeOffset() { return codeStart + offset; }
+  public int getClassCodeOffset() {
+    return codeStart + offset;
+  }
 
   @Override
-  public void visitFieldInsn(int opcode,
-      String owner, String name, String desc) {
+  public void visitFieldInsn(int opcode, String owner, String name, String desc) {
     super.visitFieldInsn(opcode, owner, name, desc);
     offset += 3;
   }
@@ -70,8 +71,7 @@ class MethodCodeOffsetAdapter extends MethodAdapter {
   }
 
   @Override
-  public void visitInvokeDynamicInsn(String name, String desc,
-      Handle bsm, Object... bsmArgs) {
+  public void visitInvokeDynamicInsn(String name, String desc, Handle bsm, Object... bsmArgs) {
     super.visitInvokeDynamicInsn(name, desc, bsm, bsmArgs);
     offset += 5;
   }
@@ -89,16 +89,14 @@ class MethodCodeOffsetAdapter extends MethodAdapter {
   }
 
   @Override
-  public void visitLookupSwitchInsn(Label dflt, int[] keys,
-      Label[] labels) {
+  public void visitLookupSwitchInsn(Label dflt, int[] keys, Label[] labels) {
     super.visitLookupSwitchInsn(dflt, keys, labels);
     offset += 8 - ((offset - codeStart) & 3);
     offset += 4 + 8 * readInt(offset);
   }
 
   @Override
-  public void visitMethodInsn(int opcode,
-      String owner, String name, String desc) {
+  public void visitMethodInsn(int opcode, String owner, String name, String desc) {
     super.visitMethodInsn(opcode, owner, name, desc);
     offset += opcode == Opcodes.INVOKEINTERFACE ? 5 : 3;
   }
@@ -110,8 +108,7 @@ class MethodCodeOffsetAdapter extends MethodAdapter {
   }
 
   @Override
-  public void visitTableSwitchInsn(int min, int max,
-      Label dflt, Label[] labels) {
+  public void visitTableSwitchInsn(int min, int max, Label dflt, Label[] labels) {
     super.visitTableSwitchInsn(min, max, dflt, labels);
     offset += 8 - ((offset - codeStart) & 3);
     offset += 4 * (readInt(offset + 4) - readInt(offset) + 3);

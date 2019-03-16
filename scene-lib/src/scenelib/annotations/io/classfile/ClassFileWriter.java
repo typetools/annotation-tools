@@ -1,23 +1,20 @@
 package scenelib.annotations.io.classfile;
 
-import java.io.*;
-
 import com.sun.tools.javac.main.CommandLine;
-
-import org.objectweb.asmx.ClassReader;
-
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.Opcodes;
 import org.plumelib.options.Option;
 import org.plumelib.options.Options;
-
 import scenelib.annotations.el.AScene;
 import scenelib.annotations.io.IndexFileParser;
 
+import java.io.*;
+
 /**
  * A <code> ClassFileWriter </code> provides methods for inserting annotations
- *  from an {@link scenelib.annotations.el.AScene} into a class file.
+ * from an {@link scenelib.annotations.el.AScene} into a class file.
  */
 public class ClassFileWriter {
-
   @Option("-h print usage information and exit")
   public static boolean help = false;
 
@@ -27,22 +24,22 @@ public class ClassFileWriter {
   private static String linesep = System.getProperty("line.separator");
 
   static String usage
-    = "usage: insert-annotations [options] class1 indexfile1 class2 indexfile2 ..."
-    + ""
-    + linesep
-    + "For each class/index file pair (a.b.C a.b.C.jaif), read annotations from"
-    + linesep
-    + "the index file a.b.C.jaif and insert them into the class a.b.C, then"
-    + linesep
-    + "output the merged class file to a.b.C.class"
-    + linesep
-    + "Each class is either a fully-qualified name of a class on your classpath,"
-    + linesep
-    + "or a path to a .class file, such as e.g. /.../path/to/a/b/C.class ."
-    + linesep
-    + "Arguments beginning with a single '@' are interpreted as argument files to"
-    + linesep
-    + "be read and expanded into the command line.  Options:";
+      = "usage: insert-annotations [options] class1 indexfile1 class2 indexfile2 ..."
+      + ""
+      + linesep
+      + "For each class/index file pair (a.b.C a.b.C.jaif), read annotations from"
+      + linesep
+      + "the index file a.b.C.jaif and insert them into the class a.b.C, then"
+      + linesep
+      + "output the merged class file to a.b.C.class"
+      + linesep
+      + "Each class is either a fully-qualified name of a class on your classpath,"
+      + linesep
+      + "or a path to a .class file, such as e.g. /.../path/to/a/b/C.class ."
+      + linesep
+      + "Arguments beginning with a single '@' are interpreted as argument files to"
+      + linesep
+      + "be read and expanded into the command line.  Options:";
 
   /**
    * Main method meant to a a convenient way to write annotations from an index
@@ -55,6 +52,7 @@ public class ClassFileWriter {
    *   -h, --help   print usage information and exit
    *   --version    print version information and exit
    * </pre>
+   *
    * @param args options and classes and index files to analyze;
    * @throws IOException if a class file or index file cannot be opened/written
    */
@@ -76,7 +74,7 @@ public class ClassFileWriter {
 
     if (version) {
       System.out.printf("insert-annotations (%s)",
-                        ClassFileReader.INDEX_UTILS_VERSION);
+          ClassFileReader.INDEX_UTILS_VERSION);
     }
     if (help) {
       options.printUsage();
@@ -104,7 +102,6 @@ public class ClassFileWriter {
     }
 
     for (int i = 0; i < file_args.length; i++) {
-
       String className = file_args[i];
       i++;
       if (i >= file_args.length) {
@@ -127,7 +124,7 @@ public class ClassFileWriter {
         } else {
           String outputFileName = className + ".class";
           System.out.printf("Reading class file %s; writing with annotations to %s%n",
-                            className, outputFileName);
+              className, outputFileName);
           insert(scene, className, outputFileName, true);
         }
       } catch (IOException e) {
@@ -135,7 +132,7 @@ public class ClassFileWriter {
         return;
       } catch (Exception e) {
         System.out.println("Unknown error trying to insert annotations from: " +
-                           indexFileName + " to " + className);
+            indexFileName + " to " + className);
         e.printStackTrace();
         System.out.println("Please submit a bug report at");
         System.out.println("  https://github.com/typetools/annotation-tools/issues");
@@ -144,7 +141,6 @@ public class ClassFileWriter {
         return;
       }
     }
-
   }
 
   /**
@@ -152,21 +148,19 @@ public class ClassFileWriter {
    * the class file contained in <code> fileName </code>, and write
    * the result back into <code> fileName </code>.
    *
-   * @param scene the scene containing the annotations to insert into a class
-   * @param fileName the file name of the class the annotations should be
-   * inserted into.  Should be a file name that can be resolved from
-   * the current working directory, which means it should end in ".class"
-   * for standard Java class files.
+   * @param scene     the scene containing the annotations to insert into a class
+   * @param fileName  the file name of the class the annotations should be
+   *                  inserted into.  Should be a file name that can be resolved from
+   *                  the current working directory, which means it should end in ".class"
+   *                  for standard Java class files.
    * @param overwrite controls behavior when an annotation exists on a
-   * particular element in both the scene and the class file.  If true,
-   * then the one from the scene is used; else the the existing annotation
-   * in the class file is retained.
+   *                  particular element in both the scene and the class file.  If true,
+   *                  then the one from the scene is used; else the the existing annotation
+   *                  in the class file is retained.
    * @throws IOException if there is a problem reading from or writing to
-   * <code> fileName </code>
+   *                     <code> fileName </code>
    */
-  public static void insert(
-      AScene scene, String fileName, boolean overwrite)
-  throws IOException {
+  public static void insert(AScene scene, String fileName, boolean overwrite) throws IOException {
     assert fileName.endsWith(".class");
 
     // can't just call other insert, because this closes the input stream
@@ -174,9 +168,8 @@ public class ClassFileWriter {
     ClassReader cr = new ClassReader(in);
     in.close();
 
-    ClassAnnotationSceneWriter cw =
-      new ClassAnnotationSceneWriter(cr, scene, overwrite);
-    cr.accept(cw, false);
+    ClassAnnotationSceneWriter cw = new ClassAnnotationSceneWriter(Opcodes.ASM7, cr, scene, overwrite);
+    cr.accept(cw, 0);
 
     OutputStream fos = new FileOutputStream(fileName);
     fos.write(cw.toByteArray());
@@ -191,24 +184,23 @@ public class ClassFileWriter {
    * contain a stream of bytes in the same format, and will also contain the
    * annotations from <code> scene </code>.
    *
-   * @param scene the scene containing the annotations to insert into a class
-   * @param in the input stream from which to read a class
-   * @param out the output stream the merged class should be written to
+   * @param scene     the scene containing the annotations to insert into a class
+   * @param input     the input stream from which to read a class
+   * @param out       the output stream the merged class should be written to
    * @param overwrite controls behavior when an annotation exists on a
-   * particular element in both the scene and the class file.  If true,
-   * then the one from the scene is used; else the the existing annotation
-   * in the class file is retained.
+   *                  particular element in both the scene and the class file.  If true,
+   *                  then the one from the scene is used; else the the existing annotation
+   *                  in the class file is retained.
    * @throws IOException if there is a problem reading from <code> in </code> or
-   * writing to <code> out </code>
+   *                     writing to <code> out </code>
    */
-  public static void insert(AScene scene, InputStream in,
-      OutputStream out, boolean overwrite) throws IOException {
-    ClassReader cr = new ClassReader(in);
+  public static void insert(AScene scene, InputStream input, OutputStream out, boolean overwrite) throws IOException {
+    ClassReader cr = new ClassReader(input);
 
     ClassAnnotationSceneWriter cw =
-      new ClassAnnotationSceneWriter(cr, scene, overwrite);
+        new ClassAnnotationSceneWriter(Opcodes.ASM7, cr, scene, overwrite);
 
-    cr.accept(cw, false);
+    cr.accept(cw, 0);
 
     out.write(cw.toByteArray());
   }
@@ -220,24 +212,23 @@ public class ClassFileWriter {
    * name of a fully-qualified class, and <code> out </code> should be the
    * name of a file to output the resulting class file to.
    *
-   * @param scene the scene containing the annotations to insert into a class
-   * @param className the fully qualified class to read
+   * @param scene          the scene containing the annotations to insert into a class
+   * @param className      the fully qualified class to read
    * @param outputFileName the name of the output file the class should be written to
-   * @param overwrite controls behavior when an annotation exists on a
-   * particular element in both the scene and the class file.  If true,
-   * then the one from the scene is used; else the the existing annotation
-   * in the class file is retained.
+   * @param overwrite      controls behavior when an annotation exists on a
+   *                       particular element in both the scene and the class file.  If true,
+   *                       then the one from the scene is used; else the the existing annotation
+   *                       in the class file is retained.
    * @throws IOException if there is a problem reading from <code> in </code> or
-   * writing to <code> out </code>
+   *                     writing to <code> out </code>
    */
-  public static void insert(AScene scene,
-      String className, String outputFileName, boolean overwrite) throws IOException {
+  public static void insert(AScene scene, String className, String outputFileName, boolean overwrite)
+      throws IOException {
     ClassReader cr = new ClassReader(className);
 
-    ClassAnnotationSceneWriter cw =
-      new ClassAnnotationSceneWriter(cr, scene, overwrite);
+    ClassAnnotationSceneWriter cw = new ClassAnnotationSceneWriter(Opcodes.ASM7, cr, scene, overwrite);
 
-    cr.accept(cw, false);
+    cr.accept(cw, 0);
 
     OutputStream fos = new FileOutputStream(outputFileName);
     fos.write(cw.toByteArray());

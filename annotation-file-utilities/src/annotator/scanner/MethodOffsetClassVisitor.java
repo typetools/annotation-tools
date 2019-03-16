@@ -1,20 +1,8 @@
 package annotator.scanner;
 
-import org.objectweb.asmx.AnnotationVisitor;
-import org.objectweb.asmx.Attribute;
-import org.objectweb.asmx.ClassReader;
-import org.objectweb.asmx.ClassWriter;
-import org.objectweb.asmx.Handle;
-import org.objectweb.asmx.Label;
-import org.objectweb.asmx.MethodAdapter;
-import org.objectweb.asmx.MethodVisitor;
-import org.objectweb.asmx.Opcodes;
-import org.objectweb.asmx.TypeAnnotationVisitor;
-import org.objectweb.asmx.TypePath;
-
-import scenelib.annotations.io.classfile.CodeOffsetAdapter;
-
 import com.sun.tools.javac.util.Pair;
+import org.objectweb.asm.*;
+import scenelib.annotations.io.classfile.CodeOffsetAdapter;
 
 
 /**
@@ -27,27 +15,29 @@ import com.sun.tools.javac.util.Pair;
 // Note: in order to ensure all labels are visited, this class
 // needs to extend ClassWriter and not other class visitor classes.
 // There is no good reason why this is the case with ASM.
-public class MethodOffsetClassVisitor extends ClassWriter {
+public class MethodOffsetClassVisitor extends ClassVisitor {
   CodeOffsetAdapter coa;
   MethodVisitor mcoa;
+  ClassWriter classWriter;
 
   // This field should be set by entry on a method through visitMethod,
   // and so all the visit* methods in LocalVariableMethodVisitor
   private String methodName;
 
-  public MethodOffsetClassVisitor(ClassReader cr) {
-    super(true, false);
+  public MethodOffsetClassVisitor(ClassReader classReader, ClassWriter classWriter) {
+    super(Opcodes.ASM7, classWriter);
+//    this.classWriter = new ClassWriter(classReader, 0);
+    this.classWriter = classWriter;
     this.methodName = "LocalVariableVisitor: DEFAULT_METHOD";
-    coa = new CodeOffsetAdapter(cr);
+    coa = new CodeOffsetAdapter(classReader);
   }
 
-  @Override
-  public MethodVisitor visitMethod(int access, String name,
-        String desc, String signature, String[  ] exceptions) {
-    methodName = name + desc.substring(0, desc.indexOf(")") + 1);
-    mcoa = coa.visitMethod(access, name, desc, signature, exceptions);
+  public MethodVisitor visitMethod(int access, String name, String descriptor, String signature,
+                                   String[] exceptions) {
+    methodName = name + descriptor.substring(0, descriptor.indexOf(")") + 1);
+    mcoa = coa.visitMethod(access, name, descriptor, signature, exceptions);
     return new MethodOffsetMethodVisitor(
-        super.visitMethod(access, name, desc, signature, exceptions));
+        super.visitMethod(access, name, descriptor, signature, exceptions));
   }
 
   /**
@@ -56,11 +46,11 @@ public class MethodOffsetClassVisitor extends ClassWriter {
    * all the offset information by calling the appropriate static
    * methods in annotator.scanner classes.
    */
-  private class MethodOffsetMethodVisitor extends MethodAdapter {
+  private class MethodOffsetMethodVisitor extends MethodVisitor {
     private Label lastLabel;
 
     public MethodOffsetMethodVisitor(MethodVisitor mv) {
-      super(mv);
+      super(Opcodes.ASM7, mv);
       lastLabel = null;
     }
 
@@ -73,15 +63,13 @@ public class MethodOffsetClassVisitor extends ClassWriter {
     }
 
     @Override
-    public void visitLocalVariable(String name, String desc,
-          String signature, Label start, Label end, int index)  {
-      super.visitLocalVariable(name, desc, signature, start, end, index);
+    public void visitLocalVariable(String name, String descriptor, String signature,
+                                   Label start, Label end, int index) {
+      super.visitLocalVariable(name, descriptor, signature, start, end, index);
       LocalVariableScanner.addToMethodNameIndexMap(
-          Pair.of(methodName, Pair.of(index, start.getOffset())),
-          name);
-      LocalVariableScanner.addToMethodNameCounter(
-          methodName, name, start.getOffset());
-      mcoa.visitLocalVariable(name, desc, signature, start, end, index);
+          Pair.of(methodName, Pair.of(index, start.getOffset())), name);
+      LocalVariableScanner.addToMethodNameCounter(methodName, name, start.getOffset());
+      mcoa.visitLocalVariable(name, descriptor, signature, start, end, index);
     }
 
     @Override
@@ -92,35 +80,35 @@ public class MethodOffsetClassVisitor extends ClassWriter {
     }
 
     @Override
-    public void visitTypeInsn(int opcode,  String desc)   {
-      super.visitTypeInsn(opcode, desc);
+    public void visitTypeInsn(int opcode, String descriptor) {
+      super.visitTypeInsn(opcode, descriptor);
       switch (opcode) {
-      case Opcodes.CHECKCAST:
-        // CastScanner.addCastToMethod(methodName, labelOffset() + 1);
-        CastScanner.addCastToMethod(methodName,
-            coa.getMethodCodeOffset());
-        break;
-      case Opcodes.NEW:
-      case Opcodes.ANEWARRAY:
-        NewScanner.addNewToMethod(methodName, labelOffset());
-        break;
-      case Opcodes.INSTANCEOF:
-        InstanceOfScanner.addInstanceOfToMethod(methodName,
-            labelOffset() + 1);
-        break;
+        case Opcodes.CHECKCAST:
+          // CastScanner.addCastToMethod(methodName, labelOffset() + 1);
+          CastScanner.addCastToMethod(methodName,
+              coa.getMethodCodeOffset());
+          break;
+        case Opcodes.NEW:
+        case Opcodes.ANEWARRAY:
+          NewScanner.addNewToMethod(methodName, labelOffset());
+          break;
+        case Opcodes.INSTANCEOF:
+          InstanceOfScanner.addInstanceOfToMethod(methodName,
+              labelOffset() + 1);
+          break;
       }
-      mcoa.visitTypeInsn(opcode, desc);
+      mcoa.visitTypeInsn(opcode, descriptor);
     }
 
     @Override
-    public void visitMultiANewArrayInsn(String desc, int dims)  {
-      super.visitMultiANewArrayInsn(desc, dims);
+    public void visitMultiANewArrayInsn(String descriptor, int dims) {
+      super.visitMultiANewArrayInsn(descriptor, dims);
       NewScanner.addNewToMethod(methodName, labelOffset());
-      mcoa.visitMultiANewArrayInsn(desc, dims);
+      mcoa.visitMultiANewArrayInsn(descriptor, dims);
     }
 
     @Override
-    public void visitIntInsn(int opcode, int operand)  {
+    public void visitIntInsn(int opcode, int operand) {
       super.visitIntInsn(opcode, operand);
       if (opcode == Opcodes.NEWARRAY) {
         NewScanner.addNewToMethod(methodName, labelOffset());
@@ -129,29 +117,26 @@ public class MethodOffsetClassVisitor extends ClassWriter {
     }
 
     @Override
-    public void visitMethodInsn(int opcode, String owner, String name,
-        String desc) {
-      super.visitMethodInsn(opcode, owner, name, desc);
+    public void visitMethodInsn(int opcode, String owner, String name, String descriptor) {
+      super.visitMethodInsn(opcode, owner, name, descriptor);
       switch (opcode) {
-      case Opcodes.INVOKEINTERFACE:
-      case Opcodes.INVOKESTATIC:
-      case Opcodes.INVOKEVIRTUAL:
-        MethodCallScanner.addMethodCallToMethod(methodName,
-            labelOffset());
-        break;
-      default:
-        break;
+        case Opcodes.INVOKEINTERFACE:
+        case Opcodes.INVOKESTATIC:
+        case Opcodes.INVOKEVIRTUAL:
+          MethodCallScanner.addMethodCallToMethod(methodName,
+              labelOffset());
+          break;
+        default:
+          break;
       }
-      mcoa.visitMethodInsn(opcode, owner, name, desc);
+      mcoa.visitMethodInsn(opcode, owner, name, descriptor);
     }
 
     @Override
-    public void visitInvokeDynamicInsn(String name, String desc,
-        Handle bsm, Object... bsmArgs) {
-      super.visitInvokeDynamicInsn(name, desc, bsm, bsmArgs);
-      LambdaScanner.addLambdaExpressionToMethod(methodName,
-          labelOffset());
-      mcoa.visitInvokeDynamicInsn(name, desc, bsm, bsmArgs);
+    public void visitInvokeDynamicInsn(String name, String descriptor, Handle bsm, Object... bsmArgs) {
+      super.visitInvokeDynamicInsn(name, descriptor, bsm, bsmArgs);
+      LambdaScanner.addLambdaExpressionToMethod(methodName, labelOffset());
+      mcoa.visitInvokeDynamicInsn(name, descriptor, bsm, bsmArgs);
     }
 
     @Override
@@ -173,10 +158,9 @@ public class MethodOffsetClassVisitor extends ClassWriter {
     }
 
     @Override
-    public void visitFieldInsn(int opcode, String owner, String name,
-        String desc) {
-      super.visitFieldInsn(opcode, owner, name, desc);
-      mcoa.visitFieldInsn(opcode, owner, name, desc);
+    public void visitFieldInsn(int opcode, String owner, String name, String descriptor) {
+      super.visitFieldInsn(opcode, owner, name, descriptor);
+      mcoa.visitFieldInsn(opcode, owner, name, descriptor);
     }
 
     @Override
@@ -198,8 +182,7 @@ public class MethodOffsetClassVisitor extends ClassWriter {
     }
 
     @Override
-    public void visitTableSwitchInsn(int min, int max, Label dflt,
-        Label[] labels) {
+    public void visitTableSwitchInsn(int min, int max, Label dflt, Label[] labels) {
       super.visitTableSwitchInsn(min, max, dflt, labels);
       mcoa.visitTableSwitchInsn(min, max, dflt, labels);
     }

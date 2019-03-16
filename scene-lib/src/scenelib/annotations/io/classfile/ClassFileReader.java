@@ -1,25 +1,23 @@
 package scenelib.annotations.io.classfile;
 
-import java.io.*;
-
 import com.sun.tools.javac.main.CommandLine;
-
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.Opcodes;
 import org.plumelib.options.Option;
 import org.plumelib.options.Options;
-
-import org.objectweb.asmx.ClassReader;
-
 import scenelib.annotations.el.AScene;
 import scenelib.annotations.io.IndexFileWriter;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
 /**
  * A <code> ClassFileReader </code> provides methods for reading in annotations
- *  from a class file into an {@link scenelib.annotations.el.AScene}.
+ * from a class file into an {@link scenelib.annotations.el.AScene}.
  */
 public class ClassFileReader {
-
-  public static final String INDEX_UTILS_VERSION
-    = "Annotation File Utilities v3.6.47";
+  public static final String INDEX_UTILS_VERSION = "Annotation File Utilities v3.6.47";
 
   @Option("-b omit annotations from bridge (compiler-created) methods")
   public static boolean ignore_bridge_methods = false;
@@ -33,27 +31,27 @@ public class ClassFileReader {
   private static String linesep = System.getProperty("line.separator");
 
   static String usage
-    = "extract-annotations [options] class1 class2 ..."
-    + linesep
-    + "Each argument is a class a.b.C (that is on your classpath) or a class file"
-    + linesep
-    + "a/b/C.class.  Extracts the annotations from each such argument and prints"
-    + linesep
-    + "them in index-file format to a.b.C.jaif .  Arguments beginning with a"
-    + linesep
-    + "single '@' are interpreted as argument files to be read and expanded into"
-    + linesep
-    + "the command line.  Options:";
+      = "extract-annotations [options] class1 class2 ..."
+      + linesep
+      + "Each argument is a class a.b.C (that is on your classpath) or a class file"
+      + linesep
+      + "a/b/C.class.  Extracts the annotations from each such argument and prints"
+      + linesep
+      + "them in index-file format to a.b.C.jaif .  Arguments beginning with a"
+      + linesep
+      + "single '@' are interpreted as argument files to be read and expanded into"
+      + linesep
+      + "the command line.  Options:";
 
   /**
    * From the command line, read annotations from a class file and write
    * them to an index file.  Also see the Anncat tool, which is more
    * versatile (and which calls this as a subroutine).
    * <p>
-   *
+   * <p>
    * For usage information, supply the -h or --help option.
    * <p>
-   *
+   * <p>
    * For programmatic access to this tool, use the read() methods instead.
    * <p>
    *
@@ -103,7 +101,7 @@ public class ClassFileReader {
       System.out.println("reading: " + origName);
       String className = origName;
       if (origName.endsWith(".class")) {
-          origName = origName.replace(".class", "");
+        origName = origName.replace(".class", "");
       }
 
       AScene scene = new AScene();
@@ -157,14 +155,13 @@ public class ClassFileReader {
    * the current working directory, which means it should end in ".class"
    * for standard Java class files.
    *
-   * @param scene the scene into which the annotations should be inserted
+   * @param scene    the scene into which the annotations should be inserted
    * @param fileName the file name of the class the annotations should be
-   * read from
+   *                 read from
    * @throws IOException if there is a problem reading from
-   * <code> fileName </code>
+   *                     <code> fileName </code>
    */
-  public static void read(AScene scene, String fileName)
-  throws IOException {
+  public static void read(AScene scene, String fileName) throws IOException {
     read(scene, new FileInputStream(fileName));
   }
 
@@ -173,12 +170,11 @@ public class ClassFileReader {
    * assumed to be in your classpath,
    * and inserts them into <code> scene </code>.
    *
-   * @param scene the scene into which the annotations should be inserted
+   * @param scene     the scene into which the annotations should be inserted
    * @param className the name of the class to read in
    * @throws IOException if there is a problem reading <code> className </code>
    */
-  public static void readFromClass(AScene scene, String className)
-  throws IOException {
+  public static void readFromClass(AScene scene, String className) throws IOException {
     read(scene, new ClassReader(className));
   }
 
@@ -187,19 +183,16 @@ public class ClassFileReader {
    * and inserts them into <code> scene </code>.
    *
    * @param scene the scene into which the annotations should be inserted
-   * @param in an input stream containing the class that the annotations
-   * should be read from
+   * @param input an input stream containing the class that the annotations
+   *              should be read from
    * @throws IOException if there is a problem reading from <code> in </code>
    */
-  public static void read(AScene scene, InputStream in)
-  throws IOException {
-    read(scene, new ClassReader(in));
+  public static void read(AScene scene, InputStream input) throws IOException {
+    read(scene, new ClassReader(input));
   }
 
   public static void read(AScene scene, ClassReader cr) {
-    ClassAnnotationSceneReader ca =
-        new ClassAnnotationSceneReader(cr, scene, ignore_bridge_methods);
-    cr.accept(ca, true);
+    ClassAnnotationSceneReader ca = new ClassAnnotationSceneReader(Opcodes.ASM7, cr, scene, ignore_bridge_methods);
+    cr.accept(ca, 0);
   }
-
 }
