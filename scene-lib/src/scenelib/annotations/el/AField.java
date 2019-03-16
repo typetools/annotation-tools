@@ -19,8 +19,8 @@ public class AField extends ADeclaration {
       }
 
       @Override
-      public boolean subPrune(AField v) {
-        return v.prune();
+      public boolean isEmptyValue(AField v) {
+        return v.isEmpty();
       }
     };
   }

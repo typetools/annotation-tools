@@ -312,7 +312,7 @@ implements ElementVisitor<Void, Pair<AElement, AElement>> {
         if (sval == null) {
           difference.put(key, mval);
         } else {
-          mval.accept(this, elemPair(sval, difference.vivify(key)));
+          mval.accept(this, elemPair(sval, difference.getVivify(key)));
         }
       }
     }

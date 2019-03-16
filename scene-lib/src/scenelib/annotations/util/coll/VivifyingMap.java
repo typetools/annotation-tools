@@ -30,7 +30,7 @@ public abstract class VivifyingMap<K, V> extends WrapperMap<K, V> {
      * not currently mapped to a value, a new, empty value is created, stored,
      * and returned.
      */
-    public V vivify(K k) {
+    public V getVivify(K k) {
         if (containsKey(k)) {
             return get(k);
         } else {
@@ -41,35 +41,36 @@ public abstract class VivifyingMap<K, V> extends WrapperMap<K, V> {
     }
 
     /**
-     * Prunes this map by deleting entries with empty values (i.e., entries
-     * that could be recreated by {@link #vivify} without information loss).
-     */
-    public boolean prune() {
-        boolean empty = true;
-        for (Iterator<Map.Entry<K, V>> ei
-                = entrySet().iterator(); ei.hasNext(); ) {
-            Map.Entry<K, V> e = ei.next();
-            boolean subEmpty = subPrune(e.getValue());
-            if (subEmpty) {
-                ei.remove();
-            } else {
-                empty = false;
-            }
-        }
-        return empty;
-    }
-
-    /**
      * Returns a new, "empty" value to which the key <code>k</code> can be
      * mapped; subclasses must implement.
      */
     protected abstract V createValueFor(K k);
 
     /**
-     * Returns whether the given value is "empty" and thus may be discarded
-     * by {@link #prune}.  Before returning, {@link #subPrune} may carry out
-     * some sort of recursive pruning on the value; for example, if the value
-     * is another {@link VivifyingMap}, {@link #subPrune} could prune that map.
+     * Prunes this map by deleting entries with empty values.
      */
-    protected abstract boolean subPrune(V v);
+    public void prune() {
+        // It would be cleaner to write
+        //   for (Map.Entry<K, V> entry : entrySet()) {
+        // but using an iterator affords efficient deletion.
+        for (Iterator<Map.Entry<K, V>> ei
+                = entrySet().iterator(); ei.hasNext(); ) {
+            V value = ei.next().getValue();
+            if (value instanceof VivifyingMap) {
+                ((VivifyingMap) value).prune();
+            }
+            if (isEmptyValue(value)) {
+                ei.remove();
+            }
+        }
+    }
+
+    /**
+     * Returns whether the given value is "empty" -- that is, it is the
+     * same as what {@link #getVivify} would create.
+     * <p>
+     * 
+     * This method does not recursively prune its argument, and it does not need to.
+     */
+    protected abstract boolean isEmptyValue(V v);
 }

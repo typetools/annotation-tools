@@ -25,8 +25,8 @@ public abstract class ADeclaration extends AElement {
       }
 
       @Override
-      public boolean subPrune(ATypeElement v) {
-          return v.prune();
+      public boolean isEmptyValue(ATypeElement v) {
+          return v.isEmpty();
       }
   };
 
@@ -40,8 +40,8 @@ public abstract class ADeclaration extends AElement {
       }
 
       @Override
-      public boolean subPrune(ATypeElementWithType v) {
-          return v.prune();
+      public boolean isEmptyValue(ATypeElementWithType v) {
+          return v.isEmpty();
       }
   };
 

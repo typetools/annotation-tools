@@ -57,9 +57,6 @@ public final class AMethod extends ADeclaration {
       return new AMethod(this);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equals(AElement o) {
         return o instanceof AMethod &&
@@ -80,9 +77,6 @@ public final class AMethod extends ADeclaration {
             && throwsException.equals(o.throwsException);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         return super.hashCode()
@@ -91,15 +85,23 @@ public final class AMethod extends ADeclaration {
                 + body.hashCode() + methodName.hashCode();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean prune() {
-        return super.prune() & bounds.prune()
-            & returnType.prune()
-            & receiver.prune() & parameters.prune()
-            & throwsException.prune() & body.prune();
+        super.prune();
+        bounds.prune();
+        returnType.prune();
+        receiver.prune();
+        parameters.prune();
+        throwsException.prune();
+        body.prune();
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return super.isEmpty() && bounds.isEmpty()
+            && returnType.isEmpty()
+            && receiver.isEmpty() && parameters.isEmpty()
+            && throwsException.isEmpty() && body.isEmpty();
     }
 
     @Override

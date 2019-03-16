@@ -200,7 +200,7 @@ public class Main {
     <K, V extends AElement>
     Void filter(VivifyingMap<K, V> vm0, VivifyingMap<K, V> vm1) {
       for (Map.Entry<K, V> entry : vm0.entrySet()) {
-        entry.getValue().accept(this, vm1.vivify(entry.getKey()));
+        entry.getValue().accept(this, vm1.getVivify(entry.getKey()));
       }
       return null;
     }
@@ -241,7 +241,7 @@ public class Main {
         ASTPath p = entry.getKey();
         ATypeElement e = entry.getValue();
         insertAnnotations.put(p, e);
-        // visitTypeElement(e, insertAnnotations.vivify(p));
+        // visitTypeElement(e, insertAnnotations.getVivify(p));
       }
       for (Map.Entry<ASTPath, ATypeElementWithType> entry :
           el0.insertTypecasts.entrySet()) {
@@ -251,10 +251,10 @@ public class Main {
         if (type instanceof scenelib.type.DeclaredType
             && ((scenelib.type.DeclaredType) type).getName().isEmpty()) {
           insertAnnotations.put(p, e);
-          // visitTypeElement(e, insertAnnotations.vivify(p));
+          // visitTypeElement(e, insertAnnotations.getVivify(p));
         } else {
           insertTypecasts.put(p, e);
-          // visitTypeElementWithType(e, insertTypecasts.vivify(p));
+          // visitTypeElementWithType(e, insertTypecasts.getVivify(p));
         }
       }
       return null;
@@ -314,7 +314,7 @@ public class Main {
     for (Map.Entry<String, AClass> entry : scene.classes.entrySet()) {
       String key = entry.getKey();
       AClass clazz0 = entry.getValue();
-      AClass clazz1 = filtered.classes.vivify(key);
+      AClass clazz1 = filtered.classes.getVivify(key);
       clazz0.accept(classFilter, clazz1);
     }
     filtered.prune();
@@ -362,7 +362,7 @@ public class Main {
       astPath = astPath.extend(entry);
     }
 
-    return decl.insertAnnotations.vivify(astPath);
+    return decl.insertAnnotations.getVivify(astPath);
   }
 
   private static void convertInsertion(String pkg,
@@ -376,7 +376,7 @@ public class Main {
         }
       }
     } else if (scene != null && rec.className != null) {
-      AClass clazz = scene.classes.vivify(rec.className);
+      AClass clazz = scene.classes.getVivify(rec.className);
       ADeclaration decl = null;  // insertion target
       if (ins.getCriteria().onBoundZero()) {
         int n = rec.astPath.size();
@@ -393,16 +393,16 @@ public class Main {
       }
       if (rec.methodName == null) {
         decl = rec.varName == null ? clazz
-            : clazz.fields.vivify(rec.varName);
+            : clazz.fields.getVivify(rec.varName);
       } else {
-        AMethod meth = clazz.methods.vivify(rec.methodName);
+        AMethod meth = clazz.methods.getVivify(rec.methodName);
         if (rec.varName == null) {
           decl = meth;  // ?
         } else {
           try {
             int i = Integer.parseInt(rec.varName);
             decl = i < 0 ? meth.receiver
-                : meth.parameters.vivify(i);
+                : meth.parameters.getVivify(i);
           } catch (NumberFormatException e) {
             TreePath path = ASTIndex.getTreePath(tree, rec);
             JCTree.JCVariableDecl varTree = null;
@@ -438,7 +438,7 @@ public class Main {
                 int a = varTree.getStartPosition();
                 int b = varTree.getEndPosition(tree.endPositions);
                 LocalLocation loc = new LocalLocation(i, a-m, b-a);
-                decl = meth.body.locals.vivify(loc);
+                decl = meth.body.locals.getVivify(loc);
                 break;
               }
               if (ASTPath.isClassEquiv(kind)) {
@@ -457,11 +457,11 @@ public class Main {
           el = decl;
         } else if (ins.getKind() == Insertion.Kind.CAST) {
           scenelib.annotations.el.ATypeElementWithType elem =
-              decl.insertTypecasts.vivify(rec.astPath);
+              decl.insertTypecasts.getVivify(rec.astPath);
           elem.setType(((CastInsertion) ins).getType());
           el = elem;
         } else {
-          el = decl.insertAnnotations.vivify(rec.astPath);
+          el = decl.insertAnnotations.getVivify(rec.astPath);
         }
         for (Annotation anno : annos) {
           el.tlAnnotationsHere.add(anno);

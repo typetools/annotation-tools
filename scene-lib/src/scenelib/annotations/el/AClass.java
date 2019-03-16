@@ -25,7 +25,7 @@ public final class AClass extends ADeclaration {
             }
 
             @Override
-            public boolean subPrune(AMethod v) {
+            public boolean isEmptyValue(AMethod v) {
                 return v.prune();
             }
         };
@@ -40,7 +40,7 @@ public final class AClass extends ADeclaration {
             }
 
             @Override
-            public boolean subPrune(ABlock v) {
+            public boolean isEmptyValue(ABlock v) {
                 return v.prune();
             }
         };
@@ -55,7 +55,7 @@ public final class AClass extends ADeclaration {
             }
 
             @Override
-            public boolean subPrune(AExpression v) {
+            public boolean isEmptyValue(AExpression v) {
                 return v.prune();
             }
         };
@@ -116,9 +116,6 @@ public final class AClass extends ADeclaration {
       return new AClass(this);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equals(Object o) {
         return o instanceof AClass
@@ -134,9 +131,6 @@ public final class AClass extends ADeclaration {
             && extendsImplements.equals(o.extendsImplements);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         return super.hashCode() + bounds.hashCode()
@@ -145,9 +139,6 @@ public final class AClass extends ADeclaration {
             + extendsImplements.hashCode();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean prune() {
         return super.prune() & bounds.prune()

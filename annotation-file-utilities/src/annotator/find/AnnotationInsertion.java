@@ -165,9 +165,6 @@ public class AnnotationInsertion extends Insertion {
         return super.addLeadingSpace(gotSeparateLine, pos, precedingChar);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected boolean addTrailingSpace(boolean gotSeparateLine) {
         // Never add a trailing space on a type parameter bound.

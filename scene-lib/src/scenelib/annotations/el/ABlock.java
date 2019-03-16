@@ -30,9 +30,6 @@ public class ABlock extends AExpression {
         return new ABlock(this);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equals(AElement o) {
         return o instanceof ABlock &&
@@ -44,17 +41,11 @@ public class ABlock extends AExpression {
                 && o.locals.equals(locals);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         return super.hashCode() + locals.hashCode();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean prune() {
         return super.prune() & locals.prune();

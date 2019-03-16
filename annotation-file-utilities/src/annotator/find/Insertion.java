@@ -233,9 +233,6 @@ public abstract class Insertion {
         this.inserted = inserted;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         return String.format("(nl=%b) @ %s", separateLine, criteria);
