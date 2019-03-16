@@ -16,52 +16,6 @@ public final class AClass extends ADeclaration {
     public final VivifyingMap<TypeIndexLocation, ATypeElement> extendsImplements =
         ATypeElement.<TypeIndexLocation>newVivifyingLHMap_ATE();
 
-    private static VivifyingMap<String, AMethod> createMethodMap() {
-        return new VivifyingMap<String, AMethod>(
-                new LinkedHashMap<String, AMethod>()) {
-            @Override
-            public  AMethod createValueFor(String k) {
-                return new AMethod(k);
-            }
-
-            @Override
-            public boolean isEmptyValue(AMethod v) {
-                return v.isEmpty();
-            }
-        };
-    }
-
-    private static VivifyingMap<Integer, ABlock> createInitBlockMap() {
-        return new VivifyingMap<Integer, ABlock>(
-                new LinkedHashMap<Integer, ABlock>()) {
-            @Override
-            public  ABlock createValueFor(Integer k) {
-                return new ABlock(k);
-            }
-
-            @Override
-            public boolean isEmptyValue(ABlock v) {
-                return v.isEmpty();
-            }
-        };
-    }
-
-    private static VivifyingMap<String, AExpression> createFieldInitMap() {
-        return new VivifyingMap<String, AExpression>(
-                new LinkedHashMap<String, AExpression>()) {
-            @Override
-            public  AExpression createValueFor(String k) {
-                return new AExpression(k);
-            }
-
-            @Override
-            public boolean isEmptyValue(AExpression v) {
-                return v.isEmpty();
-            }
-        };
-    }
-
-
     /**
      * The class's annotated methods; a method's key consists of its name
      * followed by its erased signature in JVML format.
@@ -212,4 +166,52 @@ public final class AClass extends ADeclaration {
     public <R, T> R accept(ElementVisitor<R, T> v, T t) {
         return v.visitClass(this, t);
     }
+
+    // Static methods
+
+    private static VivifyingMap<String, AMethod> createMethodMap() {
+        return new VivifyingMap<String, AMethod>(
+                new LinkedHashMap<String, AMethod>()) {
+            @Override
+            public  AMethod createValueFor(String k) {
+                return new AMethod(k);
+            }
+
+            @Override
+            public boolean subPrune(AMethod v) {
+                return v.prune();
+            }
+        };
+    }
+
+    private static VivifyingMap<Integer, ABlock> createInitBlockMap() {
+        return new VivifyingMap<Integer, ABlock>(
+                new LinkedHashMap<Integer, ABlock>()) {
+            @Override
+            public  ABlock createValueFor(Integer k) {
+                return new ABlock(k);
+            }
+
+            @Override
+            public boolean subPrune(ABlock v) {
+                return v.prune();
+            }
+        };
+    }
+
+    private static VivifyingMap<String, AExpression> createFieldInitMap() {
+        return new VivifyingMap<String, AExpression>(
+                new LinkedHashMap<String, AExpression>()) {
+            @Override
+            public  AExpression createValueFor(String k) {
+                return new AExpression(k);
+            }
+
+            @Override
+            public boolean subPrune(AExpression v) {
+                return v.prune();
+            }
+        };
+    }
+
 }

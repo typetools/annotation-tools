@@ -8,8 +8,12 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 */
 
 /**
- * A {@link VivifyingMap} is a map that can create "empty" values on demand
- * and prune "empty" values, for some definition of "empty".
+ * A {@link VivifyingMap} is a map with two additional methods:
+ * <ul>
+ * <li>{@link #vivify} is like {@code get}, but it never returns null; instead,
+ *     it stores an empty value and returns that.
+ * <li>{@link #prune} removes empty values
+ * </ul>
  */
 public abstract class VivifyingMap<K, V> extends WrapperMap<K, V> {
     /**
@@ -26,9 +30,9 @@ public abstract class VivifyingMap<K, V> extends WrapperMap<K, V> {
     }
 
     /**
-     * Returns the value to which the specified key is mapped; if the key is
-     * not currently mapped to a value, a new, empty value is created, stored,
-     * and returned.
+     * Like {@code get()}, this returns the value to which the specified key is mapped.
+     * However, this never returns null.  If the key is
+     * not currently mapped to a value, this method stores a new empty value, then returns that.
      */
     public V getVivify(K k) {
         if (containsKey(k)) {

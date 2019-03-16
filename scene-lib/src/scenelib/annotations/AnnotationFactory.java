@@ -40,6 +40,8 @@ public final class AnnotationFactory {
     /**
      * Returns an {@link AnnotationBuilder} appropriate for building a
      * {@link Annotation} of the given type name.
+     * @param typeName the name of the annotation being built
+     * @param tlAnnotationsHere the top-level meta-annotations on the annotation being built
      */
     public AnnotationBuilder beginAnnotation(String typeName, Set<Annotation> tlAnnotationsHere) {
         assert typeName != null;
