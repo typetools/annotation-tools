@@ -27,6 +27,8 @@ public class AnnotationBuilder {
     AnnotationDef def;
 
     private String typeName;
+    // The top-level meta-annotations that appear directly on the
+    // annotation being built. "tl" stands for "top-level".
     Set<Annotation> tlAnnotationsHere;
 
     boolean arrayInProgress = false;
