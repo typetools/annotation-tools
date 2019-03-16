@@ -39,17 +39,12 @@ public class ATypeElement extends AElement {
     public final VivifyingMap<InnerTypeLocation, ATypeElement> innerTypes =
         ATypeElement.<InnerTypeLocation>newVivifyingLHMap_ATE();
 
-    // general information about the element being annotated
-    public Object description;
-
     ATypeElement(Object description) {
         super(description);
-        this.description = description;
     }
 
     ATypeElement(ATypeElement elem) {
       super(elem);
-      description = elem.description;
       copyMapContents(elem.innerTypes, innerTypes);
     }
 
