@@ -15,13 +15,11 @@ final class EnclosedByCriterion implements Criterion {
     this.kind = kind;
   }
 
-  /** {@inheritDoc} */
   @Override
   public Kind getKind() {
     return Kind.ENCLOSED_BY;
   }
 
-  /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path, Tree leaf) {
     if (path == null) {
@@ -31,7 +29,6 @@ final class EnclosedByCriterion implements Criterion {
     return isSatisfiedBy(path);
   }
 
-  /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path) {
 
@@ -47,9 +44,6 @@ final class EnclosedByCriterion implements Criterion {
     return false;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String toString() {
     return "enclosed by '" + kind + "'";

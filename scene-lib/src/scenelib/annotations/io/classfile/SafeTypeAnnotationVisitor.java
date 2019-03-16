@@ -78,86 +78,50 @@ implements TypeAnnotationVisitor {
     xNameAndArgsCount = 0;
   }
 
-  /**
-   * {@inheritDoc}
-   * @see org.objectweb.asmx.AnnotationVisitor#visit(java.lang.String, java.lang.Object)
-   */
   @Override
   public void visit(String name, Object value) {
     xav.visit(name, value);
   }
 
-  /**
-   * {@inheritDoc}
-   * @see org.objectweb.asmx.AnnotationVisitor#visitAnnotation(java.lang.String, java.lang.String)
-   */
   @Override
   public AnnotationVisitor visitAnnotation(String name, String desc) {
     return xav.visitAnnotation(name, desc);
   }
 
-  /**
-   * {@inheritDoc}
-   * @see org.objectweb.asmx.AnnotationVisitor#visitArray(java.lang.String)
-   */
   @Override
   public AnnotationVisitor visitArray(String name) {
     return xav.visitArray(name);
   }
 
-  /**
-   * {@inheritDoc}
-   * @see org.objectweb.asmx.AnnotationVisitor#visitEnum(java.lang.String, java.lang.String, java.lang.String)
-   */
   @Override
   public void visitEnum(String name, String desc, String value) {
     xav.visitEnum(name, desc, value);
   }
 
-  /**
-   * {@inheritDoc}
-   * @see org.objectweb.asmx.TypeAnnotationVisitor#visitXIndex(int)
-   */
   @Override
   public void visitXIndex(int index) {
     xIndexArgs.add(index);
     xav.visitXIndex(index);
   }
 
-  /**
-   * {@inheritDoc}
-   * @see org.objectweb.asmx.TypeAnnotationVisitor#visitXLength(int)
-   */
   @Override
   public void visitXLength(int length) {
     xLengthArgs.add(length);
     xav.visitXLength(length);
   }
 
-  /**
-   * {@inheritDoc}
-   * @see org.objectweb.asmx.TypeAnnotationVisitor#visitXLocation(TypePathEntry)
-   */
   @Override
   public void visitXLocation(TypePathEntry location) {
     xLocationArgs.add(location);
     xav.visitXLocation(location);
   }
 
-  /**
-   * {@inheritDoc}
-   * @see org.objectweb.asmx.TypeAnnotationVisitor#visitXLocationLength(int)
-   */
   @Override
   public void visitXLocationLength(int location_length) {
     xLocationLengthArgs.add(location_length);
     xav.visitXLocationLength(location_length);
   }
 
-  /**
-   * {@inheritDoc}
-   * @see org.objectweb.asmx.TypeAnnotationVisitor#visitXOffset(int)
-   */
   @Override
   public void visitXOffset(int offset) {
     xOffsetArgs.add(offset);
@@ -168,40 +132,24 @@ implements TypeAnnotationVisitor {
   public void visitXNumEntries(int num_entries) {
   }
 
-  /**
-   * {@inheritDoc}
-   * @see org.objectweb.asmx.TypeAnnotationVisitor#visitXStartPc(int)
-   */
   @Override
   public void visitXStartPc(int start_pc) {
     xStartPcArgs.add(start_pc);
     xav.visitXStartPc(start_pc);
   }
 
-  /**
-   * {@inheritDoc}
-   * @see org.objectweb.asmx.TypeAnnotationVisitor#visitXTargetType(int)
-   */
   @Override
   public void visitXTargetType(int target_type) {
     xTargetTypeArgs.add(target_type);
     xav.visitXTargetType(target_type);
   }
 
-  /**
-   * {@inheritDoc}
-   * @see org.objectweb.asmx.TypeAnnotationVisitor#visitXParamIndex(int)
-   */
   @Override
   public void visitXParamIndex(int param_index) {
     xParamIndexArgs.add(param_index);
     xav.visitXParamIndex(param_index);
   }
 
-  /**
-   * {@inheritDoc}
-   * @see org.objectweb.asmx.TypeAnnotationVisitor#visitXBoundIndex(int)
-   */
   @Override
   public void visitXBoundIndex(int bound_index) {
     if (bound_index != -1) {

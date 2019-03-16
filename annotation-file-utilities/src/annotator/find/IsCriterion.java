@@ -19,15 +19,11 @@ final class IsCriterion implements Criterion {
     this.name = name;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Kind getKind() {
     return Kind.HAS_KIND;
   }
 
-  /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path, Tree leaf) {
     if (path == null) {
@@ -37,7 +33,6 @@ final class IsCriterion implements Criterion {
     return isSatisfiedBy(path);
   }
 
-  /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path) {
     if (path == null) {
@@ -64,9 +59,6 @@ final class IsCriterion implements Criterion {
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String toString() {
     return "is " + kind.toString().toLowerCase() + " '" + name + "'";

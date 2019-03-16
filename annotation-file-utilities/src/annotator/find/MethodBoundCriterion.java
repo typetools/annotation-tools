@@ -19,7 +19,6 @@ public class MethodBoundCriterion implements Criterion {
     this.boundLocationCriterion = Criteria.atBoundLocation(boundLoc);
   }
 
-  /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path, Tree leaf) {
     if (path == null) {
@@ -29,7 +28,6 @@ public class MethodBoundCriterion implements Criterion {
     return isSatisfiedBy(path);
   }
 
-  /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path) {
     return sigMethodCriterion.isSatisfiedBy(path) &&

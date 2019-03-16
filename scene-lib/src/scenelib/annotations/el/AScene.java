@@ -141,9 +141,6 @@ public final class AScene implements Cloneable {
         return o.classes.equals(classes) && o.packages.equals(packages);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         return classes.hashCode() + packages.hashCode();

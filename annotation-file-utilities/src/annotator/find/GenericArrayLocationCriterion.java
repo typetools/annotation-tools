@@ -64,7 +64,6 @@ public class GenericArrayLocationCriterion implements Criterion {
     this.location = location;
   }
 
-  /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path, Tree leaf) {
     if (path == null) {
@@ -91,7 +90,6 @@ public class GenericArrayLocationCriterion implements Criterion {
     return true;
   }
 
-  /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path) {
     if (path == null || path.getParentPath() == null) {

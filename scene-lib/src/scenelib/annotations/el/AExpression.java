@@ -73,9 +73,6 @@ public class AExpression extends AElement {
         return new AExpression(this);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equals(AElement o) {
         return o instanceof AExpression &&
@@ -92,9 +89,6 @@ public class AExpression extends AElement {
                 && funs.equals(o.funs);
         }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         return super.hashCode() + typecasts.hashCode()
@@ -102,9 +96,6 @@ public class AExpression extends AElement {
             + refs.hashCode() + calls.hashCode() + funs.hashCode();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean prune() {
         return super.prune() & typecasts.prune() & instanceofs.prune()

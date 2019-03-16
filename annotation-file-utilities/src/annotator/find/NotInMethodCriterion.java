@@ -11,15 +11,11 @@ import com.sun.source.util.TreePath;
  */
 final class NotInMethodCriterion implements Criterion {
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Kind getKind() {
     return Kind.NOT_IN_METHOD;
   }
 
-  /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path, Tree leaf) {
     if (path == null) {
@@ -29,7 +25,6 @@ final class NotInMethodCriterion implements Criterion {
     return isSatisfiedBy(path);
   }
 
-  /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path) {
     do {
@@ -46,9 +41,6 @@ final class NotInMethodCriterion implements Criterion {
     return true;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String toString() {
     return "not in method";

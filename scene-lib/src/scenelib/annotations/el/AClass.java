@@ -70,9 +70,6 @@ public final class AClass extends ADeclaration {
       return new AClass(this);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equals(Object o) {
         return o instanceof AClass
@@ -88,9 +85,6 @@ public final class AClass extends ADeclaration {
             && extendsImplements.equals(o.extendsImplements);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         return super.hashCode() + bounds.hashCode()
@@ -99,9 +93,6 @@ public final class AClass extends ADeclaration {
             + extendsImplements.hashCode();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean prune() {
         return super.prune() & bounds.prune()

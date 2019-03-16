@@ -178,9 +178,6 @@ public final class AnnotationDef extends AElement {
             && sameFieldTypes;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         return name.hashCode()
