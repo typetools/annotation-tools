@@ -18,6 +18,10 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * usually belongs directly or indirectly to an {@link AScene}. Each subclass
  * of <code>AElement</code> represents one kind of annotatable element; its
  * name should make this clear.
+ * <p>
+ *
+ * The name {@code AElement} stands for "annotatable element" or
+ * "annotated element".
  */
 public class AElement implements Cloneable {
     static <K extends Object> VivifyingMap<K, AElement> newVivifyingLHMap_AE() {

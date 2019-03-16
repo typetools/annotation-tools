@@ -66,7 +66,7 @@ extends EmptyVisitor {
   // The scene into which this class will insert annotations.
   private final AScene scene;
 
-  // The AClass that represents this class in <code>scene</code>.
+  // The AClass that will be visited, which already contains annotations.
   private AClass aClass;
 
   private final ClassReader cr;
