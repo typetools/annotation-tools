@@ -47,8 +47,14 @@ public class ABlock extends AExpression {
     }
 
     @Override
-    public boolean prune() {
-        return super.prune() & locals.prune();
+    public boolean isEmpty() {
+        return super.isEmpty() && locals.isEmpty();
+    }
+
+    @Override
+    public void prune() {
+        super.prune();
+        locals.prune();
     }
 
     @Override

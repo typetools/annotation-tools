@@ -163,7 +163,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
     super.visit(version, access, name, signature, superName, interfaces);
     // class files store fully quantified class names with '/' instead of '.'
     name = name.replace('/', '.');
-    aClass = scene.classes.vivify(name);
+    aClass = scene.classes.getVivify(name);
   }
 
   @Override
@@ -478,7 +478,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
     public FieldAnnotationSceneWriter(String name, FieldVisitor fv) {
       this.fv = fv;
       this.existingFieldAnnotations = new ArrayList<String>();
-      this.aField = aClass.fields.vivify(name);
+      this.aField = aClass.fields.getVivify(name);
     }
 
     @Override
@@ -609,7 +609,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
     MethodAnnotationSceneWriter(String name, String desc, MethodVisitor mv) {
       super(mv);
       this.hasVisitedMethodAnnotations = false;
-      this.aMethod = aClass.methods.vivify(name+desc);
+      this.aMethod = aClass.methods.getVivify(name+desc);
       this.existingMethodAnnotations = new ArrayList<String>();
     }
 

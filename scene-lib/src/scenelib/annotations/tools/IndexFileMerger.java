@@ -255,7 +255,7 @@ public class IndexFileMerger {
         Collection<String> values = entry.getValue();
         Annotation afAnno = new Annotation(afDef, Collections
                 .<String, Collection<String>>singletonMap("value", values));
-        scene.classes.vivify(key).tlAnnotationsHere.add(afAnno);
+        scene.classes.getVivify(key).tlAnnotationsHere.add(afAnno);
       }
       scene.prune();
       annotatedFor.clear();  // for gc

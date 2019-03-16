@@ -134,14 +134,18 @@ public class AElement implements Cloneable {
     }
 
     /**
-     * Removes empty subelements of this {@link AElement} depth-first; returns
-     * whether this {@link AElement} is itself empty after pruning.
+     * Returns whether this {@link AElement} is empty.
      */
-    // In subclasses, we use & (not &&) because we want complete evaluation:
-    // we should prune everything even if the first subelement is nonempty.
-    public boolean prune() {
+    public boolean isEmpty() {
         return tlAnnotationsHere.isEmpty()
-            & (type == null || type.prune());
+            && (type == null || type.isEmpty());
+    }
+
+    /**
+     * Removes empty subelements of this {@link AElement} depth-first.
+     */
+    public void prune() {
+        type.prune();
     }
 
     @Override
@@ -185,8 +189,8 @@ public class AElement implements Cloneable {
             }
 
             @Override
-            public boolean subPrune(AElement v) {
-                return v.prune();
+            public boolean isEmptyValue(AElement v) {
+                return v.isEmpty();
             }
         };
     }
@@ -202,8 +206,8 @@ public class AElement implements Cloneable {
             }
 
             @Override
-            public boolean subPrune(AElement v) {
-                return v.prune();
+            public boolean isEmptyValue(AElement v) {
+                return v.isEmpty();
             }
         };
     }

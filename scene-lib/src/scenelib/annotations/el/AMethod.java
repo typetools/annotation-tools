@@ -86,11 +86,22 @@ public final class AMethod extends ADeclaration {
     }
 
     @Override
-    public boolean prune() {
-        return super.prune() & bounds.prune()
-            & returnType.prune()
-            & receiver.prune() & parameters.prune()
-            & throwsException.prune() & body.prune();
+    public boolean isEmpty() {
+        return super.isEmpty() && bounds.isEmpty()
+            && returnType.isEmpty()
+            && receiver.isEmpty() && parameters.isEmpty()
+            && throwsException.isEmpty() && body.isEmpty();
+    }
+
+    @Override
+    public void prune() {
+        super.prune();
+        bounds.prune();
+        returnType.prune();
+        receiver.prune();
+        parameters.prune();
+        throwsException.prune();
+        body.prune();
     }
 
     @Override

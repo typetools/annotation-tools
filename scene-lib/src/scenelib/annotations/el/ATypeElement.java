@@ -71,9 +71,15 @@ public class ATypeElement extends AElement {
     }
 
     @Override
-    public boolean prune() {
+    public boolean isEmpty() {
         checkRep();
-        return super.prune() & innerTypes.prune();
+        return super.isEmpty() && innerTypes.isEmpty();
+    }
+
+    @Override
+    public void prune() {
+        super.prune();
+        innerTypes.prune();
     }
 
     private static final String lineSep = System.getProperty("line.separator");
@@ -115,8 +121,8 @@ public class ATypeElement extends AElement {
             }
 
             @Override
-            public boolean subPrune(ATypeElement v) {
-                return v.prune();
+            public boolean isEmptyValue(ATypeElement v) {
+                return v.isEmpty();
             }
         };
     }
