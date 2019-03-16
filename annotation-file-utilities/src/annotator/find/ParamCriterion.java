@@ -18,7 +18,6 @@ public class ParamCriterion implements Criterion {
     this.paramPos = pos;
   }
 
-  /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path, Tree leaf) {
     if (path == null) {
@@ -28,7 +27,6 @@ public class ParamCriterion implements Criterion {
     return isSatisfiedBy(path);
   }
 
-  /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path) {
 

@@ -135,7 +135,6 @@ public class DeclaredType extends Type {
         return innerType;
     }
 
-    /** {@inheritDoc} */
     @Override
     public Kind getKind() {
         return Kind.DECLARED;

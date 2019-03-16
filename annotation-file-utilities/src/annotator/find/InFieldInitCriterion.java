@@ -18,7 +18,6 @@ public class InFieldInitCriterion implements Criterion {
     this.varCriterion = Criteria.is(Tree.Kind.VARIABLE, varName);
   }
 
-  /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path, Tree leaf) {
     if (path == null) {
@@ -28,7 +27,6 @@ public class InFieldInitCriterion implements Criterion {
     return isSatisfiedBy(path);
   }
 
-  /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path) {
     while (path != null) {

@@ -14,7 +14,6 @@ public class ReceiverCriterion implements Criterion {
     isSigMethodCriterion = Criteria.isSigMethod(methodName);
   }
 
-  /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path, Tree leaf) {
     if (path == null) {
@@ -24,7 +23,6 @@ public class ReceiverCriterion implements Criterion {
     return isSatisfiedBy(path);
   }
 
-  /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path) {
     // want to annotate BlockTree returned by MethodTree.getBody();

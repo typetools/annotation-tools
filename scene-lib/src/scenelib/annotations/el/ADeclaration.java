@@ -73,9 +73,6 @@ public abstract class ADeclaration extends AElement {
             && insertTypecasts.equals(o.insertTypecasts);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public int hashCode() {
     return super.hashCode()
@@ -83,9 +80,6 @@ public abstract class ADeclaration extends AElement {
         + (insertTypecasts == null ? 0 : insertTypecasts.hashCode());
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public boolean prune() {
     return super.prune()

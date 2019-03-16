@@ -34,7 +34,6 @@ public class BoundLocationCriterion implements Criterion {
     }
   }
 
-  /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path, Tree leaf) {
     if (path == null) {
@@ -44,7 +43,6 @@ public class BoundLocationCriterion implements Criterion {
     return isSatisfiedBy(path);
   }
 
-  /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path) {
     if (path == null) {
@@ -126,13 +124,11 @@ public class BoundLocationCriterion implements Criterion {
     return type != null && type.tsym != null && type.tsym.isInterface();
   }
 
-  /** {@inheritDoc} */
   @Override
   public Kind getKind() {
     return Kind.BOUND_LOCATION;
   }
 
-  /** {@inheritDoc} */
   @Override
   public String toString() {
     return "BoundCriterion: at param index: " + paramIndex +
