@@ -178,8 +178,8 @@ public final class AClass extends ADeclaration {
             }
 
             @Override
-            public boolean subPrune(AMethod v) {
-                return v.prune();
+            public boolean isEmptyValue(AMethod v) {
+                return v.isEmpty();
             }
         };
     }
@@ -193,8 +193,8 @@ public final class AClass extends ADeclaration {
             }
 
             @Override
-            public boolean subPrune(ABlock v) {
-                return v.prune();
+            public boolean isEmptyValue(ABlock v) {
+                return v.isEmpty();
             }
         };
     }
@@ -208,8 +208,8 @@ public final class AClass extends ADeclaration {
             }
 
             @Override
-            public boolean subPrune(AExpression v) {
-                return v.prune();
+            public boolean isEmptyValue(AExpression v) {
+                return v.isEmpty();
             }
         };
     }

@@ -114,8 +114,8 @@ public class ATypeElementWithType extends ATypeElement {
             }
 
             @Override
-            public boolean subPrune(ATypeElementWithType v) {
-                return v.prune();
+            public boolean isEmptyValue(ATypeElementWithType v) {
+                return v.isEmpty();
             }
         };
     }
