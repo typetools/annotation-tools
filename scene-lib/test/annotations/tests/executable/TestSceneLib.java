@@ -488,7 +488,8 @@ public class TestSceneLib extends TestCase {
         s1.classes.getVivify("Foo");
         assertFalse(s1.equals(s2));
 
-        assertTrue(s1.prune());
+        s1.prune();
+        assertTrue(s1.isEmpty());
         assertTrue(s1.equals(s2));
 
         Annotation sa = AnnotationFactory.saf.beginAnnotation("Anno", Annotations.asRetentionClass).finish();
@@ -498,7 +499,8 @@ public class TestSceneLib extends TestCase {
         clazz2.tlAnnotationsHere.add(tla);
 
         assertFalse(s1.equals(s2));
-        assertFalse(s2.prune());
+        s2.prune();
+        assertFalse(s2.isEmpty());
         assertFalse(s1.equals(s2));
     }
 

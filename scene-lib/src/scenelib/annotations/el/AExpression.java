@@ -103,7 +103,7 @@ public class AExpression extends AElement {
     }
 
     @Override
-    public boolean prune() {
+    public void prune() {
         super.prune();
         typecasts.prune();
         instanceofs.prune();

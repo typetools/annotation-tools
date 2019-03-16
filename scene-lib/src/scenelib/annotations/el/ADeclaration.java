@@ -81,10 +81,17 @@ public abstract class ADeclaration extends AElement {
   }
 
   @Override
-  public boolean prune() {
-    return super.prune()
-        & (insertAnnotations == null || insertAnnotations.prune())
-        & (insertTypecasts == null || insertTypecasts.prune());
+  public boolean isEmpty() {
+    return super.isEmpty()
+        && (insertAnnotations == null || insertAnnotations.isEmpty())
+        && (insertTypecasts == null || insertTypecasts.isEmpty());
+  }
+
+  @Override
+  public void prune() {
+    super.prune();
+    if (insertAnnotations != null) insertAnnotations.prune();
+    if (insertTypecasts != null) insertTypecasts.prune();
   }
 
   @Override

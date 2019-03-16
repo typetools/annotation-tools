@@ -147,11 +147,18 @@ public final class AScene implements Cloneable {
     }
 
     /**
-     * Removes empty subelements of this {@link AScene} depth-first; returns
-     * whether this {@link AScene} is itself empty after pruning.
+     * Returns whether this {@link AScene} is empty.
      */
-    public boolean prune() {
-        return classes.prune() & packages.prune();
+    public boolean isEmpty() {
+        return classes.isEmpty() && packages.isEmpty();
+    }
+
+    /**
+     * Removes empty subelements of this {@link AScene} depth-first.
+     */
+    public void prune() {
+        classes.prune();
+        packages.prune();
     }
 
     /** Returns a string representation. */

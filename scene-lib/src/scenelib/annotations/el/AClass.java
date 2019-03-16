@@ -26,7 +26,7 @@ public final class AClass extends ADeclaration {
 
             @Override
             public boolean isEmptyValue(AMethod v) {
-                return v.prune();
+                return v.isEmpty();
             }
         };
     }
@@ -41,7 +41,7 @@ public final class AClass extends ADeclaration {
 
             @Override
             public boolean isEmptyValue(ABlock v) {
-                return v.prune();
+                return v.isEmpty();
             }
         };
     }
@@ -56,7 +56,7 @@ public final class AClass extends ADeclaration {
 
             @Override
             public boolean isEmptyValue(AExpression v) {
-                return v.prune();
+                return v.isEmpty();
             }
         };
     }
@@ -140,11 +140,22 @@ public final class AClass extends ADeclaration {
     }
 
     @Override
-    public boolean prune() {
-        return super.prune() & bounds.prune()
-            & methods.prune() & fields.prune()
-            & staticInits.prune() & instanceInits.prune()
-            & extendsImplements.prune();
+    public boolean isEmpty() {
+        return super.isEmpty() && bounds.isEmpty()
+            && methods.isEmpty() && fields.isEmpty()
+            && staticInits.isEmpty() && instanceInits.isEmpty()
+            && extendsImplements.isEmpty();
+    }
+
+    @Override
+    public void prune() {
+        super.prune();
+        bounds.prune();
+        methods.prune();
+        fields.prune();
+        staticInits.prune();
+        instanceInits.prune();
+        extendsImplements.prune();
     }
 
     @Override
