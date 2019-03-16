@@ -45,7 +45,7 @@ public class AElement implements Cloneable {
     }
 
     // general description of the element
-    final Object description;
+    public final Object description;
 
     AElement(Object description) {
         this(description, false);
