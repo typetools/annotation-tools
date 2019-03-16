@@ -27,20 +27,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * one inner type; {@link #innerTypes} maps locations to inner types.
  */
 public class ATypeElement extends AElement {
-    static <K extends Object> VivifyingMap<K, ATypeElement> newVivifyingLHMap_ATE() {
-        return new VivifyingMap<K, ATypeElement>(
-                new LinkedHashMap<K, ATypeElement>()) {
-            @Override
-            public  ATypeElement createValueFor(K k) {
-                return new ATypeElement(k);
-            }
-
-            @Override
-            public boolean subPrune(ATypeElement v) {
-                return v.prune();
-            }
-        };
-    }
 
     /**
      * The annotated inner types; map key is the inner type location.
@@ -133,4 +119,20 @@ public class ATypeElement extends AElement {
     public <R, T> R accept(ElementVisitor<R, T> v, T t) {
         return v.visitTypeElement(this, t);
     }
+
+    static <K extends Object> VivifyingMap<K, ATypeElement> newVivifyingLHMap_ATE() {
+        return new VivifyingMap<K, ATypeElement>(
+                new LinkedHashMap<K, ATypeElement>()) {
+            @Override
+            public  ATypeElement createValueFor(K k) {
+                return new ATypeElement(k);
+            }
+
+            @Override
+            public boolean subPrune(ATypeElement v) {
+                return v.prune();
+            }
+        };
+    }
+
 }

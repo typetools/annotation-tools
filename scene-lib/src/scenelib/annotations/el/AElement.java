@@ -24,46 +24,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * "annotated element".
  */
 public class AElement implements Cloneable {
-    static <K extends Object> VivifyingMap<K, AElement> newVivifyingLHMap_AE() {
-        return new VivifyingMap<K, AElement>(
-                new LinkedHashMap<K, AElement>()) {
-            @Override
-            public AElement createValueFor(K k) {
-                return new AElement(k);
-            }
-
-            @Override
-            public boolean subPrune(AElement v) {
-                return v.prune();
-            }
-        };
-    }
-
-    // Different from the above in that the elements are guaranteed to
-    // contain a non-null "type" field.
-    static <K extends Object> VivifyingMap<K, AElement> newVivifyingLHMap_AET() {
-        return new VivifyingMap<K, AElement>(
-                new LinkedHashMap<K, AElement>()) {
-            @Override
-            public AElement createValueFor(K k) {
-                return new AElement(k, true);
-            }
-
-            @Override
-            public boolean subPrune(AElement v) {
-                return v.prune();
-            }
-        };
-    }
-
-    @SuppressWarnings("unchecked")
-    <K, V extends AElement> void
-    copyMapContents(VivifyingMap<K, V> orig, VivifyingMap<K, V> copy) {
-        for (K key : orig.keySet()) {
-            V val = orig.get(key);
-            copy.put(key, (V) val.clone());
-        }
-    }
 
     /**
      * The top-level annotations directly on this element.  Annotations on
@@ -216,4 +176,48 @@ public class AElement implements Cloneable {
     public <R, T> R accept(ElementVisitor<R, T> v, T t) {
         return v.visitElement(this, t);
     }
+
+    // Static methods
+
+    static <K extends Object> VivifyingMap<K, AElement> newVivifyingLHMap_AE() {
+        return new VivifyingMap<K, AElement>(
+                new LinkedHashMap<K, AElement>()) {
+            @Override
+            public AElement createValueFor(K k) {
+                return new AElement(k);
+            }
+
+            @Override
+            public boolean subPrune(AElement v) {
+                return v.prune();
+            }
+        };
+    }
+
+    // Different from the above in that the elements are guaranteed to
+    // contain a non-null "type" field.
+    static <K extends Object> VivifyingMap<K, AElement> newVivifyingLHMap_AET() {
+        return new VivifyingMap<K, AElement>(
+                new LinkedHashMap<K, AElement>()) {
+            @Override
+            public AElement createValueFor(K k) {
+                return new AElement(k, true);
+            }
+
+            @Override
+            public boolean subPrune(AElement v) {
+                return v.prune();
+            }
+        };
+    }
+
+    @SuppressWarnings("unchecked")
+    static <K, V extends AElement> void
+    copyMapContents(VivifyingMap<K, V> orig, VivifyingMap<K, V> copy) {
+        for (K key : orig.keySet()) {
+            V val = orig.get(key);
+            copy.put(key, (V) val.clone());
+        }
+    }
+
 }
