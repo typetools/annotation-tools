@@ -97,9 +97,20 @@ public class AExpression extends AElement {
     }
 
     @Override
+    public boolean isEmpty() {
+        return super.isEmpty() && typecasts.isEmpty() && instanceofs.isEmpty()
+                && news.isEmpty() && refs.isEmpty() && calls.isEmpty() && funs.isEmpty();
+    }
+
+    @Override
     public boolean prune() {
-        return super.prune() & typecasts.prune() & instanceofs.prune()
-                & news.prune() & refs.prune() & calls.prune() & funs.prune();
+        super.prune();
+        typecasts.prune();
+        instanceofs.prune();
+        news.prune();
+        refs.prune();
+        calls.prune();
+        funs.prune();
     }
 
     @Override
