@@ -86,9 +86,6 @@ public final class RelativeLocation implements Comparable<RelativeLocation> {
                 && equals((RelativeLocation) o);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         Hasher h = new Hasher();

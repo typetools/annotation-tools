@@ -289,7 +289,6 @@ public class IsSigMethodCriterion implements Criterion {
     return b;
   }
 
-  /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path, Tree leaf) {
     if (path == null) {
@@ -299,7 +298,6 @@ public class IsSigMethodCriterion implements Criterion {
     return isSatisfiedBy(path);
   }
 
-  /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path) {
     if (path == null) {

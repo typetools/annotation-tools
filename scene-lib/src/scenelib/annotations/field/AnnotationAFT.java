@@ -24,9 +24,6 @@ public final class AnnotationAFT extends ScalarAFT {
         this.annotationDef = annotationDef;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isValidValue(Object o) {
         return o instanceof Annotation;
@@ -44,9 +41,6 @@ public final class AnnotationAFT extends ScalarAFT {
         return "annotation-field " + annotationDef.name;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String format(Object o) {
         // Ensure the argument is an Annotation.

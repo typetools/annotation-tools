@@ -319,9 +319,6 @@ public final class Annotation {
 //         this(new AnnotationDef(ann1.def(), retention), ann1);
 //     }
 //
-//     /**
-//      * {@inheritDoc}
-//      */
 //     @Override
 //     public int hashCode() {
 //         return tldef.hashCode() + ann.hashCode();

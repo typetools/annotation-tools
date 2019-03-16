@@ -21,7 +21,6 @@ public class FieldCriterion implements Criterion {
     this.notInMethodCriterion = Criteria.notInMethod();
   }
 
-  /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path, Tree leaf) {
     if (path == null) {
@@ -31,7 +30,6 @@ public class FieldCriterion implements Criterion {
     return isSatisfiedBy(path);
   }
 
-  /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path) {
     if (path == null || (isDeclaration

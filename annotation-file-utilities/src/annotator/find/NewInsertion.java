@@ -38,7 +38,6 @@ public class NewInsertion extends TypedInsertion {
     qualifyType = false;
   }
 
-  /** {@inheritDoc} */
   @Override
   protected String getText(boolean comments, boolean abbreviate) {
     if (annotationsOnly || type.getKind() != Type.Kind.ARRAY) {
@@ -93,7 +92,6 @@ public class NewInsertion extends TypedInsertion {
     this.qualifyType = qualifyType;
   }
 
-  /** {@inheritDoc} */
   @Override
   protected boolean addLeadingSpace(boolean gotSeparateLine, int pos,
       char precedingChar) {
@@ -106,13 +104,11 @@ public class NewInsertion extends TypedInsertion {
     return super.addLeadingSpace(gotSeparateLine, pos, precedingChar);
   }
 
-  /** {@inheritDoc} */
   @Override
   protected boolean addTrailingSpace(boolean gotSeparateLine) {
     return true;
   }
 
-  /** {@inheritDoc} */
   @Override
   public Kind getKind() {
     return Kind.NEW;

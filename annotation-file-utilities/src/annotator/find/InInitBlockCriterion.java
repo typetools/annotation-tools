@@ -20,7 +20,6 @@ public class InInitBlockCriterion implements Criterion {
     this.notInMethodCriterion = Criteria.notInMethod();
   }
 
-  /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path, Tree leaf) {
     if (path == null) {
@@ -30,7 +29,6 @@ public class InInitBlockCriterion implements Criterion {
     return isSatisfiedBy(path);
   }
 
-  /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path) {
     while (path != null) {

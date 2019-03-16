@@ -62,9 +62,6 @@ public class ATypeElement extends AElement {
         assert type == null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equals(AElement o) {
         return o instanceof ATypeElement
@@ -77,18 +74,12 @@ public class ATypeElement extends AElement {
             && (type == null ? o.type == null : o.type.equals(type));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         checkRep();
         return tlAnnotationsHere.hashCode() + innerTypes.hashCode();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean prune() {
         checkRep();

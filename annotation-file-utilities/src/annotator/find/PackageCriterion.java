@@ -17,20 +17,17 @@ final class PackageCriterion implements Criterion {
     this.name = name;
   }
 
-  /** {@inheritDoc} */
   @Override
   public Kind getKind() {
     return Kind.PACKAGE;
   }
 
-  /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path, Tree tree) {
     assert path == null || path.getLeaf() == tree;
     return isSatisfiedBy(path);
   }
 
-  /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path) {
     Tree tree = path.getLeaf();
@@ -52,9 +49,6 @@ final class PackageCriterion implements Criterion {
     return false;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String toString() {
     return "package '" + name + "'";

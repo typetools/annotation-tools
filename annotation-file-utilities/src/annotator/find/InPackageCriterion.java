@@ -17,15 +17,11 @@ final class InPackageCriterion implements Criterion {
     this.name = name;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Kind getKind() {
     return Kind.IN_PACKAGE;
   }
 
-  /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path, Tree leaf) {
     if (path == null) {
@@ -35,7 +31,6 @@ final class InPackageCriterion implements Criterion {
     return isSatisfiedBy(path);
   }
 
-  /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path) {
     if (path == null) {
@@ -64,9 +59,6 @@ final class InPackageCriterion implements Criterion {
     return false;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String toString() {
     return "in package '" + name + "'";

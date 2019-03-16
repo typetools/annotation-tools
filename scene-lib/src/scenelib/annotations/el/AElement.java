@@ -163,9 +163,6 @@ public class AElement implements Cloneable {
             && (o.type == null ? type == null : o.type.equals(type));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         return getClass().getName().hashCode() + tlAnnotationsHere.hashCode()
