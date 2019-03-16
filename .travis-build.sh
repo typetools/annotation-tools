@@ -64,6 +64,9 @@ fi
 if [[ "${GROUP}" == "downstream" || "${GROUP}" == "all" ]]; then
     # checker-framework and its downstream tests
     (cd .. && git clone --depth 1 https://github.com/plume-lib/plume-scripts.git)
+    REPO=`../plume-scripts/git-find-fork ${SLUGOWNER} typetools checker-framework`
+    BRANCH=`../plume-scripts/git-find-branch $REPO ${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH}`
+    (cd .. && git clone -b $BRANCH --single-branch --depth 1 $REPO) || (cd .. && git clone -b $BRANCH --single-branch --depth 1 $REPO)
     REPO=`../plume-scripts/git-find-fork ${SLUGOWNER} typetools checker-framework-inference`
     BRANCH=`../plume-scripts/git-find-branch $REPO ${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH}`
     (cd .. && git clone -b $BRANCH --single-branch --depth 1 $REPO) || (cd .. && git clone -b $BRANCH --single-branch --depth 1 $REPO)
