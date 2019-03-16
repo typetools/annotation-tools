@@ -10,7 +10,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 /**
  * A {@link VivifyingMap} is a map with two additional methods:
  * <ul>
- * <li>{@link #vivify} is like {@code get}, but it never returns null; instead,
+ * <li>{@link #getVivify} is like {@code get}, but it never returns null; instead,
  *     it stores an empty value and returns that.
  * <li>{@link #prune} removes empty values
  * </ul>
