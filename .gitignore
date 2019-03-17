@@ -83,3 +83,9 @@ annotation-file-utilities/*.png
 # User customizations
 Makefile.user
 build.properties
+
+.DS_Store
+.idea/*
+out/
+javadoc/
+*.iml
