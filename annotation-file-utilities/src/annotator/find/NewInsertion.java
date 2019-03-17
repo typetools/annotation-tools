@@ -38,7 +38,6 @@ public class NewInsertion extends TypedInsertion {
     qualifyType = false;
   }
 
-  /** {@inheritDoc} */
   @Override
   protected String getText(boolean comments, boolean abbreviate) {
     if (annotationsOnly || type.getKind() != Type.Kind.ARRAY) {
@@ -48,8 +47,13 @@ public class NewInsertion extends TypedInsertion {
       for (String a : annotations) {
         b.append(' ').append(a);  // initial space removed below
       }
-      return new AnnotationInsertion(b.substring(1), getCriteria(),
-          isSeparateLine()).getText(comments, abbreviate);
+      AnnotationInsertion aIns =  new AnnotationInsertion(b.substring(1), getCriteria(),
+                                                          isSeparateLine());
+      String result = aIns.getText(comments, abbreviate);
+      // This is a hack.  There might be other side effects that are needed too.
+      // We should avoid making temporary Insertions, due to the design of this program.
+      packageNames.addAll(aIns.getPackageNames());
+      return result;
     } else {
       DeclaredType baseType = getBaseType();
       boolean commentAnnotation = (comments && baseType.getName().isEmpty());
@@ -88,7 +92,6 @@ public class NewInsertion extends TypedInsertion {
     this.qualifyType = qualifyType;
   }
 
-  /** {@inheritDoc} */
   @Override
   protected boolean addLeadingSpace(boolean gotSeparateLine, int pos,
       char precedingChar) {
@@ -101,13 +104,11 @@ public class NewInsertion extends TypedInsertion {
     return super.addLeadingSpace(gotSeparateLine, pos, precedingChar);
   }
 
-  /** {@inheritDoc} */
   @Override
   protected boolean addTrailingSpace(boolean gotSeparateLine) {
     return true;
   }
 
-  /** {@inheritDoc} */
   @Override
   public Kind getKind() {
     return Kind.NEW;

@@ -75,8 +75,8 @@ import com.sun.tools.javac.tree.JCTree;
 
 /**
  * This is the main class for the annotator, which inserts annotations in
- * Java source code.  You can call it as <tt>java annotator.Main</tt> or by
- * using the shell script <tt>insert-annotations-to-source</tt>.
+ * Java source code.  You can call it as {@code java annotator.Main} or by
+ * using the shell script {@code insert-annotations-to-source}.
  * <p>
  *
  * It takes as input
@@ -103,7 +103,7 @@ import com.sun.tools.javac.tree.JCTree;
  *             this --in-place option, those edits are lost. Similarly, if the user runs the
  *             annotator twice in a row with --in-place, only the last set of annotations will
  *             appear in the codebase at the end. <p> To preserve changes when using the --in-place
- *             option, first remove the backup files. Or, use the <tt>-d .</tt> option, which makes
+ *             option, first remove the backup files. Or, use the {@code -d .} option, which makes
  *             (and reads) no backup, instead of --in-place. [default false]
  *         <li id="option:abbreviate"><b>-a</b> <b>--abbreviate=</b><i>boolean</i>. Abbreviate
  *             annotation names [default true]
@@ -153,12 +153,13 @@ public class Main {
    * <p>
    *
    * To preserve changes when using the --in-place option, first remove the
-   * backup files.  Or, use the <tt>-d .</tt> option, which makes (and
+   * backup files.  Or, use the {@code -d .} option, which makes (and
    * reads) no backup, instead of --in-place.
    */
   @Option("-i Overwrite original source files")
   public static boolean in_place = false;
 
+  /** If true, insert {@code import} statements as necessary. */
   @Option("-a Abbreviate annotation names")
   public static boolean abbreviate = true;
 
@@ -199,7 +200,7 @@ public class Main {
     <K, V extends AElement>
     Void filter(VivifyingMap<K, V> vm0, VivifyingMap<K, V> vm1) {
       for (Map.Entry<K, V> entry : vm0.entrySet()) {
-        entry.getValue().accept(this, vm1.vivify(entry.getKey()));
+        entry.getValue().accept(this, vm1.getVivify(entry.getKey()));
       }
       return null;
     }
@@ -240,7 +241,7 @@ public class Main {
         ASTPath p = entry.getKey();
         ATypeElement e = entry.getValue();
         insertAnnotations.put(p, e);
-        // visitTypeElement(e, insertAnnotations.vivify(p));
+        // visitTypeElement(e, insertAnnotations.getVivify(p));
       }
       for (Map.Entry<ASTPath, ATypeElementWithType> entry :
           el0.insertTypecasts.entrySet()) {
@@ -250,10 +251,10 @@ public class Main {
         if (type instanceof scenelib.type.DeclaredType
             && ((scenelib.type.DeclaredType) type).getName().isEmpty()) {
           insertAnnotations.put(p, e);
-          // visitTypeElement(e, insertAnnotations.vivify(p));
+          // visitTypeElement(e, insertAnnotations.getVivify(p));
         } else {
           insertTypecasts.put(p, e);
-          // visitTypeElementWithType(e, insertTypecasts.vivify(p));
+          // visitTypeElementWithType(e, insertTypecasts.getVivify(p));
         }
       }
       return null;
@@ -313,7 +314,7 @@ public class Main {
     for (Map.Entry<String, AClass> entry : scene.classes.entrySet()) {
       String key = entry.getKey();
       AClass clazz0 = entry.getValue();
-      AClass clazz1 = filtered.classes.vivify(key);
+      AClass clazz1 = filtered.classes.getVivify(key);
       clazz0.accept(classFilter, clazz1);
     }
     filtered.prune();
@@ -361,7 +362,7 @@ public class Main {
       astPath = astPath.extend(entry);
     }
 
-    return decl.insertAnnotations.vivify(astPath);
+    return decl.insertAnnotations.getVivify(astPath);
   }
 
   private static void convertInsertion(String pkg,
@@ -375,7 +376,7 @@ public class Main {
         }
       }
     } else if (scene != null && rec.className != null) {
-      AClass clazz = scene.classes.vivify(rec.className);
+      AClass clazz = scene.classes.getVivify(rec.className);
       ADeclaration decl = null;  // insertion target
       if (ins.getCriteria().onBoundZero()) {
         int n = rec.astPath.size();
@@ -392,16 +393,16 @@ public class Main {
       }
       if (rec.methodName == null) {
         decl = rec.varName == null ? clazz
-            : clazz.fields.vivify(rec.varName);
+            : clazz.fields.getVivify(rec.varName);
       } else {
-        AMethod meth = clazz.methods.vivify(rec.methodName);
+        AMethod meth = clazz.methods.getVivify(rec.methodName);
         if (rec.varName == null) {
           decl = meth;  // ?
         } else {
           try {
             int i = Integer.parseInt(rec.varName);
             decl = i < 0 ? meth.receiver
-                : meth.parameters.vivify(i);
+                : meth.parameters.getVivify(i);
           } catch (NumberFormatException e) {
             TreePath path = ASTIndex.getTreePath(tree, rec);
             JCTree.JCVariableDecl varTree = null;
@@ -437,7 +438,7 @@ public class Main {
                 int a = varTree.getStartPosition();
                 int b = varTree.getEndPosition(tree.endPositions);
                 LocalLocation loc = new LocalLocation(i, a-m, b-a);
-                decl = meth.body.locals.vivify(loc);
+                decl = meth.body.locals.getVivify(loc);
                 break;
               }
               if (ASTPath.isClassEquiv(kind)) {
@@ -456,11 +457,11 @@ public class Main {
           el = decl;
         } else if (ins.getKind() == Insertion.Kind.CAST) {
           scenelib.annotations.el.ATypeElementWithType elem =
-              decl.insertTypecasts.vivify(rec.astPath);
+              decl.insertTypecasts.getVivify(rec.astPath);
           elem.setType(((CastInsertion) ins).getType());
           el = elem;
         } else {
-          el = decl.insertAnnotations.vivify(rec.astPath);
+          el = decl.insertAnnotations.getVivify(rec.astPath);
         }
         for (Annotation anno : annos) {
           el.tlAnnotationsHere.add(anno);
@@ -719,8 +720,8 @@ public class Main {
         }
 
         if (convert_jaifs) {
-          // program used only for JAIF conversion; execute following
-          // block and then skip remainder of loop
+          // With --convert-jaifs command-line option, the program is used only for JAIF conversion.
+          // Execute the following block and then skip the remainder of the loop.
           Multimap<ASTRecord, Insertion> astInsertions = finder.getPaths();
           for (Map.Entry<ASTRecord, Collection<Insertion>> entry :
               astInsertions.asMap().entrySet()) {
@@ -760,11 +761,11 @@ public class Main {
                 public int compare(Pair<Integer, ASTPath> p1,
                     Pair<Integer, ASTPath> p2) {
                   int c = Integer.compare(p2.a, p1.a);
-                  if (c == 0) {
-                    c = p2.b == null ? p1.b == null ? 0 : -1
-                        : p1.b == null ? 1 : p2.b.compareTo(p1.b);
+                  if (c != 0) {
+                    return c;
                   }
-                  return c;
+                  return p2.b == null ? (p1.b == null ? 0 : -1)
+                    : (p1.b == null ? 1 : p2.b.compareTo(p1.b));
                 }
               });
         positionKeysSorted.addAll(positionKeysUnsorted);
@@ -850,7 +851,10 @@ public class Main {
 
             String toInsert = iToInsert.getText(comments, abbreviate,
                 gotSeparateLine, pos, precedingChar) + trailingWhitespace;
-            if (seen.contains(toInsert)) { continue; }  // eliminate duplicates
+            // eliminate duplicates
+            if (seen.contains(toInsert)) {
+              continue;
+            }
             seen.add(toInsert);
 
             // If it's already there, don't re-insert.  This is a hack!

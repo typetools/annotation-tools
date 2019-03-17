@@ -29,25 +29,16 @@ public final class ClassTokenAFT extends ScalarAFT {
     //    /* this.parameterization = parameterization; */
     // }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isValidValue(Object o) {
         return o instanceof java.lang.Class;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         return "Class"/* + parameterization */;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String format(Object o) {
         return ((java.lang.Class<?>)o).getName() + ".class";

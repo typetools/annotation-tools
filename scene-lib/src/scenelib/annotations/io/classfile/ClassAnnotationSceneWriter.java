@@ -156,10 +156,6 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
     return ((ClassWriter) cv).toByteArray();
   }
 
-  /**
-   * {@inheritDoc}
-   * @see org.objectweb.asmx.ClassAdapter#visit(int, int, java.lang.String, java.lang.String, java.lang.String, java.lang.String[])
-   */
   @Override
   public void visit(int version, int access, String name,
       String signature, String superName, String[] interfaces) {
@@ -167,23 +163,15 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
     super.visit(version, access, name, signature, superName, interfaces);
     // class files store fully quantified class names with '/' instead of '.'
     name = name.replace('/', '.');
-    aClass = scene.classes.vivify(name);
+    aClass = scene.classes.getVivify(name);
   }
 
-  /**
-   * {@inheritDoc}
-   * @see org.objectweb.asmx.ClassAdapter#visitInnerClass(java.lang.String, java.lang.String, java.lang.String, int)
-   */
   @Override
   public void visitInnerClass(String name, String outerName, String innerName, int access ) {
     ensureVisitSceneClassAnnotations();
     super.visitInnerClass(name, outerName, innerName, access);
   }
 
-  /**
-   * {@inheritDoc}
-   * @see org.objectweb.asmx.ClassAdapter#visitField(int, java.lang.String, java.lang.String, java.lang.String, java.lang.Object)
-   */
   @Override
   public FieldVisitor visitField(int access, String name, String desc,
       String signature, Object value) {
@@ -194,10 +182,6 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
         super.visitField(access, name, desc, signature, value));
   }
 
-  /**
-   * {@inheritDoc}
-   * @see org.objectweb.asmx.ClassAdapter#visitMethod(int, java.lang.String, java.lang.String, java.lang.String, java.lang.String[])
-   */
   @Override
   public MethodVisitor visitMethod(int access, String name, String desc,
       String signature, String[] exceptions) {
@@ -210,20 +194,12 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
             super.visitMethod(access, name, desc, signature, exceptions)));
   }
 
-  /**
-   * {@inheritDoc}
-   * @see org.objectweb.asmx.ClassAdapter#visitEnd()
-   */
   @Override
   public void visitEnd() {
     ensureVisitSceneClassAnnotations();
     super.visitEnd();
   }
 
-  /**
-   * {@inheritDoc}
-   * @see org.objectweb.asmx.ClassAdapter#visitAnnotation(java.lang.String, boolean)
-   */
   @Override
   public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
     existingClassAnnotations.add(desc);
@@ -236,10 +212,6 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
     return super.visitAnnotation(desc, visible);
   }
 
-  /**
-   * {@inheritDoc}
-   * @see org.objectweb.asmx.ClassAdapter#visitTypeAnnotation(java.lang.String, boolean, boolean)
-   */
   @Override
   public TypeAnnotationVisitor visitTypeAnnotation(String desc, boolean visible, boolean inCode) {
     existingClassAnnotations.add(desc);
@@ -506,13 +478,9 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
     public FieldAnnotationSceneWriter(String name, FieldVisitor fv) {
       this.fv = fv;
       this.existingFieldAnnotations = new ArrayList<String>();
-      this.aField = aClass.fields.vivify(name);
+      this.aField = aClass.fields.getVivify(name);
     }
 
-    /**
-     * {@inheritDoc}
-     * @see org.objectweb.asmx.FieldVisitor#visitAnnotation(java.lang.String, boolean)
-     */
     @Override
     public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
       existingFieldAnnotations.add(desc);
@@ -526,10 +494,6 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
       return fv.visitAnnotation(desc, visible);
     }
 
-    /**
-     * {@inheritDoc}
-     * @see org.objectweb.asmx.FieldVisitor#visitTypeAnnotation(java.lang.String, boolean)
-     */
     @Override
     public TypeAnnotationVisitor visitTypeAnnotation(String desc, boolean visible, boolean inCode) {
       existingFieldAnnotations.add(desc);
@@ -544,9 +508,6 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
           fv.visitTypeAnnotation(desc, visible, inCode));
     }
 
-    /** {@inheritDoc}
-     * @see org.objectweb.asmx.FieldVisitor#visitAttribute(org.objectweb.asmx.Attribute)
-     */
     @Override
     public void visitAttribute(Attribute attr) {
       fv.visitAttribute(attr);
@@ -648,34 +609,22 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
     MethodAnnotationSceneWriter(String name, String desc, MethodVisitor mv) {
       super(mv);
       this.hasVisitedMethodAnnotations = false;
-      this.aMethod = aClass.methods.vivify(name+desc);
+      this.aMethod = aClass.methods.getVivify(name+desc);
       this.existingMethodAnnotations = new ArrayList<String>();
     }
 
-    /**
-     * {@inheritDoc}
-     * @see org.objectweb.asmx.MethodAdapter#visitCode()
-     */
     @Override
     public void visitCode() {
       ensureVisitSceneMethodAnnotations();
       super.visitCode();
     }
 
-    /**
-     * {@inheritDoc}
-     * @see org.objectweb.asmx.MethodAdapter#visitEnd()
-     */
     @Override
     public void visitEnd() {
       ensureVisitSceneMethodAnnotations();
       super.visitEnd();
     }
 
-    /**
-     * {@inheritDoc}
-     * @see org.objectweb.asmx.MethodAdapter#visitAnnotation(java.lang.String, boolean)
-     */
     @Override
     public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
       existingMethodAnnotations.add(desc);
@@ -688,10 +637,6 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
       return super.visitAnnotation(desc, visible);
     }
 
-    /**
-     * {@inheritDoc}
-     * @see org.objectweb.asmx.MethodAdapter#visitTypeAnnotation(java.lang.String, boolean)
-     */
     @Override
     public TypeAnnotationVisitor visitTypeAnnotation(String desc, boolean visible, boolean inCode) {
 

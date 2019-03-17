@@ -361,9 +361,6 @@ public final class Criteria {
     return false;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String toString() {
     return criteria.toString();

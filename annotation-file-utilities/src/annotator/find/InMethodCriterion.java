@@ -21,15 +21,11 @@ final class InMethodCriterion implements Criterion {
     sigMethodCriterion = new IsSigMethodCriterion(name);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Kind getKind() {
     return Kind.IN_METHOD;
   }
 
-  /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path, Tree leaf) {
     if (path == null) {
@@ -39,7 +35,6 @@ final class InMethodCriterion implements Criterion {
     return isSatisfiedBy(path);
   }
 
-  /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path) {
     Criteria.dbug.debug("InMethodCriterion.isSatisfiedBy(%s); this=%s%n",
@@ -71,9 +66,6 @@ final class InMethodCriterion implements Criterion {
     return result;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String toString() {
     return "in method '" + name + "'";

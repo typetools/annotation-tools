@@ -60,9 +60,6 @@ public final class InnerTypeLocation {
                 && equals((InnerTypeLocation) o);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         Hasher h = new Hasher();

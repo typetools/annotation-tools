@@ -20,26 +20,17 @@ public final class EnumAFT extends ScalarAFT {
         this.typeName = typeName;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isValidValue(Object o) {
         // return o instanceof Enum;
         return o instanceof String;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public  String toString() {
         return "enum " + typeName;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String format(Object o) {
         String fieldValue = o.toString();

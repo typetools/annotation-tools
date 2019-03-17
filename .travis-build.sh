@@ -4,7 +4,7 @@ echo Entering `pwd`/.travis-build.sh, GROUP=$1
 
 # Optional argument $1 is one of:
 #   all, test, misc, downstream
-# If it is omitted, this script does everything.
+# It defaults to "all".
 export GROUP=$1
 if [[ "${GROUP}" == "" ]]; then
   export GROUP=all
@@ -29,10 +29,14 @@ set -o xtrace
 
 export SHELLOPTS
 
-SLUGOWNER=${TRAVIS_REPO_SLUG%/*}
+SLUGOWNER=${TRAVIS_PULL_REQUEST_SLUG%/*}
+if [[ "$SLUGOWNER" == "" ]]; then
+  SLUGOWNER=${TRAVIS_REPO_SLUG%/*}
+fi
 if [[ "$SLUGOWNER" == "" ]]; then
   SLUGOWNER=typetools
 fi
+echo SLUGOWNER=$SLUGOWNER
 
 ./.travis-build-without-test.sh
 
@@ -60,9 +64,12 @@ fi
 if [[ "${GROUP}" == "downstream" || "${GROUP}" == "all" ]]; then
     # checker-framework and its downstream tests
     (cd .. && git clone --depth 1 https://github.com/plume-lib/plume-scripts.git)
+    REPO=`../plume-scripts/git-find-fork ${SLUGOWNER} typetools checker-framework`
+    BRANCH=`../plume-scripts/git-find-branch ${REPO} ${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH}`
+    (cd .. && git clone -b ${BRANCH} --single-branch --depth 1 ${REPO}) || (cd .. && git clone -b ${BRANCH} --single-branch --depth 1 ${REPO})
     REPO=`../plume-scripts/git-find-fork ${SLUGOWNER} typetools checker-framework-inference`
-    BRANCH=`../plume-scripts/git-find-branch $REPO ${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH}`
-    (cd .. && git clone -b $BRANCH --single-branch --depth 1 $REPO) || (cd .. && git clone -b $BRANCH --single-branch --depth 1 $REPO)
+    BRANCH=`../plume-scripts/git-find-branch ${REPO} ${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH}`
+    (cd .. && git clone -b ${BRANCH} --single-branch --depth 1 ${REPO}) || (cd .. && git clone -b ${BRANCH} --single-branch --depth 1 ${REPO})
 
     (cd ../checker-framework-inference && . ./.travis-build-without-test.sh)
 

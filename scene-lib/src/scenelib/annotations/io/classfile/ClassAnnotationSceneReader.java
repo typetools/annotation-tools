@@ -66,7 +66,7 @@ extends EmptyVisitor {
   // The scene into which this class will insert annotations.
   private final AScene scene;
 
-  // The AClass that represents this class in <code>scene</code>.
+  // The AClass that will be visited, which already contains annotations.
   private AClass aClass;
 
   private final ClassReader cr;
@@ -109,7 +109,7 @@ extends EmptyVisitor {
   @Override
   public void visit(int version, int access, String name, String signature,
       String superName, String[] interfaces) {
-    aClass = scene.classes.vivify(name.replace('/', '.'));
+    aClass = scene.classes.getVivify(name.replace('/', '.'));
   }
 
   /**
@@ -141,7 +141,7 @@ extends EmptyVisitor {
       String signature,
       Object value  ) {
     if (trace) { System.out.printf("visitField(%s, %s, %s, %s, %s) in %s (%s)%n", access, name, desc, signature, value, this, this.getClass()); }
-    AField aField = aClass.fields.vivify(name);
+    AField aField = aClass.fields.getVivify(name);
     return new FieldAnnotationSceneReader(name, desc, signature, value, aField);
   }
 
@@ -159,7 +159,7 @@ extends EmptyVisitor {
       return null;
     }
     if (trace) { System.out.printf("visitMethod(%s, %s, %s, %s, %s) in %s (%s)%n", access, name, desc, signature, exceptions, this, this.getClass()); }
-    AMethod aMethod = aClass.methods.vivify(name+desc);
+    AMethod aMethod = aClass.methods.getVivify(name+desc);
     return new MethodAnnotationSceneReader(name, desc, signature, aMethod);
   }
 
@@ -741,7 +741,7 @@ extends EmptyVisitor {
         } else if (aElement instanceof ATypeElement) {
           ATypeElement aTypeElement = (ATypeElement) aElement;
           aTypeElement
-              .innerTypes.vivify(makeInnerTypeLocation()).
+              .innerTypes.getVivify(makeInnerTypeLocation()).
               tlAnnotationsHere.add(makeAnnotation());
         } else {
           throw new RuntimeException("Unknown FIELD_COMPONENT: " + aElement);
@@ -758,7 +758,7 @@ extends EmptyVisitor {
             .tlAnnotationsHere.add(makeAnnotation());
       } else {
         aMethod.receiver.type
-            .innerTypes.vivify(makeInnerTypeLocation())
+            .innerTypes.getVivify(makeInnerTypeLocation())
             .tlAnnotationsHere.add(makeAnnotation());
       }
     }
@@ -768,11 +768,11 @@ extends EmptyVisitor {
      */
     private void handleMethodLocalVariable(AMethod aMethod) {
       if (xLocationsArgs.isEmpty()) {
-        aMethod.body.locals.vivify(makeLocalLocation())
+        aMethod.body.locals.getVivify(makeLocalLocation())
             .tlAnnotationsHere.add(makeAnnotation());
       } else {
-        aMethod.body.locals.vivify(makeLocalLocation())
-            .type.innerTypes.vivify(makeInnerTypeLocation())
+        aMethod.body.locals.getVivify(makeLocalLocation())
+            .type.innerTypes.getVivify(makeInnerTypeLocation())
             .tlAnnotationsHere.add(makeAnnotation());
       }
     }
@@ -782,11 +782,11 @@ extends EmptyVisitor {
      */
     private void handleMethodObjectCreation(AMethod aMethod) {
       if (xLocationsArgs.isEmpty()) {
-        aMethod.body.news.vivify(makeOffset(false))
+        aMethod.body.news.getVivify(makeOffset(false))
             .tlAnnotationsHere.add(makeAnnotation());
       } else {
-        aMethod.body.news.vivify(makeOffset(false))
-            .innerTypes.vivify(makeInnerTypeLocation())
+        aMethod.body.news.getVivify(makeOffset(false))
+            .innerTypes.getVivify(makeInnerTypeLocation())
             .tlAnnotationsHere.add(makeAnnotation());
       }
     }
@@ -800,9 +800,9 @@ extends EmptyVisitor {
      */
     private void handleMethodParameterType(AMethod aMethod) {
       if (xLocationsArgs.isEmpty()) {
-        aMethod.parameters.vivify(makeParamIndex()).type.tlAnnotationsHere.add(makeAnnotation());
+        aMethod.parameters.getVivify(makeParamIndex()).type.tlAnnotationsHere.add(makeAnnotation());
       } else {
-        aMethod.parameters.vivify(makeParamIndex()).type.innerTypes.vivify(
+        aMethod.parameters.getVivify(makeParamIndex()).type.innerTypes.getVivify(
             makeInnerTypeLocation()).tlAnnotationsHere.add(makeAnnotation());
       }
     }
@@ -812,11 +812,11 @@ extends EmptyVisitor {
      */
     private void handleMethodTypecast(AMethod aMethod) {
       if (xLocationsArgs.isEmpty()) {
-        aMethod.body.typecasts.vivify(makeOffset(true))
+        aMethod.body.typecasts.getVivify(makeOffset(true))
             .tlAnnotationsHere.add(makeAnnotation());
       } else {
-        aMethod.body.typecasts.vivify(makeOffset(true))
-            .innerTypes.vivify(makeInnerTypeLocation())
+        aMethod.body.typecasts.getVivify(makeOffset(true))
+            .innerTypes.getVivify(makeInnerTypeLocation())
             .tlAnnotationsHere.add(makeAnnotation());
       }
     }
@@ -832,7 +832,7 @@ extends EmptyVisitor {
             .tlAnnotationsHere.add(makeAnnotation());
       } else {
         aMethod.returnType
-            .innerTypes.vivify(makeInnerTypeLocation())
+            .innerTypes.getVivify(makeInnerTypeLocation())
             .tlAnnotationsHere.add(makeAnnotation());
       }
     }
@@ -842,11 +842,11 @@ extends EmptyVisitor {
      */
     private void handleMethodInstanceOf(AMethod aMethod) {
       if (xLocationsArgs.isEmpty()) {
-        aMethod.body.instanceofs.vivify(makeOffset(false))
+        aMethod.body.instanceofs.getVivify(makeOffset(false))
             .tlAnnotationsHere.add(makeAnnotation());
       } else {
-        aMethod.body.typecasts.vivify(makeOffset(false))
-            .innerTypes.vivify(makeInnerTypeLocation())
+        aMethod.body.typecasts.getVivify(makeOffset(false))
+            .innerTypes.getVivify(makeInnerTypeLocation())
             .tlAnnotationsHere.add(makeAnnotation());
       }
     }
@@ -855,7 +855,7 @@ extends EmptyVisitor {
      * Creates the class type parameter bound annotation on aClass.
      */
     private void handleClassTypeParameter(AClass aClass) {
-      aClass.bounds.vivify(makeTypeParameterLocation())
+      aClass.bounds.getVivify(makeTypeParameterLocation())
           .tlAnnotationsHere.add(makeAnnotation());
     }
 
@@ -864,11 +864,11 @@ extends EmptyVisitor {
      */
     private void handleClassTypeParameterBound(AClass aClass) {
       if (xLocationsArgs.isEmpty()) {
-        aClass.bounds.vivify(makeBoundLocation())
+        aClass.bounds.getVivify(makeBoundLocation())
             .tlAnnotationsHere.add(makeAnnotation());
       } else {
-        aClass.bounds.vivify(makeBoundLocation())
-            .innerTypes.vivify(makeInnerTypeLocation())
+        aClass.bounds.getVivify(makeBoundLocation())
+            .innerTypes.getVivify(makeInnerTypeLocation())
             .tlAnnotationsHere.add(makeAnnotation());
       }
     }
@@ -877,7 +877,7 @@ extends EmptyVisitor {
        * Creates the method type parameter bound annotation on aMethod.
        */
       private void handleMethodTypeParameter(AMethod aMethod) {
-          aMethod.bounds.vivify(makeTypeParameterLocation())
+          aMethod.bounds.getVivify(makeTypeParameterLocation())
                   .tlAnnotationsHere.add(makeAnnotation());
       }
 
@@ -886,34 +886,34 @@ extends EmptyVisitor {
      */
     private void handleMethodTypeParameterBound(AMethod aMethod) {
       if (xLocationsArgs.isEmpty()) {
-        aMethod.bounds.vivify(makeBoundLocation())
+        aMethod.bounds.getVivify(makeBoundLocation())
             .tlAnnotationsHere.add(makeAnnotation());
       } else {
-        aMethod.bounds.vivify(makeBoundLocation())
-            .innerTypes.vivify(makeInnerTypeLocation())
+        aMethod.bounds.getVivify(makeBoundLocation())
+            .innerTypes.getVivify(makeInnerTypeLocation())
             .tlAnnotationsHere.add(makeAnnotation());
       }
     }
 
     private void handleClassExtends(AClass aClass) {
       if (xLocationsArgs.isEmpty()) {
-        aClass.extendsImplements.vivify(makeTypeIndexLocation())
+        aClass.extendsImplements.getVivify(makeTypeIndexLocation())
             .tlAnnotationsHere.add(makeAnnotation());
       } else {
-        aClass.extendsImplements.vivify(makeTypeIndexLocation())
-            .innerTypes.vivify(makeInnerTypeLocation())
+        aClass.extendsImplements.getVivify(makeTypeIndexLocation())
+            .innerTypes.getVivify(makeInnerTypeLocation())
             .tlAnnotationsHere.add(makeAnnotation());
       }
     }
 
     private void handleThrows(AMethod aMethod) {
-      aMethod.throwsException.vivify(makeTypeIndexLocation())
+      aMethod.throwsException.getVivify(makeTypeIndexLocation())
           .tlAnnotationsHere.add(makeAnnotation());
     }
 
     private void handleNewTypeArgument(AMethod aMethod) {
       if (xLocationsArgs.isEmpty()) {
-        // aMethod.news.vivify(makeOffset()).innerTypes.vivify();
+        // aMethod.news.getVivify(makeOffset()).innerTypes.getVivify();
             // makeInnerTypeLocation()).tlAnnotationsHere.add(makeAnnotation());
         if (strict) { System.err.println("Unhandled handleNewTypeArgument on aMethod: " + aMethod); }
       } else {
@@ -923,33 +923,33 @@ extends EmptyVisitor {
 
     private void handleMethodReference(AMethod aMethod) {
       if (xLocationsArgs.isEmpty()) {
-        aMethod.body.refs.vivify(makeOffset(false))
+        aMethod.body.refs.getVivify(makeOffset(false))
             .tlAnnotationsHere.add(makeAnnotation());
       } else {
-        aMethod.body.refs.vivify(makeOffset(false))
-            .innerTypes.vivify(makeInnerTypeLocation())
+        aMethod.body.refs.getVivify(makeOffset(false))
+            .innerTypes.getVivify(makeInnerTypeLocation())
             .tlAnnotationsHere.add(makeAnnotation());
       }
     }
 
     private void handleReferenceTypeArgument(AMethod aMethod) {
       if (xLocationsArgs.isEmpty()) {
-        aMethod.body.refs.vivify(makeOffset(true))
+        aMethod.body.refs.getVivify(makeOffset(true))
             .tlAnnotationsHere.add(makeAnnotation());
       } else {
-        aMethod.body.refs.vivify(makeOffset(true))
-            .innerTypes.vivify(makeInnerTypeLocation())
+        aMethod.body.refs.getVivify(makeOffset(true))
+            .innerTypes.getVivify(makeInnerTypeLocation())
             .tlAnnotationsHere.add(makeAnnotation());
       }
     }
 
     private void handleCallTypeArgument(AMethod aMethod) {
       if (xLocationsArgs.isEmpty()) {
-        aMethod.body.calls.vivify(makeOffset(true))
+        aMethod.body.calls.getVivify(makeOffset(true))
             .tlAnnotationsHere.add(makeAnnotation());
       } else {
-        aMethod.body.calls.vivify(makeOffset(true))
-            .innerTypes.vivify(makeInnerTypeLocation())
+        aMethod.body.calls.getVivify(makeOffset(true))
+            .innerTypes.getVivify(makeInnerTypeLocation())
             .tlAnnotationsHere.add(makeAnnotation());
       }
     }
@@ -1200,7 +1200,7 @@ extends EmptyVisitor {
     public AnnotationVisitor visitParameterAnnotation(int parameter, String desc, boolean visible) {
       if (trace) { System.out.printf("visitParameterAnnotation(%s, %s, %s) in %s (%s)%n", parameter, desc, visible, this, this.getClass()); }
       return new AnnotationSceneReader(desc, visible,
-              ((AMethod) aMethod).parameters.vivify(parameter));
+              ((AMethod) aMethod).parameters.getVivify(parameter));
     }
 
     @Override

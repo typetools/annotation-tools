@@ -186,7 +186,7 @@ public final class JavapParser {
                     line.substring(
                     line.indexOf(paramIdxHead) + paramIdxHead.length()));
             nextLine();
-            return ((AMethod) member).parameters.vivify(paramIdx);
+            return ((AMethod) member).parameters.getVivify(paramIdx);
         }
         case EXTENDED:
             // should have a "target = "
@@ -215,7 +215,7 @@ public final class JavapParser {
                         line.substring(
                         line.indexOf(paramIdxHead) + paramIdxHead.length()));
                 nextLine();
-                subOuterType = ((AMethod) member).parameters.vivify(paramIdx).type;
+                subOuterType = ((AMethod) member).parameters.getVivify(paramIdx).type;
                 break;
             case LOCAL_VARIABLE:
             case RESOURCE_VARIABLE:
@@ -228,25 +228,25 @@ public final class JavapParser {
                 LocalLocation ll =
                     new LocalLocation(index, scopeStart, scopeLength);
                 nextLine();
-                subOuterType = ((AMethod) member).body.locals.vivify(ll).type;
+                subOuterType = ((AMethod) member).body.locals.getVivify(ll).type;
                 break;
             case CAST:
             {
                 int offset = parseOffset();
                 int typeIndex = parseTypeIndex();
-                subOuterType = ((AMethod) member).body.typecasts.vivify(RelativeLocation.createOffset(offset, typeIndex));
+                subOuterType = ((AMethod) member).body.typecasts.getVivify(RelativeLocation.createOffset(offset, typeIndex));
                 break;
             }
             case INSTANCEOF:
             {
                 int offset = parseOffset();
-                subOuterType = ((AMethod) member).body.instanceofs.vivify(RelativeLocation.createOffset(offset, 0));
+                subOuterType = ((AMethod) member).body.instanceofs.getVivify(RelativeLocation.createOffset(offset, 0));
                 break;
             }
             case NEW:
             {
                 int offset = parseOffset();
-                subOuterType = ((AMethod) member).body.news.vivify(RelativeLocation.createOffset(offset, 0));
+                subOuterType = ((AMethod) member).body.news.getVivify(RelativeLocation.createOffset(offset, 0));
                 break;
             }
             default:
@@ -256,7 +256,7 @@ public final class JavapParser {
             // if (targetType.) {
                 List<Integer> location = parseInnerTypeLocationNums();
                 InnerTypeLocation itl = new InnerTypeLocation(TypeAnnotationPosition.getTypePathFromBinary(location));
-                subElement = subOuterType.innerTypes.vivify(itl);
+                subElement = subOuterType.innerTypes.getVivify(itl);
             // } else
             //    subElement = subOuterType;
             return subElement;
@@ -320,7 +320,7 @@ public final class JavapParser {
         nextLine();
         String methodKey = methodName + sig;
         System.out.println("Got method " + methodKey); // TEMP
-        parseMember(((AClass) clazz).methods.vivify(methodKey));
+        parseMember(((AClass) clazz).methods.getVivify(methodKey));
     }
 
     // the "clazz" might actually be a package in case of "interface package-info"
@@ -342,7 +342,7 @@ public final class JavapParser {
                     String fieldName = line.substring(space + 1, line.length() - 1);
                     nextLine();
                     System.out.println("Got field " + fieldName); // TEMP
-                    parseMember(((AClass) clazz).fields.vivify(fieldName));
+                    parseMember(((AClass) clazz).fields.getVivify(fieldName));
                 } else {
                     // method
                     int space = line.lastIndexOf(' ', lparen);
@@ -376,9 +376,9 @@ public final class JavapParser {
             String bp = scenelib.annotations.io.IOUtils.basenamePart(className);
             nextLine();
             if (bp.equals("package-info")) {
-                parseClass(scene.packages.vivify(pp));
+                parseClass(scene.packages.getVivify(pp));
             } else {
-                parseClass(scene.classes.vivify(className));
+                parseClass(scene.classes.getVivify(className));
             }
         }
         } catch (RuntimeException e) {
