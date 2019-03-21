@@ -52,9 +52,6 @@ public final class BoundLocation {
                 && equals((BoundLocation) o);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         Hasher h = new Hasher();

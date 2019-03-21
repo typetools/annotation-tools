@@ -27,7 +27,6 @@ public class ConstructorInsertion extends TypedInsertion {
     super(type, criteria, true, innerTypeInsertions);
   }
 
-  /** {@inheritDoc} */
   @Override
   protected String getText(boolean comments, boolean abbreviate) {
     StringBuilder b = new StringBuilder();
@@ -81,20 +80,17 @@ public class ConstructorInsertion extends TypedInsertion {
     ins.setInserted(true);
   }
 
-  /** {@inheritDoc} */
   @Override
   protected boolean addLeadingSpace(boolean gotSeparateLine, int pos,
       char precedingChar) {
     return false;
   }
 
-  /** {@inheritDoc} */
   @Override
   protected boolean addTrailingSpace(boolean gotSeparateLine) {
     return false;
   }
 
-  /** {@inheritDoc} */
   @Override
   public Kind getKind() {
     return Kind.CONSTRUCTOR;

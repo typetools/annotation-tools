@@ -12,26 +12,21 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * An {@link AElement} that represents a type might have annotations on inner
- * types ("generic/array" annotations in the design document). All such elements
- * extend {@link ATypeElement} so that their annotated inner types can be
- * accessed in a uniform fashion. An {@link AElement} holds the annotations on
+ * types ("generic/array" annotations in the design document). For example,
+ * "@A Map. @B Entry" has top-level annotation @A, and @B is an annotation on
+ * an inner type.
+ * <p>
+ *
+ * Any element that can have an inner type postpended to it
+ * extends {@link ATypeElement} so that their annotated inner types can be
+ * accessed in a uniform fashion. In the example above, "Map" is an
+ * ATypeElement rather than just an AElement. (I think!)
+ * <p>
+ *
+ * An {@link AElement} holds the annotations on
  * one inner type; {@link #innerTypes} maps locations to inner types.
  */
 public class ATypeElement extends AElement {
-    static <K extends Object> VivifyingMap<K, ATypeElement> newVivifyingLHMap_ATE() {
-        return new VivifyingMap<K, ATypeElement>(
-                new LinkedHashMap<K, ATypeElement>()) {
-            @Override
-            public  ATypeElement createValueFor(K k) {
-                return new ATypeElement(k);
-            }
-
-            @Override
-            public boolean subPrune(ATypeElement v) {
-                return v.prune();
-            }
-        };
-    }
 
     /**
      * The annotated inner types; map key is the inner type location.
@@ -39,17 +34,12 @@ public class ATypeElement extends AElement {
     public final VivifyingMap<InnerTypeLocation, ATypeElement> innerTypes =
         ATypeElement.<InnerTypeLocation>newVivifyingLHMap_ATE();
 
-    // general information about the element being annotated
-    public Object description;
-
     ATypeElement(Object description) {
         super(description);
-        this.description = description;
     }
 
     ATypeElement(ATypeElement elem) {
       super(elem);
-      description = elem.description;
       copyMapContents(elem.innerTypes, innerTypes);
     }
 
@@ -62,9 +52,6 @@ public class ATypeElement extends AElement {
         assert type == null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equals(AElement o) {
         return o instanceof ATypeElement
@@ -77,22 +64,22 @@ public class ATypeElement extends AElement {
             && (type == null ? o.type == null : o.type.equals(type));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         checkRep();
         return tlAnnotationsHere.hashCode() + innerTypes.hashCode();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public boolean prune() {
+    public boolean isEmpty() {
         checkRep();
-        return super.prune() & innerTypes.prune();
+        return super.isEmpty() && innerTypes.isEmpty();
+    }
+
+    @Override
+    public void prune() {
+        super.prune();
+        innerTypes.prune();
     }
 
     private static final String lineSep = System.getProperty("line.separator");
@@ -124,4 +111,20 @@ public class ATypeElement extends AElement {
     public <R, T> R accept(ElementVisitor<R, T> v, T t) {
         return v.visitTypeElement(this, t);
     }
+
+    static <K extends Object> VivifyingMap<K, ATypeElement> newVivifyingLHMap_ATE() {
+        return new VivifyingMap<K, ATypeElement>(
+                new LinkedHashMap<K, ATypeElement>()) {
+            @Override
+            public  ATypeElement createValueFor(K k) {
+                return new ATypeElement(k);
+            }
+
+            @Override
+            public boolean isEmptyValue(ATypeElement v) {
+                return v.isEmpty();
+            }
+        };
+    }
+
 }

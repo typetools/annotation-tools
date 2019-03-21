@@ -23,9 +23,6 @@ public final class ArrayAFT extends AnnotationFieldType {
         this.elementType = elementType;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isValidValue(Object o) {
         if (! (o instanceof Collection)) {
@@ -43,18 +40,12 @@ public final class ArrayAFT extends AnnotationFieldType {
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public  String toString() {
         return (elementType == null ? "unknown" :
             ((ScalarAFT) elementType).toString()) + "[]";
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String format(Object o) {
         Collection<?> asCollection = (Collection<?>)o;

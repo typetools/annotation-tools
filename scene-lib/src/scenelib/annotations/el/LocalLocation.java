@@ -71,9 +71,6 @@ public final class LocalLocation {
                 && equals((LocalLocation) o);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         Hasher h = new Hasher();

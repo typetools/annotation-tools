@@ -26,114 +26,72 @@ public class WrapperMap<K, V> implements Map<K, V> {
         this.back = back;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void clear() {
         back.clear();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean containsKey(Object key) {
         return back.containsKey(key);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean containsValue(Object value) {
         return back.containsValue(value);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Set<java.util.Map.Entry<K, V>>
         entrySet() {
         return back.entrySet();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public V get(Object key) {
         return back.get(key);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isEmpty() {
         return back.isEmpty();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Set<K> keySet() {
         return back.keySet();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public V put(K key, V value) {
         return back.put(key, value);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void putAll(Map<? extends K, ? extends V> m) {
         back.putAll(m);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public V remove(Object key) {
         return back.remove(key);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int size() {
         return back.size();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Collection<V> values() {
         return back.values();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equals(Object o) {
         return back.equals(o);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         return back.hashCode();

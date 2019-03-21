@@ -38,7 +38,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * already exist:
  *
  * <pre>
- * AMethod&lt;A&gt; m = s.classes.vivify("Foo").methods.vivify("bar");
+ * AMethod&lt;A&gt; m = s.classes.getVivify("Foo").methods.getVivify("bar");
  * </pre>
  *
  * <p>
@@ -81,8 +81,8 @@ public final class AScene implements Cloneable {
                 }
 
                 @Override
-                public boolean subPrune(AClass v) {
-                    return v.prune();
+                public boolean isEmptyValue(AClass v) {
+                    return v.isEmpty();
                 }
             };
 
@@ -141,20 +141,24 @@ public final class AScene implements Cloneable {
         return o.classes.equals(classes) && o.packages.equals(packages);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         return classes.hashCode() + packages.hashCode();
     }
 
     /**
-     * Removes empty subelements of this {@link AScene} depth-first; returns
-     * whether this {@link AScene} is itself empty after pruning.
+     * Returns whether this {@link AScene} is empty.
      */
-    public boolean prune() {
-        return classes.prune() & packages.prune();
+    public boolean isEmpty() {
+        return classes.isEmpty() && packages.isEmpty();
+    }
+
+    /**
+     * Removes empty subelements of this {@link AScene} depth-first.
+     */
+    public void prune() {
+        classes.prune();
+        packages.prune();
     }
 
     /** Returns a string representation. */

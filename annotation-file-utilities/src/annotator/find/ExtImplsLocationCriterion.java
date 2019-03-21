@@ -27,7 +27,6 @@ public class ExtImplsLocationCriterion implements Criterion {
     this.index = tyLoc.typeIndex;
   }
 
-  /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path, Tree leaf) {
     if (path == null) {
@@ -37,7 +36,6 @@ public class ExtImplsLocationCriterion implements Criterion {
     return isSatisfiedBy(path);
   }
 
-  /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path) {
     if (path == null) {
@@ -92,13 +90,11 @@ public class ExtImplsLocationCriterion implements Criterion {
     return index;
   }
 
-  /** {@inheritDoc} */
   @Override
   public Kind getKind() {
     return Kind.EXTIMPLS_LOCATION;
   }
 
-  /** {@inheritDoc} */
   @Override
   public String toString() {
     return "ExtImplsLocationCriterion: class " + classname + " at type index: " + index;

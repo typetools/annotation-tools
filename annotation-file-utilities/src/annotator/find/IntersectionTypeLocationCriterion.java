@@ -19,7 +19,6 @@ public class IntersectionTypeLocationCriterion implements Criterion {
     typeIndex = loc.type_index;
   }
 
-  /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path, Tree leaf) {
     if (path == null) {

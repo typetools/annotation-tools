@@ -13,31 +13,6 @@ import scenelib.annotations.util.coll.VivifyingMap;
 public class ATypeElementWithType extends ATypeElement {
 
     /**
-     * A map with {@link ATypeElementWithType}s as values. When
-     * {@link VivifyingMap#vivify(Object)} method is called, a new
-     * {@code ATypeElementWithType} is constructed with the parameter to
-     * {@code vivify} passed to {@code ATypeElementWithType}'s constructor. This
-     * parameter is also used as the key into the map. This is used to map
-     * {@link ASTPath}s to their corresponding {@code ATypeElementWithType}.
-     * <p>
-     * {@code ATEWT} stands for {@code ATypeElementWithType}.
-     */
-    /*package-private*/ static <K extends Object> VivifyingMap<K, ATypeElementWithType> newVivifyingLHMap_ATEWT() {
-        return new VivifyingMap<K, ATypeElementWithType>(
-                new LinkedHashMap<K, ATypeElementWithType>()) {
-            @Override
-            public  ATypeElementWithType createValueFor(K k) {
-                return new ATypeElementWithType(k);
-            }
-
-            @Override
-            public boolean subPrune(ATypeElementWithType v) {
-                return v.prune();
-            }
-        };
-    }
-
-    /**
      * The un-annotated type.
      */
     private Type type;
@@ -94,14 +69,15 @@ public class ATypeElementWithType extends ATypeElement {
     }
 
     @Override
-    public boolean prune() {
-        boolean result = super.prune();
-        if (result && tlAnnotationsHere.isEmpty()) {
-            // If we're about to be pruned because we have no annotations, then
-            // stop the prune to just insert a cast with no annotations.
-            result = false;
-        }
-        return result;
+    public boolean isEmpty() {
+        // Don't get pruned just because we have no annotations.
+        return false;
+    }
+
+    @Override
+    public void prune() {
+        super.prune();
+        // Don't prune here.
     }
 
     @Override
@@ -118,4 +94,30 @@ public class ATypeElementWithType extends ATypeElement {
     public <R, T> R accept(ElementVisitor<R, T> v, T t) {
         return v.visitTypeElementWithType(this, t);
     }
+
+    /**
+     * A map with {@link ATypeElementWithType}s as values. When
+     * {@link VivifyingMap#vivify(Object)} method is called, a new
+     * {@code ATypeElementWithType} is constructed with the parameter to
+     * {@code vivify} passed to {@code ATypeElementWithType}'s constructor. This
+     * parameter is also used as the key into the map. This is used to map
+     * {@link ASTPath}s to their corresponding {@code ATypeElementWithType}.
+     * <p>
+     * {@code ATEWT} stands for {@code ATypeElementWithType}.
+     */
+    /*package-private*/ static <K extends Object> VivifyingMap<K, ATypeElementWithType> newVivifyingLHMap_ATEWT() {
+        return new VivifyingMap<K, ATypeElementWithType>(
+                new LinkedHashMap<K, ATypeElementWithType>()) {
+            @Override
+            public  ATypeElementWithType createValueFor(K k) {
+                return new ATypeElementWithType(k);
+            }
+
+            @Override
+            public boolean isEmptyValue(ATypeElementWithType v) {
+                return v.isEmpty();
+            }
+        };
+    }
+
 }

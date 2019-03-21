@@ -62,7 +62,7 @@ public class Example {
             + " must not modify the receiver");
       }
 
-      ATypeElement paramType1 = method.parameters.vivify(0).type;
+      ATypeElement paramType1 = method.parameters.getVivify(0).type;
       Annotation p1nn = paramType1.lookup("NonNull");
       if (p1nn == null) {
         System.out.println("Annotating type of first parameter of "

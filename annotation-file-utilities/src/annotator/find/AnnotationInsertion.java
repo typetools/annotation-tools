@@ -156,7 +156,6 @@ public class AnnotationInsertion extends Insertion {
         return fullyQualifiedAnnotationName;
     }
 
-    /** {@inheritDoc} */
     protected boolean addLeadingSpace(boolean gotSeparateLine, int pos,
             char precedingChar) {
         if (generateExtends || precedingChar == '.') {
@@ -165,16 +164,12 @@ public class AnnotationInsertion extends Insertion {
         return super.addLeadingSpace(gotSeparateLine, pos, precedingChar);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected boolean addTrailingSpace(boolean gotSeparateLine) {
         // Never add a trailing space on a type parameter bound.
         return !wasGenerateExtends && super.addTrailingSpace(gotSeparateLine);
     }
 
-    /** {@inheritDoc} */
     public Kind getKind() {
         return Kind.ANNOTATION;
     }

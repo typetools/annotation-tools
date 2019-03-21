@@ -43,15 +43,11 @@ public final class InClassCriterion implements Criterion {
     this.exactMatch = exactMatch;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Kind getKind() {
     return Kind.IN_CLASS;
   }
 
-  /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path, Tree leaf) {
     if (path == null) {
@@ -61,7 +57,6 @@ public final class InClassCriterion implements Criterion {
     return isSatisfiedBy(path);
   }
 
-  /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path) {
     return InClassCriterion.isSatisfiedBy(path, className, exactMatch);
@@ -247,9 +242,6 @@ public final class InClassCriterion implements Criterion {
     return cname.equals("");
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String toString() {
     return "In class '" + className + "'" + (exactMatch ? " (exactly)" : "");

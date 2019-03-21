@@ -14,7 +14,7 @@
  * {@link scenelib.annotations.util.coll.VivifyingMap#isEmpty() empty}) and provides a
  * {@link scenelib.annotations.util.coll.VivifyingMap#prune() prune} method to eliminate
  * these entries.  The only way to create any element is to invoke
- * {@link scenelib.annotations.util.coll.VivifyingMap#vivify(Object) vivify()} on a
+ * {@link scenelib.annotations.util.coll.VivifyingMap#getVivify(Object) getVivify()} on a
  * {@link scenelib.annotations.util.coll.VivifyingMap} static member of the appropriate
  * {@link scenelib.annotations.el.AElement} superclass.
  */

@@ -86,7 +86,6 @@ public class ASTPathCriterion implements Criterion {
         this.astPath = astPath;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean isSatisfiedBy(TreePath path, Tree leaf) {
         if (path == null) {
@@ -96,7 +95,6 @@ public class ASTPathCriterion implements Criterion {
         return isSatisfiedBy(path);
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean isSatisfiedBy(TreePath path) {
         if (path == null) {
@@ -1138,13 +1136,11 @@ loop:       while (typeTree != null && i < astPath.size()) {
         return false;
     }
 
-    /** {@inheritDoc} */
     @Override
     public Kind getKind() {
         return Kind.AST_PATH;
     }
 
-    /** {@inheritDoc} */
     @Override
     public String toString() {
         return "ASTPathCriterion: " + astPath;

@@ -19,7 +19,6 @@ public class TypeIndexLocation {
               && equals((TypeIndexLocation) o);
   }
 
-  /** {@inheritDoc} */
   @Override
   public int hashCode() {
       Hasher h = new Hasher();
