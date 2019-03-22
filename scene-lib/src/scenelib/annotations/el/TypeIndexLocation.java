@@ -24,9 +24,7 @@ public class TypeIndexLocation {
 
   @Override
   public int hashCode() {
-      Hasher h = new Hasher();
-      h.mash(typeIndex);
-      return h.hash;
+      return typeIndex;
   }
 
   @Override
