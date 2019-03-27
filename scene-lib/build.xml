@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<project name="scene-lib" default="bin">
+<project name="scene-lib" default="bin" xmlns:if="ant:if">
 
     <property environment="env"/>
 
@@ -177,12 +177,15 @@
                 </fileset>
             </path>
         </pathconvert>
+        <condition property="is-java-8">
+            <equals arg1="${ant.java.version}" arg2="1.8"/>
+        </condition>
         <java classpathref="libpath"
                classpath="${libpath}"
                fork="true"
                failonerror="true"
                classname="com.sun.tools.javac.Main">
-            <jvmarg value="-Xbootclasspath/p:${annotations-compiler-jdk-jar}"/>
+            <jvmarg value="-Xbootclasspath/p:${annotations-compiler-jdk-jar}" if:true="${is-java-8}"/>
             <arg value="-g"/>
             <arg value="-sourcepath"/>
             <!-- TODO: How can we convert a path to a variable?

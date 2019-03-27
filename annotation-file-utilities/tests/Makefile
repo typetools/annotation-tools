@@ -16,6 +16,10 @@
 export JAVA?=java -ea
 export JAVAC?=javac
 
+ifeq ($(shell java -version 2>&1 | grep version | grep 1.8 > /dev/null; printf $$?), 0)
+export JAVA:=$(JAVA) -Xbootclasspath/p:$(CURDIR)/../annotation-file-utilities-all.jar
+endif
+
 export SHELL=/bin/bash -o pipefail
 
 
