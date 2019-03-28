@@ -218,17 +218,17 @@ extends EmptyVisitor {
     // correctly interpret the information in visitEnd()
     // note that all of these should contain 0 or 1 elements,
     // except for xLocations, which is actually a list
-    private final List<Integer> xTargetTypeArgs;
-    private final List<Integer> xIndexArgs;
-    private final List<Integer> xLengthArgs;
-    private final List<TypePathEntry> xLocationsArgs;
-    private final List<Integer> xLocationLengthArgs;
-    private final List<Integer> xOffsetArgs;
-    private final List<Integer> xStartPcArgs;
-    private final List<Integer> xParamIndexArgs;
-    private final List<Integer> xBoundIndexArgs;
-    private final List<Integer> xExceptionIndexArgs;
-    private final List<Integer> xTypeIndexArgs;
+//    private final List<Integer> xTargetTypeArgs;
+//    private final List<Integer> xIndexArgs;
+//    private final List<Integer> xLengthArgs;
+//    private final List<TypePathEntry> xLocationsArgs;
+//    private final List<Integer> xLocationLengthArgs;
+//    private final List<Integer> xOffsetArgs;
+//    private final List<Integer> xStartPcArgs;
+//    private final List<Integer> xParamIndexArgs;
+//    private final List<Integer> xBoundIndexArgs;
+//    private final List<Integer> xExceptionIndexArgs;
+//    private final List<Integer> xTypeIndexArgs;
 
     // private AnnotationDef getAnnotationDef(Object o) {
     //   if (o instanceof AnnotationDef) {
@@ -275,6 +275,8 @@ extends EmptyVisitor {
       if (trace) { System.out.printf("AnnotationSceneReader(%s, %s, %s)%n", desc, visible, aElement); }
       this.visible = visible;
       this.aElement = aElement;
+      if (trace) { System.out.printf("AnnotationSceneReader(%s, %s, %s)%n", desc, visible, aElement); }
+
       if (desc != dummyDesc) {    // interned
         AnnotationDef ad = getAnnotationDef(desc);
 
@@ -288,17 +290,17 @@ extends EmptyVisitor {
 
       // For legal annotations, and except for xLocationsArgs, these should
       //  contain at most one element.
-      this.xTargetTypeArgs = new ArrayList<Integer>(1);
-      this.xIndexArgs = new ArrayList<Integer>(1);
-      this.xLengthArgs = new ArrayList<Integer>(1);
-      this.xLocationLengthArgs = new ArrayList<Integer>(1);
-      this.xOffsetArgs = new ArrayList<Integer>(1);
-      this.xStartPcArgs = new ArrayList<Integer>(1);
-      this.xLocationsArgs = new ArrayList<TypePathEntry>();
-      this.xParamIndexArgs = new ArrayList<Integer>(1);
-      this.xBoundIndexArgs = new ArrayList<Integer>(1);
-      this.xExceptionIndexArgs = new ArrayList<Integer>(1);
-      this.xTypeIndexArgs = new ArrayList<Integer>(1);
+//      this.xTargetTypeArgs = new ArrayList<Integer>(1);
+//      this.xIndexArgs = new ArrayList<Integer>(1);
+//      this.xLengthArgs = new ArrayList<Integer>(1);
+//      this.xLocationLengthArgs = new ArrayList<Integer>(1);
+//      this.xOffsetArgs = new ArrayList<Integer>(1);
+//      this.xStartPcArgs = new ArrayList<Integer>(1);
+//      this.xLocationsArgs = new ArrayList<TypePathEntry>();
+//      this.xParamIndexArgs = new ArrayList<Integer>(1);
+//      this.xBoundIndexArgs = new ArrayList<Integer>(1);
+//      this.xExceptionIndexArgs = new ArrayList<Integer>(1);
+//      this.xTypeIndexArgs = new ArrayList<Integer>(1);
     }
 
     /*
@@ -529,96 +531,97 @@ extends EmptyVisitor {
     @Override
     public void visitEnd() {
       if (trace) { System.out.printf("visitEnd on %s (%s)%n", this, this.getClass()); }
-      if (xTargetTypeArgs.size() >= 1) {
-        TargetType target = TargetType.fromTargetTypeValue(xTargetTypeArgs.get(0));
-        // TEMP
-        // If the expression used to initialize a field contains annotations
-        // on instanceofs, typecasts, or news, the extended compiler enters
-        // those annotations on the field.  If we get such an annotation and
-        // aElement is a field, skip the annotation for now to avoid crashing.
-        switch(target) {
-        case FIELD:
-          handleField(aElement);
-          break;
-        case LOCAL_VARIABLE:
-        case RESOURCE_VARIABLE:
-          handleMethodLocalVariable((AMethod) aElement);
-          break;
-        case NEW:
-          if (aElement instanceof AMethod) {
-            handleMethodObjectCreation((AMethod) aElement);
-          } else {
-            // TODO: in field initializers
-            if (strict) { System.err.println("Unhandled NEW annotation for " + aElement); }
-          }
-          break;
-        case METHOD_FORMAL_PARAMETER:
-          handleMethodParameterType((AMethod) aElement);
-          break;
-        case METHOD_RECEIVER:
-            handleMethodReceiver((AMethod) aElement);
-            break;
-        case CAST:
-          if (aElement instanceof AMethod) {
-            handleMethodTypecast((AMethod) aElement);
-          } else {
-              // TODO: in field initializers
-              if (strict) { System.err.println("Unhandled TYPECAST annotation for " + aElement); }
-          }
-          break;
-        case METHOD_RETURN:
-          handleMethodReturnType((AMethod) aElement);
-          break;
-        case INSTANCEOF:
-          if (aElement instanceof AMethod) {
-            handleMethodInstanceOf((AMethod) aElement);
-          } else {
-              // TODO: in field initializers
-              if (strict) { System.err.println("Unhandled INSTANCEOF annotation for " + aElement); }
-          }
-          break;
-        case CLASS_TYPE_PARAMETER_BOUND:
-          handleClassTypeParameterBound((AClass) aElement);
-          break;
-        case METHOD_TYPE_PARAMETER_BOUND:
-          handleMethodTypeParameterBound((AMethod) aElement);
-          break;
-        case CLASS_EXTENDS:
-          handleClassExtends((AClass) aElement);
-          break;
-        case THROWS:
-          handleThrows((AMethod) aElement);
-          break;
-        case CONSTRUCTOR_REFERENCE:  // TODO
-        case METHOD_REFERENCE:
-          handleMethodReference((AMethod) aElement);
-          break;
-        case CONSTRUCTOR_REFERENCE_TYPE_ARGUMENT:  // TODO
-        case METHOD_REFERENCE_TYPE_ARGUMENT:
-          handleReferenceTypeArgument((AMethod) aElement);
-          break;
-        case CONSTRUCTOR_INVOCATION_TYPE_ARGUMENT:  // TODO
-        case METHOD_INVOCATION_TYPE_ARGUMENT:
-          handleCallTypeArgument((AMethod) aElement);
-          break;
-        case METHOD_TYPE_PARAMETER:
-          handleMethodTypeParameter((AMethod) aElement);
-          break;
-        case CLASS_TYPE_PARAMETER:
-          handleClassTypeParameter((AClass) aElement);
-          break;
-
-        // TODO: ensure all cases covered.
-        default:
-          // Rather than throw an error here, since a declaration annotation
-          // is being used as an extended annotation, just make the
-          // annotation and place it in the given aElement as usual.
-
-          // aElement.tlAnnotationsHere.add(makeAnnotation());
-          Annotation a = makeAnnotation();
-          aElement.tlAnnotationsHere.add(a);
-        }
-      } else {
+//      if (xTargetTypeArgs.size() >= 1) {
+//        TargetType target = TargetType.fromTargetTypeValue(xTargetTypeArgs.get(0));
+//        // TEMP
+//        // If the expression used to initialize a field contains annotations
+//        // on instanceofs, typecasts, or news, the extended compiler enters
+//        // those annotations on the field.  If we get such an annotation and
+//        // aElement is a field, skip the annotation for now to avoid crashing.
+//        switch(target) {
+//        case FIELD:
+//          handleField(aElement);
+//          break;
+//        case LOCAL_VARIABLE:
+//        case RESOURCE_VARIABLE:
+//          handleMethodLocalVariable((AMethod) aElement);
+//          break;
+//        case NEW:
+//          if (aElement instanceof AMethod) {
+//            handleMethodObjectCreation((AMethod) aElement);
+//          } else {
+//            // TODO: in field initializers
+//            if (strict) { System.err.println("Unhandled NEW annotation for " + aElement); }
+//          }
+//          break;
+//        case METHOD_FORMAL_PARAMETER:
+//          handleMethodParameterType((AMethod) aElement);
+//          break;
+//        case METHOD_RECEIVER:
+//            handleMethodReceiver((AMethod) aElement);
+//            break;
+//        case CAST:
+//          if (aElement instanceof AMethod) {
+//            handleMethodTypecast((AMethod) aElement);
+//          } else {
+//              // TODO: in field initializers
+//              if (strict) { System.err.println("Unhandled TYPECAST annotation for " + aElement); }
+//          }
+//          break;
+//        case METHOD_RETURN:
+//          handleMethodReturnType((AMethod) aElement);
+//          break;
+//        case INSTANCEOF:
+//          if (aElement instanceof AMethod) {
+//            handleMethodInstanceOf((AMethod) aElement);
+//          } else {
+//              // TODO: in field initializers
+//              if (strict) { System.err.println("Unhandled INSTANCEOF annotation for " + aElement); }
+//          }
+//          break;
+//        case CLASS_TYPE_PARAMETER_BOUND:
+//          handleClassTypeParameterBound((AClass) aElement);
+//          break;
+//        case METHOD_TYPE_PARAMETER_BOUND:
+//          handleMethodTypeParameterBound((AMethod) aElement);
+//          break;
+//        case CLASS_EXTENDS:
+//          handleClassExtends((AClass) aElement);
+//          break;
+//        case THROWS:
+//          handleThrows((AMethod) aElement);
+//          break;
+//        case CONSTRUCTOR_REFERENCE:  // TODO
+//        case METHOD_REFERENCE:
+//          handleMethodReference((AMethod) aElement);
+//          break;
+//        case CONSTRUCTOR_REFERENCE_TYPE_ARGUMENT:  // TODO
+//        case METHOD_REFERENCE_TYPE_ARGUMENT:
+//          handleReferenceTypeArgument((AMethod) aElement);
+//          break;
+//        case CONSTRUCTOR_INVOCATION_TYPE_ARGUMENT:  // TODO
+//        case METHOD_INVOCATION_TYPE_ARGUMENT:
+//          handleCallTypeArgument((AMethod) aElement);
+//          break;
+//        case METHOD_TYPE_PARAMETER:
+//          handleMethodTypeParameter((AMethod) aElement);
+//          break;
+//        case CLASS_TYPE_PARAMETER:
+//          handleClassTypeParameter((AClass) aElement);
+//          break;
+//
+//        // TODO: ensure all cases covered.
+//        default:
+//          // Rather than throw an error here, since a declaration annotation
+//          // is being used as an extended annotation, just make the
+//          // annotation and place it in the given aElement as usual.
+//
+//          // aElement.tlAnnotationsHere.add(makeAnnotation());
+//          Annotation a = makeAnnotation();
+//          aElement.tlAnnotationsHere.add(a);
+//        }
+//      }
+//      else {
         // This is not an extended annotation visitor, so just
         // make the annotation and place it in the given AElement,
         // possibly moving it to a type annotation location instead.
@@ -638,7 +641,239 @@ extends EmptyVisitor {
         } else {
           aElement.tlAnnotationsHere.add(a);
         }
+//      }
+    }
+
+    // The following are utility methods to facilitate creating all the
+    // necessary data structures in the scene library.
+
+    /**
+     * Returns an annotation, ready to be placed into the scene, from
+     *  the information visited.
+     */
+    public Annotation makeAnnotation() {
+      return annotationBuilder.finish();
+    }
+
+    /**
+     * Hook for NestedAnnotationSceneReader; overridden by
+     * ArrayAnnotationSceneReader to add an array element instead of a field
+     */
+    void supplySubannotation(String fieldName, Annotation annotation) {
+      annotationBuilder.addScalarField(fieldName,
+          new AnnotationAFT(annotation.def()), annotation);
+    }
+
+    @Override
+    public String toString() {
+      return String.format("(AnnotationSceneReader: %s %s %s)",
+                           aElement, visible, annotationBuilder);
+    }
+
+  }
+
+  private class TypeAnnotationSceneReader extends AnnotationSceneReader {
+    // Implementation strategy:
+    // For field values and enums, simply pass the information
+    //  onto annotationBuilder.
+    // For arrays, use an ArrayAnnotationBuilder that will
+    //  properly call the right annotationBuilder methods on its visitEnd().
+    // For nested annotations, use a NestedAnnotationSceneReader that will
+    //  properly call the right annotationBuilder methods on its visitEnd().
+    // For extended information, store all arguments passed in and on
+    //  this.visitEnd(), handle all the information based on target type.
+
+
+    // The AElement into which the annotation visited should be inserted.
+    protected AElement aElement;
+
+    // Whether or not this annotation is visible at runtime.
+    protected boolean visible;
+
+    // The AnnotationBuilder used to create this annotation.
+    private AnnotationBuilder annotationBuilder;
+
+    // A reference to the annotated type. The sort of this type reference must be TypeReference.CLASS_TYPE_PARAMETER,
+    // TypeReference.CLASS_TYPE_PARAMETER_BOUND or TypeReference.CLASS_EXTENDS.
+    private final int typeRef;
+
+    // The the path to the annotated type argument, wildcard bound, array element type, or static inner type within
+    // 'typeRef'. May be null if the annotation targets 'typeRef' as a whole.
+    private final TypePath typePath;
+
+    private final List<Integer> xTargetTypeArgs;
+    private final List<Integer> xIndexArgs;
+    private final List<Integer> xLengthArgs;
+    private final List<TypePathEntry> xLocationsArgs;
+    private final List<Integer> xLocationLengthArgs;
+    private final List<Integer> xOffsetArgs;
+    private final List<Integer> xStartPcArgs;
+    private final List<Integer> xParamIndexArgs;
+    private final List<Integer> xBoundIndexArgs;
+    private final List<Integer> xExceptionIndexArgs;
+    private final List<Integer> xTypeIndexArgs;
+
+    // since AnnotationSceneReader will work for both normal
+    // and extended annotations, all of the following information
+    // may or may not be present, so use a list to store
+    // information as it is received from visitX* methods, and
+    // correctly interpret the information in visitEnd()
+    // note that all of these should contain 0 or 1 elements,
+    // except for xLocations, which is actually a list
+
+    // private AnnotationDef getAnnotationDef(Object o) {
+    //   if (o instanceof AnnotationDef) {
+    //     return (AnnotationDef) o;
+    //   } else if (o instanceof String) {
+    //     return getAnnotationDef((String) o);
+    //   } else {
+    //     throw new Error(String.format("bad type %s : %s", o.getClass(), o));
+    //   }
+    // }
+
+    /**
+     * Constructs a new AnnotationScene reader with the given description and
+     * visibility.  Calling visitEnd() will ensure that this writes out the
+     * annotation it visits into aElement.
+     * @param desc JVML format for the field being read, or ClassAnnotationSceneReader.dummyDesc
+     */
+    public TypeAnnotationSceneReader(int api, String desc, boolean visible, AElement aElement, int typeRef, TypePath typePath) {
+      super(api, desc, visible, aElement);
+      this.typeRef = typeRef;
+      this.typePath = typePath;
+      this.xTargetTypeArgs = new ArrayList<Integer>(1);
+      this.xIndexArgs = new ArrayList<Integer>(1);
+      this.xLengthArgs = new ArrayList<Integer>(1);
+      this.xLocationLengthArgs = new ArrayList<Integer>(1);
+      this.xOffsetArgs = new ArrayList<Integer>(1);
+      this.xStartPcArgs = new ArrayList<Integer>(1);
+      this.xLocationsArgs = new ArrayList<TypePathEntry>();
+      this.xParamIndexArgs = new ArrayList<Integer>(1);
+      this.xBoundIndexArgs = new ArrayList<Integer>(1);
+      this.xExceptionIndexArgs = new ArrayList<Integer>(1);
+      this.xTypeIndexArgs = new ArrayList<Integer>(1);
+    }
+
+    /**
+     * Visits the end of the annotation, and actually writes out the
+     *  annotation into aElement.
+     *
+     * @see org.objectweb.asm.AnnotationVisitor#visitEnd()
+     */
+    @Override
+    public void visitEnd() {
+      if (trace) { System.out.printf("visitEnd on %s (%s)%n", this, this.getClass()); }
+      if (xTargetTypeArgs.size() >= 1) {
+        TargetType target = TargetType.fromTargetTypeValue(xTargetTypeArgs.get(0));
+        // TEMP
+        // If the expression used to initialize a field contains annotations
+        // on instanceofs, typecasts, or news, the extended compiler enters
+        // those annotations on the field.  If we get such an annotation and
+        // aElement is a field, skip the annotation for now to avoid crashing.
+        switch(target) {
+          case FIELD:
+            handleField(aElement);
+            break;
+          case LOCAL_VARIABLE:
+          case RESOURCE_VARIABLE:
+            handleMethodLocalVariable((AMethod) aElement);
+            break;
+          case NEW:
+            if (aElement instanceof AMethod) {
+              handleMethodObjectCreation((AMethod) aElement);
+            } else {
+              // TODO: in field initializers
+              if (strict) { System.err.println("Unhandled NEW annotation for " + aElement); }
+            }
+            break;
+          case METHOD_FORMAL_PARAMETER:
+            handleMethodParameterType((AMethod) aElement);
+            break;
+          case METHOD_RECEIVER:
+            handleMethodReceiver((AMethod) aElement);
+            break;
+          case CAST:
+            if (aElement instanceof AMethod) {
+              handleMethodTypecast((AMethod) aElement);
+            } else {
+              // TODO: in field initializers
+              if (strict) { System.err.println("Unhandled TYPECAST annotation for " + aElement); }
+            }
+            break;
+          case METHOD_RETURN:
+            handleMethodReturnType((AMethod) aElement);
+            break;
+          case INSTANCEOF:
+            if (aElement instanceof AMethod) {
+              handleMethodInstanceOf((AMethod) aElement);
+            } else {
+              // TODO: in field initializers
+              if (strict) { System.err.println("Unhandled INSTANCEOF annotation for " + aElement); }
+            }
+            break;
+          case CLASS_TYPE_PARAMETER_BOUND:
+            handleClassTypeParameterBound((AClass) aElement);
+            break;
+          case METHOD_TYPE_PARAMETER_BOUND:
+            handleMethodTypeParameterBound((AMethod) aElement);
+            break;
+          case CLASS_EXTENDS:
+            handleClassExtends((AClass) aElement);
+            break;
+          case THROWS:
+            handleThrows((AMethod) aElement);
+            break;
+          case CONSTRUCTOR_REFERENCE:  // TODO
+          case METHOD_REFERENCE:
+            handleMethodReference((AMethod) aElement);
+            break;
+          case CONSTRUCTOR_REFERENCE_TYPE_ARGUMENT:  // TODO
+          case METHOD_REFERENCE_TYPE_ARGUMENT:
+            handleReferenceTypeArgument((AMethod) aElement);
+            break;
+          case CONSTRUCTOR_INVOCATION_TYPE_ARGUMENT:  // TODO
+          case METHOD_INVOCATION_TYPE_ARGUMENT:
+            handleCallTypeArgument((AMethod) aElement);
+            break;
+          case METHOD_TYPE_PARAMETER:
+            handleMethodTypeParameter((AMethod) aElement);
+            break;
+          case CLASS_TYPE_PARAMETER:
+            handleClassTypeParameter((AClass) aElement);
+            break;
+
+          // TODO: ensure all cases covered.
+          default:
+            // Rather than throw an error here, since a declaration annotation
+            // is being used as an extended annotation, just make the
+            // annotation and place it in the given aElement as usual.
+
+            // aElement.tlAnnotationsHere.add(makeAnnotation());
+            Annotation a = makeAnnotation();
+            aElement.tlAnnotationsHere.add(a);
+        }
       }
+//      else {
+//        // This is not an extended annotation visitor, so just
+//        // make the annotation and place it in the given AElement,
+//        // possibly moving it to a type annotation location instead.
+//
+//        Annotation a = makeAnnotation();
+//
+//        if (a.def.isTypeAnnotation() && (aElement instanceof AMethod)) {
+//          AMethod m = (AMethod) aElement;
+//          m.returnType.tlAnnotationsHere.add(a);
+//
+//          // There is not currently a separate location for field/parameter
+//          // type annotations; they are mixed in with the declaration
+//          // annotations.  This should be fixed in the future.
+//          // Also, fields/parameters are just represented as AElement.
+//          // } else if (a.def.isTypeAnnotation() && (aElement instanceof AField)) {
+//
+//        } else {
+//          aElement.tlAnnotationsHere.add(a);
+//        }
+//      }
     }
 
     // The following are utility methods to facilitate creating all the
@@ -873,13 +1108,13 @@ extends EmptyVisitor {
       }
     }
 
-      /**
-       * Creates the method type parameter bound annotation on aMethod.
-       */
-      private void handleMethodTypeParameter(AMethod aMethod) {
-          aMethod.bounds.getVivify(makeTypeParameterLocation())
-                  .tlAnnotationsHere.add(makeAnnotation());
-      }
+    /**
+     * Creates the method type parameter bound annotation on aMethod.
+     */
+    private void handleMethodTypeParameter(AMethod aMethod) {
+      aMethod.bounds.getVivify(makeTypeParameterLocation())
+          .tlAnnotationsHere.add(makeAnnotation());
+    }
 
     /**
      * Creates the method type parameter bound annotation on aMethod.
@@ -914,7 +1149,7 @@ extends EmptyVisitor {
     private void handleNewTypeArgument(AMethod aMethod) {
       if (xLocationsArgs.isEmpty()) {
         // aMethod.news.getVivify(makeOffset()).innerTypes.getVivify();
-            // makeInnerTypeLocation()).tlAnnotationsHere.add(makeAnnotation());
+        // makeInnerTypeLocation()).tlAnnotationsHere.add(makeAnnotation());
         if (strict) { System.err.println("Unhandled handleNewTypeArgument on aMethod: " + aMethod); }
       } else {
         // if (strict) { System.err.println("Unhandled handleNewTypeArgumentGenericArray on aMethod: " + aMethod); }
@@ -966,10 +1201,11 @@ extends EmptyVisitor {
     @Override
     public String toString() {
       return String.format("(AnnotationSceneReader: %s %s %s)",
-                           aElement, visible, annotationBuilder);
+          aElement, visible, annotationBuilder);
     }
 
   }
+
 
   /**
    * A NestedAnnotationSceneReader is an AnnotationSceneReader
