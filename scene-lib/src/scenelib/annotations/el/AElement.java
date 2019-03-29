@@ -35,7 +35,10 @@ public class AElement implements Cloneable {
     /** The type of a field or a method parameter.  May be null. */
     public final ATypeElement type; // initialized in constructor
 
-    // general description of the element
+    /**
+     * A description of the element.  Used for debugging and diagnostic messages.
+     * Almost always a String, but in ATypeElement it is an ASTPath.
+     */
     public final Object description;
 
     AElement(Object description) {
