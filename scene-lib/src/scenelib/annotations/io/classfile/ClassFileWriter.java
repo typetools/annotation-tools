@@ -3,6 +3,7 @@ package scenelib.annotations.io.classfile;
 import com.sun.tools.javac.main.CommandLine;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.TypePath;
 import org.plumelib.options.Option;
 import org.plumelib.options.Options;
 import scenelib.annotations.el.AScene;
@@ -117,6 +118,7 @@ public class ClassFileWriter {
 
       // annotations loaded from index file into scene, now insert them
       // into class file
+      TypePath typePath = TypePath.fromString("");
       try {
         if (className.endsWith(".class")) {
           System.out.printf("Adding annotations to class file %s%n", className);
@@ -125,7 +127,7 @@ public class ClassFileWriter {
           String outputFileName = className + ".class";
           System.out.printf("Reading class file %s; writing with annotations to %s%n",
               className, outputFileName);
-          insert(scene, className, outputFileName, true);
+          insert(scene, typePath, className, outputFileName, true);
         }
       } catch (IOException e) {
         System.out.printf("IOException: %s%n", e.getMessage());
