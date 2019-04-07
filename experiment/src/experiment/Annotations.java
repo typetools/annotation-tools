@@ -27,4 +27,7 @@ class Annotations {
 
   @Target({ElementType.TYPE_PARAMETER, ElementType.TYPE_USE})
   @interface H { }
+
+  @interface I { }
+
 }
