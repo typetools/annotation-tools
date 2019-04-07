@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.objectweb.asm.TypePath;
 import scenelib.annotations.util.Hasher;
 
 import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
@@ -23,7 +24,7 @@ public final class InnerTypeLocation {
     /**
      * The location numbers of the inner type as defined in the extended
      * annotation specification.  For example, the location numbers of &#064;X
-     * in <code>Foo&lt;Bar&lt;Baz, &#064;X Baz&gt;&gt;</code> are
+     * in <code>Foo&lt;Bar&lt;Baz, &#064;X Baz&gt;&gt;</code> (Foo<Bar<Baz, @X Baz>>) are
      * <code>{0, 1}</code>.
      */
     public final List<TypePathEntry> location;
@@ -65,6 +66,32 @@ public final class InnerTypeLocation {
         Hasher h = new Hasher();
         h.mash(location.hashCode());
         return h.hash;
+    }
+
+
+    /**
+     * Creates a String representation of the location according to the format expected by {@link org.objectweb.asm.TypePath#fromString(String)}.
+     * @return a String representation according to {@link org.objectweb.asm.TypePath}.
+     */
+    public TypePath getTypePath() {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (TypePathEntry typePathEntry : location) {
+            switch (typePathEntry.tag) {
+                case ARRAY:
+                    stringBuilder.append("[");
+                    break;
+                case INNER_TYPE:
+                    stringBuilder.append(".");
+                    break;
+                case WILDCARD:
+                    stringBuilder.append("*");
+                    break;
+                case TYPE_ARGUMENT:
+                    stringBuilder.append(typePathEntry.arg);
+                    break;
+            }
+        }
+        return TypePath.fromString(stringBuilder.toString());
     }
 
     /**
