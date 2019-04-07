@@ -11,12 +11,13 @@ import org.objectweb.asmx.TypeAnnotationVisitor;
 
 import com.sun.tools.javac.code.TargetType;
 import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
+import org.objectweb.asm.AnnotationVisitor;
 
 /**
  * A <code>SafeTypeAnnotationVisitor</code> wraps around an
  * TypeAnnotationVisitor and delegates all calls to it.  However, it
  * maintains a record of all methods that have been called and on
- * calling {@link SafeTypeAnnotationVisitor#visitEnd},
+ * calling {@link #visitEnd},
  * performs a check to verify that all the data passed
  * to this visitor specifies a legal annotation or extended annotation.  Its
  * intended use is to wrap around an <code>TypeAnnotationWriter</code> and
@@ -33,6 +34,7 @@ import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
  * methods have been called, the check will ensure that the data passed to this
  * specifies a legal extended annotation, as defined by its target type.
  */
+@Deprecated
 public class SafeTypeAnnotationVisitor
 implements TypeAnnotationVisitor {
 
@@ -169,7 +171,6 @@ implements TypeAnnotationVisitor {
     // TODO
   }
 
-  @Override
   public void visitXNameAndArgsSize() {
     xNameAndArgsCount++;
     xav.visitXNameAndArgsSize();
@@ -184,7 +185,7 @@ implements TypeAnnotationVisitor {
    * {@inheritDoc}
    * @throws InvalidTypeAnnotationException if the information this
    *  has visited does not specify a legal extended annotation
-   * @see org.objectweb.asmx.AnnotationVisitor#visitEnd()
+   * @see org.objectweb.asm.AnnotationVisitor#visitEnd()
    */
   @Override
   public void visitEnd() {
