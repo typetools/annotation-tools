@@ -358,13 +358,13 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
     return super.visitTypeAnnotation(typeReference.getValue(), typePath, classNameToDesc(name(tla)), isRuntimeRetention(tla));
   }
 
-  /**
-   * Has tav visit the fields in the given annotation.
-   */
-  private void visitFields(AnnotationVisitor tav, Annotation a) {
-    tav.visitXNameAndArgsSize();
-    visitFields((AnnotationVisitor) tav, a);
-  }
+//  /**
+//   * Has tav visit the fields in the given annotation.
+//   */
+//  private void visitFields(AnnotationVisitor tav, Annotation a) {
+//    tav.visitXNameAndArgsSize();
+//    visitFields((AnnotationVisitor) tav, a);
+//  }
 
   /**
    * Has av visit the fields in the given annotation.
