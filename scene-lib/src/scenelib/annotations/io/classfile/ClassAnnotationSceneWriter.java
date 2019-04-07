@@ -25,7 +25,6 @@ import org.objectweb.asmx.MethodVisitor;
 import org.objectweb.asmx.commons.EmptyVisitor;
 
 import com.sun.tools.javac.code.TargetType;
-import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
 
 import scenelib.annotations.*;
 import scenelib.annotations.el.*;
@@ -119,7 +118,9 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
   private final Map<String, Set<Integer>> dynamicConstructors;
   private final Map<String, Set<Integer>> lambdaExpressions;
 
-  private ClassReader cr = null;
+  private ClassReader cr;
+
+  private TypePath typePath;
 
   /**
    * Constructs a new <code> ClassAnnotationSceneWriter </code> that will
@@ -141,6 +142,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
     this.dynamicConstructors = new HashMap<String, Set<Integer>>();
     this.lambdaExpressions = new HashMap<String, Set<Integer>>();
     this.cr = cr;
+    this.typePath = typePath;
   }
 
   /**
@@ -159,7 +161,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
   @Override
   public void visit(int version, int access, String name,
       String signature, String superName, String[] interfaces) {
-    cr.accept(new MethodCodeIndexer(), false);
+    cr.accept(new MethodCodeIndexer(api), 0);
     super.visit(version, access, name, signature, superName, interfaces);
     // class files store fully quantified class names with '/' instead of '.'
     name = name.replace('/', '.');
@@ -178,7 +180,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
     ensureVisitSceneClassAnnotations();
     // FieldAnnotationSceneWriter ensures that the field visits all
     //  its annotations in the scene.
-    return new FieldAnnotationSceneWriter(name,
+    return new FieldAnnotationSceneWriter(this.api, name,
         super.visitField(access, name, desc, signature, value));
   }
 
@@ -190,8 +192,9 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
     //  its annotations in the scene.
     // MethodAdapter is used here only for getting around an unsound
     //  "optimization" in ClassReader.
-    return new MethodAdapter(new MethodAnnotationSceneWriter(name, desc,
-            super.visitMethod(access, name, desc, signature, exceptions)));
+//    return new MethodVisitor(new MethodAnnotationSceneWriter(name, desc,
+//            super.visitMethod(access, name, desc, signature, exceptions)));
+    return new MethodAnnotationSceneWriter(api, name, desc, super.visitMethod(access, name, desc, signature, exceptions));
   }
 
   @Override
@@ -207,22 +210,25 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
     //  return empty visitor, since annotation from scene will be visited later.
     if (aClass.lookup(classDescToName(desc)) != null
         && overwrite) {
-      return new EmptyVisitor();
+//      return new EmptyVisitor();
+      return null;
     }
     return super.visitAnnotation(desc, visible);
   }
 
   @Override
-  public TypeAnnotationVisitor visitTypeAnnotation(String desc, boolean visible, boolean inCode) {
+  public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String desc, boolean visible) {
     existingClassAnnotations.add(desc);
     // If annotation exists in scene, and in overwrite mode,
     //  return empty visitor, annotation from scene will be visited later.
     if (aClass.lookup(classDescToName(desc)) != null
        && overwrite) {
-      return new EmptyVisitor();
+//      return new EmptyVisitor();
+      return null;
     }
-    return new SafeTypeAnnotationVisitor(
-        super.visitTypeAnnotation(desc, visible, inCode));
+//    return new SafeTypeAnnotationVisitor(
+//        super.visitTypeAnnotation(desc, visible, inCode));
+    return super.visitTypeAnnotation(typeRef, typePath, desc, visible);
   }
 
   /**
@@ -250,32 +256,41 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
         BoundLocation bloc = e.getKey();
         ATypeElement bound = e.getValue();
 
-        for (Annotation tla : bound.tlAnnotationsHere) {
-          TypeAnnotationVisitor xav = visitTypeAnnotation(tla);
+        int typeReferenceSort = bloc.boundIndex == -1 ? TypeReference.CLASS_TYPE_PARAMETER : TypeReference.CLASS_TYPE_PARAMETER_BOUND;
+        TypeReference typeReference = TypeReference.newTypeParameterBoundReference(typeReferenceSort, bloc.paramIndex, bloc.boundIndex);
 
-          if (bloc.boundIndex == -1) {
-            visitTargetType(xav, TargetType.CLASS_TYPE_PARAMETER);
-            visitBound(xav, bloc);
-          } else {
-            visitTargetType(xav, TargetType.CLASS_TYPE_PARAMETER_BOUND);
-            visitBound(xav, bloc);
-          }
-          visitLocations(xav, InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION);
+        for (Annotation tla : bound.tlAnnotationsHere) {
+          // For ClassVisitor. So typeRef: CLASS_TYPE_PARAMETER, CLASS_TYPE_PARAMETER_BOUND or CLASS_EXTENDS.
+          AnnotationVisitor xav = visitTypeAnnotation(tla, typeReference,
+              InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION.getTypePath());
+
+//          if (bloc.boundIndex == -1) {
+//
+//
+//            visitTargetType(xav, TargetType.CLASS_TYPE_PARAMETER);
+//            visitBound(xav, bloc);
+//          } else {
+//            visitTargetType(xav, TargetType.CLASS_TYPE_PARAMETER_BOUND);
+//            visitBound(xav, bloc);
+//          }
+//          visitLocations(xav, InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION);
           visitFields(xav, tla);
           xav.visitEnd();
         }
 
+        typeReference = TypeReference.newTypeParameterBoundReference(TypeReference.CLASS_TYPE_PARAMETER_BOUND, bloc.paramIndex, bloc.boundIndex);
         for (Map.Entry<InnerTypeLocation, ATypeElement> e2 :
           bound.innerTypes.entrySet()) {
           InnerTypeLocation itloc = e2.getKey();
           ATypeElement innerType = e2.getValue();
 
           for (Annotation tla : innerType.tlAnnotationsHere) {
-            TypeAnnotationVisitor xav = visitTypeAnnotation(tla);
+            // For ClassVisitor. So typeRef: CLASS_TYPE_PARAMETER, CLASS_TYPE_PARAMETER_BOUND or CLASS_EXTENDS.
+            AnnotationVisitor xav = visitTypeAnnotation(tla, typeReference, itloc.getTypePath());
 
-            visitTargetType(xav, TargetType.CLASS_TYPE_PARAMETER_BOUND);
-            visitBound(xav, bloc);
-            visitLocations(xav, itloc);
+//            visitTargetType(xav, TargetType.CLASS_TYPE_PARAMETER_BOUND);
+//            visitBound(xav, bloc);
+//            visitLocations(xav, itloc);
             visitFields(xav, tla);
             xav.visitEnd();
           }
@@ -336,15 +351,17 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
 
   /**
    * Returns an TypeAnnotationVisitor over the given top-level annotation.
+   * The sort of the typeReference should be CLASS_TYPE_PARAMETER, CLASS_TYPE_PARAMETER_BOUND or CLASS_EXTENDS.
    */
-  private TypeAnnotationVisitor visitTypeAnnotation(Annotation tla) {
-    return super.visitTypeAnnotation(classNameToDesc(name(tla)), isRuntimeRetention(tla), false);
+  private AnnotationVisitor visitTypeAnnotation(Annotation tla, TypeReference typeReference, TypePath typePath) {
+    // For ClassVisitor. So typeRef: CLASS_TYPE_PARAMETER, CLASS_TYPE_PARAMETER_BOUND or CLASS_EXTENDS.
+    return super.visitTypeAnnotation(typeReference.getValue(), typePath, classNameToDesc(name(tla)), isRuntimeRetention(tla));
   }
 
   /**
    * Has tav visit the fields in the given annotation.
    */
-  private void visitFields(TypeAnnotationVisitor tav, Annotation a) {
+  private void visitFields(AnnotationVisitor tav, Annotation a) {
     tav.visitXNameAndArgsSize();
     visitFields((AnnotationVisitor) tav, a);
   }
@@ -396,25 +413,25 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
   /**
    * Has xav visit the given target type.
    */
-  private void visitTargetType(TypeAnnotationVisitor xav, TargetType t) {
-    xav.visitXTargetType(t.targetTypeValue());
-  }
+//  private void visitTargetType(AnnotationVisitor xav, TargetType t) {
+//    xav.visitXTargetType(t.targetTypeValue());
+//  }
 
   /**
    * Have xav visit the location length  and all locations in loc.
    */
-  private void visitLocations(TypeAnnotationVisitor xav, InnerTypeLocation loc) {
-    List<TypePathEntry> location = loc.location;
-    xav.visitXLocationLength(location.size());
-    for (TypePathEntry l : location) {
-      xav.visitXLocation(l);
-    }
-  }
+//  private void visitLocations(AnnotationVisitor xav, InnerTypeLocation loc) {
+//    List<TypePathEntry> location = loc.location;
+//    xav.visitXLocationLength(location.size());
+//    for (TypePathEntry l : location) {
+//      xav.visitXLocation(l);
+//    }
+//  }
 
   /**
    * Has xav visit the local varialbe information in loc.
    */
-  private void visitLocalVar(TypeAnnotationVisitor xav, LocalLocation loc) {
+  private void visitLocalVar(AnnotationVisitor xav, LocalLocation loc) {
     xav.visitXNumEntries(1);
     xav.visitXStartPc(loc.scopeStart);
     xav.visitXLength(loc.scopeLength);
@@ -424,27 +441,27 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
   /**
    * Has xav visit the offset.
    */
-  private void visitOffset(TypeAnnotationVisitor xav, int offset) {
+  private void visitOffset(AnnotationVisitor xav, int offset) {
     xav.visitXOffset(offset);
   }
 
-  private void visitParameterIndex(TypeAnnotationVisitor xav, int index) {
-    xav.visitXParamIndex(index);
-  }
+//  private void visitParameterIndex(AnnotationVisitor xav, int index) {
+//    xav.visitXParamIndex(index);
+//  }
 
-  private void visitTypeIndex(TypeAnnotationVisitor xav, int index) {
-    xav.visitXTypeIndex(index);
-  }
+//  private void visitTypeIndex(AnnotationVisitor xav, int index) {
+//    xav.visitXTypeIndex(index);
+//  }
 
   /**
    * Has xav visit the type parameter bound information in loc.
    */
-  private void visitBound(TypeAnnotationVisitor xav, BoundLocation loc) {
-    xav.visitXParamIndex(loc.paramIndex);
-    if (loc.boundIndex != -1) {
-      xav.visitXBoundIndex(loc.boundIndex);
-    }
-  }
+//  private void visitBound(AnnotationVisitor xav, BoundLocation loc) {
+//    xav.visitXParamIndex(loc.paramIndex);
+//    if (loc.boundIndex != -1) {
+//      xav.visitXBoundIndex(loc.boundIndex);
+//    }
+//  }
 
   /**
    * A FieldAnnotationSceneWriter is a wrapper class around a FieldVisitor that
@@ -452,13 +469,8 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
    * visitEnd(), also has its internal FieldVisitor visit all the
    * corresponding field annotations in scene.
    */
-  private class FieldAnnotationSceneWriter implements FieldVisitor {
+  private class FieldAnnotationSceneWriter extends FieldVisitor {
     // After being constructed, none of these fields should be null.
-
-    /**
-     * Internal FieldVisitor all calls are delegated to.
-     */
-    private final FieldVisitor fv;
 
     /**
      * List of all annotations this has already visited.
@@ -475,8 +487,8 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
      * Constructs a new FieldAnnotationSceneWriter with the given name that
      * wraps the given FieldVisitor.
      */
-    public FieldAnnotationSceneWriter(String name, FieldVisitor fv) {
-      this.fv = fv;
+    public FieldAnnotationSceneWriter(int api, String name, FieldVisitor fv) {
+      super(api, fv);
       this.existingFieldAnnotations = new ArrayList<String>();
       this.aField = aClass.fields.getVivify(name);
     }
@@ -489,23 +501,28 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
       //  return empty visitor, annotation from scene will be visited later.
       if (aField.lookup(classDescToName(desc)) != null
           && overwrite)
-        return new EmptyVisitor();
+//        return new EmptyVisitor();
+        return null;
 
       return fv.visitAnnotation(desc, visible);
     }
 
     @Override
-    public TypeAnnotationVisitor visitTypeAnnotation(String desc, boolean visible, boolean inCode) {
+    public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String desc, boolean visible) {
+      // typeRef: FIELD
       existingFieldAnnotations.add(desc);
 
       // If annotation exists in scene, and in overwrite mode,
       //  return empty visitor, annotation from scene will be visited later.
       if (aField.lookup(classDescToName(desc)) != null
          && overwrite)
-        return new EmptyVisitor();
+//        return new EmptyVisitor();
+        return null;
 
-      return new SafeTypeAnnotationVisitor(
-          fv.visitTypeAnnotation(desc, visible, inCode));
+      return fv.visitTypeAnnotation(typeRef, typePath, desc, visible);
+
+//      return new SafeTypeAnnotationVisitor(
+//          fv.visitTypeAnnotation(desc, visible, inCode));
     }
 
     @Override
@@ -539,14 +556,17 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
         av.visitEnd();
       }
 
+      TypeReference typeReference = new TypeReference(TypeReference.FIELD);
       // Then do the type annotations on the field
       for (Annotation tla : aField.type.tlAnnotationsHere) {
         if ((!overwrite) && existingFieldAnnotations.contains(name(tla))) {
           continue;
         }
-        TypeAnnotationVisitor av = fv.visitTypeAnnotation(classNameToDesc(name(tla)), isRuntimeRetention(tla), false);
-        visitTargetType(av, TargetType.FIELD);
-        visitLocations(av, InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION);
+        AnnotationVisitor av = fv.visitTypeAnnotation(typeReference.getValue(),
+            InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION.getTypePath(),
+            classNameToDesc(name(tla)), isRuntimeRetention(tla));
+//        visitTargetType(av, TargetType.FIELD);
+//        visitLocations(av, InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION);
         visitFields(av, tla);
         av.visitEnd();
       }
@@ -559,10 +579,15 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
           if ((!overwrite) && existingFieldAnnotations.contains(name(tla))) {
             continue;
           }
-          TypeAnnotationVisitor xav =
-            fv.visitTypeAnnotation(classNameToDesc(name(tla)), isRuntimeRetention(tla), false);
-          visitTargetType(xav, TargetType.FIELD);
-          visitLocations(xav, fieldInnerEntry.getKey());
+          AnnotationVisitor xav =
+            fv.visitTypeAnnotation(typeReference.getValue(),
+                fieldInnerEntry.getKey().getTypePath(),
+                classNameToDesc(name(tla)), isRuntimeRetention(tla));
+
+          // Seems like ASM's visitTypeAnnotation already visits the target type and location, so we probably don't need
+          // to explicitly visit these like ASMX does.
+//          visitTargetType(xav, TargetType.FIELD);
+//          visitLocations(xav, fieldInnerEntry.getKey());
           visitFields(xav, tla);
           xav.visitEnd();
         }
@@ -577,7 +602,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
    * visits each of the extended annotations in scene in the correct
    * sequence, before any of the later data is visited.
    */
-  private class MethodAnnotationSceneWriter extends MethodAdapter {
+  private class MethodAnnotationSceneWriter extends MethodVisitor {
     // basic strategy:
     // ensureMethodVisitSceneAnnotation will be called, if it has not already
     // been called, at the beginning of visitCode, visitEnd
@@ -606,8 +631,8 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
      *  as in "(Ljava/lang/String)V"
      * @param mv the method visitor to wrap around
      */
-    MethodAnnotationSceneWriter(String name, String desc, MethodVisitor mv) {
-      super(mv);
+    MethodAnnotationSceneWriter(int api, String name, String desc, MethodVisitor mv) {
+      super(api, mv);
       this.hasVisitedMethodAnnotations = false;
       this.aMethod = aClass.methods.getVivify(name+desc);
       this.existingMethodAnnotations = new ArrayList<String>();
@@ -631,25 +656,28 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
       // If annotation exists in scene, and in overwrite mode,
       //  return empty visitor, annotation from scene will be visited later.
       if (shouldSkipExisting(classDescToName(desc))) {
-        return new EmptyVisitor();
+//        return new EmptyVisitor();
+        return null;
       }
 
       return super.visitAnnotation(desc, visible);
     }
 
     @Override
-    public TypeAnnotationVisitor visitTypeAnnotation(String desc, boolean visible, boolean inCode) {
-
+    public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String desc, boolean visible) {
+      // MethodVisitor. So typeRef: METHOD_TYPE_PARAMETER, METHOD_TYPE_PARAMETER_BOUND, METHOD_RETURN, METHOD_RECEIVER, METHOD_FORMAL_PARAMETER or THROWS.
       existingMethodAnnotations.add(desc);
 
       // If annotation exists in scene, and in overwrite mode,
       //  return empty visitor, annotation from scene will be visited later.
       if (shouldSkipExisting(classDescToName(desc))) {
-        return new EmptyVisitor();
+//        return new EmptyVisitor();
+        return null;
       }
 
-      return new SafeTypeAnnotationVisitor(
-          super.visitTypeAnnotation(desc, visible, inCode));
+//      return new SafeTypeAnnotationVisitor(
+//          super.visitTypeAnnotation(desc, visible, inCode));
+      return super.visitTypeAnnotation(typeRef, typePath, desc, visible);
     }
 
     /**
@@ -678,11 +706,11 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
 
     /**
      * Has this visit the extended annotation in tla and returns the
-     * resulting visitor.
+     * resulting visitor. The sort of the typeReference should be METHOD_TYPE_PARAMETER, METHOD_TYPE_PARAMETER_BOUND,
+     * METHOD_RETURN, METHOD_RECEIVER, METHOD_FORMAL_PARAMETER or THROWS.
      */
-    private TypeAnnotationVisitor
-    visitTypeAnnotation(Annotation tla, boolean inCode) {
-      return super.visitTypeAnnotation(classNameToDesc(name(tla)), isRuntimeRetention(tla), inCode);
+    private AnnotationVisitor visitTypeAnnotation(Annotation tla, TypeReference typeReference, TypePath typePath) {
+      return super.visitTypeAnnotation(typeReference.getValue(), typePath, classNameToDesc(name(tla)), isRuntimeRetention(tla));
     }
 
     /**
@@ -715,14 +743,14 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
      */
     private void ensureVisitReturnTypeAnnotations() {
       // Standard annotations on return type.
+      TypeReference typeReference = TypeReference.newTypeReference(TypeReference.METHOD_RETURN);
       for (Annotation tla : aMethod.returnType.tlAnnotationsHere) {
         if (shouldSkip(tla)) {
           continue;
         }
-
-        TypeAnnotationVisitor av = visitTypeAnnotation(tla, false);
-        visitTargetType(av, TargetType.METHOD_RETURN);
-        visitLocations(av, InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION);
+        AnnotationVisitor av = visitTypeAnnotation(tla, typeReference, InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION.getTypePath());
+//        visitTargetType(av, TargetType.METHOD_RETURN);
+//        visitLocations(av, InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION);
         visitFields(av, tla);
         av.visitEnd();
       }
@@ -734,13 +762,13 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
         ATypeElement innerType = e.getValue();
 
         for (Annotation tla : innerType.tlAnnotationsHere) {
-          TypeAnnotationVisitor xav = visitTypeAnnotation(tla, false);
+          AnnotationVisitor xav = visitTypeAnnotation(tla, typeReference, loc.getTypePath());
 
-          visitTargetType(xav, TargetType.METHOD_RETURN);
+//          visitTargetType(xav, TargetType.METHOD_RETURN);
           // information for raw type (return type)
           //  (none)
           // information for generic/array (on return type)
-          visitLocations(xav, loc);
+//          visitLocations(xav, loc);
           visitFields(xav, tla);
           xav.visitEnd();
         }
@@ -756,33 +784,35 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
         aMethod.bounds.entrySet()) {
         BoundLocation bloc = e.getKey();
         ATypeElement bound = e.getValue();
-
+        TypeReference typeReference = bloc.boundIndex == -1 ?
+            TypeReference.newTypeParameterReference(TypeReference.METHOD_TYPE_PARAMETER, bloc.paramIndex) :
+            TypeReference.newTypeParameterBoundReference(TypeReference.METHOD_TYPE_PARAMETER_BOUND, bloc.paramIndex, bloc.boundIndex);
         for (Annotation tla : bound.tlAnnotationsHere) {
-          TypeAnnotationVisitor xav = visitTypeAnnotation(tla, false);
+//          if (bloc.boundIndex == -1) {
+//            visitTargetType(xav, TargetType.METHOD_TYPE_PARAMETER);
+//          } else {
+//            visitTargetType(xav, TargetType.METHOD_TYPE_PARAMETER_BOUND);
+//          }
 
-          if (bloc.boundIndex == -1) {
-            visitTargetType(xav, TargetType.METHOD_TYPE_PARAMETER);
-            visitBound(xav, bloc);
-          } else {
-            visitTargetType(xav, TargetType.METHOD_TYPE_PARAMETER_BOUND);
-            visitBound(xav, bloc);
-          }
-          visitLocations(xav, InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION);
+          AnnotationVisitor xav = visitTypeAnnotation(tla, typeReference, InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION.getTypePath());
+
+//          visitBound(xav, bloc);
+//          visitLocations(xav, InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION);
           visitFields(xav, tla);
           xav.visitEnd();
         }
-
+        typeReference = TypeReference.newTypeParameterBoundReference(TypeReference.METHOD_TYPE_PARAMETER_BOUND, bloc.paramIndex, bloc.boundIndex);
         for (Map.Entry<InnerTypeLocation, ATypeElement> e2 :
           bound.innerTypes.entrySet()) {
           InnerTypeLocation itloc = e2.getKey();
           ATypeElement innerType = e2.getValue();
 
           for (Annotation tla : innerType.tlAnnotationsHere) {
-            TypeAnnotationVisitor xav = visitTypeAnnotation(tla, false);
+            AnnotationVisitor xav = visitTypeAnnotation(tla, typeReference, itloc.getTypePath());
 
-            visitTargetType(xav, TargetType.METHOD_TYPE_PARAMETER_BOUND);
-            visitBound(xav, bloc);
-            visitLocations(xav, itloc);
+//            visitTargetType(xav, TargetType.METHOD_TYPE_PARAMETER_BOUND);
+//            visitBound(xav, bloc);
+//            visitLocations(xav, itloc);
             visitFields(xav, tla);
             xav.visitEnd();
           }
@@ -794,6 +824,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
      * Has this visit the annotations on local variables in this method.
      */
     private void ensureVisitLocalVariablesAnnotations() {
+      TypeReference typeReference = TypeReference.newTypeReference(TypeReference.LOCAL_VARIABLE);
       for (Map.Entry<LocalLocation, AField> entry :
           aMethod.body.locals.entrySet()) {
         LocalLocation localLocation = entry.getKey();
@@ -803,11 +834,11 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
           if (shouldSkip(tla)) {
             continue;
           }
-
-          TypeAnnotationVisitor xav = visitTypeAnnotation(tla, true);
-          visitTargetType(xav, TargetType.LOCAL_VARIABLE);
+// FIXME
+//          AnnotationVisitor xav = visitTypeAnnotation(tla, typeReference, InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION.getTypePath());
+//          visitTargetType(xav, TargetType.LOCAL_VARIABLE);
           visitLocalVar(xav, localLocation);
-          visitLocations(xav, InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION);
+//          visitLocations(xav, InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION);
           visitFields(xav, tla);
           xav.visitEnd();
         }
@@ -821,13 +852,13 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
             if (shouldSkip(tla)) {
               continue;
             }
-
-            TypeAnnotationVisitor xav = visitTypeAnnotation(tla, true);
-            visitTargetType(xav, TargetType.LOCAL_VARIABLE);
+// FIXME
+//            AnnotationVisitor xav = visitTypeAnnotation(tla, typeReference, localVariableLocation.getTypePath());
+//            visitTargetType(xav, TargetType.LOCAL_VARIABLE);
             // information for raw type (local variable)
             visitLocalVar(xav, localLocation);
             // information for generic/array (on local variable)
-            visitLocations(xav, localVariableLocation);
+//            visitLocations(xav, localVariableLocation);
             visitFields(xav, tla);
             xav.visitEnd();
           }
@@ -840,6 +871,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
      * Has this visit the object creation (new) annotations on this method.
      */
     private void ensureVisitObjectCreationAnnotations() {
+      TypeReference typeReference = TypeReference.newTypeReference(TypeReference.NEW);
       for (Map.Entry<RelativeLocation, ATypeElement> entry :
           aMethod.body.news.entrySet()) {
         if (!entry.getKey().isBytecodeOffset()) {
@@ -850,15 +882,16 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
         }
         int offset = entry.getKey().offset;
         ATypeElement aNew = entry.getValue();
+
         for (Annotation tla : aNew.tlAnnotationsHere) {
           if (shouldSkip(tla)) {
             continue;
           }
 
-          TypeAnnotationVisitor xav = visitTypeAnnotation(tla, true);
-          visitTargetType(xav, TargetType.NEW);
+          AnnotationVisitor xav = visitTypeAnnotation(tla, typeReference, InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION.getTypePath());
+//          visitTargetType(xav, TargetType.NEW);
           visitOffset(xav, offset);
-          visitLocations(xav, InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION);
+//          visitLocations(xav, InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION);
           visitFields(xav, tla);
           xav.visitEnd();
         }
@@ -873,12 +906,12 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
               continue;
             }
 
-            TypeAnnotationVisitor xav = visitTypeAnnotation(tla, true);
-            visitTargetType(xav, TargetType.NEW);
+            AnnotationVisitor xav = visitTypeAnnotation(tla, typeReference, aNewLocation.getTypePath());
+//            visitTargetType(xav, TargetType.NEW);
             // information for raw type (object creation)
             visitOffset(xav, offset);
             // information for generic/array (on object creation)
-            visitLocations(xav, aNewLocation);
+//            visitLocations(xav, aNewLocation);
             visitFields(xav, tla);
             xav.visitEnd();
           }
@@ -905,16 +938,17 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
           av.visitEnd();
         }
 
+        TypeReference typeReference = TypeReference.newFormalParameterReference(index);
         // Then handle type annotations targeting the parameter
         for (Annotation tla : aParameter.type.tlAnnotationsHere) {
             if (shouldSkip(tla)) {
               continue;
             }
 
-            TypeAnnotationVisitor av = visitTypeAnnotation(tla, false);
-            visitTargetType(av, TargetType.METHOD_FORMAL_PARAMETER);
-            visitParameterIndex(av, index);
-            visitLocations(av, InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION);
+            AnnotationVisitor av = visitTypeAnnotation(tla, typeReference, InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION.getTypePath());
+//            visitTargetType(av, TargetType.METHOD_FORMAL_PARAMETER);
+//            visitParameterIndex(av, index);
+//            visitLocations(av, InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION);
             visitFields(av, tla);
             av.visitEnd();
         }
@@ -929,14 +963,14 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
               continue;
             }
 
-            TypeAnnotationVisitor xav = visitTypeAnnotation(tla, false);
-            visitTargetType(xav,
-                TargetType.METHOD_FORMAL_PARAMETER);
+            AnnotationVisitor xav = visitTypeAnnotation(tla, typeReference, aParameterLocation.getTypePath());
+//            visitTargetType(xav,
+//                TargetType.METHOD_FORMAL_PARAMETER);
             // information for raw type (parameter)
             //  (none)
             // information for generic/array (on parameter)
-            visitParameterIndex(xav, index);
-            visitLocations(xav, aParameterLocation);
+//            visitParameterIndex(xav, index);
+//            visitLocations(xav, aParameterLocation);
             visitFields(xav, tla);
             xav.visitEnd();
           }
@@ -959,15 +993,16 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
       //  visitFields(av, tla);
       //  av.visitEnd();
       // }
+      TypeReference typeReference = TypeReference.newTypeReference(TypeReference.METHOD_RECEIVER);
 
       for (Annotation tla : aReceiver.type.tlAnnotationsHere) {
         if (shouldSkip(tla)) {
           continue;
         }
 
-        TypeAnnotationVisitor xav = visitTypeAnnotation(tla, false);
-        visitTargetType(xav, TargetType.METHOD_RECEIVER);
-        visitLocations(xav, InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION);
+        AnnotationVisitor xav = visitTypeAnnotation(tla, typeReference, InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION.getTypePath());
+//        visitTargetType(xav, TargetType.METHOD_RECEIVER);
+//        visitLocations(xav, InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION);
         visitFields(xav, tla);
         xav.visitEnd();
       }
@@ -982,10 +1017,10 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
             continue;
           }
 
-          TypeAnnotationVisitor xav = visitTypeAnnotation(tla, false);
-          visitTargetType(xav, TargetType.METHOD_RECEIVER);
+          AnnotationVisitor xav = visitTypeAnnotation(tla, typeReference, aReceiverLocation.getTypePath());
+//          visitTargetType(xav, TargetType.METHOD_RECEIVER);
           // information for generic/array (on receiver)
-          visitLocations(xav, aReceiverLocation);
+//          visitLocations(xav, aReceiverLocation);
           visitFields(xav, tla);
           xav.visitEnd();
         }
@@ -1007,17 +1042,18 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
         }
         int offset = entry.getKey().offset;
         int typeIndex = entry.getKey().type_index;
+        TypeReference typeReference = TypeReference.newTypeArgumentReference(TypeReference.CAST, typeIndex);
         ATypeElement aTypecast = entry.getValue();
         for (Annotation tla : aTypecast.tlAnnotationsHere) {
           if (shouldSkip(tla)) {
             continue;
           }
-
-          TypeAnnotationVisitor xav = visitTypeAnnotation(tla, true);
-          visitTargetType(xav, TargetType.CAST);
+// FIXME
+//          AnnotationVisitor xav = visitTypeAnnotation(tla, typeReference, InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION.getTypePath());
+//          visitTargetType(xav, TargetType.CAST);
           visitOffset(xav, offset);
-          visitTypeIndex(xav, typeIndex);
-          visitLocations(xav, InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION);
+//          visitTypeIndex(xav, typeIndex);
+//          visitLocations(xav, InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION);
           visitFields(xav, tla);
           xav.visitEnd();
         }
@@ -1031,14 +1067,14 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
             if (shouldSkip(tla)) {
               continue;
             }
-
-            TypeAnnotationVisitor xav = visitTypeAnnotation(tla, true);
-            visitTargetType(xav, TargetType.CAST);
+// FIXME
+//            AnnotationVisitor xav = visitTypeAnnotation(tla, typeReference, aTypecastLocation.getTypePath());
+//            visitTargetType(xav, TargetType.CAST);
             // information for raw type (typecast)
             visitOffset(xav, offset);
-            visitTypeIndex(xav, typeIndex);
+//            visitTypeIndex(xav, typeIndex);
             // information for generic/array (on typecast)
-            visitLocations(xav, aTypecastLocation);
+//            visitLocations(xav, aTypecastLocation);
             visitFields(xav, tla);
             xav.visitEnd();
           }
@@ -1060,15 +1096,16 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
         }
         int offset = entry.getKey().offset;
         ATypeElement aTypeTest = entry.getValue();
+        TypeReference typeReference = TypeReference.newTypeReference(TypeReference.INSTANCEOF);
         for (Annotation tla : aTypeTest.tlAnnotationsHere) {
           if (shouldSkip(tla)) {
             continue;
           }
-
-          TypeAnnotationVisitor xav = visitTypeAnnotation(tla, true);
-          visitTargetType(xav, TargetType.INSTANCEOF);
+// FIXME
+//          AnnotationVisitor xav = visitTypeAnnotation(tla, typeReference, InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION.getTypePath());
+//          visitTargetType(xav, TargetType.INSTANCEOF);
           visitOffset(xav, offset);
-          visitLocations(xav, InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION);
+//          visitLocations(xav, InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION);
           visitFields(xav, tla);
           xav.visitEnd();
         }
@@ -1083,12 +1120,13 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
               continue;
             }
 
-            TypeAnnotationVisitor xav = visitTypeAnnotation(tla, true);
-            visitTargetType(xav, TargetType.INSTANCEOF);
+            // FIXME
+//              AnnotationVisitor xav = visitTypeAnnotation(tla, typeReference, aTypeTestLocation.getTypePath());
+//            visitTargetType(xav, TargetType.INSTANCEOF);
             // information for raw type (typetest)
             visitOffset(xav, offset);
             // information for generic/array (on typetest)
-            visitLocations(xav, aTypeTestLocation);
+//            visitLocations(xav, aTypeTestLocation);
             visitFields(xav, tla);
             xav.visitEnd();
           }
@@ -1113,7 +1151,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
         for (Map.Entry<Integer, AField> e0 : aLambda.parameters.entrySet()) {
           AField aParameter = e0.getValue();
           int index = e0.getKey();
-
+          TypeReference typeReference = TypeReference.newFormalParameterReference(index);
           for (Annotation tla : aParameter.tlAnnotationsHere) {
             if (shouldSkip(tla)) {
               continue;
@@ -1129,12 +1167,13 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
               continue;
             }
 
-            TypeAnnotationVisitor xav = visitTypeAnnotation(tla, false);
-            visitTargetType(xav, TargetType.METHOD_FORMAL_PARAMETER);
-            // visitOffset(xav, offset);
+            // FIXME
+            AnnotationVisitor xav = visitTypeAnnotation(tla, typeReference, InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION.getTypePath());
+//            visitTargetType(xav, TargetType.METHOD_FORMAL_PARAMETER);
+             visitOffset(xav, offset);
             // visitTypeIndex(xav, typeIndex);
-            visitParameterIndex(xav, index);
-            visitLocations(xav, InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION);
+//            visitParameterIndex(xav, index);
+//            visitLocations(xav, InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION);
             visitFields(xav, tla);
             xav.visitEnd();
           }
@@ -1148,12 +1187,12 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
                 continue;
               }
 
-              TypeAnnotationVisitor xav = visitTypeAnnotation(tla, false);
-              visitTargetType(xav, TargetType.METHOD_FORMAL_PARAMETER);
-              // visitOffset(xav, offset);
+              AnnotationVisitor xav = visitTypeAnnotation(tla, typeReference, aParameterLocation.getTypePath());
+//              visitTargetType(xav, TargetType.METHOD_FORMAL_PARAMETER);
+//               visitOffset(xav, offset);
               // visitTypeIndex(xav, typeIndex);
-              visitParameterIndex(xav, index);
-              visitLocations(xav, aParameterLocation);
+//              visitParameterIndex(xav, index);
+//              visitLocations(xav, aParameterLocation);
               visitFields(xav, tla);
               xav.visitEnd();
             }
@@ -1182,16 +1221,20 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
                 ? TargetType.CONSTRUCTOR_REFERENCE_TYPE_ARGUMENT
                 : TargetType.METHOD_REFERENCE_TYPE_ARGUMENT;
 
+        TypeReference typeReference = cset != null && cset.contains(offset)
+            ? TypeReference.newTypeArgumentReference(TypeReference.CONSTRUCTOR_REFERENCE_TYPE_ARGUMENT, typeIndex)
+            : TypeReference.newTypeArgumentReference(TypeReference.METHOD_REFERENCE_TYPE_ARGUMENT, typeIndex);
+
         for (Annotation tla : aTypeArg.tlAnnotationsHere) {
           if (shouldSkip(tla)) {
             continue;
           }
 
-          TypeAnnotationVisitor xav = visitTypeAnnotation(tla, true);
-          visitTargetType(xav, tt);
+//          AnnotationVisitor xav = visitTypeAnnotation(tla, typeReference, InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION.getTypePath());
+//          visitTargetType(xav, tt);
           visitOffset(xav, offset);
-          visitTypeIndex(xav, typeIndex);
-          visitLocations(xav, InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION);
+//          visitTypeIndex(xav, typeIndex);
+//          visitLocations(xav, InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION);
           visitFields(xav, tla);
           xav.visitEnd();
         }
@@ -1206,11 +1249,12 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
               continue;
             }
 
-            TypeAnnotationVisitor xav = visitTypeAnnotation(tla, true);
-            visitTargetType(xav, tt);
+            // FIXME
+//              AnnotationVisitor xav = visitTypeAnnotation(tla, typeReference, aTypeArgLocation.getTypePath());
+//            visitTargetType(xav, tt);
             visitOffset(xav, offset);
-            visitTypeIndex(xav, typeIndex);
-            visitLocations(xav, aTypeArgLocation);
+//            visitTypeIndex(xav, typeIndex);
+//            visitLocations(xav, aTypeArgLocation);
             visitFields(xav, tla);
             xav.visitEnd();
           }
@@ -1235,16 +1279,20 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
                 ? TargetType.CONSTRUCTOR_INVOCATION_TYPE_ARGUMENT
                 : TargetType.METHOD_INVOCATION_TYPE_ARGUMENT;
 
+        TypeReference typeReference = cset != null && cset.contains(offset)
+            ? TypeReference.newTypeArgumentReference(TypeReference.CONSTRUCTOR_INVOCATION_TYPE_ARGUMENT, typeIndex)
+            : TypeReference.newTypeArgumentReference(TypeReference.METHOD_INVOCATION_TYPE_ARGUMENT, typeIndex);
+
         for (Annotation tla : aCall.tlAnnotationsHere) {
           if (shouldSkip(tla)) {
             continue;
           }
-
-          TypeAnnotationVisitor xav = visitTypeAnnotation(tla, true);
-          visitTargetType(xav, tt);
+        // FIXME
+//          AnnotationVisitor xav = visitTypeAnnotation(tla, typeReference, InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION.getTypePath());
+//          visitTargetType(xav, tt);
           visitOffset(xav, offset);
-          visitTypeIndex(xav, typeIndex);
-          visitLocations(xav, InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION);
+//          visitTypeIndex(xav, typeIndex);
+//          visitLocations(xav, InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION);
           visitFields(xav, tla);
           xav.visitEnd();
         }
@@ -1254,16 +1302,21 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
             aCall.innerTypes.entrySet()) {
           InnerTypeLocation aCallLocation = e.getKey();
           AElement aInnerType = e.getValue();
+
           for (Annotation tla : aInnerType.tlAnnotationsHere) {
             if (shouldSkip(tla)) {
               continue;
             }
 
-            TypeAnnotationVisitor xav = visitTypeAnnotation(tla, true);
-            visitTargetType(xav, TargetType.INSTANCEOF);
+            // TODO: Is this really supposed to be INSTANCEOF? The usual pattern and common sense suggests this should
+            //  be the same Target Type as before. Any reason why this is INSTANCEOF instead of
+            //  (CONSTRUCTOR|METHOD)_INVOCATION_TYPE_ARGUMENT?
+            // FIXME
+//              AnnotationVisitor xav = visitTypeAnnotation(tla, typeReference, aCallLocation.getTypePath());
+//            visitTargetType(xav, TargetType.INSTANCEOF); // TODO: Get this checked
             visitOffset(xav, offset);
-            visitTypeIndex(xav, typeIndex);
-            visitLocations(xav, aCallLocation);
+//            visitTypeIndex(xav, typeIndex);
+//            visitLocations(xav, aCallLocation);
             visitFields(xav, tla);
             xav.visitEnd();
           }
@@ -1301,12 +1354,13 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
     }
   }
 
-  class MethodCodeIndexer extends EmptyVisitor {
+  class MethodCodeIndexer extends ClassVisitor {
     private int codeStart = 0;
     Set<Integer> constrs;  // distinguishes constructors from methods
     Set<Integer> lambdas;  // distinguishes lambda exprs from member refs
 
-    MethodCodeIndexer() {
+    MethodCodeIndexer(int api) {
+      super(api);
       int fieldCount;
       // const pool size is (not lowest) upper bound of string length
       codeStart = cr.header + 6;
@@ -1360,8 +1414,8 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
         lambdaExpressions.put(methodDescription, lambdas);
       }
 
-      return new MethodAdapter(
-          new MethodCodeOffsetAdapter(cr, new EmptyVisitor(), codeStart) {
+//      return new MethodAdapter(
+          return new MethodCodeOffsetAdapter(cr, null, codeStart) {
               @Override
               public void visitInvokeDynamicInsn(String name,
                   String desc, Handle bsm, Object... bsmArgs) {
@@ -1380,7 +1434,8 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
                 }
                 super.visitInvokeDynamicInsn(name, desc, bsm, bsmArgs);
               }
-          });
+          };
+//          );
     }
   }
 }
