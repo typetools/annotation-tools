@@ -124,7 +124,7 @@ public class Anncat {
                         System.err.println("Finished.");
                     } else {
                         System.err.println("Rewriting class file " + origfile + " with annotations...");
-                        ClassFileWriter.insert(theScene, origfile, overwrite);
+                        ClassFileWriter.insert(theScene, null, origfile, overwrite);
                         System.err.println("Finished.");
                     }
                 } else {

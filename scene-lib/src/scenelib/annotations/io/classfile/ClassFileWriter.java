@@ -122,7 +122,7 @@ public class ClassFileWriter {
       try {
         if (className.endsWith(".class")) {
           System.out.printf("Adding annotations to class file %s%n", className);
-          insert(scene, className, true);
+          insert(scene, typePath, className, true);
         } else {
           String outputFileName = className + ".class";
           System.out.printf("Reading class file %s; writing with annotations to %s%n",
@@ -162,7 +162,7 @@ public class ClassFileWriter {
    * @throws IOException if there is a problem reading from or writing to
    *                     <code> fileName </code>
    */
-  public static void insert(AScene scene, String fileName, boolean overwrite) throws IOException {
+  public static void insert(AScene scene, TypePath typePath, String fileName, boolean overwrite) throws IOException {
     assert fileName.endsWith(".class");
 
     // can't just call other insert, because this closes the input stream
@@ -170,7 +170,7 @@ public class ClassFileWriter {
     ClassReader cr = new ClassReader(in);
     in.close();
 
-    ClassAnnotationSceneWriter cw = new ClassAnnotationSceneWriter(Opcodes.ASM7, cr, scene, overwrite);
+    ClassAnnotationSceneWriter cw = new ClassAnnotationSceneWriter(Opcodes.ASM7, cr, scene, typePath, overwrite);
     cr.accept(cw, 0);
 
     OutputStream fos = new FileOutputStream(fileName);
@@ -200,7 +200,7 @@ public class ClassFileWriter {
     ClassReader cr = new ClassReader(input);
 
     ClassAnnotationSceneWriter cw =
-        new ClassAnnotationSceneWriter(Opcodes.ASM7, cr, scene, overwrite);
+        new ClassAnnotationSceneWriter(Opcodes.ASM7, cr, scene, TypePath.fromString(""), overwrite);
 
     cr.accept(cw, 0);
 
@@ -224,11 +224,11 @@ public class ClassFileWriter {
    * @throws IOException if there is a problem reading from <code> in </code> or
    *                     writing to <code> out </code>
    */
-  public static void insert(AScene scene, String className, String outputFileName, boolean overwrite)
+  public static void insert(AScene scene, TypePath typePath, String className, String outputFileName, boolean overwrite)
       throws IOException {
     ClassReader cr = new ClassReader(className);
 
-    ClassAnnotationSceneWriter cw = new ClassAnnotationSceneWriter(Opcodes.ASM7, cr, scene, overwrite);
+    ClassAnnotationSceneWriter cw = new ClassAnnotationSceneWriter(Opcodes.ASM7, cr, scene, typePath, overwrite);
 
     cr.accept(cw, 0);
 
