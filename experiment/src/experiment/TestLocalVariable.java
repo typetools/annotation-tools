@@ -4,10 +4,17 @@ import experiment.Annotations.A;
 import experiment.Annotations.B;
 import experiment.Annotations.C;
 import experiment.Annotations.D;
+import experiment.Annotations.E;
 
 public class TestLocalVariable {
-  public static void main(String[] args) {
+  public static int StaticMethod() {
     @A Object a = new @B Object();
-    @C @D int b = 6;
+    @C Integer b;
+    return 1;
+  }
+
+  public int InstanceMethod() {
+    @D String c = new @E String();
+    return 1;
   }
 }
