@@ -9,7 +9,7 @@ import experiment.Annotations.E;
 public class TestLocalVariable {
   public static int StaticMethod() {
     @A Object a = new @B Object();
-    @C Integer b;
+    @C Integer b = 6;
     @D String c = "";
     return 1;
   }
