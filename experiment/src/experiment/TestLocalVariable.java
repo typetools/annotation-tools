@@ -10,6 +10,7 @@ public class TestLocalVariable {
   public static int StaticMethod() {
     @A Object a = new @B Object();
     @C Integer b;
+    @D String c = "";
     return 1;
   }
 

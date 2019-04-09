@@ -1,4 +1,4 @@
-package experiment;
+package asm.experiment;
 
 import org.objectweb.asm.*;
 
@@ -19,9 +19,9 @@ public class TestLocalVariableDump implements Opcodes {
 
     classWriter.visitInnerClass("experiment/Annotations$A", "experiment/Annotations", "A", ACC_STATIC | ACC_ANNOTATION | ACC_ABSTRACT | ACC_INTERFACE);
 
-    classWriter.visitInnerClass("experiment/Annotations$E", "experiment/Annotations", "E", ACC_STATIC | ACC_ANNOTATION | ACC_ABSTRACT | ACC_INTERFACE);
-
     classWriter.visitInnerClass("experiment/Annotations$D", "experiment/Annotations", "D", ACC_STATIC | ACC_ANNOTATION | ACC_ABSTRACT | ACC_INTERFACE);
+
+    classWriter.visitInnerClass("experiment/Annotations$E", "experiment/Annotations", "E", ACC_STATIC | ACC_ANNOTATION | ACC_ABSTRACT | ACC_INTERFACE);
 
     {
       methodVisitor = classWriter.visitMethod(ACC_PUBLIC, "<init>", "()V", null, null);
@@ -43,7 +43,7 @@ public class TestLocalVariableDump implements Opcodes {
       methodVisitor.visitLineNumber(11, label0);
       methodVisitor.visitTypeInsn(NEW, "java/lang/Object");
       {
-        annotationVisitor0 = methodVisitor.visitInsnAnnotation(0x44000000, null, "Lexperiment/Annotations$B;", false);
+        annotationVisitor0 = methodVisitor.visitInsnAnnotation(1140850688, null, "Lexperiment/Annotations$B;", false);
         annotationVisitor0.visitEnd();
       }
       methodVisitor.visitInsn(DUP);
@@ -52,15 +52,24 @@ public class TestLocalVariableDump implements Opcodes {
       Label label1 = new Label();
       methodVisitor.visitLabel(label1);
       methodVisitor.visitLineNumber(13, label1);
-      methodVisitor.visitInsn(ICONST_1);
-      methodVisitor.visitInsn(IRETURN);
+      methodVisitor.visitLdcInsn("");
+      methodVisitor.visitVarInsn(ASTORE, 2);
       Label label2 = new Label();
       methodVisitor.visitLabel(label2);
+      methodVisitor.visitLineNumber(14, label2);
+      methodVisitor.visitInsn(ICONST_1);
+      methodVisitor.visitInsn(IRETURN);
+      Label label3 = new Label();
+      methodVisitor.visitLabel(label3);
       {
-        annotationVisitor0 = methodVisitor.visitLocalVariableAnnotation(0x40000000, null, new Label[]{label1}, new Label[]{label2}, new int[]{0}, "Lexperiment/Annotations$A;", false);
+        annotationVisitor0 = methodVisitor.visitLocalVariableAnnotation(1073741824, null, new Label[]{label1}, new Label[]{label3}, new int[]{0}, "Lexperiment/Annotations$A;", false);
         annotationVisitor0.visitEnd();
       }
-      methodVisitor.visitMaxs(2, 2);
+      {
+        annotationVisitor0 = methodVisitor.visitLocalVariableAnnotation(1073741824, null, new Label[]{label2}, new Label[]{label3}, new int[]{2}, "Lexperiment/Annotations$D;", false);
+        annotationVisitor0.visitEnd();
+      }
+      methodVisitor.visitMaxs(2, 3);
       methodVisitor.visitEnd();
     }
     {
@@ -68,10 +77,10 @@ public class TestLocalVariableDump implements Opcodes {
       methodVisitor.visitCode();
       Label label0 = new Label();
       methodVisitor.visitLabel(label0);
-      methodVisitor.visitLineNumber(17, label0);
+      methodVisitor.visitLineNumber(18, label0);
       methodVisitor.visitTypeInsn(NEW, "java/lang/String");
       {
-        annotationVisitor0 = methodVisitor.visitInsnAnnotation(0x44000000, null, "Lexperiment/Annotations$E;", false);
+        annotationVisitor0 = methodVisitor.visitInsnAnnotation(1140850688, null, "Lexperiment/Annotations$E;", false);
         annotationVisitor0.visitEnd();
       }
       methodVisitor.visitInsn(DUP);
@@ -79,13 +88,13 @@ public class TestLocalVariableDump implements Opcodes {
       methodVisitor.visitVarInsn(ASTORE, 1);
       Label label1 = new Label();
       methodVisitor.visitLabel(label1);
-      methodVisitor.visitLineNumber(18, label1);
+      methodVisitor.visitLineNumber(19, label1);
       methodVisitor.visitInsn(ICONST_1);
       methodVisitor.visitInsn(IRETURN);
       Label label2 = new Label();
       methodVisitor.visitLabel(label2);
       {
-        annotationVisitor0 = methodVisitor.visitLocalVariableAnnotation(0x40000000, null, new Label[]{label1}, new Label[]{label2}, new int[]{1}, "Lexperiment/Annotations$D;", false);
+        annotationVisitor0 = methodVisitor.visitLocalVariableAnnotation(1073741824, null, new Label[]{label1}, new Label[]{label2}, new int[]{1}, "Lexperiment/Annotations$D;", false);
         annotationVisitor0.visitEnd();
       }
       methodVisitor.visitMaxs(2, 2);
