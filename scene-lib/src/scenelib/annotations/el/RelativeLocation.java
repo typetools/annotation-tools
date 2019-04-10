@@ -1,6 +1,6 @@
 package scenelib.annotations.el;
 
-import scenelib.annotations.util.Hasher;
+import java.util.Objects;
 
 /**
  * A {@link RelativeLocation} holds location information for a
@@ -88,11 +88,7 @@ public final class RelativeLocation implements Comparable<RelativeLocation> {
 
     @Override
     public int hashCode() {
-        Hasher h = new Hasher();
-        h.mash(offset);
-        h.mash(index);
-        h.mash(type_index);
-        return h.hash;
+        return Objects.hash(offset, index, type_index);
     }
 
     @Override

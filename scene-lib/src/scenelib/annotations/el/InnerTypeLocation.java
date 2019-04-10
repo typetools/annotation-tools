@@ -3,8 +3,7 @@ package scenelib.annotations.el;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import scenelib.annotations.util.Hasher;
+import java.util.Objects;
 
 import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
 
@@ -62,9 +61,7 @@ public final class InnerTypeLocation {
 
     @Override
     public int hashCode() {
-        Hasher h = new Hasher();
-        h.mash(location.hashCode());
-        return h.hash;
+        return Objects.hash(location);
     }
 
     /**
