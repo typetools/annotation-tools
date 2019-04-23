@@ -834,9 +834,12 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
           if (shouldSkip(tla)) {
             continue;
           }
-// FIXME
-//          AnnotationVisitor xav = visitTypeAnnotation(tla, typeReference, InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION.getTypePath());
-//          visitTargetType(xav, TargetType.LOCAL_VARIABLE);
+          // FIXME
+          Label label0 = new Label();
+          this.visitLabel(label0);
+          this.visitLineNumber(localLocation);
+          AnnotationVisitor xav = visitLocalVariableAnnotation(tla, typeReference, InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION.getTypePath());
+          visitTargetType(xav, TargetType.LOCAL_VARIABLE);
           visitLocalVar(xav, localLocation);
 //          visitLocations(xav, InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION);
           visitFields(xav, tla);
@@ -853,6 +856,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
               continue;
             }
 // FIXME
+            AnnotationVisitor xav = visitLocalVariableAnnotation(tla, typeReference, InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION.getTypePath());
 //            AnnotationVisitor xav = visitTypeAnnotation(tla, typeReference, localVariableLocation.getTypePath());
 //            visitTargetType(xav, TargetType.LOCAL_VARIABLE);
             // information for raw type (local variable)
@@ -888,7 +892,9 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
             continue;
           }
 
-          AnnotationVisitor xav = visitTypeAnnotation(tla, typeReference, InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION.getTypePath());
+          // FIXME
+          AnnotationVisitor xav = super.visitInsnAnnotation(typeReference.getValue(),
+              InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION.getTypePath(), classNameToDesc(name(tla)), isRuntimeRetention(tla));
 //          visitTargetType(xav, TargetType.NEW);
           visitOffset(xav, offset);
 //          visitLocations(xav, InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION);
@@ -906,7 +912,9 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
               continue;
             }
 
-            AnnotationVisitor xav = visitTypeAnnotation(tla, typeReference, aNewLocation.getTypePath());
+            // FIXME
+            AnnotationVisitor xav = super.visitInsnAnnotation(typeReference.getValue(), aNewLocation.getTypePath(),
+                classNameToDesc(name(tla)), isRuntimeRetention(tla));
 //            visitTargetType(xav, TargetType.NEW);
             // information for raw type (object creation)
             visitOffset(xav, offset);
@@ -1049,6 +1057,8 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
             continue;
           }
 // FIXME
+          AnnotationVisitor xav = super.visitInsnAnnotation(typeReference.getValue(),
+              InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION.getTypePath(), classNameToDesc(name(tla)), isRuntimeRetention(tla));
 //          AnnotationVisitor xav = visitTypeAnnotation(tla, typeReference, InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION.getTypePath());
 //          visitTargetType(xav, TargetType.CAST);
           visitOffset(xav, offset);
@@ -1068,6 +1078,8 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
               continue;
             }
 // FIXME
+            AnnotationVisitor xav = super.visitInsnAnnotation(typeReference.getValue(), aTypecastLocation.getTypePath(),
+                classNameToDesc(name(tla)), isRuntimeRetention(tla));
 //            AnnotationVisitor xav = visitTypeAnnotation(tla, typeReference, aTypecastLocation.getTypePath());
 //            visitTargetType(xav, TargetType.CAST);
             // information for raw type (typecast)
@@ -1102,6 +1114,8 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
             continue;
           }
 // FIXME
+          AnnotationVisitor xav = super.visitInsnAnnotation(typeReference.getValue(), InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION.getTypePath(),
+              classNameToDesc(name(tla)), isRuntimeRetention(tla));
 //          AnnotationVisitor xav = visitTypeAnnotation(tla, typeReference, InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION.getTypePath());
 //          visitTargetType(xav, TargetType.INSTANCEOF);
           visitOffset(xav, offset);
@@ -1121,6 +1135,8 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
             }
 
             // FIXME
+            AnnotationVisitor xav = super.visitInsnAnnotation(typeReference.getValue(), aTypeTestLocation.getTypePath(),
+                classNameToDesc(name(tla)), isRuntimeRetention(tla));
 //              AnnotationVisitor xav = visitTypeAnnotation(tla, typeReference, aTypeTestLocation.getTypePath());
 //            visitTargetType(xav, TargetType.INSTANCEOF);
             // information for raw type (typetest)
@@ -1189,7 +1205,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
 
               AnnotationVisitor xav = visitTypeAnnotation(tla, typeReference, aParameterLocation.getTypePath());
 //              visitTargetType(xav, TargetType.METHOD_FORMAL_PARAMETER);
-//               visitOffset(xav, offset);
+               visitOffset(xav, offset);
               // visitTypeIndex(xav, typeIndex);
 //              visitParameterIndex(xav, index);
 //              visitLocations(xav, aParameterLocation);
@@ -1230,6 +1246,8 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
             continue;
           }
 
+          AnnotationVisitor xav = super.visitInsnAnnotation(typeReference.getValue(), InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION.getTypePath(),
+              classNameToDesc(name(tla)), isRuntimeRetention(tla));
 //          AnnotationVisitor xav = visitTypeAnnotation(tla, typeReference, InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION.getTypePath());
 //          visitTargetType(xav, tt);
           visitOffset(xav, offset);
@@ -1250,6 +1268,8 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
             }
 
             // FIXME
+            AnnotationVisitor xav = super.visitInsnAnnotation(typeReference.getValue(), aTypeArgLocation.getTypePath(),
+                classNameToDesc(name(tla)), isRuntimeRetention(tla));
 //              AnnotationVisitor xav = visitTypeAnnotation(tla, typeReference, aTypeArgLocation.getTypePath());
 //            visitTargetType(xav, tt);
             visitOffset(xav, offset);
@@ -1287,7 +1307,9 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
           if (shouldSkip(tla)) {
             continue;
           }
-        // FIXME
+
+          AnnotationVisitor xav = super.visitInsnAnnotation(typeReference.getValue(), InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION.getTypePath(),
+              classNameToDesc(name(tla)), isRuntimeRetention(tla));
 //          AnnotationVisitor xav = visitTypeAnnotation(tla, typeReference, InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION.getTypePath());
 //          visitTargetType(xav, tt);
           visitOffset(xav, offset);
@@ -1308,12 +1330,9 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
               continue;
             }
 
-            // TODO: Is this really supposed to be INSTANCEOF? The usual pattern and common sense suggests this should
-            //  be the same Target Type as before. Any reason why this is INSTANCEOF instead of
-            //  (CONSTRUCTOR|METHOD)_INVOCATION_TYPE_ARGUMENT?
-            // FIXME
-//              AnnotationVisitor xav = visitTypeAnnotation(tla, typeReference, aCallLocation.getTypePath());
-//            visitTargetType(xav, TargetType.INSTANCEOF); // TODO: Get this checked
+            AnnotationVisitor xav = super.visitInsnAnnotation(typeReference.getValue(), aCallLocation.getTypePath(),
+                classNameToDesc(name(tla)), isRuntimeRetention(tla));
+//            AnnotationVisitor xav = visitTypeAnnotation(tla, typeReference, aCallLocation.getTypePath());
             visitOffset(xav, offset);
 //            visitTypeIndex(xav, typeIndex);
 //            visitLocations(xav, aCallLocation);
