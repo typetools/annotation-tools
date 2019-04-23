@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.objectweb.asm.TypePath;
-import scenelib.annotations.util.Hasher;
+import java.util.Objects;
 
 import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
 
@@ -24,7 +24,7 @@ public final class InnerTypeLocation {
     /**
      * The location numbers of the inner type as defined in the extended
      * annotation specification.  For example, the location numbers of &#064;X
-     * in <code>Foo&lt;Bar&lt;Baz, &#064;X Baz&gt;&gt;</code> (Foo<Bar<Baz, @X Baz>>) are
+     * in <code>Foo&lt;Bar&lt;Baz, &#064;X Baz&gt;&gt;</code> are
      * <code>{0, 1}</code>.
      */
     public final List<TypePathEntry> location;
@@ -63,9 +63,7 @@ public final class InnerTypeLocation {
 
     @Override
     public int hashCode() {
-        Hasher h = new Hasher();
-        h.mash(location.hashCode());
-        return h.hash;
+        return Objects.hash(location);
     }
 
 

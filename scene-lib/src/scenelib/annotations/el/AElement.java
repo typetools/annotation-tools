@@ -32,19 +32,13 @@ public class AElement implements Cloneable {
      */
     public final Set<Annotation> tlAnnotationsHere;
 
-    /** The type of a field or a method parameter */
+    /** The type of a field or a method parameter.  May be null. */
     public final ATypeElement type; // initialized in constructor
 
-    public Annotation lookup(String name) {
-        for (Annotation anno : tlAnnotationsHere) {
-            if (anno.def.name.equals(name)) {
-                return anno;
-            }
-        }
-        return null;
-    }
-
-    // general description of the element
+    /**
+     * A description of the element.  Used for debugging and diagnostic messages.
+     * Almost always a String, but in ATypeElement it is an ASTPath.
+     */
     public final Object description;
 
     AElement(Object description) {
@@ -161,6 +155,17 @@ public class AElement implements Cloneable {
       }
       // typeargs?
       return sb.toString();
+    }
+
+    /** Return the top-level annotation on this that has the given name.
+        Return null if no such annotation exists. */
+    public Annotation lookup(String name) {
+        for (Annotation anno : tlAnnotationsHere) {
+            if (anno.def.name.equals(name)) {
+                return anno;
+            }
+        }
+        return null;
     }
 
     public void tlAnnotationsHereFormatted(StringBuilder sb) {

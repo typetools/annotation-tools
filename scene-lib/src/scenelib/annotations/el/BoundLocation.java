@@ -1,6 +1,6 @@
 package scenelib.annotations.el;
 
-import scenelib.annotations.util.Hasher;
+import java.util.Objects;
 
 /**
  * A {@link BoundLocation} holds location information for a bound of a type
@@ -54,10 +54,7 @@ public final class BoundLocation {
 
     @Override
     public int hashCode() {
-        Hasher h = new Hasher();
-        h.mash(paramIndex);
-        h.mash(boundIndex);
-        return h.hash;
+        return Objects.hash(paramIndex, boundIndex);
     }
 
     @Override
