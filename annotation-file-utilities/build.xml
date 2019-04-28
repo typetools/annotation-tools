@@ -307,21 +307,7 @@
         <include name="annotation-file-format.dvi"/>
         <include name="annotation-file-format.html"/>
         <include name="annotation-file-format.pdf"/>
-        <include name="annotation-file-utilities.jar"/>
         <include name="annotation-file-utilities-all.jar"/>
-        <include name="bin/**"/>
-      </fileset>
-    </copy>
-
-    <copy todir="${temp-annotation-tools}/asmx">
-      <fileset dir="${asmx}">
-        <include name="bin/**"/>
-      </fileset>
-    </copy>
-
-    <copy todir="${temp-annotation-tools}/scene-lib">
-      <fileset dir="${scene-lib}">
-        <include name="bin/**"/>
       </fileset>
     </copy>
 
