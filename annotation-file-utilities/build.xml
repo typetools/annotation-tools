@@ -312,6 +312,7 @@
         <include name="annotation-file-format.html"/>
         <include name="annotation-file-format.pdf"/>
         <include name="annotation-file-utilities.jar"/>
+        <include name="annotation-file-utilities-all.jar"/>
         <include name="bin/**"/>
       </fileset>
     </copy>
