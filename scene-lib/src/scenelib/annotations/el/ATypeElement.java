@@ -3,6 +3,7 @@ package scenelib.annotations.el;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.objectweb.asm.TypePath;
 import scenelib.annotations.Annotation;
 import scenelib.annotations.util.coll.VivifyingMap;
 
@@ -31,8 +32,8 @@ public class ATypeElement extends AElement {
     /**
      * The annotated inner types; map key is the inner type location.
      */
-    public final VivifyingMap<InnerTypeLocation, ATypeElement> innerTypes =
-        ATypeElement.<InnerTypeLocation>newVivifyingLHMap_ATE();
+    public final VivifyingMap<TypePath, ATypeElement> innerTypes =
+        ATypeElement.<TypePath>newVivifyingLHMap_ATE();
 
     ATypeElement(Object description) {
         super(description);
@@ -96,7 +97,7 @@ public class ATypeElement extends AElement {
         }
         sb.append("{");
         String linePrefix = "  ";
-        for (Map.Entry<InnerTypeLocation, ATypeElement> entry : innerTypes.entrySet()) {
+        for (Map.Entry<TypePath, ATypeElement> entry : innerTypes.entrySet()) {
             sb.append(linePrefix);
             sb.append(entry.getKey().toString());
             sb.append(" => ");
