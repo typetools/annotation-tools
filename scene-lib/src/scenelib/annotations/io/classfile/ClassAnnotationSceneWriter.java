@@ -411,24 +411,6 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
   }
 
   /**
-   * Has xav visit the given target type.
-   */
-//  private void visitTargetType(AnnotationVisitor xav, TargetType t) {
-//    xav.visitXTargetType(t.targetTypeValue());
-//  }
-
-  /**
-   * Have xav visit the location length  and all locations in loc.
-   */
-//  private void visitLocations(AnnotationVisitor xav, InnerTypeLocation loc) {
-//    List<TypePathEntry> location = loc.location;
-//    xav.visitXLocationLength(location.size());
-//    for (TypePathEntry l : location) {
-//      xav.visitXLocation(l);
-//    }
-//  }
-
-  /**
    * Has xav visit the local varialbe information in loc.
    */
   private void visitLocalVar(AnnotationVisitor xav, LocalLocation loc) {
@@ -1204,16 +1186,15 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
             xav.visitEnd();
           }
 
-          for (Map.Entry<InnerTypeLocation, ATypeElement> e1 :
-              aParameter.type.innerTypes.entrySet()) {
-            InnerTypeLocation aParameterLocation = e1.getKey();
+          for (Map.Entry<TypePath, ATypeElement> e1 : aParameter.type.innerTypes.entrySet()) {
+            TypePath aParameterLocation = e1.getKey();
             ATypeElement aInnerType = e1.getValue();
             for (Annotation tla : aInnerType.tlAnnotationsHere) {
               if (shouldSkip(tla)) {
                 continue;
               }
 
-              AnnotationVisitor xav = visitTypeAnnotation(tla, typeReference, aParameterLocation.getTypePath());
+              AnnotationVisitor xav = visitTypeAnnotation(tla, typeReference, aParameterLocation);
 //              visitTargetType(xav, TargetType.METHOD_FORMAL_PARAMETER);
                visitOffset(xav, offset);
               // visitTypeIndex(xav, typeIndex);

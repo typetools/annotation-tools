@@ -12,9 +12,6 @@ import scenelib.annotations.*;
 import scenelib.annotations.el.*;
 import scenelib.annotations.field.*;
 
-import com.sun.tools.javac.code.TargetType;
-import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
-
 /**
  * A <code> ClassAnnotationSceneReader </code> is a
  * {@link org.objectweb.asm.ClassVisitor} that will insert all annotations it
@@ -38,8 +35,7 @@ import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
  * and should not be called anywhere else, due to the order in which
  * {@link org.objectweb.asm.ClassVisitor} methods should be called.
  */
-public class ClassAnnotationSceneReader
-extends ClassVisitor {
+public class ClassAnnotationSceneReader extends ClassVisitor {
   // general strategy:
   // -only "Runtime[In]visible[Type]Annotations" are supported
   // -use an empty visitor for everything besides annotations, fields and
@@ -68,9 +64,9 @@ extends ClassVisitor {
    * the definition itself.  Maps from both the qualified name and the
    * unqualified name.  If the unqualified name is not unique, it maps
    * to null and the qualified name should be used instead. */
-  private final Map<String, AnnotationDef> adefs = initAdefs();
-  private static Map<String,AnnotationDef> initAdefs() {
-    Map<String,AnnotationDef> result = new HashMap<String,AnnotationDef>();
+  private final Map<String, AnnotationDef> annotationDefinitions = initialiseAnnotationDefinitions();
+  private static Map<String,AnnotationDef> initialiseAnnotationDefinitions() {
+    Map<String,AnnotationDef> result = new HashMap<>();
     for (AnnotationDef ad : Annotations.standardDefs) {
       result.put(ad.name, ad);
     }
@@ -81,15 +77,11 @@ extends ClassVisitor {
    * Constructs a new <code> ClassAnnotationSceneReader </code> that will
    * insert all the annotations in the class that it visits into
    * <code>scene</code>.
-   * @param cr
-   *
-   * @param scene the annotation scene into which annotations this visits
-   *  will be inserted
-   * @param ignoreBridgeMethods whether to omit annotations on
-   *  compiler-generated methods
+   * @param cr the {@link ClassReader} that visits this <code>ClassAnnotationSceneReader</code>.
+   * @param scene the annotation scene into which annotations this visits will be inserted
+   * @param ignoreBridgeMethods whether to omit annotations on compiler-generated methods
    */
-  public ClassAnnotationSceneReader(int api, ClassReader cr, AScene scene,
-      boolean ignoreBridgeMethods) {
+  public ClassAnnotationSceneReader(int api, ClassReader cr, AScene scene, boolean ignoreBridgeMethods) {
     super(api);
     this.cr = cr;
     this.scene = scene;
@@ -97,70 +89,68 @@ extends ClassVisitor {
   }
 
   /**
-   * @see org.objectweb.asm.ClassVisitor#visit(int, int, java.lang.String, java.lang.String, java.lang.String, java.lang.String[])
+   * @see org.objectweb.asm.ClassVisitor#visit
    */
   @Override
-  public void visit(int version, int access, String name, String signature,
-      String superName, String[] interfaces) {
+  public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
     aClass = scene.classes.getVivify(name.replace('/', '.'));
   }
 
   /**
-   * @see org.objectweb.asm.ClassVisitor#visitAnnotation(java.lang.String, boolean)
+   * @see org.objectweb.asm.ClassVisitor#visitAnnotation
    */
   @Override
-  public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
-    if (trace) { System.out.printf("visitAnnotation(%s, %s) in %s (%s)%n", desc, visible, this, this.getClass()); }
-//    return visitTypeAnnotation(desc, visible);
-    return new AnnotationSceneReader(this.api, desc, visible, aClass);
+  public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
+    if (trace) { System.out.printf("visitAnnotation(%s, %s) in %s (%s)%n", descriptor, visible, this, this.getClass()); }
+    return new AnnotationSceneReader(this.api, descriptor, visible, aClass);
   }
 
   /**
    * @see org.objectweb.asm.ClassVisitor#visitTypeAnnotation
    */
   @Override
-  public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String desc, boolean visible) {
-    if (trace) { System.out.printf("visitTypeAnnotation(%s, %s, %s); aClass=%s in %s (%s)%n", desc, visible, aClass, this, this.getClass()); }
+  public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String descriptor, boolean visible) {
+    if (trace) { System.out.printf("visitTypeAnnotation(%s, %s, %s, %s); aClass=%s in %s (%s)%n", typeRef, typePath, descriptor, visible, aClass, this, this.getClass()); }
     // typeRef.getSort(): TypeReference.CLASS_TYPE_PARAMETER, TypeReference.CLASS_TYPE_PARAMETER_BOUND or TypeReference.CLASS_EXTENDS.
-    return new TypeAnnotationSceneReader(this.api, desc, visible, aClass, typeRef, typePath, null, null, null);
+    return new TypeAnnotationSceneReader(this.api, descriptor, visible, aClass, typeRef, typePath, null, null, null);
   }
 
   /**
-   * @see org.objectweb.asm.ClassVisitor#visitField(int, java.lang.String, java.lang.String, java.lang.String, java.lang.Object)
+   * @see org.objectweb.asm.ClassVisitor#visitField
    */
   @Override
   public FieldVisitor visitField(
       int access,
       String name,
-      String desc,
+      String descriptor,
       String signature,
       Object value) {
-    if (trace) { System.out.printf("visitField(%s, %s, %s, %s, %s) in %s (%s)%n", access, name, desc, signature, value, this, this.getClass()); }
+    if (trace) { System.out.printf("visitField(%s, %s, %s, %s, %s) in %s (%s)%n", access, name, descriptor, signature, value, this, this.getClass()); }
     AField aField = aClass.fields.getVivify(name);
     return new FieldAnnotationSceneReader(this.api, aField);
   }
 
   /**
-   * @see org.objectweb.asm.ClassVisitor#visitMethod(int, java.lang.String, java.lang.String, java.lang.String, java.lang.String[])
+   * @see org.objectweb.asm.ClassVisitor#visitMethod
    */
   @Override
   public MethodVisitor visitMethod(
       int access,
       String name,
-      String desc,
+      String descriptor,
       String signature,
       String[] exceptions) {
     if (ignoreBridgeMethods && (access & Opcodes.ACC_BRIDGE) != 0) {
       return null;
     }
-    if (trace) { System.out.printf("visitMethod(%s, %s, %s, %s, %s) in %s (%s)%n", access, name, desc, signature, exceptions, this, this.getClass()); }
-    AMethod aMethod = aClass.methods.getVivify(name+desc);
-    return new MethodAnnotationSceneReader(this.api, name, desc, signature, aMethod);
+    if (trace) { System.out.printf("visitMethod(%s, %s, %s, %s, %s) in %s (%s)%n", access, name, descriptor, signature, Arrays.toString(exceptions), this, this.getClass()); }
+    AMethod aMethod = aClass.methods.getVivify(name+descriptor);
+    return new MethodAnnotationSceneReader(this.api, name, descriptor, signature, aMethod);
   }
 
   // converts JVML format to Java format
-  private static String classDescToName(String desc) {
-    return desc.substring(1, desc.length() - 1).replace('/', '.');
+  private static String classDescToName(String descriptor) {
+    return descriptor.substring(1, descriptor.length() - 1).replace('/', '.');
   }
 
 
@@ -170,7 +160,7 @@ extends ClassVisitor {
 
   // Hackish workaround for odd subclassing.
   @SuppressWarnings("signature")
-  String dummyDesc = "dummy";
+  private String dummyDesc = "dummy";
 
   /**
    * Most of the complexity behind reading annotations from a class file into
@@ -235,7 +225,7 @@ extends ClassVisitor {
         throw new Error(e);
       }
 
-      AnnotationDef ad = AnnotationDef.fromClass(annoClass, adefs);
+      AnnotationDef ad = AnnotationDef.fromClass(annoClass, annotationDefinitions);
 
       return ad;
     }
@@ -245,20 +235,20 @@ extends ClassVisitor {
      * Constructs a new AnnotationScene reader with the given description and
      * visibility.  Calling visitEnd() will ensure that this writes out the
      * annotation it visits into aElement.
-     * @param desc JVML format for the field being read, or ClassAnnotationSceneReader.dummyDesc
+     * @param descriptor JVML format for the field being read, or ClassAnnotationSceneReader.dummyDesc
      */
-    public AnnotationSceneReader(int api, String desc, boolean visible, AElement aElement) {
+    AnnotationSceneReader(int api, String descriptor, boolean visible, AElement aElement) {
       super(api);
       this.visible = visible;
       this.aElement = aElement;
-      if (trace) { System.out.printf("AnnotationSceneReader(%s, %s, %s)%n", desc, visible, aElement); }
+      if (trace) { System.out.printf("AnnotationSceneReader(%s, %s, %s)%n", descriptor, visible, aElement); }
 
-      if (desc != dummyDesc) {    // interned
-        AnnotationDef ad = getAnnotationDef(desc);
+      if (descriptor != dummyDesc) {    // interned
+        AnnotationDef ad = getAnnotationDef(descriptor);
 
         AnnotationBuilder ab = AnnotationFactory.saf.beginAnnotation(ad);
         if (ab == null) {
-          throw new IllegalArgumentException("bad description: " + desc);
+          throw new IllegalArgumentException("bad description: " + descriptor);
         } else {
           this.annotationBuilder = ab;
         }
@@ -325,7 +315,7 @@ extends ClassVisitor {
      * the same elements as in hiddenArray.
      */
     private List<Object> asList(Object hiddenArray) {
-      List<Object> objects = new ArrayList<Object>();
+      List<Object> objects = new ArrayList<>();
       Class<?> c = hiddenArray.getClass().getComponentType();
       if (c.equals(boolean.class)) {
         for (boolean o : (boolean[]) hiddenArray) {
@@ -369,18 +359,18 @@ extends ClassVisitor {
      * @see org.objectweb.asm.AnnotationVisitor#visitEnum(java.lang.String, java.lang.String, java.lang.String)
      */
     @Override
-    public void visitEnum(String name, String desc, String value) {
-      if (trace) { System.out.printf("visitEnum(%s, %s) in %s (%s)%n", name, desc, this, this.getClass()); }
-      annotationBuilder.addScalarField(name, new EnumAFT(desc), value);
+    public void visitEnum(String name, String descriptor, String value) {
+      if (trace) { System.out.printf("visitEnum(%s, %s) in %s (%s)%n", name, descriptor, this, this.getClass()); }
+      annotationBuilder.addScalarField(name, new EnumAFT(descriptor), value);
     }
 
     /*
      * @see org.objectweb.asm.AnnotationVisitor#visitAnnotation(java.lang.String, java.lang.String)
      */
     @Override
-    public AnnotationVisitor visitAnnotation(String name, String desc) {
-      if (trace) { System.out.printf("visitAnnotation(%s, %s) in %s (%s)%n", name, desc, this, this.getClass()); }
-      return new NestedAnnotationSceneReader(this.api, this, name, desc);
+    public AnnotationVisitor visitAnnotation(String name, String descriptor) {
+      if (trace) { System.out.printf("visitAnnotation(%s, %s) in %s (%s)%n", name, descriptor, this, this.getClass()); }
+      return new NestedAnnotationSceneReader(this.api, this, name, descriptor);
     }
 
     /*
@@ -427,7 +417,7 @@ extends ClassVisitor {
      * Returns an annotation, ready to be placed into the scene, from
      *  the information visited.
      */
-    public Annotation makeAnnotation() {
+    Annotation makeAnnotation() {
       return annotationBuilder.finish();
     }
 
@@ -470,6 +460,7 @@ extends ClassVisitor {
     // 'typeRef'. May be null if the annotation targets 'typeRef' as a whole.
     private final TypePath typePath;
 
+    // Used only for TypeReference#LOCAL_VARIABLE and TypeReference#RESOURCE_VARIABLE.
     private final Label[] start;
     private final Label[] end;
     private final int[] index;
@@ -496,16 +487,22 @@ extends ClassVisitor {
      * Constructs a new AnnotationScene reader with the given description and
      * visibility.  Calling visitEnd() will ensure that this writes out the
      * annotation it visits into aElement.
-     * @param desc JVML format for the field being read, or ClassAnnotationSceneReader.dummyDesc
+     * @param descriptor JVML format for the field being read, or ClassAnnotationSceneReader.dummyDesc
      */
-    public TypeAnnotationSceneReader(int api, String desc, boolean visible, AElement aElement, int typeRef, TypePath typePath,
+    TypeAnnotationSceneReader(int api, String descriptor, boolean visible, AElement aElement, int typeRef, TypePath typePath,
                                      Label[] start, Label[] end, int[] index) {
-      super(api, desc, visible, aElement);
+      super(api, descriptor, visible, aElement);
       this.typeReference = new TypeReference(typeRef);
       this.typePath = typePath;
       this.start = start;
       this.end = end;
       this.index = index;
+      if (typeReference.getSort() != TypeReference.LOCAL_VARIABLE || typeReference.getSort() != TypeReference.RESOURCE_VARIABLE) {
+        if (start != null || end != null || index != null) {
+          System.err.printf("Error: LOCAL_VARIABLE and RESOURCE_VARIABLE TypeReference with start = %s, end = %s, index = %s",
+              Arrays.toString(start), Arrays.toString(end), Arrays.toString(index));
+        }
+      }
     }
 
     /**
@@ -519,7 +516,7 @@ extends ClassVisitor {
       if (trace) { System.out.printf("visitEnd on %s (%s)%n", this, this.getClass()); }
       // TEMP
       // If the expression used to initialize a field contains annotations
-      // on instanceofs, typecasts, or news, the extended compiler enters
+      // on instanceOfs, typecasts, or news, the extended compiler enters
       // those annotations on the field.  If we get such an annotation and
       // aElement is a field, skip the annotation for now to avoid crashing.
       switch(typeReference.getSort()) {
@@ -550,7 +547,7 @@ extends ClassVisitor {
           }
           break;
         case TypeReference.METHOD_FORMAL_PARAMETER:
-          handleMethodParameterType((AMethod) aElement);
+          handleMethodFormalParameter((AMethod) aElement);
           break;
         case TypeReference.METHOD_RECEIVER:
           handleMethodReceiver((AMethod) aElement);
@@ -594,7 +591,7 @@ extends ClassVisitor {
           break;
         case TypeReference.CONSTRUCTOR_INVOCATION_TYPE_ARGUMENT:  // TODO
         case TypeReference.METHOD_INVOCATION_TYPE_ARGUMENT:
-          handleCallTypeArgument((AMethod) aElement);
+          handleInvocationTypeArgument((AMethod) aElement);
           break;
         case TypeReference.METHOD_TYPE_PARAMETER:
           handleMethodTypeParameter((AMethod) aElement);
@@ -638,186 +635,10 @@ extends ClassVisitor {
 ////      }
 //    }
 
-  /**
-   * Creates the inner annotation on aElement.innerTypes.
-   */
-  private void handleField(AElement aElement) {
-    if (aElement instanceof AClass) {
-      // handleFieldGenericArrayOnClass((AClass) aElement);
-      if (strict) {
-        System.err.println("Unhandled FIELD_COMPONENT annotation for " + aElement);
-      }
-    } else if (aElement instanceof ATypeElement) {
-      ATypeElement aTypeElement = (ATypeElement) aElement;
-      aTypeElement
-          .innerTypes.getVivify(typePath)
-          .tlAnnotationsHere.add(makeAnnotation());
-    } else {
-      throw new RuntimeException("Unknown FIELD_COMPONENT: " + aElement);
-    }
-  }
-
-  /**
-   * Creates the method receiver annotation on aMethod.
-   */
-  private void handleMethodReceiver(AMethod aMethod) {
-     aMethod.receiver.type
-         .innerTypes.getVivify(typePath)
-         .tlAnnotationsHere.add(makeAnnotation());
-  }
-
-  /**
-   * Creates the local variable annotation on aMethod.
-   */
-  private void handleMethodLocalVariable(AMethod aMethod) {
-    aMethod.body.locals.getVivify(makeLocalLocation())
-        .type.innerTypes.getVivify(typePath)
-        .tlAnnotationsHere.add(makeAnnotation());
-  }
-
-  /**
-   * Creates the object creation annotation on aMethod.
-   */
-  private void handleMethodObjectCreation(AMethod aMethod) {
-    aMethod.body.news.getVivify(makeOffset(false))
-        .innerTypes.getVivify(typePath)
-        .tlAnnotationsHere.add(makeAnnotation());
-  }
-
-  /**
-   * Creates the method parameter type generic/array annotation on aMethod.
-   */
-  private void handleMethodParameterType(AMethod aMethod) {
-     aMethod.parameters.getVivify(typeReference.getFormalParameterIndex())
-        .type.innerTypes.getVivify(typePath)
-        .tlAnnotationsHere.add(makeAnnotation());
-  }
-
-  /**
-   * Creates the typecast annotation on aMethod.
-   */
-  private void handleMethodTypecast(AMethod aMethod) {
-    aMethod.body.typecasts.getVivify(makeOffset(true))
-        .innerTypes.getVivify(typePath)
-        .tlAnnotationsHere.add(makeAnnotation());
-  }
-
-  /**
-   * Creates the method return type generic/array annotation on aMethod.
-   */
-  private void handleMethodReturnType(AMethod aMethod) {
-    // TODO: why is this traced and not other stuff?
-    if (trace) { System.out.printf("handleMethodReturnType(%s)%n", aMethod); }
-      aMethod.returnType
-          .innerTypes.getVivify(typePath)
-          .tlAnnotationsHere.add(makeAnnotation());
-  }
-
-  /**
-   * Creates the method instance of annotation on aMethod.
-   */
-  private void handleMethodInstanceOf(AMethod aMethod) {
-    aMethod.body.typecasts.getVivify(makeOffset(false))
-        .innerTypes.getVivify(typePath)
-        .tlAnnotationsHere.add(makeAnnotation());
-  }
-
-  private void handleThrows(AMethod aMethod) {
-    TypeIndexLocation typeIndexLocation = new TypeIndexLocation(typeReference.getExceptionIndex());
-    aMethod.throwsException.getVivify(typeIndexLocation)
-        .tlAnnotationsHere.add(makeAnnotation());
-  }
-
-  private void handleMethodReference(AMethod aMethod) {
-    aMethod.body.refs.getVivify(makeOffset(false))
-        .innerTypes.getVivify(typePath)
-        .tlAnnotationsHere.add(makeAnnotation());
-  }
-
-  private void handleReferenceTypeArgument(AMethod aMethod) {
-    aMethod.body.refs.getVivify(makeOffset(true))
-        .innerTypes.getVivify(typePath)
-        .tlAnnotationsHere.add(makeAnnotation());
-
-  }
-
-  /**
-   * Creates the method type parameter bound annotation on aMethod.
-   */
-  private void handleMethodTypeParameter(AMethod aMethod) {
-    BoundLocation boundLocation = makeBoundLocation();
-    aMethod.bounds.getVivify(boundLocation)
-        .tlAnnotationsHere.add(makeAnnotation());
-  }
-
-  /**
-   * Creates the method type parameter bound annotation on aMethod.
-   */
-  private void handleMethodTypeParameterBound(AMethod aMethod) {
-    aMethod.bounds.getVivify(makeBoundLocation())
-        .innerTypes.getVivify(typePath)
-        .tlAnnotationsHere.add(makeAnnotation());
-  }
-
-  private void handleCallTypeArgument(AMethod aMethod) {
-    aMethod.body.calls.getVivify(makeOffset(true))
-        .innerTypes.getVivify(typePath)
-        .tlAnnotationsHere.add(makeAnnotation());
-  }
-
-  /**
-   * Returns a LocalLocation for this annotation.
-   */
-  private LocalLocation makeLocalLocation() {
-    int index = xIndexArgs.get(0);
-    int length = xLengthArgs.get(0);
-    int start = xStartPcArgs.get(0);
-    return new LocalLocation(index, start, length);
-  }
-
-
-  /**
-   * Returns the offset for this annotation.
-   */
-  private RelativeLocation makeOffset(boolean needTypeIndex) {
-    int offset = xOffsetArgs.get(0);
-    int typeIndex = needTypeIndex ? typeReference.getTypeArgumentIndex() : -1;
-    return RelativeLocation.createOffset(offset, typeIndex);
-  }
-
-/**
- * Returns the index for this annotation.
- */
-    /*
-    private int makeIndex() {
-      return xIndexArgs.get(0);
-    }
-    */
-
-    /**
-     * Returns the bound location for this annotation.
-     *
-     */
-    private BoundLocation makeBoundLocation() {
-      return typeReference.getSort() == TypeReference.CLASS_TYPE_PARAMETER_BOUND ||
-          typeReference.getSort() == TypeReference.METHOD_TYPE_PARAMETER_BOUND
-          ? new BoundLocation(typeReference.getTypeParameterIndex(), typeReference.getTypeParameterBoundIndex())
-          : new BoundLocation(typeReference.getTypeParameterIndex(), -1);
-      // TODO: Give up on unbounded wildcards for now!
-//      if (!xParamIndexArgs.isEmpty()) {
-//        return new BoundLocation(xParamIndexArgs.get(0), xBoundIndexArgs.get(0));
-//      } else {
-//        if (strict) { System.err.println("makeBoundLocation with empty xParamIndexArgs!"); }
-//        return new BoundLocation(Integer.MAX_VALUE, Integer.MAX_VALUE);
-//      }
-    }
-
-    // TODO: makeExceptionIndexLocation?
-
-
     /**
      * Creates the class type parameter bound annotation on aClass.
      * Works for {@link TypeReference#CLASS_TYPE_PARAMETER}
+     * @param aClass the annotatable class in which annotation will be inserted
      */
     private void handleClassTypeParameter(AClass aClass) {
       // TODO: Any reason this does not need the "innerTypes.getVivify(typePath)" part that is there in
@@ -848,6 +669,209 @@ extends ClassVisitor {
           .tlAnnotationsHere.add(makeAnnotation());
     }
 
+  /**
+   * Creates the inner annotation on aElement.innerTypes.
+   * Works for {@link TypeReference#FIELD}
+   */
+  private void handleField(AElement aElement) {
+    if (aElement instanceof AClass) {
+      // handleFieldGenericArrayOnClass((AClass) aElement);
+      if (strict) {
+        System.err.println("Unhandled FIELD_COMPONENT annotation for " + aElement);
+      }
+    } else if (aElement instanceof ATypeElement) {
+      ATypeElement aTypeElement = (ATypeElement) aElement;
+      aTypeElement
+          .innerTypes.getVivify(typePath)
+          .tlAnnotationsHere.add(makeAnnotation());
+    } else {
+      throw new RuntimeException("Unknown FIELD_COMPONENT: " + aElement);
+    }
+  }
+
+  /**
+   * Creates the method receiver annotation on aMethod.
+   * Works for {@link TypeReference#METHOD_RECEIVER}.
+   * @param aMethod the annotatable method in which annotation will be inserted
+   */
+  private void handleMethodReceiver(AMethod aMethod) {
+     aMethod.receiver.type
+         .innerTypes.getVivify(typePath)
+         .tlAnnotationsHere.add(makeAnnotation());
+  }
+
+  /**
+   * Creates the local variable annotation on aMethod.
+   * Works for {@link TypeReference#LOCAL_VARIABLE} and {@link TypeReference#RESOURCE_VARIABLE}.
+   * @param aMethod the annotatable method in which annotation will be inserted
+   */
+  private void handleMethodLocalVariable(AMethod aMethod) {
+    aMethod.body.locals.getVivify(makeLocalLocation())
+        .type.innerTypes.getVivify(typePath)
+        .tlAnnotationsHere.add(makeAnnotation());
+  }
+
+  /**
+   * Creates the object creation annotation on aMethod.
+   * Works for {@link TypeReference#NEW}
+   * @param aMethod the annotatable method in which annotation will be inserted
+   */
+  private void handleMethodObjectCreation(AMethod aMethod) {
+    aMethod.body.news.getVivify(makeOffset(false))
+        .innerTypes.getVivify(typePath)
+        .tlAnnotationsHere.add(makeAnnotation());
+  }
+
+  /**
+   * Creates the method parameter type generic/array annotation on aMethod.
+   * Works for {@link TypeReference#METHOD_FORMAL_PARAMETER}
+   * @param aMethod the annotatable method in which annotation will be inserted
+   */
+  private void handleMethodFormalParameter(AMethod aMethod) {
+     aMethod.parameters.getVivify(typeReference.getFormalParameterIndex())
+        .type.innerTypes.getVivify(typePath)
+        .tlAnnotationsHere.add(makeAnnotation());
+  }
+
+  /**
+   * Creates the typecast annotation on aMethod.
+   * Works for {@link TypeReference#CAST}
+   * @param aMethod the annotatable method in which annotation will be inserted
+   */
+  private void handleMethodTypecast(AMethod aMethod) {
+    aMethod.body.typecasts.getVivify(makeOffset(true))
+        .innerTypes.getVivify(typePath)
+        .tlAnnotationsHere.add(makeAnnotation());
+  }
+
+  /**
+   * Creates the method return type generic/array annotation on aMethod.
+   * Works for {@link TypeReference#METHOD_RETURN}
+   * @param aMethod the annotatable method in which annotation will be inserted
+   */
+  private void handleMethodReturnType(AMethod aMethod) {
+    // TODO: why is this traced and not other stuff?
+    if (trace) { System.out.printf("handleMethodReturnType(%s)%n", aMethod); }
+      aMethod.returnType
+          .innerTypes.getVivify(typePath)
+          .tlAnnotationsHere.add(makeAnnotation());
+  }
+
+  /**
+   * Creates the method instance of annotation on aMethod.
+   * Works for {@link TypeReference#INSTANCEOF}
+   * @param aMethod the annotatable method in which annotation will be inserted
+   */
+  private void handleMethodInstanceOf(AMethod aMethod) {
+    aMethod.body.typecasts.getVivify(makeOffset(false))
+        .innerTypes.getVivify(typePath)
+        .tlAnnotationsHere.add(makeAnnotation());
+  }
+
+    /**
+     * Works for {@link TypeReference#THROWS}
+     * @param aMethod the annotatable method in which annotation will be inserted
+     */
+  private void handleThrows(AMethod aMethod) {
+    TypeIndexLocation typeIndexLocation = new TypeIndexLocation(typeReference.getExceptionIndex());
+    aMethod.throwsException.getVivify(typeIndexLocation)
+        .tlAnnotationsHere.add(makeAnnotation());
+  }
+
+    /**
+     * Works for {@link TypeReference#METHOD_REFERENCE} and {@link TypeReference#CONSTRUCTOR_REFERENCE}.
+     * @param aMethod the annotatable method in which annotation will be inserted
+     */
+  private void handleMethodReference(AMethod aMethod) {
+    aMethod.body.refs.getVivify(makeOffset(false))
+        .innerTypes.getVivify(typePath)
+        .tlAnnotationsHere.add(makeAnnotation());
+  }
+
+    /**
+     * Works for {@link TypeReference#METHOD_REFERENCE_TYPE_ARGUMENT} and
+     * {@link TypeReference#CONSTRUCTOR_REFERENCE_TYPE_ARGUMENT}.
+     * @param aMethod the annotatable method in which annotation will be inserted
+     */
+  private void handleReferenceTypeArgument(AMethod aMethod) {
+    aMethod.body.refs.getVivify(makeOffset(true))
+        .innerTypes.getVivify(typePath)
+        .tlAnnotationsHere.add(makeAnnotation());
+
+  }
+
+  /**
+   * Creates the method type parameter bound annotation on aMethod.
+   * Works for {@link TypeReference#METHOD_TYPE_PARAMETER}
+   * @param aMethod the annotatable method in which annotation will be inserted
+   */
+  private void handleMethodTypeParameter(AMethod aMethod) {
+    aMethod.bounds.getVivify(makeBoundLocation())
+        .tlAnnotationsHere.add(makeAnnotation());
+  }
+
+  /**
+   * Creates the method type parameter bound annotation on aMethod.
+   * Works for {@link TypeReference#METHOD_TYPE_PARAMETER_BOUND}
+   * @param aMethod the annotatable method in which annotation will be inserted
+   */
+  private void handleMethodTypeParameterBound(AMethod aMethod) {
+    aMethod.bounds.getVivify(makeBoundLocation())
+        .innerTypes.getVivify(typePath)
+        .tlAnnotationsHere.add(makeAnnotation());
+  }
+
+    /**
+     * Works for {@link TypeReference#METHOD_INVOCATION_TYPE_ARGUMENT} and {@link TypeReference#CONSTRUCTOR_INVOCATION_TYPE_ARGUMENT}
+     * @param aMethod the annotatable method in which annotation will be inserted
+     */
+  private void handleInvocationTypeArgument(AMethod aMethod) {
+    aMethod.body.calls.getVivify(makeOffset(true))
+        .innerTypes.getVivify(typePath)
+        .tlAnnotationsHere.add(makeAnnotation());
+  }
+
+  /**
+   * Returns a LocalLocation for this annotation.
+   */
+  private LocalLocation makeLocalLocation() {
+    int index = xIndexArgs.get(0);
+    int length = xLengthArgs.get(0);
+    int start = xStartPcArgs.get(0);
+    return new LocalLocation(index, start, length);
+  }
+
+
+  /**
+   * Returns the offset for this annotation.
+   */
+  private RelativeLocation makeOffset(boolean needTypeIndex) {
+    int offset = xOffsetArgs.get(0);
+    int typeIndex = needTypeIndex ? typeReference.getTypeArgumentIndex() : -1;
+    return RelativeLocation.createOffset(offset, typeIndex);
+  }
+
+    /**
+     * Returns the bound location for this annotation.
+     * Works with {@link TypeReference#CLASS_TYPE_PARAMETER}, {@link TypeReference#METHOD_TYPE_PARAMETER},
+     * {@link TypeReference#CLASS_TYPE_PARAMETER_BOUND} or {@link TypeReference#METHOD_TYPE_PARAMETER_BOUND}.
+     */
+    private BoundLocation makeBoundLocation() {
+      return typeReference.getSort() == TypeReference.CLASS_TYPE_PARAMETER_BOUND ||
+          typeReference.getSort() == TypeReference.METHOD_TYPE_PARAMETER_BOUND
+          ? new BoundLocation(typeReference.getTypeParameterIndex(), typeReference.getTypeParameterBoundIndex())
+          : new BoundLocation(typeReference.getTypeParameterIndex(), -1);
+      // TODO: Give up on unbounded wildcards for now!
+//      if (!xParamIndexArgs.isEmpty()) {
+//        return new BoundLocation(xParamIndexArgs.get(0), xBoundIndexArgs.get(0));
+//      } else {
+//        if (strict) { System.err.println("makeBoundLocation with empty xParamIndexArgs!"); }
+//        return new BoundLocation(Integer.MAX_VALUE, Integer.MAX_VALUE);
+//      }
+    }
+
+    // TODO: makeExceptionIndexLocation?
+
 //    /**
 //     * Hook for NestedAnnotationSceneReader; overridden by
 //     * ArrayAnnotationSceneReader to add an array element instead of a field
@@ -876,15 +900,14 @@ extends ClassVisitor {
   private class NestedAnnotationSceneReader extends AnnotationSceneReader {
     private final AnnotationSceneReader parent;
     private final String name;
-    // private final String desc;
+    // private final String descriptor;
 
-    public NestedAnnotationSceneReader(int api, AnnotationSceneReader parent,
-        String name, String desc) {
-      super(api, desc, parent.visible, parent.aElement);
-      if (trace) { System.out.printf("NestedAnnotationSceneReader(%s, %s, %s)%n", parent, name, desc); }
+    public NestedAnnotationSceneReader(int api, AnnotationSceneReader parent, String name, String descriptor) {
+      super(api, descriptor, parent.visible, parent.aElement);
+      if (trace) { System.out.printf("NestedAnnotationSceneReader(%s, %s, %s)%n", parent, name, descriptor); }
       this.parent = parent;
       this.name = name;
-      // this.desc = desc;
+      // this.descriptor = descriptor;
     }
 
     @Override
@@ -968,9 +991,9 @@ extends ClassVisitor {
     }
 
     @Override
-    public void visitEnum(String name, String desc, String value) {
-      if (trace) { System.out.printf("visitEnum(%s, %s, %s) in %s (%s)%n", name, desc, value, this, this.getClass()); }
-      prepareForElement(new EnumAFT(classDescToName(desc)));
+    public void visitEnum(String name, String descriptor, String value) {
+      if (trace) { System.out.printf("visitEnum(%s, %s, %s) in %s (%s)%n", name, descriptor, value, this, this.getClass()); }
+      prepareForElement(new EnumAFT(classDescToName(descriptor)));
       assert arrayBuilder != null;
       arrayBuilder.appendElement(value);
     }
@@ -981,12 +1004,12 @@ extends ClassVisitor {
     }
 
     @Override
-    public AnnotationVisitor visitAnnotation(String name, String desc) {
-      if (trace) { System.out.printf("visitAnnotation(%s, %s) in %s (%s)%n", name, desc, this, this.getClass()); }
+    public AnnotationVisitor visitAnnotation(String name, String descriptor) {
+      if (trace) { System.out.printf("visitAnnotation(%s, %s) in %s (%s)%n", name, descriptor, this, this.getClass()); }
       // The NASR will regurgitate the name we pass here when it calls
       // supplySubannotation.  Since we ignore the name there, it doesn't
       // matter what name we pass here.
-      return new NestedAnnotationSceneReader(this.api, this, name, desc);
+      return new NestedAnnotationSceneReader(this.api, this, name, descriptor);
     }
 
     @Override
@@ -1019,7 +1042,7 @@ extends ClassVisitor {
   private class FieldAnnotationSceneReader extends FieldVisitor {
 
 //    private final String name;
-//    private final String desc;
+//    private final String descriptor;
 //    private final String signature;
 //    private final Object value;
     private final AElement aField;
@@ -1030,15 +1053,15 @@ extends ClassVisitor {
     }
 
     @Override
-    public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
-      if (trace) { System.out.printf("visitAnnotation(%s, %s) in %s (%s)%n", desc, visible, this, this.getClass()); }
-      return new AnnotationSceneReader(this.api, desc, visible, aField);
+    public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
+      if (trace) { System.out.printf("visitAnnotation(%s, %s) in %s (%s)%n", descriptor, visible, this, this.getClass()); }
+      return new AnnotationSceneReader(this.api, descriptor, visible, aField);
     }
 
     @Override
-    public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String desc, boolean visible) {
-      if (trace) { System.out.printf("visitTypeAnnotation(%s, %s, %s); aField=%s, aField.type=%s in %s (%s)%n", desc, visible, aField, aField.type, this, this.getClass()); }
-      return new TypeAnnotationSceneReader(this.api, desc, visible, aField.type, typeRef, typePath, null, null, null);
+    public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String descriptor, boolean visible) {
+      if (trace) { System.out.printf("visitTypeAnnotation(%s, %s, %s); aField=%s, aField.type=%s in %s (%s)%n", descriptor, visible, aField, aField.type, this, this.getClass()); }
+      return new TypeAnnotationSceneReader(this.api, descriptor, visible, aField.type, typeRef, typePath, null, null, null);
     }
   }
 
@@ -1055,33 +1078,33 @@ extends ClassVisitor {
   private class MethodAnnotationSceneReader extends MethodVisitor {
 
     private final String name;
-    private final String desc;
+    private final String descriptor;
     private final String signature;
     private final AElement aMethod;
 
-    MethodAnnotationSceneReader(int api, String name, String desc, String signature, AElement aMethod) {
+    MethodAnnotationSceneReader(int api, String name, String descriptor, String signature, AElement aMethod) {
       super(api);
       this.name = name;
-      this.desc = desc;
+      this.descriptor = descriptor;
       this.signature = signature;
       this.aMethod = aMethod;
     }
 
     @Override
-    public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
-      if (trace) { System.out.printf("visitAnnotation(%s, %s) in %s (%s)%n", desc, visible, this, this.getClass()); }
-      return new AnnotationSceneReader(this.api, desc, visible, aMethod);
+    public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
+      if (trace) { System.out.printf("visitAnnotation(%s, %s) in %s (%s)%n", descriptor, visible, this, this.getClass()); }
+      return new AnnotationSceneReader(this.api, descriptor, visible, aMethod);
     }
 
     @Override
-    public AnnotationVisitor visitParameterAnnotation(int parameter, String desc, boolean visible) {
-      if (trace) { System.out.printf("visitParameterAnnotation(%s, %s, %s) in %s (%s)%n", parameter, desc, visible, this, this.getClass()); }
-      return new AnnotationSceneReader(this.api, desc, visible,
+    public AnnotationVisitor visitParameterAnnotation(int parameter, String descriptor, boolean visible) {
+      if (trace) { System.out.printf("visitParameterAnnotation(%s, %s, %s) in %s (%s)%n", parameter, descriptor, visible, this, this.getClass()); }
+      return new AnnotationSceneReader(this.api, descriptor, visible,
               ((AMethod) aMethod).parameters.getVivify(parameter));
     }
 
 //    @Override
-//    public void visitLocalVariable(String name, String desc, String signature,
+//    public void visitLocalVariable(String name, String descriptor, String signature,
 //        Label start, Label end, int index) {
 //      // TODO!
 //    }
