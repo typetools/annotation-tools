@@ -2,12 +2,13 @@ package scenelib.annotations.el;
 
 import org.objectweb.asm.Label;
 
+import java.lang.reflect.Field;
 import java.util.Arrays;
 
 
 /**
  * A {@link LocalLocation} holds location information for a local
- * variable: slot index, scope start, and scope length.
+ * variable: slot index, scope start, and scope end.
  */
 public final class LocalLocation {
 
@@ -19,6 +20,38 @@ public final class LocalLocation {
         this.start = start;
         this.end = end;
         this.index = index;
+    }
+
+    public LocalLocation(int index, int scopeStart, int scopeLength) {
+        // Changes values reflectively.
+        this.index = new int[] {index};
+        this.start = new Label[] {new Label()};
+        this.end = new Label[] {new Label()};
+
+        try {
+            Field flagsField = Label.class.getDeclaredField("flags");
+            Field bytecodeOffsetField = Label.class.getDeclaredField("bytecodeOffset");
+            Field FLAG_RESOLVED_FIELD = Label.class.getDeclaredField("FLAG_RESOLVED");
+
+            flagsField.setAccessible(true);
+            bytecodeOffsetField.setAccessible(true);
+            FLAG_RESOLVED_FIELD.setAccessible(true);
+
+            int FLAG_RESOLVED = (Integer) FLAG_RESOLVED_FIELD.get(null);
+
+            short flagsStart = (Short) flagsField.get(start[0]);
+            short flagsEnd = (Short) flagsField.get(end[0]);
+            flagsStart |= FLAG_RESOLVED;
+            flagsEnd |= FLAG_RESOLVED;
+
+            flagsField.set(start[0], flagsStart);
+            bytecodeOffsetField.set(start[0], scopeStart);
+
+            flagsField.set(end[0], flagsEnd);
+            bytecodeOffsetField.set(end[0], scopeStart + scopeLength);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
