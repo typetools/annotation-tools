@@ -414,17 +414,19 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
    * Has xav visit the local varialbe information in loc.
    */
   private void visitLocalVar(AnnotationVisitor xav, LocalLocation loc) {
-    xav.visitXNumEntries(1);
-    xav.visitXStartPc(loc.scopeStart);
-    xav.visitXLength(loc.scopeLength);
-    xav.visitXIndex(loc.index);
+    // TODO: CHANGE
+//    xav.visitXNumEntries(1);
+//    xav.visitXStartPc(loc.scopeStart);
+//    xav.visitXLength(loc.scopeLength);
+//    xav.visitXIndex(loc.index);
   }
 
   /**
    * Has xav visit the offset.
    */
+  // FIXME
   private void visitOffset(AnnotationVisitor xav, int offset) {
-    xav.visitXOffset(offset);
+    // xav.visitXOffset(offset);
   }
 
 //  private void visitParameterIndex(AnnotationVisitor xav, int index) {
@@ -696,6 +698,14 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
     }
 
     /**
+     * Has this visit the extended annotation in tla and returns the
+     * resulting visitor. The sort of the typeReference should be LOCAL_VARIABLE or RESOURCE_VARIABLE
+     */
+    private AnnotationVisitor visitLocalVariableAnnotation(Annotation tla, TypeReference typeReference, TypePath typePath, LocalLocation localLocation) {
+      return super.visitLocalVariableAnnotation(typeReference.getValue(), typePath, localLocation.start, localLocation.end, localLocation.index, classNameToDesc(name(tla)), isRuntimeRetention(tla));
+    }
+
+    /**
      * Has this visit the parameter annotation in tla and returns the
      * resulting visitor.
      */
@@ -819,12 +829,9 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
             continue;
           }
           // FIXME
-          Label label0 = new Label();
-          this.visitLabel(label0);
-          this.visitLineNumber(localLocation);
-          AnnotationVisitor xav = visitLocalVariableAnnotation(tla, typeReference, InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION.getTypePath());
+          AnnotationVisitor xav = visitLocalVariableAnnotation(tla, typeReference, null, localLocation);
 //          visitTargetType(xav, TargetType.LOCAL_VARIABLE);
-          visitLocalVar(xav, localLocation);
+//          visitLocalVar(xav, localLocation);
 //          visitLocations(xav, InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION);
           visitFields(xav, tla);
           xav.visitEnd();
@@ -839,12 +846,11 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
             if (shouldSkip(tla)) {
               continue;
             }
-// FIXME
-            AnnotationVisitor xav = visitLocalVariableAnnotation(tla, typeReference, localVariableLocation);
+            AnnotationVisitor xav = visitLocalVariableAnnotation(tla, typeReference, localVariableLocation, localLocation);
 //            AnnotationVisitor xav = visitTypeAnnotation(tla, typeReference, localVariableLocation.getTypePath());
 //            visitTargetType(xav, TargetType.LOCAL_VARIABLE);
             // information for raw type (local variable)
-            visitLocalVar(xav, localLocation);
+//            visitLocalVar(xav, localLocation);
             // information for generic/array (on local variable)
 //            visitLocations(xav, localVariableLocation);
             visitFields(xav, tla);
@@ -1154,6 +1160,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
         }
         // int offset = entry.getKey().offset;
         // int typeIndex = entry.getKey().type_index;
+        RelativeLocation relativeLocation = entry.getKey();
         AMethod aLambda = entry.getValue();
 
         for (Map.Entry<Integer, AField> e0 : aLambda.parameters.entrySet()) {
@@ -1178,7 +1185,8 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
             // FIXME
             AnnotationVisitor xav = visitTypeAnnotation(tla, typeReference, InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION.getTypePath());
 //            visitTargetType(xav, TargetType.METHOD_FORMAL_PARAMETER);
-             visitOffset(xav, offset);
+            // TODO: We have offset now, do we need to do anything with it?
+//             visitOffset(xav, offset);
             // visitTypeIndex(xav, typeIndex);
 //            visitParameterIndex(xav, index);
 //            visitLocations(xav, InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION);
@@ -1196,7 +1204,8 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
 
               AnnotationVisitor xav = visitTypeAnnotation(tla, typeReference, aParameterLocation);
 //              visitTargetType(xav, TargetType.METHOD_FORMAL_PARAMETER);
-               visitOffset(xav, offset);
+              // TODO: We have offset. Do we need to use it anywhere?
+//               visitOffset(xav, offset);
               // visitTypeIndex(xav, typeIndex);
 //              visitParameterIndex(xav, index);
 //              visitLocations(xav, aParameterLocation);
@@ -1396,7 +1405,8 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
 
         AnnotationVisitor xav = super.visitInsnAnnotation(typeReference.getValue(), InnerTypeLocation.EMPTY_INNER_TYPE_LOCATION.getTypePath(),
             classNameToDesc(name(tla)), isRuntimeRetention(tla));
-        visitOffset(xav, offset);
+        // TODO: We have offset. Do we need to use it anywhere?
+//        visitOffset(xav, offset);
         visitFields(xav, tla);
         xav.visitEnd();
       }
@@ -1413,7 +1423,8 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
 
           AnnotationVisitor xav = super.visitInsnAnnotation(typeReference.getValue(), location,
               classNameToDesc(name(tla)), isRuntimeRetention(tla));
-          visitOffset(xav, offset);
+          // TODO: We have offset. Do we need to use it anywhere?
+//          visitOffset(xav, offset);
           visitFields(xav, tla);
           xav.visitEnd();
         }
