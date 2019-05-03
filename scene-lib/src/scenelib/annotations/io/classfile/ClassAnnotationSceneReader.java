@@ -835,10 +835,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
    * Returns a LocalLocation for this annotation.
    */
   private LocalLocation makeLocalLocation() {
-    int index = xIndexArgs.get(0);
-    int length = xLengthArgs.get(0);
-    int start = xStartPcArgs.get(0);
-    return new LocalLocation(index, start, length);
+    return new LocalLocation(start, end, index);
   }
 
 
@@ -846,6 +843,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
    * Returns the offset for this annotation.
    */
   private RelativeLocation makeOffset(boolean needTypeIndex) {
+    // TODO: Somehow get this offset.
     int offset = xOffsetArgs.get(0);
     int typeIndex = needTypeIndex ? typeReference.getTypeArgumentIndex() : -1;
     return RelativeLocation.createOffset(offset, typeIndex);
