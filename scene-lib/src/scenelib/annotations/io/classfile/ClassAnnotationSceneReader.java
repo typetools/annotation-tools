@@ -611,63 +611,39 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
       }
     }
 
-    // The following are utility methods to facilitate creating all the
-    // necessary data structures in the scene library.
+  /**
+   * Creates the class type parameter bound annotation on aClass.
+   * Works for {@link TypeReference#CLASS_TYPE_PARAMETER}
+   * @param aClass the annotatable class in which annotation will be inserted
+   */
+  private void handleClassTypeParameter(AClass aClass) {
+    // TODO: Any reason this does not need the "innerTypes.getVivify(typePath)" part that is there in
+    //  handleClassTypeParameterBound()?
+    aClass.bounds.getVivify(makeBoundLocation())
+        .tlAnnotationsHere.add(makeAnnotation());
+  }
 
-    /*
-     * Returns an annotation, ready to be placed into the scene, from
-     *  the information visited.
-     */
-//    public Annotation makeAnnotation() {
-//      return annotationBuilder.finish();
-//    }
-
-    /*
-     * Returns the bound location for this annotation.
-     */
-//    private BoundLocation makeTypeParameterLocation() {
-//      return new BoundLocation(typeReference.getTypeParameterIndex(), -1);
-////      if (!xParamIndexArgs.isEmpty()) {
-////        return new BoundLocation(xParamIndexArgs.get(0), -1);
-////      } else {
-////        if (strict) { System.err.println("makeTypeParameterLocation with empty xParamIndexArgs!"); }
-////        return new BoundLocation(Integer.MAX_VALUE, -1);
-////      }
-//    }
-
-    /**
-     * Creates the class type parameter bound annotation on aClass.
-     * Works for {@link TypeReference#CLASS_TYPE_PARAMETER}
-     * @param aClass the annotatable class in which annotation will be inserted
-     */
-    private void handleClassTypeParameter(AClass aClass) {
-      // TODO: Any reason this does not need the "innerTypes.getVivify(typePath)" part that is there in
-      //  handleClassTypeParameterBound()?
-      aClass.bounds.getVivify(makeBoundLocation())
-          .tlAnnotationsHere.add(makeAnnotation());
-    }
-
-    /**
-     * Creates the class type parameter bound annotation on aClass.
-     * Works for {@link TypeReference#CLASS_TYPE_PARAMETER_BOUND}
-     */
-    private void handleClassTypeParameterBound(AClass aClass) {
-      aClass.bounds.getVivify(makeBoundLocation())
-          .innerTypes.getVivify(typePath)
-          .tlAnnotationsHere.add(makeAnnotation());
+  /**
+   * Creates the class type parameter bound annotation on aClass.
+   * Works for {@link TypeReference#CLASS_TYPE_PARAMETER_BOUND}
+   */
+  private void handleClassTypeParameterBound(AClass aClass) {
+    aClass.bounds.getVivify(makeBoundLocation())
+        .innerTypes.getVivify(typePath)
+        .tlAnnotationsHere.add(makeAnnotation());
 //      }
-    }
+  }
 
-    /**
-     * Creates the class extends annotation on aClass.
-     * Works for {@link TypeReference#CLASS_EXTENDS}
-     */
-    private void handleClassExtends(AClass aClass) {
-      TypeIndexLocation typeIndexLocation = new TypeIndexLocation(typeReference.getSuperTypeIndex());
-      aClass.extendsImplements.getVivify(typeIndexLocation)
-          .innerTypes.getVivify(typePath)
-          .tlAnnotationsHere.add(makeAnnotation());
-    }
+  /**
+   * Creates the class extends annotation on aClass.
+   * Works for {@link TypeReference#CLASS_EXTENDS}
+   */
+  private void handleClassExtends(AClass aClass) {
+    TypeIndexLocation typeIndexLocation = new TypeIndexLocation(typeReference.getSuperTypeIndex());
+    aClass.extendsImplements.getVivify(typeIndexLocation)
+        .innerTypes.getVivify(typePath)
+        .tlAnnotationsHere.add(makeAnnotation());
+  }
 
   /**
    * Creates the inner annotation on aElement.innerTypes.
@@ -690,114 +666,14 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
   }
 
   /**
-   * Creates the method receiver annotation on aMethod.
-   * Works for {@link TypeReference#METHOD_RECEIVER}.
-   * @param aMethod the annotatable method in which annotation will be inserted
-   */
-  private void handleMethodReceiver(AMethod aMethod) {
-     aMethod.receiver.type
-         .innerTypes.getVivify(typePath)
-         .tlAnnotationsHere.add(makeAnnotation());
-  }
-
-  /**
-   * Creates the local variable annotation on aMethod.
-   * Works for {@link TypeReference#LOCAL_VARIABLE} and {@link TypeReference#RESOURCE_VARIABLE}.
-   * @param aMethod the annotatable method in which annotation will be inserted
-   */
-  private void handleMethodLocalVariable(AMethod aMethod) {
-    aMethod.body.locals.getVivify(makeLocalLocation())
-        .type.innerTypes.getVivify(typePath)
-        .tlAnnotationsHere.add(makeAnnotation());
-  }
-
-  /**
-   * Creates the object creation annotation on aMethod.
-   * Works for {@link TypeReference#NEW}
-   * @param aMethod the annotatable method in which annotation will be inserted
-   */
-  private void handleMethodObjectCreation(AMethod aMethod) {
-    aMethod.body.news.getVivify(makeOffset(false))
-        .innerTypes.getVivify(typePath)
-        .tlAnnotationsHere.add(makeAnnotation());
-  }
-
-  /**
    * Creates the method parameter type generic/array annotation on aMethod.
    * Works for {@link TypeReference#METHOD_FORMAL_PARAMETER}
    * @param aMethod the annotatable method in which annotation will be inserted
    */
   private void handleMethodFormalParameter(AMethod aMethod) {
-     aMethod.parameters.getVivify(typeReference.getFormalParameterIndex())
+    aMethod.parameters.getVivify(typeReference.getFormalParameterIndex())
         .type.innerTypes.getVivify(typePath)
         .tlAnnotationsHere.add(makeAnnotation());
-  }
-
-  /**
-   * Creates the typecast annotation on aMethod.
-   * Works for {@link TypeReference#CAST}
-   * @param aMethod the annotatable method in which annotation will be inserted
-   */
-  private void handleMethodTypecast(AMethod aMethod) {
-    aMethod.body.typecasts.getVivify(makeOffset(true))
-        .innerTypes.getVivify(typePath)
-        .tlAnnotationsHere.add(makeAnnotation());
-  }
-
-  /**
-   * Creates the method return type generic/array annotation on aMethod.
-   * Works for {@link TypeReference#METHOD_RETURN}
-   * @param aMethod the annotatable method in which annotation will be inserted
-   */
-  private void handleMethodReturnType(AMethod aMethod) {
-    // TODO: why is this traced and not other stuff?
-    if (trace) { System.out.printf("handleMethodReturnType(%s)%n", aMethod); }
-      aMethod.returnType
-          .innerTypes.getVivify(typePath)
-          .tlAnnotationsHere.add(makeAnnotation());
-  }
-
-  /**
-   * Creates the method instance of annotation on aMethod.
-   * Works for {@link TypeReference#INSTANCEOF}
-   * @param aMethod the annotatable method in which annotation will be inserted
-   */
-  private void handleMethodInstanceOf(AMethod aMethod) {
-    aMethod.body.typecasts.getVivify(makeOffset(false))
-        .innerTypes.getVivify(typePath)
-        .tlAnnotationsHere.add(makeAnnotation());
-  }
-
-    /**
-     * Works for {@link TypeReference#THROWS}
-     * @param aMethod the annotatable method in which annotation will be inserted
-     */
-  private void handleThrows(AMethod aMethod) {
-    TypeIndexLocation typeIndexLocation = new TypeIndexLocation(typeReference.getExceptionIndex());
-    aMethod.throwsException.getVivify(typeIndexLocation)
-        .tlAnnotationsHere.add(makeAnnotation());
-  }
-
-    /**
-     * Works for {@link TypeReference#METHOD_REFERENCE} and {@link TypeReference#CONSTRUCTOR_REFERENCE}.
-     * @param aMethod the annotatable method in which annotation will be inserted
-     */
-  private void handleMethodReference(AMethod aMethod) {
-    aMethod.body.refs.getVivify(makeOffset(false))
-        .innerTypes.getVivify(typePath)
-        .tlAnnotationsHere.add(makeAnnotation());
-  }
-
-    /**
-     * Works for {@link TypeReference#METHOD_REFERENCE_TYPE_ARGUMENT} and
-     * {@link TypeReference#CONSTRUCTOR_REFERENCE_TYPE_ARGUMENT}.
-     * @param aMethod the annotatable method in which annotation will be inserted
-     */
-  private void handleReferenceTypeArgument(AMethod aMethod) {
-    aMethod.body.refs.getVivify(makeOffset(true))
-        .innerTypes.getVivify(typePath)
-        .tlAnnotationsHere.add(makeAnnotation());
-
   }
 
   /**
@@ -821,13 +697,113 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
         .tlAnnotationsHere.add(makeAnnotation());
   }
 
-    /**
-     * Works for {@link TypeReference#METHOD_INVOCATION_TYPE_ARGUMENT} and {@link TypeReference#CONSTRUCTOR_INVOCATION_TYPE_ARGUMENT}
-     * @param aMethod the annotatable method in which annotation will be inserted
-     */
+  /**
+   * Creates the method return type generic/array annotation on aMethod.
+   * Works for {@link TypeReference#METHOD_RETURN}
+   * @param aMethod the annotatable method in which annotation will be inserted
+   */
+  private void handleMethodReturnType(AMethod aMethod) {
+    // TODO: why is this traced and not other stuff?
+    if (trace) { System.out.printf("handleMethodReturnType(%s)%n", aMethod); }
+    aMethod.returnType
+        .innerTypes.getVivify(typePath)
+        .tlAnnotationsHere.add(makeAnnotation());
+  }
+
+  /**
+   * Creates the method receiver annotation on aMethod.
+   * Works for {@link TypeReference#METHOD_RECEIVER}.
+   * @param aMethod the annotatable method in which annotation will be inserted
+   */
+  private void handleMethodReceiver(AMethod aMethod) {
+    aMethod.receiver.type
+        .innerTypes.getVivify(typePath)
+        .tlAnnotationsHere.add(makeAnnotation());
+  }
+
+  /**
+   * Works for {@link TypeReference#THROWS}
+   * @param aMethod the annotatable method in which annotation will be inserted
+   */
+  private void handleThrows(AMethod aMethod) {
+    TypeIndexLocation typeIndexLocation = new TypeIndexLocation(typeReference.getExceptionIndex());
+    aMethod.throwsException.getVivify(typeIndexLocation)
+        .tlAnnotationsHere.add(makeAnnotation());
+  }
+
+  /**
+   * Creates the object creation annotation on aMethod.
+   * Works for {@link TypeReference#NEW}
+   * @param aMethod the annotatable method in which annotation will be inserted
+   */
+  private void handleMethodObjectCreation(AMethod aMethod) {
+    aMethod.body.news.getVivify(makeOffset(false))
+        .innerTypes.getVivify(typePath)
+        .tlAnnotationsHere.add(makeAnnotation());
+  }
+
+  /**
+   * Creates the method instance of annotation on aMethod.
+   * Works for {@link TypeReference#INSTANCEOF}
+   * @param aMethod the annotatable method in which annotation will be inserted
+   */
+  private void handleMethodInstanceOf(AMethod aMethod) {
+    aMethod.body.typecasts.getVivify(makeOffset(false))
+        .innerTypes.getVivify(typePath)
+        .tlAnnotationsHere.add(makeAnnotation());
+  }
+
+  /**
+   * Works for {@link TypeReference#METHOD_REFERENCE} and {@link TypeReference#CONSTRUCTOR_REFERENCE}.
+   * @param aMethod the annotatable method in which annotation will be inserted
+   */
+  private void handleMethodReference(AMethod aMethod) {
+    aMethod.body.refs.getVivify(makeOffset(false))
+        .innerTypes.getVivify(typePath)
+        .tlAnnotationsHere.add(makeAnnotation());
+  }
+
+  /**
+   * Creates the typecast annotation on aMethod.
+   * Works for {@link TypeReference#CAST}
+   * @param aMethod the annotatable method in which annotation will be inserted
+   */
+  private void handleMethodTypecast(AMethod aMethod) {
+    aMethod.body.typecasts.getVivify(makeOffset(true))
+        .innerTypes.getVivify(typePath)
+        .tlAnnotationsHere.add(makeAnnotation());
+  }
+
+  /**
+   * Works for {@link TypeReference#METHOD_INVOCATION_TYPE_ARGUMENT} and {@link TypeReference#CONSTRUCTOR_INVOCATION_TYPE_ARGUMENT}
+   * @param aMethod the annotatable method in which annotation will be inserted
+   */
   private void handleInvocationTypeArgument(AMethod aMethod) {
     aMethod.body.calls.getVivify(makeOffset(true))
         .innerTypes.getVivify(typePath)
+        .tlAnnotationsHere.add(makeAnnotation());
+  }
+
+  /**
+   * Works for {@link TypeReference#METHOD_REFERENCE_TYPE_ARGUMENT} and
+   * {@link TypeReference#CONSTRUCTOR_REFERENCE_TYPE_ARGUMENT}.
+   * @param aMethod the annotatable method in which annotation will be inserted
+   */
+  private void handleReferenceTypeArgument(AMethod aMethod) {
+    aMethod.body.refs.getVivify(makeOffset(true))
+        .innerTypes.getVivify(typePath)
+        .tlAnnotationsHere.add(makeAnnotation());
+
+  }
+
+  /**
+   * Creates the local variable annotation on aMethod.
+   * Works for {@link TypeReference#LOCAL_VARIABLE} and {@link TypeReference#RESOURCE_VARIABLE}.
+   * @param aMethod the annotatable method in which annotation will be inserted
+   */
+  private void handleMethodLocalVariable(AMethod aMethod) {
+    aMethod.body.locals.getVivify(makeLocalLocation())
+        .type.innerTypes.getVivify(typePath)
         .tlAnnotationsHere.add(makeAnnotation());
   }
 
@@ -837,7 +813,6 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
   private LocalLocation makeLocalLocation() {
     return new LocalLocation(start, end, index);
   }
-
 
   /**
    * Returns the offset for this annotation.
@@ -868,8 +843,24 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
 //      }
     }
 
+    @Override
+    public String toString() {
+      return "TypeAnnotationSceneReader{" +
+          "aElement=" + aElement +
+          ", visible=" + visible +
+          ", typeReference=" + typeReference +
+          ", typePath=" + typePath +
+          ", start=" + Arrays.toString(start) +
+          ", end=" + Arrays.toString(end) +
+          ", index=" + Arrays.toString(index) +
+          '}';
+    }
     // TODO: makeExceptionIndexLocation?
 
+//    public String toStringOld() {
+//      return String.format("(TypeAnnotationSceneReader: %s %s %s %s)",
+//          aElement, visible, typeReference, typePath);
+//    }
 //    /**
 //     * Hook for NestedAnnotationSceneReader; overridden by
 //     * ArrayAnnotationSceneReader to add an array element instead of a field
@@ -879,11 +870,29 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
 //          new AnnotationAFT(annotation.def()), annotation);
 //    }
 
-    @Override
-    public String toString() {
-      return String.format("(TypeAnnotationSceneReader: %s %s %s %s)",
-          aElement, visible, typeReference, typePath);
-    }
+    // The following are utility methods to facilitate creating all the
+    // necessary data structures in the scene library.
+
+    /*
+     * Returns an annotation, ready to be placed into the scene, from
+     *  the information visited.
+     */
+//    public Annotation makeAnnotation() {
+//      return annotationBuilder.finish();
+//    }
+
+    /*
+     * Returns the bound location for this annotation.
+     */
+//    private BoundLocation makeTypeParameterLocation() {
+//      return new BoundLocation(typeReference.getTypeParameterIndex(), -1);
+////      if (!xParamIndexArgs.isEmpty()) {
+////        return new BoundLocation(xParamIndexArgs.get(0), -1);
+////      } else {
+////        if (strict) { System.err.println("makeTypeParameterLocation with empty xParamIndexArgs!"); }
+////        return new BoundLocation(Integer.MAX_VALUE, -1);
+////      }
+//    }
   }
 
 
@@ -900,7 +909,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
     private final String name;
     // private final String descriptor;
 
-    public NestedAnnotationSceneReader(int api, AnnotationSceneReader parent, String name, String descriptor) {
+    NestedAnnotationSceneReader(int api, AnnotationSceneReader parent, String name, String descriptor) {
       super(api, descriptor, parent.visible, parent.aElement);
       if (trace) { System.out.printf("NestedAnnotationSceneReader(%s, %s, %s)%n", parent, name, descriptor); }
       this.parent = parent;
@@ -944,7 +953,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
 
     // The element type may be unknown when this is called.
     // But AnnotationSceneReader expects to know the element type.
-    public ArrayAnnotationSceneReader(int api, AnnotationSceneReader parent,
+    ArrayAnnotationSceneReader(int api, AnnotationSceneReader parent,
         String fieldName, AnnotationFieldType eltType) {
       super(api, dummyDesc, parent.visible, parent.aElement);
       if (trace) { System.out.printf("ArrayAnnotationSceneReader(%s, %s)%n", parent, fieldName); }
