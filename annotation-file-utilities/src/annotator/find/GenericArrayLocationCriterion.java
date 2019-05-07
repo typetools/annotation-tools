@@ -23,7 +23,9 @@ import com.sun.source.util.TreePath;
 //import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntryKind;
 import com.sun.tools.javac.tree.JCTree.JCExpression;
 import com.sun.tools.javac.tree.JCTree.JCFieldAccess;
-import scenelib.type.Type;
+import scenelib.annotations.el.TypePathEntry;
+
+import static scenelib.annotations.el.TypePathEntry.listToTypePath;
 
 /**
  * GenericArrayLocationCriterion represents the criterion specifying the location
@@ -546,29 +548,4 @@ public class GenericArrayLocationCriterion implements Criterion {
     }
     return location;
   }
-
-  private static TypePath listToTypePath(List<TypePathEntry> typePathEntryList) {
-    if (typePathEntryList == null || typePathEntryList.isEmpty()) {
-      return null;
-    }
-    StringBuilder stringBuilder = new StringBuilder();
-    for (TypePathEntry typePathEntry : typePathEntryList) {
-      switch (typePathEntry.step) {
-        case TypePath.ARRAY_ELEMENT:
-          stringBuilder.append('[');
-          break;
-        case TypePath.INNER_TYPE:
-          stringBuilder.append('.');
-          break;
-        case TypePath.WILDCARD_BOUND:
-          stringBuilder.append('*');
-          break;
-        case TypePath.TYPE_ARGUMENT:
-          stringBuilder.append(typePathEntry.argument).append(';');
-          break;
-      }
-    }
-    return TypePath.fromString(stringBuilder.toString());
-  }
-
 }
