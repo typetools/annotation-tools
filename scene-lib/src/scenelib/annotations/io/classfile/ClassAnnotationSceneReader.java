@@ -1117,7 +1117,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
     private final String signature;
     private final AElement aMethod;
     private final MethodVisitor methodWriter;
-    private final Field METHOD_WRITER_CURRENT_BASIC_BLOCK;
+    private Field METHOD_WRITER_CURRENT_BASIC_BLOCK;
 
     MethodAnnotationSceneReader(int api, String name, String descriptor, String signature, AElement aMethod, MethodVisitor methodWriter) {
       super(api, methodWriter);
@@ -1131,8 +1131,8 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
         METHOD_WRITER_CURRENT_BASIC_BLOCK = methodWriterClass.getDeclaredField("currentBasicBlock");
         METHOD_WRITER_CURRENT_BASIC_BLOCK.setAccessible(true);
       } catch (ClassNotFoundException | NoSuchFieldException e) {
-        e.printStackTrace();
         METHOD_WRITER_CURRENT_BASIC_BLOCK = null;
+        e.printStackTrace();
       }
     }
 
