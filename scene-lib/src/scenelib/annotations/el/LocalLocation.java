@@ -15,15 +15,21 @@ public final class LocalLocation {
     public final Label[] start;
     public final Label[] end;
     public final int[] index;
+    public final int scopeStart;
+    public final int scopeLength;
 
     public LocalLocation(Label[] start, Label[] end, int[] index) {
         this.start = start;
         this.end = end;
         this.index = index;
+        this.scopeStart = start[0].getOffset();
+        this.scopeLength = end[end.length - 1].getOffset() - start[0].getOffset(); // FIXME
     }
 
     public LocalLocation(int index, int scopeStart, int scopeLength) {
         // Changes values reflectively.
+        this.scopeStart = scopeStart;
+        this.scopeLength = scopeLength;
         this.index = new int[] {index};
         this.start = new Label[] {new Label()};
         this.end = new Label[] {new Label()};
@@ -52,6 +58,7 @@ public final class LocalLocation {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
     }
 
     @Override
