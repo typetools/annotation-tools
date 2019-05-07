@@ -5,10 +5,11 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import jdk.internal.org.objectweb.asm.TypePath;
 import scenelib.annotations.io.ASTPath;
 
 import com.sun.source.tree.Tree;
-import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
+//import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
 
 import org.plumelib.util.Pair;
 import scenelib.type.ArrayType;
@@ -422,15 +423,15 @@ public abstract class Insertion {
                 // exception and move on to the next inner type insertion if the type
                 // path and actual type don't match up.
                 for (TypePathEntry tpe : location) {
-                      switch (tpe.tag) {
-                      case ARRAY:
+                      switch (tpe.step) {
+                      case TypePath.ARRAY_ELEMENT:
                           if (type.getKind() == Type.Kind.ARRAY) {
                               type = ((ArrayType) type).getComponentType();
                           } else {
                               throw new RuntimeException("Incorrect type path.");
                           }
                           break;
-                    case INNER_TYPE:
+                    case TypePath.INNER_TYPE:
                           if (type.getKind() == Type.Kind.DECLARED) {
                             DeclaredType declaredType = (DeclaredType) type;
                             if (declaredType.getInnerType() == null) {
@@ -442,7 +443,7 @@ public abstract class Insertion {
                             throw new RuntimeException("Incorrect type path.");
                         }
                         break;
-                    case WILDCARD:
+                    case TypePath.WILDCARD_BOUND:
                         if (type.getKind() == Type.Kind.BOUNDED) {
                             BoundedType boundedType = (BoundedType) type;
                             if (boundedType.getBound() == null) {
@@ -454,21 +455,21 @@ public abstract class Insertion {
                             throw new RuntimeException("Incorrect type path.");
                         }
                         break;
-                    case TYPE_ARGUMENT:
+                    case TypePath.TYPE_ARGUMENT:
                         if (type.getKind() == Type.Kind.DECLARED) {
                             DeclaredType declaredType = (DeclaredType) type;
-                            if (0 <= tpe.arg && tpe.arg <
+                            if (0 <= tpe.argument && tpe.argument <
                                     declaredType.getTypeParameters().size()) {
-                                type = declaredType.getTypeParameter(tpe.arg);
+                                type = declaredType.getTypeParameter(tpe.argument);
                             } else {
-                                throw new RuntimeException("Incorrect type argument index: " + tpe.arg);
+                                throw new RuntimeException("Incorrect type argument index: " + tpe.argument);
                             }
                         } else {
                             throw new RuntimeException("Incorrect type path.");
                         }
                         break;
                     default:
-                        throw new RuntimeException("Illegal TypePathEntryKind: " + tpe.tag);
+                        throw new RuntimeException("Illegal TypePathEntryKind: " + tpe.step);
                     }
                 }
                 if (type.getKind() == Type.Kind.BOUNDED) {

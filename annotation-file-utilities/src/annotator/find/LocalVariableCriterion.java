@@ -66,13 +66,14 @@ public class LocalVariableCriterion implements Criterion {
 
       String varName = vtt.getName().toString();
 
-      if (Objects.equals(loc.varName, varName)) {
-        int varIndex = LocalVariableScanner.indexOfVarTree(path, vtt, varName);
-        return (loc.varIndex == varIndex);
-      }
+      // TODO: Get varname somehow or deprecate this feature
+//      if (Objects.equals(loc.varName, varName)) {
+//        int varIndex = LocalVariableScanner.indexOfVarTree(path, vtt, varName);
+//        return (loc.varIndex == varIndex);
+//      }
 
       Pair<String, Pair<Integer, Integer>> key =
-              Pair.of(fullMethodName, Pair.of(loc.index, loc.scopeStart));
+              Pair.of(fullMethodName, Pair.of(loc.index[0], loc.scopeStart));
       String potentialVarName =
               LocalVariableScanner.getFromMethodNameIndexMap(key);
       if (potentialVarName != null) {

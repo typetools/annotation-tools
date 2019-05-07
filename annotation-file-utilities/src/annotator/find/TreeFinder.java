@@ -43,8 +43,8 @@ import com.sun.source.util.TreeScanner;
 
 import com.sun.tools.javac.code.Flags;
 import com.sun.tools.javac.code.Symbol;
-import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
-import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntryKind;
+//import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
+//import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntryKind;
 import com.sun.tools.javac.code.Types;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.JCTree.JCAnnotatedType;
@@ -66,6 +66,7 @@ import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
 import com.sun.tools.javac.tree.JCTree.JCWildcard;
 import com.sun.tools.javac.util.Position;
 
+import org.objectweb.asm.TypePath;
 import scenelib.annotations.io.ASTIndex;
 import scenelib.annotations.io.ASTPath;
 import scenelib.annotations.io.ASTRecord;
@@ -944,14 +945,14 @@ loop:
 
   /**
    * Determines if the last {@link TypePathEntry} in the given list is a
-   * {@link TypePathEntryKind#WILDCARD}.
+   * {@link TypePath#WILDCARD_BOUND}.
    *
    * @param location the list to check
    * @return {@code true} if the last {@link TypePathEntry} is a
-   *         {@link TypePathEntryKind#WILDCARD}, {@code false} otherwise.
+   *         {@link TypePath#WILDCARD_BOUND}, {@code false} otherwise.
    */
   private boolean wildcardLast(List<TypePathEntry> location) {
-    return location.get(location.size() - 1).tag == TypePathEntryKind.WILDCARD;
+    return location.get(location.size() - 1).step == TypePath.WILDCARD_BOUND;
   }
 
   /**
