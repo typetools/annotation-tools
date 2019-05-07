@@ -67,6 +67,7 @@ import com.sun.tools.javac.tree.JCTree.JCWildcard;
 import com.sun.tools.javac.util.Position;
 
 import org.objectweb.asm.TypePath;
+import scenelib.annotations.el.TypePathEntry;
 import scenelib.annotations.io.ASTIndex;
 import scenelib.annotations.io.ASTPath;
 import scenelib.annotations.io.ASTRecord;

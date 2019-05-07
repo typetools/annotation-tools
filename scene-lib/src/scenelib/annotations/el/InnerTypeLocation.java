@@ -13,6 +13,7 @@ import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
  * An {@link InnerTypeLocation} holds the location information for an
  * inner type (namely the location string) inside its {@link ATypeElement}.
  */
+@Deprecated
 public final class InnerTypeLocation {
 
     /**

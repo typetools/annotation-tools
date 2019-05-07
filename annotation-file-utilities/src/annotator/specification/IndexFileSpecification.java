@@ -7,6 +7,8 @@ import com.google.common.collect.Multimap;
 import com.sun.source.tree.Tree;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.TypePath;
 import org.plumelib.util.FileIOException;
 import org.plumelib.util.Pair;
 import scenelib.annotations.Annotation;
@@ -196,7 +198,7 @@ public class IndexFileSpecification {
       try {
         ClassReader classReader = new ClassReader(className);
         ClassWriter classWriter = new ClassWriter(classReader, 0);
-        MethodOffsetClassVisitor cv = new MethodOffsetClassVisitor(classReader, classWriter);
+        MethodOffsetClassVisitor cv = new MethodOffsetClassVisitor(Opcodes.ASM7, classReader);
         classReader.accept(cv, 0);
         debug("Done reading " + className + ".class");
       } catch (IOException e) {
@@ -228,8 +230,8 @@ public class IndexFileSpecification {
       BoundLocation boundLoc = entry.getKey();
       ATypeElement bound = entry.getValue();
       CriterionList boundList = clist.add(Criteria.classBound(className, boundLoc));
-      for (Entry<InnerTypeLocation, ATypeElement> innerEntry : bound.innerTypes.entrySet()) {
-        InnerTypeLocation innerLoc = innerEntry.getKey();
+      for (Entry<TypePath, ATypeElement> innerEntry : bound.innerTypes.entrySet()) {
+        TypePath innerLoc = innerEntry.getKey();
         AElement ae = innerEntry.getValue();
         CriterionList innerBoundList = boundList.add(Criteria.atLocation(innerLoc));
         parseElement(innerBoundList, ae);
@@ -246,8 +248,8 @@ public class IndexFileSpecification {
       ATypeElement ei = entry.getValue();
       CriterionList eiList = clist.add(Criteria.atExtImplsLocation(className, eiLoc));
 
-      for (Entry<InnerTypeLocation, ATypeElement> innerEntry : ei.innerTypes.entrySet()) {
-        InnerTypeLocation innerLoc = innerEntry.getKey();
+      for (Entry<TypePath, ATypeElement> innerEntry : ei.innerTypes.entrySet()) {
+        TypePath innerLoc = innerEntry.getKey();
         AElement ae = innerEntry.getValue();
         CriterionList innerBoundList = eiList.add(Criteria.atLocation(innerLoc));
         parseElement(innerBoundList, ae);
@@ -545,11 +547,10 @@ public class IndexFileSpecification {
    * @param isCastInsertion {@code true} if this for a cast insertion, {@code false}
    *                        otherwise.
    */
-  private void parseInnerAndOuterElements(CriterionList clist,
-                                          ATypeElement typeElement, boolean isCastInsertion) {
+  private void parseInnerAndOuterElements(CriterionList clist, ATypeElement typeElement, boolean isCastInsertion) {
     List<Insertion> innerInsertions = new ArrayList<Insertion>();
-    for (Entry<InnerTypeLocation, ATypeElement> innerEntry : typeElement.innerTypes.entrySet()) {
-      InnerTypeLocation innerLoc = innerEntry.getKey();
+    for (Entry<TypePath, ATypeElement> innerEntry : typeElement.innerTypes.entrySet()) {
+      TypePath innerLoc = innerEntry.getKey();
       AElement innerElement = innerEntry.getValue();
       CriterionList innerClist = clist.add(Criteria.atLocation(innerLoc));
       innerInsertions.addAll(parseElement(innerClist, innerElement, isCastInsertion));

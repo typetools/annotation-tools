@@ -1,6 +1,5 @@
 package annotator.find;
 
-import java.util.AbstractSet;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -14,8 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.lang.model.element.Name;
@@ -23,6 +20,7 @@ import javax.lang.model.type.TypeKind;
 
 //import scenelib.annotations.el.InnerTypeLocation;
 import org.objectweb.asm.TypePath;
+import scenelib.annotations.el.TypePathEntry;
 import scenelib.annotations.io.ASTIndex;
 import scenelib.annotations.io.ASTPath;
 import scenelib.annotations.io.ASTRecord;
@@ -52,7 +50,6 @@ import com.sun.tools.javac.code.Symbol.MethodSymbol;
 import com.sun.tools.javac.code.TypeTag;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.JCTree.JCExpression;
-import com.sun.tools.javac.util.Pair;
 
 /**
  * A collection of {@link Insertion}s, indexed by outer class and inner
@@ -83,7 +80,7 @@ public class Insertions implements Iterable<Insertion> {
   private int size;
 
   public Insertions() {
-    store = new HashMap<String, Map<String, Set<Insertion>>>();
+    store = new HashMap<>();
     size = 0;
   }
 
@@ -367,7 +364,7 @@ public class Insertions implements Iterable<Insertion> {
                   if (igalc != null) {
                     ASTRecord rec1;
                     int b = igalc.getLocation().size();
-                    List<annotator.find.TypePathEntry> loc =
+                    List<TypePathEntry> loc =
                         new ArrayList<>(a + b);
                     loc.addAll(loc0);
                     loc.addAll(igalc.getLocation());

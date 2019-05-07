@@ -5,11 +5,11 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import jdk.internal.org.objectweb.asm.TypePath;
+import org.objectweb.asm.TypePath;
+import scenelib.annotations.el.TypePathEntry;
 import scenelib.annotations.io.ASTPath;
 
 import com.sun.source.tree.Tree;
-//import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
 
 import org.plumelib.util.Pair;
 import scenelib.type.ArrayType;

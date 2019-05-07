@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.objectweb.asm.TypePath;
 import scenelib.annotations.Annotation;
 import scenelib.annotations.AnnotationBuilder;
 import scenelib.annotations.AnnotationFactory;
@@ -14,9 +15,10 @@ import scenelib.annotations.Annotations;
 import scenelib.annotations.el.*;
 
 import com.sun.tools.javac.code.TargetType;
-import com.sun.tools.javac.code.TypeAnnotationPosition;
 
 import org.plumelib.util.FileIOException;
+
+import static scenelib.annotations.el.TypePathEntry.*;
 
 /**
  * <code>JavapParser</code> provides a static method that parses a class dump
@@ -255,8 +257,8 @@ public final class JavapParser {
             // TODO: update location representation
             // if (targetType.) {
                 List<Integer> location = parseInnerTypeLocationNums();
-                InnerTypeLocation itl = new InnerTypeLocation(TypeAnnotationPosition.getTypePathFromBinary(location));
-                subElement = subOuterType.innerTypes.getVivify(itl);
+                TypePath typePath = getTypePathFromBinary(location);
+                subElement = subOuterType.innerTypes.getVivify(typePath);
             // } else
             //    subElement = subOuterType;
             return subElement;
@@ -388,7 +390,6 @@ public final class JavapParser {
 
     private JavapParser(Reader in, AScene scene) {
         bin = new BufferedReader(in);
-
         this.scene = scene;
     }
 
