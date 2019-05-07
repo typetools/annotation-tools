@@ -12,26 +12,14 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.lang.annotation.RetentionPolicy;
 
-import org.objectweb.asmx.AnnotationVisitor;
-import org.objectweb.asmx.Attribute;
-import org.objectweb.asmx.ClassAdapter;
-import org.objectweb.asmx.ClassReader;
-import org.objectweb.asmx.ClassWriter;
-import org.objectweb.asmx.Handle;
-import org.objectweb.asmx.TypeAnnotationVisitor;
-import org.objectweb.asmx.FieldVisitor;
-import org.objectweb.asmx.MethodAdapter;
-import org.objectweb.asmx.MethodVisitor;
-import org.objectweb.asmx.commons.EmptyVisitor;
-
-import com.sun.tools.javac.code.TargetType;
+import org.objectweb.asm.*;
 
 import scenelib.annotations.*;
 import scenelib.annotations.el.*;
 import scenelib.annotations.field.*;
 
 /**
- * A ClassAnnotationSceneWriter is a {@link org.objectweb.asmx.ClassVisitor}
+ * A ClassAnnotationSceneWriter is a {@link org.objectweb.asm.ClassVisitor}
  * that can be used to write a class file that is the combination of an
  * existing class file and annotations in an {@link AScene}.  The "write"
  * in <code> ClassAnnotationSceneWriter </code> refers to a class file
@@ -43,23 +31,23 @@ import scenelib.annotations.field.*;
  * The proper usage of this class is to construct a
  * <code>ClassAnnotationSceneWriter</code> with a {@link AScene} that
  * already contains all its annotations, pass this as a {@link
- * org.objectweb.asmx.ClassVisitor} to {@link
- * org.objectweb.asmx.ClassReader#accept}, and then obtain the resulting
+ * org.objectweb.asm.ClassVisitor} to {@link
+ * org.objectweb.asm.ClassReader#accept}, and then obtain the resulting
  * class, ready to be written to a file, with {@link #toByteArray}.  </p>
  *
  * <p>
  *
  * All other methods are intended to be called only by
- * {@link org.objectweb.asmx.ClassReader#accept},
+ * {@link org.objectweb.asm.ClassReader#accept},
  * and should not be called anywhere else, due to the order in which
- * {@link org.objectweb.asmx.ClassVisitor} methods should be called.
+ * {@link org.objectweb.asm.ClassVisitor} methods should be called.
  *
  * <p>
  *
  * Throughout this class, "scene" refers to the {@link AScene} this class is
  * merging into a class file.
  */
-public class ClassAnnotationSceneWriter extends ClassAdapter {
+public class ClassAnnotationSceneWriter extends ClassVisitor {
 
   // Strategy for interleaving the necessary calls to visit annotations
   // from scene into the parsing done by ClassReader
@@ -132,8 +120,8 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
    * @param scene the annotation scene containing annotations to be inserted
    * into the class this visits
    */
-  public ClassAnnotationSceneWriter(ClassReader cr, AScene scene, boolean overwrite) {
-    super(new ClassWriter(cr, false));
+  public ClassAnnotationSceneWriter(int api, ClassReader cr, AScene scene, TypePath typePath, boolean overwrite) {
+    super(api, new ClassWriter(cr, 0));
     this.scene = scene;
     this.hasVisitedClassAnnotationsInScene = false;
     this.aClass = null;
@@ -150,7 +138,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
    * from merging all the annotations in the scene into the class file
    * this has visited.  This method may only be called once this has already
    * completely visited a class, which is done by calling
-   * {@link org.objectweb.asmx.ClassReader#accept}.
+   * {@link org.objectweb.asm.ClassReader#accept}.
    *
    * @return a byte array of the merged class file
    */
@@ -372,7 +360,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
       } else if (aft instanceof EnumAFT) {
         av.visitEnum(fieldName, ((EnumAFT) aft).typeName, value.toString());
       } else if (aft instanceof ClassTokenAFT) {
-        av.visit(fieldName, org.objectweb.asmx.Type.getType((Class<?>)value));
+        av.visit(fieldName, org.objectweb.asm.Type.getType((Class<?>)value));
       } else {
         // everything else is a string
         av.visit(fieldName, value);
@@ -444,7 +432,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
      * Tells this to visit the end of the field in the class file,
      * and also ensures that this visits all its annotations in the scene.
      *
-     * @see org.objectweb.asmx.FieldVisitor#visitEnd()
+     * @see org.objectweb.asm.FieldVisitor#visitEnd()
      */
     @Override
     public void visitEnd() {
