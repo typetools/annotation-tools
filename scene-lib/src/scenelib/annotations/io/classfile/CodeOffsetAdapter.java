@@ -2,7 +2,6 @@ package scenelib.annotations.io.classfile;
 
 import org.objectweb.asm.*;
 import scenelib.annotations.io.DebugWriter;
-import scenelib.annotations.util.AbstractClassVisitor;
 
 public class CodeOffsetAdapter extends ClassVisitor {
   static final DebugWriter debug;
