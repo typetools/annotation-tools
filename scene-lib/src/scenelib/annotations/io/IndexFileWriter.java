@@ -15,20 +15,7 @@ import java.util.Set;
 
 import org.objectweb.asm.TypePath;
 import scenelib.annotations.Annotation;
-import scenelib.annotations.el.AClass;
-import scenelib.annotations.el.AElement;
-import scenelib.annotations.el.AField;
-import scenelib.annotations.el.AMethod;
-import scenelib.annotations.el.AScene;
-import scenelib.annotations.el.ATypeElement;
-import scenelib.annotations.el.ATypeElementWithType;
-import scenelib.annotations.el.AnnotationDef;
-import scenelib.annotations.el.BoundLocation;
-import scenelib.annotations.el.DefCollector;
-import scenelib.annotations.el.DefException;
-import scenelib.annotations.el.LocalLocation;
-import scenelib.annotations.el.RelativeLocation;
-import scenelib.annotations.el.TypeIndexLocation;
+import scenelib.annotations.el.*;
 import scenelib.annotations.field.AnnotationAFT;
 import scenelib.annotations.field.AnnotationFieldType;
 import scenelib.annotations.field.ArrayAFT;
@@ -36,7 +23,6 @@ import scenelib.annotations.field.BasicAFT;
 import scenelib.annotations.field.ClassTokenAFT;
 import scenelib.annotations.util.Strings;
 
-import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
 
 /**
  * IndexFileWriter provides two static methods named <code>write</code>
@@ -239,7 +225,7 @@ public final class IndexFileWriter {
      * {@code tag, arg}, where tag and arg are both integers.
      */
     private String typePathEntryToString(TypePathEntry t) {
-        return t.tag.tag + ", " + t.arg;
+        return t.step + ", " + t.argument;
     }
 
     private void printNumberedAmbigiousElements(String indentation,

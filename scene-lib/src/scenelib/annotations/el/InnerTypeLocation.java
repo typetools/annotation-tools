@@ -7,7 +7,6 @@ import java.util.List;
 import org.objectweb.asm.TypePath;
 import java.util.Objects;
 
-import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
 
 /**
  * An {@link InnerTypeLocation} holds the location information for an
@@ -38,7 +37,7 @@ public final class InnerTypeLocation {
      */
     public InnerTypeLocation(List<TypePathEntry> location) {
         this.location = Collections.unmodifiableList(
-                new ArrayList<TypePathEntry>(location));
+                new ArrayList<>(location));
     }
 
     /**
@@ -75,18 +74,18 @@ public final class InnerTypeLocation {
     public TypePath getTypePath() {
         StringBuilder stringBuilder = new StringBuilder();
         for (TypePathEntry typePathEntry : location) {
-            switch (typePathEntry.tag) {
-                case ARRAY:
+            switch (typePathEntry.step) {
+                case TypePath.ARRAY_ELEMENT:
                     stringBuilder.append("[");
                     break;
-                case INNER_TYPE:
+                case TypePath.INNER_TYPE:
                     stringBuilder.append(".");
                     break;
-                case WILDCARD:
+                case TypePath.WILDCARD_BOUND:
                     stringBuilder.append("*");
                     break;
-                case TYPE_ARGUMENT:
-                    stringBuilder.append(typePathEntry.arg);
+                case TypePath.TYPE_ARGUMENT:
+                    stringBuilder.append(typePathEntry.argument).append(";");
                     break;
             }
         }

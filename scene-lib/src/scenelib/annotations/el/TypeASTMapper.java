@@ -7,9 +7,6 @@ import java.util.List;
 
 import static scenelib.annotations.el.TypePathEntry.listToTypePath;
 
-//import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
-//import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntryKind;
-
 /**
  * A {@link TypeASTMapper} traverses a client-maintained abstract syntax
  * tree representing a type in parallel with an {@link ATypeElement} from

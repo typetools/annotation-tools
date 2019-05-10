@@ -43,8 +43,6 @@ import com.sun.source.util.TreeScanner;
 
 import com.sun.tools.javac.code.Flags;
 import com.sun.tools.javac.code.Symbol;
-//import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
-//import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntryKind;
 import com.sun.tools.javac.code.Types;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.JCTree.JCAnnotatedType;

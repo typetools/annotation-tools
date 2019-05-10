@@ -23,7 +23,6 @@ import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 import com.sun.source.tree.Tree.Kind;
-import com.sun.tools.javac.code.TypeAnnotationPosition;
 
 import org.objectweb.asm.TypePath;
 import scenelib.annotations.Annotation;
