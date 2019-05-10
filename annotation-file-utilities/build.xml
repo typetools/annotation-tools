@@ -59,9 +59,6 @@
   <!-- Compiles all the subparts of the Annotation File Utilities. -->
   <target name="init-dependencies"
           depends="init-properties">
-      <ant dir="${asmx}" target="bin">
-        <property name="product.noshrink" value="true"/>
-      </ant>
       <ant dir="${scene-lib}" target="bin"/>
   </target>
 
@@ -73,12 +70,12 @@
 
     <path id="libpath">
       <pathelement location="${annotation-tools}/annotation-file-utilities/lib/compiler-2.4.0.jar"/>
+      <pathelement location="${annotation-tools}/annotation-file-utilities/lib/asm-7.0.jar"/>
       <pathelement location="${annotation-tools}/annotation-file-utilities/lib/bcel-util-1.0.0.jar"/>
       <pathelement location="${annotation-tools}/annotation-file-utilities/lib/options-1.0.0.jar"/>
       <pathelement location="${annotation-tools}/annotation-file-utilities/lib/plume-util-1.0.1.jar"/>
       <pathelement location="${annotation-tools}/annotation-file-utilities/lib/guava-20.0.jar"/>
       <pathelement location="${scene-lib}/bin"/>
-      <pathelement location="${asmx}/bin"/>
       <!-- Checker Framework qualifiers should not go in generated .jar files -->
       <pathelement location="${annotation-tools}/annotation-file-utilities/lib/checker-qual-2.5.4.jar"/>
       <!-- needed for optionsdoc target -->
@@ -143,12 +140,10 @@
       <uptodate property="bin.uptodate" targetfile="annotation-file-utilities.jar">
         <srcfiles dir="bin" />
       </uptodate>
-      <uptodate property="asmx.bin.uptodate" targetfile="annotation-file-utilities.jar">
-        <srcfiles dir="${asmx}/bin" excludes="tmp/**"/>
-      </uptodate>
       <uptodate property="scene-lib.bin.uptodate" targetfile="annotation-file-utilities.jar">
         <srcfiles dir="${scene-lib}/bin" excludes="annotations-expected/**,annotations/tests/**"/>
       </uptodate>
+      <uptodate property="plume.uptodate" targetfile="annotation-file-utilities.jar" srcfile="lib/asm-7.0.jar"/>
       <uptodate property="plume.uptodate" targetfile="annotation-file-utilities.jar" srcfile="lib/bcel-util-1.0.0.jar"/>
       <uptodate property="plume.uptodate" targetfile="annotation-file-utilities.jar" srcfile="lib/options-1.0.0.jar"/>
       <uptodate property="plume.uptodate" targetfile="annotation-file-utilities.jar" srcfile="lib/plume-util-1.0.1.jar"/>
@@ -157,7 +152,6 @@
       <condition property="jarfile.uptodate">
         <and>
           <isset property="bin.uptodate"/>
-          <isset property="asmx.bin.uptodate"/>
           <isset property="scene-lib.bin.uptodate"/>
           <isset property="plume.uptodate"/>
           <isset property="google-collect.uptodate"/>
@@ -165,7 +159,6 @@
       </condition>
 
       <echo message="bin.uptodate: ${bin.uptodate}"/>
-      <echo message="asmx.bin.uptodate: ${asmx.bin.uptodate}"/>
       <echo message="scene-lib.bin.uptodate: ${scene-lib.bin.uptodate}"/>
       <echo message="plume.uptodate: ${plume.uptodate}"/>
       <echo message="google-collect.uptodate: ${google-collect.uptodate}"/>
@@ -190,10 +183,15 @@
     <echo message="Copying .class files to ${temp-jarfile}"/>
     <copy todir="${temp-jarfile}">
       <fileset dir="bin" />
-      <fileset dir="${asmx}/bin" excludes="tmp/**"/>
       <fileset dir="${scene-lib}/bin" excludes="annotations-expected/**,annotations/tests/**"/>
     </copy>
     <!-- Also need to get class files in libraries -->
+    <unjar src="lib/asm-7.0.jar" dest="${temp-jarfile}">
+      <patternset>
+        <include name="**/*.class"/>
+        <exclude name="META-INF/" />
+      </patternset>
+    </unjar>
     <unjar src="lib/bcel-util-1.0.0.jar" dest="${temp-jarfile}">
       <patternset>
         <include name="**/*.class"/>
@@ -253,7 +251,6 @@
     <echo message="Copying .class files to ${temp-jarfile}"/>
     <copy todir="${temp-jarfile}">
       <fileset dir="bin" />
-      <fileset dir="${asmx}/bin" excludes="tmp/**"/>
       <fileset dir="${scene-lib}/bin" excludes="annotations-expected/**,annotations/tests/**"/>
     </copy>
 
@@ -309,12 +306,6 @@
         <include name="annotation-file-format.pdf"/>
         <include name="annotation-file-utilities.jar"/>
         <include name="annotation-file-utilities-all.jar"/>
-        <include name="bin/**"/>
-      </fileset>
-    </copy>
-
-    <copy todir="${temp-annotation-tools}/asmx">
-      <fileset dir="${asmx}">
         <include name="bin/**"/>
       </fileset>
     </copy>

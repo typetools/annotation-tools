@@ -1,3 +1,6 @@
+asm: https://repository.ow2.org/nexus/#nexus-search;gav~org.ow2.asm~asm
+  wget https://repository.ow2.org/nexus/service/local/repositories/releases/content/org/ow2/asm/asm/7.0/asm-7.0.jar
+
 bcel-util: https://repo.maven.apache.org/maven2/org/plumelib/bcel-util/
   wget https://repo.maven.apache.org/maven2/org/plumelib/bcel-util/1.0.0/bcel-util-1.0.0.jar
 

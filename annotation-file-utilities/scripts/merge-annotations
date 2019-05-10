@@ -9,6 +9,7 @@ if [ $# -le 1 ]; then exit 0; fi
 js="$HOME/src/jdk1.8.0_45/src"
 jb="$CHECKERFRAMEWORK/checker/dist/*"
 cf="$CHECKERFRAMEWORK/checker/build"
+# TODO: These should be relative to the current directory, not use $CHECKERFRAMEWORK.
 sl="$CHECKERFRAMEWORK/../annotation-tools/scene-lib/bin"
 al="$CHECKERFRAMEWORK/../annotation-tools/annotation-file-utilities/lib"
 jj=./jdk.jaif
