@@ -106,8 +106,8 @@
         </path>
 
         <path id="libpath">
-            <pathelement location="${asmx}/bin"/>
             <pathelement location="${junit}"/>
+            <pathelement location="${annotation-tools}/annotation-file-utilities/lib/asm-7.0.jar"/>
             <pathelement location="${annotation-tools}/annotation-file-utilities/lib/bcel-util-1.0.0.jar"/>
             <pathelement location="${annotation-tools}/annotation-file-utilities/lib/options-1.0.0.jar"/>
             <pathelement location="${annotation-tools}/annotation-file-utilities/lib/plume-util-1.0.1.jar"/>
