@@ -198,7 +198,7 @@ public class IndexFileSpecification {
       try {
         ClassReader classReader = new ClassReader(className);
         ClassWriter classWriter = new ClassWriter(classReader, 0);
-        MethodOffsetClassVisitor cv = new MethodOffsetClassVisitor(Opcodes.ASM7, classReader);
+        MethodOffsetClassVisitor cv = new MethodOffsetClassVisitor(Opcodes.ASM7, classReader, classWriter);
         classReader.accept(cv, 0);
         debug("Done reading " + className + ".class");
       } catch (IOException e) {
