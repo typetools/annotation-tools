@@ -153,6 +153,13 @@ public class CodeOffsetAdapter extends ClassVisitor {
       }
 
       @Override
+      public void visitMethodInsn(int opcode, String owner, String name, String descriptor, boolean isInterface) {
+        super.visitMethodInsn(opcode, owner, name, descriptor, isInterface);
+        debug.debug("%d visitMethodInsn(%d, %s, %s, %s, %s)%n", offset, opcode, owner, name, descriptor, isInterface);
+        offset += opcode == Opcodes.INVOKEINTERFACE ? 5 : 3;
+      }
+
+      @Override
       public void visitMultiANewArrayInsn(String descriptor, int dims) {
         super.visitMultiANewArrayInsn(descriptor, dims);
         debug.debug("%d visitMultiANewArrayInsn(%s, %d)%n", offset, descriptor, dims);

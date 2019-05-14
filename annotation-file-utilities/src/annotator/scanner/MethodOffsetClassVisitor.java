@@ -126,6 +126,21 @@ public class MethodOffsetClassVisitor extends ClassVisitor {
     }
 
     @Override
+    public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean isInterface) {
+      super.visitMethodInsn(opcode, owner, name, desc, isInterface);
+      switch (opcode) {
+        case Opcodes.INVOKEINTERFACE:
+        case Opcodes.INVOKESTATIC:
+        case Opcodes.INVOKEVIRTUAL:
+          MethodCallScanner.addMethodCallToMethod(methodName, labelOffset());
+          break;
+        default:
+          break;
+      }
+      methodCodeOffsetAdapter.visitMethodInsn(opcode, owner, name, desc, isInterface);
+    }
+
+    @Override
     public void visitInvokeDynamicInsn(String name, String desc, Handle bsm, Object... bsmArgs) {
       super.visitInvokeDynamicInsn(name, desc, bsm, bsmArgs);
       LambdaScanner.addLambdaExpressionToMethod(methodName, labelOffset());
