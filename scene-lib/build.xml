@@ -165,16 +165,16 @@
         <!-- Copy non-java files to bin.  These are mostly .jaif files. -->
         <copy todir="bin">
             <fileset dir="src" excludes="**/*.java"/>
-            <fileset dir="test" excludes="**/*.java"/>
+<!--            <fileset dir="test" excludes="**/*.java"/>-->
         </copy>
         <pathconvert pathsep=" " property="src.files.spaceseparated">
             <path>
                 <fileset dir="src">
                     <include name="**/*.java"/>
                 </fileset>
-                <fileset dir="test">
-                    <include name="**/*.java"/>
-                </fileset>
+<!--                <fileset dir="test">-->
+<!--                    <include name="**/*.java"/>-->
+<!--                </fileset>-->
             </path>
         </pathconvert>
         <java classpathref="libpath"
