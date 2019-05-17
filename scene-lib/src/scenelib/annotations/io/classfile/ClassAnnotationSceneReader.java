@@ -252,6 +252,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
       super(api, annotationWriter);
       this.visible = visible;
       this.aElement = aElement;
+      this.annotationWriter = annotationWriter;
       if (trace) { System.out.printf("AnnotationSceneReader(%s, %s, %s)%n", descriptor, visible, aElement); }
 
       if (descriptor != dummyDesc) {    // interned
