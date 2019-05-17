@@ -102,6 +102,12 @@ class MethodCodeOffsetAdapter extends MethodVisitor {
   }
 
   @Override
+  public void visitMethodInsn(int opcode, String owner, String name, String descriptor, boolean isInterface) {
+    super.visitMethodInsn(opcode, owner, name, descriptor, isInterface);
+    offset += opcode == Opcodes.INVOKEINTERFACE ? 5 : 3;
+  }
+
+  @Override
   public void visitMultiANewArrayInsn(String desc, int dims) {
     super.visitMultiANewArrayInsn(desc, dims);
     offset += 4;

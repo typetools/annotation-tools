@@ -1,0 +1,8 @@
+class ExplicitUpper<X extends @A Object> extends @B Object {
+}
+
+public class ImplicitUpper<Y extends @A Object> extends @B Object {
+}
+
+class Monomorphic extends @B Object {
+}

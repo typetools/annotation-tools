@@ -1,0 +1,13 @@
+package annotator.tests;
+
+public class ReceiverWithThrows {
+  /* @UnderInitialization ReceiverWithThrows this */
+  public void foo(@java.lang.UnderInitialization ReceiverWithThrows this) {
+
+  }
+
+  /* @Tainted ReceiverWithThrows this */
+  public void bar(@java.lang.Tainted ReceiverWithThrows this) throws Exception {
+
+  }
+}
