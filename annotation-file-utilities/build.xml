@@ -67,6 +67,9 @@
     <fileset dir="src" id="src-files">
       <include name="**/*.java"/>
     </fileset>
+<!--    <fileset dir="new-tests" id="new-tests-files">-->
+<!--      <include name="**/*.java"/>-->
+<!--    </fileset>-->
 
     <path id="libpath">
       <pathelement location="${annotation-tools}/annotation-file-utilities/lib/compiler-2.4.0.jar"/>
