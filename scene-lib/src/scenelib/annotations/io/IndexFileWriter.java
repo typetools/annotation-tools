@@ -179,7 +179,7 @@ public final class IndexFileWriter {
           pw.print(indentation + "inner-type");
           char sep = ' ';
           // TODO: Long term: Should change representation to mirror org.objectweb.asm.TypePath
-          for (int index = 0; index < typePath.getLength(); index++) {
+          for (int index = 0; typePath != null && index < typePath.getLength(); index++) {
               pw.print(sep);
               pw.print(typePathStepToString(typePath, index));
               sep = ',';

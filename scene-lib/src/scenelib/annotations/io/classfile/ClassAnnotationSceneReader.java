@@ -649,10 +649,14 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
    * Works for {@link TypeReference#CLASS_TYPE_PARAMETER_BOUND}
    */
   private void handleClassTypeParameterBound(AClass aClass) {
-    aClass.bounds.getVivify(makeBoundLocation())
-        .innerTypes.getVivify(typePath)
-        .tlAnnotationsHere.add(makeAnnotation());
-//      }
+    if (typePath == null) {
+      aClass.bounds.getVivify(makeBoundLocation())
+          .tlAnnotationsHere.add(makeAnnotation());
+    } else {
+      aClass.bounds.getVivify(makeBoundLocation())
+          .innerTypes.getVivify(typePath)
+          .tlAnnotationsHere.add(makeAnnotation());
+    }
   }
 
   /**
@@ -661,9 +665,14 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
    */
   private void handleClassExtends(AClass aClass) {
     TypeIndexLocation typeIndexLocation = new TypeIndexLocation(typeReference.getSuperTypeIndex());
-    aClass.extendsImplements.getVivify(typeIndexLocation)
-        .innerTypes.getVivify(typePath)
-        .tlAnnotationsHere.add(makeAnnotation());
+    if (typePath == null) {
+      aClass.extendsImplements.getVivify(typeIndexLocation)
+          .tlAnnotationsHere.add(makeAnnotation());
+    } else {
+      aClass.extendsImplements.getVivify(typeIndexLocation)
+          .innerTypes.getVivify(typePath)
+          .tlAnnotationsHere.add(makeAnnotation());
+    }
   }
 
   /**
@@ -678,9 +687,14 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
       }
     } else if (aElement instanceof ATypeElement) {
       ATypeElement aTypeElement = (ATypeElement) aElement;
-      aTypeElement
-          .innerTypes.getVivify(typePath)
-          .tlAnnotationsHere.add(makeAnnotation());
+      if (typePath == null) {
+        aTypeElement
+            .tlAnnotationsHere.add(makeAnnotation());
+      } else {
+        aTypeElement
+            .innerTypes.getVivify(typePath)
+            .tlAnnotationsHere.add(makeAnnotation());
+      }
     } else {
       throw new RuntimeException("Unknown FIELD_COMPONENT: " + aElement);
     }
@@ -692,9 +706,14 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
    * @param aMethod the annotatable method in which annotation will be inserted
    */
   private void handleMethodFormalParameter(AMethod aMethod) {
-    aMethod.parameters.getVivify(typeReference.getFormalParameterIndex())
-        .type.innerTypes.getVivify(typePath)
-        .tlAnnotationsHere.add(makeAnnotation());
+    if (typePath == null) {
+      aMethod.parameters.getVivify(typeReference.getFormalParameterIndex())
+          .type.tlAnnotationsHere.add(makeAnnotation());
+    } else {
+      aMethod.parameters.getVivify(typeReference.getFormalParameterIndex())
+          .type.innerTypes.getVivify(typePath)
+          .tlAnnotationsHere.add(makeAnnotation());
+    }
   }
 
   /**
@@ -713,9 +732,14 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
    * @param aMethod the annotatable method in which annotation will be inserted
    */
   private void handleMethodTypeParameterBound(AMethod aMethod) {
-    aMethod.bounds.getVivify(makeBoundLocation())
-        .innerTypes.getVivify(typePath)
-        .tlAnnotationsHere.add(makeAnnotation());
+    if (typePath == null) {
+      aMethod.bounds.getVivify(makeBoundLocation())
+          .tlAnnotationsHere.add(makeAnnotation());
+    } else {
+      aMethod.bounds.getVivify(makeBoundLocation())
+          .innerTypes.getVivify(typePath)
+          .tlAnnotationsHere.add(makeAnnotation());
+    }
   }
 
   /**
@@ -726,9 +750,14 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
   private void handleMethodReturnType(AMethod aMethod) {
     // TODO: why is this traced and not other stuff?
     if (trace) { System.out.printf("handleMethodReturnType(%s)%n", aMethod); }
-    aMethod.returnType
-        .innerTypes.getVivify(typePath)
-        .tlAnnotationsHere.add(makeAnnotation());
+    if (typePath == null) {
+      aMethod.returnType
+          .tlAnnotationsHere.add(makeAnnotation());
+    } else {
+      aMethod.returnType
+          .innerTypes.getVivify(typePath)
+          .tlAnnotationsHere.add(makeAnnotation());
+    }
   }
 
   /**
@@ -737,9 +766,14 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
    * @param aMethod the annotatable method in which annotation will be inserted
    */
   private void handleMethodReceiver(AMethod aMethod) {
-    aMethod.receiver.type
-        .innerTypes.getVivify(typePath)
-        .tlAnnotationsHere.add(makeAnnotation());
+    if (typePath == null) {
+      aMethod.receiver.type
+          .tlAnnotationsHere.add(makeAnnotation());
+    } else {
+      aMethod.receiver.type
+          .innerTypes.getVivify(typePath)
+          .tlAnnotationsHere.add(makeAnnotation());
+    }
   }
 
   /**
@@ -758,9 +792,14 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
    * @param aMethod the annotatable method in which annotation will be inserted
    */
   private void handleMethodObjectCreation(AMethod aMethod) {
-    aMethod.body.news.getVivify(makeOffset(false))
-        .innerTypes.getVivify(typePath)
-        .tlAnnotationsHere.add(makeAnnotation());
+    if (typePath == null) {
+      aMethod.body.news.getVivify(makeOffset(false))
+          .tlAnnotationsHere.add(makeAnnotation());
+    } else {
+      aMethod.body.news.getVivify(makeOffset(false))
+          .innerTypes.getVivify(typePath)
+          .tlAnnotationsHere.add(makeAnnotation());
+    }
   }
 
   /**
@@ -769,9 +808,14 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
    * @param aMethod the annotatable method in which annotation will be inserted
    */
   private void handleMethodInstanceOf(AMethod aMethod) {
-    aMethod.body.typecasts.getVivify(makeOffset(false))
-        .innerTypes.getVivify(typePath)
-        .tlAnnotationsHere.add(makeAnnotation());
+    if (typePath == null) {
+      aMethod.body.typecasts.getVivify(makeOffset(false))
+          .tlAnnotationsHere.add(makeAnnotation());
+    } else {
+      aMethod.body.typecasts.getVivify(makeOffset(false))
+          .innerTypes.getVivify(typePath)
+          .tlAnnotationsHere.add(makeAnnotation());
+    }
   }
 
   /**
@@ -779,9 +823,14 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
    * @param aMethod the annotatable method in which annotation will be inserted
    */
   private void handleMethodReference(AMethod aMethod) {
-    aMethod.body.refs.getVivify(makeOffset(false))
-        .innerTypes.getVivify(typePath)
-        .tlAnnotationsHere.add(makeAnnotation());
+    if (typePath == null) {
+      aMethod.body.refs.getVivify(makeOffset(false))
+          .tlAnnotationsHere.add(makeAnnotation());
+    } else {
+      aMethod.body.refs.getVivify(makeOffset(false))
+          .innerTypes.getVivify(typePath)
+          .tlAnnotationsHere.add(makeAnnotation());
+    }
   }
 
   /**
@@ -790,9 +839,14 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
    * @param aMethod the annotatable method in which annotation will be inserted
    */
   private void handleMethodTypecast(AMethod aMethod) {
-    aMethod.body.typecasts.getVivify(makeOffset(true))
-        .innerTypes.getVivify(typePath)
-        .tlAnnotationsHere.add(makeAnnotation());
+    if (typePath == null) {
+      aMethod.body.typecasts.getVivify(makeOffset(true))
+          .tlAnnotationsHere.add(makeAnnotation());
+    } else {
+      aMethod.body.typecasts.getVivify(makeOffset(true))
+          .innerTypes.getVivify(typePath)
+          .tlAnnotationsHere.add(makeAnnotation());
+    }
   }
 
   /**
@@ -800,9 +854,14 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
    * @param aMethod the annotatable method in which annotation will be inserted
    */
   private void handleInvocationTypeArgument(AMethod aMethod) {
-    aMethod.body.calls.getVivify(makeOffset(true))
-        .innerTypes.getVivify(typePath)
-        .tlAnnotationsHere.add(makeAnnotation());
+    if (typePath == null) {
+      aMethod.body.calls.getVivify(makeOffset(true))
+          .tlAnnotationsHere.add(makeAnnotation());
+    } else {
+      aMethod.body.calls.getVivify(makeOffset(true))
+          .innerTypes.getVivify(typePath)
+          .tlAnnotationsHere.add(makeAnnotation());
+    }
   }
 
   /**
@@ -811,10 +870,14 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
    * @param aMethod the annotatable method in which annotation will be inserted
    */
   private void handleReferenceTypeArgument(AMethod aMethod) {
-    aMethod.body.refs.getVivify(makeOffset(true))
-        .innerTypes.getVivify(typePath)
-        .tlAnnotationsHere.add(makeAnnotation());
-
+    if (typePath == null) {
+      aMethod.body.refs.getVivify(makeOffset(true))
+          .tlAnnotationsHere.add(makeAnnotation());
+    } else {
+      aMethod.body.refs.getVivify(makeOffset(true))
+          .innerTypes.getVivify(typePath)
+          .tlAnnotationsHere.add(makeAnnotation());
+    }
   }
 
   /**
@@ -823,9 +886,14 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
    * @param aMethod the annotatable method in which annotation will be inserted
    */
   private void handleMethodLocalVariable(AMethod aMethod) {
-    aMethod.body.locals.getVivify(makeLocalLocation())
-        .type.innerTypes.getVivify(typePath)
-        .tlAnnotationsHere.add(makeAnnotation());
+    if (typePath == null) {
+      aMethod.body.locals.getVivify(makeLocalLocation())
+          .type.tlAnnotationsHere.add(makeAnnotation());
+    } else {
+      aMethod.body.locals.getVivify(makeLocalLocation())
+          .type.innerTypes.getVivify(typePath)
+          .tlAnnotationsHere.add(makeAnnotation());
+    }
   }
 
   /**
