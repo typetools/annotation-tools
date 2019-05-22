@@ -35,7 +35,7 @@ public class ClassFileReader {
   static String usage
     = "extract-annotations [options] class1 class2 ..."
     + linesep
-    + "Each argument is a class a.b.C (that is on your classpath) or a class file"
+    + "Each argument is a class a.b.C (that is on the classpath) or a class file"
     + linesep
     + "a/b/C.class.  Extracts the annotations from each such argument and prints"
     + linesep
