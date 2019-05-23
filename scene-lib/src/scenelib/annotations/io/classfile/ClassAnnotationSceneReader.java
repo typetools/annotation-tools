@@ -250,12 +250,13 @@ extends EmptyVisitor {
       try {
         annoClass = (Class<? extends java.lang.annotation.Annotation>) Class.forName(annoTypeName);
       } catch (ClassNotFoundException e) {
-        System.out.printf("Could not find class: %s%n", e.getMessage());
-        printClasspath();
+        // This is an internal JDK annotation such as jdk.Profile+Annotation .
         if (annoTypeName.contains("+")) {
           return Annotations.createValueAnnotationDef(annoTypeName,
               Annotations.noAnnotations, BasicAFT.forType(int.class));
         }
+        System.out.printf("Could not find class: %s%n", e.getMessage());
+        printClasspath();
         throw new Error(e);
       }
 
@@ -1213,7 +1214,7 @@ extends EmptyVisitor {
   }
 
   public static void printClasspath() {
-    System.out.println("\nClasspath:");
+    System.out.println("Classpath:");
     StringTokenizer tokenizer =
         new StringTokenizer(System.getProperty("java.class.path"),
             File.pathSeparator);

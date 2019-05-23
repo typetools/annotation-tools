@@ -287,11 +287,14 @@ will locate the class file for <code>mypackage.MyClass</code>, read all
 annotations from it, and write the results in annotation file format to
 <code>mypackage.MyClass.jaif</code> in the present working directory.  Note
 that <code>mypackage.MyClass</code> must be located on your classpath.
+Alternately, you can specify a classfile directly:
 </p>
 
+<pre><code>extract-annotations /path/to/MyClass.class</code></pre>
+
 <p>
-Multiple classes can be specified on a single command line; if the
-program exits normally, the results are the same as if the program were
+Multiple classes or classfiles can be specified on a single command line; if the
+program exits normally, the results are the same as if the program was
 run once for each class in sequence.
 Run:
 </p>
