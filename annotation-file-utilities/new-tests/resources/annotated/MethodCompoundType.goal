@@ -1,7 +1,0 @@
-import java.util.Map;
-
-public class MethodCompoundType {
-    public Map @A [] m() {
-        return null;
-    }
-}

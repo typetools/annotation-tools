@@ -1,7 +1,0 @@
-package annotator.tests;
-
-public class ClassListAnnotationParameter {
-  @java.lang.TestAnnotation({java.lang.Object.class, java.lang.String.class})
-  public void foo() {
-  }
-}
