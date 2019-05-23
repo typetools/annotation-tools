@@ -250,12 +250,13 @@ extends EmptyVisitor {
       try {
         annoClass = (Class<? extends java.lang.annotation.Annotation>) Class.forName(annoTypeName);
       } catch (ClassNotFoundException e) {
-        System.out.printf("Could not find class: %s%n", e.getMessage());
-        printClasspath();
+        // This is an internal JDK annotation such as jdk.Profile+Annotation .
         if (annoTypeName.contains("+")) {
           return Annotations.createValueAnnotationDef(annoTypeName,
               Annotations.noAnnotations, BasicAFT.forType(int.class));
         }
+        System.out.printf("Could not find class: %s%n", e.getMessage());
+        printClasspath();
         throw new Error(e);
       }
 
