@@ -5,6 +5,7 @@ import org.objectweb.asm.TypePath;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 public class TypePathEntry {
   public final int step;
@@ -13,6 +14,20 @@ public class TypePathEntry {
   public TypePathEntry(int step, int argument) {
     this.step = step;
     this.argument = argument;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    TypePathEntry that = (TypePathEntry) o;
+    return step == that.step &&
+        argument == that.argument;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(step, argument);
   }
 
   public static TypePath getTypePathFromBinary(List<Integer> integerList) {
@@ -84,5 +99,16 @@ public class TypePathEntry {
       }
     }
     return TypePath.fromString(stringBuilder.toString());
+  }
+
+  public static List<TypePathEntry> typePathToList(TypePath typePath) {
+    List<TypePathEntry> typePathEntryList = new ArrayList<>(typePath.getLength());
+    if (typePath == null) {
+      return null;
+    }
+    for (int step = 0; step < typePath.getLength(); step++) {
+      typePathEntryList.add(new TypePathEntry(typePath.getStep(step), typePath.getStepArgument(step)));
+    }
+    return typePathEntryList;
   }
 }
