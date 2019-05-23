@@ -148,8 +148,10 @@ public final class IndexFileWriter {
 
     private void printAnnotations(Collection<? extends Annotation> annos) {
         for (Annotation tla : annos) {
-            pw.print(' ');
-            printAnnotation(tla);
+            if (!tla.def.name.contains("+")) {
+                pw.print(' ');
+                printAnnotation(tla);
+            }
         }
     }
 
