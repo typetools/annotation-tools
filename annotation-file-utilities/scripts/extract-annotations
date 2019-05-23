@@ -7,15 +7,34 @@
 # If the very first argument is "--debug-script", debug this script (but
 # don't pass --debug-script to the underlying program).
 DEBUG=0
-if [ "$1" = "--debug-script" ]; then
-  DEBUG=1
-  shift 1
-fi
+#if [ "$1" = "--debug-script" ]; then
+#  DEBUG=1
+#  shift 1
+#fi
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --debug-script)
+      DEBUG=1
+      shift
+      ;;
+    -cp|--classpath) # modify classpath
+      if [ -z "$CLASSPATH" ]; then
+        CLASSPATH=$2
+      else
+        CLASSPATH=${CLASSPATH}:$2
+      fi
+      shift 2
+      ;;
+    *)
+      break
+      ;;
+  esac
+done
 
 AFU=${AFU:-$(dirname $0)/..}
 #ANNOTATION_FILE_UTILS=${AFU}/bin:${AFU}/../scene-lib/bin:${AFU}/../asmx/bin:${AFU}/annotation-file-utilities-all.jar
 ANNOTATION_FILE_UTILS=${AFU}/bin:${AFU}/new-tests:${AFU}/../scene-lib/bin:${AFU}/annotation-file-utilities-all.jar
-CLASSPATH=${AFU}/new-tests.jar
 
 if [ "$DEBUG" = "1" ]; then
   echo "--- start of extract-annotations debugging output"
