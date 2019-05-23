@@ -257,7 +257,7 @@ public final class JavapParser {
             // TODO: update location representation
             // if (targetType.) {
                 List<Integer> location = parseInnerTypeLocationNums();
-                TypePath typePath = getTypePathFromBinary(location);
+                List<TypePathEntry> typePath = getTypePathEntryListFromBinary(location);
                 subElement = subOuterType.innerTypes.getVivify(typePath);
             // } else
             //    subElement = subOuterType;

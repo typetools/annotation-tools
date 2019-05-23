@@ -13,6 +13,8 @@ import scenelib.annotations.*;
 import scenelib.annotations.el.*;
 import scenelib.annotations.field.*;
 
+import static scenelib.annotations.el.TypePathEntry.typePathToList;
+
 /**
  * A <code> ClassAnnotationSceneReader </code> is a
  * {@link org.objectweb.asm.ClassVisitor} that will insert all annotations it
@@ -616,8 +618,8 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
         case TypeReference.METHOD_TYPE_PARAMETER:
           handleMethodTypeParameter((AMethod) aElement);
           break;
-        case TypeReference.EXCEPTION_PARAMETER:   // TODO
-          break;
+        case TypeReference.EXCEPTION_PARAMETER:   // TODO: Change if this error is ever thrown.
+          throw new Error("EXCEPTION_PARAMETER TypeReference case.");
         // TODO: ensure all cases covered.
         default:
           // TODO: We can probably delete this default case, since this will never happen.
@@ -654,7 +656,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
           .tlAnnotationsHere.add(makeAnnotation());
     } else {
       aClass.bounds.getVivify(makeBoundLocation())
-          .innerTypes.getVivify(typePath)
+          .innerTypes.getVivify(typePathToList(typePath))
           .tlAnnotationsHere.add(makeAnnotation());
     }
   }
@@ -670,7 +672,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
           .tlAnnotationsHere.add(makeAnnotation());
     } else {
       aClass.extendsImplements.getVivify(typeIndexLocation)
-          .innerTypes.getVivify(typePath)
+          .innerTypes.getVivify(typePathToList(typePath))
           .tlAnnotationsHere.add(makeAnnotation());
     }
   }
@@ -692,7 +694,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
             .tlAnnotationsHere.add(makeAnnotation());
       } else {
         aTypeElement
-            .innerTypes.getVivify(typePath)
+            .innerTypes.getVivify(typePathToList(typePath))
             .tlAnnotationsHere.add(makeAnnotation());
       }
     } else {
@@ -711,7 +713,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
           .type.tlAnnotationsHere.add(makeAnnotation());
     } else {
       aMethod.parameters.getVivify(typeReference.getFormalParameterIndex())
-          .type.innerTypes.getVivify(typePath)
+          .type.innerTypes.getVivify(typePathToList(typePath))
           .tlAnnotationsHere.add(makeAnnotation());
     }
   }
@@ -737,7 +739,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
           .tlAnnotationsHere.add(makeAnnotation());
     } else {
       aMethod.bounds.getVivify(makeBoundLocation())
-          .innerTypes.getVivify(typePath)
+          .innerTypes.getVivify(typePathToList(typePath))
           .tlAnnotationsHere.add(makeAnnotation());
     }
   }
@@ -755,7 +757,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
           .tlAnnotationsHere.add(makeAnnotation());
     } else {
       aMethod.returnType
-          .innerTypes.getVivify(typePath)
+          .innerTypes.getVivify(typePathToList(typePath))
           .tlAnnotationsHere.add(makeAnnotation());
     }
   }
@@ -771,7 +773,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
           .tlAnnotationsHere.add(makeAnnotation());
     } else {
       aMethod.receiver.type
-          .innerTypes.getVivify(typePath)
+          .innerTypes.getVivify(typePathToList(typePath))
           .tlAnnotationsHere.add(makeAnnotation());
     }
   }
@@ -797,7 +799,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
           .tlAnnotationsHere.add(makeAnnotation());
     } else {
       aMethod.body.news.getVivify(makeOffset(false))
-          .innerTypes.getVivify(typePath)
+          .innerTypes.getVivify(typePathToList(typePath))
           .tlAnnotationsHere.add(makeAnnotation());
     }
   }
@@ -813,7 +815,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
           .tlAnnotationsHere.add(makeAnnotation());
     } else {
       aMethod.body.typecasts.getVivify(makeOffset(false))
-          .innerTypes.getVivify(typePath)
+          .innerTypes.getVivify(typePathToList(typePath))
           .tlAnnotationsHere.add(makeAnnotation());
     }
   }
@@ -828,7 +830,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
           .tlAnnotationsHere.add(makeAnnotation());
     } else {
       aMethod.body.refs.getVivify(makeOffset(false))
-          .innerTypes.getVivify(typePath)
+          .innerTypes.getVivify(typePathToList(typePath))
           .tlAnnotationsHere.add(makeAnnotation());
     }
   }
@@ -844,7 +846,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
           .tlAnnotationsHere.add(makeAnnotation());
     } else {
       aMethod.body.typecasts.getVivify(makeOffset(true))
-          .innerTypes.getVivify(typePath)
+          .innerTypes.getVivify(typePathToList(typePath))
           .tlAnnotationsHere.add(makeAnnotation());
     }
   }
@@ -859,7 +861,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
           .tlAnnotationsHere.add(makeAnnotation());
     } else {
       aMethod.body.calls.getVivify(makeOffset(true))
-          .innerTypes.getVivify(typePath)
+          .innerTypes.getVivify(typePathToList(typePath))
           .tlAnnotationsHere.add(makeAnnotation());
     }
   }
@@ -875,7 +877,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
           .tlAnnotationsHere.add(makeAnnotation());
     } else {
       aMethod.body.refs.getVivify(makeOffset(true))
-          .innerTypes.getVivify(typePath)
+          .innerTypes.getVivify(typePathToList(typePath))
           .tlAnnotationsHere.add(makeAnnotation());
     }
   }
@@ -891,7 +893,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
           .type.tlAnnotationsHere.add(makeAnnotation());
     } else {
       aMethod.body.locals.getVivify(makeLocalLocation())
-          .type.innerTypes.getVivify(typePath)
+          .type.innerTypes.getVivify(typePathToList(typePath))
           .tlAnnotationsHere.add(makeAnnotation());
     }
   }

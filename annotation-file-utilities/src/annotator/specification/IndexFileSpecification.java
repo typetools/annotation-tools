@@ -230,10 +230,10 @@ public class IndexFileSpecification {
       BoundLocation boundLoc = entry.getKey();
       ATypeElement bound = entry.getValue();
       CriterionList boundList = clist.add(Criteria.classBound(className, boundLoc));
-      for (Entry<TypePath, ATypeElement> innerEntry : bound.innerTypes.entrySet()) {
-        TypePath innerLoc = innerEntry.getKey();
+      for (Entry<List<TypePathEntry>, ATypeElement> innerEntry : bound.innerTypes.entrySet()) {
+        List<TypePathEntry> innerLoc = innerEntry.getKey();
         AElement ae = innerEntry.getValue();
-        CriterionList innerBoundList = boundList.add(Criteria.atLocation(innerLoc));
+        CriterionList innerBoundList = boundList.add(Criteria.atLocation(TypePathEntry.listToTypePath(innerLoc)));
         parseElement(innerBoundList, ae);
       }
       CriterionList outerClist = boundList.add(Criteria.atLocation());
@@ -248,10 +248,10 @@ public class IndexFileSpecification {
       ATypeElement ei = entry.getValue();
       CriterionList eiList = clist.add(Criteria.atExtImplsLocation(className, eiLoc));
 
-      for (Entry<TypePath, ATypeElement> innerEntry : ei.innerTypes.entrySet()) {
-        TypePath innerLoc = innerEntry.getKey();
+      for (Entry<List<TypePathEntry>, ATypeElement> innerEntry : ei.innerTypes.entrySet()) {
+        List<TypePathEntry> innerLoc = innerEntry.getKey();
         AElement ae = innerEntry.getValue();
-        CriterionList innerBoundList = eiList.add(Criteria.atLocation(innerLoc));
+        CriterionList innerBoundList = eiList.add(Criteria.atLocation(TypePathEntry.listToTypePath(innerLoc)));
         parseElement(innerBoundList, ae);
       }
       parseElement(eiList, ei);
@@ -549,10 +549,10 @@ public class IndexFileSpecification {
    */
   private void parseInnerAndOuterElements(CriterionList clist, ATypeElement typeElement, boolean isCastInsertion) {
     List<Insertion> innerInsertions = new ArrayList<Insertion>();
-    for (Entry<TypePath, ATypeElement> innerEntry : typeElement.innerTypes.entrySet()) {
-      TypePath innerLoc = innerEntry.getKey();
+    for (Entry<List<TypePathEntry>, ATypeElement> innerEntry : typeElement.innerTypes.entrySet()) {
+      List<TypePathEntry> innerLoc = innerEntry.getKey();
       AElement innerElement = innerEntry.getValue();
-      CriterionList innerClist = clist.add(Criteria.atLocation(innerLoc));
+      CriterionList innerClist = clist.add(Criteria.atLocation(TypePathEntry.listToTypePath(innerLoc)));
       innerInsertions.addAll(parseElement(innerClist, innerElement, isCastInsertion));
     }
     CriterionList outerClist = clist;

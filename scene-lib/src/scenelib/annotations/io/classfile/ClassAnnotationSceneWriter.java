@@ -246,9 +246,9 @@ public class ClassAnnotationSceneWriter extends ClassVisitor {
 
         typeReference = TypeReference.newTypeParameterBoundReference(TypeReference.CLASS_TYPE_PARAMETER_BOUND,
             bloc.paramIndex, bloc.boundIndex);
-        for (Map.Entry<TypePath, ATypeElement> e2 :
+        for (Map.Entry<List<TypePathEntry>, ATypeElement> e2 :
           bound.innerTypes.entrySet()) {
-          TypePath typePath = e2.getKey();
+          TypePath typePath = TypePathEntry.listToTypePath(e2.getKey());
           ATypeElement innerType = e2.getValue();
 
           for (Annotation tla : innerType.tlAnnotationsHere) {
@@ -467,13 +467,13 @@ public class ClassAnnotationSceneWriter extends ClassVisitor {
       }
 
       // Now do field generics/arrays.
-      for (Map.Entry<TypePath, ATypeElement> fieldInnerEntry :
+      for (Map.Entry<List<TypePathEntry>, ATypeElement> fieldInnerEntry :
         aField.type.innerTypes.entrySet()) {
         for (Annotation tla : fieldInnerEntry.getValue().tlAnnotationsHere) {
           if ((!overwrite) && existingFieldAnnotations.contains(name(tla))) {
             continue;
           }
-          AnnotationVisitor xav = fv.visitTypeAnnotation(typeReference.getValue(), fieldInnerEntry.getKey(),
+          AnnotationVisitor xav = fv.visitTypeAnnotation(typeReference.getValue(), TypePathEntry.listToTypePath(fieldInnerEntry.getKey()),
               classNameToDesc(name(tla)), isRuntimeRetention(tla));
 
           // Seems like ASM's visitTypeAnnotation already visits the target type and location, so we probably don't need
@@ -679,9 +679,9 @@ public class ClassAnnotationSceneWriter extends ClassVisitor {
         }
 
         // now do annotations on inner type of aLocation (local variable)
-        for (Map.Entry<TypePath, ATypeElement> e :
+        for (Map.Entry<List<TypePathEntry>, ATypeElement> e :
           aLocation.type.innerTypes.entrySet()) {
-          TypePath localVariableLocation = e.getKey();
+          TypePath localVariableLocation = TypePathEntry.listToTypePath(e.getKey());;
           ATypeElement aInnerType = e.getValue();
           for (Annotation tla : aInnerType.tlAnnotationsHere) {
             if (shouldSkip(tla)) {
@@ -827,8 +827,8 @@ public class ClassAnnotationSceneWriter extends ClassVisitor {
             xav.visitEnd();
           }
 
-          for (Map.Entry<TypePath, ATypeElement> e1 : aParameter.type.innerTypes.entrySet()) {
-            TypePath aParameterLocation = e1.getKey();
+          for (Map.Entry<List<TypePathEntry>, ATypeElement> e1 : aParameter.type.innerTypes.entrySet()) {
+            TypePath aParameterLocation = TypePathEntry.listToTypePath(e1.getKey());;
             ATypeElement aInnerType = e1.getValue();
             for (Annotation tla : aInnerType.tlAnnotationsHere) {
               if (shouldSkip(tla)) {
@@ -933,11 +933,12 @@ public class ClassAnnotationSceneWriter extends ClassVisitor {
 
       // Now do generic/array information on return type
       aTypeElement.innerTypes.forEach((location, innerType) ->  {
+        TypePath typePath = TypePathEntry.listToTypePath(location);
         for (Annotation tla : innerType.tlAnnotationsHere) {
           if (maybeSkip && shouldSkip(tla)) {
             continue;
           }
-          AnnotationVisitor xav = visitTypeAnnotation(tla, typeReference, location);
+          AnnotationVisitor xav = visitTypeAnnotation(tla, typeReference, typePath);
           visitFields(xav, tla);
           xav.visitEnd();
         }
@@ -959,12 +960,13 @@ public class ClassAnnotationSceneWriter extends ClassVisitor {
 
       // now do inner annotations of call
       aTypeElement.innerTypes.forEach((location, aInnerType) -> {
+        TypePath typePath = TypePathEntry.listToTypePath(location);
         for (Annotation tla : aInnerType.tlAnnotationsHere) {
           if (maybeSkip && shouldSkip(tla)) {
             continue;
           }
 
-          AnnotationVisitor xav = super.visitInsnAnnotation(typeReference.getValue(), location,
+          AnnotationVisitor xav = super.visitInsnAnnotation(typeReference.getValue(), typePath,
               classNameToDesc(name(tla)), isRuntimeRetention(tla));
           // TODO: We have offset. Do we need to use it anywhere?
 //            visitOffset(xav, offset);

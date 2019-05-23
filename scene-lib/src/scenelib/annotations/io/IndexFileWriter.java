@@ -172,9 +172,9 @@ public final class IndexFileWriter {
     }
 
     private void printInnerTypes(String indentation, ATypeElement e) {
-      for (Map. Entry<TypePath,
+      for (Map. Entry<List<TypePathEntry>,
               ATypeElement> ite : e.innerTypes.entrySet()) {
-          TypePath typePath = ite.getKey();
+          TypePath typePath = TypePathEntry.listToTypePath(ite.getKey());
           AElement it = ite.getValue();
           pw.print(indentation + "inner-type");
           char sep = ' ';
@@ -192,9 +192,9 @@ public final class IndexFileWriter {
 
     private void printInnerTypes(String indentation, ATypeElement e,
             ASTPath path) {
-        for (Map. Entry<TypePath,
+        for (Map. Entry<List<TypePathEntry>,
                 ATypeElement> ite : e.innerTypes.entrySet()) {
-            TypePath typePath = ite.getKey();
+            TypePath typePath = TypePathEntry.listToTypePath(ite.getKey());
             AElement it = ite.getValue();
             pw.print(indentation + "inner-type");
             char sep = ' ';
@@ -247,9 +247,9 @@ public final class IndexFileWriter {
             return;
         }
         printElement(indentation + INDENT, "type", e.type);
-        for (Map. Entry<TypePath, ATypeElement> ite
+        for (Map. Entry<List<TypePathEntry>, ATypeElement> ite
                 : e.type.innerTypes.entrySet()) {
-            TypePath typePath = ite.getKey();
+            TypePath typePath = TypePathEntry.listToTypePath(ite.getKey());
             AElement it = ite.getValue();
             pw.print(indentation + INDENT + INDENT + "inner-type");
             boolean first = true;

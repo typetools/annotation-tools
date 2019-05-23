@@ -705,7 +705,7 @@ public final class IndexFileParser {
             } catch (AssertionError ex) {
                 throw new ParseException(ex.getMessage(), ex);
             }
-            AElement it = e.innerTypes.getVivify(typePath);
+            AElement it = e.innerTypes.getVivify(TypePathEntry.typePathToList(typePath));
             expectChar(':');
             parseAnnotations(it);
         }
@@ -1155,7 +1155,7 @@ public final class IndexFileParser {
                 } else {
                     i = decl.insertAnnotations.getVivify(pair.a);
                     if (pair.b != null) {
-                        i = i.innerTypes.getVivify(pair.b);
+                        i = i.innerTypes.getVivify(TypePathEntry.typePathToList(pair.b));
                         offset = pair.b.getLength();
                     }
                 }

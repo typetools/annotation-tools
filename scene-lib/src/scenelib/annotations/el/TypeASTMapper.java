@@ -43,7 +43,7 @@ public abstract class TypeASTMapper<N> {
         if (ls.isEmpty()) {
             return te;
         } else {
-            return te.innerTypes.getVivify(listToTypePath(ls));
+            return te.innerTypes.getVivify(ls);
         }
     }
 
