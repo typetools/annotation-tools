@@ -499,9 +499,9 @@ public class GenericArrayLocationCriterion implements Criterion {
   @Override
   public String toString() {
     return "GenericArrayLocationCriterion at " +
-    typePath == null
-     ? "outermost type"
-     : ("( " + typePath.toString() + " )");
+        (typePath == null
+            ? "outermost type"
+            : ("( " + typePath.toString() + " )"));
   }
 
   /**
@@ -510,7 +510,7 @@ public class GenericArrayLocationCriterion implements Criterion {
    * @return an unmodifiable list of {@link TypePathEntry}s
    */
   public List<TypePathEntry> getLocation() {
-    return Collections.unmodifiableList(location);
+    return location == null ? Collections.emptyList() : Collections.unmodifiableList(location);
   }
 
   private static List<TypePathEntry> typePathToList(TypePath typePath) {
