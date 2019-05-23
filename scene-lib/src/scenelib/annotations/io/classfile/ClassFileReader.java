@@ -31,17 +31,17 @@ public class ClassFileReader {
   private static String linesep = System.getProperty("line.separator");
 
   static String usage
-      = "extract-annotations [options] class1 class2 ..."
-      + linesep
-      + "Each argument is a class a.b.C (that is on your classpath) or a class file"
-      + linesep
-      + "a/b/C.class.  Extracts the annotations from each such argument and prints"
-      + linesep
-      + "them in index-file format to a.b.C.jaif .  Arguments beginning with a"
-      + linesep
-      + "single '@' are interpreted as argument files to be read and expanded into"
-      + linesep
-      + "the command line.  Options:";
+    = "extract-annotations [options] class1 class2 ..."
+    + linesep
+    + "Each argument is a class a.b.C (that is on the classpath) or a class file"
+    + linesep
+    + "a/b/C.class.  Extracts the annotations from each such argument and prints"
+    + linesep
+    + "them in index-file format to a.b.C.jaif .  Arguments beginning with a"
+    + linesep
+    + "single '@' are interpreted as argument files to be read and expanded into"
+    + linesep
+    + "the command line.  Options:";
 
   /**
    * From the command line, read annotations from a class file and write
