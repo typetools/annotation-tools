@@ -245,7 +245,7 @@ extends EmptyVisitor {
       String annoTypeName = classDescToName(jvmlClassName);
       // It would be better to not require the .class file to be on the
       // classpath, but to search for it on a path that is passed to this
-      // program.  Worry about that later.
+      // program.
       Class<? extends java.lang.annotation.Annotation> annoClass;
       try {
         annoClass = (Class<? extends java.lang.annotation.Annotation>) Class.forName(annoTypeName);
