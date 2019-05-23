@@ -1,0 +1,20 @@
+package annotator.tests;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+public class LocalMultiple {
+  public void foo(Object o) {
+    List myList = null;
+
+    if (myList.size() != 0) {
+      /* @UnderInitialization*/ @java.lang.UnderInitialization Set localVar = null;
+      myList.add(localVar);
+    } else {
+      /* @Tainted*/ @java.lang.Tainted Set localVar = null;
+      myList.add(localVar);
+    }
+    foo(o);
+  }
+}
