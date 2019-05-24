@@ -43,7 +43,16 @@ public class ClassFileReader {
     + linesep
     + "single '@' are interpreted as argument files to be read and expanded into"
     + linesep
-    + "the command line.  Options:";
+    + "the command line.  A few options are available only when invoked via the"
+    + linesep
+    + "script extract-annotations, not when invoked as a Java program:"
+    + "  --debug-script                       - make the extract-annotations script output debugging information"
+    + linesep
+    + "  -cp <classpath>                      - use the given classpath instead of the CLASSPATH environment variable"
+    + linesep
+    + "  -classpath <classpath>               - use the given classpath instead of the CLASSPATH environment variable"
+    + linesep
+    + "Options that are always available:";
 
   /**
    * From the command line, read annotations from a class file and write
