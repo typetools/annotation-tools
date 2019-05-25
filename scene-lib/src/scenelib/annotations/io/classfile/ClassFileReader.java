@@ -171,12 +171,11 @@ public class ClassFileReader {
    *
    * @param scene the scene into which the annotations should be inserted
    * @param fileName the file name of the class the annotations should be
-   * read from
+   *                 read from
    * @throws IOException if there is a problem reading from
-   * <code> fileName </code>
+   *                     <code> fileName </code>
    */
-  public static void read(AScene scene, String fileName)
-  throws IOException {
+  public static void read(AScene scene, String fileName) throws IOException {
     read(scene, new FileInputStream(fileName));
   }
 
@@ -189,8 +188,7 @@ public class ClassFileReader {
    * @param className the name of the class to read in
    * @throws IOException if there is a problem reading <code> className </code>
    */
-  public static void readFromClass(AScene scene, String className)
-  throws IOException {
+  public static void readFromClass(AScene scene, String className) throws IOException {
     read(scene, new ClassReader(className));
   }
 
@@ -199,13 +197,12 @@ public class ClassFileReader {
    * and inserts them into <code> scene </code>.
    *
    * @param scene the scene into which the annotations should be inserted
-   * @param in an input stream containing the class that the annotations
-   * should be read from
+   * @param input an input stream containing the class that the annotations
+   *              should be read from
    * @throws IOException if there is a problem reading from <code> in </code>
    */
-  public static void read(AScene scene, InputStream in)
-  throws IOException {
-    read(scene, new ClassReader(in));
+  public static void read(AScene scene, InputStream input) throws IOException {
+    read(scene, new ClassReader(input));
   }
 
   public static void read(AScene scene, ClassReader cr) {
