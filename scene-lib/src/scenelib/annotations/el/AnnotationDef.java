@@ -96,17 +96,21 @@ public final class AnnotationDef extends AElement {
         }
     }
 
+    /**
+     * Constructs an annotation definition with the given name and field types.
+     * Uses {@link setFieldTypes} to protect the
+     * immutability of the annotation definition.
+     */
     public AnnotationDef(String name, Set<Annotation> tlAnnotationsHere, Map<String, ? extends AnnotationFieldType> fieldTypes) {
         this(name, tlAnnotationsHere);
         setFieldTypes(fieldTypes);
     }
 
     /**
-     * Constructs an annotation definition with the given name and field types.
+     * Sets the field types of this annotation.
      * The field type map is copied and then wrapped in an
      * {@linkplain Collections#unmodifiableMap unmodifiable map} to protect the
      * immutability of the annotation definition.
-     * You MUST call setFieldTypes afterward, even if with an empty map.  (Yuck.)
      */
     public void setFieldTypes(Map<String, ? extends AnnotationFieldType> fieldTypes) {
         this.fieldTypes = Collections.unmodifiableMap(
