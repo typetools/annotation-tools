@@ -17,7 +17,7 @@ while [ $# -gt 0 ]; do
       DEBUG=1
       shift
       ;;
-    -cp|-classpath)
+    -cp | -classpath)
       # Set the classpath
       CLASSPATH=$2
       shift 2
