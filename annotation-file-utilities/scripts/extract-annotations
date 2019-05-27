@@ -10,7 +10,7 @@
 # provided.
 DEBUG=0
 CLASSPATH=${CLASSPATH}
-while [[ $# -gt 0 ]]; do
+while [ $# -gt 0 ]; do
   case "$1" in
     --debug-script)
       # Debug this script
