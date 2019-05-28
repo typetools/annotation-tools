@@ -49,6 +49,7 @@ public class ClassFileReader {
     + "the command line.  A few options are available only when invoked via the"
     + linesep
     + "script extract-annotations, not when invoked as a Java program:"
+    + linesep
     + "  --debug-script                       - make the extract-annotations script output debugging information"
     + linesep
     + "  -cp <classpath>                      - use the given classpath instead of the CLASSPATH environment variable"
