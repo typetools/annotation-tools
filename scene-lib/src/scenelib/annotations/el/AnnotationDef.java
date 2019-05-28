@@ -1,17 +1,21 @@
 package scenelib.annotations.el;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.reflect.Method;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.Opcodes;
 import scenelib.annotations.el.AElement;
 import scenelib.annotations.AnnotationBuilder;
 import scenelib.annotations.field.*;
 import scenelib.annotations.Annotation;
 import scenelib.annotations.Annotations;
+import scenelib.annotations.util.MethodRecorder;
 
 /**
  * An annotation type definition, consisting of the annotation name,
@@ -63,6 +67,19 @@ public final class AnnotationDef extends AElement {
         }
 
         Map<String,AnnotationFieldType> fieldTypes = new LinkedHashMap<String,AnnotationFieldType>();
+        // TODO: getDeclaredMethods returns methods in arbitrary order. Check bytecode for correct order.
+        List<String> methods;
+        try {
+            ClassReader classReader = new ClassReader(name);
+            MethodRecorder methodRecorder = new MethodRecorder(Opcodes.ASM7);
+            classReader.accept(methodRecorder, 0);
+            methods = methodRecorder.getMethods();
+        } catch (IOException e) {
+            methods = null;
+            e.printStackTrace();
+        }
+        methods.forEach(m -> fieldTypes.put(m, null)); // preserves order
+
         for (Method m : annoType.getDeclaredMethods()) {
             AnnotationFieldType aft = AnnotationFieldType.fromClass(m.getReturnType(), adefs);
             fieldTypes.put(m.getName(), aft);
