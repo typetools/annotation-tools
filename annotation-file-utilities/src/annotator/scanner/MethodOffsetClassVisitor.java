@@ -1,6 +1,12 @@
 package annotator.scanner;
 
-import org.objectweb.asm.*;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Handle;
+import org.objectweb.asm.Label;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
 
 import scenelib.annotations.io.classfile.CodeOffsetAdapter;
 
@@ -63,8 +69,11 @@ public class MethodOffsetClassVisitor extends ClassVisitor {
     @Override
     public void visitLocalVariable(String name, String descriptor, String signature, Label start, Label end, int index) {
       super.visitLocalVariable(name, descriptor, signature, start, end, index);
-      LocalVariableScanner.addToMethodNameIndexMap(Pair.of(methodName, Pair.of(index, start.getOffset())), name);
-      LocalVariableScanner.addToMethodNameCounter(methodName, name, start.getOffset());
+      LocalVariableScanner.addToMethodNameIndexMap(
+          Pair.of(methodName, Pair.of(index, start.getOffset())),
+          name);
+      LocalVariableScanner.addToMethodNameCounter(
+          methodName, name, start.getOffset());
       methodCodeOffsetAdapter.visitLocalVariable(name, descriptor, signature, start, end, index);
     }
 

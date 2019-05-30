@@ -77,7 +77,7 @@ public class GenericArrayLocationCriterion implements Criterion {
   }
 
   /**
-   * Determines if the given list holds only {@link TypePathEntry }s with the tag
+   * Determines if the given list holds only {@link TypePathEntry}s with the tag
    * {@link TypePath#ARRAY_ELEMENT}.
    *
    * @param location the list to check

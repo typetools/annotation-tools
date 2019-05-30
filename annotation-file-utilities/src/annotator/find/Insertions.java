@@ -18,7 +18,6 @@ import java.util.TreeSet;
 import javax.lang.model.element.Name;
 import javax.lang.model.type.TypeKind;
 
-//import scenelib.annotations.el.InnerTypeLocation;
 import org.objectweb.asm.TypePath;
 import scenelib.annotations.el.TypePathEntry;
 import scenelib.annotations.io.ASTIndex;
