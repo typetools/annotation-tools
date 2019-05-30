@@ -38,10 +38,12 @@ public class MethodOffsetClassVisitor extends ClassVisitor {
   }
 
   @Override
-  public MethodVisitor visitMethod(int access, String name, String descriptor, String signature, String[] exceptions) {
+  public MethodVisitor visitMethod(int access, String name,
+        String descriptor, String signature, String[  ] exceptions) {
     methodName = name + descriptor.substring(0, descriptor.indexOf(")") + 1);
     methodCodeOffsetAdapter = codeOffsetAdapter.visitMethod(access, name, descriptor, signature, exceptions);
-    return new MethodOffsetMethodVisitor(api, super.visitMethod(access, name, descriptor, signature, exceptions));
+    return new MethodOffsetMethodVisitor(
+        api, super.visitMethod(access, name, descriptor, signature, exceptions));
   }
 
   /**
@@ -67,7 +69,8 @@ public class MethodOffsetClassVisitor extends ClassVisitor {
     }
 
     @Override
-    public void visitLocalVariable(String name, String descriptor, String signature, Label start, Label end, int index) {
+    public void visitLocalVariable(String name, String descriptor,
+          String signature, Label start, Label end, int index)  {
       super.visitLocalVariable(name, descriptor, signature, start, end, index);
       LocalVariableScanner.addToMethodNameIndexMap(
           Pair.of(methodName, Pair.of(index, start.getOffset())),
@@ -90,14 +93,16 @@ public class MethodOffsetClassVisitor extends ClassVisitor {
       switch (opcode) {
       case Opcodes.CHECKCAST:
         // CastScanner.addCastToMethod(methodName, labelOffset() + 1);
-        CastScanner.addCastToMethod(methodName, codeOffsetAdapter.getMethodCodeOffset());
+        CastScanner.addCastToMethod(methodName,
+            codeOffsetAdapter.getMethodCodeOffset());
         break;
       case Opcodes.NEW:
       case Opcodes.ANEWARRAY:
         NewScanner.addNewToMethod(methodName, labelOffset());
         break;
       case Opcodes.INSTANCEOF:
-        InstanceOfScanner.addInstanceOfToMethod(methodName, labelOffset() + 1);
+        InstanceOfScanner.addInstanceOfToMethod(methodName,
+            labelOffset() + 1);
         break;
       }
       methodCodeOffsetAdapter.visitTypeInsn(opcode, descriptor);
@@ -120,16 +125,18 @@ public class MethodOffsetClassVisitor extends ClassVisitor {
     }
 
     @Override
-    public void visitMethodInsn(int opcode, String owner, String name, String descriptor) {
+    public void visitMethodInsn(int opcode, String owner, String name,
+        String descriptor) {
       super.visitMethodInsn(opcode, owner, name, descriptor);
       switch (opcode) {
-        case Opcodes.INVOKEINTERFACE:
-        case Opcodes.INVOKESTATIC:
-        case Opcodes.INVOKEVIRTUAL:
-          MethodCallScanner.addMethodCallToMethod(methodName, labelOffset());
-          break;
-        default:
-          break;
+      case Opcodes.INVOKEINTERFACE:
+      case Opcodes.INVOKESTATIC:
+      case Opcodes.INVOKEVIRTUAL:
+        MethodCallScanner.addMethodCallToMethod(methodName,
+            labelOffset());
+        break;
+      default:
+        break;
       }
       methodCodeOffsetAdapter.visitMethodInsn(opcode, owner, name, descriptor);
     }
@@ -150,9 +157,11 @@ public class MethodOffsetClassVisitor extends ClassVisitor {
     }
 
     @Override
-    public void visitInvokeDynamicInsn(String name, String descriptor, Handle bsm, Object... bsmArgs) {
+    public void visitInvokeDynamicInsn(String name, String descriptor,
+        Handle bsm, Object... bsmArgs) {
       super.visitInvokeDynamicInsn(name, descriptor, bsm, bsmArgs);
-      LambdaScanner.addLambdaExpressionToMethod(methodName, labelOffset());
+      LambdaScanner.addLambdaExpressionToMethod(methodName,
+          labelOffset());
       methodCodeOffsetAdapter.visitInvokeDynamicInsn(name, descriptor, bsm, bsmArgs);
     }
 
@@ -175,7 +184,8 @@ public class MethodOffsetClassVisitor extends ClassVisitor {
     }
 
     @Override
-    public void visitFieldInsn(int opcode, String owner, String name, String descriptor) {
+    public void visitFieldInsn(int opcode, String owner, String name,
+        String descriptor) {
       super.visitFieldInsn(opcode, owner, name, descriptor);
       methodCodeOffsetAdapter.visitFieldInsn(opcode, owner, name, descriptor);
     }
@@ -199,7 +209,8 @@ public class MethodOffsetClassVisitor extends ClassVisitor {
     }
 
     @Override
-    public void visitTableSwitchInsn(int min, int max, Label dflt, Label[] labels) {
+    public void visitTableSwitchInsn(int min, int max, Label dflt,
+        Label[] labels) {
       super.visitTableSwitchInsn(min, max, dflt, labels);
       methodCodeOffsetAdapter.visitTableSwitchInsn(min, max, dflt, labels);
     }

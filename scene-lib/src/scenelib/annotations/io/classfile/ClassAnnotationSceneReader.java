@@ -92,10 +92,13 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
    * insert all the annotations in the class that it visits into
    * <code>scene</code>.
    * @param classReader the {@link ClassReader} that visits this <code>ClassAnnotationSceneReader</code>.
-   * @param scene the annotation scene into which annotations this visits will be inserted
-   * @param ignoreBridgeMethods whether to omit annotations on compiler-generated methods
+   * @param scene the annotation scene into which annotations this visits
+   *  will be inserted
+   * @param ignoreBridgeMethods whether to omit annotations on
+   *  compiler-generated methods
    */
-  public ClassAnnotationSceneReader(int api, ClassReader classReader, AScene scene, boolean ignoreBridgeMethods) {
+  public ClassAnnotationSceneReader(int api, ClassReader classReader, AScene scene,
+      boolean ignoreBridgeMethods) {
     super(api);
     this.classReader = classReader;
     this.classWriter = new ClassWriter(classReader, api);
@@ -105,16 +108,17 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
   }
 
   /**
-   * @see org.objectweb.asm.ClassVisitor#visit
+   * @see org.objectweb.asm.ClassVisitor#visit(int, int, java.lang.String, java.lang.String, java.lang.String, java.lang.String[])
    */
   @Override
-  public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
+  public void visit(int version, int access, String name, String signature,
+      String superName, String[] interfaces) {
     classWriter.visit(version, access, name, signature, superName, interfaces);
     aClass = scene.classes.getVivify(name.replace('/', '.'));
   }
 
   /**
-   * @see org.objectweb.asm.ClassVisitor#visitAnnotation
+   * @see org.objectweb.asm.ClassVisitor#visitAnnotation(java.lang.String, boolean)
    */
   @Override
   public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
@@ -124,7 +128,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
   }
 
   /**
-   * @see org.objectweb.asm.ClassVisitor#visitTypeAnnotation
+   * @see org.objectweb.asm.ClassVisitor#visitTypeAnnotation(java.lang.String, boolean, boolean)
    */
   @Override
   public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String descriptor, boolean visible) {
@@ -135,7 +139,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
   }
 
   /**
-   * @see org.objectweb.asm.ClassVisitor#visitField
+   * @see org.objectweb.asm.ClassVisitor#visitField(int, java.lang.String, java.lang.String, java.lang.String, java.lang.Object)
    */
   @Override
   public FieldVisitor visitField(
