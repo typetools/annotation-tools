@@ -15,7 +15,7 @@ import scenelib.annotations.util.AbstractClassVisitor;
 public class CodeOffsetAdapter extends ClassAdapter {
   static final DebugWriter debug;
   final ClassReader classReader;
-  final char[] buf;
+  final char[] buffer;
   int methodStart;
   int codeStart;
   int offset;
@@ -33,7 +33,7 @@ public class CodeOffsetAdapter extends ClassAdapter {
     super(v);
     this.classReader = classReader;
     // const pool size is (not lowest) upper bound of string length
-    buf = new char[classReader.header];
+    buffer = new char[classReader.header];
     methodStart = classReader.header + 6;
     methodStart += 4 + 2 * classReader.readUnsignedShort(methodStart);
     for (int i = classReader.readUnsignedShort(methodStart-2); i > 0; --i) {
@@ -49,14 +49,14 @@ public class CodeOffsetAdapter extends ClassAdapter {
   public MethodVisitor visitMethod(int access,
       String name, String descriptor,
       String signature, String[] exceptions) {
-    MethodVisitor v =
+    MethodVisitor methodVisitor =
         super.visitMethod(access, name, descriptor, signature, exceptions);
-    return new MethodAdapter(v) {
+    return new MethodAdapter(methodVisitor) {
       private int methodEnd;
 
       {
-        String name = classReader.readUTF8(methodStart + 2, buf);
-        String descriptor = classReader.readUTF8(methodStart + 4, buf);
+        String name = classReader.readUTF8(methodStart + 2, buffer);
+        String descriptor = classReader.readUTF8(methodStart + 4, buffer);
         int attrCount = classReader.readUnsignedShort(methodStart + 6);
         debug.debug("visiting %s%s (%d)%n", name, descriptor, methodStart);
         debug.debug("%d attributes%n", attrCount);
@@ -66,14 +66,14 @@ public class CodeOffsetAdapter extends ClassAdapter {
         codeStart = methodEnd;
         if (attrCount > 0) {
           while (--attrCount >= 0) {
-            String attrName = classReader.readUTF8(codeStart, buf);
+            String attrName = classReader.readUTF8(codeStart, buffer);
             debug.debug("attribute %s%n", attrName);
             if ("Code".equals(attrName)) {
               codeStart += 6;
               offset = codeStart + classReader.readInt(codeStart - 4);
               codeStart += 8;
               while (--attrCount >= 0) {
-                debug.debug("attribute %s%n", classReader.readUTF8(offset, buf));
+                debug.debug("attribute %s%n", classReader.readUTF8(offset, buffer));
                 offset += 6 + classReader.readInt(offset + 2);
               }
               methodEnd = offset;
@@ -91,11 +91,9 @@ public class CodeOffsetAdapter extends ClassAdapter {
       }
 
       @Override
-      public void visitFieldInsn(int opcode,
-          String owner, String name, String descriptor) {
+      public void visitFieldInsn(int opcode, String owner, String name, String descriptor) {
         super.visitFieldInsn(opcode, owner, name, descriptor);
-        debug.debug("%d visitFieldInsn(%d, %s, %s, %s)%n", offset,
-            opcode, owner, name, descriptor);
+        debug.debug("%d visitFieldInsn(%d, %s, %s, %s)%n", offset, opcode, owner, name, descriptor);
         offset += 3;
       }
 

@@ -707,8 +707,7 @@ public final class IndexFileParser {
     private void parseInnerTypes(ATypeElement e, int offset)
             throws IOException, ParseException {
         while (matchKeyword("inner-type")) {
-            ArrayList<Integer> locNumbers =
-                    new ArrayList<Integer>();
+            ArrayList<Integer> locNumbers = new ArrayList<>();
             locNumbers.add(offset + expectNonNegative(matchNNInteger()));
             // TODO: currently, we simply read the binary representation.
             // Should we read a higher-level format?
@@ -1206,11 +1205,10 @@ public final class IndexFileParser {
                 int a = entry.getArgument();
                 if (a > 0) {
                     outerPath = astPath.getParentPath().extend(new ASTPath.ASTEntry(Kind.NEW_ARRAY, ASTPath.TYPE, 0));
-            loc = new InnerTypeLocation(TypeAnnotationPosition.getTypePathFromBinary(Collections.nCopies(2 * a, 0)));
+                    loc = TypePathEntry.getTypePathFromBinary(Collections.nCopies(2 * a, 0));
                 }
             }
         }
-
         return Pair.of(outerPath, loc);
     }
 

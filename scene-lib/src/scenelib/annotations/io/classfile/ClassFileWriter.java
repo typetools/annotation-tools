@@ -104,7 +104,6 @@ public class ClassFileWriter {
     }
 
     for (int i = 0; i < file_args.length; i++) {
-
       String className = file_args[i];
       i++;
       if (i >= file_args.length) {
@@ -145,7 +144,6 @@ public class ClassFileWriter {
         return;
       }
     }
-
   }
 
   /**
@@ -193,7 +191,7 @@ public class ClassFileWriter {
    * annotations from <code> scene </code>.
    *
    * @param scene the scene containing the annotations to insert into a class
-   * @param in the input stream from which to read a class
+   * @param input the input stream from which to read a class
    * @param out the output stream the merged class should be written to
    * @param overwrite controls behavior when an annotation exists on a
    * particular element in both the scene and the class file.  If true,
@@ -202,9 +200,8 @@ public class ClassFileWriter {
    * @throws IOException if there is a problem reading from <code> in </code> or
    * writing to <code> out </code>
    */
-  public static void insert(AScene scene, InputStream in,
-      OutputStream out, boolean overwrite) throws IOException {
-    ClassReader classReader = new ClassReader(in);
+  public static void insert(AScene scene, InputStream input, OutputStream out, boolean overwrite) throws IOException {
+    ClassReader classReader = new ClassReader(input);
 
     ClassAnnotationSceneWriter classAnnotationSceneWriter =
       new ClassAnnotationSceneWriter(classReader, scene, overwrite);

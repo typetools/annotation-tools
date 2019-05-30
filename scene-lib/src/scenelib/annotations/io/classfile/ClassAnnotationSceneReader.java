@@ -76,9 +76,9 @@ extends EmptyVisitor {
    * the definition itself.  Maps from both the qualified name and the
    * unqualified name.  If the unqualified name is not unique, it maps
    * to null and the qualified name should be used instead. */
-  private final Map<String, AnnotationDef> adefs = initAdefs();
-  private static Map<String,AnnotationDef> initAdefs() {
-    Map<String,AnnotationDef> result = new HashMap<String,AnnotationDef>();
+  private final Map<String, AnnotationDef> annotationDefinitions = initialiseAnnotationDefinitions();
+  private static Map<String,AnnotationDef> initialiseAnnotationDefinitions() {
+    Map<String,AnnotationDef> result = new HashMap<>();
     for (AnnotationDef ad : Annotations.standardDefs) {
       result.put(ad.name, ad);
     }
@@ -260,7 +260,7 @@ extends EmptyVisitor {
         throw new Error(e);
       }
 
-      AnnotationDef ad = AnnotationDef.fromClass(annoClass, adefs);
+      AnnotationDef ad = AnnotationDef.fromClass(annoClass, annotationDefinitions);
 
       return ad;
     }
@@ -362,7 +362,7 @@ extends EmptyVisitor {
      * the same elements as in hiddenArray.
      */
     private List<Object> asList(Object hiddenArray) {
-      List<Object> objects = new ArrayList<Object>();
+      List<Object> objects = new ArrayList<>();
       Class<?> c = hiddenArray.getClass().getComponentType();
       if (c.equals(boolean.class)) {
         for (boolean o : (boolean[]) hiddenArray) {

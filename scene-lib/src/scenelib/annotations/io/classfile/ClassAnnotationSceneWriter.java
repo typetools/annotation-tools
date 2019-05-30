@@ -136,10 +136,10 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
     this.scene = scene;
     this.hasVisitedClassAnnotationsInScene = false;
     this.aClass = null;
-    this.existingClassAnnotations = new ArrayList<String>();
+    this.existingClassAnnotations = new ArrayList<>();
     this.overwrite = overwrite;
-    this.dynamicConstructors = new HashMap<String, Set<Integer>>();
-    this.lambdaExpressions = new HashMap<String, Set<Integer>>();
+    this.dynamicConstructors = new HashMap<>();
+    this.lambdaExpressions = new HashMap<>();
     this.classReader = classReader;
   }
 
@@ -609,8 +609,8 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
     MethodAnnotationSceneWriter(String name, String descriptor, MethodVisitor mv) {
       super(mv);
       this.hasVisitedMethodAnnotations = false;
-      this.aMethod = aClass.methods.getVivify(name+descriptor);
-      this.existingMethodAnnotations = new ArrayList<String>();
+      this.aMethod = aClass.methods.getVivify(name + descriptor);
+      this.existingMethodAnnotations = new ArrayList<>();
     }
 
     @Override
@@ -665,8 +665,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
      * because it already exists in this method's annotations.
      */
     private boolean shouldSkipExisting(String name) {
-      return ((!overwrite)
-              && aMethod.lookup(name) != null);
+      return ((!overwrite) && aMethod.lookup(name) != null);
     }
 
     /**
@@ -707,7 +706,6 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
         visitFields(av, tla);
         av.visitEnd();
       }
-
     }
 
     /**
@@ -831,7 +829,6 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
             visitFields(xav, tla);
             xav.visitEnd();
           }
-
         }
       }
     }
@@ -1351,12 +1348,12 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
       String methodDescription = name + descriptor;
       constrs = dynamicConstructors.get(methodDescription);
       if (constrs == null) {
-        constrs = new TreeSet<Integer>();
+        constrs = new TreeSet<>();
         dynamicConstructors.put(methodDescription, constrs);
       }
       lambdas = lambdaExpressions.get(methodDescription);
       if (lambdas == null) {
-        lambdas = new TreeSet<Integer>();
+        lambdas = new TreeSet<>();
         lambdaExpressions.put(methodDescription, lambdas);
       }
 
