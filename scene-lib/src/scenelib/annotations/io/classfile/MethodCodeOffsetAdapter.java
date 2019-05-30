@@ -46,8 +46,8 @@ class MethodCodeOffsetAdapter extends MethodAdapter {
 
   @Override
   public void visitFieldInsn(int opcode,
-      String owner, String name, String desc) {
-    super.visitFieldInsn(opcode, owner, name, desc);
+      String owner, String name, String descriptor) {
+    super.visitFieldInsn(opcode, owner, name, descriptor);
     offset += 3;
   }
 
@@ -70,9 +70,9 @@ class MethodCodeOffsetAdapter extends MethodAdapter {
   }
 
   @Override
-  public void visitInvokeDynamicInsn(String name, String desc,
+  public void visitInvokeDynamicInsn(String name, String descriptor,
       Handle bsm, Object... bsmArgs) {
-    super.visitInvokeDynamicInsn(name, desc, bsm, bsmArgs);
+    super.visitInvokeDynamicInsn(name, descriptor, bsm, bsmArgs);
     offset += 5;
   }
 
@@ -98,14 +98,14 @@ class MethodCodeOffsetAdapter extends MethodAdapter {
 
   @Override
   public void visitMethodInsn(int opcode,
-      String owner, String name, String desc) {
-    super.visitMethodInsn(opcode, owner, name, desc);
+      String owner, String name, String descriptor) {
+    super.visitMethodInsn(opcode, owner, name, descriptor);
     offset += opcode == Opcodes.INVOKEINTERFACE ? 5 : 3;
   }
 
   @Override
-  public void visitMultiANewArrayInsn(String desc, int dims) {
-    super.visitMultiANewArrayInsn(desc, dims);
+  public void visitMultiANewArrayInsn(String descriptor, int dims) {
+    super.visitMultiANewArrayInsn(descriptor, dims);
     offset += 4;
   }
 
@@ -118,8 +118,8 @@ class MethodCodeOffsetAdapter extends MethodAdapter {
   }
 
   @Override
-  public void visitTypeInsn(int opcode, String desc) {
-    super.visitTypeInsn(opcode, desc);
+  public void visitTypeInsn(int opcode, String descriptor) {
+    super.visitTypeInsn(opcode, descriptor);
     offset += 3;
   }
 
