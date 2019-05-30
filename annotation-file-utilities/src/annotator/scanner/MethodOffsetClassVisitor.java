@@ -29,7 +29,7 @@ import com.sun.tools.javac.util.Pair;
 // There is no good reason why this is the case with ASM.
 public class MethodOffsetClassVisitor extends ClassWriter {
   CodeOffsetAdapter codeOffsetAdapter;
-  MethodVisitor methodOffsetClassVisitor;
+  MethodVisitor methodCodeOffsetAdapter;
 
   // This field should be set by entry on a method through visitMethod,
   // and so all the visit* methods in LocalVariableMethodVisitor
@@ -45,7 +45,7 @@ public class MethodOffsetClassVisitor extends ClassWriter {
   public MethodVisitor visitMethod(int access, String name,
         String descriptor, String signature, String[  ] exceptions) {
     methodName = name + descriptor.substring(0, descriptor.indexOf(")") + 1);
-    methodOffsetClassVisitor = codeOffsetAdapter.visitMethod(access, name, descriptor, signature, exceptions);
+    methodCodeOffsetAdapter = codeOffsetAdapter.visitMethod(access, name, descriptor, signature, exceptions);
     return new MethodOffsetMethodVisitor(
         super.visitMethod(access, name, descriptor, signature, exceptions));
   }
@@ -81,14 +81,14 @@ public class MethodOffsetClassVisitor extends ClassWriter {
           name);
       LocalVariableScanner.addToMethodNameCounter(
           methodName, name, start.getOffset());
-      methodOffsetClassVisitor.visitLocalVariable(name, descriptor, signature, start, end, index);
+      methodCodeOffsetAdapter.visitLocalVariable(name, descriptor, signature, start, end, index);
     }
 
     @Override
     public void visitLabel(Label label) {
       super.visitLabel(label);
       lastLabel = label;
-      methodOffsetClassVisitor.visitLabel(label);
+      methodCodeOffsetAdapter.visitLabel(label);
     }
 
     @Override
@@ -109,14 +109,14 @@ public class MethodOffsetClassVisitor extends ClassWriter {
             labelOffset() + 1);
         break;
       }
-      methodOffsetClassVisitor.visitTypeInsn(opcode, descriptor);
+      methodCodeOffsetAdapter.visitTypeInsn(opcode, descriptor);
     }
 
     @Override
     public void visitMultiANewArrayInsn(String descriptor, int dims)  {
       super.visitMultiANewArrayInsn(descriptor, dims);
       NewScanner.addNewToMethod(methodName, labelOffset());
-      methodOffsetClassVisitor.visitMultiANewArrayInsn(descriptor, dims);
+      methodCodeOffsetAdapter.visitMultiANewArrayInsn(descriptor, dims);
     }
 
     @Override
@@ -125,7 +125,7 @@ public class MethodOffsetClassVisitor extends ClassWriter {
       if (opcode == Opcodes.NEWARRAY) {
         NewScanner.addNewToMethod(methodName, labelOffset());
       }
-      methodOffsetClassVisitor.visitIntInsn(opcode, operand);
+      methodCodeOffsetAdapter.visitIntInsn(opcode, operand);
     }
 
     @Override
@@ -142,7 +142,7 @@ public class MethodOffsetClassVisitor extends ClassWriter {
       default:
         break;
       }
-      methodOffsetClassVisitor.visitMethodInsn(opcode, owner, name, descriptor);
+      methodCodeOffsetAdapter.visitMethodInsn(opcode, owner, name, descriptor);
     }
 
     @Override
@@ -151,69 +151,69 @@ public class MethodOffsetClassVisitor extends ClassWriter {
       super.visitInvokeDynamicInsn(name, descriptor, bsm, bsmArgs);
       LambdaScanner.addLambdaExpressionToMethod(methodName,
           labelOffset());
-      methodOffsetClassVisitor.visitInvokeDynamicInsn(name, descriptor, bsm, bsmArgs);
+      methodCodeOffsetAdapter.visitInvokeDynamicInsn(name, descriptor, bsm, bsmArgs);
     }
 
     @Override
     public void visitCode() {
       super.visitCode();
-      methodOffsetClassVisitor.visitCode();
+      methodCodeOffsetAdapter.visitCode();
     }
 
     @Override
     public void visitInsn(int opcode) {
       super.visitInsn(opcode);
-      methodOffsetClassVisitor.visitInsn(opcode);
+      methodCodeOffsetAdapter.visitInsn(opcode);
     }
 
     @Override
     public void visitVarInsn(int opcode, int var) {
       super.visitVarInsn(opcode, var);
-      methodOffsetClassVisitor.visitVarInsn(opcode, var);
+      methodCodeOffsetAdapter.visitVarInsn(opcode, var);
     }
 
     @Override
     public void visitFieldInsn(int opcode, String owner, String name,
         String descriptor) {
       super.visitFieldInsn(opcode, owner, name, descriptor);
-      methodOffsetClassVisitor.visitFieldInsn(opcode, owner, name, descriptor);
+      methodCodeOffsetAdapter.visitFieldInsn(opcode, owner, name, descriptor);
     }
 
     @Override
     public void visitJumpInsn(int opcode, Label label) {
       super.visitJumpInsn(opcode, label);
-      methodOffsetClassVisitor.visitJumpInsn(opcode, label);
+      methodCodeOffsetAdapter.visitJumpInsn(opcode, label);
     }
 
     @Override
     public void visitLdcInsn(Object cst) {
       super.visitLdcInsn(cst);
-      methodOffsetClassVisitor.visitLdcInsn(cst);
+      methodCodeOffsetAdapter.visitLdcInsn(cst);
     }
 
     @Override
     public void visitIincInsn(int var, int increment) {
       super.visitIincInsn(var, increment);
-      methodOffsetClassVisitor.visitIincInsn(var, increment);
+      methodCodeOffsetAdapter.visitIincInsn(var, increment);
     }
 
     @Override
     public void visitTableSwitchInsn(int min, int max, Label dflt,
         Label[] labels) {
       super.visitTableSwitchInsn(min, max, dflt, labels);
-      methodOffsetClassVisitor.visitTableSwitchInsn(min, max, dflt, labels);
+      methodCodeOffsetAdapter.visitTableSwitchInsn(min, max, dflt, labels);
     }
 
     @Override
     public void visitLookupSwitchInsn(Label dflt, int[] keys, Label[] labels) {
       super.visitLookupSwitchInsn(dflt, keys, labels);
-      methodOffsetClassVisitor.visitLookupSwitchInsn(dflt, keys, labels);
+      methodCodeOffsetAdapter.visitLookupSwitchInsn(dflt, keys, labels);
     }
 
     @Override
     public void visitEnd() {
       super.visitEnd();
-      methodOffsetClassVisitor.visitEnd();
+      methodCodeOffsetAdapter.visitEnd();
     }
   }
 }
