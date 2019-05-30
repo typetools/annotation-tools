@@ -205,10 +205,10 @@ public class ClassFileReader {
     read(scene, new ClassReader(in));
   }
 
-  public static void read(AScene scene, ClassReader cr) {
+  public static void read(AScene scene, ClassReader classReader) {
     ClassAnnotationSceneReader ca =
-        new ClassAnnotationSceneReader(cr, scene, ignore_bridge_methods);
-    cr.accept(ca, true);
+        new ClassAnnotationSceneReader(classReader, scene, ignore_bridge_methods);
+    classReader.accept(ca, true);
   }
 
 }

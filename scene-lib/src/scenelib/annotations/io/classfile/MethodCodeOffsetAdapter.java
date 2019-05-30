@@ -8,7 +8,7 @@ import org.objectweb.asmx.MethodVisitor;
 import org.objectweb.asmx.Opcodes;
 
 class MethodCodeOffsetAdapter extends MethodAdapter {
-  private final ClassReader cr;
+  private final ClassReader classReader;
   private final int methodStart;
   private int offset = 0;
   private int codeStart = 0;
@@ -19,7 +19,7 @@ class MethodCodeOffsetAdapter extends MethodAdapter {
     super(methodVisitor);
     char[] buf = new char[classReader.header];
     this.methodStart = start;
-    cr = classReader;
+    this.classReader = classReader;
     // const pool size is (not lowest) upper bound of string length
     codeStart = start;
     attrCount = classReader.readUnsignedShort(codeStart + 6);
@@ -35,7 +35,7 @@ class MethodCodeOffsetAdapter extends MethodAdapter {
   }
 
   private int readInt(int i) {
-    return cr.readInt(codeStart + i);
+    return classReader.readInt(codeStart + i);
   }
 
   public int getMethodCodeStart() { return methodStart; }

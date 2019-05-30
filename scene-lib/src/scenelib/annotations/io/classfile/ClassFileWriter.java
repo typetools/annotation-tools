@@ -172,12 +172,12 @@ public class ClassFileWriter {
 
     // can't just call other insert, because this closes the input stream
     InputStream in = new FileInputStream(fileName);
-    ClassReader cr = new ClassReader(in);
+    ClassReader classReader = new ClassReader(in);
     in.close();
 
     ClassAnnotationSceneWriter cw =
-      new ClassAnnotationSceneWriter(cr, scene, overwrite);
-    cr.accept(cw, false);
+      new ClassAnnotationSceneWriter(classReader, scene, overwrite);
+    classReader.accept(cw, false);
 
     OutputStream fos = new FileOutputStream(fileName);
     fos.write(cw.toByteArray());
@@ -204,12 +204,12 @@ public class ClassFileWriter {
    */
   public static void insert(AScene scene, InputStream in,
       OutputStream out, boolean overwrite) throws IOException {
-    ClassReader cr = new ClassReader(in);
+    ClassReader classReader = new ClassReader(in);
 
     ClassAnnotationSceneWriter cw =
-      new ClassAnnotationSceneWriter(cr, scene, overwrite);
+      new ClassAnnotationSceneWriter(classReader, scene, overwrite);
 
-    cr.accept(cw, false);
+    classReader.accept(cw, false);
 
     out.write(cw.toByteArray());
   }
@@ -233,12 +233,12 @@ public class ClassFileWriter {
    */
   public static void insert(AScene scene,
       String className, String outputFileName, boolean overwrite) throws IOException {
-    ClassReader cr = new ClassReader(className);
+    ClassReader classReader = new ClassReader(className);
 
     ClassAnnotationSceneWriter cw =
-      new ClassAnnotationSceneWriter(cr, scene, overwrite);
+      new ClassAnnotationSceneWriter(classReader, scene, overwrite);
 
-    cr.accept(cw, false);
+    classReader.accept(cw, false);
 
     OutputStream fos = new FileOutputStream(outputFileName);
     fos.write(cw.toByteArray());

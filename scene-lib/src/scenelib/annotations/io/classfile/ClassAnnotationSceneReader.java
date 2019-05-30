@@ -69,7 +69,7 @@ extends EmptyVisitor {
   // The AClass that will be visited, which already contains annotations.
   private AClass aClass;
 
-  private final ClassReader cr;
+  private final ClassReader classReader;
 
   /**
    * Holds definitions we've seen so far.  Maps from annotation name to
@@ -89,16 +89,16 @@ extends EmptyVisitor {
    * Constructs a new <code> ClassAnnotationSceneReader </code> that will
    * insert all the annotations in the class that it visits into
    * <code>scene</code>.
-   * @param cr
+   * @param classReader
    *
    * @param scene the annotation scene into which annotations this visits
    *  will be inserted
    * @param ignoreBridgeMethods whether to omit annotations on
    *  compiler-generated methods
    */
-  public ClassAnnotationSceneReader(ClassReader cr, AScene scene,
+  public ClassAnnotationSceneReader(ClassReader classReader, AScene scene,
       boolean ignoreBridgeMethods) {
-    this.cr = cr;
+    this.classReader = classReader;
     this.scene = scene;
     this.ignoreBridgeMethods = ignoreBridgeMethods;
   }

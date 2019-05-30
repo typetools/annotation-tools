@@ -35,10 +35,10 @@ public class MethodOffsetClassVisitor extends ClassWriter {
   // and so all the visit* methods in LocalVariableMethodVisitor
   private String methodName;
 
-  public MethodOffsetClassVisitor(ClassReader cr) {
+  public MethodOffsetClassVisitor(ClassReader classReader) {
     super(true, false);
     this.methodName = "LocalVariableVisitor: DEFAULT_METHOD";
-    coa = new CodeOffsetAdapter(cr);
+    coa = new CodeOffsetAdapter(classReader);
   }
 
   @Override
