@@ -47,18 +47,18 @@ public class CodeOffsetAdapter extends ClassAdapter {
 
   @Override
   public MethodVisitor visitMethod(int access,
-      String name, String desc,
+      String name, String descriptor,
       String signature, String[] exceptions) {
     MethodVisitor v =
-        super.visitMethod(access, name, desc, signature, exceptions);
+        super.visitMethod(access, name, descriptor, signature, exceptions);
     return new MethodAdapter(v) {
       private int methodEnd;
 
       {
         String name = cr.readUTF8(methodStart + 2, buf);
-        String desc = cr.readUTF8(methodStart + 4, buf);
+        String descriptor = cr.readUTF8(methodStart + 4, buf);
         int attrCount = cr.readUnsignedShort(methodStart + 6);
-        debug.debug("visiting %s%s (%d)%n", name, desc, methodStart);
+        debug.debug("visiting %s%s (%d)%n", name, descriptor, methodStart);
         debug.debug("%d attributes%n", attrCount);
         methodEnd = methodStart + 8;
 
@@ -92,10 +92,10 @@ public class CodeOffsetAdapter extends ClassAdapter {
 
       @Override
       public void visitFieldInsn(int opcode,
-          String owner, String name, String desc) {
-        super.visitFieldInsn(opcode, owner, name, desc);
+          String owner, String name, String descriptor) {
+        super.visitFieldInsn(opcode, owner, name, descriptor);
         debug.debug("%d visitFieldInsn(%d, %s, %s, %s)%n", offset,
-            opcode, owner, name, desc);
+            opcode, owner, name, descriptor);
         offset += 3;
       }
 
@@ -121,11 +121,11 @@ public class CodeOffsetAdapter extends ClassAdapter {
       }
 
       @Override
-      public void visitInvokeDynamicInsn(String name, String desc,
+      public void visitInvokeDynamicInsn(String name, String descriptor,
           Handle bsm, Object... bsmArgs) {
-        super.visitInvokeDynamicInsn(name, desc, bsm, bsmArgs);
+        super.visitInvokeDynamicInsn(name, descriptor, bsm, bsmArgs);
         debug.debug("%d visitInvokeDynamicInsn(%s, %s)%n", offset,
-            name, desc, bsm, bsmArgs);
+            name, descriptor, bsm, bsmArgs);
         offset += 5;
       }
 
@@ -160,18 +160,18 @@ public class CodeOffsetAdapter extends ClassAdapter {
 
       @Override
       public void visitMethodInsn(int opcode,
-          String owner, String name, String desc) {
-        super.visitMethodInsn(opcode, owner, name, desc);
+          String owner, String name, String descriptor) {
+        super.visitMethodInsn(opcode, owner, name, descriptor);
         debug.debug("%d visitMethodInsn(%d, %s, %s, %s)%n", offset,
-            opcode, owner, name, desc);
+            opcode, owner, name, descriptor);
         offset += opcode == Opcodes.INVOKEINTERFACE ? 5 : 3;
       }
 
       @Override
-      public void visitMultiANewArrayInsn(String desc, int dims) {
-        super.visitMultiANewArrayInsn(desc, dims);
+      public void visitMultiANewArrayInsn(String descriptor, int dims) {
+        super.visitMultiANewArrayInsn(descriptor, dims);
         debug.debug("%d visitMultiANewArrayInsn(%s, %d)%n", offset,
-            desc, dims);
+            descriptor, dims);
         offset += 4;
       }
 
@@ -187,9 +187,9 @@ public class CodeOffsetAdapter extends ClassAdapter {
       }
 
       @Override
-      public void visitTypeInsn(int opcode, String desc) {
-        super.visitTypeInsn(opcode, desc);
-        debug.debug("%d visitTypeInsn(%d, %s)%n", offset, opcode, desc);
+      public void visitTypeInsn(int opcode, String descriptor) {
+        super.visitTypeInsn(opcode, descriptor);
+        debug.debug("%d visitTypeInsn(%d, %s)%n", offset, opcode, descriptor);
         offset += 3;
       }
 

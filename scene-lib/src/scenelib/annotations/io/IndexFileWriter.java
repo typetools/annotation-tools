@@ -160,17 +160,17 @@ public final class IndexFileWriter {
     }
 
     private void printElement(String indentation,
-            String desc,
+            String descriptor,
             AElement e) {
-        pw.print(indentation + desc + ":");
+        pw.print(indentation + descriptor + ":");
         printAnnotations(e);
         pw.println();
     }
 
     private void printElementAndInnerTypes(String indentation,
-            String desc, AElement e) {
+            String descriptor, AElement e) {
         if (e.type != null) {
-            printElement(indentation, desc, e.type);
+            printElement(indentation, descriptor, e.type);
             if (!e.type.innerTypes.isEmpty()) {
                 printInnerTypes(indentation + INDENT, e.type);
             }
@@ -178,7 +178,7 @@ public final class IndexFileWriter {
     }
 
     private void printTypeElementAndInnerTypes(String indentation,
-            String desc,
+            String descriptor,
             ATypeElement e) {
         if (e.tlAnnotationsHere.isEmpty() && e.innerTypes.isEmpty() && desc.equals("type")) {
             return;
