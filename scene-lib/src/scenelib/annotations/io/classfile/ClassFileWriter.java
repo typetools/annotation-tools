@@ -167,11 +167,11 @@ public class ClassFileWriter {
 
     // can't just call other insert, because this closes the input stream
     InputStream in = new FileInputStream(fileName);
-    ClassReader cr = new ClassReader(in);
+    ClassReader classReader = new ClassReader(in);
     in.close();
 
-    ClassAnnotationSceneWriter classAnnotationSceneWriter = new ClassAnnotationSceneWriter(Opcodes.ASM7, cr, scene, typePath, overwrite);
-    cr.accept(classAnnotationSceneWriter, 0);
+    ClassAnnotationSceneWriter classAnnotationSceneWriter = new ClassAnnotationSceneWriter(Opcodes.ASM7, classReader, scene, typePath, overwrite);
+    classReader.accept(classAnnotationSceneWriter, 0);
 
     OutputStream fos = new FileOutputStream(fileName);
     fos.write(classAnnotationSceneWriter.toByteArray());
@@ -197,12 +197,12 @@ public class ClassFileWriter {
    *                     writing to <code> out </code>
    */
   public static void insert(AScene scene, InputStream input, OutputStream out, boolean overwrite) throws IOException {
-    ClassReader cr = new ClassReader(input);
+    ClassReader classReader = new ClassReader(input);
 
     ClassAnnotationSceneWriter classAnnotationSceneWriter =
-        new ClassAnnotationSceneWriter(Opcodes.ASM7, cr, scene, TypePath.fromString(""), overwrite);
+        new ClassAnnotationSceneWriter(Opcodes.ASM7, classReader, scene, TypePath.fromString(""), overwrite);
 
-    cr.accept(classAnnotationSceneWriter, 0);
+    classReader.accept(classAnnotationSceneWriter, 0);
 
     out.write(classAnnotationSceneWriter.toByteArray());
   }
@@ -226,11 +226,11 @@ public class ClassFileWriter {
    */
   public static void insert(AScene scene, TypePath typePath, String className, String outputFileName, boolean overwrite)
       throws IOException {
-    ClassReader cr = new ClassReader(className);
+    ClassReader classReader = new ClassReader(className);
 
-    ClassAnnotationSceneWriter classAnnotationSceneWriter = new ClassAnnotationSceneWriter(Opcodes.ASM7, cr, scene, typePath, overwrite);
+    ClassAnnotationSceneWriter classAnnotationSceneWriter = new ClassAnnotationSceneWriter(Opcodes.ASM7, classReader, scene, typePath, overwrite);
 
-    cr.accept(classAnnotationSceneWriter, 0);
+    classReader.accept(classAnnotationSceneWriter, 0);
 
     OutputStream fos = new FileOutputStream(outputFileName);
     fos.write(classAnnotationSceneWriter.toByteArray());

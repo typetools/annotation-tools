@@ -106,7 +106,7 @@ public class ClassAnnotationSceneWriter extends ClassVisitor {
   private final Map<String, Set<Integer>> dynamicConstructors;
   private final Map<String, Set<Integer>> lambdaExpressions;
 
-  private ClassReader cr;
+  private ClassReader classReader;
 
   private TypePath typePath;
 
@@ -116,12 +116,12 @@ public class ClassAnnotationSceneWriter extends ClassVisitor {
    * it visits.  <code> scene </code> must be an {@link AScene} over the
    * class that this will visit.
    *
-   * @param cr the reader for the class being modified
+   * @param classReader the reader for the class being modified
    * @param scene the annotation scene containing annotations to be inserted
    * into the class this visits
    */
-  public ClassAnnotationSceneWriter(int api, ClassReader cr, AScene scene, TypePath typePath, boolean overwrite) {
-    super(api, new ClassWriter(cr, 0));
+  public ClassAnnotationSceneWriter(int api, ClassReader classReader, AScene scene, TypePath typePath, boolean overwrite) {
+    super(api, new ClassWriter(classReader, 0));
     this.scene = scene;
     this.hasVisitedClassAnnotationsInScene = false;
     this.aClass = null;
@@ -129,7 +129,7 @@ public class ClassAnnotationSceneWriter extends ClassVisitor {
     this.overwrite = overwrite;
     this.dynamicConstructors = new HashMap<>();
     this.lambdaExpressions = new HashMap<>();
-    this.cr = cr;
+    this.classReader = classReader;
     this.typePath = typePath;
   }
 
@@ -148,7 +148,7 @@ public class ClassAnnotationSceneWriter extends ClassVisitor {
 
   @Override
   public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
-    cr.accept(new MethodCodeIndexer(api), 0);
+    classReader.accept(new MethodCodeIndexer(api), 0);
     super.visit(version, access, name, signature, superName, interfaces);
     // class files store fully quantified class names with '/' instead of '.'
     name = name.replace('/', '.');
@@ -987,15 +987,15 @@ public class ClassAnnotationSceneWriter extends ClassVisitor {
       super(api);
       int fieldCount;
       // const pool size is (not lowest) upper bound of string length
-      codeStart = cr.header + 6;
-      codeStart += 2 + 2 * cr.readUnsignedShort(codeStart);
-      fieldCount = cr.readUnsignedShort(codeStart);
+      codeStart = classReader.header + 6;
+      codeStart += 2 + 2 * classReader.readUnsignedShort(codeStart);
+      fieldCount = classReader.readUnsignedShort(codeStart);
       codeStart += 2;
       while (--fieldCount >= 0) {
-        int attrCount = cr.readUnsignedShort(codeStart + 6);
+        int attrCount = classReader.readUnsignedShort(codeStart + 6);
         codeStart += 8;
         while (--attrCount >= 0) {
-          codeStart += 6 + cr.readInt(codeStart + 2);
+          codeStart += 6 + classReader.readInt(codeStart + 2);
         }
       }
       codeStart += 2;
@@ -1038,7 +1038,7 @@ public class ClassAnnotationSceneWriter extends ClassVisitor {
         lambdaExpressions.put(methodDescription, lambdas);
       }
 
-      return new MethodCodeOffsetAdapter(cr, null, codeStart) {
+      return new MethodCodeOffsetAdapter(classReader, null, codeStart) {
         @Override
         public void visitInvokeDynamicInsn(String name,
             String desc, Handle bsm, Object... bsmArgs) {
