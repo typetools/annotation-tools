@@ -170,11 +170,11 @@ public class ClassFileWriter {
     ClassReader cr = new ClassReader(in);
     in.close();
 
-    ClassAnnotationSceneWriter cw = new ClassAnnotationSceneWriter(Opcodes.ASM7, cr, scene, typePath, overwrite);
-    cr.accept(cw, 0);
+    ClassAnnotationSceneWriter classAnnotationSceneWriter = new ClassAnnotationSceneWriter(Opcodes.ASM7, cr, scene, typePath, overwrite);
+    cr.accept(classAnnotationSceneWriter, 0);
 
     OutputStream fos = new FileOutputStream(fileName);
-    fos.write(cw.toByteArray());
+    fos.write(classAnnotationSceneWriter.toByteArray());
     fos.close();
   }
 
@@ -199,12 +199,12 @@ public class ClassFileWriter {
   public static void insert(AScene scene, InputStream input, OutputStream out, boolean overwrite) throws IOException {
     ClassReader cr = new ClassReader(input);
 
-    ClassAnnotationSceneWriter cw =
+    ClassAnnotationSceneWriter classAnnotationSceneWriter =
         new ClassAnnotationSceneWriter(Opcodes.ASM7, cr, scene, TypePath.fromString(""), overwrite);
 
-    cr.accept(cw, 0);
+    cr.accept(classAnnotationSceneWriter, 0);
 
-    out.write(cw.toByteArray());
+    out.write(classAnnotationSceneWriter.toByteArray());
   }
 
   /**
@@ -228,12 +228,12 @@ public class ClassFileWriter {
       throws IOException {
     ClassReader cr = new ClassReader(className);
 
-    ClassAnnotationSceneWriter cw = new ClassAnnotationSceneWriter(Opcodes.ASM7, cr, scene, typePath, overwrite);
+    ClassAnnotationSceneWriter classAnnotationSceneWriter = new ClassAnnotationSceneWriter(Opcodes.ASM7, cr, scene, typePath, overwrite);
 
-    cr.accept(cw, 0);
+    cr.accept(classAnnotationSceneWriter, 0);
 
     OutputStream fos = new FileOutputStream(outputFileName);
-    fos.write(cw.toByteArray());
+    fos.write(classAnnotationSceneWriter.toByteArray());
     fos.close();
   }
 }
