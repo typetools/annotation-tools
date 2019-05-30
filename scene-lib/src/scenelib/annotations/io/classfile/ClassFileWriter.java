@@ -175,12 +175,12 @@ public class ClassFileWriter {
     ClassReader classReader = new ClassReader(in);
     in.close();
 
-    ClassAnnotationSceneWriter cw =
+    ClassAnnotationSceneWriter classAnnotationSceneWriter =
       new ClassAnnotationSceneWriter(classReader, scene, overwrite);
-    classReader.accept(cw, false);
+    classReader.accept(classAnnotationSceneWriter, false);
 
     OutputStream fos = new FileOutputStream(fileName);
-    fos.write(cw.toByteArray());
+    fos.write(classAnnotationSceneWriter.toByteArray());
     fos.close();
   }
 
@@ -206,12 +206,12 @@ public class ClassFileWriter {
       OutputStream out, boolean overwrite) throws IOException {
     ClassReader classReader = new ClassReader(in);
 
-    ClassAnnotationSceneWriter cw =
+    ClassAnnotationSceneWriter classAnnotationSceneWriter =
       new ClassAnnotationSceneWriter(classReader, scene, overwrite);
 
-    classReader.accept(cw, false);
+    classReader.accept(classAnnotationSceneWriter, false);
 
-    out.write(cw.toByteArray());
+    out.write(classAnnotationSceneWriter.toByteArray());
   }
 
   /**
@@ -235,13 +235,13 @@ public class ClassFileWriter {
       String className, String outputFileName, boolean overwrite) throws IOException {
     ClassReader classReader = new ClassReader(className);
 
-    ClassAnnotationSceneWriter cw =
+    ClassAnnotationSceneWriter classAnnotationSceneWriter =
       new ClassAnnotationSceneWriter(classReader, scene, overwrite);
 
-    classReader.accept(cw, false);
+    classReader.accept(classAnnotationSceneWriter, false);
 
     OutputStream fos = new FileOutputStream(outputFileName);
-    fos.write(cw.toByteArray());
+    fos.write(classAnnotationSceneWriter.toByteArray());
     fos.close();
   }
 }
