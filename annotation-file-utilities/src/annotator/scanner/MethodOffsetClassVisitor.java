@@ -32,10 +32,10 @@ public class MethodOffsetClassVisitor extends ClassVisitor {
   }
 
   @Override
-  public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
-    methodName = name + desc.substring(0, desc.indexOf(")") + 1);
-    methodCodeOffsetAdapter = codeOffsetAdapter.visitMethod(access, name, desc, signature, exceptions);
-    return new MethodOffsetMethodVisitor(api, super.visitMethod(access, name, desc, signature, exceptions));
+  public MethodVisitor visitMethod(int access, String name, String descriptor, String signature, String[] exceptions) {
+    methodName = name + descriptor.substring(0, descriptor.indexOf(")") + 1);
+    methodCodeOffsetAdapter = codeOffsetAdapter.visitMethod(access, name, descriptor, signature, exceptions);
+    return new MethodOffsetMethodVisitor(api, super.visitMethod(access, name, descriptor, signature, exceptions));
   }
 
   /**
@@ -61,11 +61,11 @@ public class MethodOffsetClassVisitor extends ClassVisitor {
     }
 
     @Override
-    public void visitLocalVariable(String name, String desc, String signature, Label start, Label end, int index) {
-      super.visitLocalVariable(name, desc, signature, start, end, index);
+    public void visitLocalVariable(String name, String descriptor, String signature, Label start, Label end, int index) {
+      super.visitLocalVariable(name, descriptor, signature, start, end, index);
       LocalVariableScanner.addToMethodNameIndexMap(Pair.of(methodName, Pair.of(index, start.getOffset())), name);
       LocalVariableScanner.addToMethodNameCounter(methodName, name, start.getOffset());
-      methodCodeOffsetAdapter.visitLocalVariable(name, desc, signature, start, end, index);
+      methodCodeOffsetAdapter.visitLocalVariable(name, descriptor, signature, start, end, index);
     }
 
     @Override
@@ -76,8 +76,8 @@ public class MethodOffsetClassVisitor extends ClassVisitor {
     }
 
     @Override
-    public void visitTypeInsn(int opcode,  String desc)   {
-      super.visitTypeInsn(opcode, desc);
+    public void visitTypeInsn(int opcode,  String descriptor)   {
+      super.visitTypeInsn(opcode, descriptor);
       switch (opcode) {
       case Opcodes.CHECKCAST:
         // CastScanner.addCastToMethod(methodName, labelOffset() + 1);
@@ -91,14 +91,14 @@ public class MethodOffsetClassVisitor extends ClassVisitor {
         InstanceOfScanner.addInstanceOfToMethod(methodName, labelOffset() + 1);
         break;
       }
-      methodCodeOffsetAdapter.visitTypeInsn(opcode, desc);
+      methodCodeOffsetAdapter.visitTypeInsn(opcode, descriptor);
     }
 
     @Override
-    public void visitMultiANewArrayInsn(String desc, int dims)  {
-      super.visitMultiANewArrayInsn(desc, dims);
+    public void visitMultiANewArrayInsn(String descriptor, int dims)  {
+      super.visitMultiANewArrayInsn(descriptor, dims);
       NewScanner.addNewToMethod(methodName, labelOffset());
-      methodCodeOffsetAdapter.visitMultiANewArrayInsn(desc, dims);
+      methodCodeOffsetAdapter.visitMultiANewArrayInsn(descriptor, dims);
     }
 
     @Override
@@ -111,8 +111,8 @@ public class MethodOffsetClassVisitor extends ClassVisitor {
     }
 
     @Override
-    public void visitMethodInsn(int opcode, String owner, String name, String desc) {
-      super.visitMethodInsn(opcode, owner, name, desc);
+    public void visitMethodInsn(int opcode, String owner, String name, String descriptor) {
+      super.visitMethodInsn(opcode, owner, name, descriptor);
       switch (opcode) {
         case Opcodes.INVOKEINTERFACE:
         case Opcodes.INVOKESTATIC:
@@ -122,12 +122,12 @@ public class MethodOffsetClassVisitor extends ClassVisitor {
         default:
           break;
       }
-      methodCodeOffsetAdapter.visitMethodInsn(opcode, owner, name, desc);
+      methodCodeOffsetAdapter.visitMethodInsn(opcode, owner, name, descriptor);
     }
 
     @Override
-    public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean isInterface) {
-      super.visitMethodInsn(opcode, owner, name, desc, isInterface);
+    public void visitMethodInsn(int opcode, String owner, String name, String descriptor, boolean isInterface) {
+      super.visitMethodInsn(opcode, owner, name, descriptor, isInterface);
       switch (opcode) {
         case Opcodes.INVOKEINTERFACE:
         case Opcodes.INVOKESTATIC:
@@ -137,14 +137,14 @@ public class MethodOffsetClassVisitor extends ClassVisitor {
         default:
           break;
       }
-      methodCodeOffsetAdapter.visitMethodInsn(opcode, owner, name, desc, isInterface);
+      methodCodeOffsetAdapter.visitMethodInsn(opcode, owner, name, descriptor, isInterface);
     }
 
     @Override
-    public void visitInvokeDynamicInsn(String name, String desc, Handle bsm, Object... bsmArgs) {
-      super.visitInvokeDynamicInsn(name, desc, bsm, bsmArgs);
+    public void visitInvokeDynamicInsn(String name, String descriptor, Handle bsm, Object... bsmArgs) {
+      super.visitInvokeDynamicInsn(name, descriptor, bsm, bsmArgs);
       LambdaScanner.addLambdaExpressionToMethod(methodName, labelOffset());
-      methodCodeOffsetAdapter.visitInvokeDynamicInsn(name, desc, bsm, bsmArgs);
+      methodCodeOffsetAdapter.visitInvokeDynamicInsn(name, descriptor, bsm, bsmArgs);
     }
 
     @Override
@@ -166,9 +166,9 @@ public class MethodOffsetClassVisitor extends ClassVisitor {
     }
 
     @Override
-    public void visitFieldInsn(int opcode, String owner, String name, String desc) {
-      super.visitFieldInsn(opcode, owner, name, desc);
-      methodCodeOffsetAdapter.visitFieldInsn(opcode, owner, name, desc);
+    public void visitFieldInsn(int opcode, String owner, String name, String descriptor) {
+      super.visitFieldInsn(opcode, owner, name, descriptor);
+      methodCodeOffsetAdapter.visitFieldInsn(opcode, owner, name, descriptor);
     }
 
     @Override
