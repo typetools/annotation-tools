@@ -890,7 +890,7 @@ public class Main {
             }
             dbug.debug("Post-insertion source: %n" + src.getString());
 
-            Set<String> packageNames = iToInsert.getPackageNames();
+            Collection<String> packageNames = nonJavaLangClasses(iToInsert.getPackageNames());
             if (!packageNames.isEmpty()) {
               dbug.debug("Need import %s%n  due to insertion %s%n",
                   packageNames, toInsert);
@@ -1004,6 +1004,33 @@ public class Main {
         System.exit(1);
       }
     }
+  }
+
+  /** A regular expression for classes in the java.lang package. */
+  private static Pattern javaLangClassPattern = Pattern.compile("^java.lang.[A-Za-z0-9_]+$");
+
+  /**
+   * Return true iff the class is a top-level class in the java.lang package.
+   * @returns true iff the class is a top-level class in the java.lang package
+   */
+  private static boolean isJavaLangClass(String classname) {
+    Matcher m = javaLangClassPattern.matcher(classname);
+    return m.matches();
+  }
+
+  /**
+   * Filters out classes in the java.lang package from the given collection.
+   * @param a collection of class names
+   * @return the class names that are not in the java.lang package
+   */
+  private static Collection<String> nonJavaLangClasses(Collection<String> classnames) {
+    // Don't side-effect the argument
+    List<String> result = new ArrayList<>();
+    for (String classname : classnames) {
+      if (! isJavaLangClass(classname)) {
+        result.add(classname);
+      }
+    } return result;
   }
 
   /** Return the representation of the leaf of the path. */
