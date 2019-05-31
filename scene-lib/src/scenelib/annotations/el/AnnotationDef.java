@@ -98,7 +98,7 @@ public final class AnnotationDef extends AElement {
 
     /**
      * Constructs an annotation definition with the given name and field types.
-     * Uses {@link #setFieldTypes} to protect the
+     * Uses {@link setFieldTypes} to protect the
      * immutability of the annotation definition.
      */
     public AnnotationDef(String name, Set<Annotation> tlAnnotationsHere, Map<String, ? extends AnnotationFieldType> fieldTypes) {
