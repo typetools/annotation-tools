@@ -1205,7 +1205,7 @@ public final class IndexFileParser {
                 int a = entry.getArgument();
                 if (a > 0) {
                     outerPath = astPath.getParentPath().extend(new ASTPath.ASTEntry(Kind.NEW_ARRAY, ASTPath.TYPE, 0));
-                    loc = TypePathEntry.getTypePathFromBinary(Collections.nCopies(2 * a, 0));
+                    loc = new InnerTypeLocation(TypeAnnotationPosition.getTypePathFromBinary(Collections.nCopies(2 * a, 0)));
                 }
             }
         }
