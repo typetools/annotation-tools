@@ -857,9 +857,10 @@ public class Main {
             }
             seen.add(toInsert);
 
-            // If it's already there, don't re-insert.  This is a hack!
+            // If it's an annotation and already there, don't re-insert.  This is a hack!
             // Also, I think this is already checked when constructing the
             // insertions.
+            if (toInsert.startsWith("@")) {
             int precedingTextPos = pos-toInsert.length()-1;
             if (precedingTextPos >= 0) {
               String precedingTextPlusChar
@@ -874,6 +875,24 @@ public class Main {
                 dbug.debug("Already present, skipping%n");
                 continue;
               }
+            }
+            int followingTextEndPos = pos+toInsert.length();
+            if (followingTextEndPos < src.getString().length()) {
+              String followingText
+                  = src.getString().substring(pos, followingTextEndPos);
+              dbug.debug("followingText=\"%s\"%n", followingText);
+              dbug.debug("toInsert=\"%s\"%n", toInsert);
+              // toInsertNoWs does not contain the trailing whitespace.
+              String toInsertNoWs = toInsert.substring(0, toInsert.length()-1);
+              if (followingText.equals(toInsert)
+                  || (followingText.substring(0, followingText.length()-1)
+                      .equals(toInsertNoWs)
+                      // Untested.  Is there an off-by-one error here?
+                      && Character.isWhitespace(src.getString().charAt(followingTextEndPos)))) {
+                dbug.debug("Already present, skipping %s%n", toInsertNoWs);
+                continue;
+              }
+            }
             }
 
             // TODO: Neither the above hack nor this check should be
