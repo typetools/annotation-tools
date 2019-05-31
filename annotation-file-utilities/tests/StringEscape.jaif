@@ -1,11 +1,11 @@
 package :
 annotation @Key:
-    String descriptor
+    String desc
 
 package annotator.tests:
 class StringEscape:
     method foo(Ljava/lang/String;)V:
         return:
         parameter #0:
-            type: @Key(descriptor="PartialRegex(\"\\\")")
+            type: @Key(desc="PartialRegex(\"\\\")")
 
