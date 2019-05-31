@@ -144,7 +144,7 @@ public class ASTPath extends ImmutableStack<ASTPath.ASTEntry>
     /**
      * Constructs a new AST entry, without a numeric argument.
      *
-     * See {@link #ASTEntry(Tree.Kind, String, Integer)} for an example of the parameters.
+     * See {@link ASTPath.ASTEntry#ASTPath.ASTEntry(Tree.Kind, String, Integer)} for an example of the parameters.
      *
      * @param treeKind the kind of this AST entry
      * @param childSelector the child selector to this AST entry
