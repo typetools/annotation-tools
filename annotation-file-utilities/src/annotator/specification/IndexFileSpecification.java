@@ -86,9 +86,7 @@ public class IndexFileSpecification {
         if (ix >= 0) {
           String name = key.substring(ix + 1);
           // containsKey() would give wrong result here
-          if (annotationDefs.get(name) == null) {
-            ambiguous.add(name);
-          }
+          if (annotationDefs.get(name) == null) { ambiguous.add(name); }
         }
       }
       Insertion.setAlwaysQualify(ambiguous);
