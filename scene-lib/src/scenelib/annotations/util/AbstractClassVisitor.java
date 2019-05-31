@@ -14,16 +14,16 @@ import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
 
 public class AbstractClassVisitor implements ClassVisitor {
   @Override
-  public TypeAnnotationVisitor visitTypeAnnotation(String desc,
+  public TypeAnnotationVisitor visitTypeAnnotation(String descriptor,
       boolean visible, boolean inCode) {
     return new TypeAnnotationVisitor() {
       @Override
       public void visit(String name, Object value) {}
       @Override
-      public void visitEnum(String name, String desc, String value) {}
+      public void visitEnum(String name, String descriptor, String value) {}
       @Override
       public AnnotationVisitor visitAnnotation(String name,
-          String desc) {
+          String descriptor) {
         return null;
       }
       @Override
@@ -70,19 +70,19 @@ public class AbstractClassVisitor implements ClassVisitor {
   public void visitSource(String source, String debug) {}
 
   @Override
-  public void visitOuterClass(String owner, String name, String desc) {}
+  public void visitOuterClass(String owner, String name, String descriptor) {}
 
   @Override
-  public AnnotationVisitor visitAnnotation(String desc,
+  public AnnotationVisitor visitAnnotation(String descriptor,
       boolean visible) {
     return new AnnotationVisitor() {
       @Override
       public void visit(String name, Object value) {}
       @Override
-      public void visitEnum(String name, String desc, String value) {}
+      public void visitEnum(String name, String descriptor, String value) {}
       @Override
       public AnnotationVisitor visitAnnotation(String name,
-          String desc) {
+          String descriptor) {
         return null;
       }
       @Override
@@ -103,20 +103,20 @@ public class AbstractClassVisitor implements ClassVisitor {
   }
 
   @Override
-  public FieldVisitor visitField(int access, String name, String desc,
+  public FieldVisitor visitField(int access, String name, String descriptor,
       String signature, Object value) {
     return new FieldVisitor() {
       @Override
-      public TypeAnnotationVisitor visitTypeAnnotation(String desc,
+      public TypeAnnotationVisitor visitTypeAnnotation(String descriptor,
           boolean visible, boolean inCode) {
         return new TypeAnnotationVisitor() {
           @Override
           public void visit(String name, Object value) {}
           @Override
-          public void visitEnum(String name, String desc, String value) {}
+          public void visitEnum(String name, String descriptor, String value) {}
           @Override
           public AnnotationVisitor visitAnnotation(String name,
-              String desc) {
+              String descriptor) {
             return null;
           }
           @Override
@@ -154,7 +154,7 @@ public class AbstractClassVisitor implements ClassVisitor {
         };
       }
       @Override
-      public AnnotationVisitor visitAnnotation(String desc,
+      public AnnotationVisitor visitAnnotation(String descriptor,
           boolean visible) {
         return null;
       }
@@ -166,20 +166,20 @@ public class AbstractClassVisitor implements ClassVisitor {
   }
 
   @Override
-  public MethodVisitor visitMethod(int access, String name, String desc,
+  public MethodVisitor visitMethod(int access, String name, String descriptor,
       String signature, String[] exceptions) {
     return new MethodVisitor() {
       @Override
-      public TypeAnnotationVisitor visitTypeAnnotation(String desc,
+      public TypeAnnotationVisitor visitTypeAnnotation(String descriptor,
           boolean visible, boolean inCode) {
         return new TypeAnnotationVisitor() {
           @Override
           public void visit(String name, Object value) {}
           @Override
-          public void visitEnum(String name, String desc, String value) {}
+          public void visitEnum(String name, String descriptor, String value) {}
           @Override
           public AnnotationVisitor visitAnnotation(String name,
-              String desc) {
+              String descriptor) {
             return null;
           }
           @Override
@@ -222,10 +222,10 @@ public class AbstractClassVisitor implements ClassVisitor {
           @Override
           public void visit(String name, Object value) {}
           @Override
-          public void visitEnum(String name, String desc, String value) {}
+          public void visitEnum(String name, String descriptor, String value) {}
           @Override
           public AnnotationVisitor visitAnnotation(String name,
-              String desc) {
+              String descriptor) {
             return null;
           }
           @Override
@@ -237,21 +237,21 @@ public class AbstractClassVisitor implements ClassVisitor {
         };
       }
       @Override
-      public AnnotationVisitor visitAnnotation(String desc,
+      public AnnotationVisitor visitAnnotation(String descriptor,
           boolean visible) {
         return null;
       }
       @Override
       public AnnotationVisitor visitParameterAnnotation(int parameter,
-          String desc, boolean visible) {
+          String descriptor, boolean visible) {
         return new AnnotationVisitor() {
           @Override
           public void visit(String name, Object value) {}
           @Override
-          public void visitEnum(String name, String desc, String value) {}
+          public void visitEnum(String name, String descriptor, String value) {}
           @Override
           public AnnotationVisitor visitAnnotation(String name,
-              String desc) {
+              String descriptor) {
             return null;
           }
           @Override
@@ -273,17 +273,17 @@ public class AbstractClassVisitor implements ClassVisitor {
       @Override
       public void visitVarInsn(int opcode, int var) {}
       @Override
-      public void visitTypeInsn(int opcode, String desc) {}
+      public void visitTypeInsn(int opcode, String descriptor) {}
       @Override
       public void visitFieldInsn(int opcode, String owner, String name,
-          String desc) {
+          String descriptor) {
       }
       @Override
       public void visitMethodInsn(int opcode, String owner, String name,
-          String desc) {
+          String descriptor) {
       }
       @Override
-      public void visitInvokeDynamicInsn(String name, String desc, Handle bsm,
+      public void visitInvokeDynamicInsn(String name, String descriptor, Handle bsm,
           Object... bsmArgs) {
       }
       @Override
@@ -304,18 +304,18 @@ public class AbstractClassVisitor implements ClassVisitor {
           Label[] labels) {
       }
       @Override
-      public void visitMultiANewArrayInsn(String desc, int dims) {}
+      public void visitMultiANewArrayInsn(String descriptor, int dims) {}
       @Override
       public AnnotationVisitor visitInsnAnnotation(int typeRef,
-          TypePath typePath, String desc, boolean visible) {
+          TypePath typePath, String descriptor, boolean visible) {
         return new AnnotationVisitor() {
           @Override
           public void visit(String name, Object value) {}
           @Override
-          public void visitEnum(String name, String desc, String value) {}
+          public void visitEnum(String name, String descriptor, String value) {}
           @Override
           public AnnotationVisitor visitAnnotation(String name,
-              String desc) {
+              String descriptor) {
             return null;
           }
           @Override
@@ -331,7 +331,7 @@ public class AbstractClassVisitor implements ClassVisitor {
           Label handler, String type) {
       }
       @Override
-      public void visitLocalVariable(String name, String desc,
+      public void visitLocalVariable(String name, String descriptor,
           String signature, Label start, Label end, int index) {
       }
       @Override

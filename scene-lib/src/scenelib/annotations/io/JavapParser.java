@@ -388,7 +388,6 @@ public final class JavapParser {
 
     private JavapParser(Reader in, AScene scene) {
         bin = new BufferedReader(in);
-
         this.scene = scene;
     }
 

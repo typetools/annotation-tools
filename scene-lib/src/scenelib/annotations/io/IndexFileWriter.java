@@ -160,17 +160,17 @@ public final class IndexFileWriter {
     }
 
     private void printElement(String indentation,
-            String desc,
+            String descriptor,
             AElement e) {
-        pw.print(indentation + desc + ":");
+        pw.print(indentation + descriptor + ":");
         printAnnotations(e);
         pw.println();
     }
 
     private void printElementAndInnerTypes(String indentation,
-            String desc, AElement e) {
+            String descriptor, AElement e) {
         if (e.type != null) {
-            printElement(indentation, desc, e.type);
+            printElement(indentation, descriptor, e.type);
             if (!e.type.innerTypes.isEmpty()) {
                 printInnerTypes(indentation + INDENT, e.type);
             }
@@ -178,12 +178,12 @@ public final class IndexFileWriter {
     }
 
     private void printTypeElementAndInnerTypes(String indentation,
-            String desc,
+            String descriptor,
             ATypeElement e) {
-        if (e.tlAnnotationsHere.isEmpty() && e.innerTypes.isEmpty() && desc.equals("type")) {
+        if (e.tlAnnotationsHere.isEmpty() && e.innerTypes.isEmpty() && descriptor.equals("type")) {
             return;
         }
-        printElement(indentation, desc, e);
+        printElement(indentation, descriptor, e);
         printInnerTypes(indentation + INDENT, e);
     }
 
@@ -233,20 +233,20 @@ public final class IndexFileWriter {
     }
 
     private void printNumberedAmbigiousElements(String indentation,
-            String desc,
+            String descriptor,
             Map<Integer, ? extends AElement> nels) {
         for (Map. Entry<Integer,
                 ? extends AElement> te : nels.entrySet()) {
             AElement t = te.getValue();
             printAmbElementAndInnerTypes(indentation,
-                    desc + " #" + te.getKey(), t);
+                    descriptor + " #" + te.getKey(), t);
         }
     }
 
     private void printAmbElementAndInnerTypes(String indentation,
-            String desc,
+            String descriptor,
             AElement e) {
-        printElement(indentation, desc, e);
+        printElement(indentation, descriptor, e);
         if (e.type.tlAnnotationsHere.isEmpty() && e.type.innerTypes.isEmpty()) {
             return;
         }
@@ -273,13 +273,13 @@ public final class IndexFileWriter {
     }
 
     private void printRelativeElements(String indentation,
-            String desc,
+            String descriptor,
             Map<RelativeLocation, ATypeElement> nels) {
         for (Map. Entry<RelativeLocation, ATypeElement> te
                 : nels.entrySet()) {
             ATypeElement t = te.getValue();
             printTypeElementAndInnerTypes(indentation,
-                    desc + " " + te.getKey().getLocationString(), t);
+                    descriptor + " " + te.getKey().getLocationString(), t);
         }
     }
 

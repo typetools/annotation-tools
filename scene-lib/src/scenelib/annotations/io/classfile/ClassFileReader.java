@@ -17,9 +17,7 @@ import scenelib.annotations.io.IndexFileWriter;
  *  from a class file into an {@link scenelib.annotations.el.AScene}.
  */
 public class ClassFileReader {
-
-  public static final String INDEX_UTILS_VERSION
-    = "Annotation File Utilities v3.6.47";
+  public static final String INDEX_UTILS_VERSION = "Annotation File Utilities v3.6.47";
 
   @Option("-b omit annotations from bridge (compiler-created) methods")
   public static boolean ignore_bridge_methods = false;
@@ -187,8 +185,7 @@ public class ClassFileReader {
    * @param className the name of the class to read in
    * @throws IOException if there is a problem reading <code> className </code>
    */
-  public static void readFromClass(AScene scene, String className)
-  throws IOException {
+  public static void readFromClass(AScene scene, String className) throws IOException {
     read(scene, new ClassReader(className));
   }
 
@@ -197,19 +194,16 @@ public class ClassFileReader {
    * and inserts them into <code> scene </code>.
    *
    * @param scene the scene into which the annotations should be inserted
-   * @param in an input stream containing the class that the annotations
-   * should be read from
+   * @param input an input stream containing the class that the annotations
+   *              should be read from
    * @throws IOException if there is a problem reading from <code> in </code>
    */
-  public static void read(AScene scene, InputStream in)
-  throws IOException {
-    read(scene, new ClassReader(in));
+  public static void read(AScene scene, InputStream input) throws IOException {
+    read(scene, new ClassReader(input));
   }
 
-  public static void read(AScene scene, ClassReader cr) {
-    ClassAnnotationSceneReader ca =
-        new ClassAnnotationSceneReader(cr, scene, ignore_bridge_methods);
-    cr.accept(ca, true);
+  public static void read(AScene scene, ClassReader classReader) {
+    ClassAnnotationSceneReader ca = new ClassAnnotationSceneReader(classReader, scene, ignore_bridge_methods);
+    classReader.accept(ca, true);
   }
-
 }

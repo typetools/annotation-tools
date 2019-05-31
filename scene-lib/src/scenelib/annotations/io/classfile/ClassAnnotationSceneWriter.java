@@ -119,7 +119,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
   private final Map<String, Set<Integer>> dynamicConstructors;
   private final Map<String, Set<Integer>> lambdaExpressions;
 
-  private ClassReader cr = null;
+  private ClassReader classReader = null;
 
   /**
    * Constructs a new <code> ClassAnnotationSceneWriter </code> that will
@@ -127,20 +127,20 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
    * it visits.  <code> scene </code> must be an {@link AScene} over the
    * class that this will visit.
    *
-   * @param cr the reader for the class being modified
+   * @param classReader the reader for the class being modified
    * @param scene the annotation scene containing annotations to be inserted
    * into the class this visits
    */
-  public ClassAnnotationSceneWriter(ClassReader cr, AScene scene, boolean overwrite) {
-    super(new ClassWriter(cr, false));
+  public ClassAnnotationSceneWriter(ClassReader classReader, AScene scene, boolean overwrite) {
+    super(new ClassWriter(classReader, false));
     this.scene = scene;
     this.hasVisitedClassAnnotationsInScene = false;
     this.aClass = null;
-    this.existingClassAnnotations = new ArrayList<String>();
+    this.existingClassAnnotations = new ArrayList<>();
     this.overwrite = overwrite;
-    this.dynamicConstructors = new HashMap<String, Set<Integer>>();
-    this.lambdaExpressions = new HashMap<String, Set<Integer>>();
-    this.cr = cr;
+    this.dynamicConstructors = new HashMap<>();
+    this.lambdaExpressions = new HashMap<>();
+    this.classReader = classReader;
   }
 
   /**
@@ -159,7 +159,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
   @Override
   public void visit(int version, int access, String name,
       String signature, String superName, String[] interfaces) {
-    cr.accept(new MethodCodeIndexer(), false);
+    classReader.accept(new MethodCodeIndexer(), false);
     super.visit(version, access, name, signature, superName, interfaces);
     // class files store fully quantified class names with '/' instead of '.'
     name = name.replace('/', '.');
@@ -173,25 +173,25 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
   }
 
   @Override
-  public FieldVisitor visitField(int access, String name, String desc,
+  public FieldVisitor visitField(int access, String name, String descriptor,
       String signature, Object value) {
     ensureVisitSceneClassAnnotations();
     // FieldAnnotationSceneWriter ensures that the field visits all
     //  its annotations in the scene.
     return new FieldAnnotationSceneWriter(name,
-        super.visitField(access, name, desc, signature, value));
+        super.visitField(access, name, descriptor, signature, value));
   }
 
   @Override
-  public MethodVisitor visitMethod(int access, String name, String desc,
+  public MethodVisitor visitMethod(int access, String name, String descriptor,
       String signature, String[] exceptions) {
     ensureVisitSceneClassAnnotations();
     // MethodAnnotationSceneWriter ensures that the method visits all
     //  its annotations in the scene.
     // MethodAdapter is used here only for getting around an unsound
     //  "optimization" in ClassReader.
-    return new MethodAdapter(new MethodAnnotationSceneWriter(name, desc,
-            super.visitMethod(access, name, desc, signature, exceptions)));
+    return new MethodAdapter(new MethodAnnotationSceneWriter(name, descriptor,
+            super.visitMethod(access, name, descriptor, signature, exceptions)));
   }
 
   @Override
@@ -201,28 +201,28 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
   }
 
   @Override
-  public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
-    existingClassAnnotations.add(desc);
+  public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
+    existingClassAnnotations.add(descriptor);
     // If annotation exists in scene, and in overwrite mode,
     //  return empty visitor, since annotation from scene will be visited later.
-    if (aClass.lookup(classDescToName(desc)) != null
+    if (aClass.lookup(classDescToName(descriptor)) != null
         && overwrite) {
       return new EmptyVisitor();
     }
-    return super.visitAnnotation(desc, visible);
+    return super.visitAnnotation(descriptor, visible);
   }
 
   @Override
-  public TypeAnnotationVisitor visitTypeAnnotation(String desc, boolean visible, boolean inCode) {
-    existingClassAnnotations.add(desc);
+  public TypeAnnotationVisitor visitTypeAnnotation(String descriptor, boolean visible, boolean inCode) {
+    existingClassAnnotations.add(descriptor);
     // If annotation exists in scene, and in overwrite mode,
     //  return empty visitor, annotation from scene will be visited later.
-    if (aClass.lookup(classDescToName(desc)) != null
+    if (aClass.lookup(classDescToName(descriptor)) != null
        && overwrite) {
       return new EmptyVisitor();
     }
     return new SafeTypeAnnotationVisitor(
-        super.visitTypeAnnotation(desc, visible, inCode));
+        super.visitTypeAnnotation(descriptor, visible, inCode));
   }
 
   /**
@@ -323,8 +323,8 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
   /**
    * Unwraps the class name from the given class descriptor.
    */
-  private static String classDescToName(String desc) {
-    return desc.substring(1, desc.length() - 1).replace('/', '.');
+  private static String classDescToName(String descriptor) {
+    return descriptor.substring(1, descriptor.length() - 1).replace('/', '.');
   }
 
   /**
@@ -482,30 +482,30 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
     }
 
     @Override
-    public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
-      existingFieldAnnotations.add(desc);
+    public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
+      existingFieldAnnotations.add(descriptor);
 
       // If annotation exists in scene, and in overwrite mode,
       //  return empty visitor, annotation from scene will be visited later.
-      if (aField.lookup(classDescToName(desc)) != null
+      if (aField.lookup(classDescToName(descriptor)) != null
           && overwrite)
         return new EmptyVisitor();
 
-      return fv.visitAnnotation(desc, visible);
+      return fv.visitAnnotation(descriptor, visible);
     }
 
     @Override
-    public TypeAnnotationVisitor visitTypeAnnotation(String desc, boolean visible, boolean inCode) {
-      existingFieldAnnotations.add(desc);
+    public TypeAnnotationVisitor visitTypeAnnotation(String descriptor, boolean visible, boolean inCode) {
+      existingFieldAnnotations.add(descriptor);
 
       // If annotation exists in scene, and in overwrite mode,
       //  return empty visitor, annotation from scene will be visited later.
-      if (aField.lookup(classDescToName(desc)) != null
+      if (aField.lookup(classDescToName(descriptor)) != null
          && overwrite)
         return new EmptyVisitor();
 
       return new SafeTypeAnnotationVisitor(
-          fv.visitTypeAnnotation(desc, visible, inCode));
+          fv.visitTypeAnnotation(descriptor, visible, inCode));
     }
 
     @Override
@@ -602,15 +602,15 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
      * description that wraps around the given MethodVisitor.
      *
      * @param name the name of the method, as in "foo"
-     * @param desc the method signature minus the name,
+     * @param descriptor the method signature minus the name,
      *  as in "(Ljava/lang/String)V"
      * @param mv the method visitor to wrap around
      */
-    MethodAnnotationSceneWriter(String name, String desc, MethodVisitor mv) {
+    MethodAnnotationSceneWriter(String name, String descriptor, MethodVisitor mv) {
       super(mv);
       this.hasVisitedMethodAnnotations = false;
-      this.aMethod = aClass.methods.getVivify(name+desc);
-      this.existingMethodAnnotations = new ArrayList<String>();
+      this.aMethod = aClass.methods.getVivify(name + descriptor);
+      this.existingMethodAnnotations = new ArrayList<>();
     }
 
     @Override
@@ -626,30 +626,30 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
     }
 
     @Override
-    public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
-      existingMethodAnnotations.add(desc);
+    public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
+      existingMethodAnnotations.add(descriptor);
       // If annotation exists in scene, and in overwrite mode,
       //  return empty visitor, annotation from scene will be visited later.
-      if (shouldSkipExisting(classDescToName(desc))) {
+      if (shouldSkipExisting(classDescToName(descriptor))) {
         return new EmptyVisitor();
       }
 
-      return super.visitAnnotation(desc, visible);
+      return super.visitAnnotation(descriptor, visible);
     }
 
     @Override
-    public TypeAnnotationVisitor visitTypeAnnotation(String desc, boolean visible, boolean inCode) {
+    public TypeAnnotationVisitor visitTypeAnnotation(String descriptor, boolean visible, boolean inCode) {
 
-      existingMethodAnnotations.add(desc);
+      existingMethodAnnotations.add(descriptor);
 
       // If annotation exists in scene, and in overwrite mode,
       //  return empty visitor, annotation from scene will be visited later.
-      if (shouldSkipExisting(classDescToName(desc))) {
+      if (shouldSkipExisting(classDescToName(descriptor))) {
         return new EmptyVisitor();
       }
 
       return new SafeTypeAnnotationVisitor(
-          super.visitTypeAnnotation(desc, visible, inCode));
+          super.visitTypeAnnotation(descriptor, visible, inCode));
     }
 
     /**
@@ -665,8 +665,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
      * because it already exists in this method's annotations.
      */
     private boolean shouldSkipExisting(String name) {
-      return ((!overwrite)
-              && aMethod.lookup(name) != null);
+      return ((!overwrite) && aMethod.lookup(name) != null);
     }
 
     /**
@@ -707,7 +706,6 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
         visitFields(av, tla);
         av.visitEnd();
       }
-
     }
 
     /**
@@ -831,7 +829,6 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
             visitFields(xav, tla);
             xav.visitEnd();
           }
-
         }
       }
     }
@@ -1309,15 +1306,15 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
     MethodCodeIndexer() {
       int fieldCount;
       // const pool size is (not lowest) upper bound of string length
-      codeStart = cr.header + 6;
-      codeStart += 2 + 2 * cr.readUnsignedShort(codeStart);
-      fieldCount = cr.readUnsignedShort(codeStart);
+      codeStart = classReader.header + 6;
+      codeStart += 2 + 2 * classReader.readUnsignedShort(codeStart);
+      fieldCount = classReader.readUnsignedShort(codeStart);
       codeStart += 2;
       while (--fieldCount >= 0) {
-        int attrCount = cr.readUnsignedShort(codeStart + 6);
+        int attrCount = classReader.readUnsignedShort(codeStart + 6);
         codeStart += 8;
         while (--attrCount >= 0) {
-          codeStart += 6 + cr.readInt(codeStart + 2);
+          codeStart += 6 + classReader.readInt(codeStart + 2);
         }
       }
       codeStart += 2;
@@ -1332,7 +1329,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
     public void visitSource(String source, String debug) {}
 
     @Override
-    public void visitOuterClass(String owner, String name, String desc) {}
+    public void visitOuterClass(String owner, String name, String descriptor) {}
 
     @Override
     public void visitInnerClass(String name, String outerName,
@@ -1340,31 +1337,31 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
     }
 
     @Override
-    public FieldVisitor visitField(int access, String name, String desc,
+    public FieldVisitor visitField(int access, String name, String descriptor,
         String signature, Object value) {
       return null;
     }
 
     @Override
     public MethodVisitor visitMethod(int access,
-        String name, String desc, String signature, String[] exceptions) {
-      String methodDescription = name + desc;
+        String name, String descriptor, String signature, String[] exceptions) {
+      String methodDescription = name + descriptor;
       constrs = dynamicConstructors.get(methodDescription);
       if (constrs == null) {
-        constrs = new TreeSet<Integer>();
+        constrs = new TreeSet<>();
         dynamicConstructors.put(methodDescription, constrs);
       }
       lambdas = lambdaExpressions.get(methodDescription);
       if (lambdas == null) {
-        lambdas = new TreeSet<Integer>();
+        lambdas = new TreeSet<>();
         lambdaExpressions.put(methodDescription, lambdas);
       }
 
       return new MethodAdapter(
-          new MethodCodeOffsetAdapter(cr, new EmptyVisitor(), codeStart) {
+          new MethodCodeOffsetAdapter(classReader, new EmptyVisitor(), codeStart) {
               @Override
               public void visitInvokeDynamicInsn(String name,
-                  String desc, Handle bsm, Object... bsmArgs) {
+                  String descriptor, Handle bsm, Object... bsmArgs) {
                 String methodName = ((Handle) bsmArgs[1]).getName();
                 int off = getMethodCodeOffset();
                 if ("<init>".equals(methodName)) {
@@ -1378,7 +1375,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
                     lambdas.add(off);
                   }
                 }
-                super.visitInvokeDynamicInsn(name, desc, bsm, bsmArgs);
+                super.visitInvokeDynamicInsn(name, descriptor, bsm, bsmArgs);
               }
           });
     }

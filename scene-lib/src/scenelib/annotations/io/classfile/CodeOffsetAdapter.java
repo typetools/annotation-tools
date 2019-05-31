@@ -14,8 +14,8 @@ import scenelib.annotations.util.AbstractClassVisitor;
 
 public class CodeOffsetAdapter extends ClassAdapter {
   static final DebugWriter debug;
-  final ClassReader cr;
-  final char[] buf;
+  final ClassReader classReader;
+  final char[] buffer;
   int methodStart;
   int codeStart;
   int offset;
@@ -25,21 +25,21 @@ public class CodeOffsetAdapter extends ClassAdapter {
     debug.setEnabled(false);
   }
 
-  public CodeOffsetAdapter(ClassReader cr) {
-    this(cr, new AbstractClassVisitor());
+  public CodeOffsetAdapter(ClassReader classReader) {
+    this(classReader, new AbstractClassVisitor());
   }
 
-  public CodeOffsetAdapter(ClassReader cr, ClassVisitor v) {
+  public CodeOffsetAdapter(ClassReader classReader, ClassVisitor v) {
     super(v);
-    this.cr = cr;
+    this.classReader = classReader;
     // const pool size is (not lowest) upper bound of string length
-    buf = new char[cr.header];
-    methodStart = cr.header + 6;
-    methodStart += 4 + 2 * cr.readUnsignedShort(methodStart);
-    for (int i = cr.readUnsignedShort(methodStart-2); i > 0; --i) {
+    buffer = new char[classReader.header];
+    methodStart = classReader.header + 6;
+    methodStart += 4 + 2 * classReader.readUnsignedShort(methodStart);
+    for (int i = classReader.readUnsignedShort(methodStart-2); i > 0; --i) {
       methodStart += 8;
-      for (int j = cr.readUnsignedShort(methodStart-2); j > 0; --j) {
-        methodStart += 6 + cr.readInt(methodStart+2);
+      for (int j = classReader.readUnsignedShort(methodStart-2); j > 0; --j) {
+        methodStart += 6 + classReader.readInt(methodStart+2);
       }
     }
     methodStart += 2;
@@ -47,18 +47,18 @@ public class CodeOffsetAdapter extends ClassAdapter {
 
   @Override
   public MethodVisitor visitMethod(int access,
-      String name, String desc,
+      String name, String descriptor,
       String signature, String[] exceptions) {
-    MethodVisitor v =
-        super.visitMethod(access, name, desc, signature, exceptions);
-    return new MethodAdapter(v) {
+    MethodVisitor methodVisitor =
+        super.visitMethod(access, name, descriptor, signature, exceptions);
+    return new MethodAdapter(methodVisitor) {
       private int methodEnd;
 
       {
-        String name = cr.readUTF8(methodStart + 2, buf);
-        String desc = cr.readUTF8(methodStart + 4, buf);
-        int attrCount = cr.readUnsignedShort(methodStart + 6);
-        debug.debug("visiting %s%s (%d)%n", name, desc, methodStart);
+        String name = classReader.readUTF8(methodStart + 2, buffer);
+        String descriptor = classReader.readUTF8(methodStart + 4, buffer);
+        int attrCount = classReader.readUnsignedShort(methodStart + 6);
+        debug.debug("visiting %s%s (%d)%n", name, descriptor, methodStart);
         debug.debug("%d attributes%n", attrCount);
         methodEnd = methodStart + 8;
 
@@ -66,20 +66,20 @@ public class CodeOffsetAdapter extends ClassAdapter {
         codeStart = methodEnd;
         if (attrCount > 0) {
           while (--attrCount >= 0) {
-            String attrName = cr.readUTF8(codeStart, buf);
+            String attrName = classReader.readUTF8(codeStart, buffer);
             debug.debug("attribute %s%n", attrName);
             if ("Code".equals(attrName)) {
               codeStart += 6;
-              offset = codeStart + cr.readInt(codeStart - 4);
+              offset = codeStart + classReader.readInt(codeStart - 4);
               codeStart += 8;
               while (--attrCount >= 0) {
-                debug.debug("attribute %s%n", cr.readUTF8(offset, buf));
-                offset += 6 + cr.readInt(offset + 2);
+                debug.debug("attribute %s%n", classReader.readUTF8(offset, buffer));
+                offset += 6 + classReader.readInt(offset + 2);
               }
               methodEnd = offset;
               break;
             }
-            codeStart += 6 + cr.readInt(codeStart + 2);
+            codeStart += 6 + classReader.readInt(codeStart + 2);
             methodEnd = codeStart;
           }
         }
@@ -87,15 +87,13 @@ public class CodeOffsetAdapter extends ClassAdapter {
       }
 
       private int readInt(int i) {
-        return cr.readInt(codeStart + i);
+        return classReader.readInt(codeStart + i);
       }
 
       @Override
-      public void visitFieldInsn(int opcode,
-          String owner, String name, String desc) {
-        super.visitFieldInsn(opcode, owner, name, desc);
-        debug.debug("%d visitFieldInsn(%d, %s, %s, %s)%n", offset,
-            opcode, owner, name, desc);
+      public void visitFieldInsn(int opcode, String owner, String name, String descriptor) {
+        super.visitFieldInsn(opcode, owner, name, descriptor);
+        debug.debug("%d visitFieldInsn(%d, %s, %s, %s)%n", offset, opcode, owner, name, descriptor);
         offset += 3;
       }
 
@@ -121,11 +119,11 @@ public class CodeOffsetAdapter extends ClassAdapter {
       }
 
       @Override
-      public void visitInvokeDynamicInsn(String name, String desc,
+      public void visitInvokeDynamicInsn(String name, String descriptor,
           Handle bsm, Object... bsmArgs) {
-        super.visitInvokeDynamicInsn(name, desc, bsm, bsmArgs);
+        super.visitInvokeDynamicInsn(name, descriptor, bsm, bsmArgs);
         debug.debug("%d visitInvokeDynamicInsn(%s, %s)%n", offset,
-            name, desc, bsm, bsmArgs);
+            name, descriptor, bsm, bsmArgs);
         offset += 5;
       }
 
@@ -134,7 +132,7 @@ public class CodeOffsetAdapter extends ClassAdapter {
         super.visitJumpInsn(opcode, label);
         debug.debug("%d visitJumpInsn(%d, %s)%n", offset, opcode, label);
         // account for wide instructions goto_w (200) and jsr_w (201)
-        offset += cr.readByte(codeStart + offset) < 200 ? 3 : 4;
+        offset += classReader.readByte(codeStart + offset) < 200 ? 3 : 4;
         assert offset > 0 && methodEnd > codeStart + offset;
       }
 
@@ -143,7 +141,7 @@ public class CodeOffsetAdapter extends ClassAdapter {
         super.visitLdcInsn(cst);
         debug.debug("%d visitLdcInsn(%s)%n", offset, cst);
         // account for wide instructions ldc_w (19) and ldc2_w (20)
-        offset += cr.readByte(codeStart + offset) > 18 ? 3 : 2;
+        offset += classReader.readByte(codeStart + offset) > 18 ? 3 : 2;
         assert offset > 0 && methodEnd > codeStart + offset;
       }
 
@@ -160,18 +158,18 @@ public class CodeOffsetAdapter extends ClassAdapter {
 
       @Override
       public void visitMethodInsn(int opcode,
-          String owner, String name, String desc) {
-        super.visitMethodInsn(opcode, owner, name, desc);
+          String owner, String name, String descriptor) {
+        super.visitMethodInsn(opcode, owner, name, descriptor);
         debug.debug("%d visitMethodInsn(%d, %s, %s, %s)%n", offset,
-            opcode, owner, name, desc);
+            opcode, owner, name, descriptor);
         offset += opcode == Opcodes.INVOKEINTERFACE ? 5 : 3;
       }
 
       @Override
-      public void visitMultiANewArrayInsn(String desc, int dims) {
-        super.visitMultiANewArrayInsn(desc, dims);
+      public void visitMultiANewArrayInsn(String descriptor, int dims) {
+        super.visitMultiANewArrayInsn(descriptor, dims);
         debug.debug("%d visitMultiANewArrayInsn(%s, %d)%n", offset,
-            desc, dims);
+            descriptor, dims);
         offset += 4;
       }
 
@@ -187,9 +185,9 @@ public class CodeOffsetAdapter extends ClassAdapter {
       }
 
       @Override
-      public void visitTypeInsn(int opcode, String desc) {
-        super.visitTypeInsn(opcode, desc);
-        debug.debug("%d visitTypeInsn(%d, %s)%n", offset, opcode, desc);
+      public void visitTypeInsn(int opcode, String descriptor) {
+        super.visitTypeInsn(opcode, descriptor);
+        debug.debug("%d visitTypeInsn(%d, %s)%n", offset, opcode, descriptor);
         offset += 3;
       }
 
