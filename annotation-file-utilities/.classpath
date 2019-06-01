@@ -10,5 +10,6 @@
 	<classpathentry kind="lib" path="lib/guava-20.0.jar"/>
 	<classpathentry kind="lib" path="lib/options-1.0.1.jar"/>
 	<classpathentry kind="lib" path="lib/plume-util-1.0.7.jar"/>
+	<classpathentry kind="lib" path="lib/signature-util-0.0.6.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

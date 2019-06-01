@@ -76,6 +76,7 @@
       <pathelement location="${annotation-tools}/annotation-file-utilities/lib/bcel-util-1.1.4.jar"/>
       <pathelement location="${annotation-tools}/annotation-file-utilities/lib/options-1.0.1.jar"/>
       <pathelement location="${annotation-tools}/annotation-file-utilities/lib/plume-util-1.0.7.jar"/>
+      <pathelement location="${annotation-tools}/annotation-file-utilities/lib/signature-util-0.0.6.jar"/>
       <pathelement location="${annotation-tools}/annotation-file-utilities/lib/guava-20.0.jar"/>
       <pathelement location="${scene-lib}/bin"/>
       <pathelement location="${asmx}/bin"/>
@@ -152,6 +153,7 @@
       <uptodate property="plume.uptodate" targetfile="annotation-file-utilities.jar" srcfile="lib/bcel-util-1.1.4.jar"/>
       <uptodate property="plume.uptodate" targetfile="annotation-file-utilities.jar" srcfile="lib/options-1.0.1.jar"/>
       <uptodate property="plume.uptodate" targetfile="annotation-file-utilities.jar" srcfile="lib/plume-util-1.0.7.jar"/>
+      <uptodate property="plume.uptodate" targetfile="annotation-file-utilities.jar" srcfile="lib/signature-util-0.0.6.jar"/>
       <uptodate property="google-collect.uptodate" targetfile="annotation-file-utilities.jar" srcfile="lib/guava-20.0.jar"/>
 
       <condition property="jarfile.uptodate">
@@ -207,6 +209,12 @@
       </patternset>
     </unjar>
     <unjar src="lib/plume-util-1.0.7.jar" dest="${temp-jarfile}">
+      <patternset>
+        <include name="**/*.class"/>
+        <exclude name="META-INF/" />
+      </patternset>
+    </unjar>
+    <unjar src="lib/signature-util-0.0.6.jar" dest="${temp-jarfile}">
       <patternset>
         <include name="**/*.class"/>
         <exclude name="META-INF/" />
@@ -549,6 +557,7 @@
           <compilerarg value="-Xlint:-options"/>
           <compilerarg value="-Werror"/>
           <compilerarg value="-g"/>
+          <compilerarg line="-Xlint:unchecked -Xlint:deprecation"/>
           <compilerarg line="${cmdTxts}"/>
       </javac>
 

@@ -7,6 +7,9 @@ options: https://repo.maven.apache.org/maven2/org/plumelib/options/
 plume-util: https://repo.maven.apache.org/maven2/org/plumelib/plume-util/
   wget https://repo.maven.apache.org/maven2/org/plumelib/plume-util/1.0.7/plume-util-1.0.7.jar
 
+signature-util: https://repo.maven.apache.org/maven2/org/plumelib/signature-util/
+  wget https://repo.maven.apache.org/maven2/org/plumelib/signature-util/0.0.6/signature-util-0.0.6.jar
+
 checker-qual: https://repo.maven.apache.org/maven2/org/checkerframework/checker-qual/
   wget https://repo.maven.apache.org/maven2/org/checkerframework/checker-qual/2.5.4/checker-qual-2.5.4.jar
 

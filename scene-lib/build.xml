@@ -111,6 +111,7 @@
             <pathelement location="${annotation-tools}/annotation-file-utilities/lib/bcel-util-1.1.4.jar"/>
             <pathelement location="${annotation-tools}/annotation-file-utilities/lib/options-1.0.1.jar"/>
             <pathelement location="${annotation-tools}/annotation-file-utilities/lib/plume-util-1.0.7.jar"/>
+            <pathelement location="${annotation-tools}/annotation-file-utilities/lib/signature-util-0.0.6.jar"/>
             <pathelement location="${annotation-tools}/annotation-file-utilities/lib/guava-20.0.jar"/>
             <!-- Can't use jsr308-langtools javac.jar, because javap.jar is also required. -->
             <pathelement location="${env.JAVA_HOME}/lib/tools.jar"/>
@@ -391,6 +392,7 @@
       <compilerarg line="-target 8"/>
       <compilerarg line="-processor org.checkerframework.checker.nullness.NullnessChecker"/>
       <compilerarg value="-implicit:class"/>
+      <compilerarg line="-Xlint:unchecked -Xlint:deprecation"/>
       <compilerarg line="-Awarns -Xmaxwarns 10000"/>
       <classpath>
         <path refid="libpath"/>
