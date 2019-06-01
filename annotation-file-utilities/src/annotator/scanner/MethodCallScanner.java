@@ -59,7 +59,7 @@ public class MethodCallScanner extends CommonScanner {
   // Map from name of a method to a list of bytecode offsets of all
   // method invocations in that method.
   private static Map<String, List<Integer>> methodNameToMethodCallOffsets =
-      new HashMap<String, List<Integer>>();
+      new HashMap<>();
 
   /**
    * Adds a lambda expression bytecode offset to the current list of

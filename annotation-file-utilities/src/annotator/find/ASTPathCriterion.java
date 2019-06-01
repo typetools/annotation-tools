@@ -107,7 +107,7 @@ public class ASTPathCriterion implements Criterion {
         // until it reaches a method node (this gets only the part of the path
         // within a method) or class node (this gets only the part of the path
         // within a field).
-        List<Tree> actualPath = new ArrayList<Tree>();
+        List<Tree> actualPath = new ArrayList<>();
         Tree leaf = path.getLeaf();
         Tree.Kind kind = leaf.getKind();
         while (kind != Tree.Kind.METHOD && !ASTPath.isClassEquiv(kind)) {

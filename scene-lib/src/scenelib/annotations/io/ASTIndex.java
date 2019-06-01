@@ -95,7 +95,7 @@ public class ASTIndex extends WrapperMap<Tree, ASTRecord> {
   private ASTIndex(CompilationUnitTree root) {
     super(HashBiMap.<Tree, ASTRecord>create(EXPECTED_SIZE));
     cut = root;
-    formals = new HashMap<String, Map<String, List<String>>>();
+    formals = new HashMap<>();
 
     // The visitor implementation is slightly complicated by the
     // inclusion of information from both parent and child nodes in each
@@ -256,7 +256,7 @@ public class ASTIndex extends WrapperMap<Tree, ASTRecord> {
       public Void visitClass(ClassTree node, ASTRecord rec) {
         Kind kind = Tree.Kind.CLASS;  // use for all class-equivalent kinds
         int i = 0;
-        formals.put(rec.className, new HashMap<String, List<String>>());
+        formals.put(rec.className, new HashMap<>());
         if (node.getSimpleName().length() > 0) {
           // don't save exts/impls for anonymous inner class
           save(node.getExtendsClause(), rec, kind, ASTPath.BOUND, -1);
@@ -367,7 +367,7 @@ public class ASTIndex extends WrapperMap<Tree, ASTRecord> {
         }
         if (params != null && !params.isEmpty()) {
           Map<String, List<String>> map = formals.get(rec.className);
-          List<String> names = new ArrayList<String>(params.size());
+          List<String> names = new ArrayList<>(params.size());
           int i = 0;
           map.put(inMethod, names);
           for (Tree param : params) {
