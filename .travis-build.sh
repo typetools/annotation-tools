@@ -62,8 +62,8 @@ if [[ "${GROUP}" == "misc" || "${GROUP}" == "all" ]]; then
 
   if [ -z ${CHECKERFRAMEWORK} ] ; then
     (cd .. && git clone https://github.com/typetools/checker-framework.git)
-    (cd ../checker-framework && ./.travis-build-without-test.sh)
-    export CHECKERFRAMEWORK=(cd ../checker-framework && pwd)
+    export CHECKERFRAMEWORK=`realpath ../checker-framework`
+    (cd ${CHECKERFRAMEWORK} && ./.travis-build-without-test.sh)
   fi
 
   (cd annotation-file-utilities && ant check-signature)
