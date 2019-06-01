@@ -101,7 +101,7 @@ public class JVMNames {
      * @param type the Type to convert to JVML
      * @return the JVML representation of type
      */
-    @SuppressWarnings("signature") // ASM is not annotated yet
+    @SuppressWarnings("signature") // com.sun.tools.javac.code is not yet annotated
     public static String typeToJvmlString(Type type) {
         if (type.getKind() == TypeKind.ARRAY) {
             return "[" + typeToJvmlString((Type) ((ArrayType) type).getComponentType());
