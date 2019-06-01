@@ -7,10 +7,16 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import scenelib.annotations.el.AnnotationDef;
 import scenelib.annotations.field.AnnotationFieldType;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
-import java.lang.reflect.*;
-
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 /**
  * A very simple annotation representation constructed with a map of field names
@@ -106,7 +112,10 @@ public final class Annotation {
     }
 
     /**
-     * Use adefs to look up (or insert into it) missing AnnotationDefs.
+     * Construct an Annotation for the given java.lang.annotation.Annotation.
+     *
+     * @param ja the java.lang.annotation.Annotation to make an Annotation for
+     * @param adefs a cache from which to look up (or insert into) AnnotationDefs
      */
     public Annotation(java.lang.annotation.Annotation ja, Map<String, AnnotationDef> adefs) {
         Class<? extends java.lang.annotation.Annotation> jaType = ja.annotationType();
