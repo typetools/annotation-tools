@@ -207,7 +207,7 @@ public class GenericArrayLocationCriterion implements Criterion {
       pathRemaining = pathRemaining.getParentPath();
     }
 
-    List<TypePathEntry> locationRemaining = new ArrayList<TypePathEntry>(location);
+    List<TypePathEntry> locationRemaining = new ArrayList<>(location);
 
     while (locationRemaining.size() != 0) {
       // annotating an inner type

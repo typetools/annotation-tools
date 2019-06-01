@@ -59,7 +59,7 @@ public class MemberReferenceScanner extends CommonScanner {
   // Map from name of a method to a list of bytecode offsets of all
   // lambda expressions in that method.
   private static Map<String, List<Integer>> methodNameToMemberReferenceOffsets =
-      new HashMap<String, List<Integer>>();
+      new HashMap<>();
 
   /**
    * Adds a member reference bytecode offset to the current list of

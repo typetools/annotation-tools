@@ -67,13 +67,12 @@ public final class AScene implements Cloneable {
      *  the fully-qualified name is <code>com.foo.Bar</code> <br>
      *  <strong>Value</strong>: names of packages this annotation needs
      */
-    public final Map<String, Set<String>> imports =
-        new LinkedHashMap<String, Set<String>>();
+    public final Map<String, Set<String>> imports = new LinkedHashMap<>();
 
     /** This scene's annotated classes; map key is class name */
     public final VivifyingMap<String, AClass> classes =
             new VivifyingMap<String, AClass>(
-                    new LinkedHashMap<String, AClass>()) {
+                    new LinkedHashMap<>()) {
                 @Override
                 public  AClass createValueFor(
                  String k) {
@@ -103,7 +102,7 @@ public final class AScene implements Cloneable {
         for (String key : scene.imports.keySet()) {
             // copy could in principle have different Set implementation
             Set<String> value = scene.imports.get(key);
-            Set<String> copy = new LinkedHashSet<String>();
+            Set<String> copy = new LinkedHashSet<>();
             copy.addAll(value);
             imports.put(key, copy);
         }

@@ -66,7 +66,7 @@ public class LambdaScanner extends CommonScanner {
   // Map from name of a method to a list of bytecode offsets of all
   // lambda expressions in that method.
   private static Map<String, List<Integer>> methodNameToLambdaExpressionOffsets =
-      new HashMap<String, List<Integer>>();
+      new HashMap<>();
 
   /**
    * Adds a lambda expression bytecode offset to the current list of
