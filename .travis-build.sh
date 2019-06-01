@@ -59,6 +59,10 @@ if [[ "${GROUP}" == "misc" || "${GROUP}" == "all" ]]; then
   ant html-validate
 
   ant javadoc
+
+  (cd annotation-file-utilities && ant check-signature)
+  (cd scene-lib && ant check-signature)
+
 fi
 
 if [[ "${GROUP}" == "downstream" || "${GROUP}" == "all" ]]; then
