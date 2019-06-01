@@ -75,7 +75,7 @@
       <pathelement location="${annotation-tools}/annotation-file-utilities/lib/compiler-2.4.0.jar"/>
       <pathelement location="${annotation-tools}/annotation-file-utilities/lib/bcel-util-1.0.0.jar"/>
       <pathelement location="${annotation-tools}/annotation-file-utilities/lib/options-1.0.0.jar"/>
-      <pathelement location="${annotation-tools}/annotation-file-utilities/lib/plume-util-1.0.1.jar"/>
+      <pathelement location="${annotation-tools}/annotation-file-utilities/lib/plume-util-1.0.7.jar"/>
       <pathelement location="${annotation-tools}/annotation-file-utilities/lib/guava-20.0.jar"/>
       <pathelement location="${scene-lib}/bin"/>
       <pathelement location="${asmx}/bin"/>
@@ -151,7 +151,7 @@
       </uptodate>
       <uptodate property="plume.uptodate" targetfile="annotation-file-utilities.jar" srcfile="lib/bcel-util-1.0.0.jar"/>
       <uptodate property="plume.uptodate" targetfile="annotation-file-utilities.jar" srcfile="lib/options-1.0.0.jar"/>
-      <uptodate property="plume.uptodate" targetfile="annotation-file-utilities.jar" srcfile="lib/plume-util-1.0.1.jar"/>
+      <uptodate property="plume.uptodate" targetfile="annotation-file-utilities.jar" srcfile="lib/plume-util-1.0.7.jar"/>
       <uptodate property="google-collect.uptodate" targetfile="annotation-file-utilities.jar" srcfile="lib/guava-20.0.jar"/>
 
       <condition property="jarfile.uptodate">
@@ -206,7 +206,7 @@
         <exclude name="META-INF/" />
       </patternset>
     </unjar>
-    <unjar src="lib/plume-util-1.0.1.jar" dest="${temp-jarfile}">
+    <unjar src="lib/plume-util-1.0.7.jar" dest="${temp-jarfile}">
       <patternset>
         <include name="**/*.class"/>
         <exclude name="META-INF/" />

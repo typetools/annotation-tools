@@ -110,7 +110,7 @@
             <pathelement location="${junit}"/>
             <pathelement location="${annotation-tools}/annotation-file-utilities/lib/bcel-util-1.0.0.jar"/>
             <pathelement location="${annotation-tools}/annotation-file-utilities/lib/options-1.0.0.jar"/>
-            <pathelement location="${annotation-tools}/annotation-file-utilities/lib/plume-util-1.0.1.jar"/>
+            <pathelement location="${annotation-tools}/annotation-file-utilities/lib/plume-util-1.0.7.jar"/>
             <pathelement location="${annotation-tools}/annotation-file-utilities/lib/guava-20.0.jar"/>
             <!-- Can't use jsr308-langtools javac.jar, because javap.jar is also required. -->
             <pathelement location="${env.JAVA_HOME}/lib/tools.jar"/>
