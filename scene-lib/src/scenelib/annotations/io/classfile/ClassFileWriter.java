@@ -24,6 +24,9 @@ public class ClassFileWriter {
   @Option("print version information and exit")
   public static boolean version = false;
 
+  @Option("print progress messages")
+  public static boolean verbose = false;
+
   private static String linesep = System.getProperty("line.separator");
 
   static String usage
@@ -122,14 +125,16 @@ public class ClassFileWriter {
       // into class file
       try {
         if (className.endsWith(".class")) {
-          if(i % 10 == 0) {
+          if (verbose) {
             System.out.printf("Adding annotations to class file %s%n", className);
           }
           insert(scene, className, true);
         } else {
           String outputFileName = className + ".class";
-          // System.out.printf("Reading class file %s; writing with annotations to %s%n",
-          //                   className, outputFileName);
+          if (verbose) {
+            System.out.printf("Reading class file %s; writing with annotations to %s%n",
+                              className, outputFileName);
+          }
           insert(scene, className, outputFileName, true);
         }
       } catch (IOException e) {
