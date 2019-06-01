@@ -65,6 +65,8 @@ import scenelib.type.BoundedType.BoundKind;
 import scenelib.type.DeclaredType;
 import scenelib.type.Type;
 
+import org.checkerframework.checker.signature.qual.ClassGetName;
+
 /**
  * IndexFileParser provides static methods
  * {@link #parse(LineNumberReader, AScene)},
@@ -301,6 +303,47 @@ public final class IndexFileParser {
         primitiveTypes = pt;
     }
 
+    /**
+     * Expect the class name in the format that Class.forName accepts.  Examples:
+     * <pre>{@code
+     *   "[[I"            for int[][].class
+     *   "[java.util.Map" for Map[].class
+     *   "java.util.Map"  for Map.class
+     * }</pre>
+     * Thes use fully-qualified names, i.e. "Object" alone won't work.
+     */
+    private @ClassGetName String expectClassGetName() throws IOException, ParseException {
+        int arrays = 0;
+        StringBuilder type = new StringBuilder();
+        while (matchChar('[')) {
+            // Array dimensions as prefix
+            ++arrays;
+        }
+        while (!matchKeyword("class")) {
+            if (st.ttype >= 0) {
+                type.append((char) st.ttype);
+            } else if (st.ttype == TT_WORD) {
+                type.append(st.sval);
+            } else {
+                throw new ParseException("Found something that doesn't belong in a signature");
+            }
+            st.nextToken();
+        }
+
+        // Drop the '.' before the "class"
+        type.deleteCharAt(type.length()-1);
+        // expectKeyword("class");
+
+        // Add arrays as prefix in the type.
+        while (arrays-->0) {
+            type.insert(0, '[');
+        }
+
+        @SuppressWarnings("signature") // string manipulation while parsing file
+        @ClassGetName String result = type.toString();
+        return result;
+    }
+
     /** Parse scalar annotation value. */
     // HMMM can a (readonly) Integer be casted to a writable Object?
     private Object parseScalarAFV(ScalarAFT aft) throws IOException, ParseException {
@@ -360,52 +403,18 @@ public final class IndexFileParser {
             assert aft.isValidValue(val);
             return val;
         } else if (aft instanceof ClassTokenAFT) {
-            // Expect the class name in the format that Class.forName accepts,
-            // which is some very strange format.
-            // Example inputs followed by their Java source ".class" equivalent:
-            //   [[I.class      for int[][].class
-            //   [java.util.Map for Map[].class
-            //   java.util.Map  for Map.class
-            // Have to use fully-qualified names, i.e. "Object" alone won't work.
-            // Also note use of primitiveTypes map for primitives and void.
-            int arrays = 0;
-            StringBuilder type = new StringBuilder();
-            while (matchChar('[')) {
-                // Array dimensions as prefix
-                ++arrays;
-            }
-            while (!matchKeyword("class")) {
-                if (st.ttype >= 0) {
-                    type.append((char) st.ttype);
-                } else if (st.ttype == TT_WORD) {
-                    type.append(st.sval);
-                } else {
-                    throw new ParseException("Found something that doesn't belong in a signature");
-                }
-                st.nextToken();
-            }
-
-            // Drop the '.' before the "class"
-            type.deleteCharAt(type.length()-1);
-            // expectKeyword("class");
-
-            // Add arrays as prefix in the type.
-            while (arrays-->0) {
-                type.insert(0, '[');
-            }
-
+            String cgname = expectClassGetName();
             try {
-                String sttype = type.toString();
                 Class<?> tktype;
-                if (primitiveTypes.containsKey(sttype)) {
-                    tktype = primitiveTypes.get(sttype);
+                if (primitiveTypes.containsKey(cgname)) {
+                    tktype = primitiveTypes.get(cgname);
                 } else {
-                    tktype = Class.forName(sttype);
+                    tktype = Class.forName(cgname);
                 }
                 assert aft.isValidValue(tktype);
                 return tktype;
             } catch (ClassNotFoundException e) {
-                throw new ParseException("Could not load class: " + type, e);
+                throw new ParseException("Could not load class: " + cgname, e);
             }
         } else if (aft instanceof EnumAFT) {
             String name = expectQualifiedName();

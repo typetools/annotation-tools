@@ -23,6 +23,8 @@ import scenelib.annotations.field.*;
 import com.sun.tools.javac.code.TargetType;
 import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
 
+import org.checkerframework.checker.signature.qual.ClassGetName;
+
 /**
  * A <code> ClassAnnotationSceneReader </code> is a
  * {@link org.objectweb.asmx.ClassVisitor} that will insert all annotations it
@@ -163,8 +165,13 @@ extends EmptyVisitor {
     return new MethodAnnotationSceneReader(name, descriptor, signature, aMethod);
   }
 
-  // converts JVML format to Java format
-  private static String classDescToName(String descriptor) {
+  /** Converts JVML format to Java format.
+   * @param descriptor class name in JVML format
+   * @return the class name in ClassGetName format
+   */
+  // TODO Can/should this use a method in reflection-util instead?
+  @SuppressWarnings("signature")  // TODO unverified, but clients use it as a ClassGetName
+  private static @ClassGetName String classDescToName(String descriptor) {
     return descriptor.substring(1, descriptor.length() - 1).replace('/', '.');
   }
 
@@ -270,6 +277,7 @@ extends EmptyVisitor {
      * Constructs a new AnnotationScene reader with the given description and
      * visibility.  Calling visitEnd() will ensure that this writes out the
      * annotation it visits into aElement.
+     *
      * @param descriptor JVML format for the field being read, or ClassAnnotationSceneReader.dummyDesc
      */
     public AnnotationSceneReader(String descriptor, boolean visible, AElement aElement) {
@@ -305,6 +313,7 @@ extends EmptyVisitor {
     /*
      * @see org.objectweb.asmx.AnnotationVisitor#visit(java.lang.String, java.lang.Object)
      */
+    @SuppressWarnings("signature") // ASM is not annotated yet
     @Override
     public void visit(String name, Object value) {
       if (trace) { System.out.printf("visit(%s, %s) on %s%n", name, value, this); }
@@ -1051,6 +1060,7 @@ extends EmptyVisitor {
 
     // There are only so many different array types that are permitted in
     // an annotation.  (I'm not sure how relevant that is here.)
+    @SuppressWarnings("signature") // ASM is not annotated yet
     @Override
     public void visit(String name, Object value) {
       if (trace) { System.out.printf("visit(%s, %s) (%s) in %s (%s)%n", name, value, value.getClass(), this, this.getClass()); }

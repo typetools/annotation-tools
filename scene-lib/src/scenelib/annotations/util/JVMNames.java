@@ -101,6 +101,7 @@ public class JVMNames {
      * @param type the Type to convert to JVML
      * @return the JVML representation of type
      */
+    @SuppressWarnings("signature") // ASM is not annotated yet
     public static String typeToJvmlString(Type type) {
         if (type.getKind() == TypeKind.ARRAY) {
             return "[" + typeToJvmlString((Type) ((ArrayType) type).getComponentType());
@@ -126,6 +127,7 @@ public class JVMNames {
         return builder.toString();
     }
 
+    @SuppressWarnings("signature") // com.sun.source.tree.Tree is not yet annotated
     private static void treeToJVMLString(Tree typeTree, StringBuilder builder) {
         // FIXME: not robust in presence of comments
         switch (typeTree.getKind()) {
