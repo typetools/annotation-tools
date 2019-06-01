@@ -2,7 +2,7 @@ bcel-util: https://repo.maven.apache.org/maven2/org/plumelib/bcel-util/
   wget https://repo.maven.apache.org/maven2/org/plumelib/bcel-util/1.0.0/bcel-util-1.0.0.jar
 
 options: https://repo.maven.apache.org/maven2/org/plumelib/options/
-  wget https://repo.maven.apache.org/maven2/org/plumelib/options/1.0.0/options-1.0.0.jar
+  wget https://repo.maven.apache.org/maven2/org/plumelib/options/1.0.1/options-1.0.1.jar
 
 plume-util: https://repo.maven.apache.org/maven2/org/plumelib/plume-util/
   wget https://repo.maven.apache.org/maven2/org/plumelib/plume-util/1.0.1/plume-util-1.0.1.jar
