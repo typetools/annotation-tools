@@ -263,7 +263,7 @@ public class ASTPath extends ImmutableStack<ASTPath.ASTEntry>
     }
   }
 
-  private static Comparator<ASTPath> comparator = new Comparator<ASTPath>() {
+  private static Comparator<ASTPath> comparator = new Comparator<>() {
     @Override
     public int compare(ASTPath p1, ASTPath p2) {
       return p1 == null ? (p2 == null ? 0 : -1) : p1.compareTo(p2);
@@ -662,7 +662,7 @@ public class ASTPath extends ImmutableStack<ASTPath.ASTEntry>
       // until it reaches a method node (this gets only the part of the path
       // within a method) or class node (this gets only the part of the path
       // within a field).
-      List<Tree> actualPath = new ArrayList<Tree>();
+      List<Tree> actualPath = new ArrayList<>();
       while (path != null && nonDecl(path)) {
         actualPath.add(0, path.getLeaf());
         path = path.getParentPath();

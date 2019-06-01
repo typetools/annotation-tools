@@ -33,7 +33,7 @@ public final class Criteria {
    * Creates a new {@code Criteria} without any {@code Criterion}.
    */
   public Criteria() {
-    this.criteria = new LinkedHashMap<Criterion.Kind, Criterion>();
+    this.criteria = new LinkedHashMap<>();
   }
 
   /**

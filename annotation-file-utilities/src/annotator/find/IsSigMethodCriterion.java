@@ -35,7 +35,7 @@ public class IsSigMethodCriterion implements Criterion {
     }
   }
 
-  private static final Map<CompilationUnitTree, Context> contextCache = new HashMap<CompilationUnitTree, Context>();
+  private static final Map<CompilationUnitTree, Context> contextCache = new HashMap<>();
 
   private final String fullMethodName; // really the full JVML signature, sans return type
   private final String simpleMethodName;
@@ -109,7 +109,7 @@ public class IsSigMethodCriterion implements Criterion {
       packageName = packageTree.toString();
     }
 
-    List<String> imports = new ArrayList<String>();
+    List<String> imports = new ArrayList<>();
     for (ImportTree i : topLevel.getImports()) {
       String imported = i.getQualifiedIdentifier().toString();
       imports.add(imported);
@@ -347,7 +347,7 @@ public class IsSigMethodCriterion implements Criterion {
     // <T> void foo(T t)
     //  creates mapping: T -> Object
 
-    Map<String, String> typeToClassMap = new HashMap<String, String>();
+    Map<String, String> typeToClassMap = new HashMap<>();
     for (TypeParameterTree param : mt.getTypeParameters()) {
       String paramName = param.getName().toString();
       String paramClass = "Object";

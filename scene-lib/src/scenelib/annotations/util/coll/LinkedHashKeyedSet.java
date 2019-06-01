@@ -10,7 +10,7 @@ import java.util.*;
 public class LinkedHashKeyedSet<K, V> extends AbstractSet<V> implements KeyedSet<K, V> {
     private final Keyer<? extends K, ? super V> keyer;
 
-    private final Map<K, V> theMap = new LinkedHashMap<K, V>();
+    private final Map<K, V> theMap = new LinkedHashMap<>();
 
     final Collection<V> theValues = theMap.values();
 

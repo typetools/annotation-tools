@@ -68,7 +68,7 @@ public final class AnnotationDef extends AElement {
             return adefs.get(name);
         }
 
-        Map<String,AnnotationFieldType> fieldTypes = new LinkedHashMap<String,AnnotationFieldType>();
+        Map<String,AnnotationFieldType> fieldTypes = new LinkedHashMap<>();
         for (Method m : annoType.getDeclaredMethods()) {
             AnnotationFieldType aft = AnnotationFieldType.fromClass(m.getReturnType(), adefs);
             fieldTypes.put(m.getName(), aft);
@@ -125,7 +125,7 @@ public final class AnnotationDef extends AElement {
      */
     public void setFieldTypes(Map<String, ? extends AnnotationFieldType> fieldTypes) {
         this.fieldTypes = Collections.unmodifiableMap(
-                new LinkedHashMap<String, AnnotationFieldType>(fieldTypes)
+                new LinkedHashMap<>(fieldTypes)
                 );
     }
 
@@ -235,7 +235,7 @@ public final class AnnotationDef extends AElement {
                  && def1.equalsElement(def2)
                  && def1.fieldTypes.keySet().equals(def2.fieldTypes.keySet())) {
             Map<String, AnnotationFieldType> newFieldTypes
-                = new LinkedHashMap<String, AnnotationFieldType>();
+                = new LinkedHashMap<>();
             for (String fieldName : def1.fieldTypes.keySet()) {
                 AnnotationFieldType aft1 = def1.fieldTypes.get(fieldName);
                 AnnotationFieldType aft2 = def2.fieldTypes.get(fieldName);

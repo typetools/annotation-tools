@@ -107,7 +107,7 @@ public final class Annotation {
             Map<String, ? extends Object> fields) {
         this.def = def;
         this.fieldValues = Collections.unmodifiableMap(
-                new LinkedHashMap<String, Object>(fields));
+                new LinkedHashMap<>(fields));
         checkRep();
     }
 
@@ -126,7 +126,7 @@ public final class Annotation {
             def = AnnotationDef.fromClass(jaType, adefs);
             adefs.put(name, def);
         }
-        fieldValues = new LinkedHashMap<String,Object>();
+        fieldValues = new LinkedHashMap<>();
         try {
             for (String fieldname : def.fieldTypes.keySet()) {
                 AnnotationFieldType aft = def.fieldTypes.get(fieldname);
@@ -142,7 +142,7 @@ public final class Annotation {
                         val = vall;
                     } else if (val instanceof Object[]) {
                         Object[] vala = (Object[]) val;
-                        List<Object> vall = new ArrayList<Object>(vala.length);
+                        List<Object> vall = new ArrayList<>(vala.length);
                         for (Object elt : vala) {
                             vall.add(elt.toString());
                         }
