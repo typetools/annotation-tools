@@ -144,8 +144,6 @@ public class ASTPath extends ImmutableStack<ASTPath.ASTEntry>
     /**
      * Constructs a new AST entry, without a numeric argument.
      *
-     * See {@link #ASTEntry(Tree.Kind, String, Integer)} for an example of the parameters.
-     *
      * @param treeKind the kind of this AST entry
      * @param childSelector the child selector to this AST entry
      */
@@ -664,7 +662,7 @@ public class ASTPath extends ImmutableStack<ASTPath.ASTEntry>
       // until it reaches a method node (this gets only the part of the path
       // within a method) or class node (this gets only the part of the path
       // within a field).
-      List<Tree> actualPath = new ArrayList<Tree>();
+      List<Tree> actualPath = new ArrayList<>();
       while (path != null && nonDecl(path)) {
         actualPath.add(0, path.getLeaf());
         path = path.getParentPath();

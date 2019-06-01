@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.plumelib.bcelutil.JvmUtil;
+import org.plumelib.signature.Signatures;
 import org.plumelib.util.UtilPlume;
 
 import com.sun.source.tree.AnnotatedTypeTree;
@@ -23,6 +23,8 @@ import com.sun.source.tree.TypeParameterTree;
 import com.sun.source.tree.VariableTree;
 import com.sun.source.util.TreePath;
 
+import org.checkerframework.checker.signature.qual.BinaryName;
+
 public class IsSigMethodCriterion implements Criterion {
 
   // The context is used for determining the fully qualified name of methods.
@@ -35,14 +37,14 @@ public class IsSigMethodCriterion implements Criterion {
     }
   }
 
-  private static final Map<CompilationUnitTree, Context> contextCache = new HashMap<CompilationUnitTree, Context>();
+  private static final Map<CompilationUnitTree, Context> contextCache = new HashMap<>();
 
   private final String fullMethodName; // really the full JVML signature, sans return type
   private final String simpleMethodName;
   // list of parameters in Java, not JVML format
-  private final List<String> fullyQualifiedParams;
+  private final List<@BinaryName String> fullyQualifiedParams;
   // in Java, not JVML, format.  may be "void"
-  private final String returnType;
+  private final @BinaryName String returnType;
 
   public IsSigMethodCriterion(String methodName) {
     this.fullMethodName = methodName.substring(0, methodName.indexOf(")") + 1);
@@ -54,7 +56,7 @@ public class IsSigMethodCriterion implements Criterion {
 //        fullyQualifiedParams.add(s);
 //      }
 //    }
-    this.fullyQualifiedParams = new ArrayList<String>();
+    this.fullyQualifiedParams = new ArrayList<>();
     try {
       parseParams(
         methodName.substring(methodName.indexOf("(") + 1,
@@ -66,7 +68,7 @@ public class IsSigMethodCriterion implements Criterion {
     String returnTypeJvml = methodName.substring(methodName.indexOf(")") + 1);
     this.returnType = (returnTypeJvml.equals("V")
                        ? "void"
-                       : JvmUtil.fieldDescriptorToBinaryName(returnTypeJvml));
+                       : Signatures.fieldDescriptorToBinaryName(returnTypeJvml));
   }
 
   // params is in JVML format
@@ -75,7 +77,7 @@ public class IsSigMethodCriterion implements Criterion {
       // nextParam is in JVML format
       String nextParam = readNext(params);
       params = params.substring(nextParam.length());
-      fullyQualifiedParams.add(JvmUtil.fieldDescriptorToBinaryName(nextParam));
+      fullyQualifiedParams.add(Signatures.fieldDescriptorToBinaryName(nextParam));
     }
   }
 
@@ -109,7 +111,7 @@ public class IsSigMethodCriterion implements Criterion {
       packageName = packageTree.toString();
     }
 
-    List<String> imports = new ArrayList<String>();
+    List<String> imports = new ArrayList<>();
     for (ImportTree i : topLevel.getImports()) {
       String imported = i.getQualifiedIdentifier().toString();
       imports.add(imported);
@@ -289,7 +291,6 @@ public class IsSigMethodCriterion implements Criterion {
     return b;
   }
 
-  /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path, Tree leaf) {
     if (path == null) {
@@ -299,7 +300,6 @@ public class IsSigMethodCriterion implements Criterion {
     return isSatisfiedBy(path);
   }
 
-  /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path) {
     if (path == null) {
@@ -349,7 +349,7 @@ public class IsSigMethodCriterion implements Criterion {
     // <T> void foo(T t)
     //  creates mapping: T -> Object
 
-    Map<String, String> typeToClassMap = new HashMap<String, String>();
+    Map<String, String> typeToClassMap = new HashMap<>();
     for (TypeParameterTree param : mt.getTypeParameters()) {
       String paramName = param.getName().toString();
       String paramClass = "Object";

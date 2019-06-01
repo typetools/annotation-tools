@@ -13,54 +13,9 @@ public final class AClass extends ADeclaration {
     public final VivifyingMap<BoundLocation, ATypeElement> bounds =
             ATypeElement.<BoundLocation>newVivifyingLHMap_ATE();
 
+    // -1 maps to superclass, non-negative integers map to implemented interfaces
     public final VivifyingMap<TypeIndexLocation, ATypeElement> extendsImplements =
         ATypeElement.<TypeIndexLocation>newVivifyingLHMap_ATE();
-
-    private static VivifyingMap<String, AMethod> createMethodMap() {
-        return new VivifyingMap<String, AMethod>(
-                new LinkedHashMap<String, AMethod>()) {
-            @Override
-            public  AMethod createValueFor(String k) {
-                return new AMethod(k);
-            }
-
-            @Override
-            public boolean subPrune(AMethod v) {
-                return v.prune();
-            }
-        };
-    }
-
-    private static VivifyingMap<Integer, ABlock> createInitBlockMap() {
-        return new VivifyingMap<Integer, ABlock>(
-                new LinkedHashMap<Integer, ABlock>()) {
-            @Override
-            public  ABlock createValueFor(Integer k) {
-                return new ABlock(k);
-            }
-
-            @Override
-            public boolean subPrune(ABlock v) {
-                return v.prune();
-            }
-        };
-    }
-
-    private static VivifyingMap<String, AExpression> createFieldInitMap() {
-        return new VivifyingMap<String, AExpression>(
-                new LinkedHashMap<String, AExpression>()) {
-            @Override
-            public  AExpression createValueFor(String k) {
-                return new AExpression(k);
-            }
-
-            @Override
-            public boolean subPrune(AExpression v) {
-                return v.prune();
-            }
-        };
-    }
-
 
     /**
      * The class's annotated methods; a method's key consists of its name
@@ -89,7 +44,7 @@ public final class AClass extends ADeclaration {
     private final String className;
 
     // debug fields to keep track of all classes created
-    // private static List<AClass> debugAllClasses = new ArrayList<AClass>();
+    // private static List<AClass> debugAllClasses = new ArrayList<>();
     // private final List<AClass> allClasses;
 
     AClass(String className) {
@@ -116,9 +71,6 @@ public final class AClass extends ADeclaration {
       return new AClass(this);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equals(Object o) {
         return o instanceof AClass
@@ -134,9 +86,6 @@ public final class AClass extends ADeclaration {
             && extendsImplements.equals(o.extendsImplements);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         return super.hashCode() + bounds.hashCode()
@@ -145,15 +94,23 @@ public final class AClass extends ADeclaration {
             + extendsImplements.hashCode();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public boolean prune() {
-        return super.prune() & bounds.prune()
-            & methods.prune() & fields.prune()
-            & staticInits.prune() & instanceInits.prune()
-            & extendsImplements.prune();
+    public boolean isEmpty() {
+        return super.isEmpty() && bounds.isEmpty()
+            && methods.isEmpty() && fields.isEmpty()
+            && staticInits.isEmpty() && instanceInits.isEmpty()
+            && extendsImplements.isEmpty();
+    }
+
+    @Override
+    public void prune() {
+        super.prune();
+        bounds.prune();
+        methods.prune();
+        fields.prune();
+        staticInits.prune();
+        instanceInits.prune();
+        extendsImplements.prune();
     }
 
     @Override
@@ -210,4 +167,49 @@ public final class AClass extends ADeclaration {
     public <R, T> R accept(ElementVisitor<R, T> v, T t) {
         return v.visitClass(this, t);
     }
+
+    // Static methods
+
+    private static VivifyingMap<String, AMethod> createMethodMap() {
+        return new VivifyingMap<String, AMethod>(new LinkedHashMap<>()) {
+            @Override
+            public  AMethod createValueFor(String k) {
+                return new AMethod(k);
+            }
+
+            @Override
+            public boolean isEmptyValue(AMethod v) {
+                return v.isEmpty();
+            }
+        };
+    }
+
+    private static VivifyingMap<Integer, ABlock> createInitBlockMap() {
+        return new VivifyingMap<Integer, ABlock>(new LinkedHashMap<>()) {
+            @Override
+            public  ABlock createValueFor(Integer k) {
+                return new ABlock(k);
+            }
+
+            @Override
+            public boolean isEmptyValue(ABlock v) {
+                return v.isEmpty();
+            }
+        };
+    }
+
+    private static VivifyingMap<String, AExpression> createFieldInitMap() {
+        return new VivifyingMap<String, AExpression>(new LinkedHashMap<>()) {
+            @Override
+            public  AExpression createValueFor(String k) {
+                return new AExpression(k);
+            }
+
+            @Override
+            public boolean isEmptyValue(AExpression v) {
+                return v.isEmpty();
+            }
+        };
+    }
+
 }

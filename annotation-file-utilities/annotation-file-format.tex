@@ -1444,6 +1444,12 @@ source file. It does not allow annotations on fields and in method bodies. The
 annotated JDK also only contains annotations in the JDK and not other Java
 files.
 
+Eclipse defines its own file format for external nullness annotations:
+\url{https://wiki.eclipse.org/JDT_Core/Null_Analysis/External_Annotations#File_format}.
+It works only for nullness annotations.  It is more compact but less
+readable than the Annotation File Format.  It is intended for tool use, not
+for editing by ordinary users, who are expected to interact with it
+via the Eclipse GUI\@.
 
 
 \bibliographystyle{alpha}

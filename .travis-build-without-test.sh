@@ -15,10 +15,14 @@ export CHECKERFRAMEWORK=`readlink -f ${CHECKERFRAMEWORK:-../checker-framework}`
 export PATH=$AFU/scripts:$JAVA_HOME/bin:$PATH
 
 
-SLUGOWNER=${TRAVIS_REPO_SLUG%/*}
+SLUGOWNER=${TRAVIS_PULL_REQUEST_SLUG%/*}
+if [[ "$SLUGOWNER" == "" ]]; then
+  SLUGOWNER=${TRAVIS_REPO_SLUG%/*}
+fi
 if [[ "$SLUGOWNER" == "" ]]; then
   SLUGOWNER=typetools
 fi
+echo SLUGOWNER=$SLUGOWNER
 
 set -e
 
@@ -28,4 +32,4 @@ which ant
 ant compile
 echo "Finished running \"ant compile\" for annotation-tools"
 
-echo Entering `pwd`/.travis-build-without-test.sh
+echo Exiting `pwd`/.travis-build-without-test.sh

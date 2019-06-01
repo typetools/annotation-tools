@@ -1,6 +1,6 @@
 package scenelib.annotations.el;
 
-import scenelib.annotations.util.Hasher;
+import java.util.Objects;
 
 /**
  * A {@link LocalLocation} holds location information for a local
@@ -71,21 +71,13 @@ public final class LocalLocation {
                 && equals((LocalLocation) o);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
-        Hasher h = new Hasher();
         if (varName==null) {
-            h.mash(index);
-            h.mash(scopeStart);
-            h.mash(scopeLength);
+            return Objects.hash(index, scopeStart, scopeLength);
         } else {
-            h.mash(varName.hashCode());
-            h.mash(varIndex);
+            return Objects.hash(varName, varIndex);
         }
-        return h.hash;
     }
 
     @Override

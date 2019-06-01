@@ -86,6 +86,7 @@ public class AnnotationInsertion extends Insertion {
      * @return the text to insert
      */
     protected String getText(boolean comments, boolean abbreviate) {
+        // The method body will build up the result by modifying this variable.
         String result = fullyQualifiedAnnotationText;
         if (abbreviate) {
             Pair<String, String> ps = removePackage(result);
@@ -155,7 +156,6 @@ public class AnnotationInsertion extends Insertion {
         return fullyQualifiedAnnotationName;
     }
 
-    /** {@inheritDoc} */
     protected boolean addLeadingSpace(boolean gotSeparateLine, int pos,
             char precedingChar) {
         if (generateExtends || precedingChar == '.') {
@@ -164,16 +164,12 @@ public class AnnotationInsertion extends Insertion {
         return super.addLeadingSpace(gotSeparateLine, pos, precedingChar);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected boolean addTrailingSpace(boolean gotSeparateLine) {
         // Never add a trailing space on a type parameter bound.
         return !wasGenerateExtends && super.addTrailingSpace(gotSeparateLine);
     }
 
-    /** {@inheritDoc} */
     public Kind getKind() {
         return Kind.ANNOTATION;
     }

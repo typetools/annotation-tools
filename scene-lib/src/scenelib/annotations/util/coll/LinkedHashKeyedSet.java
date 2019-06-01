@@ -10,7 +10,7 @@ import java.util.*;
 public class LinkedHashKeyedSet<K, V> extends AbstractSet<V> implements KeyedSet<K, V> {
     private final Keyer<? extends K, ? super V> keyer;
 
-    private final Map<K, V> theMap = new LinkedHashMap<K, V>();
+    private final Map<K, V> theMap = new LinkedHashMap<>();
 
     final Collection<V> theValues = theMap.values();
 
@@ -22,17 +22,11 @@ public class LinkedHashKeyedSet<K, V> extends AbstractSet<V> implements KeyedSet
         this.keyer = keyer;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int size() {
         return theValues.size();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean contains(Object o) {
         return theValues.contains(o);
@@ -60,25 +54,16 @@ public class LinkedHashKeyedSet<K, V> extends AbstractSet<V> implements KeyedSet
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Iterator<V> iterator() {
         return new KeyedSetIterator();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Object[] toArray() {
         return theValues.toArray();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public <T> T[] toArray(T[] a) {
         return theValues.toArray(a);
@@ -102,9 +87,6 @@ public class LinkedHashKeyedSet<K, V> extends AbstractSet<V> implements KeyedSet
         return x == y || (x != null && x.equals(y));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public V add(V o, int conflictBehavior, int equalBehavior) {
         K key = keyer.getKeyFor(o);
@@ -116,25 +98,16 @@ public class LinkedHashKeyedSet<K, V> extends AbstractSet<V> implements KeyedSet
         return old;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean add(V o) {
         return add(o, THROW_EXCEPTION, IGNORE) == null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean remove(Object o) {
         return theValues.remove(o);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean addAll(Collection<? extends V> c) {
         boolean changed = false;
@@ -144,33 +117,21 @@ public class LinkedHashKeyedSet<K, V> extends AbstractSet<V> implements KeyedSet
         return changed;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void clear() {
         theValues.clear();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Keyer<? extends K, ? super V> getKeyer() {
         return keyer;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public V replace(V v) {
         return theMap.put(keyer.getKeyFor(v), v);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public V lookup(K k) {
         return theMap.get(k);

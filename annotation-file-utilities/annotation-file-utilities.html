@@ -101,15 +101,16 @@ to read and write annotation files.
 
 <ul>
   <li> <a href="#insert-annotations"><code>insert-annotations</code></a> reads annotations from an annotation file
-       and inserts them into a class file</li>
+       and inserts them into an existing class file</li>
   <li> <a href="#extract-annotations"><code>extract-annotations</code></a> reads annotations from a class file
-       and writes them out to an annotation file</li>
+       and writes them out to a new annotation file</li>
   <li> <a href="#insert-annotations-to-source"><code>insert-annotations-to-source</code></a> reads annotations from an
-       annotation file and inserts them into a Java source file</li>
+       annotation file and inserts them into an existing Java source file</li>
 </ul>
 
 <p>
-A diagram showing the interactions between these tools is below.
+The diagram below shows how each tool moves annotations from one file
+format to another.
 </p>
 
 <div>
@@ -134,13 +135,13 @@ The following instructions assume either a Linux or Windows system using a comma
 
 <p>
 The current release is Annotation File Utilities version
-<!-- afu-version -->3.6.56, 01 Aug 2018<!-- /afu-version -->.
+<!-- afu-version -->3.8.7, 01 May 2019<!-- /afu-version -->.
 </p>
 
 <ol>
 <li>
   Download
-  <a href="annotation-tools-3.6.56.zip"><!-- annotation-tools-zip-version -->annotation-tools-3.6.56.zip<!-- /annotation-tools-zip-version --></a>.
+  <a href="annotation-tools-3.8.7.zip"><!-- annotation-tools-zip-version -->annotation-tools-3.8.7.zip<!-- /annotation-tools-zip-version --></a>.
 </li>
 
 <li>
@@ -150,7 +151,7 @@ The current release is Annotation File Utilities version
   (You will typically make <code>annotation-tools/</code> a sibling of
   <code>checker-framework/</code>.)
 
-  <pre><code>unzip annotation-tools-3.6.56.zip</code></pre>
+  <pre><code>unzip annotation-tools-3.8.7.zip</code></pre>
 
 </li>
 
@@ -286,12 +287,23 @@ will locate the class file for <code>mypackage.MyClass</code>, read all
 annotations from it, and write the results in annotation file format to
 <code>mypackage.MyClass.jaif</code> in the present working directory.  Note
 that <code>mypackage.MyClass</code> must be located on your classpath.
+Alternately, you can specify a classfile directly:
+</p>
+
+<pre><code>extract-annotations /path/to/MyClass.class</code></pre>
+
+<p>
+Multiple classes or classfiles can be specified on a single command line; if the
+program exits normally, the results are the same as if the program was
+run once for each class in sequence.
 </p>
 
 <p>
-Multiple classes can be specified on a single command line; if the
-program exits normally, the results are the same as if the program were
-run once for each class in sequence.
+The <code>-cp</code> and <code>-classpath</code> command-line options set
+the classpath to use to look up annotations.
+</p>
+
+<p>
 Run:
 </p>
 
@@ -396,7 +408,7 @@ The command-line options are as follows:
  <p>
 
  To preserve changes when using the --in-place option, first remove the
- backup files.  Or, use the <tt>-d .</tt> option, which makes (and
+ backup files.  Or, use the <code>-d .</code> option, which makes (and
  reads) no backup, instead of --in-place. [default false]
             <li id="option:abbreviate"><b>-a</b> <b>--abbreviate=</b><i>boolean</i>.
              Abbreviate annotation names [default true]
@@ -449,7 +461,7 @@ writing class files.  <code>asmx</code> is based on an old version
 (2.2.2) of the <a href="https://asm.ow2.io/">ASM Framework</a>. It has been modified to
 allow it to read and
 write <a href="https://checkerframework.org/jsr308/specification/java-annotation-design.html">type
-annotations</a> in \<.class> files.  However, it is far behind the current ASM
+annotations</a> in <code>.class</code> files.  However, it is far behind the current ASM
 version (5.0), which provides support for type annotations. We should
 discard the custom <code>asmx</code> in the Annotation File Utilities
 and adapt the Annotation File Utilities to use the official, supported

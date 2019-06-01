@@ -17,31 +17,29 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public abstract class ADeclaration extends AElement {
   /** The element's insert-annotation invocations; map key is the AST path to the insertion place */
   public final VivifyingMap<ASTPath, ATypeElement> insertAnnotations =
-          new VivifyingMap<ASTPath, ATypeElement>(
-                  new TreeMap<ASTPath, ATypeElement>()) {
+          new VivifyingMap<ASTPath, ATypeElement>(new TreeMap<>()) {
       @Override
       public  ATypeElement createValueFor(ASTPath k) {
           return new ATypeElement(k);
       }
 
       @Override
-      public boolean subPrune(ATypeElement v) {
-          return v.prune();
+      public boolean isEmptyValue(ATypeElement v) {
+          return v.isEmpty();
       }
   };
 
   /** The element's annotated insert-typecast invocations; map key is the AST path to the insertion place */
   public final VivifyingMap<ASTPath, ATypeElementWithType> insertTypecasts =
-          new VivifyingMap<ASTPath, ATypeElementWithType>(
-                new TreeMap<ASTPath, ATypeElementWithType>()) {
+          new VivifyingMap<ASTPath, ATypeElementWithType>(new TreeMap<>()) {
       @Override
       public ATypeElementWithType createValueFor(ASTPath k) {
           return new ATypeElementWithType(k);
       }
 
       @Override
-      public boolean subPrune(ATypeElementWithType v) {
-          return v.prune();
+      public boolean isEmptyValue(ATypeElementWithType v) {
+          return v.isEmpty();
       }
   };
 
@@ -73,9 +71,6 @@ public abstract class ADeclaration extends AElement {
             && insertTypecasts.equals(o.insertTypecasts);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public int hashCode() {
     return super.hashCode()
@@ -83,14 +78,18 @@ public abstract class ADeclaration extends AElement {
         + (insertTypecasts == null ? 0 : insertTypecasts.hashCode());
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  public boolean prune() {
-    return super.prune()
-        & (insertAnnotations == null || insertAnnotations.prune())
-        & (insertTypecasts == null || insertTypecasts.prune());
+  public boolean isEmpty() {
+    return super.isEmpty()
+        && (insertAnnotations == null || insertAnnotations.isEmpty())
+        && (insertTypecasts == null || insertTypecasts.isEmpty());
+  }
+
+  @Override
+  public void prune() {
+    super.prune();
+    if (insertAnnotations != null) insertAnnotations.prune();
+    if (insertTypecasts != null) insertTypecasts.prune();
   }
 
   @Override

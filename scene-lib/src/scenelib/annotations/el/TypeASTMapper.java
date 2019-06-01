@@ -42,7 +42,7 @@ public abstract class TypeASTMapper<N> {
         if (ls.isEmpty()) {
             return te;
         } else {
-            return te.innerTypes.vivify(new InnerTypeLocation(ls));
+            return te.innerTypes.getVivify(new InnerTypeLocation(ls));
         }
     }
 
@@ -62,7 +62,7 @@ public abstract class TypeASTMapper<N> {
     public void traverse(N tastRoot, ATypeElement aslRoot) {
         // Elements are added and removed from the end of this sole mutable
         // list during the traversal.
-        List<TypePathEntry> ls = new ArrayList<TypePathEntry>();
+        List<TypePathEntry> ls = new ArrayList<>();
         traverse1(tastRoot, aslRoot, ls);
     }
 

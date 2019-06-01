@@ -70,7 +70,6 @@ public class ReceiverInsertion extends TypedInsertion {
         this.qualifyThis = qualifyThis;
     }
 
-    /** {@inheritDoc} */
     @Override
     protected String getText(boolean comments, boolean abbreviate) {
       if (annotationsOnly) {
@@ -107,7 +106,6 @@ public class ReceiverInsertion extends TypedInsertion {
       }
     }
 
-    /** {@inheritDoc} */
     @Override
     protected boolean addLeadingSpace(boolean gotSeparateLine, int pos,
             char precedingChar) {
@@ -119,7 +117,6 @@ public class ReceiverInsertion extends TypedInsertion {
         return super.addLeadingSpace(gotSeparateLine, pos, precedingChar);
     }
 
-    /** {@inheritDoc} */
     @Override
     protected boolean addTrailingSpace(boolean gotSeparateLine) {
         // If the type is not already in the source and the receiver is the only
@@ -130,7 +127,6 @@ public class ReceiverInsertion extends TypedInsertion {
         return super.addTrailingSpace(gotSeparateLine);
     }
 
-    /** {@inheritDoc} */
     @Override
     public Kind getKind() {
         return Kind.RECEIVER;

@@ -43,15 +43,11 @@ public final class InClassCriterion implements Criterion {
     this.exactMatch = exactMatch;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Kind getKind() {
     return Kind.IN_CLASS;
   }
 
-  /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path, Tree leaf) {
     if (path == null) {
@@ -61,7 +57,6 @@ public final class InClassCriterion implements Criterion {
     return isSatisfiedBy(path);
   }
 
-  /** {@inheritDoc} */
   @Override
   public boolean isSatisfiedBy(TreePath path) {
     return InClassCriterion.isSatisfiedBy(path, className, exactMatch);
@@ -85,7 +80,7 @@ public final class InClassCriterion implements Criterion {
 
     // It is wrong to work from the leaf up to the root of the tree, which
     // would fail if the criterion is a.b.c and the actual is a.b.c.c.
-    List<Tree> trees = new ArrayList<Tree>();
+    List<Tree> trees = new ArrayList<>();
     for (Tree tree : path) {
       trees.add(tree);
     }
@@ -247,9 +242,6 @@ public final class InClassCriterion implements Criterion {
     return cname.equals("");
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String toString() {
     return "In class '" + className + "'" + (exactMatch ? " (exactly)" : "");
@@ -264,7 +256,7 @@ public final class InClassCriterion implements Criterion {
    */
   /*
   private static List<String> split(String s, char delim) {
-    List<String> result = new ArrayList<String>();
+    List<String> result = new ArrayList<>();
     for (int delimpos = s.indexOf(delim); delimpos != -1; delimpos = s.indexOf(delim)) {
       result.add(s.substring(0, delimpos));
       s = s.substring(delimpos+1);
