@@ -288,7 +288,7 @@ public final class IndexFileParser {
     // Class object.
     private static final Map<String, Class<?>> primitiveTypes;
     static {
-        Map<String, Class<?>> pt = new LinkedHashMap<String, Class<?>>();
+        Map<String, Class<?>> pt = new LinkedHashMap<>();
         pt.put("byte", byte.class);
         pt.put("short", short.class);
         pt.put("int", int.class);
@@ -650,7 +650,7 @@ public final class IndexFileParser {
         parseAnnotations(ad);
 
         Map<String, AnnotationFieldType> fields =
-                new LinkedHashMap<String, AnnotationFieldType>();
+                new LinkedHashMap<>();
 
         // yuck; it would be nicer to do a positive match
         while (st.ttype != TT_EOF && !checkKeyword("annotation")
@@ -1612,7 +1612,7 @@ public final class IndexFileParser {
     }
 
     private IndexFileParser(Reader in, AScene scene) {
-        defs = new LinkedHashMap<String, AnnotationDef>();
+        defs = new LinkedHashMap<>();
         for (AnnotationDef ad : Annotations.standardDefs) {
             try {
                 addDef(ad);

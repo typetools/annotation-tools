@@ -52,7 +52,7 @@ public final class BasicAFT extends ScalarAFT {
 
     static {
         Map<Class<?>, BasicAFT> tempBafts =
-            new HashMap<Class<?>, BasicAFT>(9);
+            new HashMap<>(9);
         tempBafts.put(byte.class, new BasicAFT(byte.class));
         tempBafts.put(short.class, new BasicAFT(short.class));
         tempBafts.put(int.class, new BasicAFT(int.class));

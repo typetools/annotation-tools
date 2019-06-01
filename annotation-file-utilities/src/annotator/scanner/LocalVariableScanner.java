@@ -95,12 +95,12 @@ public class LocalVariableScanner extends CommonScanner {
   // mapping from (method-name, variable-index, start-offset)
   // to variable name
   private static Map<Pair<String, Pair<Integer,Integer>>, String>
-    methodNameIndexMap = new HashMap<Pair<String, Pair<Integer,Integer>>, String>();
+    methodNameIndexMap = new HashMap<>();
 
   // map from method to map from variable name to
   // a list of start offsets
   private static Map<String, Map<String, List<Integer>>>
-    methodNameCounter = new HashMap<String, Map<String,List<Integer>>>();
+    methodNameCounter = new HashMap<>();
 
   /**
    * Adds the given variable specified as a pair of method name and
@@ -139,7 +139,7 @@ public class LocalVariableScanner extends CommonScanner {
         Integer offset) {
     Map<String, List<Integer>> nameOffsetCounter = methodNameCounter.get(methodName);
     if (nameOffsetCounter == null) {
-      nameOffsetCounter = new HashMap<String, List<Integer>>();
+      nameOffsetCounter = new HashMap<>();
       methodNameCounter.put(methodName, nameOffsetCounter);
     }
 

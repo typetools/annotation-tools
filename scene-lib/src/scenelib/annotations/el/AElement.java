@@ -196,8 +196,7 @@ public class AElement implements Cloneable {
     // Static methods
 
     static <K extends Object> VivifyingMap<K, AElement> newVivifyingLHMap_AE() {
-        return new VivifyingMap<K, AElement>(
-                new LinkedHashMap<K, AElement>()) {
+        return new VivifyingMap<K, AElement>(new LinkedHashMap<>()) {
             @Override
             public AElement createValueFor(K k) {
                 return new AElement(k);
@@ -213,8 +212,7 @@ public class AElement implements Cloneable {
     // Different from the above in that the elements are guaranteed to
     // contain a non-null "type" field.
     static <K extends Object> VivifyingMap<K, AElement> newVivifyingLHMap_AET() {
-        return new VivifyingMap<K, AElement>(
-                new LinkedHashMap<K, AElement>()) {
+        return new VivifyingMap<K, AElement>(new LinkedHashMap<>()) {
             @Override
             public AElement createValueFor(K k) {
                 return new AElement(k, true);

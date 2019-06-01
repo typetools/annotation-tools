@@ -37,10 +37,10 @@ public class AnnotationBuilder {
 
     // Generally, don't use this.  Use method fieldTypes() instead.
     private Map<String, AnnotationFieldType> fieldTypes =
-        new LinkedHashMap<String, AnnotationFieldType>();
+        new LinkedHashMap<>();
 
     Map<String, Object> fieldValues =
-        new LinkedHashMap<String, Object>();
+        new LinkedHashMap<>();
 
     public String typeName() {
         if (def != null) {

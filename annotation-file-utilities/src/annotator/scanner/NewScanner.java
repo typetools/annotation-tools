@@ -19,7 +19,7 @@ import org.plumelib.util.Pair;
 public class NewScanner extends CommonScanner {
     private static boolean debug = false;
 
-    static Map<Pair<TreePath,Tree>, Integer> cache = new HashMap<Pair<TreePath,Tree>, Integer>();
+    static Map<Pair<TreePath,Tree>, Integer> cache = new HashMap<>();
 
     /**
      * Computes the index of the given new tree amongst all new trees
@@ -92,7 +92,7 @@ public class NewScanner extends CommonScanner {
     }
 
     private static Map<String, List<Integer>> methodNameToNewOffsets =
-            new HashMap<String, List<Integer>>();
+            new HashMap<>();
 
     public static void addNewToMethod(String methodName, Integer offset) {
         debug("adding new to method: " + methodName + " offset: " + offset);

@@ -556,13 +556,13 @@ public class Main {
     // The insertions specified by the annotation files.
     Insertions insertions = new Insertions();
     // The Java files into which to insert.
-    List<String> javafiles = new ArrayList<String>();
+    List<String> javafiles = new ArrayList<>();
 
     // Indices to maintain insertion source traces.
     Map<String, Multimap<Insertion, Annotation>> insertionIndex =
-        new HashMap<String, Multimap<Insertion, Annotation>>();
-    Map<Insertion, String> insertionOrigins = new HashMap<Insertion, String>();
-    Map<String, AScene> scenes = new HashMap<String, AScene>();
+        new HashMap<>();
+    Map<Insertion, String> insertionOrigins = new HashMap<>();
+    Map<String, AScene> scenes = new HashMap<>();
 
     // maintain imports info for annotations field
     // Key: fully-qualified annotation name. e.g. "com.foo.Bar" for annotation @com.foo.Bar(x).
@@ -700,7 +700,7 @@ public class Main {
       }
 
       // Imports required to resolve annotations (when abbreviate==true).
-      LinkedHashSet<String> imports = new LinkedHashSet<String>();
+      LinkedHashSet<String> imports = new LinkedHashSet<>();
       int num_insertions = 0;
       String pkg = "";
 
@@ -773,8 +773,8 @@ public class Main {
           boolean receiverInserted = false;
           boolean newInserted = false;
           boolean constructorInserted = false;
-          Set<String> seen = new TreeSet<String>();
-          List<Insertion> toInsertList = new ArrayList<Insertion>(positions.get(pair));
+          Set<String> seen = new TreeSet<>();
+          List<Insertion> toInsertList = new ArrayList<>(positions.get(pair));
           Collections.reverse(toInsertList);
           dbug.debug("insertion pos: %d%n", pair.a);
           assert pair.a >= 0
@@ -956,7 +956,7 @@ public class Main {
         int importIndex = 0;      // default: beginning of file
         String srcString = src.getString();
         Matcher m = importPattern.matcher(srcString);
-        Set<String> inSource = new TreeSet<String>();
+        Set<String> inSource = new TreeSet<>();
         if (m.find()) {
           importIndex = m.start();
           do {
