@@ -3,7 +3,7 @@
 echo Entering `pwd`/.travis-build.sh, GROUP=$1
 
 # Optional argument $1 is one of:
-#   all, test, misc, downstream
+#   all, test, typecheck, misc, downstream
 # It defaults to "all".
 export GROUP=$1
 if [[ "${GROUP}" == "" ]]; then
@@ -46,6 +46,17 @@ if [[ "${GROUP}" == "test" || "${GROUP}" == "all" ]]; then
   ant test
 fi
 
+if [[ "${GROUP}" == "typecheck" || "${GROUP}" == "all" ]]; then
+  if [ -z ${CHECKERFRAMEWORK} ] ; then
+    (cd .. && git clone https://github.com/typetools/checker-framework.git)
+    export CHECKERFRAMEWORK=`realpath ../checker-framework`
+    (cd ${CHECKERFRAMEWORK} && ./.travis-build-without-test.sh)
+  fi
+
+  (cd annotation-file-utilities && ant check-signature)
+  (cd scene-lib && ant check-signature)
+fi
+
 if [[ "${GROUP}" == "misc" || "${GROUP}" == "all" ]]; then
   ## jdkany tests: miscellaneous tests that shouldn't depend on JDK version.
 
@@ -59,16 +70,6 @@ if [[ "${GROUP}" == "misc" || "${GROUP}" == "all" ]]; then
   ant html-validate
 
   ant javadoc
-
-  if [ -z ${CHECKERFRAMEWORK} ] ; then
-    (cd .. && git clone https://github.com/typetools/checker-framework.git)
-    export CHECKERFRAMEWORK=`realpath ../checker-framework`
-    (cd ${CHECKERFRAMEWORK} && ./.travis-build-without-test.sh)
-  fi
-
-  (cd annotation-file-utilities && ant check-signature)
-  (cd scene-lib && ant check-signature)
-
 fi
 
 if [[ "${GROUP}" == "downstream" || "${GROUP}" == "all" ]]; then
