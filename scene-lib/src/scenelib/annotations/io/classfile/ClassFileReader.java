@@ -27,8 +27,11 @@ public class ClassFileReader {
   @Option("-h print usage information and exit")
   public static boolean help = false;
 
-  @Option("-v print version information and exit")
+  @Option("print version information and exit")
   public static boolean version = false;
+
+  @Option("print progress messages")
+  public static boolean verbose = false;
 
   private static String linesep = System.getProperty("line.separator");
 
@@ -99,11 +102,9 @@ public class ClassFileReader {
       }
     }
 
-    int fileNo = 0;
     for (String origName : file_args) {
-      fileNo++;
-      if (fileNo % 10 == 0) {
-          System.out.println("reading: " + origName);
+      if (verbose) {
+        System.out.println("reading: " + origName);
       }
       String className = origName;
       if (origName.endsWith(".class")) {
@@ -118,7 +119,9 @@ public class ClassFileReader {
           readFromClass(scene, className);
         }
         String outputFile = origName + ".jaif";
-        // System.out.println("printing results to : " + outputFile);
+        if (verbose) {
+          System.out.println("printing results to : " + outputFile);
+        }
         IndexFileWriter.write(scene, outputFile);
       } catch (IOException e) {
         System.out.println("There was an error in reading class: " + origName);
