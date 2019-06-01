@@ -65,6 +65,8 @@ import scenelib.type.BoundedType.BoundKind;
 import scenelib.type.DeclaredType;
 import scenelib.type.Type;
 
+import org.checkerframework.checker.signature.qual.ClassGetName;
+
 /**
  * IndexFileParser provides static methods
  * {@link #parse(LineNumberReader, AScene)},
@@ -310,7 +312,7 @@ public final class IndexFileParser {
      * }</pre>
      * Thes use fully-qualified names, i.e. "Object" alone won't work.
      */
-    String expectClassGetName() throws IOException, ParseException {
+    private @ClassGetName String expectClassGetName() throws IOException, ParseException {
         int arrays = 0;
         StringBuilder type = new StringBuilder();
         while (matchChar('[')) {
@@ -337,7 +339,9 @@ public final class IndexFileParser {
             type.insert(0, '[');
         }
 
-        return type.toString();
+        @SuppressWarnings("signature") // string manipulation while parsing file
+        @ClassGetName String result = type.toString();
+        return result;
     }
 
     /** Parse scalar annotation value. */

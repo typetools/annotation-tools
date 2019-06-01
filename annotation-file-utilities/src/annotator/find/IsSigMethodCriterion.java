@@ -23,6 +23,8 @@ import com.sun.source.tree.TypeParameterTree;
 import com.sun.source.tree.VariableTree;
 import com.sun.source.util.TreePath;
 
+import org.checkerframework.checker.signature.qual.BinaryName;
+
 public class IsSigMethodCriterion implements Criterion {
 
   // The context is used for determining the fully qualified name of methods.
@@ -40,9 +42,9 @@ public class IsSigMethodCriterion implements Criterion {
   private final String fullMethodName; // really the full JVML signature, sans return type
   private final String simpleMethodName;
   // list of parameters in Java, not JVML format
-  private final List<String> fullyQualifiedParams;
+  private final List<@BinaryName String> fullyQualifiedParams;
   // in Java, not JVML, format.  may be "void"
-  private final String returnType;
+  private final @BinaryName String returnType;
 
   public IsSigMethodCriterion(String methodName) {
     this.fullMethodName = methodName.substring(0, methodName.indexOf(")") + 1);
@@ -54,7 +56,7 @@ public class IsSigMethodCriterion implements Criterion {
 //        fullyQualifiedParams.add(s);
 //      }
 //    }
-    this.fullyQualifiedParams = new ArrayList<String>();
+    this.fullyQualifiedParams = new ArrayList<>();
     try {
       parseParams(
         methodName.substring(methodName.indexOf("(") + 1,
