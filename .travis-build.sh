@@ -60,6 +60,12 @@ if [[ "${GROUP}" == "misc" || "${GROUP}" == "all" ]]; then
 
   ant javadoc
 
+  if [ -z ${CHECKERFRAMEWORK} ] ; then
+    (cd .. && git clone https://github.com/typetools/checker-framework.git)
+    (cd ../checker-framework && ./.travis-build-without-test.sh)
+    export CHECKERFRAMEWORK=(cd ../checker-framework && pwd)
+  fi
+
   (cd annotation-file-utilities && ant check-signature)
   (cd scene-lib && ant check-signature)
 
