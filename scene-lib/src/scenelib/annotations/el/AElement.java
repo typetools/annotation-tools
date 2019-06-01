@@ -103,9 +103,12 @@ public class AElement implements Cloneable {
     }
 
     /**
-     * Returns whether this {@link AElement} equals <code>o</code>; a
+     * Returns whether this {@link AElement} equals <code>o</code>.  This is a
      * slightly faster variant of {@link #equals(Object)} for when the argument
      * is statically known to be another nonnull {@link AElement}.
+     *
+     * @param o the AElement to compare to
+     * @return true if this is equal to {@code o}
      */
     // We need equals to be symmetric and operate correctly over the class
     // hierarchy.  Let x and y be objects of subclasses S and T, respectively,
@@ -129,6 +132,8 @@ public class AElement implements Cloneable {
 
     /**
      * Returns whether this {@link AElement} is empty.
+     *
+     * @return true iff this is empty
      */
     public boolean isEmpty() {
         return tlAnnotationsHere.isEmpty()
@@ -157,8 +162,13 @@ public class AElement implements Cloneable {
       return sb.toString();
     }
 
-    /** Return the top-level annotation on this that has the given name.
-        Return null if no such annotation exists. */
+    /**
+     * Return the top-level annotation on this that has the given name.
+     * Return null if no such annotation exists.
+     *
+     * @param name the fully-qualified type name of the annotation to search for
+     * @return the annotation on this with the given name, or null if none exists
+     */
     public Annotation lookup(String name) {
         for (Annotation anno : tlAnnotationsHere) {
             if (anno.def.name.equals(name)) {
