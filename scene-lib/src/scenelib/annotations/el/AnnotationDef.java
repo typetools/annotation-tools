@@ -38,7 +38,7 @@ public final class AnnotationDef extends AElement {
      * Constructs an annotation definition with the given name.
      * You MUST call setFieldTypes afterward, even if with an empty map.  (Yuck.)
      *
-     * @param the binary name of the annotation type
+     * @param name the binary name of the annotation type
      */
     public AnnotationDef(String name) {
         super("annotation: " + name);
@@ -57,7 +57,7 @@ public final class AnnotationDef extends AElement {
      * It might have been looked up in adefs, or created new and inserted in adefs.
      *
      * @param annoType the type for which to create an AnnotationDef
-     * @param a cache of known AnnotationDef objects
+     * @param adefs a cache of known AnnotationDef objects
      * @return an AnnotationDef for the given annotation type
      */
     public static AnnotationDef fromClass(Class<? extends java.lang.annotation.Annotation> annoType, Map<String,AnnotationDef> adefs) {
@@ -107,8 +107,8 @@ public final class AnnotationDef extends AElement {
      * Uses {@link #setFieldTypes} to protect the
      * immutability of the annotation definition.
      *
-     * @param the fully-qualified type name of the annotation
-     * @param the annotation's element types
+     * @param name the fully-qualified type name of the annotation
+     * @param fieldTypes the annotation's element types
      */
     public AnnotationDef(String name, Set<Annotation> tlAnnotationsHere, Map<String, ? extends AnnotationFieldType> fieldTypes) {
         this(name, tlAnnotationsHere);
@@ -121,7 +121,7 @@ public final class AnnotationDef extends AElement {
      * {@linkplain Collections#unmodifiableMap unmodifiable map} to protect the
      * immutability of the annotation definition.
      *
-     * @param the annotation's element types
+     * @param fieldTypes the annotation's element types
      */
     public void setFieldTypes(Map<String, ? extends AnnotationFieldType> fieldTypes) {
         this.fieldTypes = Collections.unmodifiableMap(
