@@ -210,8 +210,6 @@
       <patternset>
         <include name="**/*.class"/>
         <exclude name="META-INF/" />
-        <!-- As af plume-util-1.0.1, this file is malformed (at least according to ASM?).  I'm not sure why. -->
-        <exclude name="**/OrderedPairIterator.class" />
       </patternset>
     </unjar>
     <unjar src="lib/guava-20.0.jar" dest="${temp-jarfile}">
