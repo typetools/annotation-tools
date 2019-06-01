@@ -5,7 +5,7 @@
 	<classpathentry kind="src" path="/scene-lib"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry kind="lib" path="lib/bcel-util-1.0.0.jar"/>
+	<classpathentry kind="lib" path="lib/bcel-util-1.1.4.jar"/>
 	<classpathentry kind="lib" path="lib/checker-qual-2.5.4.jar"/>
 	<classpathentry kind="lib" path="lib/guava-20.0.jar"/>
 	<classpathentry kind="lib" path="lib/options-1.0.0.jar"/>
