@@ -8,7 +8,7 @@ public class TestFieldGeneric<T> {
   String s;
   List<String> list;
   Set<TestFieldGeneric> set;
-  TestFieldGeneric<T> testFieldGeneric = new TestFieldGeneric<T>();
+  TestFieldGeneric<T> testFieldGeneric = new TestFieldGeneric<>();
 
   public TestFieldGeneric() {
 

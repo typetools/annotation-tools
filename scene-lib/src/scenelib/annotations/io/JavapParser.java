@@ -162,7 +162,7 @@ public final class JavapParser {
     private List<Integer> parseInnerTypeLocationNums() throws IOException, ParseException {
         String numsStr
             = line.substring(line.indexOf(itlnHead) + itlnHead.length());
-        List<Integer> nums = new ArrayList<Integer>();
+        List<Integer> nums = new ArrayList<>();
         for (;;) {
             int comma = numsStr.indexOf(',');
             if (comma == -1) {

@@ -93,7 +93,7 @@ public class Insertions implements Iterable<Insertion> {
    */
   public Set<Insertion> forClass(CompilationUnitTree cut,
       String qualifiedClassName) {
-    Set<Insertion> set = new LinkedHashSet<Insertion>();
+    Set<Insertion> set = new LinkedHashSet<>();
     forClass(cut, qualifiedClassName, set);
     return set;
   }
@@ -117,7 +117,7 @@ public class Insertions implements Iterable<Insertion> {
       if (annotator.Main.temporaryDebug) {
         System.out.printf("forOuterClass(%s): map = %s%n", qualifiedOuterClassName, map);
       }
-      Set<Insertion> set = new LinkedHashSet<Insertion>();
+      Set<Insertion> set = new LinkedHashSet<>();
       for (String key : map.keySet()) {
         String qualifiedClassName = qualifiedOuterClassName + key;
         forClass(cut, qualifiedClassName, set);
@@ -135,7 +135,7 @@ public class Insertions implements Iterable<Insertion> {
     String outerClass = outerClassName(qualifiedClassName);
     Map<String, Set<Insertion>> map = store.get(outerClass);
     if (map != null) {
-      Set<Insertion> set = new TreeSet<Insertion>(byASTRecord);
+      Set<Insertion> set = new TreeSet<>(byASTRecord);
       set.addAll(map.get(innerClassName(qualifiedClassName)));
       if (annotator.Main.temporaryDebug) {
         System.out.println("organizeTypedInsertions argument set size = " + set.size());
@@ -167,7 +167,7 @@ public class Insertions implements Iterable<Insertion> {
 
     Map<String, Set<Insertion>> map = store.get(outerClass);
     if (map == null) {
-      map = new HashMap<String, Set<Insertion>>();
+      map = new HashMap<>();
       store.put(outerClass, map);
     }
 
@@ -243,7 +243,7 @@ public class Insertions implements Iterable<Insertion> {
    * in this collection.
    */
   public List<Insertion> toList() {
-    List<Insertion> list = new ArrayList<Insertion>(size);
+    List<Insertion> list = new ArrayList<>(size);
     for (Insertion ins : this) { list.add(ins); }
     return list;
   }
@@ -263,10 +263,10 @@ public class Insertions implements Iterable<Insertion> {
    */
   private Set<Insertion> organizeTypedInsertions(CompilationUnitTree cut,
       String className, Collection<Insertion> insertions) {
-    Map<ASTRecord,TypedInsertion> outerInsertions = new HashMap<ASTRecord,TypedInsertion>();
-    Set<Insertion> innerInsertions = new LinkedHashSet<Insertion>();
-    List<Insertion> innerInsertionsList = new ArrayList<Insertion>();
-    Set<Insertion> organized = new LinkedHashSet<Insertion>();
+    Map<ASTRecord,TypedInsertion> outerInsertions = new HashMap<>();
+    Set<Insertion> innerInsertions = new LinkedHashSet<>();
+    List<Insertion> innerInsertionsList = new ArrayList<>();
+    Set<Insertion> organized = new LinkedHashSet<>();
 
     if (annotator.Main.temporaryDebug) {
       System.out.printf("organizeTypedInsertions (1): insertions.size()= %d%n", insertions.size());
@@ -323,7 +323,7 @@ public class Insertions implements Iterable<Insertion> {
             if (entry.getTreeKind() == Tree.Kind.NEW_ARRAY
                 && entry.childSelectorIs(ASTPath.TYPE)) {
               int a = entry.getArgument();
-              List<TypePathEntry> loc0 = new ArrayList<TypePathEntry>(a);
+              List<TypePathEntry> loc0 = new ArrayList<>(a);
               ASTRecord rec0 = null;
               if (a == 0) {
                 rec0 = rec.replacePath(p.getParentPath());
@@ -470,7 +470,7 @@ public class Insertions implements Iterable<Insertion> {
       String methodName = criteria.getMethodName();
       String fieldName = criteria.getFieldName();
       ASTPath localTypePath = criteria.getASTPath();
-      List<TypePathEntry> tpes = new ArrayList<TypePathEntry>();
+      List<TypePathEntry> tpes = new ArrayList<>();
       if (localTypePath == null) {
           // || methodName == null && fieldName == null)
         organized.add(ins);
@@ -516,7 +516,7 @@ public class Insertions implements Iterable<Insertion> {
             int d = 0;
             ASTPath.ASTEntry e = localTypePath.getLast();
             List<TypePathEntry> loc = null;
-            List<Insertion> inners = new ArrayList<Insertion>();
+            List<Insertion> inners = new ArrayList<>();
             Type type = TypeTree.javacTypeToType(((JCTree.JCNewArray) t).type);
             if (e.getTreeKind() == Tree.Kind.NEW_ARRAY) {
               d += e.getArgument();
@@ -1183,8 +1183,7 @@ loop:
   // TODO: Why is a new implementation needed, rather than using an existing one?
   /** Simple AST implementation used only in determining type paths. */
   static abstract class TypeTree implements ExpressionTree {
-    private static Map<String, TypeTag> primTags =
-        new HashMap<String, TypeTag>();
+    private static Map<String, TypeTag> primTags = new HashMap<>();
     {
       primTags.put("byte", TypeTag.BYTE);
       primTags.put("char", TypeTag.CHAR);
@@ -1222,7 +1221,7 @@ loop:
         case PARAMETERIZED_TYPE:
           com.sun.tools.javac.util.List<JCExpression> typeArgs =
             ((JCTree.JCTypeApply) jt).getTypeArguments();
-          List<Tree> args = new ArrayList<Tree>(typeArgs.size());
+          List<Tree> args = new ArrayList<>(typeArgs.size());
           for (JCTree.JCExpression typeArg : typeArgs) {
             args.add(fromJCTree(typeArg));
           }
@@ -1262,7 +1261,7 @@ loop:
             List<Type> params = dtype.getTypeParameters();
             DeclaredType inner = dtype.getInnerType();
             if (!params.isEmpty()) {
-              final List<Tree> typeArgs = new ArrayList<Tree>(params.size());
+              final List<Tree> typeArgs = new ArrayList<>(params.size());
               for (Type t : params) { typeArgs.add(fromType(t)); }
               ret = new ParameterizedTypeTT(base, typeArgs);
             }

@@ -3,14 +3,14 @@
 echo Entering `pwd`/.travis-build.sh, GROUP=$1
 
 # Optional argument $1 is one of:
-#   all, test, misc, downstream
+#   all, test, typecheck, misc, downstream
 # It defaults to "all".
 export GROUP=$1
 if [[ "${GROUP}" == "" ]]; then
   export GROUP=all
 fi
 
-if [[ "${GROUP}" != "all" && "${GROUP}" != "test" && "${GROUP}" != "misc" && "${GROUP}" != "downstream" ]]; then
+if [[ "${GROUP}" != "all" && "${GROUP}" != "test" && "${GROUP}" != "typecheck" && "${GROUP}" != "misc" && "${GROUP}" != "downstream" ]]; then
   echo "Bad argument '${GROUP}'; should be omitted or one of: all, test, misc, downstream."
   exit 1
 fi
@@ -44,6 +44,17 @@ set -e
 
 if [[ "${GROUP}" == "test" || "${GROUP}" == "all" ]]; then
   ant test
+fi
+
+if [[ "${GROUP}" == "typecheck" || "${GROUP}" == "all" ]]; then
+  if [ -z ${CHECKERFRAMEWORK} ] ; then
+    (cd .. && git clone https://github.com/typetools/checker-framework.git)
+    export CHECKERFRAMEWORK=`realpath ../checker-framework`
+    (cd ${CHECKERFRAMEWORK} && ./.travis-build-without-test.sh downloadjdk)
+  fi
+
+  (cd annotation-file-utilities && ant check-signature)
+  (cd scene-lib && ant check-signature)
 fi
 
 if [[ "${GROUP}" == "misc" || "${GROUP}" == "all" ]]; then

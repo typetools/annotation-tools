@@ -76,7 +76,7 @@ public final class IndexFileWriter {
 
         private Collection<Annotation> requiredMetaannotations(
                 Collection<Annotation> annos) {
-            Set<Annotation> results = new HashSet<Annotation>();
+            Set<Annotation> results = new HashSet<>();
             for (Annotation a : annos) {
                 String aName = a.def.name;
                 if (aName.equals(Retention.class.getCanonicalName())

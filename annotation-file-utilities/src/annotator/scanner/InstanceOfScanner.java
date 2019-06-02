@@ -64,7 +64,7 @@ public class InstanceOfScanner extends CommonScanner {
   // Map from name of a method to a list of bytecode offsets of all
   // instanceof checks in that method.
   private static Map<String, List<Integer>> methodNameToInstanceOfOffsets =
-    new HashMap<String, List<Integer>>();
+    new HashMap<>();
 
   /**
    * Adds an instanceof bytecode offset to the current list of offsets for

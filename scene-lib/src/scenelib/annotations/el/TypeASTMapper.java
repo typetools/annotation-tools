@@ -63,7 +63,7 @@ public abstract class TypeASTMapper<N> {
     public void traverse(N tastRoot, ATypeElement aslRoot) {
         // Elements are added and removed from the end of this sole mutable
         // list during the traversal.
-        List<TypePathEntry> ls = new ArrayList<TypePathEntry>();
+        List<TypePathEntry> ls = new ArrayList<>();
         traverse1(tastRoot, aslRoot, ls);
     }
 

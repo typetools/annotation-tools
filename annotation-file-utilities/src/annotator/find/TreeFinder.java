@@ -239,7 +239,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     return result;
   }
 
-  Map<Tree, TreePath> treePathCache = new HashMap<Tree, TreePath>();
+  Map<Tree, TreePath> treePathCache = new HashMap<>();
 
   private ASTRecord astRecord(Tree node) {
     Map<Tree, ASTRecord> index = ASTIndex.indexOf(tree);
@@ -1769,7 +1769,7 @@ loop:
     }
     if (recv != null) {
       Iterator<Insertion> iter = cons.getInnerTypeInsertions().iterator();
-      List<Insertion> recvInner = new ArrayList<Insertion>();
+      List<Insertion> recvInner = new ArrayList<>();
       addReceiverType(path, recv, leaf);
       while (iter.hasNext()) {
         Insertion i = iter.next();
@@ -1804,7 +1804,7 @@ loop:
    */
   public SetMultimap<Pair<Integer, ASTPath>, Insertion>
   getInsertionsByPosition(JCCompilationUnit node, List<Insertion> p) {
-    List<Insertion> uninserted = new ArrayList<Insertion>(p);
+    List<Insertion> uninserted = new ArrayList<>(p);
     this.scan(node, uninserted);
     // There may be many extra annotations in a .jaif file.  For instance,
     // the .jaif file may be for an entire library, but its compilation
@@ -1855,7 +1855,7 @@ loop:
    */
   public SetMultimap<Pair<Integer, ASTPath>, Insertion>
   getPositions(JCCompilationUnit node, Insertions insertions) {
-    List<Insertion> list = new ArrayList<Insertion>();
+    List<Insertion> list = new ArrayList<>();
     treePathCache.clear();
     if (annotator.Main.temporaryDebug) {
       System.out.println("insertions size: " + insertions.size());

@@ -1,5 +1,7 @@
 package scenelib.annotations.io.classfile;
 
+import java.io.*;
+
 import com.sun.tools.javac.main.CommandLine;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Opcodes;
@@ -9,38 +11,40 @@ import org.plumelib.options.Options;
 import scenelib.annotations.el.AScene;
 import scenelib.annotations.io.IndexFileParser;
 
-import java.io.*;
-
 /**
  * A <code> ClassFileWriter </code> provides methods for inserting annotations
- * from an {@link scenelib.annotations.el.AScene} into a class file.
+ *  from an {@link scenelib.annotations.el.AScene} into a class file.
  */
 public class ClassFileWriter {
+
   @Option("-h print usage information and exit")
   public static boolean help = false;
 
   @Option("print version information and exit")
   public static boolean version = false;
 
+  @Option("print progress messages")
+  public static boolean verbose = false;
+
   private static String linesep = System.getProperty("line.separator");
 
   static String usage
-      = "usage: insert-annotations [options] class1 indexfile1 class2 indexfile2 ..."
-      + ""
-      + linesep
-      + "For each class/index file pair (a.b.C a.b.C.jaif), read annotations from"
-      + linesep
-      + "the index file a.b.C.jaif and insert them into the class a.b.C, then"
-      + linesep
-      + "output the merged class file to a.b.C.class"
-      + linesep
-      + "Each class is either a fully-qualified name of a class on your classpath,"
-      + linesep
-      + "or a path to a .class file, such as e.g. /.../path/to/a/b/C.class ."
-      + linesep
-      + "Arguments beginning with a single '@' are interpreted as argument files to"
-      + linesep
-      + "be read and expanded into the command line.  Options:";
+    = "usage: insert-annotations [options] class1 indexfile1 class2 indexfile2 ..."
+    + ""
+    + linesep
+    + "For each class/index file pair (a.b.C a.b.C.jaif), read annotations from"
+    + linesep
+    + "the index file a.b.C.jaif and insert them into the class a.b.C, then"
+    + linesep
+    + "output the merged class file to a.b.C.class"
+    + linesep
+    + "Each class is either a fully-qualified name of a class on your classpath,"
+    + linesep
+    + "or a path to a .class file, such as e.g. /.../path/to/a/b/C.class ."
+    + linesep
+    + "Arguments beginning with a single '@' are interpreted as argument files to"
+    + linesep
+    + "be read and expanded into the command line.  Options:";
 
   /**
    * Main method meant to a a convenient way to write annotations from an index
@@ -53,7 +57,6 @@ public class ClassFileWriter {
    *   -h, --help   print usage information and exit
    *   --version    print version information and exit
    * </pre>
-   *
    * @param args options and classes and index files to analyze;
    * @throws IOException if a class file or index file cannot be opened/written
    */
@@ -75,7 +78,7 @@ public class ClassFileWriter {
 
     if (version) {
       System.out.printf("insert-annotations (%s)",
-          ClassFileReader.INDEX_UTILS_VERSION);
+                        ClassFileReader.INDEX_UTILS_VERSION);
     }
     if (help) {
       options.printUsage();
@@ -170,7 +173,8 @@ public class ClassFileWriter {
     ClassReader classReader = new ClassReader(in);
     in.close();
 
-    ClassAnnotationSceneWriter classAnnotationSceneWriter = new ClassAnnotationSceneWriter(Opcodes.ASM7, classReader, scene, typePath, overwrite);
+    ClassAnnotationSceneWriter classAnnotationSceneWriter =
+        new ClassAnnotationSceneWriter(Opcodes.ASM7, classReader, scene, typePath, overwrite);
     classReader.accept(classAnnotationSceneWriter, 0);
 
     OutputStream fos = new FileOutputStream(fileName);
@@ -186,9 +190,9 @@ public class ClassFileWriter {
    * contain a stream of bytes in the same format, and will also contain the
    * annotations from <code> scene </code>.
    *
-   * @param scene     the scene containing the annotations to insert into a class
-   * @param input     the input stream from which to read a class
-   * @param out       the output stream the merged class should be written to
+   * @param scene the scene containing the annotations to insert into a class
+   * @param input the input stream from which to read a class
+   * @param out the output stream the merged class should be written to
    * @param overwrite controls behavior when an annotation exists on a
    *                  particular element in both the scene and the class file.  If true,
    *                  then the one from the scene is used; else the the existing annotation
@@ -224,11 +228,12 @@ public class ClassFileWriter {
    * @throws IOException if there is a problem reading from <code> in </code> or
    *                     writing to <code> out </code>
    */
-  public static void insert(AScene scene, TypePath typePath, String className, String outputFileName, boolean overwrite)
-      throws IOException {
+  public static void insert(AScene scene, TypePath typePath,
+      String className, String outputFileName, boolean overwrite) throws IOException {
     ClassReader classReader = new ClassReader(className);
 
-    ClassAnnotationSceneWriter classAnnotationSceneWriter = new ClassAnnotationSceneWriter(Opcodes.ASM7, classReader, scene, typePath, overwrite);
+    ClassAnnotationSceneWriter classAnnotationSceneWriter =
+        new ClassAnnotationSceneWriter(Opcodes.ASM7, classReader, scene, typePath, overwrite);
 
     classReader.accept(classAnnotationSceneWriter, 0);
 

@@ -27,6 +27,8 @@ import scenelib.annotations.*;
 import scenelib.annotations.el.*;
 import scenelib.annotations.field.*;
 
+import org.checkerframework.checker.signature.qual.ClassGetName;
+
 /**
  * A ClassAnnotationSceneWriter is a {@link org.objectweb.asm.ClassVisitor}
  * that can be used to write a class file that is the combination of an
@@ -156,7 +158,8 @@ public class ClassAnnotationSceneWriter extends ClassVisitor {
   }
 
   @Override
-  public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
+  public void visit(int version, int access, String name,
+      String signature, String superName, String[] interfaces) {
     classReader.accept(new MethodCodeIndexer(api), 0);
     super.visit(version, access, name, signature, superName, interfaces);
     // class files store fully quantified class names with '/' instead of '.'
@@ -171,21 +174,25 @@ public class ClassAnnotationSceneWriter extends ClassVisitor {
   }
 
   @Override
-  public FieldVisitor visitField(int access, String name, String descriptor, String signature, Object value) {
+  public FieldVisitor visitField(int access, String name, String descriptor,
+      String signature, Object value) {
     ensureVisitSceneClassAnnotations();
     // FieldAnnotationSceneWriter ensures that the field visits all
     //  its annotations in the scene.
-    return new FieldAnnotationSceneWriter(this.api, name, super.visitField(access, name, descriptor, signature, value));
+    return new FieldAnnotationSceneWriter(this.api, name,
+        super.visitField(access, name, descriptor, signature, value));
   }
 
   @Override
-  public MethodVisitor visitMethod(int access, String name, String descriptor, String signature, String[] exceptions) {
+  public MethodVisitor visitMethod(int access, String name, String descriptor,
+      String signature, String[] exceptions) {
     ensureVisitSceneClassAnnotations();
     // MethodAnnotationSceneWriter ensures that the method visits all
     //  its annotations in the scene.
     // MethodAdapter is used here only for getting around an unsound
     //  "optimization" in ClassReader.
-    return new MethodAnnotationSceneWriter(api, name, descriptor, super.visitMethod(access, name, descriptor, signature, exceptions));
+    return new MethodAnnotationSceneWriter(api, name, descriptor,
+        super.visitMethod(access, name, descriptor, signature, exceptions));
   }
 
   @Override
@@ -199,7 +206,8 @@ public class ClassAnnotationSceneWriter extends ClassVisitor {
     existingClassAnnotations.add(descriptor);
     // If annotation exists in scene, and in overwrite mode,
     //  return empty visitor, since annotation from scene will be visited later.
-    if (aClass.lookup(classDescToName(descriptor)) != null && overwrite) {
+    if (aClass.lookup(classDescToName(descriptor)) != null
+        && overwrite) {
       return null;
     }
     return super.visitAnnotation(descriptor, visible);
@@ -210,7 +218,8 @@ public class ClassAnnotationSceneWriter extends ClassVisitor {
     existingClassAnnotations.add(descriptor);
     // If annotation exists in scene, and in overwrite mode,
     //  return empty visitor, annotation from scene will be visited later.
-    if (aClass.lookup(classDescToName(descriptor)) != null && overwrite) {
+    if (aClass.lookup(classDescToName(descriptor)) != null
+        && overwrite) {
       return null;
     }
     return super.visitTypeAnnotation(typeRef, typePath, descriptor, visible);
@@ -312,8 +321,13 @@ public class ClassAnnotationSceneWriter extends ClassVisitor {
 
   /**
    * Unwraps the class name from the given class descriptor.
+   *
+   * @param descriptor class name in JVML format
+   * @return the class name in ClassGetName format
    */
-  private static String classDescToName(String descriptor) {
+  // TODO Can/should this use a method in reflection-util instead?
+  @SuppressWarnings("signature")  // TODO unverified, but clients use it as a ClassGetName
+  private static @ClassGetName String classDescToName(String descriptor) {
     return descriptor.substring(1, descriptor.length() - 1).replace('/', '.');
   }
 
@@ -484,9 +498,6 @@ public class ClassAnnotationSceneWriter extends ClassVisitor {
           }
           AnnotationVisitor xav = fv.visitTypeAnnotation(typeReference.getValue(), TypePathEntry.listToTypePath(fieldInnerEntry.getKey()),
               classNameToDesc(name(tla)), isRuntimeRetention(tla));
-
-          // Seems like ASM's visitTypeAnnotation already visits the target type and location, so we probably don't need
-          // to explicitly visit these like ASMX does.
           visitFields(xav, tla);
           xav.visitEnd();
         }

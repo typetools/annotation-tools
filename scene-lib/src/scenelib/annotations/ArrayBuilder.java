@@ -11,6 +11,8 @@ public interface ArrayBuilder {
      * {@link Annotation#getFieldValue}; furthermore, a subannotation must have
      * been created by the same factory as the annotation of which it is a
      * field.
+     *
+     * @param x the next array element
      */
     void appendElement(Object x);
 

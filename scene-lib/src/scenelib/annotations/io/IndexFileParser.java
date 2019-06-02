@@ -30,7 +30,22 @@ import scenelib.annotations.AnnotationBuilder;
 import scenelib.annotations.AnnotationFactory;
 import scenelib.annotations.Annotations;
 import scenelib.annotations.ArrayBuilder;
-import scenelib.annotations.el.*;
+import scenelib.annotations.el.ABlock;
+import scenelib.annotations.el.AClass;
+import scenelib.annotations.el.ADeclaration;
+import scenelib.annotations.el.AElement;
+import scenelib.annotations.el.AExpression;
+import scenelib.annotations.el.AField;
+import scenelib.annotations.el.AMethod;
+import scenelib.annotations.el.AScene;
+import scenelib.annotations.el.ATypeElement;
+import scenelib.annotations.el.ATypeElementWithType;
+import scenelib.annotations.el.AnnotationDef;
+import scenelib.annotations.el.BoundLocation;
+import scenelib.annotations.el.LocalLocation;
+import scenelib.annotations.el.RelativeLocation;
+import scenelib.annotations.el.TypeIndexLocation;
+import scenelib.annotations.el.TypePathEntry;
 import scenelib.annotations.field.AnnotationAFT;
 import scenelib.annotations.field.AnnotationFieldType;
 import scenelib.annotations.field.ArrayAFT;
@@ -49,6 +64,8 @@ import scenelib.type.BoundedType;
 import scenelib.type.BoundedType.BoundKind;
 import scenelib.type.DeclaredType;
 import scenelib.type.Type;
+
+import org.checkerframework.checker.signature.qual.ClassGetName;
 
 /**
  * IndexFileParser provides static methods
@@ -273,7 +290,7 @@ public final class IndexFileParser {
     // Class object.
     private static final Map<String, Class<?>> primitiveTypes;
     static {
-        Map<String, Class<?>> pt = new LinkedHashMap<String, Class<?>>();
+        Map<String, Class<?>> pt = new LinkedHashMap<>();
         pt.put("byte", byte.class);
         pt.put("short", short.class);
         pt.put("int", int.class);
@@ -284,6 +301,47 @@ public final class IndexFileParser {
         pt.put("boolean", boolean.class);
         pt.put("void", void.class);
         primitiveTypes = pt;
+    }
+
+    /**
+     * Expect the class name in the format that Class.forName accepts.  Examples:
+     * <pre>{@code
+     *   "[[I"            for int[][].class
+     *   "[java.util.Map" for Map[].class
+     *   "java.util.Map"  for Map.class
+     * }</pre>
+     * Thes use fully-qualified names, i.e. "Object" alone won't work.
+     */
+    private @ClassGetName String expectClassGetName() throws IOException, ParseException {
+        int arrays = 0;
+        StringBuilder type = new StringBuilder();
+        while (matchChar('[')) {
+            // Array dimensions as prefix
+            ++arrays;
+        }
+        while (!matchKeyword("class")) {
+            if (st.ttype >= 0) {
+                type.append((char) st.ttype);
+            } else if (st.ttype == TT_WORD) {
+                type.append(st.sval);
+            } else {
+                throw new ParseException("Found something that doesn't belong in a signature");
+            }
+            st.nextToken();
+        }
+
+        // Drop the '.' before the "class"
+        type.deleteCharAt(type.length()-1);
+        // expectKeyword("class");
+
+        // Add arrays as prefix in the type.
+        while (arrays-->0) {
+            type.insert(0, '[');
+        }
+
+        @SuppressWarnings("signature") // string manipulation while parsing file
+        @ClassGetName String result = type.toString();
+        return result;
     }
 
     /** Parse scalar annotation value. */
@@ -345,52 +403,18 @@ public final class IndexFileParser {
             assert aft.isValidValue(val);
             return val;
         } else if (aft instanceof ClassTokenAFT) {
-            // Expect the class name in the format that Class.forName accepts,
-            // which is some very strange format.
-            // Example inputs followed by their Java source ".class" equivalent:
-            //   [[I.class      for int[][].class
-            //   [java.util.Map for Map[].class
-            //   java.util.Map  for Map.class
-            // Have to use fully-qualified names, i.e. "Object" alone won't work.
-            // Also note use of primitiveTypes map for primitives and void.
-            int arrays = 0;
-            StringBuilder type = new StringBuilder();
-            while (matchChar('[')) {
-                // Array dimensions as prefix
-                ++arrays;
-            }
-            while (!matchKeyword("class")) {
-                if (st.ttype >= 0) {
-                    type.append((char) st.ttype);
-                } else if (st.ttype == TT_WORD) {
-                    type.append(st.sval);
-                } else {
-                    throw new ParseException("Found something that doesn't belong in a signature");
-                }
-                st.nextToken();
-            }
-
-            // Drop the '.' before the "class"
-            type.deleteCharAt(type.length()-1);
-            // expectKeyword("class");
-
-            // Add arrays as prefix in the type.
-            while (arrays-->0) {
-                type.insert(0, '[');
-            }
-
+            String cgname = expectClassGetName();
             try {
-                String sttype = type.toString();
                 Class<?> tktype;
-                if (primitiveTypes.containsKey(sttype)) {
-                    tktype = primitiveTypes.get(sttype);
+                if (primitiveTypes.containsKey(cgname)) {
+                    tktype = primitiveTypes.get(cgname);
                 } else {
-                    tktype = Class.forName(sttype);
+                    tktype = Class.forName(cgname);
                 }
                 assert aft.isValidValue(tktype);
                 return tktype;
             } catch (ClassNotFoundException e) {
-                throw new ParseException("Could not load class: " + type, e);
+                throw new ParseException("Could not load class: " + cgname, e);
             }
         } else if (aft instanceof EnumAFT) {
             String name = expectQualifiedName();
@@ -630,7 +654,7 @@ public final class IndexFileParser {
         parseAnnotations(ad);
 
         Map<String, AnnotationFieldType> fields =
-                new LinkedHashMap<String, AnnotationFieldType>();
+                new LinkedHashMap<>();
 
         // yuck; it would be nicer to do a positive match
         while (st.ttype != TT_EOF && !checkKeyword("annotation")
@@ -1594,7 +1618,7 @@ public final class IndexFileParser {
     }
 
     private IndexFileParser(Reader in, AScene scene) {
-        defs = new LinkedHashMap<String, AnnotationDef>();
+        defs = new LinkedHashMap<>();
         for (AnnotationDef ad : Annotations.standardDefs) {
             try {
                 addDef(ad);

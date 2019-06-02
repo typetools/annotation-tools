@@ -25,6 +25,8 @@ import scenelib.annotations.field.*;
 
 import static scenelib.annotations.el.TypePathEntry.typePathToList;
 
+import org.checkerframework.checker.signature.qual.ClassGetName;
+
 /**
  * A <code> ClassAnnotationSceneReader </code> is a
  * {@link org.objectweb.asm.ClassVisitor} that will insert all annotations it
@@ -128,7 +130,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
   }
 
   /**
-   * @see org.objectweb.asm.ClassVisitor#visitTypeAnnotation(java.lang.String, boolean, boolean)
+   * @see org.objectweb.asm.ClassVisitor#visitTypeAnnotation(int, TypePath, java.lang.String, boolean)
    */
   @Override
   public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String descriptor, boolean visible) {
@@ -173,8 +175,13 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
     return new MethodAnnotationSceneReader(this.api, name, descriptor, signature, aMethod, methodWriter);
   }
 
-  // converts JVML format to Java format
-  private static String classDescToName(String descriptor) {
+  /** Converts JVML format to Java format.
+   * @param descriptor class name in JVML format
+   * @return the class name in ClassGetName format
+   */
+  // TODO Can/should this use a method in reflection-util instead?
+  @SuppressWarnings("signature")  // TODO unverified, but clients use it as a ClassGetName
+  private static @ClassGetName String classDescToName(String descriptor) {
     return descriptor.substring(1, descriptor.length() - 1).replace('/', '.');
   }
 
@@ -185,7 +192,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
 
   // Hackish workaround for odd subclassing.
   @SuppressWarnings("signature")
-  private String dummyDesc = "dummy";
+  String dummyDesc = "dummy";
 
   /**
    * Most of the complexity behind reading annotations from a class file into
@@ -262,6 +269,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
      * Constructs a new AnnotationScene reader with the given description and
      * visibility.  Calling visitEnd() will ensure that this writes out the
      * annotation it visits into aElement.
+     *
      * @param descriptor JVML format for the field being read, or ClassAnnotationSceneReader.dummyDesc
      */
     AnnotationSceneReader(int api, String descriptor, boolean visible, AElement aElement, AnnotationVisitor annotationWriter) {
@@ -286,6 +294,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
       /*
      * @see org.objectweb.asm.AnnotationVisitor#visit(java.lang.String, java.lang.Object)
      */
+    @SuppressWarnings("signature") // ASM is not annotated yet
     @Override
     public void visit(String name, Object value) {
       if (trace) { System.out.printf("visit(%s, %s) on %s%n", name, value, this); }
@@ -959,44 +968,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
           ", index=" + Arrays.toString(index) +
           '}';
     }
-    // TODO: makeExceptionIndexLocation?
 
-//    public String toStringOld() {
-//      return String.format("(TypeAnnotationSceneReader: %s %s %s %s)",
-//          aElement, visible, typeReference, typePath);
-//    }
-//    /**
-//     * Hook for NestedAnnotationSceneReader; overridden by
-//     * ArrayAnnotationSceneReader to add an array element instead of a field
-//     */
-//    void supplySubannotation(String fieldName, Annotation annotation) {
-//      annotationBuilder.addScalarField(fieldName,
-//          new AnnotationAFT(annotation.def()), annotation);
-//    }
-
-    // The following are utility methods to facilitate creating all the
-    // necessary data structures in the scene library.
-
-    /*
-     * Returns an annotation, ready to be placed into the scene, from
-     *  the information visited.
-     */
-//    public Annotation makeAnnotation() {
-//      return annotationBuilder.finish();
-//    }
-
-    /*
-     * Returns the bound location for this annotation.
-     */
-//    private BoundLocation makeTypeParameterLocation() {
-//      return new BoundLocation(typeReference.getTypeParameterIndex(), -1);
-////      if (!xParamIndexArgs.isEmpty()) {
-////        return new BoundLocation(xParamIndexArgs.get(0), -1);
-////      } else {
-////        if (strict) { System.err.println("makeTypeParameterLocation with empty xParamIndexArgs!"); }
-////        return new BoundLocation(Integer.MAX_VALUE, -1);
-////      }
-//    }
   }
 
   /**
@@ -1078,6 +1050,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
 
     // There are only so many different array types that are permitted in
     // an annotation.  (I'm not sure how relevant that is here.)
+    @SuppressWarnings("signature") // ASM is not annotated yet
     @Override
     public void visit(String name, Object value) {
       if (trace) { System.out.printf("visit(%s, %s) (%s) in %s (%s)%n", name, value, value.getClass(), this, this.getClass()); }
@@ -1157,10 +1130,12 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
    */
   private class FieldAnnotationSceneReader extends FieldVisitor {
 
-//    private final String name;
-//    private final String descriptor;
-//    private final String signature;
-//    private final Object value;
+    /*
+    private final String name;
+    private final String descriptor;
+    private final String signature;
+    private final Object value;
+    */
     private final AElement aField;
     private final FieldVisitor fieldWriter;
 
@@ -1197,18 +1172,18 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
    */
   private class MethodAnnotationSceneReader extends MethodVisitor {
 
-    private final String name;
-    private final String descriptor;
-    private final String signature;
+    // private final String name;
+    // private final String descriptor;
+    // private final String signature;
     private final AElement aMethod;
     private final MethodVisitor methodWriter;
     private Field METHOD_WRITER_CURRENT_BASIC_BLOCK;
 
     MethodAnnotationSceneReader(int api, String name, String descriptor, String signature, AElement aMethod, MethodVisitor methodWriter) {
       super(api, methodWriter);
-      this.name = name;
-      this.descriptor = descriptor;
-      this.signature = signature;
+      // this.name = name;
+      // this.descriptor = descriptor;
+      // this.signature = signature;
       this.aMethod = aMethod;
       this.methodWriter = methodWriter;
       try {
@@ -1313,9 +1288,4 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
       System.out.println("  " + tokenizer.nextToken());
     }
   }
-
 }
-
-
-
-// --------------------------------------- Stuff that might be useful later --------------------------------------

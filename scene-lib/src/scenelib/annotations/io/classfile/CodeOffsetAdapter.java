@@ -42,8 +42,11 @@ public class CodeOffsetAdapter extends ClassVisitor {
   }
 
   @Override
-  public MethodVisitor visitMethod(int access, String name, String descriptor, String signature, String[] exceptions) {
-    MethodVisitor methodVisitor = super.visitMethod(access, name, descriptor, signature, exceptions);
+  public MethodVisitor visitMethod(int access,
+      String name, String descriptor,
+      String signature, String[] exceptions) {
+    MethodVisitor methodVisitor =
+        super.visitMethod(access, name, descriptor, signature, exceptions);
     return new MethodVisitor(api, methodVisitor) {
       private int methodEnd;
 
@@ -112,9 +115,11 @@ public class CodeOffsetAdapter extends ClassVisitor {
       }
 
       @Override
-      public void visitInvokeDynamicInsn(String name, String descriptor, Handle bsm, Object... bsmArgs) {
+      public void visitInvokeDynamicInsn(String name, String descriptor,
+            Handle bsm, Object... bsmArgs) {
         super.visitInvokeDynamicInsn(name, descriptor, bsm, bsmArgs);
-        debug.debug("%d visitInvokeDynamicInsn(%s, %s)%n", offset, name, descriptor, bsm, bsmArgs);
+        debug.debug("%d visitInvokeDynamicInsn(%s, %s)%n", offset,
+            name, descriptor, bsm, bsmArgs);
         offset += 5;
       }
 
@@ -162,7 +167,8 @@ public class CodeOffsetAdapter extends ClassVisitor {
       @Override
       public void visitMultiANewArrayInsn(String descriptor, int dims) {
         super.visitMultiANewArrayInsn(descriptor, dims);
-        debug.debug("%d visitMultiANewArrayInsn(%s, %d)%n", offset, descriptor, dims);
+        debug.debug("%d visitMultiANewArrayInsn(%s, %d)%n", offset,
+            descriptor, dims);
         offset += 4;
       }
 

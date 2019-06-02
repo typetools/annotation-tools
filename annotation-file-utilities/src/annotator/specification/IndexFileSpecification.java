@@ -55,7 +55,7 @@ import com.sun.source.tree.Tree;
 public class IndexFileSpecification {
   private final Multimap<Insertion, Annotation> insertionSources =
       LinkedHashMultimap.<Insertion, Annotation>create();
-  private final List<Insertion> insertions = new ArrayList<Insertion>();
+  private final List<Insertion> insertions = new ArrayList<>();
   /** Is a member of insertions (if non-null). */
   private ConstructorInsertion constructorInsertion = null;
   private final AScene scene;
@@ -77,7 +77,7 @@ public class IndexFileSpecification {
       Map<String, AnnotationDef> annotationDefs =
           IndexFileParser.parseFile(indexFileName, scene);
       Set<String> defKeys = annotationDefs.keySet();
-      Set<String> ambiguous = new LinkedHashSet<String>();
+      Set<String> ambiguous = new LinkedHashSet<>();
       // If a qualified name's unqualified counterpart maps to null in
       // defKeys, it means that the unqualified name is ambiguous and
       // thus should always be qualified.
@@ -269,9 +269,6 @@ public class IndexFileSpecification {
     debug("parseClass(" + className + "):  done");
   }
 
-  // keep the descriptive strings for field initializers and static inits consistent
-  // with text used in NewCriterion.
-
   /** Fill in this.insertions with insertion pairs. */
   private void parseField(CriterionList clist, String fieldName, AField field) {
     // parse declaration annotations
@@ -295,6 +292,9 @@ public class IndexFileSpecification {
     clist = clist.add(Criteria.inInstanceInit(blockID));
     parseBlock(clist, className, "instance init number " + blockID + "()", block);
   }
+
+  // keep the descriptive strings for field initializers and static inits consistent
+  // with text used in NewCriterion.
 
   private void parseFieldInit(CriterionList clist, String className, String fieldName, AExpression exp) {
     clist = clist.add(Criteria.inFieldInit(fieldName));
@@ -356,7 +356,7 @@ public class IndexFileSpecification {
     NewInsertion neu = null;
     CastInsertion cast = null;
     CloseParenthesisInsertion closeParen = null;
-    List<Insertion> annotationInsertions = new ArrayList<Insertion>();
+    List<Insertion> annotationInsertions = new ArrayList<>();
     Set<Pair<String, Annotation>> elementAnnotations = getElementAnnotations(element);
     if (elementAnnotations.isEmpty()) {
       Criteria criteria = clist.criteria();
@@ -381,7 +381,7 @@ public class IndexFileSpecification {
     }
 
     for (Pair<String, Annotation> p : elementAnnotations) {
-      List<Insertion> elementInsertions = new ArrayList<Insertion>();
+      List<Insertion> elementInsertions = new ArrayList<>();
       String annotationString = p.a;
       Annotation annotation = p.b;
       Criteria criteria = clist.criteria();
@@ -546,7 +546,7 @@ public class IndexFileSpecification {
     CastInsertion cast = new CastInsertion(criteria, type);
     CloseParenthesisInsertion closeParen = new CloseParenthesisInsertion(
         criteria, cast.isSeparateLine());
-    return new Pair<CastInsertion, CloseParenthesisInsertion>(cast, closeParen);
+    return new Pair<>(cast, closeParen);
   }
 
   /**
@@ -567,7 +567,7 @@ public class IndexFileSpecification {
    */
   private void parseInnerAndOuterElements(CriterionList clist,
       ATypeElement typeElement, boolean isCastInsertion) {
-    List<Insertion> innerInsertions = new ArrayList<Insertion>();
+    List<Insertion> innerInsertions = new ArrayList<>();
     for (Entry<List<TypePathEntry>, ATypeElement> innerEntry : typeElement.innerTypes.entrySet()) {
       List<TypePathEntry> innerLoc = innerEntry.getKey();
       AElement innerElement = innerEntry.getValue();
@@ -608,7 +608,7 @@ public class IndexFileSpecification {
         annotationString += ")";
       }
       // annotationString += " ";
-      result.add(new Pair<String, Annotation>(annotationString, a));
+      result.add(new Pair<>(annotationString, a));
     }
     return result;
   }

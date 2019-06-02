@@ -108,9 +108,10 @@
         <path id="libpath">
             <pathelement location="${junit}"/>
             <pathelement location="${annotation-tools}/annotation-file-utilities/lib/asm-7.0.jar"/>
-            <pathelement location="${annotation-tools}/annotation-file-utilities/lib/bcel-util-1.0.0.jar"/>
-            <pathelement location="${annotation-tools}/annotation-file-utilities/lib/options-1.0.0.jar"/>
-            <pathelement location="${annotation-tools}/annotation-file-utilities/lib/plume-util-1.0.1.jar"/>
+            <pathelement location="${annotation-tools}/annotation-file-utilities/lib/bcel-util-1.1.4.jar"/>
+            <pathelement location="${annotation-tools}/annotation-file-utilities/lib/options-1.0.1.jar"/>
+            <pathelement location="${annotation-tools}/annotation-file-utilities/lib/plume-util-1.0.7.jar"/>
+            <pathelement location="${annotation-tools}/annotation-file-utilities/lib/signature-util-0.0.6.jar"/>
             <pathelement location="${annotation-tools}/annotation-file-utilities/lib/guava-20.0.jar"/>
             <!-- Can't use jsr308-langtools javac.jar, because javap.jar is also required. -->
             <pathelement location="${env.JAVA_HOME}/lib/tools.jar"/>
@@ -364,6 +365,60 @@
         <echo>${line.pathprefix}${echo.@{pathid}}</echo>
       </sequential>
     </macrodef>
+
+  <!-- Boilerplate to set cfjavac property. Is there a better way? -->
+  <property environment="env"/>
+  <condition property="isUnix">
+    <os family="unix" />
+  </condition>
+  <condition property="isWindows">
+    <os family="windows" />
+  </condition>
+  <target name="init-cfjavac-unix" if="isUnix">
+    <property name="cfjavac" value="${env.CHECKERFRAMEWORK}/checker/bin/javac" />
+  </target>
+  <target name="init-cfjavac-windows" if="isWindows">
+    <property name="cfjavac" value="${env.CHECKERFRAMEWORK}/checker/bin/javac.bat" />
+  </target>
+
+  <target name="check-nullness"
+          description="Check for nullness errors."
+          depends="init,clean,init-cfjavac-unix,init-cfjavac-windows">
+    <mkdir dir="bin"/>
+    <javac srcdir="src" destdir="bin" debug="true" encoding="8859_1"
+           fork="yes"
+           executable="${cfjavac}">
+      <compilerarg value="-version"/>
+      <compilerarg line="-target 8"/>
+      <compilerarg line="-processor org.checkerframework.checker.nullness.NullnessChecker"/>
+      <compilerarg value="-implicit:class"/>
+      <compilerarg line="-Xlint:unchecked -Xlint:deprecation"/>
+      <compilerarg line="-Awarns -Xmaxwarns 10000"/>
+      <classpath>
+        <path refid="libpath"/>
+        <pathelement location="${env.annotations}/checker/dist/checker.jar"/>
+      </classpath>
+    </javac>
+  </target>
+
+  <target name="check-signature"
+          description="Check for signature errors."
+          depends="init,clean,init-cfjavac-unix,init-cfjavac-windows">
+    <mkdir dir="bin"/>
+    <javac srcdir="src" destdir="bin" debug="true" encoding="8859_1"
+           fork="yes"
+           executable="${cfjavac}">
+      <compilerarg value="-version"/>
+      <compilerarg line="-target 8"/>
+      <compilerarg line="-processor org.checkerframework.checker.signature.SignatureChecker"/>
+      <compilerarg value="-implicit:class"/>
+      <compilerarg line="-Awarns -Xmaxwarns 10000"/>
+      <classpath>
+        <path refid="libpath"/>
+        <pathelement location="${env.annotations}/checker/dist/checker.jar"/>
+      </classpath>
+    </javac>
+  </target>
 
   <target name="etags" depends="tags">
   </target>

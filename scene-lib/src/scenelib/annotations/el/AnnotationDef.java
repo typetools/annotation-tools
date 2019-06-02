@@ -41,6 +41,8 @@ public final class AnnotationDef extends AElement {
     /**
      * Constructs an annotation definition with the given name.
      * You MUST call setFieldTypes afterward, even if with an empty map.  (Yuck.)
+     *
+     * @param name the binary name of the annotation type
      */
     public AnnotationDef(String name) {
         super("annotation: " + name);
@@ -55,8 +57,12 @@ public final class AnnotationDef extends AElement {
 
     // Problem:  I am not sure how to handle circularities (annotations meta-annotated with themselves)
     /**
-     * Look up an AnnotationDefs in adefs.
-     * If not found, read from a class and insert in adefs.
+     * Returns an AnnotationDef for the given annotation type.
+     * It might have been looked up in adefs, or created new and inserted in adefs.
+     *
+     * @param annoType the type for which to create an AnnotationDef
+     * @param adefs a cache of known AnnotationDef objects
+     * @return an AnnotationDef for the given annotation type
      */
     public static AnnotationDef fromClass(Class<? extends java.lang.annotation.Annotation> annoType, Map<String,AnnotationDef> adefs) {
         String name = annoType.getName();
@@ -66,7 +72,7 @@ public final class AnnotationDef extends AElement {
             return adefs.get(name);
         }
 
-        Map<String,AnnotationFieldType> fieldTypes = new LinkedHashMap<String,AnnotationFieldType>();
+        Map<String,AnnotationFieldType> fieldTypes = new LinkedHashMap<>();
         // TODO: getDeclaredMethods returns methods in arbitrary order. Check bytecode for correct order.
         List<String> methods;
         try {
@@ -115,8 +121,11 @@ public final class AnnotationDef extends AElement {
 
     /**
      * Constructs an annotation definition with the given name and field types.
-     * Uses {@link setFieldTypes} to protect the
+     * Uses {@link #setFieldTypes} to protect the
      * immutability of the annotation definition.
+     *
+     * @param name the fully-qualified type name of the annotation
+     * @param fieldTypes the annotation's element types
      */
     public AnnotationDef(String name, Set<Annotation> tlAnnotationsHere, Map<String, ? extends AnnotationFieldType> fieldTypes) {
         this(name, tlAnnotationsHere);
@@ -128,10 +137,12 @@ public final class AnnotationDef extends AElement {
      * The field type map is copied and then wrapped in an
      * {@linkplain Collections#unmodifiableMap unmodifiable map} to protect the
      * immutability of the annotation definition.
+     *
+     * @param fieldTypes the annotation's element types
      */
     public void setFieldTypes(Map<String, ? extends AnnotationFieldType> fieldTypes) {
         this.fieldTypes = Collections.unmodifiableMap(
-                new LinkedHashMap<String, AnnotationFieldType>(fieldTypes)
+                new LinkedHashMap<>(fieldTypes)
                 );
     }
 
@@ -141,6 +152,8 @@ public final class AnnotationDef extends AElement {
      * If non-null, this is called a "top-level" annotation definition.
      * It may be null for annotations that are used only as a field of other
      * annotations.
+     *
+     * @return the retention policy for annotations of this type
      */
     public @Nullable RetentionPolicy retention() {
         if (tlAnnotationsHere.contains(Annotations.aRetentionClass)) {
@@ -157,6 +170,8 @@ public final class AnnotationDef extends AElement {
     /**
      * True if this is a type annotation (was meta-annotated
      * with @Target(ElementType.TYPE_USE) or @TypeQualifier).
+     *
+     * @return true iff this is a type annotation
      */
     public boolean isTypeAnnotation() {
         // TODO: It's enough to have @Target that includes TYPE_USE; the
@@ -182,6 +197,9 @@ public final class AnnotationDef extends AElement {
      * Returns whether this {@link AnnotationDef} equals <code>o</code>; a
      * slightly faster variant of {@link #equals(Object)} for when the argument
      * is statically known to be another nonnull {@link AnnotationDef}.
+     *
+     * @param o another AnnotationDef to compare this to
+     * @return true if this is equal to the given value
      */
     public boolean equals(AnnotationDef o) {
         boolean sameName = name.equals(o.name);
@@ -215,6 +233,10 @@ public final class AnnotationDef extends AElement {
      * {@linkplain AnnotationFieldType#unify unifies the field types}
      * to handle arrays of unknown element type, which can arise via
      * {@link AnnotationBuilder#addEmptyArrayField}.
+     *
+     * @param def1 the first AnnotationDef to unify
+     * @param def2 the second AnnotationDef to unify
+     * @return an AnnotationDef that contains all the fields of either argument
      */
     public static AnnotationDef unify(AnnotationDef def1,
             AnnotationDef def2) {
@@ -230,7 +252,7 @@ public final class AnnotationDef extends AElement {
                  && def1.equalsElement(def2)
                  && def1.fieldTypes.keySet().equals(def2.fieldTypes.keySet())) {
             Map<String, AnnotationFieldType> newFieldTypes
-                = new LinkedHashMap<String, AnnotationFieldType>();
+                = new LinkedHashMap<>();
             for (String fieldName : def1.fieldTypes.keySet()) {
                 AnnotationFieldType aft1 = def1.fieldTypes.get(fieldName);
                 AnnotationFieldType aft2 = def2.fieldTypes.get(fieldName);

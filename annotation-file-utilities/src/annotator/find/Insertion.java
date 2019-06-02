@@ -54,7 +54,7 @@ public abstract class Insertion {
      * Set of annotation names that should always be inserted fully-qualified, even
      *  when {@link getText(boolean, boolean)} is called with abbreviate=true.
      */
-    protected static Set<String> alwaysQualify = new LinkedHashSet<String>();
+    protected static Set<String> alwaysQualify = new LinkedHashSet<>();
 
     /**
      * Creates a new insertion.
