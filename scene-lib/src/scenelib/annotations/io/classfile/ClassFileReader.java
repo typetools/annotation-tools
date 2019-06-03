@@ -1,7 +1,5 @@
 package scenelib.annotations.io.classfile;
 
-import java.io.*;
-
 import com.sun.tools.javac.main.CommandLine;
 
 import org.plumelib.options.Option;

@@ -27,6 +27,7 @@ public final class LocalLocation {
     }
 
     public LocalLocation(int index, int scopeStart, int scopeLength) {
+        // Only being used by Writers, not Readers for now. Should possibly deprecate this in the future.
         // Changes values reflectively.
         this.scopeStart = scopeStart;
         this.scopeLength = scopeLength;
