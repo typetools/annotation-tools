@@ -1177,6 +1177,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
     // private final String signature;
     private final AElement aMethod;
     private final MethodVisitor methodWriter;
+    /** The MethodWriter.currentBasicBlock method. */
     private Field METHOD_WRITER_CURRENT_BASIC_BLOCK;
 
     MethodAnnotationSceneReader(int api, String name, String descriptor, String signature, AElement aMethod, MethodVisitor methodWriter) {
