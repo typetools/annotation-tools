@@ -7,13 +7,29 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * A TypePathEntry is a way to get from one node in a TypePath to another.
+ * A list of TypePathEntry corresponds to a TypePath.
+ */
 public class TypePathEntry {
+  /**
+   * How to get from the previous node in a TypePath to this one.
+   * One of TypePath.ARRAY_ELEMENT, TypePath.INNER_TYPE, TypePath.WILDCARD_BOUND, TypePath.TYPE_ARGUMENT.
+   */
   public final int step;
+  /**
+   * If this represents a type argument (that is, step == TYPE_ARGUMENT, then the index for the type argument.
+   * Otherwise, 0.
+   */
   public final int argument;
 
   public TypePathEntry(int step, int argument) {
     this.step = step;
     this.argument = argument;
+
+    assert step == TypePath.ARRAY_ELEMENT || step == TypePath.INNER_TYPE
+        || step == TypePath.WILDCARD_BOUND || step == TypePath.TYPE_ARGUMENT;
+    assert step != TYPE_ARGUMENT || argument == 0;
   }
 
   @Override
@@ -55,6 +71,8 @@ public class TypePathEntry {
         case TypePath.TYPE_ARGUMENT:
           stringBuilder.append(argument).append(';');
           break;
+        default:
+          throw new Error("This can't happen");
       }
     }
     return TypePath.fromString(stringBuilder.toString());

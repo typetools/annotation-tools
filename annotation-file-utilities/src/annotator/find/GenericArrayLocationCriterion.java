@@ -52,6 +52,11 @@ public class GenericArrayLocationCriterion implements Criterion {
     this(null, null);
   }
 
+  /**
+   * Creates a new GenericArrayLocationCriterion representing the end of the given path.
+   *
+   * @param typePath the path to the location of the element being represented
+   */
   public GenericArrayLocationCriterion(TypePath typePath) {
     this(typePath, typePathToList(typePath));
   }
