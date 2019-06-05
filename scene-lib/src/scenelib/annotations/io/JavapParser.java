@@ -1,5 +1,7 @@
 package scenelib.annotations.io;
 
+import static scenelib.annotations.el.TypePathEntry.getTypePathEntryListFromBinary;
+
 import java.io.*;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
@@ -7,7 +9,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.objectweb.asm.TypePath;
 import scenelib.annotations.Annotation;
 import scenelib.annotations.AnnotationBuilder;
 import scenelib.annotations.AnnotationFactory;
@@ -17,8 +18,6 @@ import scenelib.annotations.el.*;
 import com.sun.tools.javac.code.TargetType;
 
 import org.plumelib.util.FileIOException;
-
-import static scenelib.annotations.el.TypePathEntry.*;
 
 /**
  * <code>JavapParser</code> provides a static method that parses a class dump
