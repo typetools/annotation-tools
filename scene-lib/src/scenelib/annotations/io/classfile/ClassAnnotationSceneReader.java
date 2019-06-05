@@ -57,7 +57,9 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
   //  methods; for those three, use a special visitor that does all the work
   //  and inserts the annotations correctly into the specified AElement
 
-  // Whether to output tracing information
+  /**
+   * Whether to output tracing information
+   */
   private static final boolean trace = false;
 
   // Whether to output error messages for unsupported cases
@@ -93,6 +95,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
    * Constructs a new <code> ClassAnnotationSceneReader </code> that will
    * insert all the annotations in the class that it visits into
    * <code>scene</code>.
+   * @param api the ASM API version to use
    * @param classReader the {@link ClassReader} that visits this <code>ClassAnnotationSceneReader</code>.
    * @param scene the annotation scene into which annotations this visits
    *  will be inserted
@@ -496,15 +499,33 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
     // TypeReference.CLASS_TYPE_PARAMETER_BOUND or TypeReference.CLASS_EXTENDS.
     private final TypeReference typeReference;
 
-    // The the path to the annotated type argument, wildcard bound, array element type, or static inner type within
-    // 'typeRef'. May be null if the annotation targets 'typeRef' as a whole.
+    /**
+     * The path to the annotated type argument, wildcard bound, array element type, or static inner type within
+     *  'typeRef'. May be null if the annotation targets 'typeRef' as a whole.
+     */
     private final TypePath typePath;
 
-    // Used only for TypeReference#LOCAL_VARIABLE and TypeReference#RESOURCE_VARIABLE.
+    /**
+     * The start of the scopes of the element being visited.
+     * Used only for TypeReference#LOCAL_VARIABLE and TypeReference#RESOURCE_VARIABLE.
+     */
     private final Label[] start;
+
+    /**
+     * The end of the scopes of the element being visited.
+     * Used only for TypeReference#LOCAL_VARIABLE and TypeReference#RESOURCE_VARIABLE.
+     */
     private final Label[] end;
+
+    /**
+     * The indices of the element being visited in the classfile.
+     * Used only for TypeReference#LOCAL_VARIABLE and TypeReference#RESOURCE_VARIABLE.
+     */
     private final int[] index;
 
+    /**
+     * The current basic block being visited.
+     */
     private final Label currentBasicBlock;
 
     // since AnnotationSceneReader will work for both normal
