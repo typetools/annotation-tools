@@ -23,6 +23,8 @@ import scenelib.annotations.field.*;
 import com.sun.tools.javac.code.TargetType;
 import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
 
+import org.checkerframework.checker.signature.qual.ClassGetName;
+
 /**
  * A <code> ClassAnnotationSceneReader </code> is a
  * {@link org.objectweb.asmx.ClassVisitor} that will insert all annotations it
@@ -69,16 +71,16 @@ extends EmptyVisitor {
   // The AClass that will be visited, which already contains annotations.
   private AClass aClass;
 
-  private final ClassReader cr;
+  private final ClassReader classReader;
 
   /**
    * Holds definitions we've seen so far.  Maps from annotation name to
    * the definition itself.  Maps from both the qualified name and the
    * unqualified name.  If the unqualified name is not unique, it maps
    * to null and the qualified name should be used instead. */
-  private final Map<String, AnnotationDef> adefs = initAdefs();
-  private static Map<String,AnnotationDef> initAdefs() {
-    Map<String,AnnotationDef> result = new HashMap<String,AnnotationDef>();
+  private final Map<String, AnnotationDef> annotationDefinitions = initialiseAnnotationDefinitions();
+  private static Map<String,AnnotationDef> initialiseAnnotationDefinitions() {
+    Map<String,AnnotationDef> result = new HashMap<>();
     for (AnnotationDef ad : Annotations.standardDefs) {
       result.put(ad.name, ad);
     }
@@ -89,16 +91,16 @@ extends EmptyVisitor {
    * Constructs a new <code> ClassAnnotationSceneReader </code> that will
    * insert all the annotations in the class that it visits into
    * <code>scene</code>.
-   * @param cr
+   * @param classReader
    *
    * @param scene the annotation scene into which annotations this visits
    *  will be inserted
    * @param ignoreBridgeMethods whether to omit annotations on
    *  compiler-generated methods
    */
-  public ClassAnnotationSceneReader(ClassReader cr, AScene scene,
+  public ClassAnnotationSceneReader(ClassReader classReader, AScene scene,
       boolean ignoreBridgeMethods) {
-    this.cr = cr;
+    this.classReader = classReader;
     this.scene = scene;
     this.ignoreBridgeMethods = ignoreBridgeMethods;
   }
@@ -116,18 +118,18 @@ extends EmptyVisitor {
    * @see org.objectweb.asmx.commons.EmptyVisitor#visitAnnotation(java.lang.String, boolean)
    */
   @Override
-  public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
-    if (trace) { System.out.printf("visitAnnotation(%s, %s) in %s (%s)%n", desc, visible, this, this.getClass()); }
-    return visitTypeAnnotation(desc, visible, false);
+  public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
+    if (trace) { System.out.printf("visitAnnotation(%s, %s) in %s (%s)%n", descriptor, visible, this, this.getClass()); }
+    return visitTypeAnnotation(descriptor, visible, false);
   }
 
   /**
    * @see org.objectweb.asmx.commons.EmptyVisitor#visitTypeAnnotation(java.lang.String, boolean, boolean)
    */
   @Override
-  public TypeAnnotationVisitor visitTypeAnnotation(String desc, boolean visible, boolean inCode) {
-    if (trace) { System.out.printf("visitTypeAnnotation(%s, %s, %s); aClass=%s in %s (%s)%n", desc, inCode, visible, aClass, this, this.getClass()); }
-    return new AnnotationSceneReader(desc, visible, aClass);
+  public TypeAnnotationVisitor visitTypeAnnotation(String descriptor, boolean visible, boolean inCode) {
+    if (trace) { System.out.printf("visitTypeAnnotation(%s, %s, %s); aClass=%s in %s (%s)%n", descriptor, inCode, visible, aClass, this, this.getClass()); }
+    return new AnnotationSceneReader(descriptor, visible, aClass);
   }
 
   /**
@@ -137,12 +139,12 @@ extends EmptyVisitor {
   public FieldVisitor visitField(
       int access,
       String name,
-      String desc,
+      String descriptor,
       String signature,
       Object value  ) {
-    if (trace) { System.out.printf("visitField(%s, %s, %s, %s, %s) in %s (%s)%n", access, name, desc, signature, value, this, this.getClass()); }
+    if (trace) { System.out.printf("visitField(%s, %s, %s, %s, %s) in %s (%s)%n", access, name, descriptor, signature, value, this, this.getClass()); }
     AField aField = aClass.fields.getVivify(name);
-    return new FieldAnnotationSceneReader(name, desc, signature, value, aField);
+    return new FieldAnnotationSceneReader(name, descriptor, signature, value, aField);
   }
 
   /**
@@ -152,20 +154,25 @@ extends EmptyVisitor {
   public MethodVisitor visitMethod(
       int access,
       String name,
-      String desc,
+      String descriptor,
       String signature,
       String[] exceptions) {
     if (ignoreBridgeMethods && (access & Opcodes.ACC_BRIDGE) != 0) {
       return null;
     }
-    if (trace) { System.out.printf("visitMethod(%s, %s, %s, %s, %s) in %s (%s)%n", access, name, desc, signature, exceptions, this, this.getClass()); }
-    AMethod aMethod = aClass.methods.getVivify(name+desc);
-    return new MethodAnnotationSceneReader(name, desc, signature, aMethod);
+    if (trace) { System.out.printf("visitMethod(%s, %s, %s, %s, %s) in %s (%s)%n", access, name, descriptor, signature, exceptions, this, this.getClass()); }
+    AMethod aMethod = aClass.methods.getVivify(name+descriptor);
+    return new MethodAnnotationSceneReader(name, descriptor, signature, aMethod);
   }
 
-  // converts JVML format to Java format
-  private static String classDescToName(String desc) {
-    return desc.substring(1, desc.length() - 1).replace('/', '.');
+  /** Converts JVML format to Java format.
+   * @param descriptor class name in JVML format
+   * @return the class name in ClassGetName format
+   */
+  // TODO Can/should this use a method in reflection-util instead?
+  @SuppressWarnings("signature")  // TODO unverified, but clients use it as a ClassGetName
+  private static @ClassGetName String classDescToName(String descriptor) {
+    return descriptor.substring(1, descriptor.length() - 1).replace('/', '.');
   }
 
 
@@ -245,7 +252,7 @@ extends EmptyVisitor {
       String annoTypeName = classDescToName(jvmlClassName);
       // It would be better to not require the .class file to be on the
       // classpath, but to search for it on a path that is passed to this
-      // program.  Worry about that later.
+      // program.
       Class<? extends java.lang.annotation.Annotation> annoClass;
       try {
         annoClass = (Class<? extends java.lang.annotation.Annotation>) Class.forName(annoTypeName);
@@ -260,7 +267,7 @@ extends EmptyVisitor {
         throw new Error(e);
       }
 
-      AnnotationDef ad = AnnotationDef.fromClass(annoClass, adefs);
+      AnnotationDef ad = AnnotationDef.fromClass(annoClass, annotationDefinitions);
 
       return ad;
     }
@@ -270,18 +277,19 @@ extends EmptyVisitor {
      * Constructs a new AnnotationScene reader with the given description and
      * visibility.  Calling visitEnd() will ensure that this writes out the
      * annotation it visits into aElement.
-     * @param desc JVML format for the field being read, or ClassAnnotationSceneReader.dummyDesc
+     *
+     * @param descriptor JVML format for the field being read, or ClassAnnotationSceneReader.dummyDesc
      */
-    public AnnotationSceneReader(String desc, boolean visible, AElement aElement) {
-      if (trace) { System.out.printf("AnnotationSceneReader(%s, %s, %s)%n", desc, visible, aElement); }
+    public AnnotationSceneReader(String descriptor, boolean visible, AElement aElement) {
+      if (trace) { System.out.printf("AnnotationSceneReader(%s, %s, %s)%n", descriptor, visible, aElement); }
       this.visible = visible;
       this.aElement = aElement;
-      if (desc != dummyDesc) {    // interned
-        AnnotationDef ad = getAnnotationDef(desc);
+      if (descriptor != dummyDesc) {    // interned
+        AnnotationDef ad = getAnnotationDef(descriptor);
 
         AnnotationBuilder ab = AnnotationFactory.saf.beginAnnotation(ad);
         if (ab == null) {
-          throw new IllegalArgumentException("bad description: " + desc);
+          throw new IllegalArgumentException("bad description: " + descriptor);
         } else {
           this.annotationBuilder = ab;
         }
@@ -305,6 +313,7 @@ extends EmptyVisitor {
     /*
      * @see org.objectweb.asmx.AnnotationVisitor#visit(java.lang.String, java.lang.Object)
      */
+    @SuppressWarnings("signature") // ASM is not annotated yet
     @Override
     public void visit(String name, Object value) {
       if (trace) { System.out.printf("visit(%s, %s) on %s%n", name, value, this); }
@@ -362,7 +371,7 @@ extends EmptyVisitor {
      * the same elements as in hiddenArray.
      */
     private List<Object> asList(Object hiddenArray) {
-      List<Object> objects = new ArrayList<Object>();
+      List<Object> objects = new ArrayList<>();
       Class<?> c = hiddenArray.getClass().getComponentType();
       if (c.equals(boolean.class)) {
         for (boolean o : (boolean[]) hiddenArray) {
@@ -406,18 +415,18 @@ extends EmptyVisitor {
      * @see org.objectweb.asmx.AnnotationVisitor#visitEnum(java.lang.String, java.lang.String, java.lang.String)
      */
     @Override
-    public void visitEnum(String name, String desc, String value) {
-      if (trace) { System.out.printf("visitEnum(%s, %s) in %s (%s)%n", name, desc, this, this.getClass()); }
-      annotationBuilder.addScalarField(name, new EnumAFT(desc), value);
+    public void visitEnum(String name, String descriptor, String value) {
+      if (trace) { System.out.printf("visitEnum(%s, %s) in %s (%s)%n", name, descriptor, this, this.getClass()); }
+      annotationBuilder.addScalarField(name, new EnumAFT(descriptor), value);
     }
 
     /*
      * @see org.objectweb.asmx.AnnotationVisitor#visitAnnotation(java.lang.String, java.lang.String)
      */
     @Override
-    public AnnotationVisitor visitAnnotation(String name, String desc) {
-      if (trace) { System.out.printf("visitAnnotation(%s, %s) in %s (%s)%n", name, desc, this, this.getClass()); }
-      return new NestedAnnotationSceneReader(this, name, desc);
+    public AnnotationVisitor visitAnnotation(String name, String descriptor) {
+      if (trace) { System.out.printf("visitAnnotation(%s, %s) in %s (%s)%n", name, descriptor, this, this.getClass()); }
+      return new NestedAnnotationSceneReader(this, name, descriptor);
     }
 
     /*
@@ -983,15 +992,15 @@ extends EmptyVisitor {
   private class NestedAnnotationSceneReader extends AnnotationSceneReader {
     private final AnnotationSceneReader parent;
     private final String name;
-    // private final String desc;
+    // private final String descriptor;
 
     public NestedAnnotationSceneReader(AnnotationSceneReader parent,
-        String name, String desc) {
-      super(desc, parent.visible, parent.aElement);
-      if (trace) { System.out.printf("NestedAnnotationSceneReader(%s, %s, %s)%n", parent, name, desc); }
+        String name, String descriptor) {
+      super(descriptor, parent.visible, parent.aElement);
+      if (trace) { System.out.printf("NestedAnnotationSceneReader(%s, %s, %s)%n", parent, name, descriptor); }
       this.parent = parent;
       this.name = name;
-      // this.desc = desc;
+      // this.descriptor = descriptor;
     }
 
     @Override
@@ -1051,6 +1060,7 @@ extends EmptyVisitor {
 
     // There are only so many different array types that are permitted in
     // an annotation.  (I'm not sure how relevant that is here.)
+    @SuppressWarnings("signature") // ASM is not annotated yet
     @Override
     public void visit(String name, Object value) {
       if (trace) { System.out.printf("visit(%s, %s) (%s) in %s (%s)%n", name, value, value.getClass(), this, this.getClass()); }
@@ -1075,9 +1085,9 @@ extends EmptyVisitor {
     }
 
     @Override
-    public void visitEnum(String name, String desc, String value) {
-      if (trace) { System.out.printf("visitEnum(%s, %s, %s) in %s (%s)%n", name, desc, value, this, this.getClass()); }
-      prepareForElement(new EnumAFT(classDescToName(desc)));
+    public void visitEnum(String name, String descriptor, String value) {
+      if (trace) { System.out.printf("visitEnum(%s, %s, %s) in %s (%s)%n", name, descriptor, value, this, this.getClass()); }
+      prepareForElement(new EnumAFT(classDescToName(descriptor)));
       assert arrayBuilder != null;
       arrayBuilder.appendElement(value);
     }
@@ -1088,12 +1098,12 @@ extends EmptyVisitor {
     }
 
     @Override
-    public AnnotationVisitor visitAnnotation(String name, String desc) {
-      if (trace) { System.out.printf("visitAnnotation(%s, %s) in %s (%s)%n", name, desc, this, this.getClass()); }
+    public AnnotationVisitor visitAnnotation(String name, String descriptor) {
+      if (trace) { System.out.printf("visitAnnotation(%s, %s) in %s (%s)%n", name, descriptor, this, this.getClass()); }
       // The NASR will regurgitate the name we pass here when it calls
       // supplySubannotation.  Since we ignore the name there, it doesn't
       // matter what name we pass here.
-      return new NestedAnnotationSceneReader(this, name, desc);
+      return new NestedAnnotationSceneReader(this, name, descriptor);
     }
 
     @Override
@@ -1127,7 +1137,7 @@ extends EmptyVisitor {
 
     /*
     private final String name;
-    private final String desc;
+    private final String descriptor;
     private final String signature;
     private final Object value;
     */
@@ -1135,13 +1145,13 @@ extends EmptyVisitor {
 
     public FieldAnnotationSceneReader(
         String name,
-        String desc,
+        String descriptor,
         String signature,
         Object value,
         AElement aField) {
       /*
       this.name = name;
-      this.desc = desc;
+      this.descriptor = descriptor;
       this.signature = signature;
       this.value = value;
       */
@@ -1149,15 +1159,15 @@ extends EmptyVisitor {
     }
 
     @Override
-    public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
-      if (trace) { System.out.printf("visitAnnotation(%s, %s) in %s (%s)%n", desc, visible, this, this.getClass()); }
-      return new AnnotationSceneReader(desc, visible, aField);
+    public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
+      if (trace) { System.out.printf("visitAnnotation(%s, %s) in %s (%s)%n", descriptor, visible, this, this.getClass()); }
+      return new AnnotationSceneReader(descriptor, visible, aField);
     }
 
     @Override
-    public TypeAnnotationVisitor visitTypeAnnotation(String desc, boolean visible, boolean inCode) {
-      if (trace) { System.out.printf("visitTypeAnnotation(%s, %s, %s); aField=%s, aField.type=%s in %s (%s)%n", desc, visible, inCode, aField, aField.type, this, this.getClass()); }
-      return new AnnotationSceneReader(desc, visible, aField.type);
+    public TypeAnnotationVisitor visitTypeAnnotation(String descriptor, boolean visible, boolean inCode) {
+      if (trace) { System.out.printf("visitTypeAnnotation(%s, %s, %s); aField=%s, aField.type=%s in %s (%s)%n", descriptor, visible, inCode, aField, aField.type, this, this.getClass()); }
+      return new AnnotationSceneReader(descriptor, visible, aField.type);
     }
   }
 
@@ -1174,38 +1184,38 @@ extends EmptyVisitor {
   private class MethodAnnotationSceneReader extends EmptyVisitor implements MethodVisitor {
 
     // private final String name;
-    // private final String desc;
+    // private final String descriptor;
     // private final String signature;
     private final AElement aMethod;
 
-    public MethodAnnotationSceneReader(String name, String desc, String signature, AElement aMethod) {
+    public MethodAnnotationSceneReader(String name, String descriptor, String signature, AElement aMethod) {
       // this.name = name;
-      // this.desc = desc;
+      // this.descriptor = descriptor;
       // this.signature = signature;
       this.aMethod = aMethod;
     }
 
     @Override
-    public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
-      if (trace) { System.out.printf("visitAnnotation(%s, %s) in %s (%s)%n", desc, visible, this, this.getClass()); }
-      return visitTypeAnnotation(desc, visible, false);
+    public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
+      if (trace) { System.out.printf("visitAnnotation(%s, %s) in %s (%s)%n", descriptor, visible, this, this.getClass()); }
+      return visitTypeAnnotation(descriptor, visible, false);
     }
 
     @Override
-    public TypeAnnotationVisitor visitTypeAnnotation(String desc, boolean visible, boolean inCode) {
-      if (trace) { System.out.printf("visitTypeAnnotation(%s, %s) method=%s in %s (%s)%n", desc, visible, inCode, aMethod, this, this.getClass()); }
-      return new AnnotationSceneReader(desc, visible, aMethod);
+    public TypeAnnotationVisitor visitTypeAnnotation(String descriptor, boolean visible, boolean inCode) {
+      if (trace) { System.out.printf("visitTypeAnnotation(%s, %s) method=%s in %s (%s)%n", descriptor, visible, inCode, aMethod, this, this.getClass()); }
+      return new AnnotationSceneReader(descriptor, visible, aMethod);
     }
 
     @Override
-    public AnnotationVisitor visitParameterAnnotation(int parameter, String desc, boolean visible) {
-      if (trace) { System.out.printf("visitParameterAnnotation(%s, %s, %s) in %s (%s)%n", parameter, desc, visible, this, this.getClass()); }
-      return new AnnotationSceneReader(desc, visible,
+    public AnnotationVisitor visitParameterAnnotation(int parameter, String descriptor, boolean visible) {
+      if (trace) { System.out.printf("visitParameterAnnotation(%s, %s, %s) in %s (%s)%n", parameter, descriptor, visible, this, this.getClass()); }
+      return new AnnotationSceneReader(descriptor, visible,
               ((AMethod) aMethod).parameters.getVivify(parameter));
     }
 
     @Override
-    public void visitLocalVariable(String name, String desc, String signature,
+    public void visitLocalVariable(String name, String descriptor, String signature,
         Label start, Label end, int index) {
       // TODO!
     }

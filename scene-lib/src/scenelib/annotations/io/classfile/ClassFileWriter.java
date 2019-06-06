@@ -24,6 +24,9 @@ public class ClassFileWriter {
   @Option("print version information and exit")
   public static boolean version = false;
 
+  @Option("print progress messages")
+  public static boolean verbose = false;
+
   private static String linesep = System.getProperty("line.separator");
 
   static String usage
@@ -104,7 +107,6 @@ public class ClassFileWriter {
     }
 
     for (int i = 0; i < file_args.length; i++) {
-
       String className = file_args[i];
       i++;
       if (i >= file_args.length) {
@@ -123,12 +125,16 @@ public class ClassFileWriter {
       // into class file
       try {
         if (className.endsWith(".class")) {
-          // System.out.printf("Adding annotations to class file %s%n", className);
+          if (verbose) {
+            System.out.printf("Adding annotations to class file %s%n", className);
+          }
           insert(scene, className, true);
         } else {
           String outputFileName = className + ".class";
-          // System.out.printf("Reading class file %s; writing with annotations to %s%n",
-          //                   className, outputFileName);
+          if (verbose) {
+            System.out.printf("Reading class file %s; writing with annotations to %s%n",
+                              className, outputFileName);
+          }
           insert(scene, className, outputFileName, true);
         }
       } catch (IOException e) {
@@ -145,7 +151,6 @@ public class ClassFileWriter {
         return;
       }
     }
-
   }
 
   /**
@@ -172,15 +177,15 @@ public class ClassFileWriter {
 
     // can't just call other insert, because this closes the input stream
     InputStream in = new FileInputStream(fileName);
-    ClassReader cr = new ClassReader(in);
+    ClassReader classReader = new ClassReader(in);
     in.close();
 
-    ClassAnnotationSceneWriter cw =
-      new ClassAnnotationSceneWriter(cr, scene, overwrite);
-    cr.accept(cw, false);
+    ClassAnnotationSceneWriter classAnnotationSceneWriter =
+      new ClassAnnotationSceneWriter(classReader, scene, overwrite);
+    classReader.accept(classAnnotationSceneWriter, false);
 
     OutputStream fos = new FileOutputStream(fileName);
-    fos.write(cw.toByteArray());
+    fos.write(classAnnotationSceneWriter.toByteArray());
     fos.close();
   }
 
@@ -193,7 +198,7 @@ public class ClassFileWriter {
    * annotations from <code> scene </code>.
    *
    * @param scene the scene containing the annotations to insert into a class
-   * @param in the input stream from which to read a class
+   * @param input the input stream from which to read a class
    * @param out the output stream the merged class should be written to
    * @param overwrite controls behavior when an annotation exists on a
    * particular element in both the scene and the class file.  If true,
@@ -202,16 +207,15 @@ public class ClassFileWriter {
    * @throws IOException if there is a problem reading from <code> in </code> or
    * writing to <code> out </code>
    */
-  public static void insert(AScene scene, InputStream in,
-      OutputStream out, boolean overwrite) throws IOException {
-    ClassReader cr = new ClassReader(in);
+  public static void insert(AScene scene, InputStream input, OutputStream out, boolean overwrite) throws IOException {
+    ClassReader classReader = new ClassReader(input);
 
-    ClassAnnotationSceneWriter cw =
-      new ClassAnnotationSceneWriter(cr, scene, overwrite);
+    ClassAnnotationSceneWriter classAnnotationSceneWriter =
+      new ClassAnnotationSceneWriter(classReader, scene, overwrite);
 
-    cr.accept(cw, false);
+    classReader.accept(classAnnotationSceneWriter, false);
 
-    out.write(cw.toByteArray());
+    out.write(classAnnotationSceneWriter.toByteArray());
   }
 
   /**
@@ -233,15 +237,15 @@ public class ClassFileWriter {
    */
   public static void insert(AScene scene,
       String className, String outputFileName, boolean overwrite) throws IOException {
-    ClassReader cr = new ClassReader(className);
+    ClassReader classReader = new ClassReader(className);
 
-    ClassAnnotationSceneWriter cw =
-      new ClassAnnotationSceneWriter(cr, scene, overwrite);
+    ClassAnnotationSceneWriter classAnnotationSceneWriter =
+      new ClassAnnotationSceneWriter(classReader, scene, overwrite);
 
-    cr.accept(cw, false);
+    classReader.accept(classAnnotationSceneWriter, false);
 
     OutputStream fos = new FileOutputStream(outputFileName);
-    fos.write(cw.toByteArray());
+    fos.write(classAnnotationSceneWriter.toByteArray());
     fos.close();
   }
 }

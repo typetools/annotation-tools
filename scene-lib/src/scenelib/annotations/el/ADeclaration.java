@@ -17,8 +17,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public abstract class ADeclaration extends AElement {
   /** The element's insert-annotation invocations; map key is the AST path to the insertion place */
   public final VivifyingMap<ASTPath, ATypeElement> insertAnnotations =
-          new VivifyingMap<ASTPath, ATypeElement>(
-                  new TreeMap<ASTPath, ATypeElement>()) {
+          new VivifyingMap<ASTPath, ATypeElement>(new TreeMap<>()) {
       @Override
       public  ATypeElement createValueFor(ASTPath k) {
           return new ATypeElement(k);
@@ -32,8 +31,7 @@ public abstract class ADeclaration extends AElement {
 
   /** The element's annotated insert-typecast invocations; map key is the AST path to the insertion place */
   public final VivifyingMap<ASTPath, ATypeElementWithType> insertTypecasts =
-          new VivifyingMap<ASTPath, ATypeElementWithType>(
-                new TreeMap<ASTPath, ATypeElementWithType>()) {
+          new VivifyingMap<ASTPath, ATypeElementWithType>(new TreeMap<>()) {
       @Override
       public ATypeElementWithType createValueFor(ASTPath k) {
           return new ATypeElementWithType(k);

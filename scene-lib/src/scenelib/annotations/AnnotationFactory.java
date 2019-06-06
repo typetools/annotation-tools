@@ -21,8 +21,10 @@ public final class AnnotationFactory {
     public static final AnnotationFactory saf = new AnnotationFactory();
 
     /**
-     * Returns an {@link AnnotationBuilder} appropriate for building a
+     * Returns an {@link AnnotationBuilder} appropriate for building an
      * {@link Annotation} of the given type name.
+     *
+     * @param def the definition for the annotation to be built
      */
     public AnnotationBuilder beginAnnotation(AnnotationDef def) {
         return new AnnotationBuilder(def);

@@ -17,9 +17,7 @@ import scenelib.annotations.io.IndexFileWriter;
  *  from a class file into an {@link scenelib.annotations.el.AScene}.
  */
 public class ClassFileReader {
-
-  public static final String INDEX_UTILS_VERSION
-    = "Annotation File Utilities v3.6.47";
+  public static final String INDEX_UTILS_VERSION = "Annotation File Utilities v3.6.47";
 
   @Option("-b omit annotations from bridge (compiler-created) methods")
   public static boolean ignore_bridge_methods = false;
@@ -27,8 +25,11 @@ public class ClassFileReader {
   @Option("-h print usage information and exit")
   public static boolean help = false;
 
-  @Option("-v print version information and exit")
+  @Option("print version information and exit")
   public static boolean version = false;
+
+  @Option("print progress messages")
+  public static boolean verbose = false;
 
   private static String linesep = System.getProperty("line.separator");
 
@@ -43,7 +44,17 @@ public class ClassFileReader {
     + linesep
     + "single '@' are interpreted as argument files to be read and expanded into"
     + linesep
-    + "the command line.  Options:";
+    + "the command line.  A few options are available only when invoked via the"
+    + linesep
+    + "script extract-annotations, not when invoked as a Java program:"
+    + linesep
+    + "  --debug-script                       - make the extract-annotations script output debugging information"
+    + linesep
+    + "  -cp <classpath>                      - use the given classpath instead of the CLASSPATH environment variable"
+    + linesep
+    + "  -classpath <classpath>               - use the given classpath instead of the CLASSPATH environment variable"
+    + linesep
+    + "Options that are always available:";
 
   /**
    * From the command line, read annotations from a class file and write
@@ -100,7 +111,9 @@ public class ClassFileReader {
     }
 
     for (String origName : file_args) {
-      // System.out.println("reading: " + origName);
+      if (verbose) {
+        System.out.println("reading: " + origName);
+      }
       String className = origName;
       if (origName.endsWith(".class")) {
           origName = origName.replace(".class", "");
@@ -114,7 +127,9 @@ public class ClassFileReader {
           readFromClass(scene, className);
         }
         String outputFile = origName + ".jaif";
-        // System.out.println("printing results to : " + outputFile);
+        if (verbose) {
+          System.out.println("printing results to : " + outputFile);
+        }
         IndexFileWriter.write(scene, outputFile);
       } catch (IOException e) {
         System.out.println("There was an error in reading class: " + origName);
@@ -177,8 +192,7 @@ public class ClassFileReader {
    * @param className the name of the class to read in
    * @throws IOException if there is a problem reading <code> className </code>
    */
-  public static void readFromClass(AScene scene, String className)
-  throws IOException {
+  public static void readFromClass(AScene scene, String className) throws IOException {
     read(scene, new ClassReader(className));
   }
 
@@ -187,19 +201,16 @@ public class ClassFileReader {
    * and inserts them into <code> scene </code>.
    *
    * @param scene the scene into which the annotations should be inserted
-   * @param in an input stream containing the class that the annotations
-   * should be read from
+   * @param input an input stream containing the class that the annotations
+   *              should be read from
    * @throws IOException if there is a problem reading from <code> in </code>
    */
-  public static void read(AScene scene, InputStream in)
-  throws IOException {
-    read(scene, new ClassReader(in));
+  public static void read(AScene scene, InputStream input) throws IOException {
+    read(scene, new ClassReader(input));
   }
 
-  public static void read(AScene scene, ClassReader cr) {
-    ClassAnnotationSceneReader ca =
-        new ClassAnnotationSceneReader(cr, scene, ignore_bridge_methods);
-    cr.accept(ca, true);
+  public static void read(AScene scene, ClassReader classReader) {
+    ClassAnnotationSceneReader ca = new ClassAnnotationSceneReader(classReader, scene, ignore_bridge_methods);
+    classReader.accept(ca, true);
   }
-
 }

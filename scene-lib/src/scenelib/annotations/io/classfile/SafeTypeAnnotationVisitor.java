@@ -84,8 +84,8 @@ implements TypeAnnotationVisitor {
   }
 
   @Override
-  public AnnotationVisitor visitAnnotation(String name, String desc) {
-    return xav.visitAnnotation(name, desc);
+  public AnnotationVisitor visitAnnotation(String name, String descriptor) {
+    return xav.visitAnnotation(name, descriptor);
   }
 
   @Override
@@ -94,8 +94,8 @@ implements TypeAnnotationVisitor {
   }
 
   @Override
-  public void visitEnum(String name, String desc, String value) {
-    xav.visitEnum(name, desc, value);
+  public void visitEnum(String name, String descriptor, String value) {
+    xav.visitEnum(name, descriptor, value);
   }
 
   @Override

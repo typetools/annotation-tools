@@ -36,8 +36,7 @@ public class AExpression extends AElement {
 
     /** The method's annotated lambda expressions; map key is the offset of the invokedynamic bytecode */
     public final VivifyingMap<RelativeLocation, AMethod> funs =
-            new VivifyingMap<RelativeLocation, AMethod>(
-                    new LinkedHashMap<RelativeLocation, AMethod>()) {
+            new VivifyingMap<RelativeLocation, AMethod>(new LinkedHashMap<>()) {
         @Override
         public AMethod createValueFor(RelativeLocation k) {
             return new AMethod("" + k);  // FIXME: find generated method name
@@ -116,8 +115,7 @@ public class AExpression extends AElement {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        SortedMap<RelativeLocation, ATypeElement> map =
-            new TreeMap<RelativeLocation, ATypeElement>();
+        SortedMap<RelativeLocation, ATypeElement> map = new TreeMap<>();
         RelativeLocation prev = null;
         // sb.append("AExpression ");
         // sb.append(id);

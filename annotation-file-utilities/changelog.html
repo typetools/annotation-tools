@@ -13,6 +13,21 @@ This is the changelog for the
 
 <ul>
     <li>
+    Version 3.8.8 (released June 3, 2019):
+    <ul>
+        <li>Added command-line arguments <code>-cp</code>
+        and <code>-classpath</code> to <code>extract-annotations</code>.
+        <li>Added command-line argument <code>--verbose</code> to
+        <code>extract-annotations</code> and <code>insert-annotations</code>.
+        <li>Removed command-line argument <code>-v</code> from
+        <code>extract-annotations</code>; use <code>--version</code> instead.
+        <li><code>insert-annotations-to-source</code> does a better check
+	for existing annotations,  to avoid inserting a duplicate annotation.
+       <li> Fixed issues
+        <a href="https://github.com/typetools/annotation-tools/issues/200">#200</a> and
+        <a href="https://github.com/typetools/annotation-tools/issues/201">#201</a>.
+    </ul>
+    <li>
     Version 3.8.7 (released May 1, 2019):
     <ul>
         <li>Fixed issue

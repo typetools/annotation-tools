@@ -21,6 +21,7 @@ env:
 # block.  So, always use two jobs (use a dummy if necessary).
   matrix:
     - JDKVER=jdk8 GROUP=test
+    - JDKVER=jdkany GROUP=typecheck
     - JDKVER=jdkany GROUP=misc
     - JDKVER=jdk8 GROUP=downstream
 

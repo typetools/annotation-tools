@@ -8,7 +8,7 @@ import scenelib.type.Type;
 
 public class ConstructorInsertion extends TypedInsertion {
   private ReceiverInsertion receiverInsertion = null;
-  private Set<Insertion> declarationInsertions = new LinkedHashSet<Insertion>();
+  private Set<Insertion> declarationInsertions = new LinkedHashSet<>();
 
   /**
    * Construct a ConstructorInsertion.
