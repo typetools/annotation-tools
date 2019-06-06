@@ -86,7 +86,7 @@ jobs:
                 ($TRAVIS_PULL_REQUEST == false) ]] ; then
             SLUGOWNER=${TRAVIS_REPO_SLUG%/*}
             if [[ "$SLUGOWNER" == "" ]]; then
-              SLUGOWNER=typetools
+              SLUGOWNER=eisop
             fi
 
             curl -LO --retry 3 https://raw.github.com/plume-lib/trigger-travis/master/trigger-travis.sh
