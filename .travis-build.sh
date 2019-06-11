@@ -48,7 +48,9 @@ fi
 
 if [[ "${GROUP}" == "typecheck" || "${GROUP}" == "all" ]]; then
   if [ -z ${CHECKERFRAMEWORK} ] ; then
-    (cd .. && git clone https://github.com/$SLUGOWNER/checker-framework.git)
+    REPO=`../plume-scripts/git-find-fork ${SLUGOWNER} typetools checker-framework`
+    BRANCH=`../plume-scripts/git-find-branch ${REPO} ${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH}`
+    (cd .. && git clone -b ${BRANCH} --single-branch --depth 1 ${REPO}) || (cd .. && git clone -b ${BRANCH} --single-branch --depth 1 ${REPO})
     export CHECKERFRAMEWORK=`realpath ../checker-framework`
     (cd ${CHECKERFRAMEWORK} && ./.travis-build-without-test.sh downloadjdk)
   fi
