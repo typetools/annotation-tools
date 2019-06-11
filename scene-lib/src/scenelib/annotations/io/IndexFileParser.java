@@ -69,9 +69,9 @@ import org.checkerframework.checker.signature.qual.ClassGetName;
 
 /**
  * IndexFileParser provides static methods
- * {@link #parse(LineNumberReader, AScene)},
+ * {@link #parse(LineNumberReader, String, AScene)},
  * {@link #parseFile(String, AScene)}, and
- * {@link #parseString(String, AScene)}.
+ * {@link #parseString(String, String, AScene)}.
  * Each of these parses an index file into a {@link AScene}.
  * <p>
  *
@@ -1681,7 +1681,7 @@ public final class IndexFileParser {
 
     /**
      * Reads annotations from the index file <code>filename</code> and merges
-     * them into <code>scene</code>; see {@link #parse(LineNumberReader, AScene)}.
+     * them into <code>scene</code>; see {@link #parse(LineNumberReader, String, AScene)}.
      */
     public static Map<String, AnnotationDef> parseFile(String filename,
             AScene scene) throws IOException {
@@ -1692,7 +1692,7 @@ public final class IndexFileParser {
 
     /**
      * Reads annotations from the string (in index file format) and merges
-     * them into <code>scene</code>; see {@link #parse(LineNumberReader, AScene)}.
+     * them into <code>scene</code>; see {@link #parse(LineNumberReader, String, AScene)}.
      * Primarily for testing.
      */
     public static Map<String, AnnotationDef> parseString(String fileContents, String source,
