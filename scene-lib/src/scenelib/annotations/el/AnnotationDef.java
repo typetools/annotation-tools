@@ -42,6 +42,7 @@ public final class AnnotationDef extends AElement {
      * You MUST call setFieldTypes afterward, even if with an empty map.  (Yuck.)
      *
      * @param name the binary name of the annotation type
+     * @param source where the annotation came from, such as a filename
      */
     public AnnotationDef(String name, String source) {
         super("annotation: " + name);
@@ -111,6 +112,7 @@ public final class AnnotationDef extends AElement {
      *
      * @param name the fully-qualified type name of the annotation
      * @param fieldTypes the annotation's element types
+     * @param source where the annotation came from, such as a filename
      */
     public AnnotationDef(String name, Set<Annotation> tlAnnotationsHere, Map<String, ? extends AnnotationFieldType> fieldTypes, String source) {
         this(name, tlAnnotationsHere, source);
@@ -233,7 +235,7 @@ public final class AnnotationDef extends AElement {
      */
     public static AnnotationDef unify(AnnotationDef def1,
             AnnotationDef def2) {
-        System.out.printf("unify(%s, %s)%n", def1, def2);
+        // System.out.printf("unify(%s, %s)%n", def1, def2);
         if (def1.equals(def2)) {
             return def1;
         } else if (def1.name.equals(def2.name)
@@ -259,17 +261,6 @@ public final class AnnotationDef extends AElement {
                                          String.format("unify(%s, %s)", def1.source, def2.source));
             }
         }
-        // if (def1.name.equals(def2.name)
-        //     && def1.fieldTypes.keySet().equals(def2.fieldTypes.keySet())
-        //     && ! def1.equalsElement(def2)) {
-        //     throw new Error(String.format("Unifiable except for meta-annotations:%n  %s%n  %s%n",
-        //                                   def1, def2));
-        // }
-        System.out.println("unify => null");
-        System.out.println("  " + def1);
-        System.out.println("  " + def2);
-        System.out.println("  " + def1.fieldTypes.keySet());
-        System.out.println("  " + def2.fieldTypes.keySet());
         return null;
     }
 

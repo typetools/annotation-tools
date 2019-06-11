@@ -31,6 +31,7 @@ public class AnnotationBuilder {
     // annotation being built. "tl" stands for "top-level".
     Set<Annotation> tlAnnotationsHere;
 
+    /** Where the annotation came from, such as a filename. */
     String source;
 
     boolean arrayInProgress = false;

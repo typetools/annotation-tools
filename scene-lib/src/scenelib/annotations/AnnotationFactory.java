@@ -44,6 +44,7 @@ public final class AnnotationFactory {
      * {@link Annotation} of the given type name.
      * @param typeName the name of the annotation being built
      * @param tlAnnotationsHere the top-level meta-annotations on the annotation being built
+     * @param source where the annotation came from, such as a filename
      */
     public AnnotationBuilder beginAnnotation(String typeName, Set<Annotation> tlAnnotationsHere, String source) {
         assert typeName != null;
