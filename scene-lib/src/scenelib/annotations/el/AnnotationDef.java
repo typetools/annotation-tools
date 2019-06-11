@@ -288,7 +288,6 @@ public final class AnnotationDef extends AElement {
     }
 
     public static void printClasspath() {
-        System.out.println();
         System.out.println("Classpath:");
         StringTokenizer tokenizer =
             new StringTokenizer(System.getProperty("java.class.path"), File.pathSeparator);
