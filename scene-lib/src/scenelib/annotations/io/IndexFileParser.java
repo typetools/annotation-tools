@@ -65,6 +65,8 @@ import scenelib.type.BoundedType.BoundKind;
 import scenelib.type.DeclaredType;
 import scenelib.type.Type;
 
+import org.checkerframework.checker.signature.qual.ClassGetName;
+
 /**
  * IndexFileParser provides static methods
  * {@link #parse(LineNumberReader, AScene)},
@@ -289,7 +291,7 @@ public final class IndexFileParser {
     // Class object.
     private static final Map<String, Class<?>> primitiveTypes;
     static {
-        Map<String, Class<?>> pt = new LinkedHashMap<String, Class<?>>();
+        Map<String, Class<?>> pt = new LinkedHashMap<>();
         pt.put("byte", byte.class);
         pt.put("short", short.class);
         pt.put("int", int.class);
@@ -300,6 +302,47 @@ public final class IndexFileParser {
         pt.put("boolean", boolean.class);
         pt.put("void", void.class);
         primitiveTypes = pt;
+    }
+
+    /**
+     * Expect the class name in the format that Class.forName accepts.  Examples:
+     * <pre>{@code
+     *   "[[I"            for int[][].class
+     *   "[java.util.Map" for Map[].class
+     *   "java.util.Map"  for Map.class
+     * }</pre>
+     * Thes use fully-qualified names, i.e. "Object" alone won't work.
+     */
+    private @ClassGetName String expectClassGetName() throws IOException, ParseException {
+        int arrays = 0;
+        StringBuilder type = new StringBuilder();
+        while (matchChar('[')) {
+            // Array dimensions as prefix
+            ++arrays;
+        }
+        while (!matchKeyword("class")) {
+            if (st.ttype >= 0) {
+                type.append((char) st.ttype);
+            } else if (st.ttype == TT_WORD) {
+                type.append(st.sval);
+            } else {
+                throw new ParseException("Found something that doesn't belong in a signature");
+            }
+            st.nextToken();
+        }
+
+        // Drop the '.' before the "class"
+        type.deleteCharAt(type.length()-1);
+        // expectKeyword("class");
+
+        // Add arrays as prefix in the type.
+        while (arrays-->0) {
+            type.insert(0, '[');
+        }
+
+        @SuppressWarnings("signature") // string manipulation while parsing file
+        @ClassGetName String result = type.toString();
+        return result;
     }
 
     /** Parse scalar annotation value. */
@@ -361,52 +404,18 @@ public final class IndexFileParser {
             assert aft.isValidValue(val);
             return val;
         } else if (aft instanceof ClassTokenAFT) {
-            // Expect the class name in the format that Class.forName accepts,
-            // which is some very strange format.
-            // Example inputs followed by their Java source ".class" equivalent:
-            //   [[I.class      for int[][].class
-            //   [java.util.Map for Map[].class
-            //   java.util.Map  for Map.class
-            // Have to use fully-qualified names, i.e. "Object" alone won't work.
-            // Also note use of primitiveTypes map for primitives and void.
-            int arrays = 0;
-            StringBuilder type = new StringBuilder();
-            while (matchChar('[')) {
-                // Array dimensions as prefix
-                ++arrays;
-            }
-            while (!matchKeyword("class")) {
-                if (st.ttype >= 0) {
-                    type.append((char) st.ttype);
-                } else if (st.ttype == TT_WORD) {
-                    type.append(st.sval);
-                } else {
-                    throw new ParseException("Found something that doesn't belong in a signature");
-                }
-                st.nextToken();
-            }
-
-            // Drop the '.' before the "class"
-            type.deleteCharAt(type.length()-1);
-            // expectKeyword("class");
-
-            // Add arrays as prefix in the type.
-            while (arrays-->0) {
-                type.insert(0, '[');
-            }
-
+            String cgname = expectClassGetName();
             try {
-                String sttype = type.toString();
                 Class<?> tktype;
-                if (primitiveTypes.containsKey(sttype)) {
-                    tktype = primitiveTypes.get(sttype);
+                if (primitiveTypes.containsKey(cgname)) {
+                    tktype = primitiveTypes.get(cgname);
                 } else {
-                    tktype = Class.forName(sttype);
+                    tktype = Class.forName(cgname);
                 }
                 assert aft.isValidValue(tktype);
                 return tktype;
             } catch (ClassNotFoundException e) {
-                throw new ParseException("Could not load class: " + type, e);
+                throw new ParseException("Could not load class: " + cgname, e);
             }
         } else if (aft instanceof EnumAFT) {
             String name = expectQualifiedName();
@@ -646,7 +655,7 @@ public final class IndexFileParser {
         parseAnnotations(ad);
 
         Map<String, AnnotationFieldType> fields =
-                new LinkedHashMap<String, AnnotationFieldType>();
+                new LinkedHashMap<>();
 
         // yuck; it would be nicer to do a positive match
         while (st.ttype != TT_EOF && !checkKeyword("annotation")
@@ -708,8 +717,7 @@ public final class IndexFileParser {
     private void parseInnerTypes(ATypeElement e, int offset)
             throws IOException, ParseException {
         while (matchKeyword("inner-type")) {
-            ArrayList<Integer> locNumbers =
-                    new ArrayList<Integer>();
+            ArrayList<Integer> locNumbers = new ArrayList<>();
             locNumbers.add(offset + expectNonNegative(matchNNInteger()));
             // TODO: currently, we simply read the binary representation.
             // Should we read a higher-level format?
@@ -722,7 +730,7 @@ public final class IndexFileParser {
             } catch (AssertionError ex) {
                 throw new ParseException(ex.getMessage(), ex);
             }
-            AElement it = e.innerTypes.vivify(loc);
+            AElement it = e.innerTypes.getVivify(loc);
             expectChar(':');
             parseAnnotations(it);
         }
@@ -734,7 +742,7 @@ public final class IndexFileParser {
             if (matchKeyword("typeparam")) {
                 int paramIndex = expectNonNegative(matchNNInteger());
                 BoundLocation bl = new BoundLocation(paramIndex, -1);
-                ATypeElement b = bounds.vivify(bl);
+                ATypeElement b = bounds.getVivify(bl);
                 expectChar(':');
                 parseAnnotations(b);
                 // does this make sense?
@@ -745,7 +753,7 @@ public final class IndexFileParser {
                 expectChar('&');
                 int boundIndex = expectNonNegative(matchNNInteger());
                 BoundLocation bl = new BoundLocation(paramIndex, boundIndex);
-                ATypeElement b = bounds.vivify(bl);
+                ATypeElement b = bounds.getVivify(bl);
                 expectChar(':');
                 parseAnnotations(b);
                 // does this make sense?
@@ -759,7 +767,7 @@ public final class IndexFileParser {
     private void parseExtends(AClass cls) throws IOException, ParseException {
         expectKeyword("extends");
         TypeIndexLocation idx = new TypeIndexLocation(-1);
-        ATypeElement ext = cls.extendsImplements.vivify(idx);
+        ATypeElement ext = cls.extendsImplements.getVivify(idx);
         expectChar(':');
         parseAnnotations(ext);
         parseInnerTypes(ext);
@@ -769,7 +777,7 @@ public final class IndexFileParser {
         expectKeyword("implements");
         int implIndex = expectNonNegative(matchNNInteger());
         TypeIndexLocation idx = new TypeIndexLocation(implIndex);
-        ATypeElement impl = cls.extendsImplements.vivify(idx);
+        ATypeElement impl = cls.extendsImplements.getVivify(idx);
         expectChar(':');
         parseAnnotations(impl);
         parseInnerTypes(impl);
@@ -779,7 +787,7 @@ public final class IndexFileParser {
             ParseException {
         expectKeyword("field");
         String name = expectIdentifier();
-        AField f = c.fields.vivify(name);
+        AField f = c.fields.getVivify(name);
 
         expectChar(':');
         parseAnnotations(f);
@@ -789,7 +797,7 @@ public final class IndexFileParser {
             parseInnerTypes(f.type);
         }
 
-        f.init = c.fieldInits.vivify(name);
+        f.init = c.fieldInits.getVivify(name);
         parseExpression(f.init);
         parseASTInsertions(f);
     }
@@ -801,7 +809,7 @@ public final class IndexFileParser {
         int blockIndex = expectNonNegative(matchNNInteger());
         expectChar(':');
 
-        ABlock staticinit = c.staticInits.vivify(blockIndex);
+        ABlock staticinit = c.staticInits.getVivify(blockIndex);
         parseBlock(staticinit);
     }
 
@@ -812,7 +820,7 @@ public final class IndexFileParser {
         int blockIndex = expectNonNegative(matchNNInteger());
         expectChar(':');
 
-        ABlock instanceinit = c.instanceInits.vivify(blockIndex);
+        ABlock instanceinit = c.instanceInits.getVivify(blockIndex);
         parseBlock(instanceinit);
     }
 
@@ -852,7 +860,7 @@ public final class IndexFileParser {
             st.nextToken();
         }
 
-        AMethod m = c.methods.vivify(key);
+        AMethod m = c.methods.getVivify(key);
         parseAnnotations(m);
         parseMethod(m);
     }
@@ -872,7 +880,7 @@ public final class IndexFileParser {
                     matchChar('#');
                 }
                 int idx = expectNonNegative(matchNNInteger());
-                AField p = m.parameters.vivify(idx);
+                AField p = m.parameters.getVivify(idx);
                 expectChar(':');
                 parseAnnotations(p);
                 if (checkKeyword("type") && matchKeyword("type")) {
@@ -901,7 +909,7 @@ public final class IndexFileParser {
                 matchChar('#');
             }
             int idx = expectNonNegative(matchNNInteger());
-            AField p = m.parameters.vivify(idx);
+            AField p = m.parameters.getVivify(idx);
             expectChar(':');
             parseAnnotations(p);
             if (checkKeyword("type") && matchKeyword("type")) {
@@ -947,7 +955,7 @@ public final class IndexFileParser {
                     }
                     loc = new LocalLocation(lvar, varIndex);
                 }
-                AField l = bl.locals.vivify(loc);
+                AField l = bl.locals.getVivify(loc);
                 expectChar(':');
                 parseAnnotations(l);
                 if (checkKeyword("type") && matchKeyword("type")) {
@@ -992,7 +1000,7 @@ public final class IndexFileParser {
                     }
                     loc = RelativeLocation.createIndex(index, type_index);
                 }
-                ATypeElement t = exp.typecasts.vivify(loc);
+                ATypeElement t = exp.typecasts.getVivify(loc);
                 expectChar(':');
                 parseAnnotations(t);
                 parseInnerTypes(t);
@@ -1011,7 +1019,7 @@ public final class IndexFileParser {
                     int index = expectNonNegative(matchNNInteger());
                     loc = RelativeLocation.createIndex(index, 0);
                 }
-                ATypeElement i = exp.instanceofs.vivify(loc);
+                ATypeElement i = exp.instanceofs.getVivify(loc);
                 expectChar(':');
                 parseAnnotations(i);
                 parseInnerTypes(i);
@@ -1030,7 +1038,7 @@ public final class IndexFileParser {
                     int index = expectNonNegative(matchNNInteger());
                     loc = RelativeLocation.createIndex(index, 0);
                 }
-                ATypeElement n = exp.news.vivify(loc);
+                ATypeElement n = exp.news.getVivify(loc);
                 expectChar(':');
                 parseAnnotations(n);
                 parseInnerTypes(n);
@@ -1051,7 +1059,7 @@ public final class IndexFileParser {
                     RelativeLocation loc = isOffset
                             ? RelativeLocation.createOffset(i, type_index)
                             : RelativeLocation.createIndex(i, type_index);
-                    ATypeElement t = exp.calls.vivify(loc);
+                    ATypeElement t = exp.calls.getVivify(loc);
                     expectChar(':');
                     parseAnnotations(t);
                     parseInnerTypes(t);
@@ -1075,7 +1083,7 @@ public final class IndexFileParser {
                     loc = RelativeLocation.createIndex(i, 0);
                 }
                 expectChar(':');
-                t = exp.refs.vivify(loc);
+                t = exp.refs.getVivify(loc);
                 parseAnnotations(t);
                 parseInnerTypes(t);
                 while (checkKeyword("typearg")) {
@@ -1085,7 +1093,7 @@ public final class IndexFileParser {
                     loc = isOffset
                         ? RelativeLocation.createOffset(i, type_index)
                         : RelativeLocation.createIndex(i, type_index);
-                    t = exp.refs.vivify(loc);
+                    t = exp.refs.getVivify(loc);
                     expectChar(':');
                     parseAnnotations(t);
                     parseInnerTypes(t);
@@ -1115,7 +1123,7 @@ public final class IndexFileParser {
                     }
                     loc = RelativeLocation.createIndex(index, type_index);
                 }
-                AMethod m = exp.funs.vivify(loc);
+                AMethod m = exp.funs.getVivify(loc);
                 expectChar(':');
                 // parseAnnotations(m);
                 parseLambda(m);
@@ -1152,13 +1160,13 @@ public final class IndexFileParser {
             expectChar(':');
             // if path doesn't indicate a type, a cast must be generated
             if (selectsExpression(astPath)) {
-                ATypeElementWithType i = decl.insertTypecasts.vivify(astPath);
+                ATypeElementWithType i = decl.insertTypecasts.getVivify(astPath);
                 parseAnnotations(i);
                 i.setType(new DeclaredType());
                 parseInnerTypes(i);
             } else {
                 // astPath = fixNewArrayType(astPath);  // handle special case
-                // ATypeElement i = decl.insertAnnotations.vivify(astPath);
+                // ATypeElement i = decl.insertAnnotations.getVivify(astPath);
                 // parseAnnotations(i);
                 // parseInnerTypes(i);
                 int offset = 0;
@@ -1166,11 +1174,11 @@ public final class IndexFileParser {
                         splitNewArrayType(astPath);  // handle special case
                 ATypeElement i;
                 if (pair == null) {
-                    i = decl.insertAnnotations.vivify(astPath);
+                    i = decl.insertAnnotations.getVivify(astPath);
                 } else {
-                    i = decl.insertAnnotations.vivify(pair.a);
+                    i = decl.insertAnnotations.getVivify(pair.a);
                     if (pair.b != null) {
-                        i = i.innerTypes.vivify(pair.b);
+                        i = i.innerTypes.getVivify(pair.b);
                         offset = pair.b.location.size();
                     }
                 }
@@ -1183,7 +1191,7 @@ public final class IndexFileParser {
             matchKeyword("insert-typecast");
             ASTPath astPath = parseASTPath();
             expectChar(':');
-            ATypeElementWithType i = decl.insertTypecasts.vivify(astPath);
+            ATypeElementWithType i = decl.insertTypecasts.getVivify(astPath);
             parseAnnotations(i);
             Type type = parseType();
             i.setType(type);
@@ -1207,11 +1215,10 @@ public final class IndexFileParser {
                 int a = entry.getArgument();
                 if (a > 0) {
                     outerPath = astPath.getParentPath().extend(new ASTPath.ASTEntry(Kind.NEW_ARRAY, ASTPath.TYPE, 0));
-            loc = new InnerTypeLocation(TypeAnnotationPosition.getTypePathFromBinary(Collections.nCopies(2 * a, 0)));
+                    loc = new InnerTypeLocation(TypeAnnotationPosition.getTypePathFromBinary(Collections.nCopies(2 * a, 0)));
                 }
             }
         }
-
         return Pair.of(outerPath, loc);
     }
 
@@ -1487,7 +1494,7 @@ public final class IndexFileParser {
         String basename = expectIdentifier();
         String fullName = curPkgPrefix + basename;
 
-        AClass c = scene.classes.vivify(fullName);
+        AClass c = scene.classes.getVivify(fullName);
         expectChar(':');
 
         parseAnnotations(c);
@@ -1530,10 +1537,10 @@ public final class IndexFileParser {
                 matchChar(':');
             } else {
                 pkg = expectQualifiedName();
-                // AElement p = scene.packages.vivify(pkg);
-                AClass p = scene.classes.vivify(pkg + ".package-info");
+                // AElement p = scene.packages.getVivify(pkg);
+                AClass p = scene.classes.getVivify(pkg + ".package-info");
                 expectChar(':');
-                p = scene.classes.vivify(pkg + ".package-info");
+                p = scene.classes.getVivify(pkg + ".package-info");
                 parseAnnotations(p);
             }
 
@@ -1611,7 +1618,7 @@ public final class IndexFileParser {
 
     private IndexFileParser(Reader in, String source, AScene scene) {
         this.source = source;
-        defs = new LinkedHashMap<String, AnnotationDef>();
+        defs = new LinkedHashMap<>();
         for (AnnotationDef ad : Annotations.standardDefs) {
             try {
                 addDef(ad);

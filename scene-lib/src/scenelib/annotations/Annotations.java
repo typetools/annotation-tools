@@ -180,10 +180,13 @@ public abstract class Annotations {
     }
 
     /**
-     * Rebuilds the annotation <code>a</code> using the factory
+     * Clones the annotation <code>a</code> using the factory
      * <code>af</code> by iterating through its fields according to its
      * definition and getting the values with {@link Annotation#getFieldValue}.
-     * @return null if the factory is not interested in <code>a</code>
+     * Returns null if the factory is not interested in <code>a</code>.
+     *
+     * @param a the annotation to clone
+     * @return a clone of the given annotation
      */
     public static final Annotation rebuild(Annotation a) {
         AnnotationBuilder ab = AnnotationFactory.saf.beginAnnotation(a.def(), "rebuild " + a.def.source);

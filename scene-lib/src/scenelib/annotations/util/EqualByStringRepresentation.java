@@ -7,24 +7,15 @@ package scenelib.annotations.util;
  * {@link #equals} and {@link #hashCode} in terms of {@link #toString}.
  */
 public abstract class EqualByStringRepresentation {
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public abstract String toString();
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public final boolean equals(Object that) {
         return that != null && this.getClass() == that.getClass()
                 && this.toString().equals(that.toString());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public final int hashCode() {
         return toString().hashCode();

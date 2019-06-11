@@ -102,19 +102,19 @@ public class TestSceneLib extends TestCase {
     public void testEquals() {
         AScene s1 = newScene(), s2 = newScene();
 
-        s1.classes.vivify("Foo");
-        s1.classes.vivify("Foo").fields.vivify("x");
-        s1.classes.vivify("Foo").fields.vivify("x").tlAnnotationsHere
+        s1.classes.getVivify("Foo");
+        s1.classes.getVivify("Foo").fields.getVivify("x");
+        s1.classes.getVivify("Foo").fields.getVivify("x").tlAnnotationsHere
                 .add(createEmptyAnnotation(ready));
 
-        s2.classes.vivify("Foo").fields.vivify("x").tlAnnotationsHere
+        s2.classes.getVivify("Foo").fields.getVivify("x").tlAnnotationsHere
                 .add(Annotations.aNonNull);
-        s2.classes.vivify("Foo").fields.vivify("x").tlAnnotationsHere
+        s2.classes.getVivify("Foo").fields.getVivify("x").tlAnnotationsHere
                 .add(createEmptyAnnotation(ready));
 
         assertEquals(false, s1.equals(s2));  // FIXME: why does assertion fail?
 
-        s1.classes.vivify("Foo").fields.vivify("x").tlAnnotationsHere
+        s1.classes.getVivify("Foo").fields.getVivify("x").tlAnnotationsHere
                 .add(Annotations.aNonNull);
 
         assertEquals(true, s1.equals(s2));
@@ -123,20 +123,20 @@ public class TestSceneLib extends TestCase {
     public void testStoreParse1() {
         AScene s1 = newScene();
 
-        s1.classes.vivify("Foo").fields.vivify("x").tlAnnotationsHere
+        s1.classes.getVivify("Foo").fields.getVivify("x").tlAnnotationsHere
                 .add(createEmptyAnnotation(ready));
         Annotation myAuthor = Annotations.createValueAnnotation(adAuthor, "Matt M.");
-        s1.classes.vivify("Foo");
-        s1.classes.vivify("Foo").methods.vivify("y()Z");
-        s1.classes.vivify("Foo").methods.vivify("y()Z").parameters.vivify(5);
+        s1.classes.getVivify("Foo");
+        s1.classes.getVivify("Foo").methods.getVivify("y()Z");
+        s1.classes.getVivify("Foo").methods.getVivify("y()Z").parameters.getVivify(5);
         @SuppressWarnings("unused")
         Object dummy =
-          s1.classes.vivify("Foo").methods.vivify("y()Z").parameters.vivify(5).type;
+          s1.classes.getVivify("Foo").methods.getVivify("y()Z").parameters.getVivify(5).type;
         @SuppressWarnings("unused")
         Object dummy2 =
-          s1.classes.vivify("Foo").methods.vivify("y()Z").parameters.vivify(5).type.innerTypes;
-        s1.classes.vivify("Foo").methods.vivify("y()Z").parameters.vivify(5).type.innerTypes
-                .vivify(new InnerTypeLocation(
+          s1.classes.getVivify("Foo").methods.getVivify("y()Z").parameters.getVivify(5).type.innerTypes;
+        s1.classes.getVivify("Foo").methods.getVivify("y()Z").parameters.getVivify(5).type.innerTypes
+                .getVivify(new InnerTypeLocation(
                         TypeAnnotationPosition.getTypePathFromBinary(
                                 Arrays.asList(new Integer[] { 0, 0, 3, 2 })))).tlAnnotationsHere
                 .add(myAuthor);
@@ -296,9 +296,9 @@ public class TestSceneLib extends TestCase {
 
     public void testConflictedDefinition() throws Exception {
         AScene s1 = newScene();
-        s1.classes.vivify("Foo").tlAnnotationsHere
+        s1.classes.getVivify("Foo").tlAnnotationsHere
                 .add(createEmptyAnnotation(ready));
-        s1.classes.vivify("Bar").tlAnnotationsHere
+        s1.classes.getVivify("Bar").tlAnnotationsHere
                 .add(createEmptyAnnotation(readyClassRetention));
         StringWriter sbw = new StringWriter();
         try {
@@ -352,7 +352,7 @@ public class TestSceneLib extends TestCase {
     public void testEmptyArrayHack() throws Exception {
         AScene scene = newScene();
         AClass clazz =
-            scene.classes.vivify("bar.Test");
+            scene.classes.getVivify("bar.Test");
 
         // One annotation with an empty array of unknown type...
         AnnotationBuilder ab1 =
@@ -411,12 +411,12 @@ public class TestSceneLib extends TestCase {
         // try combining unifiable _top-level_ annotations
         AScene secondScene = newScene();
         AClass secondSceneClazz =
-            secondScene.classes.vivify("bar.Test");
+            secondScene.classes.getVivify("bar.Test");
         secondSceneClazz.tlAnnotationsHere.add(tla1);
         // Oops--the keyed set gives us an exception if we try to put two
         // different foo.ArrayAnnos on the same class!
         AClass secondSceneClazz2 =
-            secondScene.classes.vivify("bar.Test2");
+            secondScene.classes.getVivify("bar.Test2");
         secondSceneClazz2.tlAnnotationsHere.add(tla4);
 
         // it should be legal to write this
@@ -425,7 +425,7 @@ public class TestSceneLib extends TestCase {
 
         // add an incompatible annotation
         AClass secondSceneClazz3 =
-            secondScene.classes.vivify("bar.Test3");
+            secondScene.classes.getVivify("bar.Test3");
         secondSceneClazz3.tlAnnotationsHere.add(tla2);
 
         // now we should get a DefException
@@ -462,7 +462,7 @@ public class TestSceneLib extends TestCase {
         // construct a scene programmatically
         AScene scene3 = newScene();
         AClass clazz3 =
-            scene3.classes.vivify("Bar");
+            scene3.classes.getVivify("Bar");
         AnnotationBuilder ab =
           AnnotationFactory.saf.beginAnnotation("Foo", Annotations.asRetentionClass, "testSceneLib");
         ab.addEmptyArrayField("arr");
@@ -489,20 +489,22 @@ public class TestSceneLib extends TestCase {
         AScene s1 = newScene(), s2 = newScene();
         assertTrue(s1.equals(s2));
 
-        s1.classes.vivify("Foo");
+        s1.classes.getVivify("Foo");
         assertFalse(s1.equals(s2));
 
-        assertTrue(s1.prune());
+        s1.prune();
+        assertTrue(s1.isEmpty());
         assertTrue(s1.equals(s2));
 
         Annotation sa = AnnotationFactory.saf.beginAnnotation("Anno", Annotations.asRetentionClass, "testSceneLib").finish();
         Annotation tla = sa;
 
-        AClass clazz2 = s2.classes.vivify("Bar");
+        AClass clazz2 = s2.classes.getVivify("Bar");
         clazz2.tlAnnotationsHere.add(tla);
 
         assertFalse(s1.equals(s2));
-        assertFalse(s2.prune());
+        s2.prune();
+        assertFalse(s2.isEmpty());
         assertFalse(s1.equals(s2));
     }
 
@@ -579,7 +581,7 @@ public class TestSceneLib extends TestCase {
 
     private void assignId(ATypeElement myField, int id,
             Integer... ls) {
-        AElement el = myField.innerTypes.vivify(
+        AElement el = myField.innerTypes.getVivify(
                 new InnerTypeLocation(TypeAnnotationPosition.getTypePathFromBinary(Arrays.asList(ls))));
         el.tlAnnotationsHere.add(makeTLIdAnno(id));
     }
@@ -608,7 +610,7 @@ public class TestSceneLib extends TestCase {
         // We have to do this because clients are no longer allowed to create
         // AElements directly; instead, they must vivify.
         AElement myAField =
-            new AScene().classes.vivify("someclass").fields.vivify("somefield");
+            new AScene().classes.getVivify("someclass").fields.getVivify("somefield");
         ATypeElement myAFieldType = myAField.type;
         // load it with annotations we can check against IDs
         myAFieldType.tlAnnotationsHere.add(makeTLIdAnno(0));

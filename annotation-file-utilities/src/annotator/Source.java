@@ -111,7 +111,7 @@ public final class Source {
     public Set<CompilationUnitTree> parse() {
 
         try {
-            Set<CompilationUnitTree> compUnits = new HashSet<CompilationUnitTree>();
+            Set<CompilationUnitTree> compUnits = new HashSet<>();
 
             for (CompilationUnitTree tree : task.parse()) {
                 compUnits.add(tree);

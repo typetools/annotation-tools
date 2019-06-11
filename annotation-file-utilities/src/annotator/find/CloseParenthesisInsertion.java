@@ -12,13 +12,11 @@ public class CloseParenthesisInsertion extends Insertion {
         super(criteria, separateLine);
     }
 
-    /** {@inheritDoc} */
     @Override
     protected String getText(boolean comments, boolean abbreviate) {
         return "))";
     }
 
-    /** {@inheritDoc} */
     @Override
     protected boolean addLeadingSpace(boolean gotSeparateLine, int pos,
             char precedingChar) {
@@ -26,14 +24,12 @@ public class CloseParenthesisInsertion extends Insertion {
         return false;
     }
 
-    /** {@inheritDoc} */
     @Override
     protected boolean addTrailingSpace(boolean gotSeparateLine) {
         // Never add a trailing space when inserting closing parentheses.
         return false;
     }
 
-    /** {@inheritDoc} */
     public Kind getKind() {
         return Kind.CLOSE_PARENTHESIS;
     }

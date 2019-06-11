@@ -52,7 +52,7 @@ public final class BasicAFT extends ScalarAFT {
 
     static {
         Map<Class<?>, BasicAFT> tempBafts =
-            new HashMap<Class<?>, BasicAFT>(9);
+            new HashMap<>(9);
         tempBafts.put(byte.class, new BasicAFT(byte.class));
         tempBafts.put(short.class, new BasicAFT(short.class));
         tempBafts.put(int.class, new BasicAFT(int.class));
@@ -67,9 +67,6 @@ public final class BasicAFT extends ScalarAFT {
         bafts = tempBafts;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isValidValue(Object o) {
         return (   (type == byte.class && o instanceof Byte)
@@ -83,9 +80,6 @@ public final class BasicAFT extends ScalarAFT {
                 || (type == String.class && o instanceof String));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         if (type == String.class) {
@@ -95,9 +89,6 @@ public final class BasicAFT extends ScalarAFT {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String format(Object o) {
       return type != String.class ? o.toString()

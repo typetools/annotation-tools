@@ -36,16 +36,15 @@ public class AExpression extends AElement {
 
     /** The method's annotated lambda expressions; map key is the offset of the invokedynamic bytecode */
     public final VivifyingMap<RelativeLocation, AMethod> funs =
-            new VivifyingMap<RelativeLocation, AMethod>(
-                    new LinkedHashMap<RelativeLocation, AMethod>()) {
+            new VivifyingMap<RelativeLocation, AMethod>(new LinkedHashMap<>()) {
         @Override
         public AMethod createValueFor(RelativeLocation k) {
             return new AMethod("" + k);  // FIXME: find generated method name
         }
 
         @Override
-        public boolean subPrune(AMethod v) {
-            return v.prune();
+        public boolean isEmptyValue(AMethod v) {
+            return v.isEmpty();
         }
     };
 
@@ -73,9 +72,6 @@ public class AExpression extends AElement {
         return new AExpression(this);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equals(AElement o) {
         return o instanceof AExpression &&
@@ -92,9 +88,6 @@ public class AExpression extends AElement {
                 && funs.equals(o.funs);
         }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         return super.hashCode() + typecasts.hashCode()
@@ -102,20 +95,27 @@ public class AExpression extends AElement {
             + refs.hashCode() + calls.hashCode() + funs.hashCode();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public boolean prune() {
-        return super.prune() & typecasts.prune() & instanceofs.prune()
-                & news.prune() & refs.prune() & calls.prune() & funs.prune();
+    public boolean isEmpty() {
+        return super.isEmpty() && typecasts.isEmpty() && instanceofs.isEmpty()
+                && news.isEmpty() && refs.isEmpty() && calls.isEmpty() && funs.isEmpty();
+    }
+
+    @Override
+    public void prune() {
+        super.prune();
+        typecasts.prune();
+        instanceofs.prune();
+        news.prune();
+        refs.prune();
+        calls.prune();
+        funs.prune();
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        SortedMap<RelativeLocation, ATypeElement> map =
-            new TreeMap<RelativeLocation, ATypeElement>();
+        SortedMap<RelativeLocation, ATypeElement> map = new TreeMap<>();
         RelativeLocation prev = null;
         // sb.append("AExpression ");
         // sb.append(id);

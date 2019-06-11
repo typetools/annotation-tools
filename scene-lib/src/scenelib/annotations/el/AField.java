@@ -9,21 +9,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 */
 
 public class AField extends ADeclaration {
-  static <K extends Object> VivifyingMap<K, AField>
-  newVivifyingLHMap_AF() {
-    return new VivifyingMap<K, AField>(
-        new LinkedHashMap<K, AField>()) {
-      @Override
-      public AField createValueFor(K k) {
-        return new AField("" + k);
-      }
-
-      @Override
-      public boolean subPrune(AField v) {
-        return v.prune();
-      }
-    };
-  }
 
   public AExpression init;
   private final String fieldName;
@@ -67,4 +52,20 @@ public class AField extends ADeclaration {
   public <R, T> R accept(ElementVisitor<R, T> v, T t) {
     return v.visitField(this, t);
   }
+
+  static <K extends Object> VivifyingMap<K, AField>
+  newVivifyingLHMap_AF() {
+    return new VivifyingMap<K, AField>(new LinkedHashMap<>()) {
+      @Override
+      public AField createValueFor(K k) {
+        return new AField("" + k);
+      }
+
+      @Override
+      public boolean isEmptyValue(AField v) {
+        return v.isEmpty();
+      }
+    };
+  }
+
 }

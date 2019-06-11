@@ -50,10 +50,10 @@ public abstract class Insertion {
     protected Set<String> packageNames;
 
     /**
-     * Set of annotation names that should always be qualified, even
-     *  when {@link getText(boolean, boolean)} is called with abbreviate true.
+     * Set of annotation names that should always be inserted fully-qualified, even
+     *  when {@link getText(boolean, boolean)} is called with abbreviate=true.
      */
-    protected static Set<String> alwaysQualify = new LinkedHashSet<String>();
+    protected static Set<String> alwaysQualify = new LinkedHashSet<>();
 
     /**
      * Creates a new insertion.
@@ -233,9 +233,6 @@ public abstract class Insertion {
         this.inserted = inserted;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         return String.format("(nl=%b) @ %s", separateLine, criteria);

@@ -53,7 +53,6 @@ public class CastInsertion extends Insertion {
       type = t;
   }
 
-  /** {@inheritDoc} */
   @Override
   protected String getText(boolean comments, boolean abbreviate) {
     String result = onArrayLiteral
@@ -62,7 +61,6 @@ public class CastInsertion extends Insertion {
     return result;
   }
 
-  /** {@inheritDoc} */
   @Override
   protected boolean addLeadingSpace(boolean gotSeparateLine, int pos,
       char precedingChar) {
@@ -71,7 +69,6 @@ public class CastInsertion extends Insertion {
            && precedingChar != '[';
   }
 
-  /** {@inheritDoc} */
   @Override
   protected boolean addTrailingSpace(boolean gotSeparateLine) {
     // Never add a trailing space after the first part of a cast insertion.
@@ -86,7 +83,6 @@ public class CastInsertion extends Insertion {
     this.onArrayLiteral = onArrayLiteral;
   }
 
-  /** {@inheritDoc} */
   @Override
   public Kind getKind() {
     return Kind.CAST;

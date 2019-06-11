@@ -27,6 +27,8 @@ public class AnnotationBuilder {
     AnnotationDef def;
 
     private String typeName;
+    // The top-level meta-annotations that appear directly on the
+    // annotation being built. "tl" stands for "top-level".
     Set<Annotation> tlAnnotationsHere;
 
     String source;
@@ -37,10 +39,10 @@ public class AnnotationBuilder {
 
     // Generally, don't use this.  Use method fieldTypes() instead.
     private Map<String, AnnotationFieldType> fieldTypes =
-        new LinkedHashMap<String, AnnotationFieldType>();
+        new LinkedHashMap<>();
 
     Map<String, Object> fieldValues =
-        new LinkedHashMap<String, Object>();
+        new LinkedHashMap<>();
 
     public String typeName() {
         if (def != null) {
@@ -119,6 +121,10 @@ public class AnnotationBuilder {
      * if the {@link AnnotationBuilder} expects a certain definition for
      * the built annotation and the given field does not exist in that
      * definition or has the wrong type.
+     *
+     * @param fieldName the name of the annotation element to set
+     * @param aft the element's type, which is a scalar type
+     * @param x the element's value
      */
     public void addScalarField(String fieldName, ScalarAFT aft, Object x) {
         checkAddField(fieldName);
@@ -144,6 +150,9 @@ public class AnnotationBuilder {
      * if the {@link AnnotationBuilder} expects a certain definition for
      * the built annotation and the given field does not exist in that
      * definition or has the wrong type.
+     *
+     * @param fieldName the name of the annotation element to set
+     * @param aft the element's type, which is an array type
      */
     public ArrayBuilder beginArrayField(String fieldName, ArrayAFT aft) {
         checkAddField(fieldName);
@@ -172,6 +181,8 @@ public class AnnotationBuilder {
      * annotations in class files.  An array value does not specify an type
      * itself; instead, each element carries a type.  Thus, a zero-length array
      * carries no indication of its element type.
+     *
+     * @param fieldName the name of the annotation element to set to an empty array
      */
     public void addEmptyArrayField(String fieldName) {
         checkAddField(fieldName);
@@ -187,6 +198,8 @@ public class AnnotationBuilder {
      * built annotation and one or more fields in that definition were not
      * supplied.  Once this method has been called, no more method calls may be
      * made on this {@link AnnotationBuilder}.
+     *
+     * @return the completed annotation corresponding to this builder
      */
     public Annotation finish() {
         if (!active) {

@@ -115,7 +115,6 @@ public class BoundedType extends Type {
         return boundKind;
     }
 
-    /** {@inheritDoc} */
     @Override
     public Kind getKind() {
         return Kind.BOUNDED;

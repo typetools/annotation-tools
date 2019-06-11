@@ -21,8 +21,10 @@ public final class AnnotationFactory {
     public static final AnnotationFactory saf = new AnnotationFactory();
 
     /**
-     * Returns an {@link AnnotationBuilder} appropriate for building a
+     * Returns an {@link AnnotationBuilder} appropriate for building an
      * {@link Annotation} of the given type name.
+     *
+     * @param def the definition for the annotation to be built
      */
     public AnnotationBuilder beginAnnotation(AnnotationDef def, String source) {
         return new AnnotationBuilder(def, source);
@@ -40,6 +42,8 @@ public final class AnnotationFactory {
     /**
      * Returns an {@link AnnotationBuilder} appropriate for building a
      * {@link Annotation} of the given type name.
+     * @param typeName the name of the annotation being built
+     * @param tlAnnotationsHere the top-level meta-annotations on the annotation being built
      */
     public AnnotationBuilder beginAnnotation(String typeName, Set<Annotation> tlAnnotationsHere, String source) {
         assert typeName != null;

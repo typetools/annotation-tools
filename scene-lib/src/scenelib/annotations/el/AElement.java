@@ -18,48 +18,12 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * usually belongs directly or indirectly to an {@link AScene}. Each subclass
  * of <code>AElement</code> represents one kind of annotatable element; its
  * name should make this clear.
+ * <p>
+ *
+ * The name {@code AElement} stands for "annotatable element" or
+ * "annotated element".
  */
 public class AElement implements Cloneable {
-    static <K extends Object> VivifyingMap<K, AElement> newVivifyingLHMap_AE() {
-        return new VivifyingMap<K, AElement>(
-                new LinkedHashMap<K, AElement>()) {
-            @Override
-            public AElement createValueFor(K k) {
-                return new AElement(k);
-            }
-
-            @Override
-            public boolean subPrune(AElement v) {
-                return v.prune();
-            }
-        };
-    }
-
-    // Different from the above in that the elements are guaranteed to
-    // contain a non-null "type" field.
-    static <K extends Object> VivifyingMap<K, AElement> newVivifyingLHMap_AET() {
-        return new VivifyingMap<K, AElement>(
-                new LinkedHashMap<K, AElement>()) {
-            @Override
-            public AElement createValueFor(K k) {
-                return new AElement(k, true);
-            }
-
-            @Override
-            public boolean subPrune(AElement v) {
-                return v.prune();
-            }
-        };
-    }
-
-    @SuppressWarnings("unchecked")
-    <K, V extends AElement> void
-    copyMapContents(VivifyingMap<K, V> orig, VivifyingMap<K, V> copy) {
-        for (K key : orig.keySet()) {
-            V val = orig.get(key);
-            copy.put(key, (V) val.clone());
-        }
-    }
 
     /**
      * The top-level annotations directly on this element.  Annotations on
@@ -68,20 +32,14 @@ public class AElement implements Cloneable {
      */
     public final Set<Annotation> tlAnnotationsHere;
 
-    /** The type of a field or a method parameter */
+    /** The type of a field or a method parameter.  May be null. */
     public final ATypeElement type; // initialized in constructor
 
-    public Annotation lookup(String name) {
-        for (Annotation anno : tlAnnotationsHere) {
-            if (anno.def.name.equals(name)) {
-                return anno;
-            }
-        }
-        return null;
-    }
-
-    // general description of the element
-    final Object description;
+    /**
+     * A description of the element.  Used for debugging and diagnostic messages.
+     * Almost always a String, but in ATypeElement it is an ASTPath.
+     */
+    public final Object description;
 
     AElement(Object description) {
         this(description, false);
@@ -145,9 +103,12 @@ public class AElement implements Cloneable {
     }
 
     /**
-     * Returns whether this {@link AElement} equals <code>o</code>; a
+     * Returns whether this {@link AElement} equals <code>o</code>.  This is a
      * slightly faster variant of {@link #equals(Object)} for when the argument
      * is statically known to be another nonnull {@link AElement}.
+     *
+     * @param o the AElement to compare to
+     * @return true if this is equal to {@code o}
      */
     // We need equals to be symmetric and operate correctly over the class
     // hierarchy.  Let x and y be objects of subclasses S and T, respectively,
@@ -163,9 +124,6 @@ public class AElement implements Cloneable {
             && (o.type == null ? type == null : o.type.equals(type));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         return getClass().getName().hashCode() + tlAnnotationsHere.hashCode()
@@ -173,14 +131,20 @@ public class AElement implements Cloneable {
     }
 
     /**
-     * Removes empty subelements of this {@link AElement} depth-first; returns
-     * whether this {@link AElement} is itself empty after pruning.
+     * Returns whether this {@link AElement} is empty.
+     *
+     * @return true iff this is empty
      */
-    // In subclasses, we use & (not &&) because we want complete evaluation:
-    // we should prune everything even if the first subelement is nonempty.
-    public boolean prune() {
+    public boolean isEmpty() {
         return tlAnnotationsHere.isEmpty()
-            & (type == null || type.prune());
+            && (type == null || type.isEmpty());
+    }
+
+    /**
+     * Removes empty subelements of this {@link AElement} depth-first.
+     */
+    public void prune() {
+        type.prune();
     }
 
     @Override
@@ -198,6 +162,22 @@ public class AElement implements Cloneable {
       return sb.toString();
     }
 
+    /**
+     * Return the top-level annotation on this that has the given name.
+     * Return null if no such annotation exists.
+     *
+     * @param name the fully-qualified type name of the annotation to search for
+     * @return the annotation on this with the given name, or null if none exists
+     */
+    public Annotation lookup(String name) {
+        for (Annotation anno : tlAnnotationsHere) {
+            if (anno.def.name.equals(name)) {
+                return anno;
+            }
+        }
+        return null;
+    }
+
     public void tlAnnotationsHereFormatted(StringBuilder sb) {
         boolean first = true;
         for (Annotation aElement : tlAnnotationsHere) {
@@ -212,4 +192,46 @@ public class AElement implements Cloneable {
     public <R, T> R accept(ElementVisitor<R, T> v, T t) {
         return v.visitElement(this, t);
     }
+
+    // Static methods
+
+    static <K extends Object> VivifyingMap<K, AElement> newVivifyingLHMap_AE() {
+        return new VivifyingMap<K, AElement>(new LinkedHashMap<>()) {
+            @Override
+            public AElement createValueFor(K k) {
+                return new AElement(k);
+            }
+
+            @Override
+            public boolean isEmptyValue(AElement v) {
+                return v.isEmpty();
+            }
+        };
+    }
+
+    // Different from the above in that the elements are guaranteed to
+    // contain a non-null "type" field.
+    static <K extends Object> VivifyingMap<K, AElement> newVivifyingLHMap_AET() {
+        return new VivifyingMap<K, AElement>(new LinkedHashMap<>()) {
+            @Override
+            public AElement createValueFor(K k) {
+                return new AElement(k, true);
+            }
+
+            @Override
+            public boolean isEmptyValue(AElement v) {
+                return v.isEmpty();
+            }
+        };
+    }
+
+    @SuppressWarnings("unchecked")
+    static <K, V extends AElement> void
+    copyMapContents(VivifyingMap<K, V> orig, VivifyingMap<K, V> copy) {
+        for (K key : orig.keySet()) {
+            V val = orig.get(key);
+            copy.put(key, (V) val.clone());
+        }
+    }
+
 }
