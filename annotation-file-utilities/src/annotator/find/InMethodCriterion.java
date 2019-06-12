@@ -49,7 +49,7 @@ final class InMethodCriterion implements Criterion {
       Tree leaf = path.getLeaf();
       if (leaf.getKind() == Tree.Kind.METHOD) {
         boolean b = sigMethodCriterion.isSatisfiedBy(path);
-        Criteria.dbug.debug("%s%n", "InMethodCriterion.isSatisfiedBy => b");
+        Criteria.dbug.debug("InMethodCriterion.isSatisfiedBy => %s%n", b);
         return b;
       }
       if (leaf.getKind() == Tree.Kind.VARIABLE) { // variable declaration
