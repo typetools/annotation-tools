@@ -40,20 +40,22 @@ final class InMethodCriterion implements Criterion {
     Criteria.dbug.debug("InMethodCriterion.isSatisfiedBy(%s); this=%s%n",
         Main.leafString(path), this.toString());
 
-    // true if in a variable declaration.
+    // true if the argument is a variable declaration.
     boolean inDecl = false;
     // Ignore the value if inDecl==false.  Otherwise:
     // true if in a static variable declaration, false if in a member variable declaration.
     boolean staticDecl = false;
     do {
-      if (path.getLeaf().getKind() == Tree.Kind.METHOD) {
+      Tree leaf = path.getLeaf();
+      if (leaf.getKind() == Tree.Kind.METHOD) {
         boolean b = sigMethodCriterion.isSatisfiedBy(path);
         Criteria.dbug.debug("%s%n", "InMethodCriterion.isSatisfiedBy => b");
         return b;
       }
-      if (path.getLeaf().getKind() == Tree.Kind.VARIABLE) { // variable declaration
-        ModifiersTree mods = ((VariableTree) path.getLeaf()).getModifiers();
+      if (leaf.getKind() == Tree.Kind.VARIABLE) { // variable declaration
+        VariableTree varDecl = (VariableTree) leaf;
         inDecl = true;
+        ModifiersTree mods = varDecl.getModifiers();
         staticDecl = mods.getFlags().contains(Modifier.STATIC);
       }
       path = path.getParentPath();
