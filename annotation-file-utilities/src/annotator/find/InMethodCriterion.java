@@ -40,11 +40,12 @@ final class InMethodCriterion implements Criterion {
     Criteria.dbug.debug("InMethodCriterion.isSatisfiedBy(%s); this=%s%n",
         Main.leafString(path), this.toString());
 
-    // true if the argument is a variable declaration.
+    // true if the argument is within a variable declaration's initializer expression.
     boolean inDecl = false;
     // Ignore the value if inDecl==false.  Otherwise:
     // true if in a static variable declaration, false if in a member variable declaration.
     boolean staticDecl = false;
+    TreePath childPath = null;
     do {
       Tree leaf = path.getLeaf();
       if (leaf.getKind() == Tree.Kind.METHOD) {
@@ -54,10 +55,13 @@ final class InMethodCriterion implements Criterion {
       }
       if (leaf.getKind() == Tree.Kind.VARIABLE) { // variable declaration
         VariableTree varDecl = (VariableTree) leaf;
-        inDecl = true;
-        ModifiersTree mods = varDecl.getModifiers();
-        staticDecl = mods.getFlags().contains(Modifier.STATIC);
+        if (childPath != null && childPath.getLeaf() == varDecl.getInitializer()) {
+          inDecl = true;
+          ModifiersTree mods = varDecl.getModifiers();
+          staticDecl = mods.getFlags().contains(Modifier.STATIC);
+        }
       }
+      childPath = path;
       path = path.getParentPath();
     } while (path != null && path.getLeaf() != null);
 
