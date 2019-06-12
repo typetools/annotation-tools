@@ -539,7 +539,8 @@
             source="8"
             target="8"
             failonerror="true"
-            classpathref="libpath">
+            classpathref="libpath"
+            includeantruntime="false">
           <compilerarg value="-Xlint:-options"/>
           <compilerarg value="-Werror"/>
           <compilerarg value="-g"/>
@@ -570,7 +571,8 @@
     <mkdir dir="bin"/>
     <javac srcdir="src" destdir="bin" debug="true" encoding="8859_1"
            fork="yes"
-           executable="${cfjavac}">
+           executable="${cfjavac}"
+           includeantruntime="false">
       <compilerarg value="-version"/>
       <compilerarg line="-target 8"/>
       <compilerarg line="-processor org.checkerframework.checker.nullness.NullnessChecker"/>
@@ -589,7 +591,8 @@
     <mkdir dir="bin"/>
     <javac srcdir="src" destdir="bin" debug="true" encoding="8859_1"
            fork="yes"
-           executable="${cfjavac}">
+           executable="${cfjavac}"
+           includeantruntime="false">
       <compilerarg value="-version"/>
       <compilerarg line="-target 8"/>
       <compilerarg line="-processor org.checkerframework.checker.signature.SignatureChecker"/>
