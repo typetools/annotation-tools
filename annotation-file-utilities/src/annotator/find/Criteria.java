@@ -62,11 +62,11 @@ public final class Criteria {
     assert path.getLeaf() == leaf;
     for (Criterion c : criteria.values()) {
       if (! c.isSatisfiedBy(path, leaf)) {
-        dbug.debug("UNsatisfied criterion of type %s:%n    leaf=%s (%s)%n",
+        dbug.debug("UNsatisfied criterion of type %s [%s]:%n    leaf=%s%n",
             c, c.getClass(), Main.leafString(path));
         return false;
       } else {
-        dbug.debug("satisfied criterion of type %s:%n    leaf=%s (%s)%n",
+        dbug.debug("satisfied criterion of type %s [%s]:%n    leaf=%s%n",
             c, c.getClass(), Main.leafString(path));
       }
     }
