@@ -50,12 +50,12 @@ final class InMethodCriterion implements Criterion {
       Tree leaf = path.getLeaf();
       if (leaf.getKind() == Tree.Kind.METHOD) {
         boolean b = sigMethodCriterion.isSatisfiedBy(path);
-        Criteria.dbug.debug("%s%n", "InMethodCriterion.isSatisfiedBy => b");
+        Criteria.dbug.debug("InMethodCriterion.isSatisfiedBy => %s%n", b);
         return b;
       }
       if (leaf.getKind() == Tree.Kind.VARIABLE) { // variable declaration
         VariableTree varDecl = (VariableTree) leaf;
-        if (childPath != null && childPath.getLeaf() == varDecl.getNameExpression()) {
+        if (childPath != null && childPath.getLeaf() == varDecl.getInitializer()) {
           inDecl = true;
           ModifiersTree mods = varDecl.getModifiers();
           staticDecl = mods.getFlags().contains(Modifier.STATIC);
