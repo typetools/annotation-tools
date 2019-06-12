@@ -1,0 +1,7 @@
+class Issue216 {
+
+    Object value;
+
+    @org.checkerframework.dataflow.qual.SideEffectFree
+    public Issue216() {}
+}

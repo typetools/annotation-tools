@@ -40,28 +40,36 @@ final class InMethodCriterion implements Criterion {
     Criteria.dbug.debug("InMethodCriterion.isSatisfiedBy(%s); this=%s%n",
         Main.leafString(path), this.toString());
 
-    // true if in a variable declaration.
+    // true if the argument is a variable declaration.
+    boolean isDecl = path.getLeaf().getKind() == Tree.Kind.VARIABLE;
+    // true if the argument is a variable declaration or is within its initializer expression.
     boolean inDecl = false;
     // Ignore the value if inDecl==false.  Otherwise:
     // true if in a static variable declaration, false if in a member variable declaration.
     boolean staticDecl = false;
+    TreePath childPath = null;
     do {
-      if (path.getLeaf().getKind() == Tree.Kind.METHOD) {
+      Tree leaf = path.getLeaf();
+      if (leaf.getKind() == Tree.Kind.METHOD) {
         boolean b = sigMethodCriterion.isSatisfiedBy(path);
         Criteria.dbug.debug("%s%n", "InMethodCriterion.isSatisfiedBy => b");
         return b;
       }
-      if (path.getLeaf().getKind() == Tree.Kind.VARIABLE) { // variable declaration
-        ModifiersTree mods = ((VariableTree) path.getLeaf()).getModifiers();
-        inDecl = true;
-        staticDecl = mods.getFlags().contains(Modifier.STATIC);
+      if (leaf.getKind() == Tree.Kind.VARIABLE) { // variable declaration
+        VariableTree varDecl = (VariableTree) leaf;
+        if (childPath != null && childPath.getLeaf() == varDecl.getNameExpression()) {
+          inDecl = true;
+          ModifiersTree mods = varDecl.getModifiers();
+          staticDecl = mods.getFlags().contains(Modifier.STATIC);
+        }
       }
+      childPath = path;
       path = path.getParentPath();
     } while (path != null && path.getLeaf() != null);
 
     // We didn't find the method.  Return true if in a varable declarator,
     // which is initialization code that will go in <init> or <clinit>.
-    boolean result = inDecl && (staticDecl ? "<clinit>()V" : "<init>()V").equals(name);
+    boolean result = inDecl && !isDecl && (staticDecl ? "<clinit>()V" : "<init>()V").equals(name);
     Criteria.dbug.debug("InMethodCriterion.isSatisfiedBy => %s%n", result);
     return result;
   }
