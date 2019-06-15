@@ -405,7 +405,7 @@ public abstract class Insertion {
                 }
                 GenericArrayLocationCriterion c = innerInsertion.getCriteria().getGenericArrayLocation();
                 String annos =
-                    ((AnnotationInsertion) innerInsertion).getAnnotation();
+                    ((AnnotationInsertion) innerInsertion).getAnnotationText();
                 if (c == null) {
                     ASTPath astPath = innerInsertion.getCriteria().getASTPath();
                     if (outerPath != null && astPath != null) {
