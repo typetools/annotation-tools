@@ -374,8 +374,8 @@ public class IndexFileSpecification {
       String annotationString = p.a;
       Annotation annotation = p.b;
       Criteria criteria = clist.criteria();
-      Boolean isDeclarationAnnotation = !annotation.def.isTypeAnnotation()
-          || criteria.isOnFieldDeclaration();
+      boolean isTypeAnnotationOnly = annotation.def.isOnlyTypeAnnotation();
+
       if (noTypePath(criteria) && isOnReceiver(criteria)) {
         if (receiver == null) {
           DeclaredType type = new DeclaredType();
@@ -416,7 +416,7 @@ public class IndexFileSpecification {
           criteria.add(new IntersectionTypeLocationCriterion(loc));
         }
         Insertion ins = new AnnotationInsertion(annotationString, criteria,
-                                      isDeclarationAnnotation, annotation);
+                                                !isTypeAnnotationOnly, annotation);
         debug("parsed: " + ins);
         if (!isCastInsertion) {
             // Annotations on compound types of a cast insertion will be
@@ -447,7 +447,7 @@ public class IndexFileSpecification {
             constructorInsertion.addReceiverInsertion((ReceiverInsertion) i);
           } else if (criteria.isOnReturnType()) {
             ((DeclaredType) constructorInsertion.getType()).addAnnotation(annotationString);
-          } else if (isDeclarationAnnotation) {
+          } else if (!isTypeAnnotationOnly) {
             constructorInsertion.addDeclarationInsertion(i);
           } else {
             annotationInsertions.add(i);
