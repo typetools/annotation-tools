@@ -166,8 +166,9 @@ public final class AnnotationDef extends AElement {
     }
 
     /**
-     * True if this is a type annotation (was meta-annotated
-     * with @Target(ElementType.TYPE_USE) or @TypeQualifier).
+     * True if this is valid in type annotation locations.
+     * It was meta-annotated
+     * with @Target(ElementType.TYPE_USE) or @TypeQualifier.
      *
      * @return true iff this is a type annotation
      */
@@ -177,6 +178,18 @@ public final class AnnotationDef extends AElement {
                 || tlAnnotationsHere.contains(Annotations.aTypeQualifier);
     }
 
+    /**
+     * True if this is a type annotation but not a declaration annotation.
+     * It was meta-annotated
+     * with @Target(ElementType.TYPE_USE)
+     * or @Target({ElementType.TYPE_USE, ElementType.TYPE})
+     * or @Target({ElementType.TYPE, ElementType.TYPE_USE}).
+     *
+     * @return true iff this is valid only in type annotation locations
+     */
+    public boolean isOnlyTypeAnnotation() {
+        return Annotations.onlyTypeAnnotationTargets.contains(targets());
+    }
 
     /**
      * This {@link AnnotationDef} equals <code>o</code> if and only if
