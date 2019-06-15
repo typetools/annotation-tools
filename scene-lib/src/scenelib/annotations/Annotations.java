@@ -1,5 +1,6 @@
 package scenelib.annotations;
 
+import java.util.Arrays;
 import scenelib.annotations.el.AnnotationDef;
 import scenelib.annotations.field.AnnotationAFT;
 import scenelib.annotations.field.AnnotationFieldType;
@@ -38,6 +39,7 @@ public abstract class Annotations {
 
     public static AnnotationDef adTarget;
     public static Annotation aTargetTypeUse;
+    public static List<Annotation> onlyTypeAnnotationTargets;
 
     public static AnnotationDef adDocumented;
     public static Annotation aDocumented;
@@ -129,6 +131,10 @@ public abstract class Annotations {
                                                // This is the way that naively reading them from classfile gives.
                                                Collections.singletonList("TYPE_USE")
                                                );
+        onlyTypeAnnotationTargets = Arrays.asList(
+            aTargetTypeUse,
+            createValueAnnotation(adTarget, Arrays.asList("TYPE_USE", "TYPE")),
+            createValueAnnotation(adTarget, Arrays.asList("TYPE", "TYPE_USE")));
 
         typeQualifierMetaAnnotations = new HashSet<Annotation>();
         typeQualifierMetaAnnotations.add(aRetentionRuntime);
