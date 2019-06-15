@@ -142,7 +142,7 @@ public class AnnotationInsertion extends Insertion {
      * Gets the raw, unmodified annotation that was passed into the constructor.
      * @return the annotation
      */
-    public String getAnnotation() {
+    public String getAnnotationText() {
         return fullyQualifiedAnnotationText;
     }
 

@@ -168,14 +168,13 @@ public final class AnnotationDef extends AElement {
     /**
      * True if this is valid in type annotation locations.
      * It was meta-annotated
-     * with @Target(ElementType.TYPE_USE) or @TypeQualifier.
+     * with @Target({ElementType.TYPE_USE, ...}).
      *
      * @return true iff this is a type annotation
      */
     public boolean isTypeAnnotation() {
         List<String> targets = targets();
-        return (targets != null && targets.contains("TYPE_USE"))
-                || tlAnnotationsHere.contains(Annotations.aTypeQualifier);
+        return targets != null && targets.contains("TYPE_USE");
     }
 
     /**

@@ -49,9 +49,6 @@ public abstract class Annotations {
     public static AnnotationDef adNonNull;
     public static Annotation aNonNull;
 
-    public static AnnotationDef adTypeQualifier;
-    public static Annotation aTypeQualifier;
-
     /**
      * Annotations that are meta-annotated with themselves.  Due to a flaw
      * in the the Scene Library, it is unable to read them from classfiles.
@@ -152,11 +149,6 @@ public abstract class Annotations {
                                       typeQualifierMetaAnnotations,
                                       noFieldTypes);
         aNonNull = new Annotation(adNonNull, noFieldValues);
-
-        adTypeQualifier = new AnnotationDef("org.checkerframework.framework.qual.TypeQualifier",
-                                            asRetentionRuntime,
-                                            noFieldTypes);
-        aTypeQualifier = new Annotation(adTypeQualifier, noFieldValues);
 
         standardDefs = new LinkedHashSet<AnnotationDef>();
         standardDefs.add(adTarget);
