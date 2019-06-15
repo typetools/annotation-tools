@@ -151,23 +151,19 @@ public final class AnnotationDef extends AElement {
     }
 
     /**
-     * Returns the contents of the java.lang.annotation.Target
-     * meta-annotation, or null if there is none.
+     * Returns the contents of the java.lang.annotation.Target meta-annotation,
+     * or null if there is none.
      *
      * @return the contents of the @Target meta-annotation, or null
      */
     public List<String> targets() {
-        for (Annotation anno : tlAnnotationsHere) {
-            if (anno.def().equals(Annotations.adTarget)) {
-                return (List<String>) anno.getFieldValue("value");
-            }
-        }
-        return null;
+        Annotation target = target();
+        return (target == null) ? null : target.getFieldValue("value");
     }
 
     /**
-     * Returns the java.lang.annotation.Target
-     * meta-annotation, or null if there is none.
+     * Returns the java.lang.annotation.Target meta-annotation,
+     * or null if there is none.
      *
      * @return the @Target meta-annotation, or null
      */
@@ -182,8 +178,7 @@ public final class AnnotationDef extends AElement {
 
     /**
      * True if this is valid in type annotation locations.
-     * It was meta-annotated
-     * with @Target({ElementType.TYPE_USE, ...}).
+     * It was meta-annotated with @Target({ElementType.TYPE_USE, ...}).
      *
      * @return true iff this is a type annotation
      */
