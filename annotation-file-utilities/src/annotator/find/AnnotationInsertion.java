@@ -13,6 +13,7 @@ public class AnnotationInsertion extends Insertion {
      * E.g. An example would be <code>com.foo.Bar(baz)</code>
      */
     private final String fullyQualifiedAnnotationText;
+
     /**
      * The fully-qualified name of the annotation to be inserted.
      *
