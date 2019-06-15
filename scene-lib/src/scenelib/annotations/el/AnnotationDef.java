@@ -166,6 +166,21 @@ public final class AnnotationDef extends AElement {
     }
 
     /**
+     * Returns the java.lang.annotation.Target
+     * meta-annotation, or null if there is none.
+     *
+     * @return the @Target meta-annotation, or null
+     */
+    public Annotation target() {
+        for (Annotation anno : tlAnnotationsHere) {
+            if (anno.def().equals(Annotations.adTarget)) {
+                return anno;
+            }
+        }
+        return null;
+    }
+
+    /**
      * True if this is valid in type annotation locations.
      * It was meta-annotated
      * with @Target({ElementType.TYPE_USE, ...}).
@@ -187,7 +202,8 @@ public final class AnnotationDef extends AElement {
      * @return true iff this is valid only in type annotation locations
      */
     public boolean isOnlyTypeAnnotation() {
-        return Annotations.onlyTypeAnnotationTargets.contains(targets());
+        boolean result = Annotations.onlyTypeAnnotationTargets.contains(target());
+        return result;
     }
 
     /**

@@ -374,8 +374,10 @@ public class IndexFileSpecification {
       String annotationString = p.a;
       Annotation annotation = p.b;
       Criteria criteria = clist.criteria();
-      Boolean isDeclarationAnnotation = !annotation.def.isTypeAnnotation()
+      boolean isDeclarationAnnotation = !annotation.def.isTypeAnnotation()
           || criteria.isOnFieldDeclaration();
+      boolean isTypeAnnotationOnly = annotation.def.isOnlyTypeAnnotation();
+
       if (noTypePath(criteria) && isOnReceiver(criteria)) {
         if (receiver == null) {
           DeclaredType type = new DeclaredType();
