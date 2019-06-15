@@ -1,5 +1,8 @@
 package annotator.find;
 
+import scenelib.annotations.el.AnnotationDef;
+import scenelib.annotations.Annotation;
+import scenelib.annotations.io.ASTPath.ANNOTATION;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -958,7 +961,7 @@ loop:
    * Scans this tree, using the list of insertions to generate the source
    * position to insertion text mapping.  Insertions are removed from the
    * list when positions are found for them.  Thus, they are inserted at the
-   * first location (the one highest in the tree) that they match.
+   * first location (the leftmost highest in the tree) that they match.
    *
    * <p>When a match is found, this routine removes the insertion from p and
    * adds it to the insertions map as a value, with a key that is a pair.
@@ -1030,6 +1033,18 @@ loop:
         dbug.debug("  ... satisfied!%n");
         dbug.debug("    First line of node: %s%n", Main.firstLine(node.toString()));
         dbug.debug("    Type of node: %s%n", node.getClass());
+
+        // If the annotation is not applicable to this location, then
+        // continue looking elsewhere for a match.
+        if (i.getKind() == ANNOTATION) {
+          // ABSTRACT THIS OUT!
+          AnnotationInsertion ai = (AnnotationInsertion) i;
+          Annotation a = ai.getAnnotation();
+          AnnotationDef ad = a.def();
+          List<String> targets = ad.targets();
+
+          // TODO: now, check the target types of the annotation.
+        }
 
         ASTPath astPath = i.getCriteria().getASTPath();
         dbug.debug("    astPath = %s%n", astPath);
