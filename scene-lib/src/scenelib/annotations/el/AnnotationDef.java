@@ -158,7 +158,7 @@ public final class AnnotationDef extends AElement {
      */
     public List<String> targets() {
         Annotation target = target();
-        return (target == null) ? null : target.getFieldValue("value");
+        return (target == null) ? null : (List<String>) target.getFieldValue("value");
     }
 
     /**
