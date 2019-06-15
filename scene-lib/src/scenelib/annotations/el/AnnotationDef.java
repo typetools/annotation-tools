@@ -151,16 +151,30 @@ public final class AnnotationDef extends AElement {
     }
 
     /**
+     * Returns the contents of the java.lang.annotation.Target
+     * meta-annotation, or null if there is none.
+     *
+     * @return the contents of the @Target meta-annotation, or null
+     */
+    public List<String> targets() {
+        for (Annotation anno : tlAnnotationsHere) {
+            if (anno.def().equals(Annotations.adTarget)) {
+                return (List<String>) anno.getFieldValue("value");
+            }
+        }
+        return null;
+    }
+
+    /**
      * True if this is a type annotation (was meta-annotated
      * with @Target(ElementType.TYPE_USE) or @TypeQualifier).
      *
      * @return true iff this is a type annotation
      */
     public boolean isTypeAnnotation() {
-        // TODO: It's enough to have @Target that includes TYPE_USE; the
-        // entire argument to @Target doesn't have to be exactly TYPE_USE.
-        return (tlAnnotationsHere.contains(Annotations.aTargetTypeUse)
-                || tlAnnotationsHere.contains(Annotations.aTypeQualifier));
+        List<String> targets = targets();
+        return (targets != null && targets.contains("TYPE_USE"))
+                || tlAnnotationsHere.contains(Annotations.aTypeQualifier);
     }
 
 
