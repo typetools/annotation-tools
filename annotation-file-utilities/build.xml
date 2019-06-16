@@ -538,12 +538,12 @@
             destdir="bin"
             source="8"
             target="8"
+	    debug="true"
             failonerror="true"
             classpathref="libpath"
             includeantruntime="false">
           <compilerarg value="-Xlint:-options"/>
           <compilerarg value="-Werror"/>
-          <compilerarg value="-g"/>
           <compilerarg line="-Xlint:unchecked -Xlint:deprecation"/>
           <compilerarg line="${cmdTxts}"/>
       </javac>
