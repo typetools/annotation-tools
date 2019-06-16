@@ -227,7 +227,8 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
 
   // Find a node's parent in the current source tree.
   private Tree parent(Tree node) {
-    return getPath(node).getParentPath().getLeaf();
+    TreePath parentPath = getPath(node).getParentPath();
+    return (parentPath == null) ? null : parentPath.getLeaf();
   }
 
   /**
@@ -977,7 +978,7 @@ loop:
       return null;
     }
 
-    dbug.debug("TreeFinder.scan(kind=%s, %d insertions):%n%s%n", node.getKind(), p.size(), node);
+    dbug.debug("TreeFinder.scan(kind=%s, %d insertions):%n%s%n", node.getKind(), p.size(), Main.treeToString(node));
     if (annotator.Main.temporaryDebug) {
       new Error("backtrace at TreeFinder.scan()").printStackTrace();
     }
@@ -1039,8 +1040,6 @@ loop:
         if (i.getKind() == Insertion.Kind.ANNOTATION) {
           AnnotationDef adef = ((AnnotationInsertion) i).getAnnotation().def();
           boolean isTypeAnnotation = adef.isTypeAnnotation();
-          Tree parent = parent(node);
-          Tree.Kind parentKind = parent.getKind();
 
           // ASTPath parentASTPath = astPath.getParentPath();
           // ASTPath.ASTEntry parentAST = parentPath.getLast();
@@ -1049,7 +1048,6 @@ loop:
           System.out.printf("Annotation insertion.%n");
           System.out.printf("  targets = %s%n", adef.targets());
           System.out.printf("  node = %s [%s] [%s]%n", Main.firstLine(node.toString()), node.getKind(), node.getClass());
-          System.out.printf("  parent = %s [%s] [%s]%n", Main.firstLine(parent.toString()), parentKind, parent.getClass());
           switch (node.getKind()) {
             case NEW_CLASS:
               if (! isTypeAnnotation) {
@@ -1057,10 +1055,12 @@ loop:
               }
               break;
             case IDENTIFIER:
-              // if (parentKind == NEW_CLASS
-              //     && ! isTypeAnnotation) {
-              //   continue;
-              // }
+              Tree parent = parent(node);
+              Tree.Kind parentKind = parent.getKind();
+              System.out.printf("  parent = %s [%s] [%s]%n", Main.firstLine(parent.toString()), parentKind, parent.getClass());
+              if (parentKind == Tree.Kind.NEW_CLASS) {
+                continue;
+              }
               break;
             default:
               // TODO: make this switch statement exhaustive and check each case.

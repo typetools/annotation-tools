@@ -1067,7 +1067,8 @@ public class Main {
     if (oneLine.endsWith(" ")) {
       oneLine = oneLine.substring(0, oneLine.length() - 1);
     }
-    return "\"" + oneLine + "\"";
+    // return "\"" + oneLine + "\"";
+    return oneLine;
   }
 
   /**
@@ -1090,16 +1091,21 @@ public class Main {
   public static String first80(String s) {
     StringBuilder sb = new StringBuilder();
     int i = 0;
-    while (sb.size() < 80 && i < s.length()) {
-      if (s.get(i) == '\n') {
+    while (i < s.length() && Character.isWhitespace(s.charAt(i))) {
+      i++;
+    }
+    while (i < s.length() && sb.length() < 80) {
+      if (s.charAt(i) == '\n') {
         i++;
-        while (s.get(i] == ' ' || s.get(i) == '\t') {
+        while (i < s.length() && Character.isWhitespace(s.charAt(i))) {
           i++;
         }
         sb.append(' ');
-      } else {
-        sb.append(s.get(i));
       }
+      if (i < s.length()) {
+        sb.append(s.charAt(i));
+      }
+      i++;
     }
     if (i < s.length()) {
       sb.append("...");
