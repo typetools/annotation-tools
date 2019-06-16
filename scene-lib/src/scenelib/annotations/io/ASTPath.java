@@ -1164,7 +1164,7 @@ public class ASTPath extends ImmutableStack<ASTPath.ASTEntry>
         }
         }
 
-        dbug.debug("next: %s%n", next);
+        dbug.debug("next: %s%n", Main.treeToString(next));
         if (next != actualPath.get(i + 1)) {
           dbug.debug("no next match%n");
           return false;

@@ -1060,27 +1060,51 @@ public class Main {
     return treeToString(path.getLeaf());
   }
 
-  /** Return the first non-empty line of the tree's printed representation. */
+  /** Return the first 80 characters of the tree's printed representation. */
   public static String treeToString(Tree node) {
     String asString = node.toString();
-    String oneLine = firstLine(asString);
+    String oneLine = first80(asString);
+    if (oneLine.endsWith(" ")) {
+      oneLine = oneLine.substring(0, oneLine.length() - 1);
+    }
     return "\"" + oneLine + "\"";
   }
 
   /**
-   * Return the first non-empty line of the string, adding an ellipsis
+   * Return the first 80 characters of the string, adding an ellipsis
    * (...) if the string was truncated.
    */
   public static String firstLine(String s) {
-    while (s.startsWith("\n")) {
-      s = s.substring(1);
+    // TODO: This is wasteful because it processes the entire string rather than just the first part.
+    s = s.replaceAll(" *\n *", " ");
+    if (s.length() > 80) {
+      s = s.substring(0, 80) + "...";
     }
-    int newlineIndex = s.indexOf('\n');
-    if (newlineIndex == -1) {
-      return s;
-    } else {
-      return s.substring(0, newlineIndex) + "...";
+    return s;
+  }
+
+  /**
+   * Return the first 80 characters of the string, adding an ellipsis
+   * (...) if the string was truncated.
+   */
+  public static String first80(String s) {
+    StringBuilder sb = new StringBuilder();
+    int i = 0;
+    while (sb.size() < 80 && i < s.length()) {
+      if (s.get(i) == '\n') {
+        i++;
+        while (s.get(i] == ' ' || s.get(i) == '\t') {
+          i++;
+        }
+        sb.append(' ');
+      } else {
+        sb.append(s.get(i));
+      }
     }
+    if (i < s.length()) {
+      sb.append("...");
+    }
+    return sb.toString();
   }
 
   /**

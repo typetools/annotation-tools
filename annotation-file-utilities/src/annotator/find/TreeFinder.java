@@ -1,8 +1,9 @@
 package annotator.find;
 
+import annotator.find.Insertion.Kind;
+
 import scenelib.annotations.el.AnnotationDef;
 import scenelib.annotations.Annotation;
-import scenelib.annotations.io.ASTPath.ANNOTATION;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -976,15 +977,12 @@ loop:
       return null;
     }
 
-    dbug.debug("TreeFinder.scan(%s, %d insertions):%n%s%n", node.getKind(), p.size(), node);
+    dbug.debug("TreeFinder.scan(kind=%s, %d insertions):%n%s%n", node.getKind(), p.size(), node);
     if (annotator.Main.temporaryDebug) {
       new Error("backtrace at TreeFinder.scan()").printStackTrace();
     }
     if (! handled(node)) {
-      String nodeString = node.toString();
-      if (nodeString.equals("")) {
-        nodeString = "<empty>";
-      }
+      String nodeString = Main.treeToString(node);
       dbug.debug("TreeFinder.scan(%s) skipping, unhandled: %s%n", node.getClass(), node);
       // nothing to do
       return super.scan(node, p);
@@ -1033,21 +1031,42 @@ loop:
         dbug.debug("  ... satisfied!%n");
         dbug.debug("    First line of node: %s%n", Main.firstLine(node.toString()));
         dbug.debug("    Type of node: %s%n", node.getClass());
+        ASTPath astPath = i.getCriteria().getASTPath();
+        dbug.debug("    astPath = %s [%s]%n", astPath, (astPath == null) ? null : astPath.getClass());
 
         // If the annotation is not applicable to this location, then
         // continue looking elsewhere for a match.
-        if (i.getKind() == ANNOTATION) {
-          // ABSTRACT THIS OUT!
-          AnnotationInsertion ai = (AnnotationInsertion) i;
-          Annotation a = ai.getAnnotation();
-          AnnotationDef ad = a.def();
-          List<String> targets = ad.targets();
+        if (i.getKind() == Insertion.Kind.ANNOTATION) {
+          AnnotationDef adef = ((AnnotationInsertion) i).getAnnotation().def();
+          boolean isTypeAnnotation = adef.isTypeAnnotation();
+          Tree parent = parent(node);
+          Tree.Kind parentKind = parent.getKind();
 
-          // TODO: now, check the target types of the annotation.
+          // ASTPath parentASTPath = astPath.getParentPath();
+          // ASTPath.ASTEntry parentAST = parentPath.getLast();
+          // Tree.Kind parentKind = parent.getTreeKind();
+
+          System.out.printf("Annotation insertion.%n");
+          System.out.printf("  targets = %s%n", adef.targets());
+          System.out.printf("  node = %s [%s] [%s]%n", Main.firstLine(node.toString()), node.getKind(), node.getClass());
+          System.out.printf("  parent = %s [%s] [%s]%n", Main.firstLine(parent.toString()), parentKind, parent.getClass());
+          switch (node.getKind()) {
+            case NEW_CLASS:
+              if (! isTypeAnnotation) {
+                continue;
+              }
+              break;
+            case IDENTIFIER:
+              // if (parentKind == NEW_CLASS
+              //     && ! isTypeAnnotation) {
+              //   continue;
+              // }
+              break;
+            default:
+              // TODO: make this switch statement exhaustive and check each case.
+          }
         }
 
-        ASTPath astPath = i.getCriteria().getASTPath();
-        dbug.debug("    astPath = %s%n", astPath);
         Integer pos = astPath == null ? findPosition(path, i)
             : Main.convert_jaifs ? null  // already in correct form
             : findPositionByASTPath(astPath, path, i);
