@@ -1031,18 +1031,16 @@ loop:
         dbug.debug("  ... satisfied!%n");
         dbug.debug("    First line of node: %s%n", Main.firstLine(node.toString()));
         dbug.debug("    Type of node: %s%n", node.getClass());
+
         ASTPath astPath = i.getCriteria().getASTPath();
         dbug.debug("    astPath = %s [%s]%n", astPath, (astPath == null) ? null : astPath.getClass());
 
         // If the annotation is not applicable to this location, then
         // continue looking elsewhere for a match.
+        // This is a hack, because the design of Criteria is broken.
         if (i.getKind() == Insertion.Kind.ANNOTATION) {
           AnnotationDef adef = ((AnnotationInsertion) i).getAnnotation().def();
           boolean isTypeAnnotation = adef.isTypeAnnotation();
-
-          // ASTPath parentASTPath = astPath.getParentPath();
-          // ASTPath.ASTEntry parentAST = parentPath.getLast();
-          // Tree.Kind parentKind = parent.getTreeKind();
 
           switch (node.getKind()) {
             case NEW_CLASS:
