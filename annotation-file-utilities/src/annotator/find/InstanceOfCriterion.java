@@ -1,6 +1,8 @@
 package annotator.find;
 
 import scenelib.annotations.el.RelativeLocation;
+
+import annotator.Main;
 import annotator.scanner.InstanceOfScanner;
 
 import com.sun.source.tree.InstanceOfTree;

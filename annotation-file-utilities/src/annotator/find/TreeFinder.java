@@ -1045,9 +1045,6 @@ loop:
           // ASTPath.ASTEntry parentAST = parentPath.getLast();
           // Tree.Kind parentKind = parent.getTreeKind();
 
-          System.out.printf("Annotation insertion.%n");
-          System.out.printf("  targets = %s%n", adef.targets());
-          System.out.printf("  node = %s [%s] [%s]%n", Main.firstLine(node.toString()), node.getKind(), node.getClass());
           switch (node.getKind()) {
             case NEW_CLASS:
               if (! isTypeAnnotation) {
@@ -1057,8 +1054,6 @@ loop:
             case IDENTIFIER:
               Tree parent = parent(node);
               Tree.Kind parentKind = parent.getKind();
-              System.out.printf("  parent = %s [%s] [%s]%n", Main.firstLine(parent.toString()), parentKind, parent.getClass());
-              System.out.printf("    is parent NEW_CLASS? = %s%n", parentKind == Tree.Kind.NEW_CLASS);
               if (parentKind == Tree.Kind.NEW_CLASS) {
                 continue;
               }

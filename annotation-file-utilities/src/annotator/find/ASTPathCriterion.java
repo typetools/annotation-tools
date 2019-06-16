@@ -134,8 +134,7 @@ public class ASTPathCriterion implements Criterion {
             System.out.println("ASTPathCriterion.isSatisfiedBy");
             System.out.println("  " + astPath);
             for (Tree t : actualPath) {
-                String s = Main.treeToString(t);
-                System.out.println("  " + t.getKind() + ": " + s);
+                System.out.println("  " + t.getKind() + ": " + Main.treeToString(t));
             }
         }
 
