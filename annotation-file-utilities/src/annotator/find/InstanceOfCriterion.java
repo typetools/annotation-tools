@@ -37,7 +37,7 @@ public class InstanceOfCriterion implements Criterion {
 
     Tree leaf = path.getLeaf();
 
-    if (Criteria.dbug.enabled()) {
+    if (Criteria.dbug.isEnabled()) {
       Criteria.dbug.debug("InstanceOfCriterion.isSatisfiedBy:%n");
       Criteria.dbug.debug("  this: %s%n", this);
       Criteria.dbug.debug("  leaf: %s%n", Main.treeToString(leaf));
