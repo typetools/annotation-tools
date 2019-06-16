@@ -133,8 +133,8 @@ public abstract class Annotations {
                                                );
         onlyTypeAnnotationTargets = Arrays.asList(
             aTargetTypeUse,
-            createValueAnnotation(adTarget, Arrays.asList("TYPE_USE", "TYPE")),
-            createValueAnnotation(adTarget, Arrays.asList("TYPE", "TYPE_USE")));
+            createValueAnnotation(adTarget, Arrays.asList("TYPE_USE", "TYPE_PARAMETER")),
+            createValueAnnotation(adTarget, Arrays.asList("TYPE_PARAMETER", "TYPE_USE")));
 
         typeQualifierMetaAnnotations = new HashSet<Annotation>();
         typeQualifierMetaAnnotations.add(aRetentionRuntime);
