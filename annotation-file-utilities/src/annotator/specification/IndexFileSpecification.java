@@ -416,7 +416,7 @@ public class IndexFileSpecification {
           criteria.add(new IntersectionTypeLocationCriterion(loc));
         }
         Insertion ins = new AnnotationInsertion(annotationString, criteria,
-                                                !isTypeAnnotationOnly);
+                                                !isTypeAnnotationOnly, annotation);
         debug("parsed: " + ins);
         if (!isCastInsertion) {
             // Annotations on compound types of a cast insertion will be

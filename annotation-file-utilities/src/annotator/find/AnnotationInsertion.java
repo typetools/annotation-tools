@@ -1,5 +1,6 @@
 package annotator.find;
 
+import scenelib.annotations.Annotation;
 import org.plumelib.util.Pair;
 
 /**
@@ -22,6 +23,13 @@ public class AnnotationInsertion extends Insertion {
      */
     private final String fullyQualifiedAnnotationName;
 
+    /**
+     * The annotation being inserted.
+     *
+     * Used to look up target types.
+     */
+    private final Annotation annotation;
+
     private String type;
     private boolean generateBound;
     private boolean generateExtends;
@@ -36,12 +44,26 @@ public class AnnotationInsertion extends Insertion {
      * @param separateLine whether to insert the annotation on its own
      */
     public AnnotationInsertion(String fullyQualifiedAnnotationText, Criteria criteria, boolean separateLine) {
+        this(fullyQualifiedAnnotationText, criteria, separateLine, null);
+    }
+
+    /**
+     * Creates a new insertion.
+     *
+     * @param fullyQualifiedAnnotationText the annotation text to be inserted into source code;
+     *        starts with "@", and must be a fully-qualified name
+     * @param criteria where to insert the annotation
+     * @param separateLine whether to insert the annotation on its own
+     * @param annotation the annotation being inserted
+     */
+    public AnnotationInsertion(String fullyQualifiedAnnotationText, Criteria criteria, boolean separateLine, Annotation annotation) {
         super(criteria, separateLine);
         assert fullyQualifiedAnnotationText.startsWith("@") : fullyQualifiedAnnotationText;
         // A fully-qualified name in the default package does not contain a period
         // assert fullyQualifiedAnnotationText.contains(".") : fullyQualifiedAnnotationText;
         this.fullyQualifiedAnnotationText = fullyQualifiedAnnotationText;
         this.fullyQualifiedAnnotationName = extractAnnotationFullyQualifiedName();
+        this.annotation = annotation;
         type = null;
         generateBound = false;
         generateExtends = false;
@@ -181,5 +203,14 @@ public class AnnotationInsertion extends Insertion {
 
     public void setType(String s) {
         this.type = s;
+    }
+
+    /**
+     * Returns the annotation being inserted.
+     *
+     * @return the annotation being inserted.
+     */
+    public Annotation getAnnotation() {
+        return annotation;
     }
 }

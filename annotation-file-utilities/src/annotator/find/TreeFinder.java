@@ -1,5 +1,9 @@
 package annotator.find;
 
+import annotator.find.Insertion.Kind;
+
+import scenelib.annotations.el.AnnotationDef;
+import scenelib.annotations.Annotation;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -223,7 +227,8 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
 
   // Find a node's parent in the current source tree.
   private Tree parent(Tree node) {
-    return getPath(node).getParentPath().getLeaf();
+    TreePath parentPath = getPath(node).getParentPath();
+    return (parentPath == null) ? null : parentPath.getLeaf();
   }
 
   /**
@@ -958,7 +963,7 @@ loop:
    * Scans this tree, using the list of insertions to generate the source
    * position to insertion text mapping.  Insertions are removed from the
    * list when positions are found for them.  Thus, they are inserted at the
-   * first location (the one highest in the tree) that they match.
+   * first location (the leftmost highest in the tree) that they match.
    *
    * <p>When a match is found, this routine removes the insertion from p and
    * adds it to the insertions map as a value, with a key that is a pair.
@@ -1028,7 +1033,33 @@ loop:
         dbug.debug("    Type of node: %s%n", node.getClass());
 
         ASTPath astPath = i.getCriteria().getASTPath();
-        dbug.debug("    astPath = %s%n", astPath);
+        dbug.debug("    astPath = %s [%s]%n", astPath, (astPath == null) ? null : astPath.getClass());
+
+        // If the annotation is not applicable to this location, then
+        // continue looking elsewhere for a match.
+        // This is a hack, because the design of Criteria is broken.
+        if (i.getKind() == Insertion.Kind.ANNOTATION) {
+          AnnotationDef adef = ((AnnotationInsertion) i).getAnnotation().def();
+          boolean isTypeAnnotation = adef.isTypeAnnotation();
+
+          switch (node.getKind()) {
+            case NEW_CLASS:
+              if (! isTypeAnnotation) {
+                continue;
+              }
+              break;
+            case IDENTIFIER:
+              Tree parent = parent(node);
+              Tree.Kind parentKind = parent.getKind();
+              if (parentKind == Tree.Kind.NEW_CLASS) {
+                continue;
+              }
+              break;
+            default:
+              // TODO: make this switch statement exhaustive and check each case.
+          }
+        }
+
         Integer pos = astPath == null ? findPosition(path, i)
             : Main.convert_jaifs ? null  // already in correct form
             : findPositionByASTPath(astPath, path, i);
