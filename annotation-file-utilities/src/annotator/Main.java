@@ -1060,11 +1060,15 @@ public class Main {
     return treeToString(path.getLeaf());
   }
 
-  /** Return the first non-empty line of the tree's printed representation. */
+  /** Return the first 80 characters of the tree's printed representation, on one line. */
   public static String treeToString(Tree node) {
     String asString = node.toString();
-    String oneLine = firstLine(asString);
-    return "\"" + oneLine + "\"";
+    String oneLine = first80(asString);
+    if (oneLine.endsWith(" ")) {
+      oneLine = oneLine.substring(0, oneLine.length() - 1);
+    }
+    // return "\"" + oneLine + "\"";
+    return oneLine;
   }
 
   /**
@@ -1081,6 +1085,35 @@ public class Main {
     } else {
       return s.substring(0, newlineIndex) + "...";
     }
+  }
+
+  /**
+   * Return the first 80 characters of the string, adding an ellipsis
+   * (...) if the string was truncated.
+   */
+  public static String first80(String s) {
+    StringBuilder sb = new StringBuilder();
+    int i = 0;
+    while (i < s.length() && Character.isWhitespace(s.charAt(i))) {
+      i++;
+    }
+    while (i < s.length() && sb.length() < 80) {
+      if (s.charAt(i) == '\n') {
+        i++;
+        while (i < s.length() && Character.isWhitespace(s.charAt(i))) {
+          i++;
+        }
+        sb.append(' ');
+      }
+      if (i < s.length()) {
+        sb.append(s.charAt(i));
+      }
+      i++;
+    }
+    if (i < s.length()) {
+      sb.append("...");
+    }
+    return sb.toString();
   }
 
   /**
