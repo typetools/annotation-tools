@@ -1058,6 +1058,7 @@ loop:
               Tree parent = parent(node);
               Tree.Kind parentKind = parent.getKind();
               System.out.printf("  parent = %s [%s] [%s]%n", Main.firstLine(parent.toString()), parentKind, parent.getClass());
+              System.out.printf("    is parent NEW_CLASS? = %s%n", parentKind == Tree.Kind.NEW_CLASS);
               if (parentKind == Tree.Kind.NEW_CLASS) {
                 continue;
               }

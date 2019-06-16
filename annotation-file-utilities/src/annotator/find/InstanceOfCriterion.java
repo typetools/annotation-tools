@@ -36,8 +36,8 @@ public class InstanceOfCriterion implements Criterion {
     Tree leaf = path.getLeaf();
 
     Criteria.dbug.debug("%n%s%n", this.toString());
-    Criteria.dbug.debug("InstanceOfCriterion.isSatisfiedBy: %s%n", leaf);
-    Criteria.dbug.debug("leaf: %s%n", leaf);
+    Criteria.dbug.debug("InstanceOfCriterion.isSatisfiedBy:%n");
+    Criteria.dbug.debug("leaf: %s%n", Main.treeToString(leaf));
     Criteria.dbug.debug("kind: %s%n", leaf.getKind());
     Criteria.dbug.debug("class: %s%n", leaf.getClass());
 
