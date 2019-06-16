@@ -1164,11 +1164,13 @@ public class ASTPath extends ImmutableStack<ASTPath.ASTEntry>
         }
         }
 
-        String nextString = next.toString();
-        if (nextString.length() > 80) {
-          nextString = nextString.substring(0, 80) + "...";
+        if (dbug.isEnabled()) {
+          String nextString = next.toString();
+          if (nextString.length() > 80) {
+            nextString = nextString.substring(0, 80) + "...";
+          }
+          dbug.debug("next: %s%n", nextString);
         }
-        dbug.debug("next: %s%n", nextString);
         if (next != actualPath.get(i + 1)) {
           dbug.debug("no next match%n");
           return false;

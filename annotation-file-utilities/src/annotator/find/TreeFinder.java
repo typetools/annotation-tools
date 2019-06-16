@@ -978,13 +978,12 @@ loop:
       return null;
     }
 
-    dbug.debug("TreeFinder.scan(kind=%s, %d insertions):%n%s%n", node.getKind(), p.size(), Main.treeToString(node));
+    dbug.debug("TreeFinder.scan(kind=%s, %d insertions): %s%n", node.getKind(), p.size(), Main.treeToString(node));
     if (annotator.Main.temporaryDebug) {
       new Error("backtrace at TreeFinder.scan()").printStackTrace();
     }
     if (! handled(node)) {
-      String nodeString = Main.treeToString(node);
-      dbug.debug("TreeFinder.scan(%s) skipping, unhandled: %s%n", node.getClass(), node);
+      dbug.debug("TreeFinder.scan(%s) skipping, unhandled: %s%n", node.getClass(), Main.treeToString(node));
       // nothing to do
       return super.scan(node, p);
     }

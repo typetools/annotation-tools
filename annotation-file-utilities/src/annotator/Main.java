@@ -1060,7 +1060,7 @@ public class Main {
     return treeToString(path.getLeaf());
   }
 
-  /** Return the first 80 characters of the tree's printed representation. */
+  /** Return the first 80 characters of the tree's printed representation, on one line. */
   public static String treeToString(Tree node) {
     String asString = node.toString();
     String oneLine = first80(asString);
@@ -1072,16 +1072,19 @@ public class Main {
   }
 
   /**
-   * Return the first 80 characters of the string, adding an ellipsis
+   * Return the first non-empty line of the string, adding an ellipsis
    * (...) if the string was truncated.
    */
   public static String firstLine(String s) {
-    // TODO: This is wasteful because it processes the entire string rather than just the first part.
-    s = s.replaceAll(" *\n *", " ");
-    if (s.length() > 80) {
-      s = s.substring(0, 80) + "...";
+    while (s.startsWith("\n")) {
+      s = s.substring(1);
     }
-    return s;
+    int newlineIndex = s.indexOf('\n');
+    if (newlineIndex == -1) {
+      return s;
+    } else {
+      return s.substring(0, newlineIndex) + "...";
+    }
   }
 
   /**
