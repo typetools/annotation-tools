@@ -1,5 +1,6 @@
 package scenelib.annotations;
 
+import java.util.Arrays;
 import scenelib.annotations.el.AnnotationDef;
 import scenelib.annotations.field.AnnotationAFT;
 import scenelib.annotations.field.AnnotationFieldType;
@@ -38,15 +39,13 @@ public abstract class Annotations {
 
     public static AnnotationDef adTarget;
     public static Annotation aTargetTypeUse;
+    public static List<Annotation> onlyTypeAnnotationTargets;
 
     public static AnnotationDef adDocumented;
     public static Annotation aDocumented;
 
     public static AnnotationDef adNonNull;
     public static Annotation aNonNull;
-
-    public static AnnotationDef adTypeQualifier;
-    public static Annotation aTypeQualifier;
 
     /**
      * Annotations that are meta-annotated with themselves.  Due to a flaw
@@ -135,6 +134,10 @@ public abstract class Annotations {
                                                // This is the way that naively reading them from classfile gives.
                                                Collections.singletonList("TYPE_USE")
                                                );
+        onlyTypeAnnotationTargets = Arrays.asList(
+            aTargetTypeUse,
+            createValueAnnotation(adTarget, Arrays.asList("TYPE_USE", "TYPE_PARAMETER")),
+            createValueAnnotation(adTarget, Arrays.asList("TYPE_PARAMETER", "TYPE_USE")));
 
         typeQualifierMetaAnnotations = new HashSet<Annotation>();
         typeQualifierMetaAnnotations.add(aRetentionRuntime);
@@ -145,12 +148,6 @@ public abstract class Annotations {
                                       noFieldTypes,
                                       "Special-case 'NonNull' in scenelib/annotations/Annotations");
         aNonNull = new Annotation(adNonNull, noFieldValues);
-
-        adTypeQualifier = new AnnotationDef("org.checkerframework.framework.qual.TypeQualifier",
-                                            asRetentionRuntime,
-                                            noFieldTypes,
-                                            "Special-case 'TypeQualifier' in scenelib/annotations/Annotations");
-        aTypeQualifier = new Annotation(adTypeQualifier, noFieldValues);
 
         standardDefs = new LinkedHashSet<AnnotationDef>();
         standardDefs.add(adTarget);
