@@ -107,7 +107,7 @@ public abstract class Annotations {
         // before we can create the annotation on it.
         aftRetentionPolicy = new EnumAFT("java.lang.annotation.RetentionPolicy");
         adRetention = new AnnotationDef("java.lang.annotation.Retention",
-                                        "Special-case in scenelib/annotations/Annotations");
+                                        "Special-case 'Retention' in scenelib/annotations/Annotations");
         adRetention.setFieldTypes(valueFieldTypeOnly(aftRetentionPolicy));
         aRetentionRuntime = createValueAnnotation(adRetention, "RUNTIME");
         adRetention.tlAnnotationsHere.add(aRetentionRuntime);
@@ -119,7 +119,7 @@ public abstract class Annotations {
 
         // Documented's definition is also self-meta-annotated.
         adDocumented = new AnnotationDef("java.lang.annotation.Documented",
-                                         "Special-case in scenelib/annotations/Annotations");
+                                         "Special-case 'Documented' in scenelib/annotations/Annotations");
         adDocumented.setFieldTypes(noFieldTypes);
         aDocumented = new Annotation(adDocumented, noFieldValues);
         adDocumented.tlAnnotationsHere.add(aDocumented);
@@ -127,7 +127,7 @@ public abstract class Annotations {
         adTarget = createValueAnnotationDef("java.lang.annotation.Target",
                                             asRetentionRuntime,
                                             new ArrayAFT(new EnumAFT("java.lang.annotation.ElementType")),
-                                            "Special-case in scenelib/annotations/Annotations");
+                                            "Special-case 'Target' in scenelib/annotations/Annotations");
         aTargetTypeUse = createValueAnnotation(adTarget,
                                                // Problem:  ElementType.TYPE_USE is defined only in JDK 7.
                                                // need to decide what the canonical format for these strings is.
@@ -143,13 +143,13 @@ public abstract class Annotations {
         adNonNull = new AnnotationDef("org.checkerframework.checker.nullness.qual.NonNull",
                                       typeQualifierMetaAnnotations,
                                       noFieldTypes,
-                                      "Special-case in scenelib/annotations/Annotations");
+                                      "Special-case 'NonNull' in scenelib/annotations/Annotations");
         aNonNull = new Annotation(adNonNull, noFieldValues);
 
         adTypeQualifier = new AnnotationDef("org.checkerframework.framework.qual.TypeQualifier",
                                             asRetentionRuntime,
                                             noFieldTypes,
-                                            "Special-case in scenelib/annotations/Annotations");
+                                            "Special-case 'TypeQualifier' in scenelib/annotations/Annotations");
         aTypeQualifier = new Annotation(adTypeQualifier, noFieldValues);
 
         standardDefs = new LinkedHashSet<AnnotationDef>();

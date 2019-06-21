@@ -227,7 +227,7 @@ public class AnnotationBuilder {
         this.source = source;
     }
 
-    AnnotationBuilder(String typeName) {
+    AnnotationBuilder(String typeName, String source) {
         assert typeName != null;
         assert source != null;
         this.typeName = typeName;
