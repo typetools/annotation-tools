@@ -119,6 +119,7 @@ public final class AnnotationDef extends AElement {
         setFieldTypes(fieldTypes);
     }
 
+    // This ovverride is necessary because AnnotationDef extends AElement, which implements Cloneable.
     @Override
     public AnnotationDef clone() {
         throw new UnsupportedOperationException("Can't duplicate an AnnotationDef");
