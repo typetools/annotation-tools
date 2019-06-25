@@ -88,7 +88,8 @@ public final class IndexFileParser {
 
     // The input
     private final StreamTokenizer st;
-    private final String source; // filename or other source
+    // filename or other source
+    private final String source;
 
     // The output
     private final AScene scene;
