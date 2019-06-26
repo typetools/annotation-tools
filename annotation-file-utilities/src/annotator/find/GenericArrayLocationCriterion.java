@@ -213,7 +213,7 @@ public class GenericArrayLocationCriterion implements Criterion {
       pathRemaining = pathRemaining.getParentPath();
     }
 
-    List<TypePathEntry> locationRemaining = new ArrayList<>();
+    List<TypePathEntry> locationRemaining = new ArrayList<>(location);
 
     while (locationRemaining.size() != 0) {
       // annotating an inner type
@@ -517,6 +517,11 @@ public class GenericArrayLocationCriterion implements Criterion {
     return location == null ? Collections.emptyList() : Collections.unmodifiableList(location);
   }
 
+  /**
+   * TODO
+   * @param typePath
+   * @return
+   */
   private static List<TypePathEntry> typePathToList(TypePath typePath) {
     if (typePath == null) {
       return Collections.emptyList();
