@@ -67,8 +67,8 @@ public abstract class Annotations {
     }
 
     // Create an annotation definition with only a value field.
-    public static AnnotationDef createValueAnnotationDef(String name, Set<Annotation> metaAnnotations, AnnotationFieldType aft) {
-        return new AnnotationDef(name, metaAnnotations, valueFieldTypeOnly(aft));
+    public static AnnotationDef createValueAnnotationDef(String name, Set<Annotation> metaAnnotations, AnnotationFieldType aft, String source) {
+        return new AnnotationDef(name, metaAnnotations, valueFieldTypeOnly(aft), source);
     }
 
     // Create an annotation with only a value field.
@@ -105,7 +105,8 @@ public abstract class Annotations {
         // meta-annotated by itself, we have to define the annotation
         // before we can create the annotation on it.
         aftRetentionPolicy = new EnumAFT("java.lang.annotation.RetentionPolicy");
-        adRetention = new AnnotationDef("java.lang.annotation.Retention");
+        adRetention = new AnnotationDef("java.lang.annotation.Retention",
+                                        "'Retention' in scenelib/annotations/Annotations");
         adRetention.setFieldTypes(valueFieldTypeOnly(aftRetentionPolicy));
         aRetentionRuntime = createValueAnnotation(adRetention, "RUNTIME");
         adRetention.tlAnnotationsHere.add(aRetentionRuntime);
@@ -116,14 +117,16 @@ public abstract class Annotations {
         asRetentionSource = Collections.singleton(aRetentionSource);
 
         // Documented's definition is also self-meta-annotated.
-        adDocumented = new AnnotationDef("java.lang.annotation.Documented");
+        adDocumented = new AnnotationDef("java.lang.annotation.Documented",
+                                         "'Documented' in scenelib/annotations/Annotations");
         adDocumented.setFieldTypes(noFieldTypes);
         aDocumented = new Annotation(adDocumented, noFieldValues);
         adDocumented.tlAnnotationsHere.add(aDocumented);
 
         adTarget = createValueAnnotationDef("java.lang.annotation.Target",
                                             asRetentionRuntime,
-                                            new ArrayAFT(new EnumAFT("java.lang.annotation.ElementType")));
+                                            new ArrayAFT(new EnumAFT("java.lang.annotation.ElementType")),
+                                            "'Target' in scenelib/annotations/Annotations");
         aTargetTypeUse = createValueAnnotation(adTarget,
                                                // Problem:  ElementType.TYPE_USE is defined only in JDK 7.
                                                // need to decide what the canonical format for these strings is.
@@ -142,7 +145,8 @@ public abstract class Annotations {
 
         adNonNull = new AnnotationDef("org.checkerframework.checker.nullness.qual.NonNull",
                                       typeQualifierMetaAnnotations,
-                                      noFieldTypes);
+                                      noFieldTypes,
+                                      "'NonNull' in scenelib/annotations/Annotations");
         aNonNull = new Annotation(adNonNull, noFieldValues);
 
         standardDefs = new LinkedHashSet<AnnotationDef>();
@@ -182,7 +186,7 @@ public abstract class Annotations {
      * @return a clone of the given annotation
      */
     public static final Annotation rebuild(Annotation a) {
-        AnnotationBuilder ab = AnnotationFactory.saf.beginAnnotation(a.def());
+        AnnotationBuilder ab = AnnotationFactory.saf.beginAnnotation(a.def(), "rebuild " + a.def.source);
         if (ab != null) {
             for (Map. Entry<String, AnnotationFieldType> fieldDef
                     : a.def().fieldTypes.entrySet()) {
