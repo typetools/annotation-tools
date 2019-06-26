@@ -30,7 +30,6 @@ public class TypePathEntry {
 
     assert step == TypePath.ARRAY_ELEMENT || step == TypePath.INNER_TYPE
         || step == TypePath.WILDCARD_BOUND || step == TypePath.TYPE_ARGUMENT;
-    assert step != TypePath.TYPE_ARGUMENT || argument == 0;
   }
 
   @Override
