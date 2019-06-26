@@ -1198,8 +1198,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
     // private final String signature;
     private final AElement aMethod;
     private final MethodVisitor methodWriter;
-    /** The MethodWriter.currentBasicBlock method. */
-    private Field METHOD_WRITER_CURRENT_BASIC_BLOCK;
+    private Label currentLabel;
 
     MethodAnnotationSceneReader(int api, String name, String descriptor, String signature, AElement aMethod, MethodVisitor methodWriter) {
       super(api, methodWriter);
@@ -1208,14 +1207,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
       // this.signature = signature;
       this.aMethod = aMethod;
       this.methodWriter = methodWriter;
-      try {
-        Class<?> methodWriterClass = Class.forName("org.objectweb.asm.MethodWriter");
-        METHOD_WRITER_CURRENT_BASIC_BLOCK = methodWriterClass.getDeclaredField("currentBasicBlock");
-        METHOD_WRITER_CURRENT_BASIC_BLOCK.setAccessible(true);
-      } catch (ClassNotFoundException | NoSuchFieldException e) {
-        METHOD_WRITER_CURRENT_BASIC_BLOCK = null;
-        e.printStackTrace();
-      }
+      this.currentLabel = null;
     }
 
     @Override
@@ -1239,6 +1231,13 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
 //      // TODO!
 //    }
 
+
+    @Override
+    public void visitLabel(Label label) {
+      super.visitLabel(label);
+      this.currentLabel = label;
+    }
+
     @Override
     public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String descriptor, boolean visible) {
       if (trace) {
@@ -1246,7 +1245,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
             visible, aMethod, this, this.getClass());
       }
       AnnotationVisitor annotationWriter = methodWriter.visitTypeAnnotation(typeRef, typePath, descriptor, visible);
-      Label currentBasicBlock = getCurrentBasicBlock();
+      Label currentBasicBlock = currentLabel;
       return new TypeAnnotationSceneReader(this.api, descriptor, visible, aMethod, annotationWriter, typeRef, typePath, null, null, null, currentBasicBlock);
     }
 
@@ -1258,7 +1257,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
       }
       // TODO: Need to send offset from here
       AnnotationVisitor annotationWriter = methodWriter.visitInsnAnnotation(typeRef, typePath, descriptor, visible);
-      Label currentBasicBlock = getCurrentBasicBlock();
+      Label currentBasicBlock = currentLabel;
       return new TypeAnnotationSceneReader(this.api, descriptor, visible, aMethod, annotationWriter, typeRef, typePath, null, null, null, currentBasicBlock);
     }
 
@@ -1269,7 +1268,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
             descriptor, visible, aMethod, this, this.getClass());
       }
       AnnotationVisitor annotationWriter = methodWriter.visitTryCatchAnnotation(typeRef, typePath, descriptor, visible);
-      Label currentBasicBlock = getCurrentBasicBlock();
+      Label currentBasicBlock = currentLabel;
       return new TypeAnnotationSceneReader(this.api, descriptor, visible, aMethod, annotationWriter, typeRef, typePath, null, null, null, currentBasicBlock);
     }
 
@@ -1282,20 +1281,8 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
             aMethod, this, this.getClass());
       }
       AnnotationVisitor annotationWriter = methodWriter.visitLocalVariableAnnotation(typeRef, typePath, start, end, index, descriptor, visible);
-      Label currentBasicBlock = getCurrentBasicBlock();
+      Label currentBasicBlock = currentLabel;
       return new TypeAnnotationSceneReader(this.api, descriptor, visible, aMethod, annotationWriter, typeRef, typePath, start, end, index, currentBasicBlock);
-    }
-
-    private Label getCurrentBasicBlock() {
-      // TODO: Change if it is possible to get bytecode offsets without reflection
-      Label currentBasicBlock;
-      try {
-        currentBasicBlock = (Label) METHOD_WRITER_CURRENT_BASIC_BLOCK.get(methodWriter);
-      } catch (IllegalAccessException e) {
-        currentBasicBlock = null;
-        e.printStackTrace();
-      }
-      return currentBasicBlock;
     }
 
     // TODO: visit code!
