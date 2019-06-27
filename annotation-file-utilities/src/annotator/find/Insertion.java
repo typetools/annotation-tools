@@ -200,7 +200,7 @@ public abstract class Insertion {
     /**
      * Sets the set of annotation names that should always be qualified.
      *
-     * @param the annotation names that should always be inserted fully-qualified
+     * @param set the annotation names that should always be inserted fully-qualified
      */
     public static void setAlwaysQualify(Set<String> set) {
         alwaysQualify = set;
@@ -245,7 +245,7 @@ public abstract class Insertion {
     /**
      * Gets the kind of this insertion.
      *
-     * @param the kind of this insertion
+     * @return the kind of this insertion
      */
     public abstract Kind getKind();
 

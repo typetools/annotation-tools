@@ -1084,7 +1084,7 @@ public class Main {
    * Return the first non-empty line of the string, adding an ellipsis
    * (...) if the string was truncated.
    *
-   * @param a string to truncate
+   * @param s a string to truncate
    * @return the first non-empty line of the argument
    */
   public static String firstLine(String s) {
