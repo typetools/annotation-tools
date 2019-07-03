@@ -1,0 +1,10 @@
+package org.checkerframework.dataflow.qual:
+annotation @SideEffectFree: @java.lang.annotation.Retention(value=RUNTIME) @java.lang.annotation.Target(value={METHOD,CONSTRUCTOR})
+
+package :
+class Issue216:
+
+    field value:
+
+    method <init>()V: @org.checkerframework.dataflow.qual.SideEffectFree
+        return:

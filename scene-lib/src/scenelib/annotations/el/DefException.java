@@ -13,8 +13,10 @@ public class DefException extends Exception {
      */
     public final String annotationType;
 
-    DefException(String annotationType) {
-        super("Conflicting definition of annotation type " + annotationType);
+    DefException(String annotationType, AnnotationDef def1, AnnotationDef def2) {
+        super("Conflicting definitions of annotation type " + annotationType
+              + "\n  " + def1 + "\n    " + def1.source
+              + "\n  " + def2 + "\n    " + def2.source);
         this.annotationType = annotationType;
     }
 }

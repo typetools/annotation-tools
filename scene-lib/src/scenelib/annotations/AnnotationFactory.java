@@ -26,8 +26,8 @@ public final class AnnotationFactory {
      *
      * @param def the definition for the annotation to be built
      */
-    public AnnotationBuilder beginAnnotation(AnnotationDef def) {
-        return new AnnotationBuilder(def);
+    public AnnotationBuilder beginAnnotation(AnnotationDef def, String source) {
+        return new AnnotationBuilder(def, source);
     }
 
     /**
@@ -36,7 +36,7 @@ public final class AnnotationFactory {
      */
     public AnnotationBuilder beginAnnotation(java.lang.annotation.Annotation a, Map<String, AnnotationDef> adefs) {
         AnnotationDef def = AnnotationDef.fromClass(a.getClass(), adefs);
-        return new AnnotationBuilder(def);
+        return new AnnotationBuilder(def, "Annotation " + a.getClass());
     }
 
     /**
@@ -44,9 +44,10 @@ public final class AnnotationFactory {
      * {@link Annotation} of the given type name.
      * @param typeName the name of the annotation being built
      * @param tlAnnotationsHere the top-level meta-annotations on the annotation being built
+     * @param source where the annotation came from, such as a filename
      */
-    public AnnotationBuilder beginAnnotation(String typeName, Set<Annotation> tlAnnotationsHere) {
+    public AnnotationBuilder beginAnnotation(String typeName, Set<Annotation> tlAnnotationsHere, String source) {
         assert typeName != null;
-        return new AnnotationBuilder(typeName, tlAnnotationsHere);
+        return new AnnotationBuilder(typeName, tlAnnotationsHere, source);
     }
 }

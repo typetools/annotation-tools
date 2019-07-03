@@ -248,7 +248,7 @@ public class IndexFileMerger {
               Collections.<String, AnnotationDef>emptyMap());
       AnnotationDef afDef =
           Annotations.createValueAnnotationDef("AnnotatedFor",
-              Collections.<Annotation>emptySet(), stringArray);
+              Collections.<Annotation>emptySet(), stringArray, "IndexFileMerger");
       for (Map.Entry<String, Collection<String>> entry :
           annotatedFor.asMap().entrySet()) {
         String key = entry.getKey();
