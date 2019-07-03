@@ -115,7 +115,8 @@ class MethodCodeOffsetAdapter extends MethodVisitor {
   }
 
   @Override
-  public void visitTableSwitchInsn(int min, int max, Label dflt, Label[] labels) {
+  public void visitTableSwitchInsn(int min, int max,
+      Label dflt, Label[] labels) {
     super.visitTableSwitchInsn(min, max, dflt, labels);
     offset += 8 - ((offset - codeStart) & 3);
     offset += 4 * (readInt(offset + 4) - readInt(offset) + 3);

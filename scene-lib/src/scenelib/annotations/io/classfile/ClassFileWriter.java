@@ -109,6 +109,7 @@ public class ClassFileWriter {
       String className = file_args[i];
       i++;
       if (i >= file_args.length) {
+        // This can't happen, because file_args.length has been checked to be even.
         System.out.println("Error: incorrect number of arguments");
         System.out.println("Run insert-annotations --help for usage information");
         return;

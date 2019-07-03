@@ -4,7 +4,6 @@
 package scenelib.annotations.io.classfile;
 
 import java.io.File;
-import java.lang.reflect.Field;
 import java.util.*;
 
 import org.objectweb.asm.AnnotationVisitor;
@@ -395,7 +394,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
       return objects;
     }
 
-    /*
+    /**
      * @see org.objectweb.asm.AnnotationVisitor#visitEnum(java.lang.String, java.lang.String, java.lang.String)
      */
     @Override
@@ -404,7 +403,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
       annotationBuilder.addScalarField(name, new EnumAFT(descriptor), value);
     }
 
-    /*
+    /**
      * @see org.objectweb.asm.AnnotationVisitor#visitAnnotation(java.lang.String, java.lang.String)
      */
     @Override
@@ -414,7 +413,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
       return new NestedAnnotationSceneReader(this.api, this, name, descriptor, annotationWriter);
     }
 
-    /*
+    /**
      * @see org.objectweb.asm.AnnotationVisitor#visitArray(java.lang.String)
      */
     @Override
@@ -459,6 +458,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
     /**
      * Returns an annotation, ready to be placed into the scene, from
      *  the information visited.
+     * @return the annotation to be placed into the scene
      */
     Annotation makeAnnotation() {
       return annotationBuilder.finish();

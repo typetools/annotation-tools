@@ -116,7 +116,7 @@ public class CodeOffsetAdapter extends ClassVisitor {
 
       @Override
       public void visitInvokeDynamicInsn(String name, String descriptor,
-            Handle bsm, Object... bsmArgs) {
+          Handle bsm, Object... bsmArgs) {
         super.visitInvokeDynamicInsn(name, descriptor, bsm, bsmArgs);
         debug.debug("%d visitInvokeDynamicInsn(%s, %s)%n", offset,
             name, descriptor, bsm, bsmArgs);
@@ -142,16 +142,19 @@ public class CodeOffsetAdapter extends ClassVisitor {
       }
 
       @Override
-      public void visitLookupSwitchInsn(Label dflt, int[] keys, Label[] labels) {
+      public void visitLookupSwitchInsn(Label dflt, int[] keys,
+          Label[] labels) {
         super.visitLookupSwitchInsn(dflt, keys, labels);
-        debug.debug("%d visitLookupSwitchInsn(%s)%n", offset, dflt, keys, labels);
+        debug.debug("%d visitLookupSwitchInsn(%s)%n", offset,
+            dflt, keys, labels);
         offset += 8 - (offset & 3);
         offset += 4 + 8 * readInt(offset);
         assert offset > 0 && methodEnd > codeStart + offset;
       }
 
       @Override
-      public void visitMethodInsn(int opcode, String owner, String name, String descriptor) {
+      public void visitMethodInsn(int opcode,
+          String owner, String name, String descriptor) {
         super.visitMethodInsn(opcode, owner, name, descriptor);
         debug.debug("%d visitMethodInsn(%d, %s, %s, %s)%n", offset, opcode, owner, name, descriptor);
         offset += opcode == Opcodes.INVOKEINTERFACE ? 5 : 3;
@@ -173,9 +176,11 @@ public class CodeOffsetAdapter extends ClassVisitor {
       }
 
       @Override
-      public void visitTableSwitchInsn(int min, int max, Label dflt, Label[] labels) {
+      public void visitTableSwitchInsn(int min, int max,
+          Label dflt, Label[] labels) {
         super.visitTableSwitchInsn(min, max, dflt, labels);
-        debug.debug("%d visitTableSwitchInsn(%d, %d, %s)%n", offset, min, max, dflt, labels);
+        debug.debug("%d visitTableSwitchInsn(%d, %d, %s)%n", offset,
+            min, max, dflt, labels);
         offset += 8 - (offset & 3);
         offset += 4 * (readInt(offset + 4) - readInt(offset) + 3);
         assert offset > 0 && methodEnd > codeStart + offset;

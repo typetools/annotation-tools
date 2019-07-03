@@ -283,10 +283,7 @@ public class ClassAnnotationSceneWriter extends ClassVisitor {
         ATypeElement aty = e.getValue();
 
         // TODO: How is this annotation written back out?
-        if (strict) {
-          System.err.println("ClassAnnotationSceneWriter: ignoring Extends/Implements annotation " + idx
-              + " with type: " + aty);
-        }
+        if (strict) { System.err.println("ClassAnnotationSceneWriter: ignoring Extends/Implements annotation " + idx + " with type: " + aty); }
       }
 
     }

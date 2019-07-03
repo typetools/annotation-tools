@@ -73,7 +73,7 @@ public final class AnnotationDef extends AElement {
         }
 
         Map<String,AnnotationFieldType> fieldTypes = new LinkedHashMap<>();
-        // TODO: getDeclaredMethods returns methods in arbitrary order. Check bytecode for correct order.
+        // Preserves order of members, which getDeclaredMethods does not do.
         List<String> methods;
         try {
             ClassReader classReader = new ClassReader(name);
