@@ -23,6 +23,7 @@ import com.sun.tools.javac.tree.JCTree.JCFieldAccess;
 import scenelib.annotations.el.TypePathEntry;
 
 import static scenelib.annotations.el.TypePathEntry.listToTypePath;
+import static scenelib.annotations.el.TypePathEntry.typePathToList;
 
 /**
  * GenericArrayLocationCriterion represents the criterion specifying the location
@@ -44,9 +45,9 @@ public class GenericArrayLocationCriterion implements Criterion {
   /**
    * Creates a new GenericArrayLocationCriterion specifying that the element
    * is an outer type, such as:
-   *  <code>@A List&lt;Integer&gt;</code>
+   * <code>@A List&lt;Integer&gt;</code>
    * or
-   *  <code>Integer @A []</code>
+   * <code>Integer @A []</code>
    */
   public GenericArrayLocationCriterion() {
     this(null, null);
@@ -86,7 +87,7 @@ public class GenericArrayLocationCriterion implements Criterion {
    *
    * @param location the list to check
    * @return {@code true} if the list only contains
-   *         {@link TypePath#ARRAY_ELEMENT}, {@code false} otherwise.
+   * {@link TypePath#ARRAY_ELEMENT}, {@code false} otherwise.
    */
   private boolean containsOnlyArray(List<TypePathEntry> location) {
     for (TypePathEntry tpe : location) {
@@ -108,7 +109,7 @@ public class GenericArrayLocationCriterion implements Criterion {
 
     if (debug) {
       System.out.printf("GenericArrayLocationCriterion.isSatisfiedBy():%n  leaf of path: %s%n  searched location: %s%n",
-              path.getLeaf(), typePath);
+          path.getLeaf(), typePath);
     }
 
     TreePath pathRemaining = path;
@@ -132,8 +133,8 @@ public class GenericArrayLocationCriterion implements Criterion {
       if (exp.type != null && exp.type.getKind() == TypeKind.PACKAGE
           || typePath == null
           || (typePath.getStep(typePath.getLength() - 1))
-              != TypePath.INNER_TYPE) {
-          return false;
+          != TypePath.INNER_TYPE) {
+        return false;
       }
     }
 
@@ -162,7 +163,7 @@ public class GenericArrayLocationCriterion implements Criterion {
           if (typePath == null) {
             return true;
           } // else, keep going to make sure we're in the right part of the
-            // compound type
+          // compound type
         } else {
           if (typePath != null
               && typePath.getStep(typePath.getLength() - 1) != TypePath.INNER_TYPE) {
@@ -246,7 +247,7 @@ public class GenericArrayLocationCriterion implements Criterion {
                          locationRemaining, Main.treeToString(leaf), Main.treeToString(parent), parent.getClass());
       }
 
-      TypePathEntry loc = locationRemaining.get(locationRemaining.size()-1);
+      TypePathEntry loc = locationRemaining.get(locationRemaining.size() - 1);
       if (loc.step == TypePath.INNER_TYPE) {
         if (leaf.getKind() == Tree.Kind.PARAMETERIZED_TYPE) {
           leaf = parent;
@@ -259,10 +260,10 @@ public class GenericArrayLocationCriterion implements Criterion {
         if (isStatic(fieldAccess)) {
           return false;
         }
-        locationRemaining.remove(locationRemaining.size()-1);
+        locationRemaining.remove(locationRemaining.size() - 1);
         leaf = fieldAccess.selected;
         pathRemaining = parentPath;
-            // TreePath.getPath(pathRemaining.getCompilationUnit(), leaf);
+        // TreePath.getPath(pathRemaining.getCompilationUnit(), leaf);
       } else if (loc.step == TypePath.WILDCARD_BOUND
           && leaf.getKind() == Tree.Kind.UNBOUNDED_WILDCARD) {
         // Check if the leaf is an unbounded wildcard instead of the parent, since unbounded
@@ -515,44 +516,5 @@ public class GenericArrayLocationCriterion implements Criterion {
    */
   public List<TypePathEntry> getLocation() {
     return location == null ? Collections.emptyList() : Collections.unmodifiableList(location);
-  }
-
-  /**
-   * TODO
-   * @param typePath
-   * @return
-   */
-  private static List<TypePathEntry> typePathToList(TypePath typePath) {
-    if (typePath == null) {
-      return Collections.emptyList();
-    }
-    List<TypePathEntry> location = new ArrayList<>(typePath.getLength());
-    char[] array = typePath.toString().toCharArray();
-    for (int i = 0; i < array.length; i++) {
-      char c = array[i];
-      if (c == '[') {
-        location.add(new TypePathEntry(TypePath.ARRAY_ELEMENT, 0));
-      } else if (c == '.') {
-        location.add(new TypePathEntry(TypePath.INNER_TYPE, 0));
-      } else if (c == '*') {
-        location.add(new TypePathEntry(TypePath.WILDCARD_BOUND, 0));
-      } else if (c >= '0' && c <= '9') {
-        int typeArg = c - '0';
-        while (i < array.length) {
-          c = array[i++];
-          if (c >= '0' && c <= '9') {
-            typeArg = typeArg * 10 + c - '0';
-          } else if (c == ';') {
-            break;
-          } else {
-            throw new IllegalArgumentException();
-          }
-        }
-        location.add(new TypePathEntry(TypePath.TYPE_ARGUMENT, typeArg));
-      } else {
-        throw new IllegalArgumentException();
-      }
-    }
-    return location;
   }
 }

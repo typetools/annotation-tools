@@ -143,12 +143,12 @@ public class TypePathEntry {
    * @return the list of {@link TypePathEntry} elements corresponding with the <code>typePath</code>.
    */
   public static List<TypePathEntry> typePathToList(TypePath typePath) {
-    List<TypePathEntry> typePathEntryList = new ArrayList<>(typePath.getLength());
     if (typePath == null) {
       return null;
     }
-    for (int step = 0; step < typePath.getLength(); step++) {
-      typePathEntryList.add(new TypePathEntry(typePath.getStep(step), typePath.getStepArgument(step)));
+    List<TypePathEntry> typePathEntryList = new ArrayList<>(typePath.getLength());
+    for (int index = 0; index < typePath.getLength(); index++) {
+      typePathEntryList.add(new TypePathEntry(typePath.getStep(index), typePath.getStepArgument(index)));
     }
     return typePathEntryList;
   }
