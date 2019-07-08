@@ -29,13 +29,9 @@ set -o xtrace
 
 export SHELLOPTS
 
-export JAVA_HOME=${JAVA_HOME:-$(dirname $(dirname $(dirname $(readlink -f $(/usr/bin/which java)))))}
+./.travis-build-without-test.sh
 
-export AFU=`readlink -f ${AFU:-../annotation-tools/annotation-file-utilities}`
-export CHECKERFRAMEWORK=`readlink -f ${CHECKERFRAMEWORK:-../checker-framework}`
-
-export PATH=$AFU/scripts:$JAVA_HOME/bin:$PATH
-ant compile
+set -e
 
 git -C /tmp/plume-scripts pull > /dev/null 2>&1 \
   || git -C /tmp clone --depth 1 -q https://github.com/plume-lib/plume-scripts.git
