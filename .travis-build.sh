@@ -29,18 +29,17 @@ set -o xtrace
 
 export SHELLOPTS
 
-SLUGOWNER=${TRAVIS_PULL_REQUEST_SLUG%/*}
-if [[ "$SLUGOWNER" == "" ]]; then
-  SLUGOWNER=${TRAVIS_REPO_SLUG%/*}
-fi
-if [[ "$SLUGOWNER" == "" ]]; then
-  SLUGOWNER=typetools
-fi
-echo SLUGOWNER=$SLUGOWNER
+export JAVA_HOME=${JAVA_HOME:-$(dirname $(dirname $(dirname $(readlink -f $(/usr/bin/which java)))))}
 
-./.travis-build-without-test.sh
+export AFU=`readlink -f ${AFU:-../annotation-tools/annotation-file-utilities}`
+export CHECKERFRAMEWORK=`readlink -f ${CHECKERFRAMEWORK:-../checker-framework}`
 
-set -e
+export PATH=$AFU/scripts:$JAVA_HOME/bin:$PATH
+ant compile
+
+git -C /tmp/plume-scripts pull > /dev/null 2>&1 \
+  || git -C /tmp clone --depth 1 -q https://github.com/plume-lib/plume-scripts.git
+SLUGOWNER=`/tmp/plume-scripts/git-organization typetools`
 
 if [[ "${GROUP}" == "test" || "${GROUP}" == "all" ]]; then
   ant test
