@@ -29,18 +29,13 @@ set -o xtrace
 
 export SHELLOPTS
 
-SLUGOWNER=${TRAVIS_PULL_REQUEST_SLUG%/*}
-if [[ "$SLUGOWNER" == "" ]]; then
-  SLUGOWNER=${TRAVIS_REPO_SLUG%/*}
-fi
-if [[ "$SLUGOWNER" == "" ]]; then
-  SLUGOWNER=typetools
-fi
-echo SLUGOWNER=$SLUGOWNER
-
 ./.travis-build-without-test.sh
 
 set -e
+
+git -C /tmp/plume-scripts pull > /dev/null 2>&1 \
+  || git -C /tmp clone --depth 1 -q https://github.com/plume-lib/plume-scripts.git
+SLUGOWNER=`/tmp/plume-scripts/git-organization typetools`
 
 if [[ "${GROUP}" == "test" || "${GROUP}" == "all" ]]; then
   ant test
