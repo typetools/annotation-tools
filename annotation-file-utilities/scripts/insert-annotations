@@ -4,8 +4,9 @@
 # For usage information, run: insert-annotations --help
 # See the Annotation File Utilities documentation for more information.
 
-# If the very first argument is "--debug-script", debug this script (but
-# don't pass --debug-script to the underlying program).
+# A few options are consumed by this script rather than being passed to the
+# underlying Java program.  They must be the first command-line arguments
+# provided.
 DEBUG=0
 CLASSPATH=${CLASSPATH}
 while [ "$#" -gt 0 ]; do
