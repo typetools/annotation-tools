@@ -129,14 +129,14 @@ public class AnnotationVerifier {
       this.name = name;
       this.signature = signature;
 
-      fieldRecorders = new HashMap<String, ClassRecorder>();
-      methodRecorders = new HashMap<String, ClassRecorder>();
+      fieldRecorders = new HashMap<>();
+      methodRecorders = new HashMap<>();
 
-      anns = new HashMap<String, AnnotationRecorder>();
-      xanns = new HashMap<String, AnnotationRecorder>();
+      anns = new HashMap<>();
+      xanns = new HashMap<>();
 
       danns = new HashSet<AnnotationRecorder>();
-      panns = new HashMap<ParameterDescription, AnnotationRecorder>();
+      panns = new HashMap<>();
     }
 
     public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
@@ -276,7 +276,7 @@ public class AnnotationVerifier {
     public void prettyPrint(StringBuilder sb, String indent) {
 
       // avoid boilerplate of adding indent and lineSep every time
-      List<String> lines = new ArrayList<String>();
+      List<String> lines = new ArrayList<>();
 
       lines.add("description: " + description);
       lines.add("  name: " + name);
@@ -356,10 +356,10 @@ public class AnnotationVerifier {
 
       innerAnnotationArgsName = new ArrayList<String>();
       innerAnnotationArgsDesc = new ArrayList<String>();
-      innerAnnotationMap = new HashMap<String, AnnotationRecorder>();
+      innerAnnotationMap = new HashMap<>();
 
       arrayArgs = new ArrayList<String>();
-      arrayMap = new HashMap<String, AnnotationRecorder>();
+      arrayMap = new HashMap<>();
 
       xIndexArgs = new ArrayList<Integer>();
       xLengthArgs = new ArrayList<Integer>();

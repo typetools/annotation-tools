@@ -103,7 +103,7 @@ public class IndexFileMerger {
       if (!byDir) {
 /*
         // collect defs
-        Map<String, String> annoPkgs = new HashMap<String, String>();
+        Map<String, String> annoPkgs = new HashMap<>();
         try {
           new DefCollector(scene) {
             @Override
@@ -126,7 +126,7 @@ public class IndexFileMerger {
           // final String classname = entry.getKey();
 
           entry.getValue().accept(new ElementVisitor<Void, Void>() {
-            // Map<String, String> annoPkgs = new HashMap<String, String>();
+            // Map<String, String> annoPkgs = new HashMap<>();
 
             // Void process(AElement el) {
             //  for (Annotation anno : el.tlAnnotationsHere) {

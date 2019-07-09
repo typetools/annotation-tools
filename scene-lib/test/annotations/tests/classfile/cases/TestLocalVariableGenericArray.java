@@ -27,14 +27,14 @@ public class TestLocalVariableGenericArray {
   }
 
   public void someMethod() {
-    Set<String> s = new HashSet<String>();
+    Set<String> s = new HashSet<>();
     s.add(new String());
     s.add(s.toString());
   }
 
   public int someMethod2(int i) {
-    Set<Boolean> s = new HashSet<Boolean>();
-    Set<Integer> ints = new HashSet<Integer>();
+    Set<Boolean> s = new HashSet<>();
+    Set<Integer> ints = new HashSet<>();
     boolean b = someMethod3();
     if (s.iterator().next() & b) {
       return b ? i : ints.iterator().next();
@@ -43,10 +43,10 @@ public class TestLocalVariableGenericArray {
   }
 
   public boolean someMethod3() {
-    Map<String, Set<String>> t = new HashMap<String, Set<String>>();
+    Map<String, Set<String>> t = new HashMap<>();
     Map<String, Set<Map<Integer, String[][]>>> s = null;
 
-    s.get("3").add(new HashMap<Integer, String[][]>());
+    s.get("3").add(new HashMap<>());
 
     s.get("4").iterator().next().get(3)[2][4] = "Hello";
 
@@ -55,7 +55,7 @@ public class TestLocalVariableGenericArray {
 
   protected void someMethod4() {
     try {
-      Set<String> s = new HashSet<String>();
+      Set<String> s = new HashSet<>();
       Map<Set<String>, String> m;
       throw new RuntimeException("Hello");
     } catch (Exception e) {

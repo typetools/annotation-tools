@@ -556,13 +556,13 @@ public class Main {
     // The insertions specified by the annotation files.
     Insertions insertions = new Insertions();
     // The Java files into which to insert.
-    List<String> javafiles = new ArrayList<String>();
+    List<String> javafiles = new ArrayList<>();
 
     // Indices to maintain insertion source traces.
     Map<String, Multimap<Insertion, Annotation>> insertionIndex =
-        new HashMap<String, Multimap<Insertion, Annotation>>();
-    Map<Insertion, String> insertionOrigins = new HashMap<Insertion, String>();
-    Map<String, AScene> scenes = new HashMap<String, AScene>();
+        new HashMap<>();
+    Map<Insertion, String> insertionOrigins = new HashMap<>();
+    Map<String, AScene> scenes = new HashMap<>();
 
     // maintain imports info for annotations field
     // Key: fully-qualified annotation name. e.g. "com.foo.Bar" for annotation @com.foo.Bar(x).
@@ -700,7 +700,7 @@ public class Main {
       }
 
       // Imports required to resolve annotations (when abbreviate==true).
-      LinkedHashSet<String> imports = new LinkedHashSet<String>();
+      LinkedHashSet<String> imports = new LinkedHashSet<>();
       int num_insertions = 0;
       String pkg = "";
 
@@ -773,8 +773,8 @@ public class Main {
           boolean receiverInserted = false;
           boolean newInserted = false;
           boolean constructorInserted = false;
-          Set<String> seen = new TreeSet<String>();
-          List<Insertion> toInsertList = new ArrayList<Insertion>(positions.get(pair));
+          Set<String> seen = new TreeSet<>();
+          List<Insertion> toInsertList = new ArrayList<>(positions.get(pair));
           Collections.reverse(toInsertList);
           dbug.debug("insertion pos: %d%n", pair.a);
           assert pair.a >= 0
@@ -857,9 +857,10 @@ public class Main {
             }
             seen.add(toInsert);
 
-            // If it's already there, don't re-insert.  This is a hack!
+            // If it's an annotation and already there, don't re-insert.  This is a hack!
             // Also, I think this is already checked when constructing the
             // insertions.
+            if (toInsert.startsWith("@")) {
             int precedingTextPos = pos-toInsert.length()-1;
             if (precedingTextPos >= 0) {
               String precedingTextPlusChar
@@ -874,6 +875,24 @@ public class Main {
                 dbug.debug("Already present, skipping%n");
                 continue;
               }
+            }
+            int followingTextEndPos = pos+toInsert.length();
+            if (followingTextEndPos < src.getString().length()) {
+              String followingText
+                  = src.getString().substring(pos, followingTextEndPos);
+              dbug.debug("followingText=\"%s\"%n", followingText);
+              dbug.debug("toInsert=\"%s\"%n", toInsert);
+              // toInsertNoWs does not contain the trailing whitespace.
+              String toInsertNoWs = toInsert.substring(0, toInsert.length()-1);
+              if (followingText.equals(toInsert)
+                  || (followingText.substring(0, followingText.length()-1)
+                      .equals(toInsertNoWs)
+                      // Untested.  Is there an off-by-one error here?
+                      && Character.isWhitespace(src.getString().charAt(followingTextEndPos)))) {
+                dbug.debug("Already present, skipping %s%n", toInsertNoWs);
+                continue;
+              }
+            }
             }
 
             // TODO: Neither the above hack nor this check should be
@@ -890,7 +909,7 @@ public class Main {
             }
             dbug.debug("Post-insertion source: %n" + src.getString());
 
-            Set<String> packageNames = iToInsert.getPackageNames();
+            Collection<String> packageNames = nonJavaLangClasses(iToInsert.getPackageNames());
             if (!packageNames.isEmpty()) {
               dbug.debug("Need import %s%n  due to insertion %s%n",
                   packageNames, toInsert);
@@ -937,7 +956,7 @@ public class Main {
         int importIndex = 0;      // default: beginning of file
         String srcString = src.getString();
         Matcher m = importPattern.matcher(srcString);
-        Set<String> inSource = new TreeSet<String>();
+        Set<String> inSource = new TreeSet<>();
         if (m.find()) {
           importIndex = m.start();
           do {
@@ -1004,6 +1023,33 @@ public class Main {
         System.exit(1);
       }
     }
+  }
+
+  /** A regular expression for classes in the java.lang package. */
+  private static Pattern javaLangClassPattern = Pattern.compile("^java.lang.[A-Za-z0-9_]+$");
+
+  /**
+   * Return true iff the class is a top-level class in the java.lang package.
+   * @returns true iff the class is a top-level class in the java.lang package
+   */
+  private static boolean isJavaLangClass(String classname) {
+    Matcher m = javaLangClassPattern.matcher(classname);
+    return m.matches();
+  }
+
+  /**
+   * Filters out classes in the java.lang package from the given collection.
+   * @param a collection of class names
+   * @return the class names that are not in the java.lang package
+   */
+  private static Collection<String> nonJavaLangClasses(Collection<String> classnames) {
+    // Don't side-effect the argument
+    List<String> result = new ArrayList<>();
+    for (String classname : classnames) {
+      if (! isJavaLangClass(classname)) {
+        result.add(classname);
+      }
+    } return result;
   }
 
   /** Return the representation of the leaf of the path. */

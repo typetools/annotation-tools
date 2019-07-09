@@ -44,7 +44,7 @@ public final class AClass extends ADeclaration {
     private final String className;
 
     // debug fields to keep track of all classes created
-    // private static List<AClass> debugAllClasses = new ArrayList<AClass>();
+    // private static List<AClass> debugAllClasses = new ArrayList<>();
     // private final List<AClass> allClasses;
 
     AClass(String className) {
@@ -171,8 +171,7 @@ public final class AClass extends ADeclaration {
     // Static methods
 
     private static VivifyingMap<String, AMethod> createMethodMap() {
-        return new VivifyingMap<String, AMethod>(
-                new LinkedHashMap<String, AMethod>()) {
+        return new VivifyingMap<String, AMethod>(new LinkedHashMap<>()) {
             @Override
             public  AMethod createValueFor(String k) {
                 return new AMethod(k);
@@ -186,8 +185,7 @@ public final class AClass extends ADeclaration {
     }
 
     private static VivifyingMap<Integer, ABlock> createInitBlockMap() {
-        return new VivifyingMap<Integer, ABlock>(
-                new LinkedHashMap<Integer, ABlock>()) {
+        return new VivifyingMap<Integer, ABlock>(new LinkedHashMap<>()) {
             @Override
             public  ABlock createValueFor(Integer k) {
                 return new ABlock(k);
@@ -201,8 +199,7 @@ public final class AClass extends ADeclaration {
     }
 
     private static VivifyingMap<String, AExpression> createFieldInitMap() {
-        return new VivifyingMap<String, AExpression>(
-                new LinkedHashMap<String, AExpression>()) {
+        return new VivifyingMap<String, AExpression>(new LinkedHashMap<>()) {
             @Override
             public  AExpression createValueFor(String k) {
                 return new AExpression(k);

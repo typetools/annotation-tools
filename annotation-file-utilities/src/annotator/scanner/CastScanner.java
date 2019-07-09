@@ -63,7 +63,7 @@ public class CastScanner extends CommonScanner {
   // Map from name of a method a list of bytecode offsets of all
   // casts in that method.
   private static Map<String,List<Integer>> methodNameToCastOffsets =
-    new HashMap<String, List<Integer>>();
+    new HashMap<>();
 
 
   /**

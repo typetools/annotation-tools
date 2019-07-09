@@ -31,6 +31,8 @@ import scenelib.annotations.*;
 import scenelib.annotations.el.*;
 import scenelib.annotations.field.*;
 
+import org.checkerframework.checker.signature.qual.ClassGetName;
+
 /**
  * A ClassAnnotationSceneWriter is a {@link org.objectweb.asmx.ClassVisitor}
  * that can be used to write a class file that is the combination of an
@@ -322,8 +324,13 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
 
   /**
    * Unwraps the class name from the given class descriptor.
+   *
+   * @param descriptor class name in JVML format
+   * @return the class name in ClassGetName format
    */
-  private static String classDescToName(String descriptor) {
+  // TODO Can/should this use a method in reflection-util instead?
+  @SuppressWarnings("signature")  // TODO unverified, but clients use it as a ClassGetName
+  private static @ClassGetName String classDescToName(String descriptor) {
     return descriptor.substring(1, descriptor.length() - 1).replace('/', '.');
   }
 

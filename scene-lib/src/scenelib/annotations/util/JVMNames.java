@@ -10,7 +10,7 @@ import com.sun.tools.javac.tree.JCTree.JCMethodDecl;
 import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
 import com.sun.tools.javac.util.List;
 
-import org.plumelib.bcelutil.JvmUtil;
+import org.plumelib.signature.Signatures;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
@@ -94,13 +94,14 @@ public class JVMNames {
 
     /**
      * Create a JVML string for a type.
-     * Uses {@link JvmUtil#binaryNameToFieldDescriptor(String)}
+     * Uses {@link Signatures#binaryNameToFieldDescriptor(String)}
      *
      * Array strings are built by recursively converting the component type.
      *
      * @param type the Type to convert to JVML
      * @return the JVML representation of type
      */
+    @SuppressWarnings("signature") // com.sun.tools.javac.code is not yet annotated
     public static String typeToJvmlString(Type type) {
         if (type.getKind() == TypeKind.ARRAY) {
             return "[" + typeToJvmlString((Type) ((ArrayType) type).getComponentType());
@@ -110,7 +111,7 @@ public class JVMNames {
         } else if (type.getKind() == TypeKind.VOID) {
             return "V";  // special case since UtilPlume doesn't handle void
         } else {
-            return JvmUtil.binaryNameToFieldDescriptor(type.tsym.flatName().toString());
+            return Signatures.binaryNameToFieldDescriptor(type.tsym.flatName().toString());
         }
     }
 
@@ -126,6 +127,7 @@ public class JVMNames {
         return builder.toString();
     }
 
+    @SuppressWarnings("signature") // com.sun.source.tree.Tree is not yet annotated
     private static void treeToJVMLString(Tree typeTree, StringBuilder builder) {
         // FIXME: not robust in presence of comments
         switch (typeTree.getKind()) {
@@ -136,13 +138,13 @@ public class JVMNames {
         default:
             String str = typeTree.toString();
             builder.append("void".equals(str) ? "V"
-                : JvmUtil.binaryNameToFieldDescriptor(typeTree.toString()));
+                : Signatures.binaryNameToFieldDescriptor(typeTree.toString()));
             break;
         }
     }
 
     public static String jvmlStringToJavaTypeString(String str) {
         return str.equals("V") ? "void"
-                : JvmUtil.fieldDescriptorToBinaryName(str);
+                : Signatures.fieldDescriptorToBinaryName(str);
     }
 }

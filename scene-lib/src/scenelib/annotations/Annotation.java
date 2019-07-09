@@ -7,10 +7,16 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import scenelib.annotations.el.AnnotationDef;
 import scenelib.annotations.field.AnnotationFieldType;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
-import java.lang.reflect.*;
-
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 /**
  * A very simple annotation representation constructed with a map of field names
@@ -101,12 +107,15 @@ public final class Annotation {
             Map<String, ? extends Object> fields) {
         this.def = def;
         this.fieldValues = Collections.unmodifiableMap(
-                new LinkedHashMap<String, Object>(fields));
+                new LinkedHashMap<>(fields));
         checkRep();
     }
 
     /**
-     * Use adefs to look up (or insert into it) missing AnnotationDefs.
+     * Construct an Annotation for the given java.lang.annotation.Annotation.
+     *
+     * @param ja the java.lang.annotation.Annotation to make an Annotation for
+     * @param adefs a cache from which to look up (or insert into) AnnotationDefs
      */
     public Annotation(java.lang.annotation.Annotation ja, Map<String, AnnotationDef> adefs) {
         Class<? extends java.lang.annotation.Annotation> jaType = ja.annotationType();
@@ -117,7 +126,7 @@ public final class Annotation {
             def = AnnotationDef.fromClass(jaType, adefs);
             adefs.put(name, def);
         }
-        fieldValues = new LinkedHashMap<String,Object>();
+        fieldValues = new LinkedHashMap<>();
         try {
             for (String fieldname : def.fieldTypes.keySet()) {
                 AnnotationFieldType aft = def.fieldTypes.get(fieldname);
@@ -133,7 +142,7 @@ public final class Annotation {
                         val = vall;
                     } else if (val instanceof Object[]) {
                         Object[] vala = (Object[]) val;
-                        List<Object> vall = new ArrayList<Object>(vala.length);
+                        List<Object> vall = new ArrayList<>(vala.length);
                         for (Object elt : vala) {
                             vall.add(elt.toString());
                         }
