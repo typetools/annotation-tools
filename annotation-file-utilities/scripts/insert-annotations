@@ -7,10 +7,24 @@
 # If the very first argument is "--debug-script", debug this script (but
 # don't pass --debug-script to the underlying program).
 DEBUG=0
-if [ "$1" = "--debug-script" ]; then
-  DEBUG=1
-  shift 1
-fi
+CLASSPATH=${CLASSPATH}
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --debug-script)
+      # Debug this script
+      DEBUG=1
+      shift
+      ;;
+    -cp|-classpath)
+      # Set the classpath
+      CLASSPATH=$2
+      shift 2
+      ;;
+    *)
+      break
+      ;;
+  esac
+done
 
 AFU=${AFU:-$(dirname $0)/..}
 ANNOTATION_FILE_UTILS=${AFU}/bin:${AFU}/../scene-lib/bin:${AFU}/../asmx/bin:${AFU}/annotation-file-utilities-all.jar
