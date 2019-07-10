@@ -14,15 +14,9 @@ export CHECKERFRAMEWORK=`readlink -f ${CHECKERFRAMEWORK:-../checker-framework}`
 
 export PATH=$AFU/scripts:$JAVA_HOME/bin:$PATH
 
-
-SLUGOWNER=${TRAVIS_PULL_REQUEST_SLUG%/*}
-if [[ "$SLUGOWNER" == "" ]]; then
-  SLUGOWNER=${TRAVIS_REPO_SLUG%/*}
-fi
-if [[ "$SLUGOWNER" == "" ]]; then
-  SLUGOWNER=typetools
-fi
-echo SLUGOWNER=$SLUGOWNER
+git -C /tmp/plume-scripts pull > /dev/null 2>&1 \
+    || git -C /tmp clone --depth 1 -q https://github.com/plume-lib/plume-scripts.git
+eval `ci-info`
 
 set -e
 
