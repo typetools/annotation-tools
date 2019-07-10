@@ -256,7 +256,9 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
         printClasspath();
         if (annoTypeName.contains("+")) {
           return Annotations.createValueAnnotationDef(annoTypeName,
-              Annotations.noAnnotations, BasicAFT.forType(int.class));
+              Annotations.noAnnotations, BasicAFT.forType(int.class),
+                                                      String.format("Could not find class %s: %s",
+                                                                    jvmlClassName, e.getMessage()));
         }
         throw new Error(e);
       }
@@ -284,7 +286,11 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
       if (descriptor != dummyDesc) {    // interned
         AnnotationDef ad = getAnnotationDef(descriptor);
 
-        AnnotationBuilder ab = AnnotationFactory.saf.beginAnnotation(ad);
+        AnnotationBuilder ab = AnnotationFactory.saf.beginAnnotation(ad,
+                                                                     // This method is not in ASMX
+                                                                     // "ClassReader " + cr.getClassName()
+                                                                     "TODO: ClassAnnotationSceneReader"
+                                                                     );
         if (ab == null) {
           throw new IllegalArgumentException("bad description: " + descriptor);
         } else {

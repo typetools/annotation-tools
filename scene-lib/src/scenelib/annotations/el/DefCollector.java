@@ -69,7 +69,7 @@ public abstract class DefCollector {
         } else {
             AnnotationDef ud = AnnotationDef.unify(oldD, d);
             if (ud == null) {
-                throw new DefException(d.name);
+                throw new DefException(d.name, oldD, d);
             }
             defs.remove(oldD);
             defs.add(ud);

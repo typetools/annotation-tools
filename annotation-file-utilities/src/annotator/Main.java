@@ -501,6 +501,7 @@ public class Main {
   /**
    * Runs the annotator, parsing the source and spec files and applying
    * the annotations.
+   * @param args .jaif files and/or .java files and/or @arg-files, in any order
    */
   public static void main(String[] args) throws IOException {
 
@@ -1052,7 +1053,11 @@ public class Main {
     } return result;
   }
 
-  /** Return the representation of the leaf of the path. */
+  /** Return the representation of the leaf of the path.
+   *
+   * @param path a path whose leaf to format
+   * @return the representation of the leaf of the path
+   */
   public static String leafString(TreePath path) {
     if (path == null) {
       return "null";
@@ -1060,16 +1065,27 @@ public class Main {
     return treeToString(path.getLeaf());
   }
 
-  /** Return the first non-empty line of the tree's printed representation. */
+  /** Return the first 80 characters of the tree's printed representation, on one line.
+   *
+   * @param node a tree to format with truncation
+   * @return  the first 80 characters of the tree's printed representation, on one line
+   */
   public static String treeToString(Tree node) {
     String asString = node.toString();
-    String oneLine = firstLine(asString);
-    return "\"" + oneLine + "\"";
+    String oneLine = first80(asString);
+    if (oneLine.endsWith(" ")) {
+      oneLine = oneLine.substring(0, oneLine.length() - 1);
+    }
+    // return "\"" + oneLine + "\"";
+    return oneLine;
   }
 
   /**
    * Return the first non-empty line of the string, adding an ellipsis
    * (...) if the string was truncated.
+   *
+   * @param s a string to truncate
+   * @return the first non-empty line of the argument
    */
   public static String firstLine(String s) {
     while (s.startsWith("\n")) {
@@ -1084,8 +1100,41 @@ public class Main {
   }
 
   /**
+   * Return the first 80 characters of the string, adding an ellipsis
+   * (...) if the string was truncated.
+   *
+   * @param s a string to truncate
+   * @return the first 80 characters of the string
+   */
+  public static String first80(String s) {
+    StringBuilder sb = new StringBuilder();
+    int i = 0;
+    while (i < s.length() && Character.isWhitespace(s.charAt(i))) {
+      i++;
+    }
+    while (i < s.length() && sb.length() < 80) {
+      if (s.charAt(i) == '\n') {
+        i++;
+        while (i < s.length() && Character.isWhitespace(s.charAt(i))) {
+          i++;
+        }
+        sb.append(' ');
+      }
+      if (i < s.length()) {
+        sb.append(s.charAt(i));
+      }
+      i++;
+    }
+    if (i < s.length()) {
+      sb.append("...");
+    }
+    return sb.toString();
+  }
+
+  /**
    * Separates the annotation class from its arguments.
    *
+   * @param s the string representation of an annotation
    * @return given <code>@foo(bar)</code> it returns the pair <code>{ @foo, (bar) }</code>.
    */
   public static Pair<String,String> removeArgs(String s) {

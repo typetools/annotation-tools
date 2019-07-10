@@ -271,12 +271,12 @@ public final class JavapParser {
         while (inData()) {
             String annoTypeName = parseAnnotationHead();
             RetentionPolicy retention = sec.retention;
-            AnnotationBuilder ab = AnnotationFactory.saf.beginAnnotation(annoTypeName, Annotations.getRetentionPolicyMetaAnnotationSet(retention));
+            AnnotationBuilder ab = AnnotationFactory.saf.beginAnnotation(annoTypeName, Annotations.getRetentionPolicyMetaAnnotationSet(retention), "JavapParser");
             if (ab == null) {
                 // don't care about the result
                 // but need to skip over it anyway
                 parseAnnotationBody(
-                        AnnotationFactory.saf.beginAnnotation(annoTypeName, Annotations.noAnnotations),
+                    AnnotationFactory.saf.beginAnnotation(annoTypeName, Annotations.noAnnotations, "JavapParser"),
                         SECTION_DATA_PREFIX);
             } else {
                 // Wrap it in a TLA with the appropriate retention policy

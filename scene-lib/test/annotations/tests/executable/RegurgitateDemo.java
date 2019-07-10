@@ -14,7 +14,7 @@ public class RegurgitateDemo {
         @NonNull AScene scene = new AScene();
         try {
             LineNumberReader in = new LineNumberReader(new FileReader("test2-2.jaif"));
-            IndexFileParser.parse(in, scene);
+            IndexFileParser.parse(in, "test2-2.jaif", scene);
 
             System.out.println("regurgitating:");
             IndexFileWriter.write(scene, new FileWriter("test2-3.jaif"));

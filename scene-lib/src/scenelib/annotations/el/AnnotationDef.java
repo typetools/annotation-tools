@@ -33,26 +33,27 @@ public final class AnnotationDef extends AElement {
 
     /**
      * A map of the names of this annotation type's fields to their types. Since
-     * {@link AnnotationDef}s are immutable, attempting to modify this
-     * map will result in an exception.
+     * {@link AnnotationDef}s are immutable, clients should not modify this
+     * map, and doing so will result in an exception.
      */
     public Map<String, AnnotationFieldType> fieldTypes;
+
+    /** Where the annotation definition came from, such as a file name. */
+    public String source;
 
     /**
      * Constructs an annotation definition with the given name.
      * You MUST call setFieldTypes afterward, even if with an empty map.  (Yuck.)
      *
      * @param name the binary name of the annotation type
+     * @param source where the annotation came from, such as a filename
      */
-    public AnnotationDef(String name) {
+    public AnnotationDef(String name, String source) {
         super("annotation: " + name);
         assert name != null;
+        assert source != null;
         this.name = name;
-    }
-
-    @Override
-    public AnnotationDef clone() {
-        throw new UnsupportedOperationException("can't duplicate AnnotationDefs");
+        this.source = source;
     }
 
     // Problem:  I am not sure how to handle circularities (annotations meta-annotated with themselves)
@@ -91,7 +92,7 @@ public final class AnnotationDef extends AElement {
             fieldTypes.put(m.getName(), aft);
         }
 
-        AnnotationDef result = new AnnotationDef(name, Annotations.noAnnotations, fieldTypes);
+        AnnotationDef result = new AnnotationDef(name, Annotations.noAnnotations, fieldTypes, "class " + annoType);
         adefs.put(name, result);
 
         // An annotation can be meta-annotated with itself, so add
@@ -110,10 +111,12 @@ public final class AnnotationDef extends AElement {
         return result;
     }
 
-    public AnnotationDef(String name, Set<Annotation> tlAnnotationsHere) {
+    public AnnotationDef(String name, Set<Annotation> tlAnnotationsHere, String source) {
         super("annotation: " + name);
         assert name != null;
+        assert source != null;
         this.name = name;
+        this.source = source;
         if (tlAnnotationsHere != null) {
             this.tlAnnotationsHere.addAll(tlAnnotationsHere);
         }
@@ -126,10 +129,17 @@ public final class AnnotationDef extends AElement {
      *
      * @param name the fully-qualified type name of the annotation
      * @param fieldTypes the annotation's element types
+     * @param source where the annotation came from, such as a filename
      */
-    public AnnotationDef(String name, Set<Annotation> tlAnnotationsHere, Map<String, ? extends AnnotationFieldType> fieldTypes) {
-        this(name, tlAnnotationsHere);
+    public AnnotationDef(String name, Set<Annotation> tlAnnotationsHere, Map<String, ? extends AnnotationFieldType> fieldTypes, String source) {
+        this(name, tlAnnotationsHere, source);
         setFieldTypes(fieldTypes);
+    }
+
+    // This ovverride is necessary because AnnotationDef extends AElement, which implements Cloneable.
+    @Override
+    public AnnotationDef clone() {
+        throw new UnsupportedOperationException("Can't duplicate an AnnotationDef");
     }
 
     /**
@@ -168,18 +178,55 @@ public final class AnnotationDef extends AElement {
     }
 
     /**
-     * True if this is a type annotation (was meta-annotated
-     * with @Target(ElementType.TYPE_USE) or @TypeQualifier).
+     * Returns the contents of the java.lang.annotation.Target meta-annotation,
+     * or null if there is none.
+     *
+     * @return the contents of the @Target meta-annotation, or null
+     */
+    public List<String> targets() {
+        Annotation target = target();
+        return (target == null) ? null : (List<String>) target.getFieldValue("value");
+    }
+
+    /**
+     * Returns the java.lang.annotation.Target meta-annotation,
+     * or null if there is none.
+     *
+     * @return the @Target meta-annotation, or null
+     */
+    public Annotation target() {
+        for (Annotation anno : tlAnnotationsHere) {
+            if (anno.def().equals(Annotations.adTarget)) {
+                return anno;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * True if this is valid in type annotation locations.
+     * It was meta-annotated with @Target({ElementType.TYPE_USE, ...}).
      *
      * @return true iff this is a type annotation
      */
     public boolean isTypeAnnotation() {
-        // TODO: It's enough to have @Target that includes TYPE_USE; the
-        // entire argument to @Target doesn't have to be exactly TYPE_USE.
-        return (tlAnnotationsHere.contains(Annotations.aTargetTypeUse)
-                || tlAnnotationsHere.contains(Annotations.aTypeQualifier));
+        List<String> targets = targets();
+        return targets != null && targets.contains("TYPE_USE");
     }
 
+    /**
+     * True if this is a type annotation but not a declaration annotation.
+     * It was meta-annotated
+     * with @Target(ElementType.TYPE_USE)
+     * or @Target({ElementType.TYPE_USE, ElementType.TYPE})
+     * or @Target({ElementType.TYPE, ElementType.TYPE_USE}).
+     *
+     * @return true iff this is valid only in type annotation locations
+     */
+    public boolean isOnlyTypeAnnotation() {
+        boolean result = Annotations.onlyTypeAnnotationTargets.contains(target());
+        return result;
+    }
 
     /**
      * This {@link AnnotationDef} equals <code>o</code> if and only if
@@ -233,6 +280,9 @@ public final class AnnotationDef extends AElement {
      * {@linkplain AnnotationFieldType#unify unifies the field types}
      * to handle arrays of unknown element type, which can arise via
      * {@link AnnotationBuilder#addEmptyArrayField}.
+     * <p>
+     *
+     * As a special case, if one annotation has no elements, the other one's elements are used.
      *
      * @param def1 the first AnnotationDef to unify
      * @param def2 the second AnnotationDef to unify
@@ -240,33 +290,33 @@ public final class AnnotationDef extends AElement {
      */
     public static AnnotationDef unify(AnnotationDef def1,
             AnnotationDef def2) {
-        // if (def1.name.equals(def2.name)
-        //     && def1.fieldTypes.keySet().equals(def2.fieldTypes.keySet())
-        //     && ! def1.equalsElement(def2)) {
-        //     throw new Error(String.format("Unifiable except for meta-annotations:%n  %s%n  %s%n",
-        //                                   def1, def2));
-        // }
+        // System.out.printf("unify(%s, %s)%n", def1, def2);
         if (def1.equals(def2)) {
             return def1;
         } else if (def1.name.equals(def2.name)
-                 && def1.equalsElement(def2)
-                 && def1.fieldTypes.keySet().equals(def2.fieldTypes.keySet())) {
-            Map<String, AnnotationFieldType> newFieldTypes
-                = new LinkedHashMap<>();
-            for (String fieldName : def1.fieldTypes.keySet()) {
-                AnnotationFieldType aft1 = def1.fieldTypes.get(fieldName);
-                AnnotationFieldType aft2 = def2.fieldTypes.get(fieldName);
-                AnnotationFieldType uaft = AnnotationFieldType.unify(aft1, aft2);
-                if (uaft == null) {
-                    return null;
-                } else {
-                    newFieldTypes.put(fieldName, uaft);
+                   && def1.equalsElement(def2)) {
+            Set<String> ks1 = def1.fieldTypes.keySet();
+            Set<String> ks2 = def2.fieldTypes.keySet();
+            if (ks1.isEmpty() || ks2.isEmpty() || ks1.equals(ks2)) {
+                Map<String, AnnotationFieldType> newFieldTypes
+                        = new LinkedHashMap<>();
+                for (String fieldName : def1.fieldTypes.keySet()) {
+                    AnnotationFieldType aft1 = def1.fieldTypes.get(fieldName);
+                    AnnotationFieldType aft2 = def2.fieldTypes.get(fieldName);
+                    AnnotationFieldType uaft = aft1 == null ? aft2
+                                               : aft2 == null ? aft1
+                                               : AnnotationFieldType.unify(aft1, aft2);
+                    if (uaft == null) {
+                        return null;
+                    } else {
+                        newFieldTypes.put(fieldName, uaft);
+                    }
                 }
+                return new AnnotationDef(def1.name, def1.tlAnnotationsHere, newFieldTypes,
+                                         String.format("unify(%s, %s)", def1.source, def2.source));
             }
-            return new AnnotationDef(def1.name, def1.tlAnnotationsHere, newFieldTypes);
-        } else {
-            return null;
         }
+        return null;
     }
 
     @Override
@@ -305,7 +355,6 @@ public final class AnnotationDef extends AElement {
     }
 
     public static void printClasspath() {
-        System.out.println();
         System.out.println("Classpath:");
         StringTokenizer tokenizer =
             new StringTokenizer(System.getProperty("java.class.path"), File.pathSeparator);
