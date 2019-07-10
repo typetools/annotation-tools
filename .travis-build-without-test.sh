@@ -14,12 +14,6 @@ export CHECKERFRAMEWORK=`readlink -f ${CHECKERFRAMEWORK:-../checker-framework}`
 
 export PATH=$AFU/scripts:$JAVA_HOME/bin:$PATH
 
-git -C /tmp/plume-scripts pull > /dev/null 2>&1 \
-    || git -C /tmp clone --depth 1 -q https://github.com/plume-lib/plume-scripts.git
-eval `/tmp/plume-scripts/ci-info typetools`
-
-set -e
-
 ## Compile
 echo "About to run \"ant compile\" for annotation-tools" in `pwd`
 which ant
