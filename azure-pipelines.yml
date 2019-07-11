@@ -6,7 +6,7 @@ jobs:
   steps:
   - checkout: self
     fetchDepth: 25
-  - bash: ./checker/bin-devel/test-ant-test.sh
+  - bash: ./annotation-file-utilities/dev-scripts/test-ant-test.sh
     displayName: test-ant-test.sh
 - job: typecheck_jdk8
   pool:
@@ -15,7 +15,7 @@ jobs:
   steps:
   - checkout: self
     fetchDepth: 25
-  - bash: ./checker/bin-devel/test-typecheck.sh
+  - bash: ./annotation-file-utilities/dev-scripts/test-typecheck.sh
     displayName: test-typecheck.sh
 - job: misc_jdk8
   pool:
@@ -24,7 +24,7 @@ jobs:
   steps:
   - checkout: self
     fetchDepth: 25
-  - bash: ./checker/bin-devel/test-misc.sh
+  - bash: ./annotation-file-utilities/dev-scripts/test-misc.sh
     displayName: test-misc.sh
 - job: downstream_jdk8
   pool:
@@ -33,7 +33,7 @@ jobs:
   steps:
   - checkout: self
     fetchDepth: 25
-  - bash: ./checker/bin-devel/test-downstream.sh
+  - bash: ./annotation-file-utilities/dev-scripts/test-downstream.sh
     displayName: test-downstream.sh
 
 trigger:
