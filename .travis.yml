@@ -69,6 +69,7 @@ script:
      export JAVA_HOME=\`which javac|xargs readlink -f|xargs dirname|xargs dirname\` &&
      java -version &&
      javac -version &&
+     export TRAVIS=$TRAVIS &&
      export TRAVIS_REPO_SLUG=$TRAVIS_REPO_SLUG &&
      export TRAVIS_BUILD_DIR=$TRAVIS_BUILD_DIR &&
      export TRAVIS_COMMIT_RANGE=$TRAVIS_COMMIT_RANGE &&
