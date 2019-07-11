@@ -35,6 +35,7 @@ set -e
 
 git -C /tmp/plume-scripts pull > /dev/null 2>&1 \
   || git -C /tmp clone --depth 1 -q https://github.com/plume-lib/plume-scripts.git
+env | sort
 eval `/tmp/plume-scripts/ci-info typetools`
 
 if [[ "${GROUP}" == "test" || "${GROUP}" == "all" ]]; then
