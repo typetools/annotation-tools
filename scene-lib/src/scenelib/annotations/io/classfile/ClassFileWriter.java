@@ -125,10 +125,11 @@ public class ClassFileWriter {
       // into class file
       try {
         if (className.endsWith(".class")) {
+          String fileName = className;
           if (verbose) {
-            System.out.printf("Adding annotations to class file %s%n", className);
+            System.out.printf("Adding annotations to class file %s%n", fileName);
           }
-          insert(scene, className, true);
+          insert(scene, fileName, true);
         } else {
           String outputFileName = className + ".class";
           if (verbose) {

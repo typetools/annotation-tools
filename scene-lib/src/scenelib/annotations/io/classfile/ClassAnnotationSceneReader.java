@@ -260,7 +260,9 @@ extends EmptyVisitor {
         // This is an internal JDK annotation such as jdk.Profile+Annotation .
         if (annoTypeName.contains("+")) {
           return Annotations.createValueAnnotationDef(annoTypeName,
-              Annotations.noAnnotations, BasicAFT.forType(int.class));
+              Annotations.noAnnotations, BasicAFT.forType(int.class),
+                                                      String.format("Could not find class %s: %s",
+                                                                    jvmlClassName, e.getMessage()));
         }
         System.out.printf("Could not find class: %s%n", e.getMessage());
         printClasspath();
@@ -287,7 +289,11 @@ extends EmptyVisitor {
       if (descriptor != dummyDesc) {    // interned
         AnnotationDef ad = getAnnotationDef(descriptor);
 
-        AnnotationBuilder ab = AnnotationFactory.saf.beginAnnotation(ad);
+        AnnotationBuilder ab = AnnotationFactory.saf.beginAnnotation(ad,
+                                                                     // This method is not in ASMX
+                                                                     // "ClassReader " + cr.getClassName()
+                                                                     "TODO: ClassAnnotationSceneReader"
+                                                                     );
         if (ab == null) {
           throw new IllegalArgumentException("bad description: " + descriptor);
         } else {

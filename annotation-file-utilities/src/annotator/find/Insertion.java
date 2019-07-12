@@ -189,7 +189,9 @@ public abstract class Insertion {
     }
 
     /**
-     * Gets the set of annotation names that should always be qualified.
+     * Gets the set of annotation names that should always be inserted fully-qualified.
+     *
+     * @return the annotation names that should always be inserted fully-qualified
      */
     public static Set<String> getAlwaysQualify() {
         return alwaysQualify;
@@ -197,6 +199,8 @@ public abstract class Insertion {
 
     /**
      * Sets the set of annotation names that should always be qualified.
+     *
+     * @param set the annotation names that should always be inserted fully-qualified
      */
     public static void setAlwaysQualify(Set<String> set) {
         alwaysQualify = set;
@@ -240,6 +244,8 @@ public abstract class Insertion {
 
     /**
      * Gets the kind of this insertion.
+     *
+     * @return the kind of this insertion
      */
     public abstract Kind getKind();
 
@@ -405,7 +411,7 @@ public abstract class Insertion {
                 }
                 GenericArrayLocationCriterion c = innerInsertion.getCriteria().getGenericArrayLocation();
                 String annos =
-                    ((AnnotationInsertion) innerInsertion).getAnnotation();
+                    ((AnnotationInsertion) innerInsertion).getAnnotationText();
                 if (c == null) {
                     ASTPath astPath = innerInsertion.getCriteria().getASTPath();
                     if (outerPath != null && astPath != null) {

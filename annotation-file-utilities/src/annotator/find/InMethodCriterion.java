@@ -40,22 +40,28 @@ final class InMethodCriterion implements Criterion {
     Criteria.dbug.debug("InMethodCriterion.isSatisfiedBy(%s); this=%s%n",
         Main.leafString(path), this.toString());
 
-    // true if in a variable declaration.
+    // true if the argument is within a variable declaration's initializer expression.
     boolean inDecl = false;
     // Ignore the value if inDecl==false.  Otherwise:
     // true if in a static variable declaration, false if in a member variable declaration.
     boolean staticDecl = false;
+    TreePath childPath = null;
     do {
-      if (path.getLeaf().getKind() == Tree.Kind.METHOD) {
+      Tree leaf = path.getLeaf();
+      if (leaf.getKind() == Tree.Kind.METHOD) {
         boolean b = sigMethodCriterion.isSatisfiedBy(path);
-        Criteria.dbug.debug("%s%n", "InMethodCriterion.isSatisfiedBy => b");
+        Criteria.dbug.debug("InMethodCriterion.isSatisfiedBy => %s%n", b);
         return b;
       }
-      if (path.getLeaf().getKind() == Tree.Kind.VARIABLE) { // variable declaration
-        ModifiersTree mods = ((VariableTree) path.getLeaf()).getModifiers();
-        inDecl = true;
-        staticDecl = mods.getFlags().contains(Modifier.STATIC);
+      if (leaf.getKind() == Tree.Kind.VARIABLE) { // variable declaration
+        VariableTree varDecl = (VariableTree) leaf;
+        if (childPath != null && childPath.getLeaf() == varDecl.getInitializer()) {
+          inDecl = true;
+          ModifiersTree mods = varDecl.getModifiers();
+          staticDecl = mods.getFlags().contains(Modifier.STATIC);
+        }
       }
+      childPath = path;
       path = path.getParentPath();
     } while (path != null && path.getLeaf() != null);
 
