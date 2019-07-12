@@ -122,7 +122,7 @@ public class ClassFileWriter {
 
       // annotations loaded from index file into scene, now insert them
       // into class file
-      TypePath typePath = TypePath.fromString("");
+      TypePath typePath = null;
       try {
         if (className.endsWith(".class")) {
           System.out.printf("Adding annotations to class file %s%n", className);
@@ -205,7 +205,7 @@ public class ClassFileWriter {
     ClassReader classReader = new ClassReader(input);
 
     ClassAnnotationSceneWriter classAnnotationSceneWriter =
-        new ClassAnnotationSceneWriter(Opcodes.ASM7, classReader, scene, TypePath.fromString(""), overwrite);
+        new ClassAnnotationSceneWriter(Opcodes.ASM7, classReader, scene, null, overwrite);
 
     classReader.accept(classAnnotationSceneWriter, 0);
 
