@@ -125,12 +125,17 @@ public class ClassFileWriter {
       TypePath typePath = null;
       try {
         if (className.endsWith(".class")) {
-          System.out.printf("Adding annotations to class file %s%n", className);
-          insert(scene, typePath, className, true);
+          String fileName = className;
+          if (verbose) {
+            System.out.printf("Adding annotations to class file %s%n", fileName);
+          }
+          insert(scene, typePath, fileName, true);
         } else {
           String outputFileName = className + ".class";
-          System.out.printf("Reading class file %s; writing with annotations to %s%n",
-              className, outputFileName);
+          if (verbose) {
+            System.out.printf("Reading class file %s; writing with annotations to %s%n",
+                              className, outputFileName);
+          }
           insert(scene, typePath, className, outputFileName, true);
         }
       } catch (IOException e) {
