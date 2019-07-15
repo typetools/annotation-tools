@@ -122,21 +122,20 @@ public class ClassFileWriter {
 
       // annotations loaded from index file into scene, now insert them
       // into class file
-      TypePath typePath = null;
       try {
         if (className.endsWith(".class")) {
           String fileName = className;
           if (verbose) {
             System.out.printf("Adding annotations to class file %s%n", fileName);
           }
-          insert(scene, typePath, fileName, true);
+          insert(scene, fileName, true);
         } else {
           String outputFileName = className + ".class";
           if (verbose) {
             System.out.printf("Reading class file %s; writing with annotations to %s%n",
                               className, outputFileName);
           }
-          insert(scene, typePath, className, outputFileName, true);
+          insert(scene, className, outputFileName, true);
         }
       } catch (IOException e) {
         System.out.printf("IOException: %s%n", e.getMessage());
@@ -171,7 +170,7 @@ public class ClassFileWriter {
    * @throws IOException if there is a problem reading from or writing to
    *                     <code> fileName </code>
    */
-  public static void insert(AScene scene, TypePath typePath, String fileName, boolean overwrite) throws IOException {
+  public static void insert(AScene scene, String fileName, boolean overwrite) throws IOException {
     assert fileName.endsWith(".class");
 
     // can't just call other insert, because this closes the input stream
@@ -180,7 +179,7 @@ public class ClassFileWriter {
     in.close();
 
     ClassAnnotationSceneWriter classAnnotationSceneWriter =
-        new ClassAnnotationSceneWriter(Opcodes.ASM7, classReader, scene, typePath, overwrite);
+        new ClassAnnotationSceneWriter(Opcodes.ASM7, classReader, scene, null, overwrite);
     classReader.accept(classAnnotationSceneWriter, 0);
 
     OutputStream fos = new FileOutputStream(fileName);
@@ -206,7 +205,8 @@ public class ClassFileWriter {
    * @throws IOException if there is a problem reading from <code> in </code> or
    *                     writing to <code> out </code>
    */
-  public static void insert(AScene scene, InputStream input, OutputStream out, boolean overwrite) throws IOException {
+  public static void insert(AScene scene, InputStream input, OutputStream out, boolean overwrite)
+      throws IOException {
     ClassReader classReader = new ClassReader(input);
 
     ClassAnnotationSceneWriter classAnnotationSceneWriter =
@@ -234,12 +234,12 @@ public class ClassFileWriter {
    * @throws IOException if there is a problem reading from <code> in </code> or
    *                     writing to <code> out </code>
    */
-  public static void insert(AScene scene, TypePath typePath,
-      String className, String outputFileName, boolean overwrite) throws IOException {
+  public static void insert(AScene scene, String className, String outputFileName, boolean overwrite)
+      throws IOException {
     ClassReader classReader = new ClassReader(className);
 
     ClassAnnotationSceneWriter classAnnotationSceneWriter =
-        new ClassAnnotationSceneWriter(Opcodes.ASM7, classReader, scene, typePath, overwrite);
+        new ClassAnnotationSceneWriter(Opcodes.ASM7, classReader, scene, null, overwrite);
 
     classReader.accept(classAnnotationSceneWriter, 0);
 
