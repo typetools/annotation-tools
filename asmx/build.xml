@@ -128,6 +128,7 @@
       <classpath>
         <pathelement location="${out.tmp}"/>
         <pathelement location="${annotation-tools}/annotation-file-utilities/lib/compiler-2.4.0.jar"/>
+        <pathelement location="${env.JAVA_HOME}/lib/tools.jar"/>
       </classpath>
       <src path="${src}"/>
       <include name="**/*.java"/>

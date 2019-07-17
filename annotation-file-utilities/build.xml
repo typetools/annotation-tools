@@ -77,7 +77,7 @@
       <pathelement location="${annotation-tools}/annotation-file-utilities/lib/options-1.0.1.jar"/>
       <pathelement location="${annotation-tools}/annotation-file-utilities/lib/plume-util-1.0.7.jar"/>
       <pathelement location="${annotation-tools}/annotation-file-utilities/lib/signature-util-0.0.6.jar"/>
-      <pathelement location="${annotation-tools}/annotation-file-utilities/lib/guava-20.0.jar"/>
+      <pathelement location="${annotation-tools}/annotation-file-utilities/lib/guava-28.0-jre.jar"/>
       <pathelement location="${scene-lib}/bin"/>
       <pathelement location="${asmx}/bin"/>
       <!-- Checker Framework qualifiers should not go in generated .jar files -->
@@ -154,7 +154,7 @@
       <uptodate property="plume.uptodate" targetfile="annotation-file-utilities.jar" srcfile="lib/options-1.0.1.jar"/>
       <uptodate property="plume.uptodate" targetfile="annotation-file-utilities.jar" srcfile="lib/plume-util-1.0.7.jar"/>
       <uptodate property="plume.uptodate" targetfile="annotation-file-utilities.jar" srcfile="lib/signature-util-0.0.6.jar"/>
-      <uptodate property="google-collect.uptodate" targetfile="annotation-file-utilities.jar" srcfile="lib/guava-20.0.jar"/>
+      <uptodate property="google-collect.uptodate" targetfile="annotation-file-utilities.jar" srcfile="lib/guava-28.0-jre.jar"/>
 
       <condition property="jarfile.uptodate">
         <and>
@@ -220,7 +220,7 @@
         <exclude name="META-INF/" />
       </patternset>
     </unjar>
-    <unjar src="lib/guava-20.0.jar" dest="${temp-jarfile}">
+    <unjar src="lib/guava-28.0-jre.jar" dest="${temp-jarfile}">
       <patternset>
         <include name="com/google/common/base/**/*.class"/>
         <include name="com/google/common/collect/**/*.class"/>
