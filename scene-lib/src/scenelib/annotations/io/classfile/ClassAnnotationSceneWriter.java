@@ -474,7 +474,7 @@ public class ClassAnnotationSceneWriter extends ClassVisitor {
         av.visitEnd();
       }
 
-      TypeReference typeReference = new TypeReference(TypeReference.FIELD);
+      TypeReference typeReference = TypeReference.newTypeReference(TypeReference.FIELD);
       // Then do the type annotations on the field
       for (Annotation tla : aField.type.tlAnnotationsHere) {
         if ((!overwrite) && existingFieldAnnotations.contains(name(tla))) {

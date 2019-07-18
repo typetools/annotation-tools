@@ -1251,8 +1251,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
             visible, aMethod, this, this.getClass());
       }
       AnnotationVisitor annotationWriter = methodWriter.visitTypeAnnotation(typeRef, typePath, descriptor, visible);
-      Label currentBasicBlock = currentLabel;
-      return new TypeAnnotationSceneReader(this.api, descriptor, visible, aMethod, annotationWriter, typeRef, typePath, null, null, null, currentBasicBlock);
+      return new TypeAnnotationSceneReader(this.api, descriptor, visible, aMethod, annotationWriter, typeRef, typePath, null, null, null, currentLabel);
     }
 
     @Override
