@@ -7,7 +7,7 @@
 	<classpathentry kind="lib" path="lib/bcel-util-1.1.4.jar"/>
 	<classpathentry kind="lib" path="lib/asm-7.1.jar"/>
 	<classpathentry kind="lib" path="lib/checker-qual-2.5.4.jar"/>
-	<classpathentry kind="lib" path="lib/guava-20.0.jar"/>
+	<classpathentry kind="lib" path="lib/guava-28.0-jre.jar"/>
 	<classpathentry kind="lib" path="lib/options-1.0.1.jar"/>
 	<classpathentry kind="lib" path="lib/plume-util-1.0.7.jar"/>
 	<classpathentry kind="lib" path="lib/signature-util-0.0.6.jar"/>

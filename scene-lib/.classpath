@@ -6,7 +6,7 @@
 	<classpathentry kind="lib" path="/annotation-file-utilities/lib/asm-7.1.jar"/>
 	<classpathentry kind="lib" path="/annotation-file-utilities/lib/bcel-util-1.1.4.jar"/>
 	<classpathentry kind="lib" path="/annotation-file-utilities/lib/checker-qual-2.5.4.jar"/>
-	<classpathentry kind="lib" path="/annotation-file-utilities/lib/guava-20.0.jar"/>
+	<classpathentry kind="lib" path="/annotation-file-utilities/lib/guava-28.0-jre.jar"/>
 	<classpathentry kind="lib" path="/annotation-file-utilities/lib/options-1.0.1.jar"/>
 	<classpathentry kind="lib" path="/annotation-file-utilities/lib/plume-util-1.0.7.jar"/>
 	<classpathentry kind="lib" path="/annotation-file-utilities/lib/signature-util-0.0.6.jar"/>

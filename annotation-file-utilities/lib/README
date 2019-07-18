@@ -4,6 +4,9 @@ asm: https://repository.ow2.org/nexus/#nexus-search;gav~org.ow2.asm~asm
 bcel-util: https://repo.maven.apache.org/maven2/org/plumelib/bcel-util/
   wget https://repo.maven.apache.org/maven2/org/plumelib/bcel-util/1.1.4/bcel-util-1.1.4.jar
 
+guava: https://mvnrepository.com/artifact/com.google.guava/guava/
+  wget https://repo1.maven.org/maven2/com/google/guava/guava/28.0-jre/guava-28.0-jre.jar
+
 options: https://repo.maven.apache.org/maven2/org/plumelib/options/
   wget https://repo.maven.apache.org/maven2/org/plumelib/options/1.0.1/options-1.0.1.jar
 
