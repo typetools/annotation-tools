@@ -112,7 +112,7 @@
             <pathelement location="${annotation-tools}/annotation-file-utilities/lib/options-1.0.1.jar"/>
             <pathelement location="${annotation-tools}/annotation-file-utilities/lib/plume-util-1.0.7.jar"/>
             <pathelement location="${annotation-tools}/annotation-file-utilities/lib/signature-util-0.0.6.jar"/>
-            <pathelement location="${annotation-tools}/annotation-file-utilities/lib/guava-20.0.jar"/>
+            <pathelement location="${annotation-tools}/annotation-file-utilities/lib/guava-28.0-jre.jar"/>
             <!-- remainder only for repository version -->
             <pathelement location="${annotations-compiler-jar}"/>
             <pathelement location="bin"/>

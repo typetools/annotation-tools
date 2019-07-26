@@ -14,18 +14,6 @@ export CHECKERFRAMEWORK=`readlink -f ${CHECKERFRAMEWORK:-../checker-framework}`
 
 export PATH=$AFU/scripts:$JAVA_HOME/bin:$PATH
 
-
-SLUGOWNER=${TRAVIS_PULL_REQUEST_SLUG%/*}
-if [[ "$SLUGOWNER" == "" ]]; then
-  SLUGOWNER=${TRAVIS_REPO_SLUG%/*}
-fi
-if [[ "$SLUGOWNER" == "" ]]; then
-  SLUGOWNER=eisop
-fi
-echo SLUGOWNER=$SLUGOWNER
-
-set -e
-
 # jsr308-langtools
 if [ -d ../jsr308-langtools ] ; then
     (cd ../jsr308-langtools && hg pull && hg update)
@@ -42,6 +30,7 @@ else
     echo "... done: (cd .. && hg clone https://bitbucket.org/${SLUGOWNER}/jsr308-langtools)"
 fi
 (cd ../jsr308-langtools/ && ./.travis-build-without-test.sh)
+
 
 ## Compile
 echo "About to run \"ant compile\" for annotation-tools" in `pwd`
