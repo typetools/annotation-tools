@@ -1054,6 +1054,10 @@ loop:
               if (parentKind == Tree.Kind.NEW_CLASS) {
                 continue;
               }
+              IdentifierTree id = (IdentifierTree) node;
+              if (id.getName().contentEquals("this")) {
+                continue;
+              }
               break;
             default:
               // TODO: make this switch statement exhaustive and check each case.
