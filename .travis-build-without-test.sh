@@ -26,7 +26,7 @@ else
     echo "Running: hg identify https://bitbucket.org/${CI_ORGANIZATION}/jsr308-langtools"
     hg identify https://bitbucket.org/${CI_ORGANIZATION}/jsr308-langtools &>/dev/null
     if [ "$?" -ne 0 ]; then
-        CI_ORGANIZATION=typetools
+        CI_ORGANIZATION=eisop
     fi
     set -e
     echo "Running:  (cd .. && hg clone https://bitbucket.org/${CI_ORGANIZATION}/jsr308-langtools)"
