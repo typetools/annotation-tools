@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<project name="scene-lib" default="bin">
+<project name="scene-lib" default="bin" xmlns:if="ant:if">
 
     <property environment="env"/>
 
@@ -113,8 +113,8 @@
             <pathelement location="${annotation-tools}/annotation-file-utilities/lib/plume-util-1.0.7.jar"/>
             <pathelement location="${annotation-tools}/annotation-file-utilities/lib/signature-util-0.0.6.jar"/>
             <pathelement location="${annotation-tools}/annotation-file-utilities/lib/guava-28.0-jre.jar"/>
-            <!-- Can't use jsr308-langtools javac.jar, because javap.jar is also required. -->
-            <pathelement location="${env.JAVA_HOME}/lib/tools.jar"/>
+            <!-- remainder only for repository version -->
+            <pathelement location="${annotations-compiler-jar}"/>
             <pathelement location="bin"/>
             <!-- Checker Framework qualifiers should not go in generated .jar files -->
             <pathelement location="${annotation-tools}/annotation-file-utilities/lib/checker-qual-2.5.4.jar"/>
@@ -178,11 +178,15 @@
                 </fileset>
             </path>
         </pathconvert>
+        <condition property="is-java-8">
+            <equals arg1="${ant.java.version}" arg2="1.8"/>
+        </condition>
         <java classpathref="libpath"
                classpath="${libpath}"
                fork="true"
                failonerror="true"
                classname="com.sun.tools.javac.Main">
+            <jvmarg value="-Xbootclasspath/p:${annotations-compiler-jdk-jar}" if:true="${is-java-8}"/>
             <arg value="-g"/>
             <arg value="-sourcepath"/>
             <!-- TODO: How can we convert a path to a variable?

@@ -72,7 +72,10 @@
     </fileset>
 
     <path id="libpath">
-      <pathelement location="${annotation-tools}/annotation-file-utilities/lib/compiler-2.4.0.jar"/>
+      <!-- alternate for distribution:
+      <pathelement location="${annotations-compiler}/bin"/>
+      -->
+      <pathelement location="${annotations-compiler-jar}"/>
       <pathelement location="${annotation-tools}/annotation-file-utilities/lib/bcel-util-1.1.4.jar"/>
       <pathelement location="${annotation-tools}/annotation-file-utilities/lib/options-1.0.1.jar"/>
       <pathelement location="${annotation-tools}/annotation-file-utilities/lib/plume-util-1.0.7.jar"/>
@@ -150,6 +153,7 @@
       <uptodate property="scene-lib.bin.uptodate" targetfile="annotation-file-utilities.jar">
         <srcfiles dir="${scene-lib}/bin" excludes="annotations-expected/**,annotations/tests/**"/>
       </uptodate>
+      <uptodate property="annotations-compiler.uptodate" targetfile="annotation-file-utilities.jar" srcfile="${annotations-compiler-jar}"/>
       <uptodate property="plume.uptodate" targetfile="annotation-file-utilities.jar" srcfile="lib/bcel-util-1.1.4.jar"/>
       <uptodate property="plume.uptodate" targetfile="annotation-file-utilities.jar" srcfile="lib/options-1.0.1.jar"/>
       <uptodate property="plume.uptodate" targetfile="annotation-file-utilities.jar" srcfile="lib/plume-util-1.0.7.jar"/>
@@ -228,7 +232,7 @@
         <exclude name="META-INF/" />
       </patternset>
     </unjar>
-    <unjar src="${annotation-tools}/annotation-file-utilities/lib/compiler-2.4.0.jar" dest="${temp-jarfile}">
+    <unjar src="${annotations-compiler-jar}" dest="${temp-jarfile}">
       <patternset>
         <include name="**/*.class"/>
         <exclude name="META-INF/" />
@@ -533,7 +537,7 @@
     </fileset>
     <pathconvert property="cmdTxts" refid="javacSrc" pathsep=" " />
 
-      <javac
+    <javac
             srcdir="src"
             destdir="bin"
             source="8"
@@ -546,8 +550,7 @@
           <compilerarg value="-Werror"/>
           <compilerarg line="-Xlint:unchecked -Xlint:deprecation"/>
           <compilerarg line="${cmdTxts}"/>
-      </javac>
-
+    </javac>
   </target>
 
   <!-- Boilerplate to set cfjavac property. Is there a better way? -->

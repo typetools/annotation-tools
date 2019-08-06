@@ -67,9 +67,7 @@ public final class Source {
         // Compiler options.
         // -Xlint:-options is a hack to get around Jenkins build problem:
         // "target value 1.8 is obsolete and will be removed in a future release"
-        final String[] stringOpts = new String[] { "-g", "-Xlint:-options" };
-            // "-XDTA:noannotationsincomments"
-          // TODO: figure out if these options are necessary? "-source", "1.6x"
+        final String[] stringOpts = new String[] { "-g", "-Xlint:-options", "-source", "8", "-target", "8" };
         List<String> optsList = Arrays.asList(stringOpts);
 
         // Create a task.
