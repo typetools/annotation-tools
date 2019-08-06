@@ -22,13 +22,7 @@ eval `/tmp/plume-scripts/ci-info eisop`
 if [ -d ../jsr308-langtools ] ; then
     (cd ../jsr308-langtools && hg pull && hg update)
 else
-    set +e
-    echo "Running: hg identify https://bitbucket.org/${CI_ORGANIZATION}/jsr308-langtools"
-    hg identify https://bitbucket.org/${CI_ORGANIZATION}/jsr308-langtools &>/dev/null
-    if [ "$?" -ne 0 ]; then
-        CI_ORGANIZATION=eisop
-    fi
-    set -e
+    CI_ORGANIZATION=eisop
     echo "Running:  (cd .. && hg clone https://bitbucket.org/${CI_ORGANIZATION}/jsr308-langtools)"
     (cd .. && (hg clone https://bitbucket.org/${CI_ORGANIZATION}/jsr308-langtools || hg clone https://bitbucket.org/${CI_ORGANIZATION}/jsr308-langtools))
     echo "... done: (cd .. && hg clone https://bitbucket.org/${CI_ORGANIZATION}/jsr308-langtools)"
