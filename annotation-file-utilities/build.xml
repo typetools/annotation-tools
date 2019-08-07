@@ -72,10 +72,7 @@
     </fileset>
 
     <path id="libpath">
-      <!-- alternate for distribution:
-      <pathelement location="${annotations-compiler}/bin"/>
-      -->
-      <pathelement location="${annotations-compiler-jar}"/>
+      <pathelement location="${annotation-tools}/annotation-file-utilities/lib/javac-9-dev-r4023-3.jar"/>
       <pathelement location="${annotation-tools}/annotation-file-utilities/lib/bcel-util-1.1.4.jar"/>
       <pathelement location="${annotation-tools}/annotation-file-utilities/lib/options-1.0.1.jar"/>
       <pathelement location="${annotation-tools}/annotation-file-utilities/lib/plume-util-1.0.7.jar"/>
@@ -232,7 +229,7 @@
         <exclude name="META-INF/" />
       </patternset>
     </unjar>
-    <unjar src="${annotations-compiler-jar}" dest="${temp-jarfile}">
+    <unjar src="${annotation-tools}/annotation-file-utilities/lib/javac-9-dev-r4023-3.jar" dest="${temp-jarfile}">
       <patternset>
         <include name="**/*.class"/>
         <exclude name="META-INF/" />
