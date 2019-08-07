@@ -10,7 +10,7 @@ import junit.framework.TestCase;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
-import org.objectweb.asmx.ClassReader;
+import org.objectweb.asm.ClassReader;
 
 import scenelib.annotations.Annotation;
 import scenelib.annotations.AnnotationFactory;
@@ -251,8 +251,8 @@ public class AnnotationsTest extends TestCase {
 
       AnnotationVerifier av = new AnnotationVerifier();
 
-      crCorrect.accept(av.originalVisitor(), false);
-      crGenerated.accept(av.newVisitor(), false);
+      crCorrect.accept(av.originalVisitor(), ClassReader.SKIP_CODE);
+      crGenerated.accept(av.newVisitor(), ClassReader.SKIP_CODE);
 
       try {
         av.verify();

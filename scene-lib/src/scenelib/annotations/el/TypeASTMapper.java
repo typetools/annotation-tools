@@ -78,7 +78,7 @@ public abstract class TypeASTMapper<N> {
             int nta = numTypeArguments(n);
             for (int tai = 0; tai < nta; tai++) {
                 ls.add(new TypePathEntry(TypePath.TYPE_ARGUMENT, tai));
-                traverse1(getTypeArgument(n, tai), te, ls);
+                traverse1(getTypeArgument(n, tai), te, new ArrayList<>(ls));
                 ls.remove(ls.size() - 1);
             }
         } else {

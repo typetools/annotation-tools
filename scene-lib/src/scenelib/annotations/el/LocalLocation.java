@@ -15,15 +15,18 @@ public final class LocalLocation {
     public final Label[] start;
     public final Label[] end;
     public final int[] index;
-    public final int scopeStart;
-    public final int scopeLength;
+
+    // This is made private so that we always call {@link Label#getOffset} whenever we access these. This is to prevent
+    // a case where labels passed to the constructor would not be resolved at that point.
+    private int scopeStart;
+    private int scopeLength;
 
     public LocalLocation(Label[] start, Label[] end, int[] index) {
         this.start = start;
         this.end = end;
         this.index = index;
-        this.scopeStart = start[0].getOffset();
-        this.scopeLength = end[end.length - 1].getOffset() - start[0].getOffset(); // FIXME
+        this.scopeStart = -1; // start[0].getOffset();  // FIXME
+        this.scopeLength = -1; // end[end.length - 1].getOffset() - start[0].getOffset(); // FIXME
     }
 
     public LocalLocation(int index, int scopeStart, int scopeLength) {
@@ -60,6 +63,24 @@ public final class LocalLocation {
             e.printStackTrace();
         }
 
+    }
+
+    /**
+     * Returns the bytecode offset to the start of the scope
+     * @return The bytecode offset to the start of the scope
+     */
+    public int getScopeStart() {
+        scopeStart = start[0].getOffset();
+        return scopeStart;
+    }
+
+    /**
+     * Returns the length of the scope (in bytes)
+     * @return The length of the scope (in bytes)
+     */
+    public int getScopeLength() {
+        scopeLength = end[end.length - 1].getOffset() - start[0].getOffset();
+        return scopeLength;
     }
 
     @Override

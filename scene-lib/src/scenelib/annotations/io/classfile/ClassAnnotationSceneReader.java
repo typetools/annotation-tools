@@ -3,28 +3,50 @@
 // an AScene.
 package scenelib.annotations.io.classfile;
 
-import java.io.File;
-import java.util.*;
+import static scenelib.annotations.el.TypePathEntry.typePathToList;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
+import org.checkerframework.checker.signature.qual.ClassGetName;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.Label;
-import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.FieldVisitor;
+import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.TypePath;
 import org.objectweb.asm.TypeReference;
-
-import scenelib.annotations.*;
-import scenelib.annotations.el.*;
-import scenelib.annotations.field.*;
-
-import static scenelib.annotations.el.TypePathEntry.typePathToList;
-
-import org.checkerframework.checker.signature.qual.ClassGetName;
+import scenelib.annotations.Annotation;
+import scenelib.annotations.AnnotationBuilder;
+import scenelib.annotations.AnnotationFactory;
+import scenelib.annotations.Annotations;
+import scenelib.annotations.ArrayBuilder;
+import scenelib.annotations.el.AClass;
+import scenelib.annotations.el.AElement;
+import scenelib.annotations.el.AField;
+import scenelib.annotations.el.AMethod;
+import scenelib.annotations.el.AScene;
+import scenelib.annotations.el.ATypeElement;
+import scenelib.annotations.el.AnnotationDef;
+import scenelib.annotations.el.BoundLocation;
+import scenelib.annotations.el.LocalLocation;
+import scenelib.annotations.el.RelativeLocation;
+import scenelib.annotations.el.TypeIndexLocation;
+import scenelib.annotations.field.AnnotationAFT;
+import scenelib.annotations.field.AnnotationFieldType;
+import scenelib.annotations.field.ArrayAFT;
+import scenelib.annotations.field.BasicAFT;
+import scenelib.annotations.field.ClassTokenAFT;
+import scenelib.annotations.field.EnumAFT;
+import scenelib.annotations.field.ScalarAFT;
 
 /**
  * A <code> ClassAnnotationSceneReader </code> is a
@@ -530,9 +552,9 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
     private final int[] index;
 
     /**
-     * The current basic block being visited.
+     * The current Label being visited.
      */
-    private final Label currentBasicBlock;
+    private final Label currentLabel;
 
     // since AnnotationSceneReader will work for both normal
     // and extended annotations, all of the following information
@@ -559,21 +581,25 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
      * @param descriptor JVML format for the field being read, or ClassAnnotationSceneReader.dummyDesc
      */
     TypeAnnotationSceneReader(int api, String descriptor, boolean visible, AElement aElement, AnnotationVisitor annotationWriter, int typeRef, TypePath typePath,
-                                     Label[] start, Label[] end, int[] index, Label currentBasicBlock) {
-      // TODO: Also need offset from somewhere.
+                                     Label[] start, Label[] end, int[] index, Label currentLabel) {
       super(api, descriptor, visible, aElement, annotationWriter);
       this.typeReference = new TypeReference(typeRef);
       this.typePath = typePath;
       this.start = start;
       this.end = end;
       this.index = index;
-      this.currentBasicBlock = currentBasicBlock;
+      this.currentLabel = currentLabel;
       if (typeReference.getSort() != TypeReference.LOCAL_VARIABLE && typeReference.getSort() != TypeReference.RESOURCE_VARIABLE) {
         if (start != null || end != null || index != null) {
           System.err.printf("Error: LOCAL_VARIABLE and RESOURCE_VARIABLE TypeReference with start = %s, end = %s, index = %s",
               Arrays.toString(start), Arrays.toString(end), Arrays.toString(index));
         }
       }
+    }
+
+    @Override
+    public void visit(String name, Object value) {
+      annotationWriter.visit(name, value);
     }
 
     /**
@@ -949,7 +975,8 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
   }
 
   /**
-   * Returns a LocalLocation for this annotation.
+   * Makes a LocalLocation for this annotation.
+   * @return a LocalLocation for this annotation.
    */
   private LocalLocation makeLocalLocation() {
     return new LocalLocation(start, end, index);
@@ -957,9 +984,12 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
 
   /**
    * Returns the offset for this annotation.
+   *
+   * @param needTypeIndex flag denoting whether we need the type index or not
+   * @return a RelativeLocation for this annotation
    */
   private RelativeLocation makeOffset(boolean needTypeIndex) {
-    int offset = currentBasicBlock.getOffset();
+    int offset = currentLabel.getOffset();
     int typeIndex = needTypeIndex ? typeReference.getTypeArgumentIndex() : -1;
     return RelativeLocation.createOffset(offset, typeIndex);
   }
@@ -968,6 +998,8 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
      * Returns the bound location for this annotation.
      * Works with {@link TypeReference#CLASS_TYPE_PARAMETER}, {@link TypeReference#METHOD_TYPE_PARAMETER},
      * {@link TypeReference#CLASS_TYPE_PARAMETER_BOUND} or {@link TypeReference#METHOD_TYPE_PARAMETER_BOUND}.
+     *
+     * @return the bound location for this annotation.
      */
     private BoundLocation makeBoundLocation() {
       return typeReference.getSort() == TypeReference.CLASS_TYPE_PARAMETER_BOUND ||
@@ -975,12 +1007,6 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
           ? new BoundLocation(typeReference.getTypeParameterIndex(), typeReference.getTypeParameterBoundIndex())
           : new BoundLocation(typeReference.getTypeParameterIndex(), -1);
       // TODO: Give up on unbounded wildcards for now!
-//      if (!xParamIndexArgs.isEmpty()) {
-//        return new BoundLocation(xParamIndexArgs.get(0), xBoundIndexArgs.get(0));
-//      } else {
-//        if (strict) { System.err.println("makeBoundLocation with empty xParamIndexArgs!"); }
-//        return new BoundLocation(Integer.MAX_VALUE, Integer.MAX_VALUE);
-//      }
     }
 
     @Override
@@ -995,7 +1021,6 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
           ", index=" + Arrays.toString(index) +
           '}';
     }
-
   }
 
   /**
@@ -1240,7 +1265,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
 
     @Override
     public void visitLabel(Label label) {
-      super.visitLabel(label);
+      methodWriter.visitLabel(label);
       this.currentLabel = label;
     }
 
@@ -1262,8 +1287,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
       }
       // TODO: Need to send offset from here
       AnnotationVisitor annotationWriter = methodWriter.visitInsnAnnotation(typeRef, typePath, descriptor, visible);
-      Label currentBasicBlock = currentLabel;
-      return new TypeAnnotationSceneReader(this.api, descriptor, visible, aMethod, annotationWriter, typeRef, typePath, null, null, null, currentBasicBlock);
+      return new TypeAnnotationSceneReader(this.api, descriptor, visible, aMethod, annotationWriter, typeRef, typePath, null, null, null, currentLabel);
     }
 
     @Override
@@ -1273,8 +1297,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
             descriptor, visible, aMethod, this, this.getClass());
       }
       AnnotationVisitor annotationWriter = methodWriter.visitTryCatchAnnotation(typeRef, typePath, descriptor, visible);
-      Label currentBasicBlock = currentLabel;
-      return new TypeAnnotationSceneReader(this.api, descriptor, visible, aMethod, annotationWriter, typeRef, typePath, null, null, null, currentBasicBlock);
+      return new TypeAnnotationSceneReader(this.api, descriptor, visible, aMethod, annotationWriter, typeRef, typePath, null, null, null, currentLabel);
     }
 
     @Override
@@ -1286,8 +1309,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
             aMethod, this, this.getClass());
       }
       AnnotationVisitor annotationWriter = methodWriter.visitLocalVariableAnnotation(typeRef, typePath, start, end, index, descriptor, visible);
-      Label currentBasicBlock = currentLabel;
-      return new TypeAnnotationSceneReader(this.api, descriptor, visible, aMethod, annotationWriter, typeRef, typePath, start, end, index, currentBasicBlock);
+      return new TypeAnnotationSceneReader(this.api, descriptor, visible, aMethod, annotationWriter, typeRef, typePath, start, end, index, currentLabel);
     }
 
     // TODO: visit code!

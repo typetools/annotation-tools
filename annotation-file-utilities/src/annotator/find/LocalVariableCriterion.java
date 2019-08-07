@@ -73,7 +73,7 @@ public class LocalVariableCriterion implements Criterion {
 //      }
 
       Pair<String, Pair<Integer, Integer>> key =
-              Pair.of(fullMethodName, Pair.of(loc.index[0], loc.scopeStart));
+              Pair.of(fullMethodName, Pair.of(loc.index[0], loc.getScopeStart()));
       String potentialVarName =
               LocalVariableScanner.getFromMethodNameIndexMap(key);
       if (potentialVarName != null) {
@@ -85,7 +85,7 @@ public class LocalVariableCriterion implements Criterion {
                   LocalVariableScanner.getFromMethodNameCounter(fullMethodName, potentialVarName);
           //      methodNameCounter.get(fullMethodName).get(potentialVarName);
           Integer thisVariablesOffset =
-                  allOffsetsWithThisName.indexOf(loc.scopeStart);
+                  allOffsetsWithThisName.indexOf(loc.getScopeStart());
 
           // now you need to make sure that this is the
           // thisVariablesOffset'th variable tree in the entire source

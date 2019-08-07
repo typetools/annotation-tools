@@ -7,10 +7,12 @@ import java.lang.annotation.RetentionPolicy;
 import com.sun.tools.classfile.TypeAnnotation.Position.TypePathEntryKind;
 import com.sun.tools.javac.code.TypeAnnotationPosition;
 
+import java.util.Map.Entry;
 import junit.framework.*;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import org.objectweb.asm.TypePath;
 import scenelib.annotations.*;
 import scenelib.annotations.el.*;
 import scenelib.annotations.field.*;
@@ -136,9 +138,8 @@ public class TestSceneLib extends TestCase {
         Object dummy2 =
           s1.classes.getVivify("Foo").methods.getVivify("y()Z").parameters.getVivify(5).type.innerTypes;
         s1.classes.getVivify("Foo").methods.getVivify("y()Z").parameters.getVivify(5).type.innerTypes
-                .getVivify(new InnerTypeLocation(
-                        TypeAnnotationPosition.getTypePathFromBinary(
-                                Arrays.asList(new Integer[] { 0, 0, 3, 2 })))).tlAnnotationsHere
+                .getVivify(TypePathEntry.getTypePathEntryListFromBinary(Arrays.asList(0, 0, 3, 2)))
+            .tlAnnotationsHere
                 .add(myAuthor);
 
         doParseTest(fooIndexContents, "fooIndexContents", s1);
@@ -147,11 +148,14 @@ public class TestSceneLib extends TestCase {
     private void checkConstructor(AMethod constructor) {
         Annotation ann = ((Annotation) constructor.receiver.type.lookup("p2.D"));
         assertEquals(Collections.singletonMap("value", "spam"), ann.fieldValues);
-        ATypeElement l = (ATypeElement) constructor.body.locals
-                        .get(new LocalLocation(1, 3, 5)).type;
-        AElement i = (AElement) l.innerTypes.get(new InnerTypeLocation(
-                TypeAnnotationPosition.getTypePathFromBinary(
-                                Arrays.asList(new Integer[] { 0, 0 }))));
+        Set<Entry<LocalLocation, AField>> set = constructor.body.locals.entrySet();
+        Entry<LocalLocation, AField> entry = set.iterator().next();
+        assertEquals(1, entry.getKey().index[0]);
+        assertEquals(3, entry.getKey().getScopeStart());
+        assertEquals(5, entry.getKey().getScopeLength());
+        ATypeElement l = (ATypeElement) entry.getValue().type;
+        AElement i = (AElement) l.innerTypes.get(TypePathEntry
+            .getTypePathEntryListFromBinary(Arrays.asList(0, 0)));
         assertNotNull(i.lookup("p2.C"));
         AField l2 =
                 constructor.body.locals.get(new LocalLocation(1, 3, 6));
@@ -582,7 +586,7 @@ public class TestSceneLib extends TestCase {
     private void assignId(ATypeElement myField, int id,
             Integer... ls) {
         AElement el = myField.innerTypes.getVivify(
-                new InnerTypeLocation(TypeAnnotationPosition.getTypePathFromBinary(Arrays.asList(ls))));
+            TypePathEntry.getTypePathEntryListFromBinary(Arrays.asList(ls)));
         el.tlAnnotationsHere.add(makeTLIdAnno(id));
     }
 
@@ -615,8 +619,8 @@ public class TestSceneLib extends TestCase {
         // load it with annotations we can check against IDs
         myAFieldType.tlAnnotationsHere.add(makeTLIdAnno(0));
 
-        final int ARRAY = TypePathEntryKind.ARRAY.tag;
-        final int TYPE_ARGUMENT = TypePathEntryKind.TYPE_ARGUMENT.tag;
+        final int ARRAY = TypePath.ARRAY_ELEMENT;
+        final int TYPE_ARGUMENT = TypePath.TYPE_ARGUMENT;
 
         assignId(myAFieldType, 1, TYPE_ARGUMENT, 0);
         assignId(myAFieldType, 2, TYPE_ARGUMENT, 0, ARRAY, 0);
@@ -638,7 +642,7 @@ public class TestSceneLib extends TestCase {
         }
         // make sure it vivified #10 and our annotation stuck
         AElement e10 = myAFieldType.innerTypes.get(
-                new InnerTypeLocation(TypeAnnotationPosition.getTypePathFromBinary(Arrays.asList(TYPE_ARGUMENT, 1, TYPE_ARGUMENT, 3))));
+            TypePathEntry.getTypePathEntryListFromBinary(Arrays.asList(TYPE_ARGUMENT, 1, TYPE_ARGUMENT, 3)));
         assertNotNull(e10);
         int e10aid = (Integer) e10.lookup("IdAnno").getFieldValue("id");
         assertEquals(e10aid, 10);

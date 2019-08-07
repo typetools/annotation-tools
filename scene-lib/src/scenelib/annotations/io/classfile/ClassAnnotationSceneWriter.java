@@ -249,11 +249,12 @@ public class ClassAnnotationSceneWriter extends ClassVisitor {
         BoundLocation bloc = e.getKey();
         ATypeElement bound = e.getValue();
 
-        int typeReferenceSort = bloc.boundIndex == -1
-            ? TypeReference.CLASS_TYPE_PARAMETER
-            : TypeReference.CLASS_TYPE_PARAMETER_BOUND;
-        TypeReference typeReference = TypeReference.newTypeParameterBoundReference(typeReferenceSort,
+        TypeReference typeReference = bloc.boundIndex == -1
+            ? TypeReference.newTypeParameterReference(TypeReference.CLASS_TYPE_PARAMETER, bloc.paramIndex)
+            : TypeReference.newTypeParameterBoundReference(TypeReference.CLASS_TYPE_PARAMETER_BOUND,
             bloc.paramIndex, bloc.boundIndex);
+//        TypeReference typeReference = TypeReference.newTypeParameterBoundReference(typeReferenceSort,
+//            bloc.paramIndex, bloc.boundIndex);
 
         for (Annotation tla : bound.tlAnnotationsHere) {
           // For ClassVisitor. So typeRef: CLASS_TYPE_PARAMETER, CLASS_TYPE_PARAMETER_BOUND or CLASS_EXTENDS.

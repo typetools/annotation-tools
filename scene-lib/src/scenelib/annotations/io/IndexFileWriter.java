@@ -504,7 +504,7 @@ public final class IndexFileWriter {
 //                            + " #" + loc.scopeStart + "+" + loc.scopeLength
 //                        : loc.varName);
                     sb.append(loc.index[0]
-                        + " #" + loc.scopeStart + "+" + loc.scopeLength);
+                        + " #" + loc.getScopeStart() + "+" + loc.getScopeLength());
                     printElement(indent2, sb.toString(), l);
                     printTypeElementAndInnerTypes(indent3,
                             "type", l.type);
