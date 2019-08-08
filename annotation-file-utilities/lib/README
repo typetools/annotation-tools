@@ -18,3 +18,9 @@ checker-qual: https://repo.maven.apache.org/maven2/org/checkerframework/checker-
 
 javac-9-dev-r4023-3.jar: https://repo.maven.apache.org/maven2/com/google/errorprone/javac/
   wget https://repo.maven.apache.org/maven2/com/google/errorprone/javac/9-dev-r4023-3/javac-9-dev-r4023-3.jar
+
+javac.jar: https://bitbucket.org/eisop/jsr308-langtools
+  hg clone https://bitbucket.org/eisop/jsr308-langtools; cd jsr308-langtools/cfmake; make; make clean;
+
+javac-jdk.jar: https://bitbucket.org/eisop/jsr308-langtools
+  hg clone https://bitbucket.org/eisop/jsr308-langtools; cd jsr308-langtools/cfmake; make; make clean;
