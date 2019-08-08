@@ -323,7 +323,7 @@ public class ClassReader {
     /**
      * Copies the bootstrap method data into the given {@link ClassWriter}.
      * Should be called before the {@link #accept(ClassVisitor,int)} method.
-     * 
+     *
      * @param classWriter
      *            the {@link ClassWriter} to copy bootstrap methods into.
      */
@@ -1868,7 +1868,7 @@ public class ClassReader {
 
     /**
      * Returns the start index of the attribute_info structure of this class.
-     * 
+     *
      * @return the start index of the attribute_info structure of this class.
      */
     private int getAttributes() {

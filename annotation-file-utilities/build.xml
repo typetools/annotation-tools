@@ -533,7 +533,7 @@
     </fileset>
     <pathconvert property="cmdTxts" refid="javacSrc" pathsep=" " />
 
-      <javac
+    <javac
             srcdir="src"
             destdir="bin"
             source="8"
@@ -546,8 +546,7 @@
           <compilerarg value="-Werror"/>
           <compilerarg line="-Xlint:unchecked -Xlint:deprecation"/>
           <compilerarg line="${cmdTxts}"/>
-      </javac>
-
+    </javac>
   </target>
 
   <!-- Boilerplate to set cfjavac property. Is there a better way? -->
