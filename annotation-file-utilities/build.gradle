@@ -1,3 +1,5 @@
+import org.gradle.internal.jvm.Jvm
+
 plugins {
     // https://plugins.gradle.org/plugin/com.github.johnrengelman.shadow (v5 requires Gradle 5)
     id 'com.github.johnrengelman.shadow' version '5.1.0'
@@ -15,10 +17,19 @@ repositories {
     mavenCentral()
 }
 sourceSets {
-    main {
-        java {
-            srcDirs =['src', '../scene-lib/src']
-        }
+    main.java {
+        srcDirs =['src', '../scene-lib/src']
+    }
+    test.java{
+        srcDirs += ['../scene-lib/test']
+        include("**/AnnotationsTest.java")
+        include("**/foo/*.java")
+        include("**/AnnotationVerifier.java")
+        include("**/TestSceneLib.java")
+    }
+    test.resources {
+        srcDirs += ['../scene-lib/test']
+        exclude("**/*.java")
     }
 }
 dependencies {
@@ -26,11 +37,16 @@ dependencies {
     implementation 'org.plumelib:options:1.0.1'
     implementation 'org.plumelib:plume-util:1.0.7'
     implementation 'org.plumelib:signature-util:0.0.6'
-    implementation 'org.checkerframework:checker-qual:2.5.4'
-    compileOnly 'org.checkerframework:compiler:2.4.0'
+    compileOnly 'org.checkerframework:checker-qual:2.5.4'
+    implementation 'org.checkerframework:compiler:2.4.0'
     implementation 'com.google.guava:guava:28.0-jre'
-
     implementation files('../asmx/bin')
+
+    // TODO: the ant build file use a version of junit commited as part of the intial commit.
+    // We can probably update this.
+    testCompile group: 'junit', name: 'junit', version: '3.8'
+    // Change the JDK via -Dorg.gradle.java.home=JDK_PATH
+    testCompile files(Jvm.current().toolsJar)
 }
 task compileAsmx(type:Exec) {
     workingDir '../asmx'
@@ -70,4 +86,31 @@ shadowJar {
     relocate 'org.objectweb.asm', 'org.checkerframework.org.objectweb.asm'
     relocate 'com.google', 'org.checkerframework.com.google'
     relocate 'plume', 'org.checkerframework.plume'
+}
+
+test {
+    testLogging {
+        showStandardStreams = true
+        // Always run the tests
+        outputs.upToDateWhen { false }
+
+        // Show the found unexpected diagnostics and expected diagnostics not found.
+        exceptionFormat "full"
+        events "failed"
+    }
+
+    // After each test, print a summary.
+    afterSuite { desc, result ->
+        if (desc.getClassName() != null) {
+            long mils = result.getEndTime() - result.getStartTime()
+            double seconds = mils / 1000.0
+
+            println "Testsuite: ${desc.getClassName()}\n" +
+                    "Tests run: ${result.testCount}, " +
+                    "Failures: ${result.failedTestCount}, " +
+                    "Skipped: ${result.skippedTestCount}, " +
+                    "Time elapsed: ${seconds} sec\n"
+        }
+
+    }
 }
