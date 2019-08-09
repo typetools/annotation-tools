@@ -59,7 +59,8 @@ compileJava {
 }
 
 shadowJar {
-    version = null
+    destinationDirectory = projectDir
+    archiveVersion = null
 
     // These appear in annotation-file-utilities-all.jar:
     relocate 'org.apache', 'org.checkerframework.org.apache'
