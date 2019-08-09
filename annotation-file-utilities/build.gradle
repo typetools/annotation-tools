@@ -42,9 +42,7 @@ dependencies {
     implementation 'com.google.guava:guava:28.0-jre'
     implementation files('../asmx/bin')
 
-    // TODO: the ant build file use a version of junit commited as part of the intial commit.
-    // We can probably update this.
-    testCompile group: 'junit', name: 'junit', version: '3.8'
+    testCompile group: 'junit', name: 'junit', version: '4.12'
     // Change the JDK via -Dorg.gradle.java.home=JDK_PATH
     testCompile files(Jvm.current().toolsJar)
 }
