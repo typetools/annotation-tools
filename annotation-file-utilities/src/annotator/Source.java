@@ -133,9 +133,8 @@ public final class Source {
             try {
               task.analyze();
             } catch (Throwable e) {
-              System.err.println("WARNING: " + path
-                  + ": type analysis failed; skipping");
-              System.err.println("(incomplete CLASSPATH?)");
+              System.err.println("WARNING: skipping " + path);
+              System.err.println("  Type analysis failed due to: " + e.getMessage());
               return Collections.<CompilationUnitTree>emptySet();
             }
 
