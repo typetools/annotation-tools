@@ -597,11 +597,6 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
       }
     }
 
-    @Override
-    public void visit(String name, Object value) {
-      annotationWriter.visit(name, value);
-    }
-
     /**
      * Visits the end of the annotation, and actually writes out the
      *  annotation into aElement.
