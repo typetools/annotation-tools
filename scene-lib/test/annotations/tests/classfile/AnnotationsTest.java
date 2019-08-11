@@ -76,6 +76,7 @@ public class AnnotationsTest extends TestCase {
     "TestClassNonEmpty",
     "TestFieldSimple",
     "TestFieldGeneric",
+    "TestFieldGenericSmall",
     "TestLocalVariable",
     "TestLocalVariableA",
     "TestLocalVariableGenericArray",
@@ -424,6 +425,11 @@ public class AnnotationsTest extends TestCase {
   public void testiFieldGeneric() {
     testAgainstIndexFile(nameIndex("TestFieldGeneric.jaif"),
         nameClass("TestFieldGeneric.class"));
+  }
+
+  public void testiFieldGenericSmall() {
+    testAgainstIndexFile(nameIndex("TestFieldGenericSmall.jaif"),
+        nameClass("TestFieldGenericSmall.class"));
   }
 
   /**
