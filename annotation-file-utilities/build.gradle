@@ -11,7 +11,8 @@ apply plugin: 'java'
 apply plugin: 'com.github.johnrengelman.shadow'
 
 group 'org.checkerframework'
-version '1.0-SNAPSHOT'
+// TODO: Use this in the release process.
+version '3.8.10'
 
 sourceCompatibility = 1.8
 
@@ -429,8 +430,7 @@ task updateWorkspace {
 
 task zipfile(type: Zip) {
     description "create the distribution: annotation-tools.zip"
-//    dependsOn(shadowJar, makeAnnotationFileFormat, testAnnotator, updateWorkspace)
-    dependsOn(shadowJar, updateWorkspace)
+    dependsOn(shadowJar, makeAnnotationFileFormat, testAnnotator, updateWorkspace)
     archiveFileName = 'annotation-tools.zip'
     destinationDirectory = projectDir
     from files(tmpAnnotationTools)
