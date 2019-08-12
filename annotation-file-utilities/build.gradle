@@ -145,7 +145,7 @@ task testExample(dependsOn: compileTestJava) {
 }
 
 task cleanTestExample {
-    doLast{
+    doLast {
         String testDir = '../scene-lib/test/annotations/tests/executable/'
         delete "${testDir}/example-output.jaif"
         delete "${testDir}/example-stdout.jaif"
@@ -427,18 +427,18 @@ task updateWorkspace {
     }
 }
 
-task zipfile(type:Zip) {
+task zipfile(type: Zip) {
     description "create the distribution: annotation-tools.zip"
 //    dependsOn(shadowJar, makeAnnotationFileFormat, testAnnotator, updateWorkspace)
     dependsOn(shadowJar, updateWorkspace)
-    archiveFileName  = 'annotation-tools.zip'
+    archiveFileName = 'annotation-tools.zip'
     destinationDirectory = projectDir
-    from  files(tmpAnnotationTools)
+    from files(tmpAnnotationTools)
 }
 
 task copyToDeployDir {
     doLast {
-       String deployDir = project.getProperties().get("deploy-dir")
+        String deployDir = project.getProperties().get("deploy-dir")
         String afuVersion = project.getProperties().get("afu.version")
         println("Export location: ${deployDir}")
         println("Copying annotation-tools.zip")
@@ -462,7 +462,7 @@ task copyToDeployDir {
 
 task releaseBuild(type: GradleBuild) {
     description 'Build everything required for a release'
-    doFirst{
+    doFirst {
         if (!project.hasProperty('deploy-dir')) {
             throw new RuntimeException("You must specify a deploy-dir, the live site deploy-dir=/cse/www2/types/annotation-file-utilities/releases/_version num_")
         }
@@ -471,7 +471,7 @@ task releaseBuild(type: GradleBuild) {
         }
     }
 
-    startParameter.projectProperties +=  gradle.startParameter.projectProperties
+    startParameter.projectProperties += gradle.startParameter.projectProperties
     startParameter.projectProperties += [release: true.toString()]
 
     tasks = ['clean', 'zipfile', 'copyToDeployDir']
