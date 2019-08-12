@@ -145,6 +145,13 @@ task testExample(dependsOn: compileTestJava) {
     }
 }
 
+task testAnnotator(type: Exec, dependsOn: assemble) {
+    description "run tests for the annotator"
+    workingDir 'tests/'
+    executable 'make'
+}
+
+// Copied from Checker Framework
 task checkBasicStyle(group: 'Format') {
     description 'Check basic style guidelines.  Not related to Checkstyle tool.'
 
@@ -241,4 +248,61 @@ task checkBasicStyle(group: 'Format') {
             throw new GradleException("Files do not meet basic style guidelines.")
         }
     }
+}
+
+/**
+ * Creates a task that runs the checker on the main source set. The task is named
+ * "check${shortName}", for example "checkPurity" or "checkNullness".
+ * @param checker full qualified name of the checker to run
+ * @param shortName shorter version of the checker to use to name the task.
+ */
+def createCheckTypeTask(checker, shortName) {
+    tasks.create(name: "check${shortName}", type: JavaCompile) {
+        description "Run the ${shortName} Checker on the main sources."
+        group 'Verification'
+        String checkerDist='../../checker-framework/checker/dist'
+        // Always run the task.
+        outputs.upToDateWhen { false }
+        source = sourceSets.main.java
+        classpath = files("${checkerDist}/checker-qual.jar")
+        classpath += sourceSets.main.compileClasspath
+        destinationDir = file("${buildDir}/typecheck/${shortName}")
+
+        options.annotationProcessorPath = files("${checkerDist}/checker.jar")
+        options.compilerArgs += [
+                '-processor', "${checker}",
+                '-proc:only',
+                '-Xlint:-processing',
+                "-Xbootclasspath/p:${checkerDist}/jdk8.jar"
+        ]
+    }
+}
+
+createCheckTypeTask('org.checkerframework.checker.signature.SignatureChecker', 'Signature')
+
+task htmlValidate(type: Exec){
+    description 'Validate that HTML files are well-formed; only works with JDK 8'
+    workingDir '../'
+    executable 'html5validator'
+    args = [
+            "--ignore",
+            "/api/",
+            "/build/",
+            "/javadoc/",
+            "/annotation-file-utilities/annotation-file-format.html",
+            "/scene-lib/javadoc/"
+            ]
+}
+
+task allTests(type: GradleBuild, group: 'Verification') {
+    tasks = ['test', 'testExample', 'testAnnotator']
+}
+
+javadoc {
+    options.memberLevel = JavadocMemberLevel.PUBLIC
+
+}
+
+artifacts {
+    archives shadowJar
 }

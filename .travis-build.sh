@@ -38,7 +38,7 @@ git -C /tmp/plume-scripts pull > /dev/null 2>&1 \
 eval `/tmp/plume-scripts/ci-info typetools`
 
 if [[ "${GROUP}" == "test" || "${GROUP}" == "all" ]]; then
-  ant test
+   (cd annotation-file-utilities && ./gradlew allTests)
 fi
 
 if [[ "${GROUP}" == "typecheck" || "${GROUP}" == "all" ]]; then
@@ -51,8 +51,7 @@ if [[ "${GROUP}" == "typecheck" || "${GROUP}" == "all" ]]; then
     (cd ${CHECKERFRAMEWORK} && ./.travis-build-without-test.sh downloadjdk)
   fi
 
-  (cd annotation-file-utilities && ant check-signature)
-  (cd scene-lib && ant check-signature)
+  (cd annotation-file-utilities && ./gradlew checkSignature)
 fi
 
 if [[ "${GROUP}" == "misc" || "${GROUP}" == "all" ]]; then
@@ -60,12 +59,12 @@ if [[ "${GROUP}" == "misc" || "${GROUP}" == "all" ]]; then
 
   set -e
 
-  ant check-style
+   (cd annotation-file-utilities && ./gradlew checkBasicStyle)
 
   # TODO: when codebase is reformatted (after merging branches?)
   # ant check-format
 
-  ant html-validate
+  (cd annotation-file-utilities && ./gradlew htmlValidate)
 
   ant javadoc
 fi
