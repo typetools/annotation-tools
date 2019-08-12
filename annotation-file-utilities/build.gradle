@@ -1,5 +1,7 @@
 import org.gradle.internal.jvm.Jvm
 
+import java.nio.file.Files
+
 plugins {
     // https://plugins.gradle.org/plugin/com.github.johnrengelman.shadow (v5 requires Gradle 5)
     id 'com.github.johnrengelman.shadow' version '5.1.0'
@@ -26,6 +28,7 @@ sourceSets {
         include("**/foo/*.java")
         include("**/AnnotationVerifier.java")
         include("**/TestSceneLib.java")
+        include("**/Example.java")
     }
     test.resources {
         srcDirs += ['../scene-lib/test']
@@ -110,5 +113,34 @@ test {
                     "Time elapsed: ${seconds} sec\n"
         }
 
+    }
+}
+task testExample(dependsOn: compileTestJava) {
+    doLast {
+        String testDir = '../scene-lib/test/annotations/tests/executable/'
+        javaexec {
+            classpath = files(sourceSets.test.java.outputDir)
+            classpath += sourceSets.test.compileClasspath
+            main = 'annotations.tests.executable.Example'
+            standardOutput = new FileOutputStream("${testDir}/example-stdout.jaif")
+
+            args = ["${testDir}/example-input.jaif",
+                    "foo.Bar",
+                    "${testDir}/example-output.jaif"]
+        }
+        File outputGoal = new File(testDir, "example-output.jaif.goal");
+        File output = new File(testDir, "example-output.jaif");
+
+        byte[] goalJaif = Files.readAllBytes(new File(testDir, "example-output.jaif.goal").toPath());
+        byte[] outputJaif = Files.readAllBytes(new File(testDir, "example-output.jaif").toPath());
+        if(!Arrays.equals(goalJaif, outputJaif)) {
+            throw new GradleException("In ${testDir}, file example-output.jaif does not match goal.")
+        }
+
+        byte[] goalStdOut = Files.readAllBytes(new File(testDir, "example-stdout.jaif.goal").toPath());
+        byte[] stdOut = Files.readAllBytes(new File(testDir, "example-stdout.jaif").toPath());
+        if(!Arrays.equals(goalStdOut, stdOut)){
+            throw new GradleException("In ${testDir}, file example-stdout.jaif does not match goal.")
+        }
     }
 }
