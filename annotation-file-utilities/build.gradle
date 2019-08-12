@@ -14,7 +14,6 @@ group 'org.checkerframework'
 version '1.0-SNAPSHOT'
 
 sourceCompatibility = 1.8
-ext.release = false
 
 repositories {
     mavenCentral()
@@ -80,7 +79,8 @@ shadowJar {
     destinationDirectory = projectDir
     archiveVersion = null
     doFirst {
-        if (release) {
+        if (project.hasProperty('release')) {
+            println 'Relocating packages.'
             relocate 'org.apache', 'org.checkerframework.org.apache'
             relocate 'org.relaxng', 'org.checkerframework.org.relaxng'
             relocate 'org.plumelib', 'org.checkerframework.org.plumelib'
@@ -429,8 +429,50 @@ task updateWorkspace {
 
 task zipfile(type:Zip) {
     description "create the distribution: annotation-tools.zip"
-    dependsOn(shadowJar, makeAnnotationFileFormat, testAnnotator, updateWorkspace)
+//    dependsOn(shadowJar, makeAnnotationFileFormat, testAnnotator, updateWorkspace)
+    dependsOn(shadowJar, updateWorkspace)
     archiveFileName  = 'annotation-tools.zip'
     destinationDirectory = projectDir
     from  files(tmpAnnotationTools)
+}
+
+task copyToDeployDir {
+    doLast {
+       String deployDir = project.getProperties().get("deploy-dir")
+        String afuVersion = project.getProperties().get("afu.version")
+        println("Export location: ${deployDir}")
+        println("Copying annotation-tools.zip")
+        copy {
+            from projectDir
+            into deployDir
+            include 'annotation-tools.zip'
+            include 'annotation-file-utilities.html'
+            include 'annotation-file-format.html'
+            include 'annotation-file-format.pdf'
+            include 'figures/*.svg'
+            include 'figures/*.png'
+            include 'figures/*.gif'
+            include 'changelog.html'
+            rename('annotation-tools.zip', "annotation-tools-${afuVersion}.zip")
+        }
+        delete "${deployDir}/index.html"
+        Files.createSymbolicLink(file("${deployDir}/index.html").toPath(), file("${deployDir}/annotation-file-utilities.html").toPath())
+    }
+}
+
+task releaseBuild(type: GradleBuild) {
+    description 'Build everything required for a release'
+    doFirst{
+        if (!project.hasProperty('deploy-dir')) {
+            throw new RuntimeException("You must specify a deploy-dir, the live site deploy-dir=/cse/www2/types/annotation-file-utilities/releases/_version num_")
+        }
+        if (!project.hasProperty('afu.version')) {
+            throw new RuntimeException("You must specify an afu.version, such as 3.6.22")
+        }
+    }
+
+    startParameter.projectProperties +=  gradle.startParameter.projectProperties
+    startParameter.projectProperties += [release: true.toString()]
+
+    tasks = ['clean', 'zipfile', 'copyToDeployDir']
 }
