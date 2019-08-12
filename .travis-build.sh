@@ -66,7 +66,7 @@ if [[ "${GROUP}" == "misc" || "${GROUP}" == "all" ]]; then
 
   (cd annotation-file-utilities && ./gradlew htmlValidate)
 
-  ant javadoc
+  (cd annotation-file-utilities && ./gradlew javadoc)
 fi
 
 if [[ "${GROUP}" == "downstream" || "${GROUP}" == "all" ]]; then
