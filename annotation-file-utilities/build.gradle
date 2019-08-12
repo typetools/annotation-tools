@@ -144,3 +144,101 @@ task testExample(dependsOn: compileTestJava) {
         }
     }
 }
+
+task checkBasicStyle(group: 'Format') {
+    description 'Check basic style guidelines.  Not related to Checkstyle tool.'
+
+    String[] ignoreDirectories = ['.git',
+                                  '.gradle',
+                                  '.idea',
+                                  '.plume-scripts',
+                                  'annotated',
+                                  'api',
+                                  'bib',
+                                  'build',
+                                  'jdk',
+                                  'asmx',
+                                  'javadoc']
+
+    String[] ignoreFilePatterns = [
+            '*.aux',
+            '*.class',
+            '*.dvi',
+            '*.eps',
+            '*.jaif',
+            '*.jar',
+            '*.jtr',
+            '*.log',
+            '*.patch',
+            '*.pdf',
+            '*.png',
+            '*.sty',
+            '*.zip',
+            '*~',
+            '*.goal',
+            '*.jaif',
+            'CFLogo.ai',
+            'logfile.log.rec.index',
+            'annotation-file-format.html']
+
+    doLast {
+        FileTree tree = fileTree(dir: projectDir)
+        for (String dir : ignoreDirectories) {
+            tree.exclude "**/${dir}/**"
+        }
+        for (String file : ignoreFilePatterns) {
+            tree.exclude "**/${file}"
+        }
+        boolean failed = false
+        tree.visit {
+            if (!it.file.isDirectory()) {
+                int isBlankLine
+                it.file.eachLine { line ->
+                    if (line.endsWith(' ')) {
+                        println("Trailing whitespace: ${it.file.absolutePath}")
+                        failed = true
+                    }
+                    if (!line.startsWith('\\') &&
+                            (line.matches('^.* (else|finally|try)\\{}.*$')
+                                    || line.matches('^.*}(catch|else|finally) .*$')
+                                    || line.matches('^.* (catch|for|if|while)\\('))) {
+                        // This runs on non-java files, too.
+                        println("Missing space: ${it.file.absolutePath}")
+                        failed = true
+                    }
+                    if (line.isEmpty()) {
+                        isBlankLine++;
+                    } else {
+                        isBlankLine = 0;
+                    }
+                }
+
+                if (isBlankLine > 1) {
+                    println("Blank line at end of file: ${it.file.absolutePath}")
+                    failed = true
+                }
+
+                RandomAccessFile file
+                try {
+                    file = new RandomAccessFile(it.file, 'r')
+                    int end = file.length() - 1;
+                    if (end > 0) {
+                        file.seek(end)
+                        byte last = file.readByte()
+                        if (last != '\n') {
+                            println("Missing newline at end of file: ${it.file.absolutePath}")
+                            failed = true
+                        }
+                    }
+                } finally {
+                    if (file != null) {
+                        file.close()
+                    }
+                }
+            }
+        }
+        if (failed) {
+            throw new GradleException("Files do not meet basic style guidelines.")
+        }
+    }
+}
