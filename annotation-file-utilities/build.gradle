@@ -44,12 +44,13 @@ dependencies {
     compileOnly 'org.checkerframework:checker-qual:2.5.4'
     implementation 'org.checkerframework:compiler:2.4.0'
     implementation 'com.google.guava:guava:28.0-jre'
-    implementation files('../asmx/bin')
+    implementation files("${project.buildDir}/libs/asmx.jar")
 
     testCompile group: 'junit', name: 'junit', version: '4.12'
     // Change the JDK via -Dorg.gradle.java.home=JDK_PATH
     testCompile files(Jvm.current().toolsJar)
 }
+
 task compileAsmx(type: Exec) {
     workingDir '../asmx'
     executable 'ant'
@@ -59,8 +60,13 @@ task compileAsmx(type: Exec) {
     ]
 }
 
+task jarAsmx(type: Jar, dependsOn: compileAsmx) {
+    from '../asmx/bin'
+    archiveFileName = 'asmx.jar'
+}
+
 compileJava {
-    dependsOn compileAsmx
+    dependsOn jarAsmx
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
     options.failOnError = true
@@ -79,6 +85,12 @@ compileJava {
 shadowJar {
     destinationDirectory = projectDir
     archiveVersion = null
+    minimize {
+        exclude(dependency('org.checkerframework:compiler:.*'))
+    }
+    // Don't include any class from the Checker Framework.
+    // This should just be checker-qual.
+    exclude 'org/checkerframework/**'
     doFirst {
         if (project.hasProperty('release')) {
             println 'Relocating packages.'
@@ -87,6 +99,25 @@ shadowJar {
             relocate 'org.plumelib', 'org.checkerframework.org.plumelib'
             relocate 'org.objectweb.asm', 'org.checkerframework.org.objectweb.asm'
             relocate 'com.google', 'org.checkerframework.com.google'
+        }
+    }
+}
+
+// Shadowing Test Sources and Dependencies
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
+task skinnyJar(type: ShadowJar, dependsOn: compileJava) {
+    destinationDirectory = projectDir
+    from files(sourceSets.main.output, '../asmx/bin/')
+    archiveFileName = 'annotation-file-utilities.jar'
+    minimize()
+    include 'scenelib/**/*.class'
+    include 'annotator/**/*.class'
+    include 'org/objectweb/asmx/**/*.class'
+    doFirst {
+        if (project.hasProperty('release')) {
+            println 'Relocating packages.'
+            relocate 'org.objectweb.asmx', 'org.checkerframework.org.objectweb.asm'
         }
     }
 }
@@ -387,11 +418,11 @@ task allTests(type: GradleBuild, group: 'Verification') {
 
 javadoc {
     options.memberLevel = JavadocMemberLevel.PUBLIC
-
 }
 
 artifacts {
     archives shadowJar
+    archives skinnyJar
 }
 
 clean {
