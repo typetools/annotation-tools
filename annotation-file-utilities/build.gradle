@@ -21,9 +21,9 @@ repositories {
 }
 sourceSets {
     main.java {
-        srcDirs =['src', '../scene-lib/src']
+        srcDirs = ['src', '../scene-lib/src']
     }
-    test.java{
+    test.java {
         srcDirs += ['../scene-lib/test']
         include("**/AnnotationsTest.java")
         include("**/foo/*.java")
@@ -50,7 +50,7 @@ dependencies {
     // Change the JDK via -Dorg.gradle.java.home=JDK_PATH
     testCompile files(Jvm.current().toolsJar)
 }
-task compileAsmx(type:Exec) {
+task compileAsmx(type: Exec) {
     workingDir '../asmx'
     executable 'ant'
     args = [
@@ -134,13 +134,13 @@ task testExample(dependsOn: compileTestJava) {
 
         byte[] goalJaif = Files.readAllBytes(new File(testDir, "example-output.jaif.goal").toPath());
         byte[] outputJaif = Files.readAllBytes(new File(testDir, "example-output.jaif").toPath());
-        if(!Arrays.equals(goalJaif, outputJaif)) {
+        if (!Arrays.equals(goalJaif, outputJaif)) {
             throw new GradleException("In ${testDir}, file example-output.jaif does not match goal.")
         }
 
         byte[] goalStdOut = Files.readAllBytes(new File(testDir, "example-stdout.jaif.goal").toPath());
         byte[] stdOut = Files.readAllBytes(new File(testDir, "example-stdout.jaif").toPath());
-        if(!Arrays.equals(goalStdOut, stdOut)){
+        if (!Arrays.equals(goalStdOut, stdOut)) {
             throw new GradleException("In ${testDir}, file example-stdout.jaif does not match goal.")
         }
     }
@@ -150,6 +150,84 @@ task testAnnotator(type: Exec, dependsOn: assemble) {
     description "run tests for the annotator"
     workingDir 'tests/'
     executable 'make'
+}
+
+task cleanTestAnnotator(type: Exec) {
+    description "run tests for the annotator"
+    workingDir 'tests/'
+    executable 'make'
+    args("clean")
+}
+
+task makeAnnotationFileFormat {
+    description 'Make documentation: annotation-file-format.{html,pdf}'
+    doLast {
+        exec {
+            executable 'make'
+            args = [
+                    '-C',
+                    'figures'
+            ]
+        }
+        exec {
+            executable 'latex'
+            args 'annotation-file-format.tex'
+        }
+        exec {
+            executable 'bibtex'
+            args 'annotation-file-format'
+        }
+
+        exec {
+            executable 'latex'
+            args 'annotation-file-format.tex'
+        }
+
+        exec {
+            executable 'latex'
+            args 'annotation-file-format.tex'
+        }
+
+        exec {
+            executable 'pdflatex'
+            args 'annotation-file-format.tex'
+        }
+
+        exec {
+            executable 'hevea'
+            args = [
+                    "-fix",
+                    "-exec",
+                    "xxdate.exe",
+                    "urlhref.hva",
+                    "annotation-file-format.tex"
+            ]
+        }
+    }
+}
+
+task cleanAnnotationFileFormat {
+    description "removes generated documentation files"
+
+    doLast {
+        delete "annotation-file-format.aux"
+        delete "annotation-file-format.dvi"
+        delete "annotation-file-format.haux"
+        delete "annotation-file-format.html"
+        delete "annotation-file-format.htoc"
+        delete "annotation-file-format.log"
+        delete "annotation-file-format.pdf"
+        delete "annotation-file-format.toc"
+        delete "scene-lib-type-hierarchy.png"
+        exec {
+            executable 'make'
+            args = [
+                    '-C',
+                    'figures',
+                    'clean'
+            ]
+        }
+    }
 }
 
 // Copied from Checker Framework
@@ -167,7 +245,7 @@ task checkBasicStyle(group: 'Format') {
                                   'jdk',
                                   'asmx',
                                   'javadoc',
-    "test"]
+                                  "test"]
 
     String[] ignoreFilePatterns = [
             '*.aux',
@@ -262,7 +340,7 @@ def createCheckTypeTask(checker, shortName) {
     tasks.create(name: "check${shortName}", type: JavaCompile) {
         description "Run the ${shortName} Checker on the main sources."
         group 'Verification'
-        String checkerDist='../../checker-framework/checker/dist'
+        String checkerDist = '../../checker-framework/checker/dist'
         // Always run the task.
         outputs.upToDateWhen { false }
         source = sourceSets.main.java
@@ -282,7 +360,7 @@ def createCheckTypeTask(checker, shortName) {
 
 createCheckTypeTask('org.checkerframework.checker.signature.SignatureChecker', 'Signature')
 
-task htmlValidate(type: Exec){
+task htmlValidate(type: Exec) {
     description 'Validate that HTML files are well-formed; only works with JDK 8'
     workingDir '../'
     executable 'html5validator'
@@ -293,7 +371,7 @@ task htmlValidate(type: Exec){
             "/javadoc/",
             "/annotation-file-utilities/annotation-file-format.html",
             "/scene-lib/javadoc/"
-            ]
+    ]
 }
 
 task allTests(type: GradleBuild, group: 'Verification') {
@@ -307,4 +385,9 @@ javadoc {
 
 artifacts {
     archives shadowJar
+}
+
+clean {
+    dependsOn(cleanTestAnnotator, cleanAnnotationFileFormat)
+    delete('annotation-file-utilities-all.jar', 'annotation-tools.zip')
 }

@@ -116,3 +116,5 @@ clean :
 	(cd enum-imports && make clean)
 	(cd ad-hoc && make clean)
 	(cd issue155 && make clean)
+	(cd source-extension && make clean)
+	(cd system-test && make clean)
