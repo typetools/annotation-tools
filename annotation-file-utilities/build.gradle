@@ -307,7 +307,7 @@ task checkBasicStyle(group: 'Format') {
             'annotation-file-format.html']
 
     doLast {
-        FileTree tree = fileTree(dir: projectDir)
+        FileTree tree = fileTree(dir: "${projectDir}/../")
         for (String dir : ignoreDirectories) {
             tree.exclude "**/${dir}/**"
         }
