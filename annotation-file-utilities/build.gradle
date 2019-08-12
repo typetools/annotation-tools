@@ -251,7 +251,7 @@ task checkBasicStyle(group: 'Format') {
                                   'jdk',
                                   'asmx',
                                   'javadoc',
-                                  "test"]
+                                  "tests"]
 
     String[] ignoreFilePatterns = [
             '*.aux',
@@ -431,5 +431,6 @@ task zipfile(type:Zip) {
     description "create the distribution: annotation-tools.zip"
     dependsOn(shadowJar, makeAnnotationFileFormat, testAnnotator, updateWorkspace)
     archiveFileName  = 'annotation-tools.zip'
+    destinationDirectory = projectDir
     from  files(tmpAnnotationTools)
 }
