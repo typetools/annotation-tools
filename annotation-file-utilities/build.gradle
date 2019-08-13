@@ -197,7 +197,28 @@ task cleanTestAnnotator(type: Exec) {
     args("clean")
 }
 
-task makeAnnotationFileFormat {
+ext.plumeBibHome = "${projectDir}/bib"
+
+task getPlumeBib() {
+    description 'Obtain or update the run-google-java-format scripts'
+    if (file(plumeBibHome).exists()) {
+        exec {
+            workingDir plumeBibHome
+            executable 'git'
+            args = ['pull', '-q']
+            ignoreExitValue = true
+        }
+    } else {
+        exec {
+            workingDir "${plumeBibHome}/../"
+            executable 'git'
+            args = ['clone', '-q', 'https://github.com/mernst/plume-bib.git', 'bib']
+        }
+    }
+}
+
+
+task makeAnnotationFileFormat(dependsOn: getPlumeBib) {
     description 'Make documentation: annotation-file-format.{html,pdf}'
     doLast {
         exec {
@@ -211,9 +232,11 @@ task makeAnnotationFileFormat {
             executable 'latex'
             args 'annotation-file-format.tex'
         }
+
         exec {
             executable 'bibtex'
             args 'annotation-file-format'
+            environment BIBINPUTS: ".:${plumeBibHome}"
         }
 
         exec {
