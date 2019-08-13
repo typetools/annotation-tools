@@ -1,9 +1,8 @@
 <?xml version="1.0"?>
 
-<project name="annotation-file-utilities" default="zipfile">
+<project name="annotation-file-utilities">
   <description>
-     Ant build file for the annotation file utilities.
-     Run "ant -projecthelp" for a full list of options.
+     Ant build file to update version number.  Use gradle to build.
   </description>
 
   <target name="init-properties">
