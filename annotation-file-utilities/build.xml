@@ -16,17 +16,6 @@
 
     <property file="build.properties"/>
 
-    <fail
-      unless="global.build.properties"
-      message="Local build.properties file did not define global buildfile in property global.build.properties"/>
-    <condition property="exists.global.build.properties">
-      <available file="${global.build.properties}"/>
-    </condition>
-    <fail
-      unless="exists.global.build.properties"
-      message="File ${global.build.properties} file not found."/>
-    <property file="${global.build.properties}"/>
-
   </target>
 
   <macrodef name="update">
