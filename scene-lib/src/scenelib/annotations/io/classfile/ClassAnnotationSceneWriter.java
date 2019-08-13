@@ -373,7 +373,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
       AnnotationFieldType aft = a.def().fieldTypes.get(fieldName);
       if (value instanceof Annotation) {
         AnnotationVisitor nav = av.visitAnnotation(fieldName, classDescToName(a.def().name));
-        visitFields(nav, (Annotation) a);
+        visitFields(nav, a);
         nav.visitEnd();
       } else if (value instanceof List) {
         // In order to visit an array, the AnnotationVisitor returned by
