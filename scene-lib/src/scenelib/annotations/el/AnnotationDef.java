@@ -168,7 +168,7 @@ public final class AnnotationDef extends AElement {
      */
     public List<String> targets() {
         Annotation target = target();
-        if(target == null) {
+        if (target == null) {
             return null;
         }
         @SuppressWarnings("unchecked")
