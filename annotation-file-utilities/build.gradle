@@ -1,9 +1,8 @@
 import org.gradle.internal.jvm.Jvm
-
 import java.nio.file.Files
 
 plugins {
-    // https://plugins.gradle.org/plugin/com.github.johnrengelman.shadow (v5 requires Gradle 5)
+    // https://plugins.gradle.org/plugin/com.github.johnrengelman.shadow
     id 'com.github.johnrengelman.shadow' version '5.1.0'
     id 'java'
 }
@@ -19,6 +18,7 @@ sourceCompatibility = 1.8
 repositories {
     mavenCentral()
 }
+
 sourceSets {
     main.java {
         srcDirs = ['src', '../scene-lib/src']
@@ -36,6 +36,7 @@ sourceSets {
         exclude("**/*.java")
     }
 }
+
 dependencies {
     implementation 'org.plumelib:bcel-util:1.1.4'
     implementation 'org.plumelib:options:1.0.1'
@@ -44,14 +45,16 @@ dependencies {
     compileOnly 'org.checkerframework:checker-qual:2.5.4'
     implementation 'org.checkerframework:compiler:2.4.0'
     implementation 'com.google.guava:guava:28.0-jre'
-    implementation files("${project.buildDir}/libs/asmx.jar")
+//    implementation files("${project.buildDir}/libs/asmx.jar")
+    implementation files('../asmx/bin/')
 
     testCompile group: 'junit', name: 'junit', version: '4.12'
     // Change the JDK via -Dorg.gradle.java.home=JDK_PATH
     testCompile files(Jvm.current().toolsJar)
 }
 
-task compileAsmx(type: Exec) {
+task compileAsmx(type: Exec, group: 'Build') {
+    description 'Compile asmx.'
     workingDir '../asmx'
     executable 'ant'
     args = [
@@ -60,13 +63,15 @@ task compileAsmx(type: Exec) {
     ]
 }
 
-task jarAsmx(type: Jar, dependsOn: compileAsmx) {
-    from '../asmx/bin'
-    archiveFileName = 'asmx.jar'
+task cleanAsmx(type: Exec) {
+    description 'Clean asmx.'
+    workingDir '../asmx'
+    executable 'ant'
+    args = ['clean']
 }
 
 compileJava {
-    dependsOn jarAsmx
+    dependsOn compileAsmx
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
     options.failOnError = true
@@ -84,9 +89,11 @@ compileJava {
 
 shadowJar {
     destinationDirectory = projectDir
+    includeEmptyDirs = false
     archiveVersion = null
     minimize {
         exclude(dependency('org.checkerframework:compiler:.*'))
+        exclude(dependency(files('../asmx/bin/')))
     }
     // Don't include any class from the Checker Framework.
     // This should just be checker-qual.
@@ -107,6 +114,8 @@ shadowJar {
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 task skinnyJar(type: ShadowJar, dependsOn: compileJava) {
+    description 'Builds annotation-file-utilities.jar with only asmx, scene-lib, and annotation-file-utility classes.'
+    includeEmptyDirs = false
     destinationDirectory = projectDir
     from files(sourceSets.main.output, '../asmx/bin/')
     archiveFileName = 'annotation-file-utilities.jar'
@@ -148,7 +157,8 @@ test {
 
     }
 }
-task testExample(dependsOn: compileTestJava) {
+task testExample(dependsOn: compileTestJava, group: 'Verification') {
+    description 'Run the scene-lib example test.'
     doLast {
         String testDir = '../scene-lib/test/annotations/tests/executable/'
         javaexec {
@@ -177,6 +187,7 @@ task testExample(dependsOn: compileTestJava) {
 }
 
 task cleanTestExample {
+    description 'Clean the scene-lib example test.'
     doLast {
         String testDir = '../scene-lib/test/annotations/tests/executable/'
         delete "${testDir}/example-output.jaif"
@@ -184,14 +195,14 @@ task cleanTestExample {
     }
 }
 
-task testAnnotator(type: Exec, dependsOn: assemble) {
-    description "run tests for the annotator"
+task testAnnotator(type: Exec, dependsOn: assemble, group: 'Verification') {
+    description 'Run the annotator test.'
     workingDir 'tests/'
     executable 'make'
 }
 
 task cleanTestAnnotator(type: Exec) {
-    description "run tests for the annotator"
+    description "Clean the annotator test."
     workingDir 'tests/'
     executable 'make'
     args("clean")
@@ -200,7 +211,7 @@ task cleanTestAnnotator(type: Exec) {
 ext.plumeBibHome = "${projectDir}/bib"
 
 task getPlumeBib() {
-    description 'Obtain or update the run-google-java-format scripts'
+    description 'Obtain or update the run-google-java-format scripts.'
     if (file(plumeBibHome).exists()) {
         exec {
             workingDir plumeBibHome
@@ -219,7 +230,7 @@ task getPlumeBib() {
 
 
 task makeAnnotationFileFormat(dependsOn: getPlumeBib) {
-    description 'Make documentation: annotation-file-format.{html,pdf}'
+    description 'Make documentation: annotation-file-format.{html,pdf}.'
     doLast {
         exec {
             executable 'make'
@@ -268,7 +279,7 @@ task makeAnnotationFileFormat(dependsOn: getPlumeBib) {
 }
 
 task cleanAnnotationFileFormat {
-    description "removes generated documentation files"
+    description "Removes generated documentation files."
 
     doLast {
         delete "annotation-file-format.aux"
@@ -422,7 +433,7 @@ def createCheckTypeTask(checker, shortName) {
 createCheckTypeTask('org.checkerframework.checker.signature.SignatureChecker', 'Signature')
 
 task htmlValidate(type: Exec) {
-    description 'Validate that HTML files are well-formed; only works with JDK 8'
+    description 'Validate that HTML files are well-formed; only works with JDK 8.'
     workingDir '../'
     executable 'html5validator'
     args = [
@@ -436,6 +447,7 @@ task htmlValidate(type: Exec) {
 }
 
 task allTests(type: GradleBuild, group: 'Verification') {
+    description 'Run all tests.'
     tasks = ['test', 'testExample', 'testAnnotator']
 }
 
@@ -449,12 +461,12 @@ artifacts {
 }
 
 clean {
-    dependsOn(cleanTestAnnotator, cleanAnnotationFileFormat, cleanTestExample)
-    delete('annotation-file-utilities-all.jar', 'annotation-tools.zip')
+    dependsOn(cleanTestAnnotator, cleanAnnotationFileFormat, cleanTestExample, cleanAsmx)
+    delete('annotation-file-utilities.jar','annotation-file-utilities-all.jar', 'annotation-tools.zip')
 }
 
 ext.tmpAnnotationTools = "${buildDir}/tmp-annotation-tools"
-task updateWorkspace {
+task cloneAndPrepDirectoryForZipfile {
     description 'Copy files from repository to temporary directory from which they will be packaged up.'
     doLast {
         delete tmpAnnotationTools
@@ -484,13 +496,14 @@ task updateWorkspace {
 
 task zipfile(type: Zip) {
     description "create the distribution: annotation-tools.zip"
-    dependsOn(shadowJar, makeAnnotationFileFormat, testAnnotator, updateWorkspace)
+    dependsOn(shadowJar, makeAnnotationFileFormat, testAnnotator, cloneAndPrepDirectoryForZipfile)
     archiveFileName = 'annotation-tools.zip'
     destinationDirectory = projectDir
     from files(tmpAnnotationTools)
 }
 
 task copyToDeployDir {
+    description 'copy release to deployDir.'
     doLast {
         String deployDir = project.getProperties().get("deploy-dir")
         String afuVersion = project.getProperties().get("afu.version")
@@ -515,7 +528,7 @@ task copyToDeployDir {
 }
 
 task releaseBuild(type: GradleBuild) {
-    description 'Build everything required for a release'
+    description 'Build everything required for a release.'
     doFirst {
         if (!project.hasProperty('deploy-dir')) {
             throw new RuntimeException("You must specify a deploy-dir, the live site deploy-dir=/cse/www2/types/annotation-file-utilities/releases/_version num_")
