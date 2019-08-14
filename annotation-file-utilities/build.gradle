@@ -467,6 +467,7 @@ clean {
 
 ext.tmpAnnotationTools = "${buildDir}/tmp-annotation-tools"
 task cloneAndPrepDirectoryForZipfile {
+    dependsOn(assemble, makeAnnotationFileFormat)
     description 'Copy files from repository to temporary directory from which they will be packaged up.'
     doLast {
         delete tmpAnnotationTools
@@ -485,7 +486,7 @@ task cloneAndPrepDirectoryForZipfile {
         delete "${tmpAnnotationTools}/.hgignore"
         copy {
             from projectDir
-            into tmpAnnotationTools
+            into "${tmpAnnotationTools}/annotation-file-utilities"
             include "annotation-file-format.dvi"
             include "annotation-file-format.html"
             include "annotation-file-format.pdf"
@@ -497,7 +498,7 @@ task cloneAndPrepDirectoryForZipfile {
 
 task zipfile(type: Zip) {
     description "create the distribution: annotation-tools.zip"
-    dependsOn(shadowJar, makeAnnotationFileFormat, testAnnotator, cloneAndPrepDirectoryForZipfile)
+    dependsOn(cloneAndPrepDirectoryForZipfile)
     archiveFileName = 'annotation-tools.zip'
     destinationDirectory = projectDir
     from files(tmpAnnotationTools)
@@ -542,5 +543,5 @@ task releaseBuild(type: GradleBuild) {
     startParameter.projectProperties += gradle.startParameter.projectProperties
     startParameter.projectProperties += [release: true.toString()]
 
-    tasks = ['clean', 'zipfile', 'copyToDeployDir']
+    tasks = ['clean', 'zipfile', 'testAnnotator', 'copyToDeployDir']
 }
