@@ -433,7 +433,7 @@ def createCheckTypeTask(checker, shortName) {
 createCheckTypeTask('org.checkerframework.checker.signature.SignatureChecker', 'Signature')
 
 task htmlValidate(type: Exec) {
-    description 'Validate that HTML files are well-formed; only works with JDK 8.'
+    description 'Validate that HTML files are well-formed.'
     workingDir '../'
     executable 'html5validator'
     args = [
