@@ -489,6 +489,7 @@ task cloneAndPrepDirectoryForZipfile {
             include "annotation-file-format.dvi"
             include "annotation-file-format.html"
             include "annotation-file-format.pdf"
+            include "annotation-file-utilities.jar"
             include "annotation-file-utilities-all.jar"
         }
     }
