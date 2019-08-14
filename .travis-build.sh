@@ -38,7 +38,7 @@ git -C /tmp/plume-scripts pull > /dev/null 2>&1 \
 eval `/tmp/plume-scripts/ci-info typetools`
 
 if [[ "${GROUP}" == "test" || "${GROUP}" == "all" ]]; then
-   (cd annotation-file-utilities && ./gradlew allTests)
+  (cd annotation-file-utilities && ./gradlew allTests)
 fi
 
 if [[ "${GROUP}" == "typecheck" || "${GROUP}" == "all" ]]; then
@@ -59,7 +59,7 @@ if [[ "${GROUP}" == "misc" || "${GROUP}" == "all" ]]; then
 
   set -e
 
-   (cd annotation-file-utilities && ./gradlew checkBasicStyle)
+  (cd annotation-file-utilities && ./gradlew checkBasicStyle)
 
   # TODO: when codebase is reformatted (after merging branches?)
   # ant check-format
