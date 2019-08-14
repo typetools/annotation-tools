@@ -57,14 +57,14 @@ public class AnnotationsTest extends TestCase {
    * The directory in which to find the index files to test.
    */
   private static final String INDEX_FILE_BASE =
-    "test/annotations/tests/classfile/cases/";
+    "build/resources/test/annotations/tests/classfile/cases/";
 
   /**
    * The directory in which to find the class files (both .class and _Generated.class)
    * to test.
    */
   private static final String CLASS_FILE_BASE =
-    "test/annotations-expected/tests/classfile/cases/";
+    "build/resources/test/annotations-expected/tests/classfile/cases/";
 
   /**
    * An array of all the classes to test.  For each name in this array, there

@@ -48,18 +48,18 @@ results: ../bin/VerifyDiffs.class
 
 # Remakes the little java program that checks and compares diffs
 ../bin/VerifyDiffs.class : ../VerifyDiffs.java
-	@$(JAVAC) -g -cp ../../bincompile -d ../bin ../VerifyDiffs.java
+	@$(JAVAC) -g -cp ../../build/classes/java/maincompile -d ../bin ../VerifyDiffs.java
 
 # Compiles all the test cases (be verbose about this).
 .PHONY: compile
 compile : $(SRC)
 	mkdir -p bin
-	$(JAVAC) -g -cp bin:../../bin -d bin -sourcepath . $(SRC)
+	$(JAVAC) -g -cp bin:../../build/classes/java/main -d bin -sourcepath . $(SRC)
 
 # Actually runs the annotator to create the annotated java file.
-output: compile $(JAIF) ../../bin $(AFU_JARS)
+output: compile $(JAIF) ../../build/classes/java/main $(AFU_JARS)
 	$(JAVA) \
-	-cp ../../bin:../../annotation-file-utilities-all.jar:bin \
+	-cp ../../build/classes/java/main:../../annotation-file-utilities-all.jar:bin \
 	annotator.Main \
 	${DEBUG} \
 	--abbreviate=true \
