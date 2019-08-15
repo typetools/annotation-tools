@@ -29,7 +29,13 @@ done
 
 AFU=${AFU:-$(dirname $0)/..}
 ANNOTATION_FILE_UTILS=${AFU}/bin:${AFU}/../scene-lib/bin:${AFU}/../asmx/bin:${AFU}/annotation-file-utilities-all.jar
-JAVAC_JAR=${JAVAC_JAR:-${ANNOTATION_FILE_UTILS}/lib/compiler-2.4.0.jar}
+JAVAC_JAR=${JAVAC_JAR:-${ANNOTATION_FILE_UTILS}/lib/javac-9-dev-r4023-3.jar}
+
+JAVA_VERSION=`java -version 2>&1 | head -1 | cut -d'"' -f2 | sed '/^1\./s///' | cut -d'.' -f1`
+if [ "$JAVA_VERSION" = "8" ]; then
+  # -Xbootclasspth isn't supported in 9+ and isn't required.
+  BOOTCLASSPATH=-Xbootclasspath/p:${JAVAC_JAR}
+fi
 
 if [ "$DEBUG" = "1" ]; then
   echo "--- start of insert-annotations debugging output"
@@ -37,10 +43,11 @@ if [ "$DEBUG" = "1" ]; then
   echo "ANNOTATION_FILE_UTILS=${ANNOTATION_FILE_UTILS}"
   echo "LANGTOOLS=${LANGTOOLS}"
   echo "JAVAC_JAR=${JAVAC_JAR}"
+  echo "JAVA_VERSION=${JAVA_VERSION}"
   # Keep this in sync with the actual command below.
-  echo "java -ea -cp ${JAVAC_JAR}:${AFU}/lib/plume-lib.jar:${ANNOTATION_FILE_UTILS}:${CLASSPATH} scenelib.annotations.io.classfile.ClassFileWriter $@"
+  echo "java -ea ${BOOTCLASSPATH} -cp ${JAVAC_JAR}:${AFU}/lib/plume-lib.jar:${ANNOTATION_FILE_UTILS}:${CLASSPATH} scenelib.annotations.io.classfile.ClassFileWriter $@"
   echo "--- end of insert-annotations debugging output"
 fi
 
 # Needs CLASSPATH to find user files
-java -ea -cp ${JAVAC_JAR}:${AFU}/lib/plume-lib.jar:${ANNOTATION_FILE_UTILS}:${CLASSPATH} scenelib.annotations.io.classfile.ClassFileWriter "$@"
+java -ea ${BOOTCLASSPATH} -cp ${JAVAC_JAR}:${AFU}/lib/plume-lib.jar:${ANNOTATION_FILE_UTILS}:${CLASSPATH} scenelib.annotations.io.classfile.ClassFileWriter "$@"
