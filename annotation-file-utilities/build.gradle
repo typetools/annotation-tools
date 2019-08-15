@@ -99,10 +99,10 @@ shadowJar {
     destinationDirectory = projectDir
     includeEmptyDirs = false
     archiveVersion = null
-    minimize {
-        exclude(dependency('com.google.errorprone:.*'))
-        exclude(dependency(files('../asmx/bin/')))
-    }
+//    minimize {
+//        exclude(dependency('com.google.errorprone:.*'))
+//        exclude(dependency(files('../asmx/bin/')))
+//    }
     // Don't include any class from the Checker Framework.
     // This should just be checker-qual.
     exclude 'org/checkerframework/**'
@@ -127,7 +127,6 @@ task skinnyJar(type: ShadowJar, dependsOn: compileJava) {
     destinationDirectory = projectDir
     from files(sourceSets.main.output, '../asmx/bin/')
     archiveFileName = 'annotation-file-utilities.jar'
-    minimize()
     include 'scenelib/**/*.class'
     include 'annotator/**/*.class'
     include 'org/objectweb/asmx/**/*.class'
