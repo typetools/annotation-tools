@@ -79,7 +79,7 @@ if [[ "${GROUP}" == "downstream" || "${GROUP}" == "all" ]]; then
     BRANCH=`../plume-scripts/git-find-branch ${REPO} ${CI_BRANCH}`
     (cd .. && git clone -b ${BRANCH} --single-branch --depth 1 ${REPO}) || (cd .. && git clone -b ${BRANCH} --single-branch --depth 1 ${REPO})
 
-    (cd ../checker-framework-inference && . ./.travis-build-without-test.sh)
+    (cd ../checker-framework-inference && ./.travis-build-without-test.sh)
 
     (cd ../checker-framework/framework && ../gradlew wholeProgramInferenceTests)
     (cd ../checker-framework-inference && ./gradlew dist && ./gradlew test)
