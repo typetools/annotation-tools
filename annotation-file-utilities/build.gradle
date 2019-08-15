@@ -43,14 +43,12 @@ dependencies {
     implementation 'org.plumelib:plume-util:1.0.7'
     implementation 'org.plumelib:signature-util:0.0.6'
     compileOnly 'org.checkerframework:checker-qual:2.5.4'
-    implementation 'org.checkerframework:compiler:2.4.0'
+    implementation 'com.google.errorprone:javac:9-dev-r4023-3'
     implementation 'com.google.guava:guava:28.0-jre'
-//    implementation files("${project.buildDir}/libs/asmx.jar")
     implementation files('../asmx/bin/')
 
     testCompile group: 'junit', name: 'junit', version: '4.12'
-    // Change the JDK via -Dorg.gradle.java.home=JDK_PATH
-    testCompile files(Jvm.current().toolsJar)
+    testCompile files('lib/javac.jar')
 }
 
 task compileAsmx(type: Exec, group: 'Build') {
@@ -92,7 +90,7 @@ shadowJar {
     includeEmptyDirs = false
     archiveVersion = null
     minimize {
-        exclude(dependency('org.checkerframework:compiler:.*'))
+        exclude(dependency('com.google.errorprone:.*'))
         exclude(dependency(files('../asmx/bin/')))
     }
     // Don't include any class from the Checker Framework.
