@@ -19,6 +19,10 @@ repositories {
     mavenCentral()
 }
 
+// On a Java 8 JVM, use error-prone javac and source/target 8.
+// On a Java 9+ JVM, use the host javac, default source/target, and required module flags.
+ext.isJava8 = JavaVersion.current() == JavaVersion.VERSION_1_8
+
 sourceSets {
     main.java {
         srcDirs = ['src', '../scene-lib/src']
@@ -36,8 +40,14 @@ sourceSets {
         exclude("**/*.java")
     }
 }
+configurations {
+    javacJar
+}
 
 dependencies {
+    if (isJava8) {
+        javacJar group: 'com.google.errorprone', name: 'javac', version: "9+181-r4173-1"
+    }
     implementation 'org.plumelib:bcel-util:1.1.4'
     implementation 'org.plumelib:options:1.0.1'
     implementation 'org.plumelib:plume-util:1.0.7'
@@ -410,7 +420,7 @@ def createCheckTypeTask(checker, shortName) {
     tasks.create(name: "check${shortName}", type: JavaCompile) {
         description "Run the ${shortName} Checker on the main sources."
         group 'Verification'
-        String checkerDist = '../../checker-framework/checker/dist'
+        String checkerDist = "${projectDir}/../../checker-framework/checker/dist"
         // Always run the task.
         outputs.upToDateWhen { false }
         source = sourceSets.main.java
@@ -423,8 +433,17 @@ def createCheckTypeTask(checker, shortName) {
                 '-processor', "${checker}",
                 '-proc:only',
                 '-Xlint:-processing',
-                "-Xbootclasspath/p:${checkerDist}/jdk8.jar"
         ]
+        options.fork = true
+
+        if (isJava8) {
+            sourceCompatibility = 8
+            targetCompatibility = 8
+            options.compilerArgs += [
+                    "-Xbootclasspath/p:${checkerDist}/jdk8.jar"
+            ]
+            options.forkOptions.jvmArgs += ["-Xbootclasspath/p:${configurations.javacJar.asPath}"]
+        }
     }
 }
 
