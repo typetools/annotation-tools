@@ -168,7 +168,12 @@ public final class AnnotationDef extends AElement {
      */
     public List<String> targets() {
         Annotation target = target();
-        return (target == null) ? null : (List<String>) target.getFieldValue("value");
+        if (target == null) {
+            return null;
+        }
+        @SuppressWarnings("unchecked")
+        List<String> fieldValue = (List<String>) target.getFieldValue("value");
+        return fieldValue;
     }
 
     /**

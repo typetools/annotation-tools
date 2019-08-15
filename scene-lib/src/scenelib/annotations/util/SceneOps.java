@@ -3,6 +3,7 @@ package scenelib.annotations.util;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 import java.util.Set;
 
@@ -348,15 +349,12 @@ implements ElementVisitor<Void, Pair<AElement, AElement>> {
         } else if (!sval.equals(mval)) {
           try {
             @SuppressWarnings("unchecked")
-            Set<V> set = (Set<V>) sval.getClass().newInstance();
+            Set<V> set = (Set<V>) sval.getClass().getDeclaredConstructor().newInstance();
             diff(mval, sval, set);
             if (!set.isEmpty()) {
               difference.put(key, set);
             }
-          } catch (InstantiationException e) {
-            e.printStackTrace();
-            System.exit(1);
-          } catch (IllegalAccessException e) {
+          } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
             e.printStackTrace();
             System.exit(1);
           }

@@ -46,12 +46,12 @@ results: ../bin/VerifyDiffs.class
 
 # Remakes the little Java program that checks and compares diffs.
 ../bin/VerifyDiffs.class : ../VerifyDiffs.java
-	@$(JAVAC) -g -cp ../../bincompile -d ../bin ../VerifyDiffs.java
+	@$(JAVAC) -g -cp ../../build/classes/java/maincompile -d ../bin ../VerifyDiffs.java
 
 # Compiles all the test cases (be verbose about this).
 compile :
 	mkdir -p bin
-	$(JAVAC) -g -cp ../../bin -d bin ../*.java
+	$(JAVAC) -g -cp ../../build/classes/java/main -d bin ../*.java
 
 .PRECIOUS : bin/annotator/tests/%.class
 bin/annotator/tests/%.class: %.java
@@ -77,9 +77,9 @@ bin/annotator/tests/%.class: %.java
 # TODO: added `-` to these commands to proceed past failures
 # The failures will still show up in the summary, but it might
 # be better to fail earlier.
-%.output: %.jaif %.java bin/annotator/tests/%.class ../../bin ../../annotation-file-utilities-all.jar
+%.output: %.jaif %.java bin/annotator/tests/%.class ../../build/classes/java/main ../../annotation-file-utilities-all.jar
 	-$(JAVA) \
-	    -cp ../../bin:../../annotation-file-utilities-all.jar:bin \
+	    -cp ../../build/classes/java/main:../../annotation-file-utilities-all.jar:bin \
 	    annotator.Main \
 	    ${DEBUG} \
 	    --abbreviate=false \
