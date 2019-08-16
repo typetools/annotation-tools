@@ -935,7 +935,7 @@ public final class IndexFileParser {
                 matchKeyword("local");
                 matched = true;
                 LocalLocation loc;
-//                if (checkNNInteger() != -1) {
+                if (checkNNInteger() != -1) {
                     // the local variable is specified by bytecode index/range
                     int index = expectNonNegative(matchNNInteger());
                     expectChar('#');
@@ -943,21 +943,21 @@ public final class IndexFileParser {
                     expectChar('+');
                     int scopeLength = expectNonNegative(matchNNInteger());
                     loc = new LocalLocation(index, scopeStart, scopeLength);
-//                }
+                }
                 // TODO: Need some way to get the actual variable info from string, or deprecate this feature.
-//                else {
-//                    // look for a valid identifier for the local variable
-//                    String lvar = expectIdentifier();
-//                    int varIndex;
-//                    if (checkChar('*')) {
-//                        expectChar('*');
-//                        varIndex = expectNonNegative(matchNNInteger());
-//                    } else {
-//                        // default the variable index to 0, the most common case
-//                        varIndex = 0;
-//                    }
-//                    loc = new LocalLocation(lvar, varIndex);
-//                }
+                else {
+                    // look for a valid identifier for the local variable
+                    String lvar = expectIdentifier();
+                    int varIndex;
+                    if (checkChar('*')) {
+                        expectChar('*');
+                        varIndex = expectNonNegative(matchNNInteger());
+                    } else {
+                        // default the variable index to 0, the most common case
+                        varIndex = 0;
+                    }
+                    loc = new LocalLocation(lvar, varIndex);
+                }
                 AField l = bl.locals.getVivify(loc);
                 expectChar(':');
                 parseAnnotations(l);
