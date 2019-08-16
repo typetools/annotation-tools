@@ -1,9 +1,0 @@
-package annotator.tests;
-
-public class LocalArray {
-
-  public void foo() {
-    @java.lang.UnderInitialization Object @java.lang.Tainted [] o = null;
-    System.out.println(o);
-  }
-}

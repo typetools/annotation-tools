@@ -1,7 +1,0 @@
-package:
-    annotation @A: @Target(TYPE_USE)
-
-package pkg.name.here:
-    class Package:
-        field o:
-            type: @A
