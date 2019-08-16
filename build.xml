@@ -6,7 +6,6 @@
   <property environment="env"/>
 
   <!-- default location of projects, has effect only if not previously set -->
-  <!--<property name="asmx" location="asmx"/>-->
   <property name="scene-lib" location="scene-lib"/>
   <property name="afu" location="annotation-file-utilities"/>
 
@@ -34,18 +33,6 @@
       depends="prep,compile,test-all"/>
 
   <target name="clean" depends="clean-all"/>
-
-  <!--<target name="compile-asmx">-->
-      <!--<ant dir="${asmx}" target="compile">-->
-	  <!--<property name="product.noshrink" value="true"/>-->
-      <!--</ant>-->
-  <!--</target>-->
-
-  <!-- TODO: Get this working -->
-  <!-- Known to fail -->
-  <!--<target name="test-asmx">-->
-      <!--<ant dir="${asmx}" target="test"/>-->
-  <!--</target>-->
 
   <target name="compile-scene-lib">
       <ant dir="${scene-lib}" target="bin"/>
@@ -77,7 +64,6 @@
   <target name="test-all"
 	 depends="test-scene-lib,test-afu"/>
   <target name="clean-all">
-    <!--<ant dir="${asmx}" target="clean"/>-->
     <ant dir="${scene-lib}" target="clean"/>
     <ant dir="${afu}" target="clean"/>
   </target>
