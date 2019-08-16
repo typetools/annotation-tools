@@ -15,28 +15,41 @@ public final class LocalLocation {
     public final Label[] start;
     public final Label[] end;
     public final int[] index;
+    public final String variableName;
 
     // This is made private so that we always call {@link Label#getOffset} whenever we access these. This is to prevent
     // a case where labels passed to the constructor would not be resolved at that point.
     private int scopeStart;
     private int scopeLength;
 
-    public LocalLocation(Label[] start, Label[] end, int[] index) {
+    public LocalLocation(String variableName, int index) {
+        this(new Label(), new Label(), index, variableName);
+        System.out.println("BAD1");
+    }
+
+    public LocalLocation(Label start, Label end, int index, String variableName) {
+        this(new Label[] {start}, new Label[] {end}, new int[] {index}, variableName);
+    }
+
+    public LocalLocation(Label[] start, Label[] end, int[] index, String variableName) {
         this.start = start;
         this.end = end;
         this.index = index;
         this.scopeStart = -1; // start[0].getOffset();  // FIXME
         this.scopeLength = -1; // end[end.length - 1].getOffset() - start[0].getOffset(); // FIXME
+        this.variableName = variableName;
     }
 
     public LocalLocation(int index, int scopeStart, int scopeLength) {
         // Only being used by Writers, not Readers for now. Should possibly deprecate this in the future.
         // Changes values reflectively.
+        System.out.println("BAD2");
         this.scopeStart = scopeStart;
         this.scopeLength = scopeLength;
         this.index = new int[] {index};
         this.start = new Label[] {new Label()};
         this.end = new Label[] {new Label()};
+        this.variableName = null;
 
         try {
             Field flagsField = Label.class.getDeclaredField("flags");
@@ -62,8 +75,8 @@ public final class LocalLocation {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
+
 
     /**
      * Returns the bytecode offset to the start of the scope

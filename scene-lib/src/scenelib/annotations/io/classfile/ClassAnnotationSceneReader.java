@@ -556,6 +556,11 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
      */
     private final Label currentLabel;
 
+    /**
+     * The name of the local variable being visited.
+     */
+    private final String localVariableName;
+
     // since AnnotationSceneReader will work for both normal
     // and extended annotations, all of the following information
     // may or may not be present, so use a list to store
@@ -580,8 +585,20 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
      * annotation it visits into aElement.
      * @param descriptor JVML format for the field being read, or ClassAnnotationSceneReader.dummyDesc
      */
-    TypeAnnotationSceneReader(int api, String descriptor, boolean visible, AElement aElement, AnnotationVisitor annotationWriter, int typeRef, TypePath typePath,
-                                     Label[] start, Label[] end, int[] index, Label currentLabel) {
+    TypeAnnotationSceneReader(int api, String descriptor, boolean visible, AElement aElement, AnnotationVisitor annotationWriter,
+                              int typeRef, TypePath typePath, Label[] start, Label[] end, int[] index, Label currentLabel) {
+      this(api, descriptor, visible, aElement, annotationWriter, typeRef, typePath, start, end, index, currentLabel, null);
+    }
+
+    /**
+     * Constructs a new AnnotationScene reader with the given description and
+     * visibility.  Calling visitEnd() will ensure that this writes out the
+     * annotation it visits into aElement.
+     * @param descriptor JVML format for the field being read, or ClassAnnotationSceneReader.dummyDesc
+     */
+    TypeAnnotationSceneReader(int api, String descriptor, boolean visible, AElement aElement, AnnotationVisitor annotationWriter,
+                              int typeRef, TypePath typePath, Label[] start, Label[] end, int[] index, Label currentLabel,
+                              String localVariableName) {
       super(api, descriptor, visible, aElement, annotationWriter);
       this.typeReference = new TypeReference(typeRef);
       this.typePath = typePath;
@@ -595,6 +612,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
               Arrays.toString(start), Arrays.toString(end), Arrays.toString(index));
         }
       }
+      this.localVariableName = localVariableName;
     }
 
     /**
@@ -974,7 +992,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
    * @return a LocalLocation for this annotation.
    */
   private LocalLocation makeLocalLocation() {
-    return new LocalLocation(start, end, index);
+    return new LocalLocation(start, end, index, localVariableName);
   }
 
   /**
@@ -1225,6 +1243,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
     private final AElement aMethod;
     private final MethodVisitor methodWriter;
     private Label currentLabel;
+    private String localVariableName;
 
     MethodAnnotationSceneReader(int api, String name, String descriptor, String signature, AElement aMethod, MethodVisitor methodWriter) {
       super(api, methodWriter);
@@ -1251,12 +1270,11 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
               ((AMethod) aMethod).parameters.getVivify(parameter), annotationWriter);
     }
 
-//    @Override
-//    public void visitLocalVariable(String name, String descriptor, String signature,
-//        Label start, Label end, int index) {
-//      // TODO!
-//    }
-
+    @Override
+    public void visitLocalVariable(String name, String descriptor, String signature, Label start, Label end, int index) {
+      super.visitLocalVariable(name, descriptor, signature, start, end, index);
+      this.localVariableName = name;
+    }
 
     @Override
     public void visitLabel(Label label) {
@@ -1304,7 +1322,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
             aMethod, this, this.getClass());
       }
       AnnotationVisitor annotationWriter = methodWriter.visitLocalVariableAnnotation(typeRef, typePath, start, end, index, descriptor, visible);
-      return new TypeAnnotationSceneReader(this.api, descriptor, visible, aMethod, annotationWriter, typeRef, typePath, start, end, index, currentLabel);
+      return new TypeAnnotationSceneReader(this.api, descriptor, visible, aMethod, annotationWriter, typeRef, typePath, start, end, index, currentLabel, localVariableName);
     }
 
     // TODO: visit code!
