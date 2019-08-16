@@ -15,9 +15,5 @@ export CHECKERFRAMEWORK=`readlink -f ${CHECKERFRAMEWORK:-../checker-framework}`
 export PATH=$AFU/scripts:$JAVA_HOME/bin:$PATH
 
 ## Compile
-echo "About to run \"ant compile\" for annotation-tools" in `pwd`
-which ant
-ant compile
-echo "Finished running \"ant compile\" for annotation-tools"
-
+cd ${AFU}; ./gradlew assemble
 echo Exiting `pwd`/.travis-build-without-test.sh

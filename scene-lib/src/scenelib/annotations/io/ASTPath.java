@@ -1,5 +1,6 @@
 package scenelib.annotations.io;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Objects;
 import java.io.IOException;
 import java.io.StreamTokenizer;
@@ -1406,15 +1407,13 @@ class ImmutableStack<E> {
   private static <T, S extends ImmutableStack<T>> S extend(T el, S s0) {
     try {
       @SuppressWarnings("unchecked")
-      S s1 = (S) s0.getClass().newInstance();
+      S s1 = (S) s0.getClass().getDeclaredConstructor().newInstance();
       ImmutableStack<T> cs = (ImmutableStack<T>) s1;
       cs.size = 1 + s0.size();
       cs.elem = el;
       cs.rest = s0;
       return s1;
-    } catch (InstantiationException e) {
-      throw new RuntimeException(e);
-    } catch (IllegalAccessException e) {
+    } catch (InstantiationException | InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
       throw new RuntimeException(e);
     }
   }

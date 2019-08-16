@@ -426,7 +426,7 @@ public class ASTIndex extends WrapperMap<Tree, ASTRecord> {
             counters.push(++i);
             className = rec.className + "$" + i;
           } else {
-            ClassSymbol sym = ((JCTree.JCClassDecl) classBody).sym;
+            ClassSymbol sym = classBody.sym;
             String s = sym == null ? "" : sym.toString();
             if (s.startsWith("<anonymous ")) {
               int i = counters.pop();
@@ -607,7 +607,7 @@ public class ASTIndex extends WrapperMap<Tree, ASTRecord> {
         Kind kind = node.getKind();
         if (rec.methodName == null) {  // member field
           rec = new ASTRecord(cut, rec.className, rec.methodName,
-              ((VariableTree) node).getName().toString(), rec.astPath);
+              node.getName().toString(), rec.astPath);
         }
         save(node.getType(), rec, kind, ASTPath.TYPE);
         save(node.getInitializer(), rec, kind, ASTPath.INITIALIZER);

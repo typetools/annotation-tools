@@ -1,11 +1,15 @@
-package java.lang:
-annotation @UnderInitialization: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
+package org.checkerframework.checker.initialization.qual:
+annotation @UnderInitialization: @java.lang.annotation.Target(value={TYPE_USE,TYPE_PARAMETER}) @java.lang.annotation.Retention(value=RUNTIME)
+    Class value
 
 package annotator.tests:
 class LocalVariables:
 
     method <init>()V:
+        return:
 
     method foo()V:
-        local a: @java.lang.UnderInitialization
+        return:
+        local 1 #2+5:
+            type: @org.checkerframework.checker.initialization.qual.UnderInitialization
 
