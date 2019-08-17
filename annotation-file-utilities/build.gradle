@@ -6,6 +6,7 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '5.1.0'
     id 'java'
 }
+apply plugin: 'idea'
 apply plugin: 'java'
 apply plugin: 'com.github.johnrengelman.shadow'
 
@@ -45,33 +46,15 @@ dependencies {
     compileOnly 'org.checkerframework:checker-qual:2.5.4'
     implementation 'org.checkerframework:compiler:2.4.0'
     implementation 'com.google.guava:guava:28.0-jre'
-//    implementation files("${project.buildDir}/libs/asmx.jar")
-    implementation files('../asmx/bin/')
+    implementation 'org.ow2.asm:asm:7.2-beta'
 
     testCompile group: 'junit', name: 'junit', version: '4.12'
     // Change the JDK via -Dorg.gradle.java.home=JDK_PATH
     testCompile files(Jvm.current().toolsJar)
 }
 
-task compileAsmx(type: Exec, group: 'Build') {
-    description 'Compile asmx.'
-    workingDir '../asmx'
-    executable 'ant'
-    args = [
-            '-Dproduct.noshrink=true',
-            'bin'
-    ]
-}
-
-task cleanAsmx(type: Exec) {
-    description 'Clean asmx.'
-    workingDir '../asmx'
-    executable 'ant'
-    args = ['clean']
-}
 
 compileJava {
-    dependsOn compileAsmx
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
     options.failOnError = true
@@ -93,7 +76,6 @@ shadowJar {
     archiveVersion = null
     minimize {
         exclude(dependency('org.checkerframework:compiler:.*'))
-        exclude(dependency(files('../asmx/bin/')))
     }
     // Don't include any class from the Checker Framework.
     // This should just be checker-qual.
@@ -114,19 +96,18 @@ shadowJar {
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 task skinnyJar(type: ShadowJar, dependsOn: compileJava) {
-    description 'Builds annotation-file-utilities.jar with only asmx, scene-lib, and annotation-file-utility classes.'
+    description 'Builds annotation-file-utilities.jar with only scene-lib, and annotation-file-utility classes.'
     includeEmptyDirs = false
     destinationDirectory = projectDir
-    from files(sourceSets.main.output, '../asmx/bin/')
+//    from files(sourceSets.main.output, '../asmx/bin/')
     archiveFileName = 'annotation-file-utilities.jar'
     minimize()
     include 'scenelib/**/*.class'
     include 'annotator/**/*.class'
-    include 'org/objectweb/asmx/**/*.class'
     doFirst {
         if (project.hasProperty('release')) {
             println 'Relocating packages.'
-            relocate 'org.objectweb.asmx', 'org.checkerframework.org.objectweb.asm'
+            relocate 'org.objectweb.asm', 'org.checkerframework.org.objectweb.asm'
         }
     }
 }
@@ -315,7 +296,6 @@ task checkBasicStyle(group: 'Format') {
                                   'bib',
                                   'build',
                                   'jdk',
-                                  'asmx',
                                   'javadoc',
                                   "tests"]
 
@@ -461,7 +441,7 @@ artifacts {
 }
 
 clean {
-    dependsOn(cleanTestAnnotator, cleanAnnotationFileFormat, cleanTestExample, cleanAsmx)
+    dependsOn(cleanTestAnnotator, cleanAnnotationFileFormat, cleanTestExample)
     delete('annotation-file-utilities.jar','annotation-file-utilities-all.jar', 'annotation-tools.zip')
 }
 
