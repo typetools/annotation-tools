@@ -29,7 +29,8 @@ done
 
 AFU=${AFU:-$(dirname $0)/..}
 AFU=`cd \`dirname $0\`/.. && pwd`
-ANNOTATION_FILE_UTILS=${ANNOTATION_FILE_UTILS:-${AFU}/bin:${AFU}/../scene-lib/bin:${AFU}/../asmx/bin:${AFU}/annotation-file-utilities-all.jar}
+
+ANNOTATION_FILE_UTILS=${ANNOTATION_FILE_UTILS:-${AFU}/annotation-file-utilities-all.jar}
 JAVAC_JAR=${JAVAC_JAR:-${AFU}/lib/javac-9-dev-r4023-3.jar}
 
 java -version 2>&1 | grep version | grep 1.8 > /dev/null
