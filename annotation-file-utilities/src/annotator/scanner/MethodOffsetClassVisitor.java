@@ -124,22 +124,23 @@ public class MethodOffsetClassVisitor extends ClassVisitor {
       methodCodeOffsetAdapter.visitIntInsn(opcode, operand);
     }
 
-//    @Override
-//    public void visitMethodInsn(int opcode, String owner, String name,
-//        String descriptor) {
-//      super.visitMethodInsn(opcode, owner, name, descriptor);
-//      switch (opcode) {
-//      case Opcodes.INVOKEINTERFACE:
-//      case Opcodes.INVOKESTATIC:
-//      case Opcodes.INVOKEVIRTUAL:
-//        MethodCallScanner.addMethodCallToMethod(methodName,
-//            labelOffset());
-//        break;
-//      default:
-//        break;
-//      }
-//      methodCodeOffsetAdapter.visitMethodInsn(opcode, owner, name, descriptor);
-//    }
+    @Deprecated
+    @Override
+    public void visitMethodInsn(int opcode, String owner, String name,
+        String descriptor) {
+      super.visitMethodInsn(opcode, owner, name, descriptor);
+      switch (opcode) {
+      case Opcodes.INVOKEINTERFACE:
+      case Opcodes.INVOKESTATIC:
+      case Opcodes.INVOKEVIRTUAL:
+        MethodCallScanner.addMethodCallToMethod(methodName,
+            labelOffset());
+        break;
+      default:
+        break;
+      }
+      methodCodeOffsetAdapter.visitMethodInsn(opcode, owner, name, descriptor);
+    }
 
     @Override
     public void visitMethodInsn(int opcode, String owner, String name, String descriptor, boolean isInterface) {
@@ -210,7 +211,7 @@ public class MethodOffsetClassVisitor extends ClassVisitor {
 
     @Override
     public void visitTableSwitchInsn(int min, int max, Label dflt,
-        Label[] labels) {
+        Label... labels) {
       super.visitTableSwitchInsn(min, max, dflt, labels);
       methodCodeOffsetAdapter.visitTableSwitchInsn(min, max, dflt, labels);
     }

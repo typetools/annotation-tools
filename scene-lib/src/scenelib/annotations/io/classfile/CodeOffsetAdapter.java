@@ -152,6 +152,7 @@ public class CodeOffsetAdapter extends ClassVisitor {
         assert offset > 0 && methodEnd > codeStart + offset;
       }
 
+      @Deprecated
       @Override
       public void visitMethodInsn(int opcode,
           String owner, String name, String descriptor) {
@@ -177,7 +178,7 @@ public class CodeOffsetAdapter extends ClassVisitor {
 
       @Override
       public void visitTableSwitchInsn(int min, int max,
-          Label dflt, Label[] labels) {
+          Label dflt, Label... labels) {
         super.visitTableSwitchInsn(min, max, dflt, labels);
         debug.debug("%d visitTableSwitchInsn(%d, %d, %s)%n", offset,
             min, max, dflt, labels);

@@ -95,6 +95,7 @@ class MethodCodeOffsetAdapter extends MethodVisitor {
     offset += 4 + 8 * readInt(offset);
   }
 
+  @Deprecated
   @Override
   public void visitMethodInsn(int opcode,
       String owner, String name, String descriptor) {
@@ -116,7 +117,7 @@ class MethodCodeOffsetAdapter extends MethodVisitor {
 
   @Override
   public void visitTableSwitchInsn(int min, int max,
-      Label dflt, Label[] labels) {
+      Label dflt, Label... labels) {
     super.visitTableSwitchInsn(min, max, dflt, labels);
     offset += 8 - ((offset - codeStart) & 3);
     offset += 4 * (readInt(offset + 4) - readInt(offset) + 3);
