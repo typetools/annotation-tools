@@ -4,9 +4,6 @@ import java.io.*;
 import java.util.*;
 import java.lang.annotation.RetentionPolicy;
 
-import com.sun.tools.classfile.TypeAnnotation.Position.TypePathEntryKind;
-import com.sun.tools.javac.code.TypeAnnotationPosition;
-
 import java.util.Map.Entry;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -156,7 +153,7 @@ public class TestSceneLib {
         Entry<LocalLocation, AField> entry = set.iterator().next();
         Assert.assertEquals(1, entry.getKey().index[0]);
         Assert.assertEquals(3, entry.getKey().getScopeStart());
-        assertEquals(5, entry.getKey().getScopeLength());
+        Assert.assertEquals(5, entry.getKey().getScopeLength());
         ATypeElement l = (ATypeElement) entry.getValue().type;
         AElement i = (AElement) l.innerTypes.get(TypePathEntry
             .getTypePathEntryListFromBinary(Arrays.asList(0, 0)));

@@ -5,7 +5,6 @@ import java.io.*;
 import com.sun.tools.javac.main.CommandLine;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.TypePath;
 import org.plumelib.options.Option;
 import org.plumelib.options.Options;
 import scenelib.annotations.el.AScene;
