@@ -29,7 +29,7 @@ while [ "$#" -gt 0 ]; do
 done
 
 AFU=${AFU:-$(dirname $0)/..}
-ANNOTATION_FILE_UTILS=${AFU}/bin:${AFU}/../scene-lib/bin:${AFU}/../asmx/bin:${AFU}/annotation-file-utilities-all.jar
+ANNOTATION_FILE_UTILS=${AFU}/annotation-file-utilities-all.jar
 
 if [ "$DEBUG" = "1" ]; then
   echo "--- start of extract-annotations debugging output"
