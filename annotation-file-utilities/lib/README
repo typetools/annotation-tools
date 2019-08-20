@@ -1,6 +1,2 @@
 javac.jar: https://bitbucket.org/eisop/jsr308-langtools
   hg clone https://bitbucket.org/eisop/jsr308-langtools; cd jsr308-langtools/cfmake; make; make clean;
-
-# Used by scripts
-javac-9-dev-r4023-3.jar: https://mvnrepository.com/artifact/com.google.errorprone/javac
-  wget https://repo1.maven.org/maven2/com/google/errorprone/javac/9-dev-r4023-3/javac-9-dev-r4023-3.jar
