@@ -58,7 +58,7 @@ dependencies {
     implementation files('../asmx/bin/')
 
     testCompile group: 'junit', name: 'junit', version: '4.12'
-    testCompile files('lib/javac.jar')
+    testCompile 'com.google.errorprone:javac:9-dev-r4023-3'
 }
 
 task compileAsmx(type: Exec, group: 'Build') {
