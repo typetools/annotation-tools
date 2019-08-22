@@ -100,7 +100,7 @@ shadowJar {
     exclude 'org/checkerframework/**'
     doFirst {
         // TODO: The release fails because of this, so skip it for now.
-        if (project.hasProperty('release') || false) {
+        if (project.hasProperty('release') && false) {
             println 'Relocating packages.'
             relocate 'org.apache', 'org.checkerframework.org.apache'
             relocate 'org.relaxng', 'org.checkerframework.org.relaxng'
@@ -126,7 +126,7 @@ task skinnyJar(type: ShadowJar, dependsOn: compileJava) {
     include 'org/objectweb/asmx/**/*.class'
     doFirst {
     // TODO: The release fails because of this, so skip it for now.
-    if (project.hasProperty('release') || false) {
+    if (project.hasProperty('release') && false) {
             println 'Relocating packages.'
             relocate 'org.objectweb.asmx', 'org.checkerframework.org.objectweb.asm'
         }
