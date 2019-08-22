@@ -11,7 +11,7 @@ apply plugin: 'com.github.johnrengelman.shadow'
 
 group 'org.checkerframework'
 // TODO: Use this in the release process.
-version '3.8.10'
+version '3.8.11'
 
 sourceCompatibility = 1.8
 
@@ -103,7 +103,8 @@ shadowJar {
     // This should just be checker-qual.
     exclude 'org/checkerframework/**'
     doFirst {
-        if (project.hasProperty('release')) {
+        // TODO: The release fails because of this, so skip it for now.
+        if (project.hasProperty('release') && false) {
             println 'Relocating packages.'
             relocate 'org.apache', 'org.checkerframework.org.apache'
             relocate 'org.relaxng', 'org.checkerframework.org.relaxng'
@@ -127,7 +128,8 @@ task skinnyJar(type: ShadowJar, dependsOn: compileJava) {
     include 'annotator/**/*.class'
     include 'org/objectweb/asmx/**/*.class'
     doFirst {
-        if (project.hasProperty('release')) {
+    // TODO: The release fails because of this, so skip it for now.
+    if (project.hasProperty('release') && false) {
             println 'Relocating packages.'
             relocate 'org.objectweb.asmx', 'org.checkerframework.org.objectweb.asm'
         }
