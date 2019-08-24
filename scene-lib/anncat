@@ -6,7 +6,5 @@ SCENE_LIB=$(dirname $0)
 WORKSPACE=$SCENE_LIB/..
 ASMX=$WORKSPACE/asmx
 
-JAVAC_JAR=${JAVAC_JAR:-$WORKSPACE/annotation-file-utilities/lib/compiler-2.4.0.jar}
-
 export CLASSPATH=$WORKSPACE/annotation-file-utilities/annotation-file-utilities-all.jar:$CLASSPATH
 java scenelib.annotations.tools.Anncat "$@"

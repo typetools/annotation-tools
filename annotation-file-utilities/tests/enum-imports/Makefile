@@ -60,12 +60,10 @@ compile : $(SRC)
 # Actually runs the annotator to create the annotated java file.
 # We are required to put annotation-file-utilities-all.jar (and ../bin) on the
 # bootclasspath so that the JSR 308 javac classes bundled therein are found
-# before the stock javac classes that the Mac OS includes on the bootclasspath
-# (other platforms do not make such inclusions)
+# before the stock javac classes on the bootclasspath
 output: compile $(JAIF) ../../build/classes/java/main $(AFU_JARS)
 	$(JAVA) \
-        -Xbootclasspath/p:../../build/classes/java/main:../../annotation-file-utilities-all.jar \
-	-cp bin \
+	-cp ../../annotation-file-utilities-all.jar \
 	annotator.Main \
 	${DEBUG} \
 	--abbreviate=true \
