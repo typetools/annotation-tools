@@ -12,13 +12,17 @@ apply plugin: 'com.github.johnrengelman.shadow'
 
 group 'org.checkerframework'
 // TODO: Use this in the release process.
-version '3.8.10'
+version '3.8.11'
 
 sourceCompatibility = 1.8
 
 repositories {
     mavenCentral()
 }
+
+// On a Java 8 JVM, use error-prone javac and source/target 8.
+// On a Java 9+ JVM, use the host javac, default source/target, and required module flags.
+ext.isJava8 = JavaVersion.current() == JavaVersion.VERSION_1_8
 
 sourceSets {
     main.java {
@@ -37,20 +41,24 @@ sourceSets {
         exclude("**/*.java")
     }
 }
+configurations {
+    javacJar
+}
 
 dependencies {
+    if (isJava8) {
+        javacJar group: 'com.google.errorprone', name: 'javac', version: "9+181-r4173-1"
+    }
     implementation 'org.plumelib:bcel-util:1.1.4'
     implementation 'org.plumelib:options:1.0.1'
     implementation 'org.plumelib:plume-util:1.0.7'
     implementation 'org.plumelib:signature-util:0.0.6'
     compileOnly 'org.checkerframework:checker-qual:2.5.4'
-    implementation 'org.checkerframework:compiler:2.4.0'
+    implementation 'com.google.errorprone:javac:9+181-r4173-1'
     implementation 'com.google.guava:guava:28.0-jre'
     implementation 'org.ow2.asm:asm:7.2-beta'
 
     testCompile group: 'junit', name: 'junit', version: '4.12'
-    // Change the JDK via -Dorg.gradle.java.home=JDK_PATH
-    testCompile files(Jvm.current().toolsJar)
 }
 
 
@@ -81,7 +89,8 @@ shadowJar {
     // This should just be checker-qual.
     exclude 'org/checkerframework/**'
     doFirst {
-        if (project.hasProperty('release')) {
+        // TODO: The release fails because of this, so skip it for now.
+        if (project.hasProperty('release') && false) {
             println 'Relocating packages.'
             relocate 'org.apache', 'org.checkerframework.org.apache'
             relocate 'org.relaxng', 'org.checkerframework.org.relaxng'
@@ -100,11 +109,11 @@ task skinnyJar(type: ShadowJar, dependsOn: compileJava) {
     includeEmptyDirs = false
     destinationDirectory = projectDir
     archiveFileName = 'annotation-file-utilities.jar'
-    minimize()
     include 'scenelib/**/*.class'
     include 'annotator/**/*.class'
     doFirst {
-        if (project.hasProperty('release')) {
+    // TODO: The release fails because of this, so skip it for now.
+    if (project.hasProperty('release') && false) {
             println 'Relocating packages.'
             relocate 'org.objectweb.asm', 'org.checkerframework.org.objectweb.asm'
         }
@@ -391,7 +400,7 @@ def createCheckTypeTask(checker, shortName) {
     tasks.create(name: "check${shortName}", type: JavaCompile) {
         description "Run the ${shortName} Checker on the main sources."
         group 'Verification'
-        String checkerDist = '../../checker-framework/checker/dist'
+        String checkerDist = "${projectDir}/../../checker-framework/checker/dist"
         // Always run the task.
         outputs.upToDateWhen { false }
         source = sourceSets.main.java
@@ -404,8 +413,17 @@ def createCheckTypeTask(checker, shortName) {
                 '-processor', "${checker}",
                 '-proc:only',
                 '-Xlint:-processing',
-                "-Xbootclasspath/p:${checkerDist}/jdk8.jar"
         ]
+        options.fork = true
+
+        if (isJava8) {
+            sourceCompatibility = 8
+            targetCompatibility = 8
+            options.compilerArgs += [
+                    "-Xbootclasspath/p:${checkerDist}/jdk8.jar"
+            ]
+            options.forkOptions.jvmArgs += ["-Xbootclasspath/p:${configurations.javacJar.asPath}"]
+        }
     }
 }
 
