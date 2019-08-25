@@ -99,7 +99,6 @@ task skinnyJar(type: ShadowJar, dependsOn: compileJava) {
     description 'Builds annotation-file-utilities.jar with only scene-lib, and annotation-file-utility classes.'
     includeEmptyDirs = false
     destinationDirectory = projectDir
-//    from files(sourceSets.main.output, '../asmx/bin/')
     archiveFileName = 'annotation-file-utilities.jar'
     minimize()
     include 'scenelib/**/*.class'
