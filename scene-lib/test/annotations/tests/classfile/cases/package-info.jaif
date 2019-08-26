@@ -1,5 +1,7 @@
 package java.lang:
-annotation @Deprecated: @java.lang.annotation.Target(value={CONSTRUCTOR,FIELD,LOCAL_VARIABLE,METHOD,PACKAGE,PARAMETER,TYPE}) @java.lang.annotation.Documented @java.lang.annotation.Retention(value=RUNTIME)
+annotation @Deprecated: @java.lang.annotation.Target(value={CONSTRUCTOR,FIELD,LOCAL_VARIABLE,METHOD,PACKAGE,MODULE,PARAMETER,TYPE}) @java.lang.annotation.Documented @java.lang.annotation.Retention(value=RUNTIME)
+    String since
+    boolean forRemoval
 
 package annotations.tests.classfile.cases: @java.lang.Deprecated
 
