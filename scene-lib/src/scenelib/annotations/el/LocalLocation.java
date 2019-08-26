@@ -24,7 +24,7 @@ public final class LocalLocation {
 
     public LocalLocation(String variableName, int index) {
         this(new Label(), new Label(), index, variableName);
-        System.out.println("BAD1");
+//        System.out.println("BAD1");
     }
 
     public LocalLocation(Label start, Label end, int index, String variableName) {
@@ -43,7 +43,7 @@ public final class LocalLocation {
     public LocalLocation(int index, int scopeStart, int scopeLength) {
         // Only being used by Writers, not Readers for now. Should possibly deprecate this in the future.
         // Changes values reflectively.
-        System.out.println("BAD2");
+//        System.out.println("BAD2");
         this.scopeStart = scopeStart;
         this.scopeLength = scopeLength;
         this.index = new int[] {index};
