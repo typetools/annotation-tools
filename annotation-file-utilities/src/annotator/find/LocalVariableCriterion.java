@@ -72,6 +72,7 @@ public class LocalVariableCriterion implements Criterion {
 //        return (loc.varIndex == varIndex);
 //      }
 
+      // Method name to pair of (local-variable-index, bytecode-offset-for-start)
       Pair<String, Pair<Integer, Integer>> key =
               Pair.of(fullMethodName, Pair.of(loc.index[0], loc.getScopeStart()));
       String potentialVarName =

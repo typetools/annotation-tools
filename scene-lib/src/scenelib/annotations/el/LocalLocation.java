@@ -79,7 +79,7 @@ public final class LocalLocation {
 
 
     /**
-     * Returns the bytecode offset to the start of the scope
+     * Returns the bytecode offset to the start of the scope.
      * @return The bytecode offset to the start of the scope
      */
     public int getScopeStart() {
