@@ -127,7 +127,7 @@
     <javac destdir="${out.tmp}" debug="on" includeantruntime="false" source="8" target="8">
       <classpath>
         <pathelement location="${out.tmp}"/>
-        <pathelement location="${env.JAVA_HOME}/lib/tools.jar"/>
+        <pathelement location="${basedir}/../annotation-file-utilities/lib/javac-9+181-r4173-1.jar"/>
       </classpath>
       <src path="${src}"/>
       <include name="**/*.java"/>

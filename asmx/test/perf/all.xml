@@ -15,7 +15,7 @@
         </fileset>
       </classpath>
       <arg value="${out.test}/"/>
-      <arg value="${java.home}/../lib/tools.jar"/>
+      <arg value="${basedir}/../annotation-file-utilities/lib/javac-9+181-r4173-1.jar"/>
     </java>
   </target>
 </project>
