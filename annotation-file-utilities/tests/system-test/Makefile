@@ -37,7 +37,13 @@ out2.jaif:
 	CLASSPATH=`pwd`/out1 ${ANNCAT} --class out1/annotations/tests/AnnotationTest.class --out --index out2.jaif
 
 out2.diff: out2.jaif
-	diff -u expected-annos.jaif out2.jaif > out2.diff
+	# Ignore differences between bytecode indices between Java 8 and 9+
+	# TODO: handle different versions?
+	# diff -u expected-annos.jaif out2.jaif > out2.diff
+	grep -v typecast expected-annos.jaif | grep -v instanceof > exp2
+	grep -v typecast out2.jaif | grep -v instanceof > act2
+	diff -u exp2 act2 > out2.diff
+	rm exp2 act2
 
 .PHONY: check-out2
 # Fail if out2.diff is non-empty
