@@ -40,10 +40,10 @@ out2.diff: out2.jaif
 	# Ignore differences between bytecode indices between Java 8 and 9+
 	# TODO: handle different versions?
 	# diff -u expected-annos.jaif out2.jaif > out2.diff
-	grep -v typecast expected-annos.jaif | grep -v instanceof > exp2
-	grep -v typecast out2.jaif | grep -v instanceof > act2
-	diff -u exp2 act2 > out2.diff
-	rm exp2 act2
+	grep -v typecast expected-annos.jaif | grep -v instanceof > expected-annos.jaif.no-cast-no-instanceof
+	grep -v typecast out2.jaif | grep -v instanceof > out2.jaif.no-cast-no-instanceof
+	diff -u expected-annos.jaif.no-cast-no-instanceof out2.jaif.no-cast-no-instanceof > out2.diff
+	rm expected-annos.jaif.no-cast-no-instanceof out2.jaif.no-cast-no-instanceof
 
 .PHONY: check-out2
 # Fail if out2.diff is non-empty
