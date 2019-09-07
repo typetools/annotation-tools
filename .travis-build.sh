@@ -42,8 +42,8 @@ fi
 
 if [[ "${GROUP}" == "typecheck" || "${GROUP}" == "all" ]]; then
   if [ -z ${CHECKERFRAMEWORK} ] ; then
-    /tmp/plume-scripts/git-clone-related typetools checker-framework
     export CHECKERFRAMEWORK=`realpath ../checker-framework`
+    /tmp/plume-scripts/git-clone-related typetools checker-framework ${CHECKERFRAMEWORK}
     (cd ${CHECKERFRAMEWORK} && ./.travis-build-without-test.sh downloadjdk)
   fi
 
