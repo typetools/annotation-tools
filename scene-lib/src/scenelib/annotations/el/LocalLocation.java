@@ -83,7 +83,11 @@ public final class LocalLocation {
      * @return The bytecode offset to the start of the scope
      */
     public int getScopeStart() {
-        scopeStart = start[0].getOffset();
+        try {
+            scopeStart = start[0].getOffset();
+        } catch (IllegalStateException e) {
+            System.err.println("Labels not resolved: " + Arrays.toString(start));
+        }
         return scopeStart;
     }
 
@@ -92,7 +96,12 @@ public final class LocalLocation {
      * @return The length of the scope (in bytes)
      */
     public int getScopeLength() {
-        scopeLength = end[end.length - 1].getOffset() - start[0].getOffset();
+        try {
+            scopeLength = end[end.length - 1].getOffset() - start[0].getOffset();
+        } catch (IllegalStateException e) {
+            System.err.println("Labels not resolved: " + Arrays.toString(start));
+            System.err.println("Labels not resolved: " + Arrays.toString(end));
+        }
         return scopeLength;
     }
 
