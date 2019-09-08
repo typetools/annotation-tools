@@ -32,10 +32,14 @@ DEBUG :=
 # Use this to enable some debugging.
 # DEBUG := --debug
 
-default : all
+default : diffs
 
 .PHONY: all
-all : $(DIFFS) abbreviated converted enum-imports ad-hoc issue155 system-test source-extension results
+all : diffs abbreviated converted enum-imports ad-hoc issue155 system-test source-extension results
+
+.PHONY: diffs
+diffs:
+	${MAKE} $(DIFFS)
 
 .PHONY: abbreviated
 abbreviated:
