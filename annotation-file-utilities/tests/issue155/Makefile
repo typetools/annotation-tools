@@ -48,13 +48,13 @@ results: ../bin/VerifyDiffs.class
 
 # Remakes the little java program that checks and compares diffs
 ../bin/VerifyDiffs.class : ../VerifyDiffs.java
-	@$(JAVAC) -g -cp ../../bincompile -d ../bin ../VerifyDiffs.java
+	@$(JAVAC) -g -cp ../../build/classes/java/maincompile -d ../bin ../VerifyDiffs.java
 
 # Actually runs the annotator to create the annotated java file.
 .PRECIOUS: %.output
-%.output: %.jaif %.java ../../bin ../../annotation-file-utilities-all.jar
+%.output: %.jaif %.java ../../build/classes/java/main ../../annotation-file-utilities-all.jar
 	$(JAVA) \
-	-cp ../../bin:../bin:../../annotation-file-utilities-all.jar:bin \
+	-cp ../../build/classes/java/main:../bin:../../annotation-file-utilities-all.jar:bin \
 	annotator.Main \
 	${DEBUG} \
 	--abbreviate=true \

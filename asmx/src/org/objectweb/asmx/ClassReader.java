@@ -323,7 +323,7 @@ public class ClassReader {
     /**
      * Copies the bootstrap method data into the given {@link ClassWriter}.
      * Should be called before the {@link #accept(ClassVisitor,int)} method.
-     * 
+     *
      * @param classWriter
      *            the {@link ClassWriter} to copy bootstrap methods into.
      */
@@ -939,7 +939,7 @@ public class ClassReader {
                         k = readUnsignedShort(w);
                         w += 2;
                         for (; k > 0; --k) {
-                            w = readTypeAnnotationValues(w,
+                            w = readTypeAnnotationValuesBodies(w,
                                   c, mv, j != 0);
                         }
                     }
@@ -1469,9 +1469,13 @@ public class ClassReader {
         av.visitEnd();
         return v;
     }
+
    /**
     * Reads the values and reference info of an extended annotation
-    * and makes the given visitor visit them.
+    * and makes the given visitor visit them. Should not be used for reading
+    * methods' extended annotations due to JDK-8198945; use
+    * {@link #readTypeAnnotationValuesBodies readTypeAnnotationValuesBodies}
+    * instead.
     *
     * @param v the start offset in {@link #b b} of the values to be read
     *        (including the unsigned short that gives the number of values).
@@ -1488,6 +1492,56 @@ public class ClassReader {
         final char[] buf,
         final MemberVisitor mv,
         final boolean visible)
+    {
+        return readTypeAnnotationValuesHelper(v, buf, mv, visible, false);
+    }
+
+    /**
+    * This is a method for the work-around related to the bug JDK-8198945.
+    * All type annotations should be read using the original method
+    * except methods' extended annotations for which this method should be used.
+    *
+    * @param v the start offset in {@link #b b} of the values to be read
+    *        (including the unsigned short that gives the number of values).
+    * @param buf buffer to be used to call {@link #readUTF8 readUTF8},
+    *        {@link #readClass(int,char[]) readClass} or
+    *        {@link #readConst readConst}.
+    * @param mv the visitor to generate the visitor that must visit the values.
+    * @param visible {@code true} if the annotation is visible at runtime.
+    * @return the end offset of the annotations values.
+    */
+    private int readTypeAnnotationValuesBodies(
+        int v,
+        final char[] buf,
+        final MemberVisitor mv,
+        final boolean visible)
+    {
+        return readTypeAnnotationValuesHelper(v, buf, mv, visible, true);
+    }
+
+    /**
+    * Reads the values and reference info of an extended annotation
+    * and makes the given visitor visit them.
+    *
+    * @param v the start offset in {@link #b b} of the values to be read
+    *        (including the unsigned short that gives the number of values).
+    * @param buf buffer to be used to call {@link #readUTF8 readUTF8},
+    *        {@link #readClass(int,char[]) readClass} or
+    *        {@link #readConst readConst}.
+    * @param mv the visitor to generate the visitor that must visit the values.
+    * @param visible {@code true} if the annotation is visible at runtime.
+    * @param isMethodBody {@code true} if this method is
+    *        called to read a method's extended annotations; needs to be
+    *        {@code false} for all other cases.
+    * @return the end offset of the annotations values.
+    * @author jaimeq
+    */
+    private int readTypeAnnotationValuesHelper(
+        int v,
+        final char[] buf,
+        final MemberVisitor mv,
+        final boolean visible,
+        final boolean isMethodBody)
     {
         // first handle
         //
@@ -1706,7 +1760,16 @@ public class ClassReader {
             v = readAnnotationValue(v, buf, name, xav);
         }
 
-        xav.visitEnd();
+        // Work around
+        // https://bugs.openjdk.java.net/browse/JDK-8198945
+        // which has only been fixed in JDK 12, by not running the
+        // visitor if an invalid CLASS_EXTENDS is found in a method body.
+        // A similar workaround is located at
+        // https://github.com/eisop/checker-framework/blob/abdb77758e6eb2dcb9dc569ff9f34341dda8b776/framework/src/main/java/org/checkerframework/framework/util/element/MethodApplier.java#L81
+        // which explains why it is TargetType.CLASS_EXTENDS.
+        if (!(isMethodBody && target_type == TargetType.CLASS_EXTENDS)) {
+            xav.visitEnd();
+        }
         return v;
     }
 
@@ -1868,7 +1931,7 @@ public class ClassReader {
 
     /**
      * Returns the start index of the attribute_info structure of this class.
-     * 
+     *
      * @return the start index of the attribute_info structure of this class.
      */
     private int getAttributes() {

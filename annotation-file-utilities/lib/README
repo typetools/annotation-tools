@@ -1,20 +1,3 @@
-bcel-util: https://repo.maven.apache.org/maven2/org/plumelib/bcel-util/
-  wget https://repo.maven.apache.org/maven2/org/plumelib/bcel-util/1.1.4/bcel-util-1.1.4.jar
-
-options: https://repo.maven.apache.org/maven2/org/plumelib/options/
-  wget https://repo.maven.apache.org/maven2/org/plumelib/options/1.0.1/options-1.0.1.jar
-
-plume-util: https://repo.maven.apache.org/maven2/org/plumelib/plume-util/
-  wget https://repo.maven.apache.org/maven2/org/plumelib/plume-util/1.0.7/plume-util-1.0.7.jar
-
-signature-util: https://repo.maven.apache.org/maven2/org/plumelib/signature-util/
-  wget https://repo.maven.apache.org/maven2/org/plumelib/signature-util/0.0.6/signature-util-0.0.6.jar
-
-checker-qual: https://repo.maven.apache.org/maven2/org/checkerframework/checker-qual/
-  wget https://repo.maven.apache.org/maven2/org/checkerframework/checker-qual/2.5.4/checker-qual-2.5.4.jar
-
-# Use jsr308-langtools javac.jar rather than tools.jar, because some versions
-# of tools.jar contain bugs that have been fixed in new versions.  Also, we
-# have permission to distribute this jar.
-compiler: https://repo.maven.apache.org/maven2/org/checkerframework/compiler/
-  wget https://repo.maven.apache.org/maven2/org/checkerframework/compiler/2.4.0/compiler-2.4.0.jar
+# Used by scripts
+javac-9+181-r4173-1.jar: https://mvnrepository.com/artifact/com.google.errorprone/javac
+  wget https://repo1.maven.org/maven2/com/google/errorprone/javac/9+181-r4173-1/javac-9+181-r4173-1.jar

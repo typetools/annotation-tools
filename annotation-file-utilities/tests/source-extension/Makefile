@@ -45,25 +45,25 @@ results: ../bin/VerifyDiffs.class
 
 # Remakes the little java program that checks and compares diffs
 ../bin/VerifyDiffs.class : ../VerifyDiffs.java
-	@$(JAVAC) -g -cp ../../bincompile -d ../bin ../VerifyDiffs.java
+	@$(JAVAC) -g -cp ../../build/classes/java/maincompile -d ../bin ../VerifyDiffs.java
 
 # Compiles all the test cases (be verbose about this).
 .PHONY: compile
 compile : $(SRC)
 	mkdir -p bin
-	$(JAVAC) -g -cp ../../bin -d bin $(SRC)
+	$(JAVAC) -g -cp ../../build/classes/java/main -d bin $(SRC)
 
 # Compiles just one test case
 .PRECIOUS : bin/annotator/tests/%.class
 bin/annotator/tests/%.class: %.java
 	mkdir -p bin
-	$(JAVAC) -g -cp bin:../../bin -d bin -sourcepath . $<
+	$(JAVAC) -g -cp bin:../../build/classes/java/main -d bin -sourcepath . $<
 
 # Actually runs the annotator to create the annotated java file.
 .PRECIOUS: %.output
-%.output: %.jaif %.java bin/annotator/tests/%.class ../../bin ../../annotation-file-utilities-all.jar
+%.output: %.jaif %.java bin/annotator/tests/%.class ../../build/classes/java/main ../../annotation-file-utilities-all.jar
 	$(JAVA) \
-	-cp ../../bin:../../annotation-file-utilities-all.jar:bin \
+	-cp ../../build/classes/java/main:../../annotation-file-utilities-all.jar:bin \
 	annotator.Main \
 	${DEBUG} \
 	--abbreviate=false \

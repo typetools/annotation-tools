@@ -4,12 +4,13 @@ import java.io.*;
 import java.util.*;
 import java.lang.annotation.RetentionPolicy;
 
-import com.sun.tools.classfile.TypeAnnotation.Position.TypePathEntryKind;
 import com.sun.tools.javac.code.TypeAnnotationPosition;
-
-import junit.framework.*;
+import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntryKind;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import org.junit.Assert;
+import org.junit.Test;
 
 import scenelib.annotations.*;
 import scenelib.annotations.el.*;
@@ -18,7 +19,7 @@ import scenelib.annotations.io.*;
 
 import org.plumelib.util.FileIOException;
 
-public class TestSceneLib extends TestCase {
+public class TestSceneLib {
     LineNumberReader openPackagedIndexFile(String name) {
         return new LineNumberReader(new InputStreamReader(
                 (InputStream) TestSceneLib.class.getResourceAsStream(name)));
@@ -80,7 +81,7 @@ public class TestSceneLib extends TestCase {
           System.err.println(esu);
           System.err.println(su);
         }
-        assertEquals(expectScene, s);
+        Assert.assertEquals(expectScene, s);
     }
 
     // lazy typist!
@@ -99,6 +100,7 @@ public class TestSceneLib extends TestCase {
         return new Annotation(def, Collections.<String, Object> emptyMap());
     }
 
+    @Test
     public void testEquals() {
         AScene s1 = newScene(), s2 = newScene();
 
@@ -112,14 +114,15 @@ public class TestSceneLib extends TestCase {
         s2.classes.getVivify("Foo").fields.getVivify("x").tlAnnotationsHere
                 .add(createEmptyAnnotation(ready));
 
-        assertEquals(false, s1.equals(s2));  // FIXME: why does assertion fail?
+        Assert.assertEquals(false, s1.equals(s2));  // FIXME: why does assertion fail?
 
         s1.classes.getVivify("Foo").fields.getVivify("x").tlAnnotationsHere
                 .add(Annotations.aNonNull);
 
-        assertEquals(true, s1.equals(s2));
+        Assert.assertEquals(true, s1.equals(s2));
     }
 
+    @Test
     public void testStoreParse1() {
         AScene s1 = newScene();
 
@@ -146,37 +149,38 @@ public class TestSceneLib extends TestCase {
 
     private void checkConstructor(AMethod constructor) {
         Annotation ann = ((Annotation) constructor.receiver.type.lookup("p2.D"));
-        assertEquals(Collections.singletonMap("value", "spam"), ann.fieldValues);
+        Assert.assertEquals(Collections.singletonMap("value", "spam"), ann.fieldValues);
         ATypeElement l = (ATypeElement) constructor.body.locals
                         .get(new LocalLocation(1, 3, 5)).type;
         AElement i = (AElement) l.innerTypes.get(new InnerTypeLocation(
                 TypeAnnotationPosition.getTypePathFromBinary(
                                 Arrays.asList(new Integer[] { 0, 0 }))));
-        assertNotNull(i.lookup("p2.C"));
+        Assert.assertNotNull(i.lookup("p2.C"));
         AField l2 =
                 constructor.body.locals.get(new LocalLocation(1, 3, 6));
-        assertNull(l2);
+        Assert.assertNull(l2);
     }
 
+    @Test
     public void testParseRetrieve1() throws Exception {
         LineNumberReader fr = openPackagedIndexFile("test1.jaif");
         AScene s1 = newScene();
         IndexFileParser.parse(fr, "test1.jaif", s1);
 
         AClass foo1 = s1.classes.get("p1.Foo");
-        assertNotNull("Didn't find foo1", foo1);
+        Assert.assertNotNull("Didn't find foo1", foo1);
         AClass foo = (AClass) foo1;
         boolean sawConstructor = false;
         for (Map.Entry<String, AMethod> me : foo.methods.entrySet()) {
             if (me.getKey().equals("<init>(Ljava/util/Set;)V")) {
-                assertFalse(sawConstructor);
+                Assert.assertFalse(sawConstructor);
                 AMethod constructor = me.getValue();
-                assertNotNull(constructor);
+                Assert.assertNotNull(constructor);
                 checkConstructor((AMethod) constructor);
                 sawConstructor = true;
             }
         }
-        assertTrue(sawConstructor);
+        Assert.assertTrue(sawConstructor);
     }
 
     class TestDefCollector extends DefCollector {
@@ -191,29 +195,30 @@ public class TestSceneLib extends TestCase {
         @Override
         protected void visitAnnotationDef(AnnotationDef tldef) {
             if (tldef.name.equals("p2.A")) {
-                assertNull(a);
+                Assert.assertNull(a);
                 a = tldef;
             } else if (tldef.name.equals("p2.B")) {
-                assertNull(b);
+                Assert.assertNull(b);
                 b = tldef;
             } else if (tldef.name.equals("p2.C")) {
-                assertNull(c);
+                Assert.assertNull(c);
                 c = tldef;
             } else if (tldef.name.equals("p2.D")) {
-                assertNull(d);
+                Assert.assertNull(d);
                 d = tldef;
             } else if (tldef.name.equals("p2.E")) {
-                assertNotNull(f); // should give us fields first
-                assertNull(e);
+                Assert.assertNotNull(f); // should give us fields first
+                Assert.assertNull(e);
                 e = tldef;
             } else if (tldef.name.equals("p2.F")) {
                 f = tldef;
             } else {
-                fail();
+                Assert.fail();
             }
         }
     }
 
+    @Test
     public void testParseRetrieveTypes() throws Exception {
         LineNumberReader fr = openPackagedIndexFile("test1.jaif");
         AScene s1 = newScene();
@@ -221,34 +226,35 @@ public class TestSceneLib extends TestCase {
 
         TestDefCollector tdc = new TestDefCollector(s1);
         tdc.visit();
-        assertNotNull(tdc.a);
-        assertNotNull(tdc.b);
-        assertNotNull(tdc.c);
-        assertNotNull(tdc.d);
-        assertNotNull(tdc.e);
-        assertNotNull(tdc.f);
+        Assert.assertNotNull(tdc.a);
+        Assert.assertNotNull(tdc.b);
+        Assert.assertNotNull(tdc.c);
+        Assert.assertNotNull(tdc.d);
+        Assert.assertNotNull(tdc.e);
+        Assert.assertNotNull(tdc.f);
 
         // now look at p2.E because it has some rather complex types
         AnnotationDef tle = (AnnotationDef) tdc.e;
-        assertEquals(RetentionPolicy.CLASS, tle.retention());
+        Assert.assertEquals(RetentionPolicy.CLASS, tle.retention());
         AnnotationDef e = tle;
-        assertEquals(new ArrayAFT(new AnnotationAFT(tdc.a)), e.fieldTypes
+        Assert.assertEquals(new ArrayAFT(new AnnotationAFT(tdc.a)), e.fieldTypes
                 .get("first"));
-        assertEquals(new AnnotationAFT(tdc.f), e.fieldTypes.get("second"));
-        assertEquals(new EnumAFT("Foo"), e.fieldTypes.get("third"));
-        assertEquals(
+        Assert.assertEquals(new AnnotationAFT(tdc.f), e.fieldTypes.get("second"));
+        Assert.assertEquals(new EnumAFT("Foo"), e.fieldTypes.get("third"));
+        Assert.assertEquals(
                 ClassTokenAFT.ctaft,
                 e.fieldTypes.get("fourth"));
-        assertEquals(ClassTokenAFT.ctaft, e.fieldTypes.get("fifth"));
+        Assert.assertEquals(ClassTokenAFT.ctaft, e.fieldTypes.get("fifth"));
 
         AnnotationDef tla = (AnnotationDef) tdc.a;
-        assertEquals(RetentionPolicy.RUNTIME, tla.retention());
+        Assert.assertEquals(RetentionPolicy.RUNTIME, tla.retention());
         AnnotationDef a = tla;
-        assertEquals(BasicAFT.forType(int.class), a.fieldTypes.get("value"));
+        Assert.assertEquals(BasicAFT.forType(int.class), a.fieldTypes.get("value"));
         AnnotationDef d = tdc.d;
-        assertEquals(BasicAFT.forType(String.class), d.fieldTypes.get("value"));
+        Assert.assertEquals(BasicAFT.forType(String.class), d.fieldTypes.get("value"));
     }
 
+    @Test
     public void testParseRetrieveValues() throws Exception {
         LineNumberReader fr = openPackagedIndexFile("test1.jaif");
         AScene s1 = newScene();
@@ -257,22 +263,22 @@ public class TestSceneLib extends TestCase {
         // now look at Bar because it has some rather complex values
         Annotation a = s1.classes.get("p1.Bar").lookup("p2.E");
 
-        assertEquals("fooconstant", a.fieldValues.get("third"));
-        assertEquals("interface java.util.Map", a.fieldValues.get("fourth").toString());
-        assertEquals("class [[I", a.fieldValues.get("fifth").toString());
+        Assert.assertEquals("fooconstant", a.fieldValues.get("third"));
+        Assert.assertEquals("interface java.util.Map", a.fieldValues.get("fourth").toString());
+        Assert.assertEquals("class [[I", a.fieldValues.get("fifth").toString());
 
         List<?> first =
                 (List<?>) a.fieldValues.get("first");
-        assertEquals(2, first.size(), 2);
+        Assert.assertEquals(2, first.size(), 2);
         Annotation aa = (Annotation) first.get(0);
-        assertEquals("p2.A", aa.def().name);
-        assertEquals(-1, aa.fieldValues.get("value"));
+        Assert.assertEquals("p2.A", aa.def().name);
+        Assert.assertEquals(-1, aa.fieldValues.get("value"));
 
         Annotation a2 =
                 s1.classes.get("p1.Baz").lookup("p2.E");
-        assertEquals("FOO_FOO", a2.fieldValues.get("third"));
-        assertEquals("class java.util.LinkedHashMap", a2.fieldValues.get("fourth").toString());
-        assertEquals("void", a2.fieldValues.get("fifth").toString());
+        Assert.assertEquals("FOO_FOO", a2.fieldValues.get("third"));
+        Assert.assertEquals("class java.util.LinkedHashMap", a2.fieldValues.get("fourth").toString());
+        Assert.assertEquals("void", a2.fieldValues.get("fifth").toString());
     }
 
     void doRewriteTest(LineNumberReader r, String filename) throws Exception {
@@ -281,19 +287,22 @@ public class TestSceneLib extends TestCase {
         StringWriter sbw = new StringWriter();
         IndexFileWriter.write(s1, sbw);
         IndexFileParser.parseString(sbw.toString(), "unparsed " + filename, s2);
-        assertEquals(s1, s2);
+        Assert.assertEquals(s1, s2);
     }
 
+    @Test
     public void testRewriteOne() throws Exception {
         LineNumberReader fr = openPackagedIndexFile("test1.jaif");
         doRewriteTest(fr, "test1.jaif");
     }
 
+    @Test
     public void testRewriteTwo() throws Exception {
         LineNumberReader fr = openPackagedIndexFile("test2.jaif");
         doRewriteTest(fr, "test2.jaif");
     }
 
+    @Test
     public void testConflictedDefinition() throws Exception {
         AScene s1 = newScene();
         s1.classes.getVivify("Foo").tlAnnotationsHere
@@ -303,28 +312,30 @@ public class TestSceneLib extends TestCase {
         StringWriter sbw = new StringWriter();
         try {
             IndexFileWriter.write(s1, sbw);
-            fail("an exception should have been thrown");
+            Assert.fail("an exception should have been thrown");
         } catch (DefException de) {
-            assertEquals("Ready", de.annotationType);
+            Assert.assertEquals("Ready", de.annotationType);
             // success
         }
 
     }
 
+    @Test
     public void testParseErrorMissingColon() throws Exception {
         AScene s1 = newScene();
         String fileContents = "package p1:\n" + "annotation @A:\n"
                               + "class Foo @A";
         try {
             IndexFileParser.parseString(fileContents, "testParseErrorMissingColon()", s1);
-            fail(); // an exception should have been thrown
+            Assert.fail(); // an exception should have been thrown
         } catch (FileIOException e) {
             // TODO:  check line number
-            // assertEquals(3, e.line);
+            // Assert.assertEquals(3, e.line);
             // success
         }
     }
 
+    @Test
     public void testParseErrorMissingDefinition() throws Exception {
         AScene s1 = newScene();
         String fileContents
@@ -332,10 +343,10 @@ public class TestSceneLib extends TestCase {
           + "class Foo:\n" + "@AIsDefined\n" + "@BIsNotDefined\n";
         try {
             IndexFileParser.parseString(fileContents, "testParseErrorMissingDefinition()", s1);
-            fail(); // an exception should have been thrown
+            Assert.fail(); // an exception should have been thrown
         } catch (FileIOException e) {
             // TODO: check line number
-            // assertEquals(5, e.line);
+            // Assert.assertEquals(5, e.line);
             // success
         }
     }
@@ -349,6 +360,7 @@ public class TestSceneLib extends TestCase {
         return null;
     }
 
+    @Test
     public void testEmptyArrayHack() throws Exception {
         AScene scene = newScene();
         AClass clazz =
@@ -388,15 +400,15 @@ public class TestSceneLib extends TestCase {
         IndexFileParser.parseString(sw.toString(), "testEmptyArrayHack()", sceneRead);
 
         // the anomaly: see second "consequence" on IndexFileWriter#write
-        assertFalse(scene.equals(sceneRead));
+        Assert.assertFalse(scene.equals(sceneRead));
 
         AClass clazz2 = sceneRead.classes.get("bar.Test");
-        assertNotNull(clazz2);
+        Assert.assertNotNull(clazz2);
         Annotation a3_2 = getAnnotation(clazz2.tlAnnotationsHere, "foo.CombinedAnno");
         Annotation a1_2 = (Annotation) a3_2.getFieldValue("fieldOne");
         Annotation a2_2 = (Annotation) a3_2.getFieldValue("fieldTwo");
         // now that the defs were merged, the annotations should be equal
-        assertEquals(a1_2, a2_2);
+        Assert.assertEquals(a1_2, a2_2);
 
         // Yet another annotation with an array of a different known type
         AnnotationBuilder ab4 =
@@ -433,13 +445,14 @@ public class TestSceneLib extends TestCase {
         try {
             IndexFileWriter.write(secondScene, secondSceneSW2);
             // we should have gotten an exception
-            fail();
+            Assert.fail();
         } catch (DefException de) {
-            assertTrue(de.getMessage().startsWith("Conflicting definitions of annotation type foo.ArrayAnno"));
+            Assert.assertTrue(de.getMessage().startsWith("Conflicting definitions of annotation type foo.ArrayAnno"));
             // success
         }
     }
 
+    @Test
     public void testEmptyArrayIO() throws Exception {
         // should succeed
         String index1 = "package: annotation @Foo: @Retention(CLASS)\n  unknown[] arr\n" +
@@ -454,7 +467,7 @@ public class TestSceneLib extends TestCase {
         try {
             IndexFileParser.parseString(index2, "testEmptyArrayIO()", scene2);
             // should have gotten an exception
-            fail();
+            Assert.fail();
         } catch (FileIOException e) {
             // success
         }
@@ -470,31 +483,32 @@ public class TestSceneLib extends TestCase {
         Annotation tla = a;
         clazz3.tlAnnotationsHere.add(tla);
 
-        assertEquals(scene1, scene3);
+        Assert.assertEquals(scene1, scene3);
 
         // when we write the scene out, the index file should contain the
         // special unknown[] field type
         StringWriter sw3 = new StringWriter();
         IndexFileWriter.write(scene3, sw3);
         String index3 = sw3.toString();
-        assertTrue(index3.indexOf("unknown[]") >= 0);
+        Assert.assertTrue(index3.indexOf("unknown[]") >= 0);
 
         // can we read it back in and get the same thing?
         AScene scene4 = newScene();
         IndexFileParser.parseString(index3, "testEmptyArrayIO()", scene4);
-        assertEquals(scene3, scene4);
+        Assert.assertEquals(scene3, scene4);
     }
 
+    @Test
     public void testPrune() {
         AScene s1 = newScene(), s2 = newScene();
-        assertTrue(s1.equals(s2));
+        Assert.assertTrue(s1.equals(s2));
 
         s1.classes.getVivify("Foo");
-        assertFalse(s1.equals(s2));
+        Assert.assertFalse(s1.equals(s2));
 
         s1.prune();
-        assertTrue(s1.isEmpty());
-        assertTrue(s1.equals(s2));
+        Assert.assertTrue(s1.isEmpty());
+        Assert.assertTrue(s1.equals(s2));
 
         Annotation sa = AnnotationFactory.saf.beginAnnotation("Anno", Annotations.asRetentionClass, "testSceneLib").finish();
         Annotation tla = sa;
@@ -502,10 +516,10 @@ public class TestSceneLib extends TestCase {
         AClass clazz2 = s2.classes.getVivify("Bar");
         clazz2.tlAnnotationsHere.add(tla);
 
-        assertFalse(s1.equals(s2));
+        Assert.assertFalse(s1.equals(s2));
         s2.prune();
-        assertFalse(s2.isEmpty());
-        assertFalse(s1.equals(s2));
+        Assert.assertFalse(s2.isEmpty());
+        Assert.assertFalse(s1.equals(s2));
     }
 
     static class MyTAST {
@@ -568,13 +582,13 @@ public class TestSceneLib extends TestCase {
         protected void map(MyTAST n, ATypeElement e) {
             int nodeID = n.id;
             if (nodeID == 10) {
-                assertTrue(e.lookup("IdAnno") == null);
+                Assert.assertTrue(e.lookup("IdAnno") == null);
                 e.tlAnnotationsHere.add(makeTLIdAnno(10));
             } else {
                 int annoID = (Integer) e.lookup("IdAnno").getFieldValue("id");
-                assertEquals(nodeID, annoID);
+                Assert.assertEquals(nodeID, annoID);
             }
-            assertFalse(saw[nodeID]);
+            Assert.assertFalse(saw[nodeID]);
             saw[nodeID] = true;
         }
     }
@@ -586,6 +600,7 @@ public class TestSceneLib extends TestCase {
         el.tlAnnotationsHere.add(makeTLIdAnno(id));
     }
 
+    @Test
     public void testTypeASTMapper() {
         // Construct a TAST for the type structure:
         // 0< 3<4>[1][2], 5<6, 8[7], 9, 10> >
@@ -634,13 +649,13 @@ public class TestSceneLib extends TestCase {
         mapper.traverse(tast, myAFieldType);
 
         for (int i = 0; i < 11; i++) {
-            assertTrue(mapper.saw[i]);
+            Assert.assertTrue(mapper.saw[i]);
         }
         // make sure it vivified #10 and our annotation stuck
         AElement e10 = myAFieldType.innerTypes.get(
                 new InnerTypeLocation(TypeAnnotationPosition.getTypePathFromBinary(Arrays.asList(TYPE_ARGUMENT, 1, TYPE_ARGUMENT, 3))));
-        assertNotNull(e10);
+        Assert.assertNotNull(e10);
         int e10aid = (Integer) e10.lookup("IdAnno").getFieldValue("id");
-        assertEquals(e10aid, 10);
+        Assert.assertEquals(e10aid, 10);
     }
 }

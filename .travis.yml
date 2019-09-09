@@ -21,9 +21,12 @@ env:
 # block.  So, always use two jobs (use a dummy if necessary).
   matrix:
     - JDKVER=jdk8 GROUP=test
+    - JDKVER=jdk11 GROUP=test
     - JDKVER=jdkany GROUP=typecheck
     - JDKVER=jdkany GROUP=misc
     - JDKVER=jdk8 GROUP=downstream
+# TODO: enable once all downstream tests work with JDK 11
+# - JDKVER=jdk11 GROUP=downstream
 
 # The "docker run" command will pull if needed.
 # Running this first gives two tries in case of network lossage.

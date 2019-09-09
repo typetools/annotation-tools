@@ -87,7 +87,7 @@ import com.sun.tools.javac.tree.JCTree;
  * Annotations that are not for the specified Java files are ignored.
  * <p>
  *
- * The <a name="command-line-options">command-line options</a> are as follows:
+ * The <a id="command-line-options">command-line options</a> are as follows:
  * <!-- start options doc (DO NOT EDIT BY HAND) -->
  *
  * <ul>

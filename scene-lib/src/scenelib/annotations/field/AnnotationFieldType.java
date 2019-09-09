@@ -30,6 +30,7 @@ public abstract class AnnotationFieldType extends EqualByStringRepresentation {
     // TODO: add a cache?
     public static AnnotationFieldType fromClass(Class<?> c, Map<String,AnnotationDef> adefs) {
         if (c.isAnnotation()) {
+            @SuppressWarnings("unchecked")
             Class<? extends java.lang.annotation.Annotation> cAnno
                 = (Class<? extends java.lang.annotation.Annotation>) c;
             return new AnnotationAFT(AnnotationDef.fromClass(cAnno, adefs));

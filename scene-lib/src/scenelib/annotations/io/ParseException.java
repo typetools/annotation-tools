@@ -11,6 +11,7 @@ package scenelib.annotations.io;
  * isn't very good; in particular, it sometimes says "expected A, B or C"
  * when there are legal tokens other than A, B, and C.
  */
+@SuppressWarnings("serial")
 public final class ParseException extends Exception {
 
     public ParseException() {

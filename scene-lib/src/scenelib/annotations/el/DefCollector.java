@@ -149,7 +149,7 @@ public abstract class DefCollector {
             collect(b);
         }
         collect((ADeclaration) m);
-        collect((ATypeElement) m.returnType);
+        collect(m.returnType);
         collect(m.receiver);
         for (AElement p : m.parameters.values()) {
             collect(p);
