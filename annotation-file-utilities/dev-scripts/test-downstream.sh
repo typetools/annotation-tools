@@ -11,7 +11,7 @@ export AFU=`readlink -f ${AFU:-annotation-file-utilities}`
 export CHECKERFRAMEWORK=`readlink -f ${CHECKERFRAMEWORK:-../checker-framework}`
 export PATH=$AFU/scripts:$JAVA_HOME/bin:$PATH
 
-./gradlew assemble
+(cd ${AFU} && ./gradlew assemble)
 
 git -C /tmp/plume-scripts pull > /dev/null 2>&1 \
   || git -C /tmp clone --depth 1 -q https://github.com/plume-lib/plume-scripts.git
