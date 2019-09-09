@@ -1,7 +1,6 @@
 #!/bin/bash
 
-SCRIPTDIR=`dirname "$0"`
-echo Entering ${SCRIPTDIR}/.travis-build-without-test.sh
+echo Entering `readlink -f "$0"`
 
 # Fail the whole script if any command fails
 set -e
@@ -16,4 +15,5 @@ export PATH=$AFU/scripts:$JAVA_HOME/bin:$PATH
 
 ## Compile
 (cd ${AFU} && ./gradlew assemble)
-echo Exiting ${SCRIPTDIR}/.travis-build-without-test.sh
+
+echo Exiting `readlink -f "$0"`
