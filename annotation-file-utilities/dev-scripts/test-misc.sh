@@ -23,7 +23,7 @@ cd ${AFU}
 ./gradlew htmlValidate
 
 ./gradlew javadoc
-(./gradlew requireJavadocPrivate > /tmp/warnings.txt 2>&1) || true
-/tmp/plume-scripts/ci-lint-diff /tmp/warnings.txt
 (./gradlew javadocPrivate > /tmp/warnings.txt 2>&1) || true
+/tmp/plume-scripts/ci-lint-diff /tmp/warnings.txt
+(./gradlew requireJavadocPrivate > /tmp/warnings.txt 2>&1) || true
 /tmp/plume-scripts/ci-lint-diff /tmp/warnings.txt
