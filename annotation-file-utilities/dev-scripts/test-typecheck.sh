@@ -14,14 +14,8 @@ export PATH=$AFU/scripts:$JAVA_HOME/bin:$PATH
 
 git -C /tmp/plume-scripts pull > /dev/null 2>&1 \
   || git -C /tmp clone --depth 1 -q https://github.com/plume-lib/plume-scripts.git
-eval `/tmp/plume-scripts/ci-info typetools`
 
-(cd .. && git clone --depth 1 https://github.com/plume-lib/plume-scripts.git)
-REPO=`../plume-scripts/git-find-fork ${CI_ORGANIZATION} typetools checker-framework`
-BRANCH=`../plume-scripts/git-find-branch ${REPO} ${CI_BRANCH}`
-(cd .. && git clone -b ${BRANCH} --single-branch --depth 1 ${REPO}) || (cd .. && git clone -b ${BRANCH} --single-branch --depth 1 ${REPO})
-export CHECKERFRAMEWORK=`realpath ../checker-framework`
+/tmp/plume-scripts/git-clone-related typetools checker-framework ${CHECKERFRAMEWORK}
 (cd ${CHECKERFRAMEWORK} && ./.travis-build-without-test.sh downloadjdk)
 
-(cd annotation-file-utilities && ant check-signature)
-(cd scene-lib && ant check-signature)
+(cd ${AFU} && ./gradlew checkSignature)

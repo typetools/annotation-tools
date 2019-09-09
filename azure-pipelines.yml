@@ -15,8 +15,8 @@ jobs:
   steps:
   - checkout: self
     fetchDepth: 25
-  - bash: ./annotation-file-utilities/dev-scripts/test-ant-test.sh
-    displayName: test-ant-test.sh
+  - bash: ./annotation-file-utilities/dev-scripts/test-allTests.sh
+    displayName: test-allTests.sh
 - job: typecheck_jdk8
   pool:
     vmImage: 'ubuntu-16.04'

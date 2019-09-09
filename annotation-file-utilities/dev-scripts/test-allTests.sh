@@ -10,4 +10,4 @@ export AFU=`readlink -f ${AFU:-$(dirname $0)/..}`
 export CHECKERFRAMEWORK=`readlink -f ${CHECKERFRAMEWORK:-../checker-framework}`
 export PATH=$AFU/scripts:$JAVA_HOME/bin:$PATH
 
-(cd ${AFU} && ./gradlew build)
+(cd ${AFU} && ./gradlew allTests)
