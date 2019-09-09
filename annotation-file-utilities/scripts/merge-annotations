@@ -9,8 +9,9 @@ if [ $# -le 1 ]; then exit 0; fi
 js="$HOME/src/jdk1.8.0_45/src"
 jb="$CHECKERFRAMEWORK/checker/dist/*"
 cf="$CHECKERFRAMEWORK/checker/build"
-sl="$CHECKERFRAMEWORK/../annotation-tools/scene-lib/bin"
-al="$CHECKERFRAMEWORK/../annotation-tools/annotation-file-utilities/lib"
+AFU=${AFU:-$CHECKERFRAMEWORK/../annotation-tools/annotation-file-utilities}
+al="${AFU}/lib"
+sl=readlink -f "${AFU}/../scene-lib/bin"
 jj=./jdk.jaif
 wd=`pwd`
 cp="$jb:$cf:$sl:$al/*:$wd:$CLASSPATH"
