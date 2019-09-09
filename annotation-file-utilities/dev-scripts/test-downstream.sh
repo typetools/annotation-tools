@@ -7,7 +7,7 @@ export SHELLOPTS
 
 export JAVA_HOME=${JAVA_HOME:-$(dirname $(dirname $(dirname $(readlink -f $(/usr/bin/which java)))))}
 
-export AFU=`readlink -f ${AFU:-../annotation-tools/annotation-file-utilities}`
+export AFU=`readlink -f ${AFU:-annotation-file-utilities}`
 export CHECKERFRAMEWORK=`readlink -f ${CHECKERFRAMEWORK:-../checker-framework}`
 export PATH=$AFU/scripts:$JAVA_HOME/bin:$PATH
 
