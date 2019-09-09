@@ -16,6 +16,6 @@ git -C /tmp/plume-scripts pull > /dev/null 2>&1 \
   || git -C /tmp clone --depth 1 -q https://github.com/plume-lib/plume-scripts.git
 
 /tmp/plume-scripts/git-clone-related typetools checker-framework ${CHECKERFRAMEWORK}
-(cd ${CHECKERFRAMEWORK} && ./.travis-build-without-test.sh downloadjdk)
+(cd ${CHECKERFRAMEWORK} && checker/bin-devel/build.sh)
 
 (cd ${AFU} && ./gradlew checkSignature)
