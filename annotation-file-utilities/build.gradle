@@ -6,7 +6,6 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '5.1.0'
     id 'java'
 }
-apply plugin: 'idea'
 apply plugin: 'java'
 apply plugin: 'com.github.johnrengelman.shadow'
 
@@ -82,9 +81,6 @@ shadowJar {
     destinationDirectory = projectDir
     includeEmptyDirs = false
     archiveVersion = null
-    minimize {
-        exclude(dependency('org.checkerframework:compiler:.*'))
-    }
     // Don't include any class from the Checker Framework.
     // This should just be checker-qual.
     exclude 'org/checkerframework/**'
