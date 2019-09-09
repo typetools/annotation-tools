@@ -1,6 +1,7 @@
 #!/bin/bash
 
-echo Entering `pwd`/.travis-build.sh, GROUP=$1
+SCRIPTDIR=`dirname "$0"`
+echo Entering ${SCRIPTDIR}/.travis-build.sh, GROUP=$1
 
 # Optional argument $1 is one of:
 #   all, test, typecheck, misc, downstream
@@ -76,4 +77,4 @@ if [[ "${GROUP}" == "downstream" || "${GROUP}" == "all" ]]; then
     (cd ../checker-framework-inference && ./gradlew dist && ./gradlew test)
 fi
 
-echo Exiting `pwd`/.travis-build.sh, GROUP=$1
+echo Exiting ${SCRIPTDIR}/.travis-build.sh, GROUP=$1

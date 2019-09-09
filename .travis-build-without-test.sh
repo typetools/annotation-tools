@@ -1,6 +1,7 @@
 #!/bin/bash
 
-echo Entering `pwd`/.travis-build-without-test.sh
+SCRIPTDIR=`dirname "$0"`
+echo Entering ${SCRIPTDIR}/.travis-build-without-test.sh
 
 # Fail the whole script if any command fails
 set -e
@@ -15,4 +16,4 @@ export PATH=$AFU/scripts:$JAVA_HOME/bin:$PATH
 
 ## Compile
 (cd ${AFU} && ./gradlew assemble)
-echo Exiting `pwd`/.travis-build-without-test.sh
+echo Exiting ${SCRIPTDIR}/.travis-build-without-test.sh
