@@ -468,6 +468,28 @@ javadoc {
     options.memberLevel = JavadocMemberLevel.PUBLIC
 }
 
+task javadocPrivate(type: Javadoc) {
+  description = 'Run Javadoc in strict mode.'
+  source = sourceSets.main.allJava
+  classpath = sourceSets.main.runtimeClasspath
+  options.addStringOption('Xwerror', '-Xdoclint:all')
+  options.memberLevel = JavadocMemberLevel.PRIVATE
+}
+
+dependencies {
+  compileOnly group: 'org.plumelib', name: 'require-javadoc', version: '0.1.2'
+}
+task requireJavadocPrivate(type: Javadoc) {
+  description = 'Ensures that Javadoc documentation exists.'
+  destinationDir temporaryDir
+  source = sourceSets.main.allJava
+  classpath = project.sourceSets.main.compileClasspath
+  options.docletpath = project.sourceSets.main.compileClasspath as List
+  options.doclet = "org.plumelib.javadoc.RequireJavadoc"
+  options.memberLevel = JavadocMemberLevel.PRIVATE
+  // options.addStringOption('skip', 'ClassNotToCheck|OtherClass')
+}
+
 artifacts {
     archives shadowJar
     archives skinnyJar
