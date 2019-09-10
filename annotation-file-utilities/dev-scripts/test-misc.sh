@@ -10,8 +10,8 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 else
   export JAVA_HOME=${JAVA_HOME:-$(dirname $(dirname $(readlink -f $(which javac))))}
 fi
-export AFU="$(cd "${AFU:-annotation-file-utilities}" && pwd -P)"
-export CHECKERFRAMEWORK="$(cd "${CHECKERFRAMEWORK:-../checker-framework}" && pwd -P)"
+export AFU="${AFU:-$(cd annotation-file-utilities && pwd -P)}"
+export CHECKERFRAMEWORK="${CHECKERFRAMEWORK:-$(cd ../checker-framework && pwd -P)}"
 export PATH=$AFU/scripts:$JAVA_HOME/bin:$PATH
 
 git -C /tmp/plume-scripts pull > /dev/null 2>&1 \
