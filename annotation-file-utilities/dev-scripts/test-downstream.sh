@@ -5,10 +5,13 @@ set -o verbose
 set -o xtrace
 export SHELLOPTS
 
-export JAVA_HOME=${JAVA_HOME:-$(dirname $(dirname $(dirname $(readlink -f $(/usr/bin/which java)))))}
-
-export AFU=`readlink -f ${AFU:-annotation-file-utilities}`
-export CHECKERFRAMEWORK=`readlink -f ${CHECKERFRAMEWORK:-../checker-framework}`
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  export JAVA_HOME=${JAVA_HOME:-$(/usr/libexec/java_home)}
+else
+  export JAVA_HOME=${JAVA_HOME:-$(dirname $(dirname $(readlink -f $(which javac))))}
+fi
+export AFU="$(cd "${AFU:-annotation-file-utilities}" && pwd -P)"
+export CHECKERFRAMEWORK="$(cd "${CHECKERFRAMEWORK:-../checker-framework}" && pwd -P)"
 export PATH=$AFU/scripts:$JAVA_HOME/bin:$PATH
 
 (cd ${AFU} && ./gradlew assemble)
