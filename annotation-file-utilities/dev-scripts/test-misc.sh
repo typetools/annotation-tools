@@ -10,12 +10,20 @@ export AFU=`readlink -f ${AFU:-$(dirname $0)/..}`
 export CHECKERFRAMEWORK=`readlink -f ${CHECKERFRAMEWORK:-../checker-framework}`
 export PATH=$AFU/scripts:$JAVA_HOME/bin:$PATH
 
+git -C /tmp/plume-scripts pull > /dev/null 2>&1 \
+  || git -C /tmp clone --depth 1 -q https://github.com/plume-lib/plume-scripts.git
+
 cd ${AFU}
 ./gradlew assemble
 
 ./gradlew checkBasicStyle
 # TODO: enable check-format when codebase is reformatted (after merging branches?)
 # ant check-format
+
 ./gradlew htmlValidate
+
 ./gradlew javadoc
-# TODO: check that all changed lines have Javadoc.
+(./gradlew javadocPrivate > /tmp/warnings.txt 2>&1) || true
+/tmp/plume-scripts/ci-lint-diff /tmp/warnings.txt
+(./gradlew requireJavadocPrivate > /tmp/warnings.txt 2>&1) || true
+/tmp/plume-scripts/ci-lint-diff /tmp/warnings.txt
