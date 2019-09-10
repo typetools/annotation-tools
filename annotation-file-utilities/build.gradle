@@ -389,8 +389,8 @@ task checkBasicStyle(group: 'Format') {
 /**
  * Creates a task that runs the checker on the main source set. The task is named
  * "check${shortName}", for example "checkPurity" or "checkNullness".
- * @param checker full qualified name of the checker to run
- * @param shortName shorter version of the checker to use to name the task.
+ * @param checker fully-qualified name of the checker to run
+ * @param shortName short name of the checker, to use to name the task.
  */
 def createCheckTypeTask(checker, shortName) {
     tasks.create(name: "check${shortName}", type: JavaCompile) {
@@ -423,6 +423,7 @@ def createCheckTypeTask(checker, shortName) {
     }
 }
 
+// Create checkSignature task
 createCheckTypeTask('org.checkerframework.checker.signature.SignatureChecker', 'Signature')
 
 task htmlValidate(type: Exec) {
@@ -446,6 +447,28 @@ task allTests(type: GradleBuild, group: 'Verification') {
 
 javadoc {
     options.memberLevel = JavadocMemberLevel.PUBLIC
+}
+
+task javadocPrivate(type: Javadoc) {
+  description = 'Run Javadoc in strict mode.'
+  source = sourceSets.main.allJava
+  classpath = sourceSets.main.runtimeClasspath
+  options.addStringOption('Xwerror', '-Xdoclint:all')
+  options.memberLevel = JavadocMemberLevel.PRIVATE
+}
+
+dependencies {
+  compileOnly group: 'org.plumelib', name: 'require-javadoc', version: '0.1.2'
+}
+task requireJavadocPrivate(type: Javadoc) {
+  description = 'Ensures that Javadoc documentation exists.'
+  destinationDir temporaryDir
+  source = sourceSets.main.allJava
+  classpath = project.sourceSets.main.compileClasspath
+  options.docletpath = project.sourceSets.main.compileClasspath as List
+  options.doclet = "org.plumelib.javadoc.RequireJavadoc"
+  options.memberLevel = JavadocMemberLevel.PRIVATE
+  // options.addStringOption('skip', 'ClassNotToCheck|OtherClass')
 }
 
 artifacts {

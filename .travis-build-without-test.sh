@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo Entering `pwd`/.travis-build-without-test.sh
+echo Entering `readlink -f "$0"`
 
 # Fail the whole script if any command fails
 set -e
@@ -8,12 +8,12 @@ set -e
 export SHELLOPTS
 
 export JAVA_HOME=${JAVA_HOME:-$(dirname $(dirname $(dirname $(readlink -f $(/usr/bin/which java)))))}
-
-export AFU=`readlink -f ${AFU:-../annotation-tools/annotation-file-utilities}`
-export CHECKERFRAMEWORK=`readlink -f ${CHECKERFRAMEWORK:-../checker-framework}`
+echo JAVA_HOME=$JAVA_HOME
+export AFU=`readlink -f ${AFU:-annotation-file-utilities}`
 
 export PATH=$AFU/scripts:$JAVA_HOME/bin:$PATH
 
 ## Compile
-cd ${AFU}; ./gradlew assemble
-echo Exiting `pwd`/.travis-build-without-test.sh
+(cd ${AFU} && ./gradlew assemble)
+
+echo Exiting `readlink -f "$0"`
