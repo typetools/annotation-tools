@@ -7,10 +7,10 @@ set -e
 
 export SHELLOPTS
 
-if [[ "$OSTYPE" == "darwin"* ]]; then
+if [ "$(uname)" = "Darwin" ] ; then
   export JAVA_HOME=${JAVA_HOME:-$(/usr/libexec/java_home)}
 else
-  export JAVA_HOME=${JAVA_HOME:-`dirname $(dirname $(readlink -f $(which javac)))`}
+  export JAVA_HOME=${JAVA_HOME:-$(dirname $(dirname $(readlink -f $(which javac))))}
 fi
 echo JAVA_HOME=$JAVA_HOME
 export AFU="${AFU:-$(cd annotation-file-utilities && pwd -P)}"
