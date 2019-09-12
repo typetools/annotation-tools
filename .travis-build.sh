@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo Entering `readlink -f "$0"`, GROUP=$1
+echo Entering "$(cd "$(dirname "$0")" && pwd -P)/$(basename "$0")"
 
 # Optional argument $1 is one of:
 #   all, test, typecheck, misc, downstream
@@ -76,4 +76,4 @@ if [[ "${GROUP}" == "downstream" || "${GROUP}" == "all" ]]; then
     (cd ../checker-framework-inference && ./gradlew dist && ./gradlew test)
 fi
 
-echo Exiting `readlink -f "$0"`, GROUP=$1
+echo Exiting "$(cd "$(dirname "$0")" && pwd -P)/$(basename "$0")"
