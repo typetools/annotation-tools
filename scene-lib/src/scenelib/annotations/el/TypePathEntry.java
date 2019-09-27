@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * A TypePathEntry is a way to get from one node in a TypePath to another.
+ * A TypePathEntry is a way to get from one node in a {@link TypePath} to another.
  * One can treat these as edges in a graph.
- * A list of TypePathEntry corresponds to a TypePath.
+ * A list of TypePathEntry corresponds to a {@link TypePath}.
  */
 public class TypePathEntry {
   /**

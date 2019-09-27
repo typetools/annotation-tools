@@ -12,19 +12,44 @@ import java.util.Arrays;
  */
 public final class LocalLocation {
 
-    public final Label[] start;
-    public final Label[] end;
-    public final int[] index;
+    /**
+     * The start of the scopes of the element being visited.
+     * Used only for TypeReference#LOCAL_VARIABLE and TypeReference#RESOURCE_VARIABLE.
+     */
+    private final Label[] start;
+
+    /**
+     * The end of the scopes of the element being visited.
+     * Used only for TypeReference#LOCAL_VARIABLE and TypeReference#RESOURCE_VARIABLE.
+     */
+    private final Label[] end;
+
+    /**
+     * The indices of the element being visited in the classfile.
+     * Used only for TypeReference#LOCAL_VARIABLE and TypeReference#RESOURCE_VARIABLE.
+     */
+    private final int[] index;
+
+    /**
+     * The name of the local variable being visited.
+     */
     public final String variableName;
 
     // This is made private so that we always call {@link Label#getOffset} whenever we access these. This is to prevent
     // a case where labels passed to the constructor would not be resolved at that point.
+
+    /**
+     * The bytecode offset to the start of the scope. Used for backwards compatibility with ASMX stuff and JAIF files.
+     */
     private int scopeStart;
+
+    /**
+     * The length of the scope. Used for backwards compatibility with ASMX stuff and JAIF files.
+     */
     private int scopeLength;
 
     public LocalLocation(String variableName, int index) {
         this(new Label(), new Label(), index, variableName);
-//        System.out.println("BAD1");
     }
 
     public LocalLocation(Label start, Label end, int index, String variableName) {

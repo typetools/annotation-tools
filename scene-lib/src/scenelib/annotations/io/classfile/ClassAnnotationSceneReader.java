@@ -221,8 +221,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
   /**
    * Most of the complexity behind reading annotations from a class file into
    * a scene is in AnnotationSceneReader, which fully implements the
-   * TypeAnnotationVisitor interface (and therefore also implements the
-   * AnnotationVisitor interface).  It keeps an AElement of the
+   * AnnotationVisitor interface.  It keeps an AElement of the
    * element into which this should insert the annotations it visits in
    * a class file.  Thus, constructing an AnnotationSceneReader with an
    * AElement of the right type is sufficient for writing out annotations
@@ -239,9 +238,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
     //  properly call the right annotationBuilder methods on its visitEnd().
     // For nested annotations, use a NestedAnnotationSceneReader that will
     //  properly call the right annotationBuilder methods on its visitEnd().
-    // For extended information, store all arguments passed in and on
-    //  this.visitEnd(), handle all the information based on target type.
-
+    // For type annotations, see TypeAnnotationSceneReader.
 
     // The AElement into which the annotation visited should be inserted.
     protected AElement aElement;
@@ -253,16 +250,6 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
     private AnnotationBuilder annotationBuilder;
 
     protected AnnotationVisitor annotationWriter;
-
-    // private AnnotationDef getAnnotationDef(Object o) {
-    //   if (o instanceof AnnotationDef) {
-    //     return (AnnotationDef) o;
-    //   } else if (o instanceof String) {
-    //     return getAnnotationDef((String) o);
-    //   } else {
-    //     throw new Error(String.format("bad type %s : %s", o.getClass(), o));
-    //   }
-    // }
 
     @SuppressWarnings("unchecked")
     private AnnotationDef getAnnotationDef(String jvmlClassName) {
@@ -286,7 +273,6 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
       }
 
       AnnotationDef ad = AnnotationDef.fromClass(annoClass, annotationDefinitions);
-
       return ad;
     }
 
@@ -296,7 +282,10 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
      * visibility.  Calling visitEnd() will ensure that this writes out the
      * annotation it visits into aElement.
      *
-     * @param descriptor JVML format for the field being read, or ClassAnnotationSceneReader.dummyDesc
+     * @param descriptor the class descriptor of the enumeration class.
+     * @param visible whether or not this annotation is visible at runtime.
+     * @param aElement the AElement into which the annotation visited should be inserted.
+     * @param annotationWriter the AnnotationWriter passed by the caller
      */
     AnnotationSceneReader(int api, String descriptor, boolean visible, AElement aElement, AnnotationVisitor annotationWriter) {
       super(api, annotationWriter);
@@ -373,7 +362,6 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
 
       // handle everything but arrays
       annotationBuilder.addScalarField(name, BasicAFT.forType(c),value);
-
     }
 
     /**
@@ -509,22 +497,18 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
 
   }
 
+  /**
+   * Handles all the logic related to reading Type Annotations and creating the appropriate scenes. The
+   * visitEnd() method chooses the appropriate scene element for the correct TypeReference.getSort()
+   * (which is the target type of the type annotation). So if new target types are added, the visitEnd method
+   * needs to be updated accordingly.
+   */
   private class TypeAnnotationSceneReader extends AnnotationSceneReader {
     // Implementation strategy:
-    // For field values and enums, simply pass the information
-    //  onto annotationBuilder.
-    // For arrays, use an ArrayAnnotationBuilder that will
-    //  properly call the right annotationBuilder methods on its visitEnd().
-    // For nested annotations, use a NestedAnnotationSceneReader that will
-    //  properly call the right annotationBuilder methods on its visitEnd().
-    // For extended information, store all arguments passed in and on
+    // For type annotation information, store all arguments passed in and on
     //  this.visitEnd(), handle all the information based on target type.
 
-    // The AnnotationBuilder used to create this annotation.
-//    private AnnotationBuilder annotationBuilder;
-
-    // A reference to the annotated type. The sort of this type reference must be TypeReference.CLASS_TYPE_PARAMETER,
-    // TypeReference.CLASS_TYPE_PARAMETER_BOUND or TypeReference.CLASS_EXTENDS.
+    // A reference to the annotated type.
     private final TypeReference typeReference;
 
     /**
@@ -561,29 +545,21 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
      */
     private final String localVariableName;
 
-    // since AnnotationSceneReader will work for both normal
-    // and extended annotations, all of the following information
-    // may or may not be present, so use a list to store
-    // information as it is received from visitX* methods, and
-    // correctly interpret the information in visitEnd()
-    // note that all of these should contain 0 or 1 elements,
-    // except for xLocations, which is actually a list
-
-    // private AnnotationDef getAnnotationDef(Object o) {
-    //   if (o instanceof AnnotationDef) {
-    //     return (AnnotationDef) o;
-    //   } else if (o instanceof String) {
-    //     return getAnnotationDef((String) o);
-    //   } else {
-    //     throw new Error(String.format("bad type %s : %s", o.getClass(), o));
-    //   }
-    // }
-
     /**
-     * Constructs a new AnnotationScene reader with the given description and
+     * Constructs a new TypeAnnotationSceneReader with the given description and
      * visibility.  Calling visitEnd() will ensure that this writes out the
      * annotation it visits into aElement.
-     * @param descriptor JVML format for the field being read, or ClassAnnotationSceneReader.dummyDesc
+     * @param typeRef A reference to the annotated type. This has information about the target type, param index and
+     *                bound index for the type annotation. {@see org.objectweb.asm.TypeReference}
+     * @param typePath The path to the annotated type argument, wildcard bound, array element type, or static inner
+     *                 type within 'typeRef'. May be null if the annotation targets 'typeRef' as a whole.
+     * @param start the start of the scopes of the element being visited. Used only for TypeReference#LOCAL_VARIABLE
+     *              and TypeReference#RESOURCE_VARIABLE.
+     * @param end the end of the scopes of the element being visited. Used only for TypeReference#LOCAL_VARIABLE
+     *            and TypeReference#RESOURCE_VARIABLE.
+     * @param index The indices of the element being visited in the classfile. Used only for TypeReference#LOCAL_VARIABLE
+     *              and TypeReference#RESOURCE_VARIABLE.
+     * @param currentLabel The current Label being visited.
      */
     TypeAnnotationSceneReader(int api, String descriptor, boolean visible, AElement aElement, AnnotationVisitor annotationWriter,
                               int typeRef, TypePath typePath, Label[] start, Label[] end, int[] index, Label currentLabel) {
@@ -594,7 +570,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
      * Constructs a new AnnotationScene reader with the given description and
      * visibility.  Calling visitEnd() will ensure that this writes out the
      * annotation it visits into aElement.
-     * @param descriptor JVML format for the field being read, or ClassAnnotationSceneReader.dummyDesc
+     * @param localVariableName the name of the local variable being visited.
      */
     TypeAnnotationSceneReader(int api, String descriptor, boolean visible, AElement aElement, AnnotationVisitor annotationWriter,
                               int typeRef, TypePath typePath, Label[] start, Label[] end, int[] index, Label currentLabel,
@@ -616,8 +592,8 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
     }
 
     /**
-     * Visits the end of the annotation, and actually writes out the
-     *  annotation into aElement.
+     * Visits the end of the annotation, and actually writes out the annotation into aElement.
+     * Needs to be updated whenever a new target type is added.
      *
      * @see org.objectweb.asm.AnnotationVisitor#visitEnd()
      */
@@ -712,13 +688,8 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
             throw new Error("EXCEPTION_PARAMETER TypeReference case.");
             // TODO: ensure all cases covered.
           default:
-            // TODO: We can probably delete this default case, since this will never happen.
-            // Rather than throw an error here, since a declaration annotation
-            // is being used as an extended annotation, just make the
-            // annotation and place it in the given aElement as usual.
-
-            // aElement.tlAnnotationsHere.add(makeAnnotation());
-            System.err.println("ERROR: This should not happen.");
+            System.err.println("ERROR: Either this is a bug, or this particular TypeReference is not supported yet: "
+                + Integer.toHexString(typeReference.getValue()));
             Annotation a = makeAnnotation();
             aElement.tlAnnotationsHere.add(a);
         }
@@ -745,6 +716,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
   /**
    * Creates the class type parameter bound annotation on aClass.
    * Works for {@link TypeReference#CLASS_TYPE_PARAMETER_BOUND}
+   * @param aClass the annotatable class in which annotation will be inserted
    */
   private void handleClassTypeParameterBound(AClass aClass) {
     if (typePath == null) {
@@ -760,6 +732,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
   /**
    * Creates the class extends annotation on aClass.
    * Works for {@link TypeReference#CLASS_EXTENDS}
+   * @param aClass the annotatable class in which annotation will be inserted
    */
   private void handleClassExtends(AClass aClass) {
     TypeIndexLocation typeIndexLocation = new TypeIndexLocation(typeReference.getSuperTypeIndex());
@@ -776,6 +749,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
   /**
    * Creates the inner annotation on aElement.innerTypes.
    * Works for {@link TypeReference#FIELD}
+   * @param aElement the annotatable element in which annotation will be inserted
    */
   private void handleField(AElement aElement) {
     if (aElement instanceof AClass) {
@@ -1056,6 +1030,10 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
     private final String name;
     // private final String descriptor;
 
+    /**
+     * {@inheritDoc}
+     * @param parent the parent AnnotationSceneReader.
+     */
     NestedAnnotationSceneReader(int api, AnnotationSceneReader parent, String name, String descriptor, AnnotationVisitor annotationWriter) {
       super(api, descriptor, parent.visible, parent.aElement, annotationWriter);
       if (trace) { System.out.printf("NestedAnnotationSceneReader(%s, %s, %s)%n", parent, name, descriptor); }
