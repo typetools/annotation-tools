@@ -16,19 +16,19 @@ public final class LocalLocation {
      * The start of the scopes of the element being visited.
      * Used only for TypeReference#LOCAL_VARIABLE and TypeReference#RESOURCE_VARIABLE.
      */
-    private final Label[] start;
+    public final Label[] start;
 
     /**
      * The end of the scopes of the element being visited.
      * Used only for TypeReference#LOCAL_VARIABLE and TypeReference#RESOURCE_VARIABLE.
      */
-    private final Label[] end;
+    public final Label[] end;
 
     /**
      * The indices of the element being visited in the classfile.
      * Used only for TypeReference#LOCAL_VARIABLE and TypeReference#RESOURCE_VARIABLE.
      */
-    private final int[] index;
+    public final int[] index;
 
     /**
      * The name of the local variable being visited.
