@@ -630,96 +630,103 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
       // on instanceOfs, typecasts, or news, the extended compiler enters
       // those annotations on the field.  If we get such an annotation and
       // aElement is a field, skip the annotation for now to avoid crashing.
-      switch(typeReference.getSort()) {
-        case TypeReference.CLASS_TYPE_PARAMETER_BOUND:
-          handleClassTypeParameterBound((AClass) aElement);
-          break;
-        case TypeReference.CLASS_TYPE_PARAMETER:
-          handleClassTypeParameter((AClass) aElement);
-          break;
-        case TypeReference.CLASS_EXTENDS:
-          handleClassExtends((AClass) aElement);
-          break;
-        case TypeReference.FIELD:
-          handleField(aElement);
-          break;
-        case TypeReference.LOCAL_VARIABLE:
-        case TypeReference.RESOURCE_VARIABLE:
-          handleMethodLocalVariable((AMethod) aElement);
-          break;
-        case TypeReference.NEW:
-          if (aElement instanceof AMethod) {
-            handleMethodObjectCreation((AMethod) aElement);
-          } else {
-            // TODO: in field initializers
-            if (strict) {
-              System.err.println("Unhandled NEW annotation for " + aElement);
+      try {
+        switch (typeReference.getSort()) {
+          case TypeReference.CLASS_TYPE_PARAMETER_BOUND:
+            handleClassTypeParameterBound((AClass) aElement);
+            break;
+          case TypeReference.CLASS_TYPE_PARAMETER:
+            handleClassTypeParameter((AClass) aElement);
+            break;
+          case TypeReference.CLASS_EXTENDS:
+            handleClassExtends((AClass) aElement);
+            break;
+          case TypeReference.FIELD:
+            handleField(aElement);
+            break;
+          case TypeReference.LOCAL_VARIABLE:
+          case TypeReference.RESOURCE_VARIABLE:
+            handleMethodLocalVariable((AMethod) aElement);
+            break;
+          case TypeReference.NEW:
+            if (aElement instanceof AMethod) {
+              handleMethodObjectCreation((AMethod) aElement);
+            } else {
+              // TODO: in field initializers
+              if (strict) {
+                System.err.println("Unhandled NEW annotation for " + aElement);
+              }
             }
-          }
-          break;
-        case TypeReference.METHOD_FORMAL_PARAMETER:
-          handleMethodFormalParameter((AMethod) aElement);
-          break;
-        case TypeReference.METHOD_RECEIVER:
-          handleMethodReceiver((AMethod) aElement);
-          break;
-        case TypeReference.CAST:
-          if (aElement instanceof AMethod) {
-            handleMethodTypecast((AMethod) aElement);
-          } else {
-            // TODO: in field initializers
-            if (strict) {
-              System.err.println("Unhandled TYPECAST annotation for " + aElement);
+            break;
+          case TypeReference.METHOD_FORMAL_PARAMETER:
+            handleMethodFormalParameter((AMethod) aElement);
+            break;
+          case TypeReference.METHOD_RECEIVER:
+            handleMethodReceiver((AMethod) aElement);
+            break;
+          case TypeReference.CAST:
+            if (aElement instanceof AMethod) {
+              handleMethodTypecast((AMethod) aElement);
+            } else {
+              // TODO: in field initializers
+              if (strict) {
+                System.err.println("Unhandled TYPECAST annotation for " + aElement);
+              }
             }
-          }
-          break;
-        case TypeReference.METHOD_RETURN:
-          handleMethodReturnType((AMethod) aElement);
-          break;
-        case TypeReference.INSTANCEOF:
-          if (aElement instanceof AMethod) {
-            handleMethodInstanceOf((AMethod) aElement);
-          } else {
-            // TODO: in field initializers
-            if (strict) {
-              System.err.println("Unhandled INSTANCEOF annotation for " + aElement);
+            break;
+          case TypeReference.METHOD_RETURN:
+            handleMethodReturnType((AMethod) aElement);
+            break;
+          case TypeReference.INSTANCEOF:
+            if (aElement instanceof AMethod) {
+              handleMethodInstanceOf((AMethod) aElement);
+            } else {
+              // TODO: in field initializers
+              if (strict) {
+                System.err.println("Unhandled INSTANCEOF annotation for " + aElement);
+              }
             }
-          }
-          break;
-        case TypeReference.METHOD_TYPE_PARAMETER_BOUND:
-          handleMethodTypeParameterBound((AMethod) aElement);
-          break;
-        case TypeReference.THROWS:
-          handleThrows((AMethod) aElement);
-          break;
-        case TypeReference.CONSTRUCTOR_REFERENCE:  // TODO
-        case TypeReference.METHOD_REFERENCE:
-          handleMethodReference((AMethod) aElement);
-          break;
-        case TypeReference.CONSTRUCTOR_REFERENCE_TYPE_ARGUMENT:  // TODO
-        case TypeReference.METHOD_REFERENCE_TYPE_ARGUMENT:
-          handleReferenceTypeArgument((AMethod) aElement);
-          break;
-        case TypeReference.CONSTRUCTOR_INVOCATION_TYPE_ARGUMENT:  // TODO
-        case TypeReference.METHOD_INVOCATION_TYPE_ARGUMENT:
-          handleInvocationTypeArgument((AMethod) aElement);
-          break;
-        case TypeReference.METHOD_TYPE_PARAMETER:
-          handleMethodTypeParameter((AMethod) aElement);
-          break;
-        case TypeReference.EXCEPTION_PARAMETER:   // TODO: Change if this error is ever thrown.
-          throw new Error("EXCEPTION_PARAMETER TypeReference case.");
-        // TODO: ensure all cases covered.
-        default:
-          // TODO: We can probably delete this default case, since this will never happen.
-          // Rather than throw an error here, since a declaration annotation
-          // is being used as an extended annotation, just make the
-          // annotation and place it in the given aElement as usual.
+            break;
+          case TypeReference.METHOD_TYPE_PARAMETER_BOUND:
+            handleMethodTypeParameterBound((AMethod) aElement);
+            break;
+          case TypeReference.THROWS:
+            handleThrows((AMethod) aElement);
+            break;
+          case TypeReference.CONSTRUCTOR_REFERENCE:  // TODO
+          case TypeReference.METHOD_REFERENCE:
+            handleMethodReference((AMethod) aElement);
+            break;
+          case TypeReference.CONSTRUCTOR_REFERENCE_TYPE_ARGUMENT:  // TODO
+          case TypeReference.METHOD_REFERENCE_TYPE_ARGUMENT:
+            handleReferenceTypeArgument((AMethod) aElement);
+            break;
+          case TypeReference.CONSTRUCTOR_INVOCATION_TYPE_ARGUMENT:  // TODO
+          case TypeReference.METHOD_INVOCATION_TYPE_ARGUMENT:
+            handleInvocationTypeArgument((AMethod) aElement);
+            break;
+          case TypeReference.METHOD_TYPE_PARAMETER:
+            handleMethodTypeParameter((AMethod) aElement);
+            break;
+          case TypeReference.EXCEPTION_PARAMETER:   // TODO: Change if this error is ever thrown.
+            throw new Error("EXCEPTION_PARAMETER TypeReference case.");
+            // TODO: ensure all cases covered.
+          default:
+            // TODO: We can probably delete this default case, since this will never happen.
+            // Rather than throw an error here, since a declaration annotation
+            // is being used as an extended annotation, just make the
+            // annotation and place it in the given aElement as usual.
 
-          // aElement.tlAnnotationsHere.add(makeAnnotation());
-          System.err.println("ERROR: This should not happen.");
-          Annotation a = makeAnnotation();
-          aElement.tlAnnotationsHere.add(a);
+            // aElement.tlAnnotationsHere.add(makeAnnotation());
+            System.err.println("ERROR: This should not happen.");
+            Annotation a = makeAnnotation();
+            aElement.tlAnnotationsHere.add(a);
+        }
+      } catch (ClassCastException e) {
+        System.err.println("Exception trace: " + e.getMessage());
+        System.err.println("Classfile is malformed. Ignoring this type annotation.");
+        System.err.println("    This AElement: " + aElement);
+        System.err.println("    This TypeReference: " + typeReference.getValue());
       }
     }
 
