@@ -47,13 +47,13 @@ configurations {
 dependencies {
     if (isJava8) {
         javacJar group: 'com.google.errorprone', name: 'javac', version: "9+181-r4173-1"
+        implementation 'com.google.errorprone:javac:9+181-r4173-1'
     }
     implementation 'org.plumelib:bcel-util:1.1.4'
     implementation 'org.plumelib:options:1.0.1'
     implementation 'org.plumelib:plume-util:1.0.7'
     implementation 'org.plumelib:signature-util:0.0.6'
     compileOnly 'org.checkerframework:checker-qual:2.5.4'
-    implementation 'com.google.errorprone:javac:9+181-r4173-1'
     implementation 'com.google.guava:guava:28.0-jre'
     implementation files('../asmx/bin/')
 
