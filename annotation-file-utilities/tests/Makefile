@@ -32,7 +32,7 @@ DEBUG :=
 # Use this to enable some debugging.
 # DEBUG := --debug
 
-default : diffs
+default : all
 
 .PHONY: all
 all : diffs abbreviated converted enum-imports ad-hoc issue155 system-test source-extension results
