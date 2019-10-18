@@ -881,10 +881,10 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
    */
   private void handleMethodInstanceOf(AMethod aMethod) {
     if (typePath == null) {
-      aMethod.body.typecasts.getVivify(makeOffset(false))
+      aMethod.body.instanceofs.getVivify(makeOffset(false))
           .tlAnnotationsHere.add(makeAnnotation());
     } else {
-      aMethod.body.typecasts.getVivify(makeOffset(false))
+      aMethod.body.instanceofs.getVivify(makeOffset(false))
           .innerTypes.getVivify(typePathToList(typePath))
           .tlAnnotationsHere.add(makeAnnotation());
     }
