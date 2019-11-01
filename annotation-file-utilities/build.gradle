@@ -117,6 +117,34 @@ shadowJar {
 // Shadowing Test Sources and Dependencies
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
+task allButJavacJar(type: ShadowJar, dependsOn: compileJava) {
+    description 'Builds annotation-file-utilities-all-but-javac.jar with all dependencies except javac.jar.'
+    destinationDirectory = projectDir
+    includeEmptyDirs = false
+    archiveFileName = 'annotation-file-utilities-all-but-javac.jar'
+
+    from shadowJar.source
+    configurations  = shadowJar.configurations
+
+    dependencies {
+        exclude(dependency('com.google.errorprone:javac:.*'))
+    }
+    // Don't include any class from the Checker Framework.
+    // This should just be checker-qual.
+    exclude 'org/checkerframework/**'
+    doFirst {
+        // TODO: The release fails because of this, so skip it for now.
+        if (project.hasProperty('release') && false) {
+            println 'Relocating packages.'
+            relocate 'org.apache', 'org.checkerframework.org.apache'
+            relocate 'org.relaxng', 'org.checkerframework.org.relaxng'
+            relocate 'org.plumelib', 'org.checkerframework.org.plumelib'
+            relocate 'org.objectweb.asm', 'org.checkerframework.org.objectweb.asm'
+            relocate 'com.google', 'org.checkerframework.com.google'
+        }
+    }
+}
+
 task skinnyJar(type: ShadowJar, dependsOn: compileJava) {
     description 'Builds annotation-file-utilities.jar with only asmx, scene-lib, and annotation-file-utility classes.'
     includeEmptyDirs = false
@@ -494,6 +522,7 @@ task requireJavadocPrivate(type: Javadoc) {
 artifacts {
     archives shadowJar
     archives skinnyJar
+    archives allButJavacJar
 }
 
 clean {
