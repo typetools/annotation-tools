@@ -132,6 +132,7 @@ task allButJavacJar(type: ShadowJar, dependsOn: compileJava) {
     // Don't include any class from the Checker Framework.
     // This should just be checker-qual.
     exclude 'org/checkerframework/**'
+    exclude 'javax/**'
     doFirst {
         // TODO: The release fails because of this, so skip it for now.
         if (project.hasProperty('release') && false) {
