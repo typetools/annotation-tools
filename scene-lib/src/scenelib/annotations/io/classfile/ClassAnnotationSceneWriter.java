@@ -696,6 +696,16 @@ public class ClassAnnotationSceneWriter extends ClassVisitor {
           xav.visitEnd();
         }
 
+        for (Annotation tla : aLocation.type.tlAnnotationsHere) {
+          if (shouldSkip(tla)) {
+            continue;
+          }
+          // FIXME
+          AnnotationVisitor xav = visitLocalVariableAnnotation(tla, typeReference, null, localLocation);
+          visitFields(xav, tla);
+          xav.visitEnd();
+        }
+
         // now do annotations on inner type of aLocation (local variable)
         for (Map.Entry<List<TypePathEntry>, ATypeElement> e :
           aLocation.type.innerTypes.entrySet()) {
