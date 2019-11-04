@@ -520,6 +520,21 @@ task requireJavadocPrivate(type: Javadoc) {
   // options.addStringOption('skip', 'ClassNotToCheck|OtherClass')
 }
 
+task updateUserOptions(type: Javadoc, dependsOn: 'assemble') {
+  description "Updates printed documentation of command-line arguments."
+
+  // source = sourceSets.main.allJava
+  exclude 'scenelib.annotations.io.classfile/**'
+  classpath = project.sourceSets.main.compileClasspath + project.sourceSets.main.runtimeClasspath
+  options.memberLevel = JavadocMemberLevel.PRIVATE
+  options.docletpath = project.sourceSets.main.runtimeClasspath as List
+  options.doclet = "org.plumelib.options.OptionsDoclet"
+  options.addStringOption("docfile", "${projectDir}/src/annotator/Main.java")
+  options.addStringOption("format", "javadoc")
+  options.addStringOption("i", "-quiet")
+  title = ""
+}
+
 artifacts {
     archives shadowJar
     archives skinnyJar
