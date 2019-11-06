@@ -1,9 +1,6 @@
 package annotator.find;
 
-import annotator.find.Insertion.Kind;
-
 import scenelib.annotations.el.AnnotationDef;
-import scenelib.annotations.Annotation;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;

@@ -1,7 +1,5 @@
 package annotator.scanner;
 
-import org.objectweb.asmx.AnnotationVisitor;
-import org.objectweb.asmx.Attribute;
 import org.objectweb.asmx.ClassReader;
 import org.objectweb.asmx.ClassWriter;
 import org.objectweb.asmx.Handle;
@@ -9,8 +7,6 @@ import org.objectweb.asmx.Label;
 import org.objectweb.asmx.MethodAdapter;
 import org.objectweb.asmx.MethodVisitor;
 import org.objectweb.asmx.Opcodes;
-import org.objectweb.asmx.TypeAnnotationVisitor;
-import org.objectweb.asmx.TypePath;
 
 import scenelib.annotations.io.classfile.CodeOffsetAdapter;
 
