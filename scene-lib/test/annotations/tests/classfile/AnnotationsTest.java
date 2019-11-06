@@ -13,14 +13,11 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.objectweb.asmx.ClassReader;
 
-import scenelib.annotations.Annotation;
-import scenelib.annotations.AnnotationFactory;
 import scenelib.annotations.el.AScene;
 import scenelib.annotations.io.IndexFileParser;
 import scenelib.annotations.io.IndexFileWriter;
 import scenelib.annotations.io.classfile.ClassFileReader;
 import scenelib.annotations.io.classfile.ClassFileWriter;
-import annotations.tests.classfile.foo.A;
 
 /**
  * This class is the testing framework for the class file/index file

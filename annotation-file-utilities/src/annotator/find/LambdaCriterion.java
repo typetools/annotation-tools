@@ -3,7 +3,6 @@ package annotator.find;
 import scenelib.annotations.el.RelativeLocation;
 import annotator.scanner.LambdaScanner;
 
-import com.sun.source.tree.LambdaExpressionTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
 

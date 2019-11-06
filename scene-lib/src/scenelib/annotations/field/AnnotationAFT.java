@@ -1,7 +1,5 @@
 package scenelib.annotations.field;
 
-import java.util.Map.Entry;
-
 import scenelib.annotations.Annotation;
 import scenelib.annotations.el.AnnotationDef;
 
