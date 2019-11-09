@@ -7,10 +7,6 @@ import java.util.Set;
 import scenelib.annotations.Annotation;
 import scenelib.annotations.util.coll.VivifyingMap;
 
-/*>>>
-import org.checkerframework.checker.nullness.qual.Nullable;
-*/
-
 /**
  * An <code>AElement</code> represents a Java element and the annotations it
  * carries. Some <code>AElements</code> may contain others; for example, an

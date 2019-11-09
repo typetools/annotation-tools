@@ -1,9 +1,5 @@
 package scenelib.annotations;
 
-/*>>>
-import org.checkerframework.checker.nullness.qual.Nullable;
-*/
-
 import scenelib.annotations.el.AnnotationDef;
 import scenelib.annotations.field.AnnotationFieldType;
 
@@ -277,8 +273,6 @@ public final class Annotation {
 }
 
 // package annotations;
-//
-// import org.checkerframework.checker.nullness.qual.Nullable;
 //
 // import scenelib.annotations.el.*;
 // import scenelib.annotations.util.coll.Keyer;

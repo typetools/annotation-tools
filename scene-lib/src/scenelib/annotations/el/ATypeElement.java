@@ -6,10 +6,6 @@ import java.util.Map;
 import scenelib.annotations.Annotation;
 import scenelib.annotations.util.coll.VivifyingMap;
 
-/*>>>
-import org.checkerframework.checker.nullness.qual.Nullable;
-*/
-
 /**
  * An {@link AElement} that represents a type might have annotations on inner
  * types ("generic/array" annotations in the design document). For example,

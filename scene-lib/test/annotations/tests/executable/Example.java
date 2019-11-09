@@ -1,10 +1,5 @@
 package annotations.tests.executable;
 
-/*>>>
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.tainting.qual.Tainted;
-*/
-
 import java.io.*;
 import java.util.*;
 

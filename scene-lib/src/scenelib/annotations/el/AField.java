@@ -4,10 +4,6 @@ import java.util.LinkedHashMap;
 
 import scenelib.annotations.util.coll.VivifyingMap;
 
-/*>>>
-import org.checkerframework.checker.nullness.qual.Nullable;
-*/
-
 public class AField extends ADeclaration {
 
   public AExpression init;

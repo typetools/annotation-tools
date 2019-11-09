@@ -9,10 +9,6 @@ import scenelib.annotations.Annotation;
 import scenelib.annotations.io.IndexFileParser;
 import scenelib.annotations.util.coll.VivifyingMap;
 
-/*>>>
-import org.checkerframework.checker.nullness.qual.Nullable;
-*/
-
 /**
  * An <code>AScene</code> (annotated scene) represents the annotations on a
  * set of Java classes and packages along with the definitions of some or all of

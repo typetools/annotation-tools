@@ -6,10 +6,6 @@ import java.util.TreeMap;
 import scenelib.annotations.io.ASTPath;
 import scenelib.annotations.util.coll.VivifyingMap;
 
-/*>>>
-import org.checkerframework.checker.nullness.qual.Nullable;
-*/
-
 /**
  * A declaration, as opposed to an expression.  Base class for AClass,
  * AMethod, and AField.
