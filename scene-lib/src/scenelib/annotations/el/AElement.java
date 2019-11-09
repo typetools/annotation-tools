@@ -32,7 +32,14 @@ public class AElement implements Cloneable {
      */
     public final Set<Annotation> tlAnnotationsHere;
 
-    /** The type of a field or a method parameter.  May be null. */
+    /**
+     * The type of a field or a method parameter.
+
+     * When this AElement object is a field or method, its annotations are declaration annotations,
+     * and the {@code type} field represents its type, whose annotations are type annotations.
+     *
+     * When this AElement object is NOT a field or method, the {@code type} field is null.
+     */
     public final ATypeElement type; // initialized in constructor
 
     /**
