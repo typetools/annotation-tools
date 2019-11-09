@@ -32,13 +32,17 @@ public class AElement implements Cloneable {
      */
     public final Set<Annotation> tlAnnotationsHere;
 
+    // TODO: What about methods; is `type` the return type?
     /**
      * The type of a field or a method parameter.
-
-     * When this AElement object is a field or method, its annotations are declaration annotations,
-     * and the {@code type} field represents its type, whose annotations are type annotations.
      *
-     * When this AElement object is NOT a field or method, the {@code type} field is null.
+     * When this AElement object is a field or method parameter, its
+     * annotations are declaration annotations, and the {@code type}
+     * field represents its type, whose annotations are type
+     * annotations.
+     *
+     * When this AElement object is NOT a field or method parameter,
+     * the {@code type} field is null.
      */
     public final ATypeElement type; // initialized in constructor
 
