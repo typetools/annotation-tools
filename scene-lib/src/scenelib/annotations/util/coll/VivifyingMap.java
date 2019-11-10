@@ -3,10 +3,6 @@ package scenelib.annotations.util.coll;
 import java.util.Iterator;
 import java.util.Map;
 
-/*>>>
-import org.checkerframework.checker.nullness.qual.Nullable;
-*/
-
 /**
  * A {@link VivifyingMap} is a map with two additional methods:
  * <ul>

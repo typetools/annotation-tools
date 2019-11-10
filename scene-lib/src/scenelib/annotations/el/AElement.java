@@ -7,10 +7,6 @@ import java.util.Set;
 import scenelib.annotations.Annotation;
 import scenelib.annotations.util.coll.VivifyingMap;
 
-/*>>>
-import org.checkerframework.checker.nullness.qual.Nullable;
-*/
-
 /**
  * An <code>AElement</code> represents a Java element and the annotations it
  * carries. Some <code>AElements</code> may contain others; for example, an
@@ -32,7 +28,18 @@ public class AElement implements Cloneable {
      */
     public final Set<Annotation> tlAnnotationsHere;
 
-    /** The type of a field or a method parameter.  May be null. */
+    // TODO: What about methods; is `type` the return type?
+    /**
+     * The type of a field or a method parameter.
+     *
+     * When this AElement object is a field or method parameter, its
+     * annotations are declaration annotations, and the {@code type}
+     * field represents its type, whose annotations are type
+     * annotations.
+     *
+     * When this AElement object is NOT a field or method parameter,
+     * the {@code type} field is null.
+     */
     public final ATypeElement type; // initialized in constructor
 
     /**

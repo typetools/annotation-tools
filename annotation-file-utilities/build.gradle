@@ -69,7 +69,7 @@ compileJava {
     options.compilerArgs += [
             '-g',
             '-Werror',
-            // To not get a warning about missing bootstrap classpath for Java 8 (once we use Java 9).
+            // To not get a warning about missing bootstrap classpath for Java 8.
             "-Xlint:-options",
             "-Xlint:unchecked",
             "-Xlint",
@@ -99,6 +99,35 @@ shadowJar {
 
 // Shadowing Test Sources and Dependencies
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
+task allButJavacJar(type: ShadowJar, dependsOn: compileJava) {
+    description 'Builds annotation-file-utilities-all-but-javac.jar with all dependencies except javac.jar.'
+    destinationDirectory = projectDir
+    includeEmptyDirs = false
+    archiveFileName = 'annotation-file-utilities-all-but-javac.jar'
+
+    from shadowJar.source
+    configurations  = shadowJar.configurations
+
+    dependencies {
+        exclude(dependency('com.google.errorprone:javac:.*'))
+    }
+    // Don't include any class from the Checker Framework.
+    // This should just be checker-qual.
+    exclude 'org/checkerframework/**'
+    exclude 'javax/**'
+    doFirst {
+        // TODO: The release fails because of this, so skip it for now.
+        if (project.hasProperty('release') && false) {
+            println 'Relocating packages.'
+            relocate 'org.apache', 'org.checkerframework.org.apache'
+            relocate 'org.relaxng', 'org.checkerframework.org.relaxng'
+            relocate 'org.plumelib', 'org.checkerframework.org.plumelib'
+            relocate 'org.objectweb.asm', 'org.checkerframework.org.objectweb.asm'
+            relocate 'com.google', 'org.checkerframework.com.google'
+        }
+    }
+}
 
 task skinnyJar(type: ShadowJar, dependsOn: compileJava) {
     description 'Builds annotation-file-utilities.jar with only scene-lib, and annotation-file-utility classes.'
@@ -471,9 +500,25 @@ task requireJavadocPrivate(type: Javadoc) {
   // options.addStringOption('skip', 'ClassNotToCheck|OtherClass')
 }
 
+task updateUserOptions(type: Javadoc, dependsOn: 'assemble') {
+  description "Updates printed documentation of command-line arguments."
+
+  // source = sourceSets.main.allJava
+  exclude 'scenelib.annotations.io.classfile/**'
+  classpath = project.sourceSets.main.compileClasspath + project.sourceSets.main.runtimeClasspath
+  options.memberLevel = JavadocMemberLevel.PRIVATE
+  options.docletpath = project.sourceSets.main.runtimeClasspath as List
+  options.doclet = "org.plumelib.options.OptionsDoclet"
+  options.addStringOption("docfile", "${projectDir}/src/annotator/Main.java")
+  options.addStringOption("format", "javadoc")
+  options.addStringOption("i", "-quiet")
+  title = ""
+}
+
 artifacts {
     archives shadowJar
     archives skinnyJar
+    archives allButJavacJar
 }
 
 clean {

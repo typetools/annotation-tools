@@ -105,8 +105,8 @@ import com.sun.tools.javac.tree.JCTree;
  *             appear in the codebase at the end. <p> To preserve changes when using the --in-place
  *             option, first remove the backup files. Or, use the {@code -d .} option, which makes
  *             (and reads) no backup, instead of --in-place. [default false]
- *         <li id="option:abbreviate"><b>-a</b> <b>--abbreviate=</b><i>boolean</i>. Abbreviate
- *             annotation names [default true]
+ *         <li id="option:abbreviate"><b>-a</b> <b>--abbreviate=</b><i>boolean</i>. If true, insert
+ *             {@code import} statements as necessary. [default true]
  *         <li id="option:comments"><b>-c</b> <b>--comments=</b><i>boolean</i>. Insert annotations
  *             in comments [default false]
  *         <li id="option:omit-annotation"><b>-o</b> <b>--omit-annotation=</b><i>string</i>. Omit

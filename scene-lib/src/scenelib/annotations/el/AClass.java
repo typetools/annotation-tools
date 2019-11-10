@@ -7,7 +7,7 @@ import scenelib.annotations.util.coll.VivifyingMap;
 
 import org.plumelib.util.CollectionsPlume;
 
-/** An annotated class */
+/** An annotated class. */
 public final class AClass extends ADeclaration {
     /** The class's annotated type parameter bounds */
     public final VivifyingMap<BoundLocation, ATypeElement> bounds =
@@ -41,12 +41,18 @@ public final class AClass extends ADeclaration {
     public final VivifyingMap<String, AExpression> fieldInits =
         createFieldInitMap();
 
-    private final String className;
+    /** The fully-qualified name of the annotated class. */
+    public final String className;
 
     // debug fields to keep track of all classes created
     // private static List<AClass> debugAllClasses = new ArrayList<>();
     // private final List<AClass> allClasses;
 
+    /**
+     * Create a new AClass.
+     *
+     * @param className the fully-qualified name of the annotated class
+     */
     AClass(String className) {
       super("class: " + className);
       this.className = className;
@@ -54,6 +60,11 @@ public final class AClass extends ADeclaration {
       // allClasses = debugAllClasses;
     }
 
+    /**
+     * A copy constructor for AClass.
+     *
+     * @param clazz the AClass to copy
+     */
     AClass(AClass clazz) {
       super(clazz);
       className = clazz.className;

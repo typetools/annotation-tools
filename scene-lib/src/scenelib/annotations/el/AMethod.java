@@ -1,9 +1,5 @@
 package scenelib.annotations.el;
 
-/*>>>
-import org.checkerframework.checker.nullness.qual.Nullable;
-*/
-
 import java.util.Map;
 
 import scenelib.annotations.util.coll.VivifyingMap;
