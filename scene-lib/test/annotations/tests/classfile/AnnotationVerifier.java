@@ -1,5 +1,6 @@
 package annotations.tests.classfile;
 
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
