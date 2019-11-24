@@ -523,7 +523,7 @@ task requireJavadocPrivate(type: Javadoc) {
 task updateUserOptions(type: Javadoc, dependsOn: 'assemble') {
   description "Updates printed documentation of command-line arguments."
 
-  // source = sourceSets.main.allJava
+  // source = sourceSets.main.allJava.files.sort()
   exclude 'scenelib.annotations.io.classfile/**'
   classpath = project.sourceSets.main.compileClasspath + project.sourceSets.main.runtimeClasspath
   options.memberLevel = JavadocMemberLevel.PRIVATE
