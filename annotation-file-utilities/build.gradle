@@ -230,7 +230,7 @@ task cleanTestExample {
 
 task testAnnotator(type: Exec, dependsOn: assemble, group: 'Verification') {
     description 'Run the annotator test.'
-    workingDir 'tests/'
+    workingDir "${projectDir}/tests/"
     executable 'make'
 }
 
@@ -491,7 +491,7 @@ task htmlValidate(type: Exec) {
 
 task allTests(type: GradleBuild, group: 'Verification') {
     description 'Run all tests.'
-    tasks = ['test', 'testExample', 'testAnnotator']
+    dependsOn('test', 'testExample', 'testAnnotator')
 }
 
 javadoc {
