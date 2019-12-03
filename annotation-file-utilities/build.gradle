@@ -97,7 +97,7 @@ compileJava {
 shadowJar {
     destinationDirectory = projectDir
     includeEmptyDirs = false
-    archiveVersion = null
+    archiveFileName = 'annotation-file-utilities-all.jar'
     // Don't include any class from the Checker Framework.
     // This should just be checker-qual.
     exclude 'org/checkerframework/**'
