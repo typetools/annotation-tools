@@ -10,7 +10,7 @@ import com.sun.tools.javac.tree.JCTree.JCMethodDecl;
 import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
 import com.sun.tools.javac.util.List;
 
-import org.plumelib.signature.Signatures;
+import org.plumelib.reflection.Signatures;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
