@@ -123,6 +123,8 @@ public final class IndexFileWriter {
             pw.print(aft.format(o));
         } else if (aft instanceof BasicAFT && o instanceof String) {
             pw.print(Strings.escape((String) o));
+        } else if (aft instanceof BasicAFT && o instanceof Long) {
+            pw.print(o.toString() + "L");
         } else {
             pw.print(o.toString());
         }
