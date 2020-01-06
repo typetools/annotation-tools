@@ -17,9 +17,9 @@ export PATH=$AFU/scripts:$JAVA_HOME/bin:$PATH
 (cd ${AFU} && ./gradlew assemble)
 
 if [ -d "/tmp/plume-scripts" ] ; then
-  git -C /tmp/plume-scripts pull -q > /dev/null 2>&1
+  (cd /tmp/plume-scripts && git pull -q) > /dev/null 2>&1
 else
-  git -C /tmp clone --depth 1 -q https://github.com/plume-lib/plume-scripts.git
+  (cd /tmp && git clone --depth 1 -q https://github.com/plume-lib/plume-scripts.git)
 fi
 
 /tmp/plume-scripts/git-clone-related typetools checker-framework ${CHECKERFRAMEWORK}
