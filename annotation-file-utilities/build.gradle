@@ -3,7 +3,7 @@ import java.nio.file.Files
 
 plugins {
     // https://plugins.gradle.org/plugin/com.github.johnrengelman.shadow
-    id 'com.github.johnrengelman.shadow' version '5.1.0'
+    id 'com.github.johnrengelman.shadow' version '5.2.0'
     id 'java'
 }
 apply plugin: 'java'
@@ -49,15 +49,15 @@ dependencies {
         javacJar group: 'com.google.errorprone', name: 'javac', version: "9+181-r4173-1"
         implementation 'com.google.errorprone:javac:9+181-r4173-1'
     }
-    implementation 'org.plumelib:bcel-util:1.1.4'
-    implementation 'org.plumelib:options:1.0.1'
-    implementation 'org.plumelib:plume-util:1.0.7'
-    implementation 'org.plumelib:signature-util:0.0.6'
-    compileOnly 'org.checkerframework:checker-qual:2.5.4'
-    implementation 'com.google.guava:guava:28.0-jre'
+    implementation 'org.plumelib:bcel-util:1.1.5'
+    implementation 'org.plumelib:options:1.0.3'
+    implementation 'org.plumelib:plume-util:1.0.10'
+    implementation 'org.plumelib:reflection-util:0.2.0'
+    compileOnly 'org.checkerframework:checker-qual:3.0.1'
+    implementation 'com.google.guava:guava:28.1-jre'
     implementation 'org.ow2.asm:asm:7.2-beta'
 
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testImplementation group: 'junit', name: 'junit', version: '4.12'
 }
 
 
@@ -80,7 +80,7 @@ compileJava {
 shadowJar {
     destinationDirectory = projectDir
     includeEmptyDirs = false
-    archiveVersion = null
+    archiveFileName = 'annotation-file-utilities-all.jar'
     // Don't include any class from the Checker Framework.
     // This should just be checker-qual.
     exclude 'org/checkerframework/**'
@@ -211,7 +211,7 @@ task cleanTestExample {
 
 task testAnnotator(type: Exec, dependsOn: assemble, group: 'Verification') {
     description 'Run the annotator test.'
-    workingDir 'tests/'
+    workingDir "${projectDir}/tests/"
     executable 'make'
 }
 
@@ -471,7 +471,7 @@ task htmlValidate(type: Exec) {
 
 task allTests(type: GradleBuild, group: 'Verification') {
     description 'Run all tests.'
-    tasks = ['test', 'testExample', 'testAnnotator']
+    dependsOn('test', 'testExample', 'testAnnotator')
 }
 
 javadoc {
@@ -503,7 +503,7 @@ task requireJavadocPrivate(type: Javadoc) {
 task updateUserOptions(type: Javadoc, dependsOn: 'assemble') {
   description "Updates printed documentation of command-line arguments."
 
-  // source = sourceSets.main.allJava
+  // source = sourceSets.main.allJava.files.sort()
   exclude 'scenelib.annotations.io.classfile/**'
   classpath = project.sourceSets.main.compileClasspath + project.sourceSets.main.runtimeClasspath
   options.memberLevel = JavadocMemberLevel.PRIVATE

@@ -15,7 +15,11 @@ set -e
 CHANGED_JAVA_FILES=`git diff --staged --name-only --diff-filter=ACM | grep '\.java$' | grep -v '/jdk/' | grep -v 'stubparser/' | grep -v '/eclipse/' ` || true
 # echo CHANGED_JAVA_FILES "'"${CHANGED_JAVA_FILES}"'"
 if [ ! -z "$CHANGED_JAVA_FILES" ]; then
-    (((cd .run-google-java-format && git pull -q) || git clone -q https://github.com/plume-lib/run-google-java-format.git .run-google-java-format) || true)
+    if [ -d ".run-google-java-format" ] ; then
+        git -C .run-google-java-format pull -q > /dev/null 2>&1
+    else
+        git clone -q https://github.com/plume-lib/run-google-java-format.git .run-google-java-format
+    fi
     ## For debugging:
     # echo "CHANGED_JAVA_FILES: ${CHANGED_JAVA_FILES}"
     python .run-google-java-format/check-google-java-format.py --aosp ${CHANGED_JAVA_FILES}
