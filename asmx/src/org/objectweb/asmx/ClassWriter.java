@@ -991,7 +991,8 @@ public class ClassWriter implements ClassVisitor {
             Handle h = (Handle) cst;
             return newHandleItem(h.tag, h.owner, h.name, h.desc);
         } else {
-            throw new IllegalArgumentException("value " + cst);
+            throw new IllegalArgumentException(
+                String.format("unexpected argument to newConstItem: %s [%s]", cst, cst.getClass()));
         }
     }
 
