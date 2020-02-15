@@ -12,6 +12,7 @@ package scenelib.annotations.field;
  */
 public final class ClassTokenAFT extends ScalarAFT {
 
+    /** Create the singleton {@link #ctaft}. */
     private ClassTokenAFT() {}
 
     /**
