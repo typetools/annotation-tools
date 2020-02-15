@@ -385,7 +385,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
           if (aft instanceof EnumAFT) {
             aav.visitEnum(null, ((EnumAFT) aft).typeName, o.toString());
           } else if (o instanceof Class) {
-            aav.visit(null, Type.getType(o));
+            aav.visit(null, org.objectweb.asmx.Type.getType(o));
           } else {
             aav.visit(null, o);
           }
