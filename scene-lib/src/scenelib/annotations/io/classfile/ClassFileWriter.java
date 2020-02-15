@@ -145,6 +145,7 @@ public class ClassFileWriter {
         System.out.println("Unknown error trying to insert annotations from: " +
                            indexFileName + " to " + className);
         e.printStackTrace();
+        System.out.flush();
         System.out.println("Please submit a bug report at");
         System.out.println("  https://github.com/typetools/annotation-tools/issues");
         System.out.println("Be sure to include a copy of the following output trace, instructions on how");
