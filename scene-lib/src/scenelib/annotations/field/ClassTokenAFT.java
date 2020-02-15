@@ -3,20 +3,14 @@ package scenelib.annotations.field;
 /**
  * A {@link ClassTokenAFT} is the type of an annotation field that holds a
  * class token (something like <code>{@link String}.class</code>).
+ *
+ * Use the singleton {@link #ctaft}.
+ *
  * Even if the field type was originally some parameterization
  * <code>{@link Class}&lt;...&gt;</code>, the annotation scene library
- * represents it as a plain {@link ClassTokenAFT}.  Use the singleton
- * {@link #ctaft}.
+ * represents it as a plain {@link ClassTokenAFT}.
  */
 public final class ClassTokenAFT extends ScalarAFT {
-
-    // On 2006.07.07 we decided against parameterizations because
-    // class files that use annotations don't contain them.
-
-    // The type arguments, if any, of the field type
-    // Could be "" or "<HashMap>" (stupid) or "<? extends PrettyPrinter>", etc.,
-    // but not null.
-    /* public final String parameterization; */
 
     private ClassTokenAFT() {}
 
@@ -25,10 +19,6 @@ public final class ClassTokenAFT extends ScalarAFT {
      */
     public static final ClassTokenAFT ctaft = new ClassTokenAFT();
 
-    // public ClassTokenAFT(/* String parameterization */) {
-    //    /* this.parameterization = parameterization; */
-    // }
-
     @Override
     public boolean isValidValue(Object o) {
         return o instanceof java.lang.Class;
@@ -36,7 +26,7 @@ public final class ClassTokenAFT extends ScalarAFT {
 
     @Override
     public String toString() {
-        return "Class"/* + parameterization */;
+        return "Class";
     }
 
     @Override
