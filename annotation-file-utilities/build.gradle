@@ -52,7 +52,7 @@ dependencies {
     implementation 'org.plumelib:bcel-util:1.1.7'
     implementation 'org.plumelib:options:1.0.4'
     implementation 'org.plumelib:plume-util:1.0.11'
-    implementation 'org.plumelib:reflection-util:0.2.1'
+    implementation 'org.plumelib:reflection-util:0.2.2'
     compileOnly 'org.checkerframework:checker-qual:3.0.1'
     implementation 'com.google.guava:guava:28.1-jre'
     implementation files('../asmx/bin/')
