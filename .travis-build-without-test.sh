@@ -17,7 +17,7 @@ export AFU="${AFU:-$(cd annotation-file-utilities && pwd -P)}"
 
 export PATH=$AFU/scripts:$JAVA_HOME/bin:$PATH
 
-## Download Gradle itself if necessary (retry for network lossage)
+## Download Gradle itself if necessary (retry in case of network lossage).
 (cd ${AFU} && timeout 300 ./gradlew tasks || ./gradlew tasks)
 
 ## Compile
