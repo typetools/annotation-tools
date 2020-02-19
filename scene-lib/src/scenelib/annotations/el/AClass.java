@@ -21,8 +21,8 @@ public final class AClass extends ADeclaration {
     /**
      * The class's annotated methods; a method's key consists of its name
      * followed by its erased signature in JVML format.
-     * For example, <code>foo()V</code> or
-     * <code>bar(B[I[[Ljava/lang/String;)I</code>.  The annotation scene library
+     * For example, {@code foo()V} or
+     * {@code bar(B[I[[Ljava/lang/String;)I}.  The annotation scene library
      * does not validate the keys, nor does it check that annotated subelements
      * of the {@link AMethod}s exist in the signature.
      */
