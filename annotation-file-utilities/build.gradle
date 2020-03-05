@@ -54,7 +54,7 @@ dependencies {
     implementation 'org.plumelib:plume-util:1.1.3'
     implementation 'org.plumelib:reflection-util:0.2.2'
     compileOnly 'org.checkerframework:checker-qual:3.2.0'
-    implementation 'com.google.guava:guava:28.1-jre'
+    implementation 'com.google.guava:guava:28.2-jre'
     implementation files('../asmx/bin/')
 
     testImplementation group: 'junit', name: 'junit', version: '4.13'
