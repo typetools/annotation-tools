@@ -8,7 +8,6 @@ pr:
   branches:
     include:
     - '*'
-
 ## Version without the workaround
 # trigger:
 #   batch: true
