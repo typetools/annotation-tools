@@ -3,10 +3,14 @@ trigger:
   branches:
     include:
     - '*'
+  batch: true
 pr:
   branches:
     include:
     - '*'
+## Version without the workaround
+# trigger:
+#   batch: true
 
 
 jobs:
@@ -55,6 +59,3 @@ jobs:
     fetchDepth: 25
   - bash: ./annotation-file-utilities/dev-scripts/test-downstream.sh
     displayName: test-downstream.sh
-
-trigger:
-  batch: true
