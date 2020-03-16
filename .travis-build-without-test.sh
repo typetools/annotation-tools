@@ -5,6 +5,9 @@ echo Entering "$(cd "$(dirname "$0")" && pwd -P)/$(basename "$0")" in `pwd`
 # Fail the whole script if any command fails
 set -e
 
+# Print commands as they are executed
+set -x
+
 export SHELLOPTS
 
 if [ "$(uname)" = "Darwin" ] ; then

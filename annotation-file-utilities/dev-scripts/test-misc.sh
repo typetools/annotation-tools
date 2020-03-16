@@ -11,7 +11,7 @@ else
   export JAVA_HOME=${JAVA_HOME:-$(dirname $(dirname $(readlink -f $(which javac))))}
 fi
 export AFU="${AFU:-$(cd annotation-file-utilities && pwd -P)}"
-export CHECKERFRAMEWORK="${CHECKERFRAMEWORK:-$(pwd -P)/../checker-framework}"
+export CHECKERFRAMEWORK="${CHECKERFRAMEWORK:-$(cd .. && pwd -P)/checker-framework}"
 export PATH=$AFU/scripts:$JAVA_HOME/bin:$PATH
 
 if [ -d "/tmp/plume-scripts" ] ; then
