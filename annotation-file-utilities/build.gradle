@@ -49,15 +49,15 @@ dependencies {
         javacJar group: 'com.google.errorprone', name: 'javac', version: "9+181-r4173-1"
         implementation 'com.google.errorprone:javac:9+181-r4173-1'
     }
-    implementation 'org.plumelib:bcel-util:1.1.5'
-    implementation 'org.plumelib:options:1.0.3'
-    implementation 'org.plumelib:plume-util:1.0.10'
-    implementation 'org.plumelib:reflection-util:0.2.0'
-    compileOnly 'org.checkerframework:checker-qual:3.0.1'
-    implementation 'com.google.guava:guava:28.1-jre'
+    implementation 'org.plumelib:bcel-util:1.1.8'
+    implementation 'org.plumelib:options:1.0.4'
+    implementation 'org.plumelib:plume-util:1.1.4'
+    implementation 'org.plumelib:reflection-util:0.2.2'
+    compileOnly 'org.checkerframework:checker-qual:3.2.0'
+    implementation 'com.google.guava:guava:28.2-jre'
     implementation 'org.ow2.asm:asm:7.2-beta'
 
-    testImplementation group: 'junit', name: 'junit', version: '4.12'
+    testImplementation group: 'junit', name: 'junit', version: '4.13'
 }
 
 

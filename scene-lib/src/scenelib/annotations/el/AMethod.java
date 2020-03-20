@@ -26,6 +26,12 @@ public final class AMethod extends ADeclaration {
         ATypeElement.<TypeIndexLocation>newVivifyingLHMap_ATE();
 
     public ABlock body;
+    /*
+     * The methodName field is apparently the method's simple name
+     * followed by its erased signature in JVML format.
+     * For example, {@code foo()V} or
+     * {@code bar(B[I[[Ljava/lang/String;)I}.
+     */
     public final String methodName;
 
     AMethod(String methodName) {

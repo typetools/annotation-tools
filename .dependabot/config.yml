@@ -1,0 +1,5 @@
+version: 1
+update_configs:
+  - package_manager: "java:gradle"
+    directory: "/annotation-file-utilities"
+    update_schedule: "daily"

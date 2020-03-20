@@ -11,13 +11,13 @@ else
   export JAVA_HOME=${JAVA_HOME:-$(dirname $(dirname $(readlink -f $(which javac))))}
 fi
 export AFU="${AFU:-$(cd annotation-file-utilities && pwd -P)}"
-export CHECKERFRAMEWORK="${CHECKERFRAMEWORK:-$(pwd -P)/../checker-framework}"
+export CHECKERFRAMEWORK="${CHECKERFRAMEWORK:-$(cd .. && pwd -P)/checker-framework}"
 export PATH=$AFU/scripts:$JAVA_HOME/bin:$PATH
 
-if [ -d "/tmp/plume-scripts" ] ; then
-  (cd /tmp/plume-scripts && git pull -q) > /dev/null 2>&1
+if [ -d "/tmp/$USER/plume-scripts" ] ; then
+  (cd /tmp/$USER/plume-scripts && git pull -q) > /dev/null 2>&1
 else
-  (cd /tmp && git clone --depth 1 -q https://github.com/plume-lib/plume-scripts.git)
+  mkdir -p /tmp/$USER && git -C /tmp/$USER clone --depth 1 -q https://github.com/plume-lib/plume-scripts.git
 fi
 
 cd ${AFU}
@@ -31,6 +31,6 @@ cd ${AFU}
 
 ./gradlew javadoc
 (./gradlew javadocPrivate > /tmp/warnings.txt 2>&1) || true
-/tmp/plume-scripts/ci-lint-diff /tmp/warnings.txt
+/tmp/$USER/plume-scripts/ci-lint-diff /tmp/warnings.txt
 (./gradlew requireJavadocPrivate > /tmp/warnings.txt 2>&1) || true
-/tmp/plume-scripts/ci-lint-diff /tmp/warnings.txt
+/tmp/$USER/plume-scripts/ci-lint-diff /tmp/warnings.txt
