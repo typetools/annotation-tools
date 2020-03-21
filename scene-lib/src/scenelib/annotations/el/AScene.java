@@ -47,7 +47,7 @@ import scenelib.annotations.util.coll.VivifyingMap;
  * ));
  * </pre>
  */
-public final class AScene implements Cloneable {
+public class AScene implements Cloneable {
     private static boolean checkClones = true;
     public static boolean debugFoundMap = false;
 
