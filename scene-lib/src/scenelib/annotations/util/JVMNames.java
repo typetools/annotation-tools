@@ -33,9 +33,9 @@ public class JVMNames {
      * @return a String signature of methodTree in jvml format
      * @deprecated use {@link #getJVMMethodSignature(MethodTree)}
      */
-     @Deprecated use getJVMMethodSignature(MethodTree)
+    @Deprecated // use getJVMMethodSignature(MethodTree)
     public static String getJVMMethodName(MethodTree methodTree) {
-        return getJVMMethodSignature
+        return getJVMMethodSignature(methodTree);
     }
 
     /**
@@ -87,7 +87,7 @@ public class JVMNames {
      * @return a String signature of methodElement in JVML format
      * @deprecated use {@link #getJVMMethodSignature(ExecutableElement)}
      */
-    @Deprecated use getJVMMethodSignature(ExecutableElement)
+    @Deprecated // use getJVMMethodSignature(ExecutableElement)
     public static String getJVMMethodName(ExecutableElement methodElement) {
         return getJVMMethodSignature(methodElement);
     }
