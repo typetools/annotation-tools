@@ -12,6 +12,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringJoiner;
 
 import scenelib.annotations.Annotation;
 import scenelib.annotations.el.AClass;
@@ -90,60 +91,67 @@ public final class IndexFileWriter {
 
     final PrintWriter pw;
 
-    private void printValue(AnnotationFieldType aft, Object o) {
+    /**
+     * Returns the String representation of an annotation in Java source format.
+     *
+     * @param a the annotation to print
+     * @return the formatted annotation
+     */
+    public static String formatAnnotation(Annotation a) {
+        String annoName = a.def().name.substring(a.def().name.lastIndexOf('.') + 1);
+        if (a.fieldValues.isEmpty()) {
+            return "@" + annoName;
+        }
+        StringJoiner sj = new StringJoiner(",", "@" + annoName + "(", ")");
+        for (Map.Entry<String, Object> f : a.fieldValues.entrySet()) {
+            AnnotationFieldType aft = a.def().fieldTypes.get(f.getKey());
+            sj.add(f.getKey() + "=" + IndexFileWriter.formatAnnotationValue(aft, f.getValue()));
+        }
+        return sj.toString();
+    }
+
+    /**
+     * Formats a literal argument of an annotation. Copied from {@code IndexFileWriter#printValue}
+     * in the Annotation File Utilities (which the jaif printer uses), but modified to not print
+     * directly and instead return the result to be printed.
+     *
+     * @param aft the annotation whose values are being formatted, for context
+     * @param o the value or values to format
+     * @return the String representation of the value
+     */
+    private static String formatAnnotationValue(AnnotationFieldType aft, Object o) {
         if (aft instanceof AnnotationAFT) {
-            printAnnotation((Annotation) o);
+            return formatAnnotation((Annotation) o);
         } else if (aft instanceof ArrayAFT) {
+            StringJoiner sj = new StringJoiner(",", "{", "}");
             ArrayAFT aaft = (ArrayAFT) aft;
-            pw.print('{');
-            if (!(o instanceof List)) {
-                printValue(aaft.elementType, o);
+            List<?> l = (List<?>) o;
+            // watch out--could be an empty array of unknown type
+            // (see AnnotationBuilder#addEmptyArrayField)
+            if (aaft.elementType == null) {
+                if (l.size() != 0) {
+                    throw new AssertionError();
+                }
             } else {
-                List<?> l =
-                    (List<?>) o;
-                // watch out--could be an empty array of unknown type
-                // (see AnnotationBuilder#addEmptyArrayField)
-                if (aaft.elementType == null) {
-                    if (l.size() != 0) {
-                        throw new AssertionError();
-                    }
-                } else {
-                    boolean first = true;
-                    for (Object o2 : l) {
-                        if (!first) {
-                            pw.print(',');
-                        }
-                        printValue(aaft.elementType, o2);
-                        first = false;
-                    }
+
+                for (Object o2 : l) {
+                    sj.add(formatAnnotationValue(aaft.elementType, o2));
                 }
             }
-            pw.print('}');
+            return sj.toString();
         } else if (aft instanceof ClassTokenAFT) {
-            pw.print(aft.format(o));
+            return aft.format(o);
         } else if (aft instanceof BasicAFT && o instanceof String) {
-            pw.print(Strings.escape((String) o));
+            return Strings.escape((String) o);
+        } else if (aft instanceof BasicAFT && o instanceof Long) {
+            return o.toString() + "L";
         } else {
-            pw.print(o.toString());
+            return o.toString();
         }
     }
 
     private void printAnnotation(Annotation a) {
-        pw.print("@" + a.def().name);
-        if (!a.fieldValues.isEmpty()) {
-            pw.print('(');
-            boolean first = true;
-            for (Map. Entry<String, Object> f
-                    : a.fieldValues.entrySet()) {
-                if (!first) {
-                    pw.print(',');
-                }
-                pw.print(f.getKey() + "=");
-                printValue(a.def().fieldTypes.get(f.getKey()), f.getValue());
-                first = false;
-            }
-            pw.print(')');
-        }
+        pw.print(formatAnnotation(a));
     }
 
     private void printAnnotations(Collection<? extends Annotation> annos) {
