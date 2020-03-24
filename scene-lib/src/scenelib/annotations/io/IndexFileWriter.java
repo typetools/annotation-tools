@@ -92,64 +92,9 @@ public final class IndexFileWriter {
     final PrintWriter pw;
 
     /**
-     * Returns the String representation of an annotation in Java source format.
-     *
+     * Print the annotation using the {@link pw} field, after formatting it.
      * @param a the annotation to print
-     * @return the formatted annotation
      */
-    public static String formatAnnotation(Annotation a) {
-        String annoName = a.def().name.substring(a.def().name.lastIndexOf('.') + 1);
-        if (a.fieldValues.isEmpty()) {
-            return "@" + annoName;
-        }
-        StringJoiner sj = new StringJoiner(",", "@" + annoName + "(", ")");
-        for (Map.Entry<String, Object> f : a.fieldValues.entrySet()) {
-            AnnotationFieldType aft = a.def().fieldTypes.get(f.getKey());
-            sj.add(f.getKey() + "=" + IndexFileWriter.formatAnnotationValue(aft, f.getValue()));
-        }
-        return sj.toString();
-    }
-
-    /**
-     * Formats a literal argument of an annotation. Copied from {@code IndexFileWriter#printValue}
-     * in the Annotation File Utilities (which the jaif printer uses), but modified to not print
-     * directly and instead return the result to be printed.
-     *
-     * @param aft the annotation whose values are being formatted, for context
-     * @param o the value or values to format
-     * @return the String representation of the value
-     */
-    private static String formatAnnotationValue(AnnotationFieldType aft, Object o) {
-        if (aft instanceof AnnotationAFT) {
-            return formatAnnotation((Annotation) o);
-        } else if (aft instanceof ArrayAFT) {
-            StringJoiner sj = new StringJoiner(",", "{", "}");
-            ArrayAFT aaft = (ArrayAFT) aft;
-            List<?> l = (List<?>) o;
-            // watch out--could be an empty array of unknown type
-            // (see AnnotationBuilder#addEmptyArrayField)
-            if (aaft.elementType == null) {
-                if (l.size() != 0) {
-                    throw new AssertionError();
-                }
-            } else {
-
-                for (Object o2 : l) {
-                    sj.add(formatAnnotationValue(aaft.elementType, o2));
-                }
-            }
-            return sj.toString();
-        } else if (aft instanceof ClassTokenAFT) {
-            return aft.format(o);
-        } else if (aft instanceof BasicAFT && o instanceof String) {
-            return Strings.escape((String) o);
-        } else if (aft instanceof BasicAFT && o instanceof Long) {
-            return o.toString() + "L";
-        } else {
-            return o.toString();
-        }
-    }
-
     private void printAnnotation(Annotation a) {
         pw.print(formatAnnotation(a));
     }
@@ -533,6 +478,65 @@ public final class IndexFileWriter {
         pw = new PrintWriter(out);
         write();
         pw.flush();
+    }
+
+    /**
+     * Returns the String representation of an annotation in Java source format.
+     *
+     * @param a the annotation to print
+     * @return the formatted annotation
+     */
+    public static String formatAnnotation(Annotation a) {
+        String annoName = a.def().name.substring(a.def().name.lastIndexOf('.') + 1);
+        if (a.fieldValues.isEmpty()) {
+            return "@" + annoName;
+        }
+        StringJoiner sj = new StringJoiner(",", "@" + annoName + "(", ")");
+        for (Map.Entry<String, Object> f : a.fieldValues.entrySet()) {
+            AnnotationFieldType aft = a.def().fieldTypes.get(f.getKey());
+            sj.add(f.getKey() + "=" + IndexFileWriter.formatAnnotationValue(aft, f.getValue()));
+        }
+        return sj.toString();
+    }
+
+    /**
+     * Formats a literal argument of an annotation. Copied from {@code IndexFileWriter#printValue}
+     * in the Annotation File Utilities (which the jaif printer uses), but modified to not print
+     * directly and instead return the result to be printed.
+     *
+     * @param aft the annotation whose values are being formatted, for context
+     * @param o the value or values to format
+     * @return the String representation of the value
+     */
+    public static String formatAnnotationValue(AnnotationFieldType aft, Object o) {
+        if (aft instanceof AnnotationAFT) {
+            return formatAnnotation((Annotation) o);
+        } else if (aft instanceof ArrayAFT) {
+            StringJoiner sj = new StringJoiner(",", "{", "}");
+            ArrayAFT aaft = (ArrayAFT) aft;
+            List<?> l = (List<?>) o;
+            // watch out--could be an empty array of unknown type
+            // (see AnnotationBuilder#addEmptyArrayField)
+            if (aaft.elementType == null) {
+                if (l.size() != 0) {
+                    throw new AssertionError();
+                }
+            } else {
+
+                for (Object o2 : l) {
+                    sj.add(formatAnnotationValue(aaft.elementType, o2));
+                }
+            }
+            return sj.toString();
+        } else if (aft instanceof ClassTokenAFT) {
+            return aft.format(o);
+        } else if (aft instanceof BasicAFT && o instanceof String) {
+            return Strings.escape((String) o);
+        } else if (aft instanceof BasicAFT && o instanceof Long) {
+            return o.toString() + "L";
+        } else {
+            return o.toString();
+        }
     }
 
     /**
