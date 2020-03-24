@@ -89,6 +89,9 @@ public final class IndexFileWriter {
         }
     }
 
+    /**
+     * The printer onto which the index file will be written.
+     */
     final PrintWriter pw;
 
     /**
@@ -481,30 +484,28 @@ public final class IndexFileWriter {
     }
 
     /**
-     * Returns the String representation of an annotation in Java source format.
-     *
-     * @param a the annotation to print
-     * @return the formatted annotation
+     * Formats an annotation to be printed in an index file.
+     * @param a the annotation to format
+     * @return the annotation formatted correctly, as a string
      */
-    public static String formatAnnotation(Annotation a) {
-        String annoName = a.def().name.substring(a.def().name.lastIndexOf('.') + 1);
+    private static String formatAnnotation(Annotation a) {
+        String annoName = "@" + a.def().name;
         if (a.fieldValues.isEmpty()) {
-            return "@" + annoName;
+            return annoName;
         }
-        StringJoiner sj = new StringJoiner(",", "@" + annoName + "(", ")");
+        StringJoiner sj = new StringJoiner(",", annoName + "(", ")");
         for (Map.Entry<String, Object> f : a.fieldValues.entrySet()) {
             AnnotationFieldType aft = a.def().fieldTypes.get(f.getKey());
-            sj.add(f.getKey() + "=" + IndexFileWriter.formatAnnotationValue(aft, f.getValue()));
+            sj.add(f.getKey() + "=" + formatAnnotationValue(aft, f.getValue()));
         }
         return sj.toString();
     }
 
     /**
-     * Formats a literal argument of an annotation. Copied from {@code IndexFileWriter#printValue}
-     * in the Annotation File Utilities (which the jaif printer uses), but modified to not print
-     * directly and instead return the result to be printed.
+     * Formats a literal argument of an annotation. Public to permit re-use
+     * in stub-based whole-program inference.
      *
-     * @param aft the annotation whose values are being formatted, for context
+     * @param aft the type of the annotation field
      * @param o the value or values to format
      * @return the String representation of the value
      */
