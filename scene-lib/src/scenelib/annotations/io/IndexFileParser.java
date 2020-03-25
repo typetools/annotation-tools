@@ -389,10 +389,6 @@ public final class IndexFileParser {
                         val = (int) n;
                     } else if (type == long.class) {
                         val = (long) n;
-                        // permit optional 'L' character after long literal
-                        if (checkChar('L')) {
-                            matchChar('L');
-                        }
                     } else if (type == float.class) {
                         val = (float) n;
                     } else if (type == double.class) {
@@ -401,6 +397,10 @@ public final class IndexFileParser {
                         throw new AssertionError();
                     }
                     st.nextToken();
+                    if (type == long.class) {
+                        // permit optional 'L' character after long literals
+                        matchKeyword("L");
+                    }
                 } else {
                     throw new ParseException(
                             "Expected a number literal");
