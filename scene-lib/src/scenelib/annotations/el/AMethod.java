@@ -56,7 +56,9 @@ public final class AMethod extends ADeclaration {
       copyMapContents(method.bounds, bounds);
     }
 
-    /** Returns the method's simple name.
+    /**
+     * Returns the method's simple name.
+     *
      * @return the method's simple name
      */
     String getMethodName() {
