@@ -36,6 +36,12 @@ public final class AMethod extends ADeclaration {
      */
     public final String methodSignature;
 
+    /**
+     * Create an AMethod.
+     *
+     * @param methodSignature the method's name, plus its erased signature
+     *   in JVML format within parentheses
+     */
     AMethod(String methodSignature) {
       super("method: " + methodSignature);
       this.methodSignature = methodSignature;
@@ -44,6 +50,11 @@ public final class AMethod extends ADeclaration {
       receiver = new AField("receiver parameter type of " + methodSignature);
     }
 
+    /**
+     * Create a copy on an AMethod.
+     *
+     * @param method the AMethod to copy
+     */
     AMethod(AMethod method) {
       super("method: " + method.methodSignature, method);
       methodSignature = method.methodSignature;
