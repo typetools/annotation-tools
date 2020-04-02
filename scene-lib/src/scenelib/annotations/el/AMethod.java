@@ -72,7 +72,7 @@ public final class AMethod extends ADeclaration {
      *
      * @return the method's simple name
      */
-    String getMethodName() {
+    public String getMethodName() {
         return methodSignature.substring(0, methodSignature.indexOf("("));
     }
 
