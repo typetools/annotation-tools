@@ -53,7 +53,7 @@ dependencies {
     implementation 'org.plumelib:options:1.0.4'
     implementation 'org.plumelib:plume-util:1.1.4'
     implementation 'org.plumelib:reflection-util:0.2.2'
-    compileOnly 'org.checkerframework:checker-qual:3.2.0'
+    compileOnly 'org.checkerframework:checker-qual:3.3.0'
     implementation 'com.google.guava:guava:28.2-jre'
     implementation files('../asmx/bin/')
 
