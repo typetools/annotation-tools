@@ -25,26 +25,39 @@ public final class AMethod extends ADeclaration {
     public final VivifyingMap<TypeIndexLocation, ATypeElement> throwsException =
         ATypeElement.<TypeIndexLocation>newVivifyingLHMap_ATE();
 
+    /** The body of the method. */
     public ABlock body;
-    /*
-     * The methodName field is apparently the method's simple name
+
+    /**
+     * The method's simple name
      * followed by its erased signature in JVML format.
      * For example, {@code foo()V} or
      * {@code bar(B[I[[Ljava/lang/String;)I}.
      */
-    public final String methodName;
+    public final String methodSignature;
 
-    AMethod(String methodName) {
-      super("method: " + methodName);
-      this.methodName = methodName;
-      this.body = new ABlock(methodName);
-      returnType = new ATypeElement("return type of " + methodName);
-      receiver = new AField("receiver parameter type of " + methodName);
+    /**
+     * Create an AMethod.
+     *
+     * @param methodSignature the method's name, plus its erased signature
+     *   in JVML format within parentheses
+     */
+    AMethod(String methodSignature) {
+      super("method: " + methodSignature);
+      this.methodSignature = methodSignature;
+      this.body = new ABlock(methodSignature);
+      returnType = new ATypeElement("return type of " + methodSignature);
+      receiver = new AField("receiver parameter type of " + methodSignature);
     }
 
+    /**
+     * Create a copy on an AMethod.
+     *
+     * @param method the AMethod to copy
+     */
     AMethod(AMethod method) {
-      super("method: " + method.methodName, method);
-      methodName = method.methodName;
+      super("method: " + method.methodSignature, method);
+      methodSignature = method.methodSignature;
       body = method.body.clone();
       returnType = method.returnType.clone();
       receiver = method.receiver.clone();
@@ -52,6 +65,15 @@ public final class AMethod extends ADeclaration {
       copyMapContents(method.parameters, parameters);
       copyMapContents(method.throwsException, throwsException);
       copyMapContents(method.bounds, bounds);
+    }
+
+    /**
+     * Returns the method's simple name.
+     *
+     * @return the method's simple name
+     */
+    public String getMethodName() {
+        return methodSignature.substring(0, methodSignature.indexOf("("));
     }
 
     @Override
@@ -75,7 +97,7 @@ public final class AMethod extends ADeclaration {
             && receiver.equals(o.receiver)
             && parameters.equals(o.parameters)
             && body.equals(o.body)
-            && methodName.equals(o.methodName)
+            && methodSignature.equals(o.methodSignature)
             && throwsException.equals(o.throwsException);
     }
 
@@ -84,7 +106,7 @@ public final class AMethod extends ADeclaration {
         return super.hashCode()
                 + bounds.hashCode() + receiver.hashCode()
                 + parameters.hashCode() + throwsException.hashCode()
-                + body.hashCode() + methodName.hashCode();
+                + body.hashCode() + methodSignature.hashCode();
     }
 
     @Override
@@ -110,7 +132,7 @@ public final class AMethod extends ADeclaration {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("AMethod ");
-        sb.append(methodName);
+        sb.append(methodSignature);
         sb.append(": (");
         sb.append(" -1:");
         sb.append(receiver.toString());
