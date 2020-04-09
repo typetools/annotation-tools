@@ -516,14 +516,11 @@ public final class IndexFileWriter {
             StringJoiner sj = new StringJoiner(",", "{", "}");
             ArrayAFT aaft = (ArrayAFT) aft;
             List<?> l = (List<?>) o;
-            // watch out--could be an empty array of unknown type
-            // (see AnnotationBuilder#addEmptyArrayField)
             if (aaft.elementType == null) {
                 if (l.size() != 0) {
-                    throw new AssertionError();
+                    throw new AssertionError("nonempty array of unknown type");
                 }
             } else {
-
                 for (Object o2 : l) {
                     sj.add(formatAnnotationValue(aaft.elementType, o2));
                 }
