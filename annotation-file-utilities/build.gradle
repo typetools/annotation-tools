@@ -512,7 +512,7 @@ task javadocPrivate(type: Javadoc) {
 }
 
 dependencies {
-  compileOnly group: 'org.plumelib', name: 'require-javadoc', version: '0.1.2'
+  compileOnly group: 'org.plumelib', name: 'require-javadoc', version: '0.2.2'
 }
 task requireJavadocPrivate(type: Javadoc) {
   description = 'Ensures that Javadoc documentation exists.'
