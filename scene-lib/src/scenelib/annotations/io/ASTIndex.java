@@ -356,7 +356,7 @@ public class ASTIndex extends WrapperMap<Tree, ASTRecord> {
         ModifiersTree mods = node.getModifiers();
         List<? extends Tree> params = node.getParameters();
         String outMethod = inMethod;
-        inMethod = JVMNames.getJVMMethodName(node);
+        inMethod = JVMNames.getJVMMethodSignature(node);
         rec = new ASTRecord(cut, rec.className, inMethod, null,
             ASTPath.empty());
         if (mods != null) {
