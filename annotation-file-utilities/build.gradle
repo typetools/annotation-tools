@@ -524,7 +524,7 @@ task requireJavadoc(type: JavaExec) {
   args "annotation-file-utilities/src", "scene-lib/src"
   workingDir = "${projectDir}/.."
 }
-check.dependsOn requireJavadoc
+// check.dependsOn requireJavadoc
 
 task updateUserOptions(type: Javadoc, dependsOn: 'assemble') {
   description "Updates printed documentation of command-line arguments."
