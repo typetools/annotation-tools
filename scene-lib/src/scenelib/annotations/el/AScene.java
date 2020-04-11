@@ -48,8 +48,8 @@ import scenelib.annotations.util.coll.VivifyingMap;
  * </pre>
  */
 public class AScene implements Cloneable {
+    /** If true, check that the copy constructor works correctly. */
     private static boolean checkClones = true;
-    public static boolean debugFoundMap = false;
 
     /** This scene's annotated packages; map key is package name */
     public final VivifyingMap<String, AElement> packages =
@@ -177,6 +177,8 @@ public class AScene implements Cloneable {
     }
 
     /**
+     * Checks that the arguments are clones of one another.
+     *
      * Throws exception if the arguments 1) are the same reference;
      * 2) are not equal() in both directions; or 3) contain
      * corresponding elements that meet either of the preceding two
