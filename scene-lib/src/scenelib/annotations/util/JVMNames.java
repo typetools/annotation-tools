@@ -26,13 +26,26 @@ import javax.lang.model.type.TypeMirror;
 public class JVMNames {
 
     /**
-     * Converts a MethodTree into a jvml format method signature.
+     * Converts a MethodTree into a JVML format method signature.
      * There is probably an API to do this, but I couldn't find it.
      *
      * @param methodTree the tree to convert
      * @return a String signature of methodTree in jvml format
+     * @deprecated use {@link #getJVMMethodSignature(MethodTree)}
      */
+    @Deprecated // use getJVMMethodSignature(MethodTree)
     public static String getJVMMethodName(MethodTree methodTree) {
+        return getJVMMethodSignature(methodTree);
+    }
+
+    /**
+     * Converts a MethodTree into a JVML format method signature.
+     * There is probably an API to do this, but I couldn't find it.
+     *
+     * @param methodTree the tree to convert
+     * @return a String signature of methodTree in JVML format
+     */
+    public static String getJVMMethodSignature(MethodTree methodTree) {
         ExecutableElement methodElement = ((JCMethodDecl) methodTree).sym;
         StringBuilder builder = new StringBuilder();
         String returnTypeStr;
@@ -67,13 +80,26 @@ public class JVMNames {
     }
 
     /**
-     * Converts a method element into a jvml format method signature.
+     * Converts a method element into a JVML format method signature.
      * There is probably an API to do this, but I couldn't find it.
      *
      * @param methodElement the method element to convert
-     * @return a String signature of methodElement in jvml format
+     * @return a String signature of methodElement in JVML format
+     * @deprecated use {@link #getJVMMethodSignature(ExecutableElement)}
      */
+    @Deprecated // use getJVMMethodSignature(ExecutableElement)
     public static String getJVMMethodName(ExecutableElement methodElement) {
+        return getJVMMethodSignature(methodElement);
+    }
+
+    /**
+     * Converts a method element into a JVML format method signature.
+     * There is probably an API to do this, but I couldn't find it.
+     *
+     * @param methodElement the method element to convert
+     * @return a String signature of methodElement in JVML format
+     */
+    public static String getJVMMethodSignature(ExecutableElement methodElement) {
         StringBuilder builder = new StringBuilder();
         String returnTypeStr;
         builder.append(methodElement.getSimpleName());
