@@ -304,7 +304,7 @@ public class AScene implements Cloneable {
             @Override
             public Void visitMethod(AMethod el, AElement arg) {
                 AMethod m = (AMethod) arg;
-                checkObject(el.methodName, m.methodName);
+                checkObject(el.methodSignature, m.methodSignature);
                 checkElem(el.body, m.body);
                 checkElem(el.returnType, m.returnType);
                 checkElems(el.bounds, m.bounds);

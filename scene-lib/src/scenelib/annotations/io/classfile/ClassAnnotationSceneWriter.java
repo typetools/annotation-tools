@@ -1181,9 +1181,9 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
         int offset = entry.getKey().offset;
         int typeIndex = entry.getKey().type_index;
         ATypeElement aTypeArg = entry.getValue();
-        Set<Integer> lset = lambdaExpressions.get(aMethod.methodName);
+        Set<Integer> lset = lambdaExpressions.get(aMethod.methodSignature);
         if (lset.contains(offset)) { continue; }  // something's wrong
-        Set<Integer> cset = dynamicConstructors.get(aMethod.methodName);
+        Set<Integer> cset = dynamicConstructors.get(aMethod.methodSignature);
         TargetType tt = cset != null && cset.contains(offset)
                 ? TargetType.CONSTRUCTOR_REFERENCE_TYPE_ARGUMENT
                 : TargetType.METHOD_REFERENCE_TYPE_ARGUMENT;
@@ -1236,7 +1236,7 @@ public class ClassAnnotationSceneWriter extends ClassAdapter {
         int offset = entry.getKey().offset;
         int typeIndex = entry.getKey().type_index;
         ATypeElement aCall = entry.getValue();
-        Set<Integer> cset = dynamicConstructors.get(aMethod.methodName);
+        Set<Integer> cset = dynamicConstructors.get(aMethod.methodSignature);
         TargetType tt = cset != null && cset.contains(offset)
                 ? TargetType.CONSTRUCTOR_INVOCATION_TYPE_ARGUMENT
                 : TargetType.METHOD_INVOCATION_TYPE_ARGUMENT;

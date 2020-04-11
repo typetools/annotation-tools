@@ -397,6 +397,10 @@ public final class IndexFileParser {
                         throw new AssertionError();
                     }
                     st.nextToken();
+                    if (type == long.class) {
+                        // permit optional 'L' character after long literals
+                        matchKeyword("L");
+                    }
                 } else {
                     throw new ParseException(
                             "Expected a number literal");
