@@ -239,7 +239,9 @@ public class AScene implements Cloneable {
     public static void checkObject(Object o0, Object o1) {
         if (o0 == null ? o1 != null
                 : !(o0.equals(o1) && o1.equals(o0))) {  // ok if ==
-            throw new RuntimeException("clone check failed");
+            throw new RuntimeException(
+                String.format("clone check failed for %s [%s] %s [%s]",
+                              o0, o0.getClass(), o1, o1.getClass()));
         }
     }
 
