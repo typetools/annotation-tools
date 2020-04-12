@@ -1,23 +1,83 @@
 package scenelib.annotations.el;
 
 import java.util.LinkedHashMap;
-
+import javax.lang.model.type.TypeMirror;
 import scenelib.annotations.util.coll.VivifyingMap;
 
+/** A field or method formal parameter. */
 public class AField extends ADeclaration {
 
-  public AExpression init;
-  private final String fieldName;
+  /** The name of this field or formal parameter. */
+  private final String name;
 
-  AField(String fieldName) {
-    super(fieldName);
-    this.fieldName = fieldName;
+  /** Javac's representation of the type of this. */
+  private TypeMirror typeMirror;
+
+  /** The field's initializer. */
+  public AExpression init;
+
+  /**
+   * Create an AField of the given name.
+   *
+   * @param name the name of the field or formal parameter
+   */
+  public AField(String name) {
+    super(name);
+    this.name = name;
+    this.typeMirror = null;
+    this.init = null;
   }
 
-  AField(AField field) {
-    super(field.fieldName, field);
-    fieldName = field.fieldName;
+  /**
+   * Create an AField of the given name and type
+   *
+   * @param name the name of the field or formal parameter
+   * @param typeMirror javac's representation of the type of the wrapped field
+   */
+  public AField(String name, TypeMirror typeMirror) {
+    super(name);
+    this.name = name;
+    this.typeMirror = typeMirror;
+    this.init = null;
+  }
+
+  /**
+   * Create an AField that is a copy of the given one.
+   *
+   * @param field the AField to copy
+   */
+  public AField(AField field) {
+    super(field.name, field);
+    name = field.name;
+    typeMirror = field.typeMirror;
     init = field.init == null ? null : field.init.clone();
+  }
+
+  /**
+   * Return the name of this field or formal parameter.
+   *
+   * @return the name of this field or formal parameter
+   */
+  public String getName() {
+    return name;
+  }
+
+  /**
+   * Return javac's representation of the type of this.
+   *
+   * @return javac's representation of the type of this
+   */
+  public TypeMirror getTypeMirror() {
+    return typeMirror;
+  }
+
+  /**
+   * Set the TypeMirror this.
+   *
+   * @param typeMirror javac's representation of the type of this
+   */
+  public void setTypeMirror(TypeMirror typeMirror) {
+    this.typeMirror = typeMirror;
   }
 
   @Override
@@ -27,19 +87,28 @@ public class AField extends ADeclaration {
 
   @Override
   public boolean equals(Object o) {
-    return o instanceof AField
-        && ((AField) o).equalsField(this);
+    return o instanceof AField && equalsField((AField) o);
   }
 
   final boolean equalsField(AField o) {
+    // With this implementation, tests fail (!).
+    // return o != null && super.equals(o) && name.equals(o.name) && typeMirror.equals(o.typeMirror)
+    // && init.equals(o.init);
     return super.equals(o);
   }
 
-  @Override  // TODO: remove?
+  // Just use super.hashCode(), since equals() is just super.equals().
+  // @Override
+  // public int hashCode() {
+  //   return super.hashCode() + Objects.hash(name, typeMirror, init);
+  // }
+
+  @Override // TODO: remove?
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("AField ");
-    sb.append(fieldName);
+    sb.append(name);
+    sb.append(" [typeMirror=" + typeMirror + "; init=" + init + "] ");
     sb.append(super.toString());
     return sb.toString();
   }
@@ -49,8 +118,7 @@ public class AField extends ADeclaration {
     return v.visitField(this, t);
   }
 
-  static <K extends Object> VivifyingMap<K, AField>
-  newVivifyingLHMap_AF() {
+  static <K extends Object> VivifyingMap<K, AField> newVivifyingLHMap_AF() {
     return new VivifyingMap<K, AField>(new LinkedHashMap<>()) {
       @Override
       public AField createValueFor(K k) {
@@ -63,5 +131,4 @@ public class AField extends ADeclaration {
       }
     };
   }
-
 }
