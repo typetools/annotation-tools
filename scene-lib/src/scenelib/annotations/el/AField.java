@@ -23,7 +23,7 @@ public class AField extends ADeclaration {
    * @param name the name of the field or formal parameter
    */
   public AField(String name) {
-    super(name);
+    super("AField");  // not name because that can change
     this.name = name;
     this.typeMirror = null;
     this.init = null;
@@ -36,7 +36,7 @@ public class AField extends ADeclaration {
    * @param typeMirror javac's representation of the type of the wrapped field
    */
   public AField(String name, TypeMirror typeMirror) {
-    super(name);
+    super("AField");  // not name because that can change
     this.name = name;
     this.typeMirror = typeMirror;
     this.init = null;
@@ -48,7 +48,7 @@ public class AField extends ADeclaration {
    * @param field the AField to copy
    */
   public AField(AField field) {
-    super(field.name, field);
+    super(field.description, field);
     name = field.name;
     typeMirror = field.typeMirror;
     init = field.init == null ? null : field.init.clone();
