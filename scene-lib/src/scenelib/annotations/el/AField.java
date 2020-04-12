@@ -90,6 +90,12 @@ public class AField extends ADeclaration {
     return o instanceof AField && equalsField((AField) o);
   }
 
+  /**
+   * Returns true if this is equal to the given AField.
+   *
+   * @param o the other AField to compare to
+   * @return true if this is equal to the given AField
+   */
   final boolean equalsField(AField o) {
     // With this implementation, tests fail (!).
     // return o != null && super.equals(o) && name.equals(o.name) && typeMirror.equals(o.typeMirror)
@@ -103,6 +109,11 @@ public class AField extends ADeclaration {
   //   return super.hashCode() + Objects.hash(name, typeMirror, init);
   // }
 
+  /**
+   * Return a printed representation of this.
+   *
+   * @return a printed representation of this
+   */
   @Override // TODO: remove?
   public String toString() {
     StringBuilder sb = new StringBuilder();
@@ -118,7 +129,8 @@ public class AField extends ADeclaration {
     return v.visitField(this, t);
   }
 
-  static <K extends Object> VivifyingMap<K, AField> newVivifyingLHMap_AF() {
+  static <K extends Object> VivifyingMap<K, AField>
+  newVivifyingLHMap_AF() {
     return new VivifyingMap<K, AField>(new LinkedHashMap<>()) {
       @Override
       public AField createValueFor(K k) {
