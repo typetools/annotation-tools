@@ -46,7 +46,7 @@ public class AElement implements Cloneable {
      * A description of the element.  Used for debugging and diagnostic messages.
      * Almost always a String, but in ATypeElement it is an ASTPath.
      */
-    public final Object description;
+    public Object description;
 
     AElement(Object description) {
         this(description, false);

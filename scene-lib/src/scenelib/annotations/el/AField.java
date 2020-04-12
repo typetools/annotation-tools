@@ -23,7 +23,7 @@ public class AField extends ADeclaration {
    * @param name the name of the field or formal parameter
    */
   public AField(String name) {
-    super("AField");  // not name because that can change
+    super(name);
     this.name = name;
     this.typeMirror = null;
     this.init = null;
@@ -36,7 +36,7 @@ public class AField extends ADeclaration {
    * @param typeMirror javac's representation of the type of the wrapped field
    */
   public AField(String name, TypeMirror typeMirror) {
-    super("AField");  // not name because that can change
+    super(name);
     this.name = name;
     this.typeMirror = typeMirror;
     this.init = null;
@@ -72,15 +72,12 @@ public class AField extends ADeclaration {
    * @param newName the new name of this field or formal parameter
    */
   public void setName(String newName) {
-    if (name == null) {
-      name = newName;
-      return;
-    }
     if (name.equals(newName)) {
       return;
     }
     if (digits.matcher(name).matches()) {
       name = newName;
+      description = newName;
       return;
     }
     throw new Error(String.format("old name=%s, new name=%s", name, newName));
