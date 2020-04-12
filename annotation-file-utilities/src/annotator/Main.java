@@ -1,5 +1,6 @@
 package annotator;
 
+import java.util.Arrays;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -513,15 +514,17 @@ public class Main {
         "Main [options] { jaif-file | java-file | @arg-file } ...\n"
             + "(Contents of argfiles are expanded into the argument list.)",
         Main.class);
+    String[] cl_args;
     String[] file_args;
     try {
-      String[] cl_args = CommandLine.parse(args);
+      cl_args = CommandLine.parse(args);
       file_args = options.parse(true, cl_args);
     } catch (IOException ex) {
       System.err.println(ex);
       System.err.println("(For non-argfile beginning with \"@\", use \"@@\" for initial \"@\".");
       System.err.println("Alternative for filenames: indicate directory, e.g. as './@file'.");
       System.err.println("Alternative for flags: use '=', as in '-o=@Deprecated'.)");
+      cl_args = null; // convince compiler that variables are initialized
       file_args = null;  // Eclipse compiler issue workaround
       System.exit(1);
     }
@@ -549,6 +552,9 @@ public class Main {
 
     if (file_args.length < 2) {
       System.out.printf("Supplied %d arguments, at least 2 needed%n", file_args.length);
+      System.out.printf("Supplied arguments: %s%n", Arrays.toString(args));
+      System.out.printf("  (After javac parsing, remaining arguments = %s)%n", Arrays.toString(cl_args));
+      System.out.printf("  (File arguments = %s)%n", Arrays.toString(file_args));
       options.printUsage();
       System.exit(1);
     }
