@@ -1,6 +1,7 @@
 package scenelib.annotations.el;
 
 import java.util.LinkedHashMap;
+import java.util.regex.Pattern;
 import javax.lang.model.type.TypeMirror;
 import scenelib.annotations.util.coll.VivifyingMap;
 
@@ -8,7 +9,7 @@ import scenelib.annotations.util.coll.VivifyingMap;
 public class AField extends ADeclaration {
 
   /** The name of this field or formal parameter. */
-  private final String name;
+  private String name;
 
   /** Javac's representation of the type of this. */
   private TypeMirror typeMirror;
@@ -60,6 +61,28 @@ public class AField extends ADeclaration {
    */
   public String getName() {
     return name;
+  }
+
+  private Pattern digits = Pattern.compile("^[0-9]+$");
+
+  /**
+   * Set the name of this field or formal parameter.
+   *
+   * @param newName the new name of this field or formal parameter
+   */
+  public void setName(String newName) {
+    if (name == null) {
+      name = newName;
+      return;
+    }
+    if (name.equals(newName)) {
+      return;
+    }
+    if (digits.matcher(name).matches()) {
+      name = newName;
+      return;
+    }
+    throw new Error(String.format("old name=%s, new name=%s", name, newName));
   }
 
   /**
