@@ -63,6 +63,7 @@ public class AField extends ADeclaration {
     return name;
   }
 
+  /** A pattern that matches a string consisting only of digits. */
   private Pattern digits = Pattern.compile("^[0-9]+$");
 
   /**
