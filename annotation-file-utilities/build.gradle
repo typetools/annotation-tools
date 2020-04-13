@@ -53,11 +53,16 @@ dependencies {
     implementation 'org.plumelib:options:1.0.4'
     implementation 'org.plumelib:plume-util:1.1.4'
     implementation 'org.plumelib:reflection-util:0.2.2'
-    compileOnly 'org.checkerframework:checker-qual:3.2.0'
-    implementation 'com.google.guava:guava:28.2-jre'
+    // Annotations in checker-qual.jar are used, but no checkers are (currently) run on the code.
+    compileOnly 'org.checkerframework:checker-qual:3.3.0'
+    implementation ('com.google.guava:guava:28.2-jre') {
+        // So long as Guava only uses annotations from checker-qual, excluding it should not cause problems.
+        exclude group: 'org.checkerframework'
+    }
     implementation files('../asmx/bin/')
 
     testImplementation group: 'junit', name: 'junit', version: '4.13'
+    testImplementation 'org.checkerframework:checker-qual:3.3.0'
 }
 
 task compileAsmx(type: Exec, group: 'Build') {
@@ -506,19 +511,20 @@ task javadocPrivate(type: Javadoc) {
   options.memberLevel = JavadocMemberLevel.PRIVATE
 }
 
+configurations {
+  requireJavadoc
+}
 dependencies {
-  compileOnly group: 'org.plumelib', name: 'require-javadoc', version: '0.1.2'
+  requireJavadoc "org.plumelib:require-javadoc:0.3.0"
 }
-task requireJavadocPrivate(type: Javadoc) {
+task requireJavadoc(type: JavaExec) {
   description = 'Ensures that Javadoc documentation exists.'
-  destinationDir temporaryDir
-  source = sourceSets.main.allJava
-  classpath = project.sourceSets.main.compileClasspath
-  options.docletpath = project.sourceSets.main.compileClasspath as List
-  options.doclet = "org.plumelib.javadoc.RequireJavadoc"
-  options.memberLevel = JavadocMemberLevel.PRIVATE
-  // options.addStringOption('skip', 'ClassNotToCheck|OtherClass')
+  main = "org.plumelib.javadoc.RequireJavadoc"
+  classpath = configurations.requireJavadoc
+  args "annotation-file-utilities/src", "scene-lib/src"
+  workingDir = "${projectDir}/.."
 }
+// check.dependsOn requireJavadoc
 
 task updateUserOptions(type: Javadoc, dependsOn: 'assemble') {
   description "Updates printed documentation of command-line arguments."

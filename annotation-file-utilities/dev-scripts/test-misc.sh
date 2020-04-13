@@ -32,5 +32,5 @@ cd ${AFU}
 ./gradlew javadoc
 (./gradlew javadocPrivate > /tmp/warnings.txt 2>&1) || true
 /tmp/$USER/plume-scripts/ci-lint-diff /tmp/warnings.txt
-(./gradlew requireJavadocPrivate > /tmp/warnings.txt 2>&1) || true
+(./gradlew requireJavadoc > /tmp/warnings.txt 2>&1) || true
 /tmp/$USER/plume-scripts/ci-lint-diff /tmp/warnings.txt
