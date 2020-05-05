@@ -9,7 +9,7 @@ import org.plumelib.util.CollectionsPlume;
 
 // TODO: Add a method to indicate whether this class in an enum, and one to get the enum fields.
 /** An annotated class. */
-public final class AClass extends ADeclaration {
+public class AClass extends ADeclaration {
     /** The class's annotated type parameter bounds */
     public final VivifyingMap<BoundLocation, ATypeElement> bounds =
             ATypeElement.<BoundLocation>newVivifyingLHMap_ATE();

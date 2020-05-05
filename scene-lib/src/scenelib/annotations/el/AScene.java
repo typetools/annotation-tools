@@ -47,9 +47,9 @@ import scenelib.annotations.util.coll.VivifyingMap;
  * ));
  * </pre>
  */
-public final class AScene implements Cloneable {
+public class AScene implements Cloneable {
+    /** If true, check that the copy constructor works correctly. */
     private static boolean checkClones = true;
-    public static boolean debugFoundMap = false;
 
     /** This scene's annotated packages; map key is package name */
     public final VivifyingMap<String, AElement> packages =
@@ -177,6 +177,8 @@ public final class AScene implements Cloneable {
     }
 
     /**
+     * Checks that the arguments are clones of one another.
+     *
      * Throws exception if the arguments 1) are the same reference;
      * 2) are not equal() in both directions; or 3) contain
      * corresponding elements that meet either of the preceding two
@@ -237,7 +239,9 @@ public final class AScene implements Cloneable {
     public static void checkObject(Object o0, Object o1) {
         if (o0 == null ? o1 != null
                 : !(o0.equals(o1) && o1.equals(o0))) {  // ok if ==
-            throw new RuntimeException("clone check failed");
+            throw new RuntimeException(
+                String.format("clone check failed for %s [%s] %s [%s]",
+                              o0, o0.getClass(), o1, o1.getClass()));
         }
     }
 
