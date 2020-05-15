@@ -64,12 +64,12 @@ public class AClass extends ADeclaration {
     public final String className;
 
     /**
-     * This HashSet contains the simple class names any of this class' outer classes (or this class)
+     * The simple class names any of this class's outer classes (or this class)
      * that are enums.
      */
     private final HashSet<String> enums = new HashSet<>();
 
-    /** The enum constants of the class, or null if this class is not an enum. */
+    /** The enum constants of this class, or null if this class is not an enum. */
     private /*@MonotonicNonNull*/ List<VariableElement> enumConstants = null;
 
     // debug fields to keep track of all classes created
@@ -289,11 +289,10 @@ public class AClass extends ADeclaration {
      * @return the enum constants, or null if this is not an enum
      */
     public /*@Nullable*/ List<VariableElement> getEnumConstants() {
-        if (enumConstants != null) {
-            return ImmutableList.copyOf(enumConstants);
-        } else {
+        if (enumConstants == null) {
             return null;
         }
+        return ImmutableList.copyOf(enumConstants);
     }
 
     /**
@@ -339,7 +338,7 @@ public class AClass extends ADeclaration {
     }
 
     /**
-     * Get all the methods that have been vivified (had their types updated by WPI) on a class.
+     * Get all the methods that have been vivified on a class.
      *
      * @return a map from method signature (in JVM format) to the object representing the method
      */
@@ -366,13 +365,10 @@ public class AClass extends ADeclaration {
     }
 
     /**
-     * Obtain the given method, which can be further operated on to e.g. add information about a
-     * parameter. WPI uses this to update the types in the method signature.
-     *
-     * <p>Results are interned.
+     * Update the method's fields, using information from the given ExecutableElement.
      *
      * @param methodElt the method
-     * @return an AMethod representing the method
+     * @return an interned AMethod representing the method
      */
     public AMethod setFieldsFromMethodElement(ExecutableElement methodElt) {
         String methodSignature = JVMNames.getJVMMethodSignature(methodElt);
@@ -382,13 +378,11 @@ public class AClass extends ADeclaration {
     }
 
     /**
-     * Obtain the given field, which can be further operated on.
-     *
-     * <p>Results are interned.
+     * Set the type mirror of the given field.
      *
      * @param fieldName the name of the field
-     * @param type the type of the field, which scenelib doesn't track
-     * @return an AField object representing the field
+     * @param type the type of the field
+     * @return an interned AField representing the field
      */
     public AField setTypeMirror(String fieldName, TypeMirror type) {
         AField field = fields.getVivify(fieldName);
