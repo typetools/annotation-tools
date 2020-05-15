@@ -1,17 +1,20 @@
 package scenelib.annotations.el;
 
-import com.google.common.collect.ImmutableMap;
-import java.util.Collection;
-import java.util.Map;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.TypeMirror;
 
 import scenelib.annotations.Annotation;
+import scenelib.annotations.util.JVMNames;
 import scenelib.annotations.util.coll.VivifyingMap;
 
 import org.plumelib.util.CollectionsPlume;
@@ -360,6 +363,37 @@ public class AClass extends ADeclaration {
      */
     public Collection<? extends Annotation> getAnnotations() {
         return tlAnnotationsHere;
+    }
+
+    /**
+     * Obtain the given method, which can be further operated on to e.g. add information about a
+     * parameter. WPI uses this to update the types in the method signature.
+     *
+     * <p>Results are interned.
+     *
+     * @param methodElt the method
+     * @return an AMethod representing the method
+     */
+    public AMethod setFieldsFromMethodElement(ExecutableElement methodElt) {
+        String methodSignature = JVMNames.getJVMMethodSignature(methodElt);
+        AMethod method = methods.getVivify(methodSignature);
+        method.setFieldsFromMethodElement(methodElt);
+        return method;
+    }
+
+    /**
+     * Obtain the given field, which can be further operated on.
+     *
+     * <p>Results are interned.
+     *
+     * @param fieldName the name of the field
+     * @param type the type of the field, which scenelib doesn't track
+     * @return an AField object representing the field
+     */
+    public AField setTypeMirror(String fieldName, TypeMirror type) {
+        AField field = fields.getVivify(fieldName);
+        field.setTypeMirror(type);
+        return field;
     }
 
 }
