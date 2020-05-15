@@ -1,5 +1,8 @@
 package scenelib.annotations.el;
 
+import com.google.common.collect.ImmutableMap;
+import java.util.Collection;
+import java.util.Map;
 import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -330,6 +333,33 @@ public class AClass extends ADeclaration {
             throw new Error(String.format(
                 "setTypeElement(%s): type is already %s", typeElement, this.typeElement));
         }
+    }
+
+    /**
+     * Get all the methods that have been vivified (had their types updated by WPI) on a class.
+     *
+     * @return a map from method signature (in JVM format) to the object representing the method
+     */
+    public Map<String, AMethod> getMethods() {
+        return ImmutableMap.copyOf(methods);
+    }
+
+    /**
+     * Get all the fields that have been vivified on a class.
+     *
+     * @return a map from field name to the object representing the field
+     */
+    public Map<String, AField> getFields() {
+        return ImmutableMap.copyOf(fields);
+    }
+
+    /**
+     * Get the annotations on the class.
+     *
+     * @return the annotations, directly from scenelib
+     */
+    public Collection<? extends Annotation> getAnnotations() {
+        return tlAnnotationsHere;
     }
 
 }
