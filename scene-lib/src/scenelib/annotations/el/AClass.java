@@ -1,6 +1,13 @@
 package scenelib.annotations.el;
 
+import com.google.common.collect.ImmutableList;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
+import javax.lang.model.element.VariableElement;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import scenelib.annotations.Annotation;
 import scenelib.annotations.util.coll.VivifyingMap;
@@ -44,6 +51,15 @@ public class AClass extends ADeclaration {
 
     /** The fully-qualified name of the annotated class. */
     public final String className;
+
+    /**
+     * This HashSet contains the simple class names any of this class' outer classes (or this class)
+     * that are enums.
+     */
+    private final HashSet<String> enums = new HashSet<>();
+
+    /** The enum constants of the class, or null if this class is not an enum. */
+    private @MonotonicNonNull List<VariableElement> enumConstants = null;
 
     // debug fields to keep track of all classes created
     // private static List<AClass> debugAllClasses = new ArrayList<>();
@@ -222,6 +238,65 @@ public class AClass extends ADeclaration {
                 return v.isEmpty();
             }
         };
+    }
+
+    /**
+     * Checks if the given class is an enum or not.
+     *
+     * @param className the simple class name of this class or one of its outer classes
+     * @return true if the given class is an enum
+     */
+    public boolean isEnum(String className) {
+        return enums.contains(className);
+    }
+
+    /**
+     * Checks if this class is an enum.
+     *
+     * @return true if this class is an enum
+     */
+    public boolean isEnum() {
+        return enums.contains(this.className);
+    }
+
+    /**
+     * Marks the given simple class name as an enum. This method is used to mark outer classes of
+     * this class that have not been vivified, meaning that only their names are available.
+     *
+     * <p>Note that this code will misbehave if a class has the same name as its inner enum, or
+     * vice-versa, because this uses simple names.
+     *
+     * @param className the simple class name of this class or one of its outer classes
+     */
+    public void markAsEnum(String className) {
+        enums.add(className);
+    }
+
+    /**
+     * Returns the set of enum constants for this class, or null if this is not an enum.
+     *
+     * @return the enum constants, or null if this is not an enum
+     */
+    public @Nullable List<VariableElement> getEnumConstants() {
+        if (enumConstants != null) {
+            return ImmutableList.copyOf(enumConstants);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Marks this class as an enum.
+     *
+     * @param enumConstants the list of enum constants for the class
+     */
+    public void setEnumConstants(List<VariableElement> enumConstants) {
+        if (this.enumConstants != null) {
+            throw new Error(String.format(
+                    "setEnumConstants was called multiple times with arguments %s and %s",
+                    this.enumConstants, enumConstants));
+        }
+        this.enumConstants = new ArrayList<>(enumConstants);
     }
 
 }
