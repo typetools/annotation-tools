@@ -6,8 +6,6 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import javax.lang.model.element.VariableElement;
-import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 import scenelib.annotations.Annotation;
 import scenelib.annotations.util.coll.VivifyingMap;
@@ -59,7 +57,7 @@ public class AClass extends ADeclaration {
     private final HashSet<String> enums = new HashSet<>();
 
     /** The enum constants of the class, or null if this class is not an enum. */
-    private @MonotonicNonNull List<VariableElement> enumConstants = null;
+    private /*@MonotonicNonNull*/ List<VariableElement> enumConstants = null;
 
     // debug fields to keep track of all classes created
     // private static List<AClass> debugAllClasses = new ArrayList<>();
@@ -277,7 +275,7 @@ public class AClass extends ADeclaration {
      *
      * @return the enum constants, or null if this is not an enum
      */
-    public @Nullable List<VariableElement> getEnumConstants() {
+    public /*@Nullable*/ List<VariableElement> getEnumConstants() {
         if (enumConstants != null) {
             return ImmutableList.copyOf(enumConstants);
         } else {
