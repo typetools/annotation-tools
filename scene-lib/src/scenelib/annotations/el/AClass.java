@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 
 import scenelib.annotations.Annotation;
@@ -46,6 +47,12 @@ public class AClass extends ADeclaration {
 
     public final VivifyingMap<String, AExpression> fieldInits =
         createFieldInitMap();
+
+    /**
+     * The type element representing the class. Clients must call {@link
+     * #setTypeElement(TypeElement)} before accessing this field.
+     */
+    private /*@MonotonicNonNull*/ TypeElement typeElement = null;
 
     /** The fully-qualified name of the annotated class. */
     public final String className;
@@ -295,6 +302,34 @@ public class AClass extends ADeclaration {
                     this.enumConstants, enumConstants));
         }
         this.enumConstants = new ArrayList<>(enumConstants);
+    }
+
+    /**
+     * Get the type of the class, or null if it is unknown. Callers should ensure that either:
+     *
+     * <ul>
+     *   <li>{@link #setTypeElement(TypeElement)} has been called, or
+     *   <li>the return value is checked against null.
+     * </ul>
+     *
+     * @return a type element representing this class
+     */
+    public /*@Nullable*/ TypeElement getTypeElement() {
+        return typeElement;
+    }
+
+    /**
+     * Set the type element representing the class.
+     *
+     * @param typeElement the type element representing the class
+     */
+    public void setTypeElement(TypeElement typeElement) {
+        if (this.typeElement == null) {
+            this.typeElement = typeElement;
+        } else if (!this.typeElement.equals(typeElement)) {
+            throw new Error(String.format(
+                "setTypeElement(%s): type is already %s", typeElement, this.typeElement));
+        }
     }
 
 }
