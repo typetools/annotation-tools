@@ -1,5 +1,6 @@
 package scenelib.annotations.el;
 
+import com.google.common.collect.ImmutableMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -66,7 +67,7 @@ public class AScene implements Cloneable {
     public final Map<String, Set<String>> imports = new LinkedHashMap<>();
 
     /** This scene's annotated classes; map key is class name */
-    public final VivifyingMap<String, AClass> classes =
+    public final VivifyingMap</*@BinaryName*/ String, AClass> classes =
             new VivifyingMap<String, AClass>(
                     new LinkedHashMap<>()) {
                 @Override
@@ -139,6 +140,15 @@ public class AScene implements Cloneable {
     @Override
     public int hashCode() {
         return classes.hashCode() + packages.hashCode();
+    }
+
+    /**
+     * Fetch the classes in this scene, represented as AClass objects.
+     *
+     * @return an immutable map from binary names to AClass objects
+     */
+    public Map</*@BinaryName*/ String, AClass> getClasses() {
+        return ImmutableMap.copyOf(classes);
     }
 
     /**

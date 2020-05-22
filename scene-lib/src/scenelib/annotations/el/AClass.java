@@ -55,8 +55,8 @@ public class AClass extends ADeclaration {
         createFieldInitMap();
 
     /**
-     * The type element representing the class. Clients must call {@link
-     * #setTypeElement(TypeElement)} before accessing this field.
+     * The type element representing the class.
+     * Clients must call {@link #setTypeElement(TypeElement)} before accessing this field.
      */
     private /*@MonotonicNonNull*/ TypeElement typeElement = null;
 
@@ -252,7 +252,7 @@ public class AClass extends ADeclaration {
     }
 
     /**
-     * Checks if the given class is an enum or not.
+     * Checks whether the given class is an enum.
      *
      * @param className the simple class name of this class or one of its outer classes
      * @return true if the given class is an enum
@@ -262,7 +262,7 @@ public class AClass extends ADeclaration {
     }
 
     /**
-     * Checks if this class is an enum.
+     * Checks whether this class is an enum.
      *
      * @return true if this class is an enum
      */
@@ -363,32 +363,4 @@ public class AClass extends ADeclaration {
     public Collection<? extends Annotation> getAnnotations() {
         return tlAnnotationsHere;
     }
-
-    /**
-     * Vivify the method if necessary, then update the method's fields using
-     * information from the given ExecutableElement.
-     *
-     * @param methodElt the method
-     * @return an interned AMethod representing the method
-     */
-    public AMethod vivifyAndSetFieldsFromMethodElement(ExecutableElement methodElt) {
-        String methodSignature = JVMNames.getJVMMethodSignature(methodElt);
-        AMethod method = methods.getVivify(methodSignature);
-        method.setFieldsFromMethodElement(methodElt);
-        return method;
-    }
-
-    /**
-     * Vivify the given field if necessary, then set its type mirror.
-     *
-     * @param fieldName the name of the field
-     * @param type the type of the field
-     * @return an interned AField representing the field
-     */
-    public AField vivifyAndSetTypeMirror(String fieldName, TypeMirror type) {
-        AField field = fields.getVivify(fieldName);
-        field.setTypeMirror(type);
-        return field;
-    }
-
 }
