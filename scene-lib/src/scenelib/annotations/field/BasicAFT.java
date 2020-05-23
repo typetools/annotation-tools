@@ -91,8 +91,13 @@ public final class BasicAFT extends ScalarAFT {
 
     @Override
     public String format(Object o) {
-      return type != String.class ? o.toString()
-          : "\"" + charEscaper.escape((String) o) + "\"";
+      if (type == String.class) {
+          return "\"" + charEscaper.escape((String) o) + "\"";
+      } else if (type == long.class) {
+          return o.toString() + "L";
+      } else {
+          return o.toString();
+      }
     }
 
     @Override

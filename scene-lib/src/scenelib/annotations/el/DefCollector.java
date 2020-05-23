@@ -188,6 +188,9 @@ public abstract class DefCollector {
     /**
      * Override this method to perform some sort of subclass-specific
      * processing on the given {@link AnnotationDef}.
+
+     * It is only called once per annotation used in the scene,
+     * because each annotation is only defined once.
      */
     protected abstract void visitAnnotationDef(AnnotationDef d);
 

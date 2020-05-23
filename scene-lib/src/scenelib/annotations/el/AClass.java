@@ -1,15 +1,27 @@
 package scenelib.annotations.el;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.TypeMirror;
 
 import scenelib.annotations.Annotation;
+import scenelib.annotations.util.JVMNames;
 import scenelib.annotations.util.coll.VivifyingMap;
 
 import org.plumelib.util.CollectionsPlume;
 
 // TODO: Add a method to indicate whether this class in an enum, and one to get the enum fields.
 /** An annotated class. */
-public final class AClass extends ADeclaration {
+public class AClass extends ADeclaration {
     /** The class's annotated type parameter bounds */
     public final VivifyingMap<BoundLocation, ATypeElement> bounds =
             ATypeElement.<BoundLocation>newVivifyingLHMap_ATE();
@@ -42,8 +54,23 @@ public final class AClass extends ADeclaration {
     public final VivifyingMap<String, AExpression> fieldInits =
         createFieldInitMap();
 
+    /**
+     * The type element representing the class.
+     * Clients must call {@link #setTypeElement(TypeElement)} before accessing this field.
+     */
+    private /*@MonotonicNonNull*/ TypeElement typeElement = null;
+
     /** The fully-qualified name of the annotated class. */
     public final String className;
+
+    /**
+     * The simple class names any of this class's outer classes (or this class)
+     * that are enums.
+     */
+    private final HashSet<String> enums = new HashSet<>();
+
+    /** The enum constants of this class, or null if this class is not an enum. */
+    private /*@MonotonicNonNull*/ List<VariableElement> enumConstants = null;
 
     // debug fields to keep track of all classes created
     // private static List<AClass> debugAllClasses = new ArrayList<>();
@@ -224,4 +251,116 @@ public final class AClass extends ADeclaration {
         };
     }
 
+    /**
+     * Checks whether the given class is an enum.
+     *
+     * @param className the simple class name of this class or one of its outer classes
+     * @return true if the given class is an enum
+     */
+    public boolean isEnum(String className) {
+        return enums.contains(className);
+    }
+
+    /**
+     * Checks whether this class is an enum.
+     *
+     * @return true if this class is an enum
+     */
+    public boolean isEnum() {
+        return enums.contains(this.className);
+    }
+
+    /**
+     * Marks the given simple class name as an enum. This method is used to mark outer classes of
+     * this class that have not been vivified, meaning that only their names are available.
+     *
+     * <p>Note that this code will misbehave if a class has the same name as its inner enum, or
+     * vice-versa, because this uses simple names.
+     *
+     * @param className the simple class name of this class or one of its outer classes
+     */
+    public void markAsEnum(String className) {
+        enums.add(className);
+    }
+
+    /**
+     * Returns the set of enum constants for this class, or null if this is not an enum.
+     *
+     * @return the enum constants, or null if this is not an enum
+     */
+    public /*@Nullable*/ List<VariableElement> getEnumConstants() {
+        if (enumConstants == null) {
+            return null;
+        }
+        return ImmutableList.copyOf(enumConstants);
+    }
+
+    /**
+     * Marks this class as an enum.
+     *
+     * @param enumConstants the list of enum constants for the class
+     */
+    public void setEnumConstants(List<VariableElement> enumConstants) {
+        if (this.enumConstants != null) {
+            throw new Error(String.format(
+                    "setEnumConstants was called multiple times with arguments %s and %s",
+                    this.enumConstants, enumConstants));
+        }
+        this.enumConstants = new ArrayList<>(enumConstants);
+    }
+
+    /**
+     * Get the type of the class, or null if it is unknown. Callers should ensure that either:
+     *
+     * <ul>
+     *   <li>{@link #setTypeElement(TypeElement)} has been called, or
+     *   <li>the return value is checked against null.
+     * </ul>
+     *
+     * @return a type element representing this class
+     */
+    public /*@Nullable*/ TypeElement getTypeElement() {
+        return typeElement;
+    }
+
+    /**
+     * Set the type element representing the class.
+     *
+     * @param typeElement the type element representing the class
+     */
+    public void setTypeElement(TypeElement typeElement) {
+        if (this.typeElement == null) {
+            this.typeElement = typeElement;
+        } else if (!this.typeElement.equals(typeElement)) {
+            throw new Error(String.format(
+                "setTypeElement(%s): type is already %s", typeElement, this.typeElement));
+        }
+    }
+
+    /**
+     * Get all the methods that have been vivified on a class.
+     *
+     * @return a map from method signature (in JVM format) to the object representing the method
+     */
+    public Map<String, AMethod> getMethods() {
+        return ImmutableMap.copyOf(methods);
+    }
+
+    /**
+     * Get all the fields that have been vivified on a class.
+     *
+     * @return a map from field name to the object representing the field
+     */
+    public Map<String, AField> getFields() {
+        return ImmutableMap.copyOf(fields);
+    }
+
+    /**
+     * Get the annotations on the class.
+     *
+     * @return the annotations, directly from scenelib
+     */
+    public Collection<? extends Annotation> getAnnotations() {
+        return tlAnnotationsHere;
+    }
 }

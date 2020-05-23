@@ -12,6 +12,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringJoiner;
 
 import scenelib.annotations.Annotation;
 import scenelib.annotations.el.AClass;
@@ -88,62 +89,17 @@ public final class IndexFileWriter {
         }
     }
 
+    /**
+     * The printer onto which the index file will be written.
+     */
     final PrintWriter pw;
 
-    private void printValue(AnnotationFieldType aft, Object o) {
-        if (aft instanceof AnnotationAFT) {
-            printAnnotation((Annotation) o);
-        } else if (aft instanceof ArrayAFT) {
-            ArrayAFT aaft = (ArrayAFT) aft;
-            pw.print('{');
-            if (!(o instanceof List)) {
-                printValue(aaft.elementType, o);
-            } else {
-                List<?> l =
-                    (List<?>) o;
-                // watch out--could be an empty array of unknown type
-                // (see AnnotationBuilder#addEmptyArrayField)
-                if (aaft.elementType == null) {
-                    if (l.size() != 0) {
-                        throw new AssertionError();
-                    }
-                } else {
-                    boolean first = true;
-                    for (Object o2 : l) {
-                        if (!first) {
-                            pw.print(',');
-                        }
-                        printValue(aaft.elementType, o2);
-                        first = false;
-                    }
-                }
-            }
-            pw.print('}');
-        } else if (aft instanceof ClassTokenAFT) {
-            pw.print(aft.format(o));
-        } else if (aft instanceof BasicAFT && o instanceof String) {
-            pw.print(Strings.escape((String) o));
-        } else {
-            pw.print(o.toString());
-        }
-    }
-
+    /**
+     * Print the annotation using the {@link pw} field, after formatting it.
+     * @param a the annotation to print
+     */
     private void printAnnotation(Annotation a) {
-        pw.print("@" + a.def().name);
-        if (!a.fieldValues.isEmpty()) {
-            pw.print('(');
-            boolean first = true;
-            for (Map. Entry<String, Object> f
-                    : a.fieldValues.entrySet()) {
-                if (!first) {
-                    pw.print(',');
-                }
-                pw.print(f.getKey() + "=");
-                printValue(a.def().fieldTypes.get(f.getKey()), f.getValue());
-                first = false;
-            }
-            pw.print(')');
-        }
+        pw.print(formatAnnotation(a));
     }
 
     private void printAnnotations(Collection<? extends Annotation> annos) {
@@ -525,6 +481,60 @@ public final class IndexFileWriter {
         pw = new PrintWriter(out);
         write();
         pw.flush();
+    }
+
+    /**
+     * Formats an annotation to be printed in an index file.
+     * @param a the annotation to format
+     * @return the annotation formatted correctly, as a string
+     */
+    private static String formatAnnotation(Annotation a) {
+        String annoName = "@" + a.def().name;
+        if (a.fieldValues.isEmpty()) {
+            return annoName;
+        }
+        StringJoiner sj = new StringJoiner(",", annoName + "(", ")");
+        for (Map.Entry<String, Object> f : a.fieldValues.entrySet()) {
+            AnnotationFieldType aft = a.def().fieldTypes.get(f.getKey());
+            sj.add(f.getKey() + "=" + formatAnnotationValue(aft, f.getValue()));
+        }
+        return sj.toString();
+    }
+
+    /**
+     * Formats a literal argument of an annotation. Public to permit re-use
+     * in stub-based whole-program inference.
+     *
+     * @param aft the type of the annotation field
+     * @param o the value or values to format
+     * @return the String representation of the value
+     */
+    public static String formatAnnotationValue(AnnotationFieldType aft, Object o) {
+        if (aft instanceof AnnotationAFT) {
+            return formatAnnotation((Annotation) o);
+        } else if (aft instanceof ArrayAFT) {
+            StringJoiner sj = new StringJoiner(",", "{", "}");
+            ArrayAFT aaft = (ArrayAFT) aft;
+            List<?> l = (List<?>) o;
+            if (aaft.elementType == null) {
+                if (l.size() != 0) {
+                    throw new AssertionError("nonempty array of unknown type");
+                }
+            } else {
+                for (Object o2 : l) {
+                    sj.add(formatAnnotationValue(aaft.elementType, o2));
+                }
+            }
+            return sj.toString();
+        } else if (aft instanceof ClassTokenAFT) {
+            return aft.format(o);
+        } else if (aft instanceof BasicAFT && o instanceof String) {
+            return Strings.escape((String) o);
+        } else if (aft instanceof BasicAFT && o instanceof Long) {
+            return o.toString() + "L";
+        } else {
+            return o.toString();
+        }
     }
 
     /**
