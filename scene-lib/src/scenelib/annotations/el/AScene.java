@@ -1,5 +1,6 @@
 package scenelib.annotations.el;
 
+import com.google.common.collect.ImmutableMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -47,9 +48,9 @@ import scenelib.annotations.util.coll.VivifyingMap;
  * ));
  * </pre>
  */
-public final class AScene implements Cloneable {
+public class AScene implements Cloneable {
+    /** If true, check that the copy constructor works correctly. */
     private static boolean checkClones = true;
-    public static boolean debugFoundMap = false;
 
     /** This scene's annotated packages; map key is package name */
     public final VivifyingMap<String, AElement> packages =
@@ -66,7 +67,7 @@ public final class AScene implements Cloneable {
     public final Map<String, Set<String>> imports = new LinkedHashMap<>();
 
     /** This scene's annotated classes; map key is class name */
-    public final VivifyingMap<String, AClass> classes =
+    public final VivifyingMap</*@BinaryName*/ String, AClass> classes =
             new VivifyingMap<String, AClass>(
                     new LinkedHashMap<>()) {
                 @Override
@@ -142,6 +143,15 @@ public final class AScene implements Cloneable {
     }
 
     /**
+     * Fetch the classes in this scene, represented as AClass objects.
+     *
+     * @return an immutable map from binary names to AClass objects
+     */
+    public Map</*@BinaryName*/ String, AClass> getClasses() {
+        return ImmutableMap.copyOf(classes);
+    }
+
+    /**
      * Returns whether this {@link AScene} is empty.
      */
     public boolean isEmpty() {
@@ -177,6 +187,8 @@ public final class AScene implements Cloneable {
     }
 
     /**
+     * Checks that the arguments are clones of one another.
+     *
      * Throws exception if the arguments 1) are the same reference;
      * 2) are not equal() in both directions; or 3) contain
      * corresponding elements that meet either of the preceding two
@@ -237,7 +249,9 @@ public final class AScene implements Cloneable {
     public static void checkObject(Object o0, Object o1) {
         if (o0 == null ? o1 != null
                 : !(o0.equals(o1) && o1.equals(o0))) {  // ok if ==
-            throw new RuntimeException("clone check failed");
+            throw new RuntimeException(
+                String.format("clone check failed for %s [%s] %s [%s]",
+                              o0, o0.getClass(), o1, o1.getClass()));
         }
     }
 

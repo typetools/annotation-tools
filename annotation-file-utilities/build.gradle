@@ -62,7 +62,7 @@ dependencies {
     implementation files('../asmx/bin/')
 
     testImplementation group: 'junit', name: 'junit', version: '4.13'
-    testImplementation 'org.checkerframework:checker-qual:3.3.0'
+    testImplementation 'org.checkerframework:checker-qual:3.4.0'
 }
 
 task compileAsmx(type: Exec, group: 'Build') {
