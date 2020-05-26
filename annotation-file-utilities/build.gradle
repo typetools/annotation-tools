@@ -5,13 +5,14 @@ plugins {
     // https://plugins.gradle.org/plugin/com.github.johnrengelman.shadow
     id 'com.github.johnrengelman.shadow' version '5.2.0'
     id 'java'
+    id 'maven-publish'
 }
 apply plugin: 'java'
 apply plugin: 'com.github.johnrengelman.shadow'
 
 group 'org.checkerframework'
 // TODO: Use this in the release process.
-version '3.8.11'
+version '3.9.9-SNAPSHOT'
 
 sourceCompatibility = 1.8
 
@@ -64,6 +65,11 @@ dependencies {
 
     testImplementation group: 'junit', name: 'junit', version: '4.13'
     testImplementation 'org.checkerframework:checker-qual:3.4.0'
+}
+
+java {
+    withJavadocJar()
+    withSourcesJar()
 }
 
 task compileAsmx(type: Exec, group: 'Build') {
@@ -632,4 +638,45 @@ task releaseBuild(type: GradleBuild) {
     startParameter.projectProperties += [release: true.toString()]
 
     tasks = ['clean', 'zipfile', 'testAnnotator', 'copyToDeployDir']
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = 'annotation-file-utilities'
+            from components.java
+            versionMapping {
+                usage('java-api') {
+                    fromResolutionOf('runtimeClasspath')
+                }
+                usage('java-runtime') {
+                    fromResolutionResult()
+                }
+            }
+            pom {
+                name = 'Annotation File Utilities'
+                description = 'Tools to extract annotations from, and write annotations to, .java and .class files. It also provides a representation (called an “annotation file”) for annotations that is outside the source code or the .class file.'
+                url = 'https://checkerframework.org/annotation-file-utilities/'
+
+                licenses {
+                    license {
+                        name = 'The MIT License'
+                        url = 'http://opensource.org/licenses/MIT'
+                    }
+                }
+//                developers {
+//                    developer {
+//                        id = 'mernst'
+//                        name = 'Michael Ernst'
+//                        email = 'mernst@cw'
+//                    }
+//                }
+                scm {
+                    connection = 'https://github.com/typetools/annotation-tools.git'
+                    developerConnection = 'git@github.com:typetools/annotation-tools.git'
+                    url = 'https://github.com/typetools/annotation-tools.git'
+                }
+            }
+        }
+    }
 }
