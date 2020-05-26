@@ -522,7 +522,6 @@ task updateUserOptions(type: Javadoc, dependsOn: 'assemble') {
 artifacts {
     archives shadowJar
     archives skinnyJar
-    archives allButJavacJar
 }
 
 clean {
