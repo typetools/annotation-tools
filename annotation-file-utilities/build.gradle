@@ -89,6 +89,10 @@ task cleanAsmx(type: Exec) {
     args = ['clean']
 }
 
+javadoc {
+    options.addStringOption('source', '8')
+}
+
 compileJava {
     dependsOn compileAsmx
     sourceCompatibility = 1.8
