@@ -664,13 +664,6 @@ publishing {
                         url = 'http://opensource.org/licenses/MIT'
                     }
                 }
-//                developers {
-//                    developer {
-//                        id = 'mernst'
-//                        name = 'Michael Ernst'
-//                        email = 'mernst@cw'
-//                    }
-//                }
                 scm {
                     connection = 'https://github.com/typetools/annotation-tools.git'
                     developerConnection = 'git@github.com:typetools/annotation-tools.git'
