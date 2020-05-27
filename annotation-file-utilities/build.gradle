@@ -616,6 +616,7 @@ task releaseBuild(type: GradleBuild) {
 
 publishing {
     publications {
+        // This is publishing to the local Maven repository.  Use PublishToMavenLocal to publish.
         mavenJava(MavenPublication) {
             artifactId = 'annotation-file-utilities'
             from components.java
