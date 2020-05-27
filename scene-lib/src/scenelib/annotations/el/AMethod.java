@@ -113,7 +113,7 @@ public class AMethod extends ADeclaration {
     /**
      * Set the type parameters of this method.
      *
-     * @param the list of type parameters
+     * @param typeParameters the list of type parameters
      */
     public void setTypeParameters(List<? extends TypeParameterElement> typeParameters) {
         if (typeParameters == null) {
