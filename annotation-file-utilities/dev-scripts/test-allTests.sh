@@ -10,8 +10,8 @@ if [ "$(uname)" = "Darwin" ] ; then
 else
   export JAVA_HOME=${JAVA_HOME:-$(dirname $(dirname $(readlink -f $(which javac))))}
 fi
-export AFU="${AFU:-$(cd annotation-file-utilities && pwd -P)}"
-export CHECKERFRAMEWORK="${CHECKERFRAMEWORK:-$(cd .. && pwd -P)/checker-framework}"
+export AFU="${AFU:-$(cd annotation-file-utilities >/dev/null 2>&1 && pwd -P)}"
+export CHECKERFRAMEWORK="${CHECKERFRAMEWORK:-$(cd .. >/dev/null 2>&1 && pwd -P)/checker-framework}"
 export PATH=$AFU/scripts:$JAVA_HOME/bin:$PATH
 
 (cd "${AFU}" && ./gradlew build allTests)
