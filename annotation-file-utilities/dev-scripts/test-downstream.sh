@@ -10,25 +10,25 @@ if [ "$(uname)" = "Darwin" ] ; then
 else
   export JAVA_HOME=${JAVA_HOME:-$(dirname $(dirname $(readlink -f $(which javac))))}
 fi
-export AFU="${AFU:-$(cd annotation-file-utilities && pwd -P)}"
-export CHECKERFRAMEWORK="${CHECKERFRAMEWORK:-$(cd .. && pwd -P)/checker-framework}"
+export AFU="${AFU:-$(cd annotation-file-utilities >/dev/null 2>&1 && pwd -P)}"
+export CHECKERFRAMEWORK="${CHECKERFRAMEWORK:-$(cd .. >/dev/null 2>&1 && pwd -P)/checker-framework}"
 export PATH=$AFU/scripts:$JAVA_HOME/bin:$PATH
 
-(cd ${AFU} && ./gradlew assemble)
+(cd "${AFU}" && ./gradlew assemble)
 
 if [ -d "/tmp/$USER/plume-scripts" ] ; then
-  (cd /tmp/$USER/plume-scripts && git pull -q) > /dev/null 2>&1
+  (cd "/tmp/$USER/plume-scripts" && git pull -q) > /dev/null 2>&1
 else
-  mkdir -p /tmp/$USER && git -C /tmp/$USER clone --depth 1 -q https://github.com/plume-lib/plume-scripts.git
+  mkdir -p "/tmp/$USER" && git -C "/tmp/$USER" clone --depth 1 -q https://github.com/plume-lib/plume-scripts.git
 fi
 
 # checker-framework and its downstream tests
-/tmp/$USER/plume-scripts/git-clone-related typetools checker-framework ${CHECKERFRAMEWORK}
-(cd ${CHECKERFRAMEWORK} && checker/bin-devel/build.sh)
+"/tmp/$USER/plume-scripts/git-clone-related" typetools checker-framework "${CHECKERFRAMEWORK}"
+(cd "${CHECKERFRAMEWORK}" && checker/bin-devel/build.sh)
 
-(cd ${CHECKERFRAMEWORK}/framework && ../gradlew wholeProgramInferenceTests)
+(cd "${CHECKERFRAMEWORK}/framework" && ../gradlew wholeProgramInferenceTests)
 
-/tmp/$USER/plume-scripts/git-clone-related typetools checker-framework-inference
+"/tmp/$USER/plume-scripts/git-clone-related" typetools checker-framework-inference
 (cd ../checker-framework-inference && . ./.travis-build-without-test.sh)
 
 (cd ../checker-framework-inference && ./gradlew dist && ./gradlew test)
