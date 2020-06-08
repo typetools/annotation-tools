@@ -506,7 +506,7 @@ public class Main {
   public static void main(String[] args) throws IOException {
 
     if (verbose) {
-      System.out.printf("insert-annotations-to-source (%s)",
+      System.out.printf("insert-annotations-to-source (%s)%n",
                         scenelib.annotations.io.classfile.ClassFileReader.INDEX_UTILS_VERSION);
     }
 

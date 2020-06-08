@@ -41,7 +41,6 @@ if [ "$DEBUG" = "1" ]; then
   echo "--- start of insert-annotations debugging output"
   echo "AFU=${AFU}"
   echo "ANNOTATION_FILE_UTILS=${ANNOTATION_FILE_UTILS}"
-  echo "LANGTOOLS=${LANGTOOLS}"
   echo "JAVAC_JAR=${JAVAC_JAR}"
   # Keep this in sync with the actual command below.
   echo "java -ea ${BOOTCLASSPATH} -cp ${JAVAC_JAR}:${AFU}/lib/plume-lib.jar:${ANNOTATION_FILE_UTILS}:${CLASSPATH} scenelib.annotations.io.classfile.ClassFileWriter $@"
