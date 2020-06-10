@@ -27,7 +27,8 @@ while [ "$#" -gt 0 ]; do
   esac
 done
 
-AFU=`cd \`dirname "$0"\`/.. >/dev/null 2>&1 && pwd`
+AFUSCRIPTS=$(dirname "$0")
+AFU=$(cd "$AFUSCRIPTS/.." >/dev/null 2>&1 && pwd)
 
 ANNOTATION_FILE_UTILS=${ANNOTATION_FILE_UTILS:-${AFU}/annotation-file-utilities-all.jar}
 JAVAC_JAR=${JAVAC_JAR:-${AFU}/lib/javac-9+181-r4173-1.jar}
