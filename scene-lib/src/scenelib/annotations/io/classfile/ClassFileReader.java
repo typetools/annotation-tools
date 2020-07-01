@@ -17,7 +17,7 @@ import scenelib.annotations.io.IndexFileWriter;
  *  from a class file into an {@link scenelib.annotations.el.AScene}.
  */
 public class ClassFileReader {
-  public static final String INDEX_UTILS_VERSION = "Annotation File Utilities v3.6.47";
+  public static final String INDEX_UTILS_VERSION = "Annotation File Utilities v3.9.10";
 
   @Option("-b omit annotations from bridge (compiler-created) methods")
   public static boolean ignore_bridge_methods = false;
