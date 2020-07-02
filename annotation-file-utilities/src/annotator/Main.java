@@ -1032,11 +1032,12 @@ public class Main {
   }
 
   /** A regular expression for classes in the java.lang package. */
-  private static Pattern javaLangClassPattern = Pattern.compile("^java.lang.[A-Za-z0-9_]+$");
+  private static Pattern javaLangClassPattern = Pattern.compile("^java\\.lang\\.[A-Za-z0-9_]+$");
 
   /**
    * Return true iff the class is a top-level class in the java.lang package.
    *
+   * @param classname the class to test
    * @return true iff the class is a top-level class in the java.lang package
    */
   private static boolean isJavaLangClass(String classname) {

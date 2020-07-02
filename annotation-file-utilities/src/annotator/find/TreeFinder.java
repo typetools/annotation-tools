@@ -169,12 +169,14 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
 
   /**
    * Returns the position of the first (non-commented) instance of a
-   * character at or after the given position.  (Assumes position is not
-   * inside a comment.)
+   * character at or after the given position.
    *
+   * @param c the character to search for
+   * @param start the position at which to start searching.  Must not be inside a comment.
+   * @return the position of the first instance of {@code c} after position {@code start}
    * @see #getNthInstanceInRange(char, int, int, int)
    */
-  private int getFirstInstanceAfter(char c, int i) {
+  private int getFirstInstanceAfter(char c, int start) {
     return getNthInstanceInRange(c, i, Integer.MAX_VALUE, 1);
   }
 
