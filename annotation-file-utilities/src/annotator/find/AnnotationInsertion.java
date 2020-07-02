@@ -104,8 +104,6 @@ public class AnnotationInsertion extends Insertion {
      *            if true, the annotation will be surrounded by block comments
      * @param abbreviate
      *            if true, the package name will be removed from the annotation.
-     *            The package name can be retrieved again by calling the
-     *            {@link #getPackageName()} method.
      * @return the text to insert
      */
     protected String getText(boolean comments, boolean abbreviate) {
@@ -143,8 +141,7 @@ public class AnnotationInsertion extends Insertion {
      * Returns the fully-qualified name of the annotation, given its string representation.
      * For example, given "@com.foo.Bar(baz)", returns "com.foo.Bar".
      *
-     * @param annotation the string representation of the annotation; starts with "@"
-     * @return the fully-qualified name of the annotation, given its string representation
+     * @return the fully-qualified name of the annotation
      */
     private String extractAnnotationFullyQualifiedName() {
         assert fullyQualifiedAnnotationText.startsWith("@");

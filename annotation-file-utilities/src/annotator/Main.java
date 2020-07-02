@@ -1036,7 +1036,8 @@ public class Main {
 
   /**
    * Return true iff the class is a top-level class in the java.lang package.
-   * @returns true iff the class is a top-level class in the java.lang package
+   *
+   * @return true iff the class is a top-level class in the java.lang package
    */
   private static boolean isJavaLangClass(String classname) {
     Matcher m = javaLangClassPattern.matcher(classname);
@@ -1045,7 +1046,7 @@ public class Main {
 
   /**
    * Filters out classes in the java.lang package from the given collection.
-   * @param a collection of class names
+   * @param classnames a collection of class names
    * @return the class names that are not in the java.lang package
    */
   private static Collection<String> nonJavaLangClasses(Collection<String> classnames) {
