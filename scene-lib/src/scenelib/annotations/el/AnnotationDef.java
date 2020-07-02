@@ -1,9 +1,10 @@
 package scenelib.annotations.el;
 
 import java.io.File;
-import java.util.*;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.reflect.Method;
+import java.util.*;
+import java.util.StringJoiner;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -307,39 +308,27 @@ public final class AnnotationDef extends AElement {
         return null;
     }
 
+    /** The printed representation is: "[meta-annos...] @name(args...)". */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("[");
-        // Not: sb.append(((AElement) this).toString());
-        // because it causes an infinite loop.
-        boolean first;
-        first = true;
-        for (Annotation a : tlAnnotationsHere) {
-            if (!first) {
-                sb.append(" ");
-            } else {
-                first=false;
+
+        String metaAnnos;
+        if (tlAnnotationsHere.isEmpty()) {
+            metaAnnos = "";
+        } else {
+            StringJoiner metaAnnosJoiner = new StringJoiner(" ", "[", "]");
+            for (Annotation a : tlAnnotationsHere) {
+                metaAnnosJoiner.add(a.toString());
             }
-            sb.append(a);
+            metaAnnos = metaAnnosJoiner.toString() + " ";
         }
-        sb.append("] ");
-        sb.append("@");
-        sb.append(name);
-        sb.append("(");
-        first = true;
+
+        StringJoiner args = new StringJoiner(",", "(", ")");
         for (Map.Entry<String, AnnotationFieldType> entry : fieldTypes.entrySet()) {
-            if (!first) {
-                sb.append(",");
-            } else {
-                first = false;
-            }
-            sb.append(entry.getValue().toString());
-            sb.append(" ");
-            sb.append(entry.getKey());
+            args. add(entry.getValue().toString() + " "+entry.getKey());
         }
-        sb.append(")");
-        return sb.toString();
+
+        return metaAnnos.toString() + "@" + name + args.toString();
     }
 
     public static void printClasspath() {
