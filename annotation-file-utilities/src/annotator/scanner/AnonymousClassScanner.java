@@ -55,7 +55,7 @@ public class AnonymousClassScanner extends TreePathScanner<Void, Integer> {
    * Creates a new AnonymousClassScanner that searches for the index of the given
    * tree, representing an anonymous class.
    *
-   * @param tree the anonymous class to search for
+   * @param anonclass the anonymous class to search for
    */
   private AnonymousClassScanner(Tree anonclass) {
     this.index = 1;             // start counting at 1

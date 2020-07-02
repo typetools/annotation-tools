@@ -33,7 +33,7 @@ public abstract class TypedInsertion extends Insertion {
   protected Type type;
 
   /**
-   * If true only the annotations from {@link type} will be inserted.
+   * If true only the annotations from {@link #type} will be inserted.
    */
   protected boolean annotationsOnly;
 

@@ -27,7 +27,7 @@ status=0
 
 ./gradlew checkBasicStyle || status=1
 # TODO: enable check-format when codebase is reformatted (after merging branches?)
-# ant check-format
+# ant check-format || status=1
 
 ./gradlew htmlValidate || status=1
 

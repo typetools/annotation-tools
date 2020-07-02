@@ -1375,8 +1375,9 @@ public final class IndexFileParser {
      * Parses and constructs a new AST entry, where none of the child selections require
      * arguments. For example, the call:
      *
-     * <pre>
-     * {@code newASTEntry(Kind.WHILE_LOOP, new String[] {"condition", "statement"});</pre>
+     * <pre>{@code
+     * newASTEntry(Kind.WHILE_LOOP, new String[] {"condition", "statement"});
+     * }</pre>
      *
      * constructs a while loop AST entry, where the valid child selectors are "condition" or
      * "statement".
@@ -1393,9 +1394,9 @@ public final class IndexFileParser {
     /**
      * Parses and constructs a new AST entry. For example, the call:
      *
-     * <pre>
-     * {@code newASTEntry(Kind.CASE, new String[] {"expression", "statement"}, new String[] {"statement"});
-     * </pre>
+     * <pre>{@code
+     * newASTEntry(Kind.CASE, new String[] {"expression", "statement"}, new String[] {"statement"});
+     * }</pre>
      *
      * constructs a case AST entry, where the valid child selectors are
      * "expression" or "statement" and the "statement" child selector requires

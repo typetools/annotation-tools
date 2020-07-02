@@ -257,7 +257,7 @@ public class AScene implements Cloneable {
 
     /**
      * Throw exception on visit if el == arg or !el.equals(arg).
-     * (See {@link checkClone(AScene, AScene)} for explanation.)
+     * (See {@link #checkClone(AScene, AScene)} for explanation.)
      */
     private static ElementVisitor<Void, AElement> checkVisitor =
         new ElementVisitor<Void, AElement>() {

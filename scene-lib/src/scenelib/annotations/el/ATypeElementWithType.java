@@ -97,7 +97,7 @@ public class ATypeElementWithType extends ATypeElement {
 
     /**
      * A map with {@link ATypeElementWithType}s as values. When
-     * {@link VivifyingMap#vivify(Object)} method is called, a new
+     * {@link VivifyingMap#getVivify(Object)} method is called, a new
      * {@code ATypeElementWithType} is constructed with the parameter to
      * {@code vivify} passed to {@code ATypeElementWithType}'s constructor. This
      * parameter is also used as the key into the map. This is used to map
