@@ -507,7 +507,7 @@ javadoc {
 task javadocPrivate(type: Javadoc) {
   description = 'Run Javadoc in strict mode.'
   source = sourceSets.main.allJava
-  classpath = sourceSets.main.runtimeClasspath
+  classpath = sourceSets.main.compileClasspath
   options.addStringOption('Xwerror', '-Xdoclint:all')
   options.memberLevel = JavadocMemberLevel.PRIVATE
 }
