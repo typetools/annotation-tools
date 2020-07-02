@@ -309,7 +309,7 @@ implements TypeAnnotationVisitor {
    * Else, has no effect.
    *
    * @param list the list of arguments actually visited
-   * @param correctLength the correct length of list
+   * @param idealLength the correct length of list
    * @param methodName the name of the method whose arguments went into list
    * @param sb the StringBuilder to append error messages to
    */

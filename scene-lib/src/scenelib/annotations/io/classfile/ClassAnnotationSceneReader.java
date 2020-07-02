@@ -373,7 +373,7 @@ extends EmptyVisitor {
 
     /**
      * Method that accepts an Object whose actual type is c[], where c is a
-     * primitive, and returns an equivalent List<Object> that contains
+     * primitive, and returns an equivalent {@code List<Object>} that contains
      * the same elements as in hiddenArray.
      */
     private List<Object> asList(Object hiddenArray) {

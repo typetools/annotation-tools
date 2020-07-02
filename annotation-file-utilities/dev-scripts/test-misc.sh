@@ -23,14 +23,17 @@ fi
 cd "${AFU}"
 ./gradlew assemble
 
-./gradlew checkBasicStyle
+status=0
+./gradlew checkBasicStyle || status=1
 # TODO: enable check-format when codebase is reformatted (after merging branches?)
-# ant check-format
+# ant check-format || status=1
 
-./gradlew htmlValidate
+./gradlew htmlValidate || status=1
 
-./gradlew javadoc
+./gradlew javadoc || status=1
 (./gradlew javadocPrivate > /tmp/warnings.txt 2>&1) || true
-"/tmp/$USER/plume-scripts/ci-lint-diff" /tmp/warnings.txt
+"/tmp/$USER/plume-scripts/ci-lint-diff" /tmp/warnings.txt || status=1
 (./gradlew requireJavadoc > /tmp/warnings.txt 2>&1) || true
-"/tmp/$USER/plume-scripts/ci-lint-diff" /tmp/warnings.txt
+"/tmp/$USER/plume-scripts/ci-lint-diff" /tmp/warnings.txt || status=1
+
+exit $status
