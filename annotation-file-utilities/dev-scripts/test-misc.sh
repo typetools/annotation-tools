@@ -30,7 +30,7 @@ status=0
 
 ./gradlew htmlValidate || status=1
 
-./gradlew javadoc
+./gradlew javadoc || status=1
 (./gradlew javadocPrivate > /tmp/warnings.txt 2>&1) || true
 "/tmp/$USER/plume-scripts/ci-lint-diff" /tmp/warnings.txt || status=1
 (./gradlew requireJavadoc > /tmp/warnings.txt 2>&1) || true
