@@ -25,6 +25,10 @@ import com.sun.source.util.TreePath;
 import org.checkerframework.checker.signature.qual.BinaryName;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+/**
+ * A criterion that matches a method with a specific signature
+ * (name, argument types, and return type).
+ */
 public class IsSigMethodCriterion implements Criterion {
 
   // The context is used for determining the fully qualified name of methods.
@@ -37,6 +41,7 @@ public class IsSigMethodCriterion implements Criterion {
     }
   }
 
+  /** Map from compilation unit to Context. */
   private static final Map<CompilationUnitTree, Context> contextCache = new HashMap<>();
 
   /** The full JVML signature, without return type. */
