@@ -502,7 +502,7 @@ task allTests(type: GradleBuild, group: 'Verification') {
 
 javadoc {
     options.memberLevel = JavadocMemberLevel.PUBLIC
-    options.addStringOption('quiet', '-Xdoclint:all')
+    options.addStringOption('Xdoclint:all', '-quiet')
 }
 
 task javadocPrivate(type: Javadoc) {
