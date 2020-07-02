@@ -42,8 +42,8 @@ public class IsSigMethodCriterion implements Criterion {
   private final String simpleMethodName;
   // list of parameters in Java, not JVML format
   private final List<@BinaryName String> fullyQualifiedParams;
-  // in Java, not JVML, format.  may be "void"
-  private final @BinaryName String returnType;
+  // in Java, not JVML, format.  null if return type is "void".
+  private final @Nullable @BinaryName String returnType;
 
   public IsSigMethodCriterion(String methodName) {
     this.fullMethodName = methodName.substring(0, methodName.indexOf(")") + 1);
@@ -66,7 +66,7 @@ public class IsSigMethodCriterion implements Criterion {
     }
     String returnTypeJvml = methodName.substring(methodName.indexOf(")") + 1);
     this.returnType = (returnTypeJvml.equals("V")
-                       ? "void"
+                       ? null
                        : Signatures.fieldDescriptorToBinaryName(returnTypeJvml));
   }
 
@@ -395,6 +395,7 @@ public class IsSigMethodCriterion implements Criterion {
     }
 
     if ((mt.getReturnType() != null) // must be a constructor
+        && (returnType != null)
         && (! matchTypeParam(returnType, mt.getReturnType(), typeToClassMap, context))) {
       Criteria.dbug.debug("IsSigMethodCriterion => false: Return types don't match%n");
       return false;
