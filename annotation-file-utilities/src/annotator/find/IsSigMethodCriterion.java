@@ -23,7 +23,7 @@ import com.sun.source.tree.VariableTree;
 import com.sun.source.util.TreePath;
 
 import org.checkerframework.checker.signature.qual.BinaryName;
-import org.checkerframework.checker.signature.qual.BinaryName;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class IsSigMethodCriterion implements Criterion {
 
