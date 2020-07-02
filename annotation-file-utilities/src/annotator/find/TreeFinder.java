@@ -177,7 +177,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
    * @see #getNthInstanceInRange(char, int, int, int)
    */
   private int getFirstInstanceAfter(char c, int start) {
-    return getNthInstanceInRange(c, i, Integer.MAX_VALUE, 1);
+    return getNthInstanceInRange(c, start, Integer.MAX_VALUE, 1);
   }
 
   /**
