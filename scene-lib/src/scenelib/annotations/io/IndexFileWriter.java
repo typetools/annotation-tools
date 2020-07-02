@@ -95,7 +95,7 @@ public final class IndexFileWriter {
     final PrintWriter pw;
 
     /**
-     * Print the annotation using the {@link pw} field, after formatting it.
+     * Print the annotation using the {@link #pw} field, after formatting it.
      * @param a the annotation to print
      */
     private void printAnnotation(Annotation a) {

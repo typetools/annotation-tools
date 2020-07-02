@@ -23,7 +23,12 @@ import com.sun.source.tree.VariableTree;
 import com.sun.source.util.TreePath;
 
 import org.checkerframework.checker.signature.qual.BinaryName;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+/**
+ * A criterion that matches a method with a specific signature
+ * (name, argument types, and return type).
+ */
 public class IsSigMethodCriterion implements Criterion {
 
   // The context is used for determining the fully qualified name of methods.
@@ -36,21 +41,28 @@ public class IsSigMethodCriterion implements Criterion {
     }
   }
 
+  /** Map from compilation unit to Context. */
   private static final Map<CompilationUnitTree, Context> contextCache = new HashMap<>();
 
-  private final String fullMethodName; // really the full JVML signature, sans return type
+  /** The full JVML signature, without return type. */
+  private final String signature;
+  /** The method name. */
   private final String simpleMethodName;
-  // list of parameters in Java, not JVML format
+  /** List of parameters in Java, not JVML, format. */
   private final List<@BinaryName String> fullyQualifiedParams;
-  // in Java, not JVML, format.  may be "void"
-  private final @BinaryName String returnType;
+  /** Return type in Java, not JVML, format.  null if return type is "void". */
+  private final @Nullable @BinaryName String returnType;
 
-  public IsSigMethodCriterion(String methodName) {
-    this.fullMethodName = methodName.substring(0, methodName.indexOf(")") + 1);
-    this.simpleMethodName = methodName.substring(0, methodName.indexOf("("));
+  /** Creates a new IsSigMethodCriterion.
+   *
+   * @param fullSignature the full JVML signature
+   */
+  public IsSigMethodCriterion(String fullSignature) {
+    this.signature = fullSignature.substring(0, fullSignature.indexOf(")") + 1);
+    this.simpleMethodName = fullSignature.substring(0, fullSignature.indexOf("("));
 //    this.fullyQualifiedParams = new ArrayList<String>();
-//    for (String s : methodName.substring(
-//        methodName.indexOf("(") + 1, methodName.indexOf(")")).split(",")) {
+//    for (String s : fullSignature.substring(
+//        fullSignature.indexOf("(") + 1, fullSignature.indexOf(")")).split(",")) {
 //      if (s.length() > 0) {
 //        fullyQualifiedParams.add(s);
 //      }
@@ -58,15 +70,15 @@ public class IsSigMethodCriterion implements Criterion {
     this.fullyQualifiedParams = new ArrayList<>();
     try {
       parseParams(
-        methodName.substring(methodName.indexOf("(") + 1,
-            methodName.indexOf(")")));
+        fullSignature.substring(fullSignature.indexOf("(") + 1,
+            fullSignature.indexOf(")")));
     } catch (Exception e) {
       throw new RuntimeException("Caught exception while parsing method: " +
-          methodName, e);
+          fullSignature, e);
     }
-    String returnTypeJvml = methodName.substring(methodName.indexOf(")") + 1);
+    String returnTypeJvml = fullSignature.substring(fullSignature.indexOf(")") + 1);
     this.returnType = (returnTypeJvml.equals("V")
-                       ? "void"
+                       ? null
                        : Signatures.fieldDescriptorToBinaryName(returnTypeJvml));
   }
 
@@ -90,7 +102,7 @@ public class IsSigMethodCriterion implements Criterion {
     } else if (firstChar.equals("L")) {
       return "L" + restOfParams.substring(1, restOfParams.indexOf(";") + 1);
     } else {
-      throw new RuntimeException("Unknown method params: " + fullMethodName + " with remainder: " + restOfParams);
+      throw new RuntimeException("Unknown method params: " + signature + " with remainder: " + restOfParams);
     }
   }
 
@@ -395,6 +407,7 @@ public class IsSigMethodCriterion implements Criterion {
     }
 
     if ((mt.getReturnType() != null) // must be a constructor
+        && (returnType != null)
         && (! matchTypeParam(returnType, mt.getReturnType(), typeToClassMap, context))) {
       Criteria.dbug.debug("IsSigMethodCriterion => false: Return types don't match%n");
       return false;
@@ -540,6 +553,6 @@ public class IsSigMethodCriterion implements Criterion {
 
   @Override
   public String toString() {
-    return "IsSigMethodCriterion: " + fullMethodName;
+    return "IsSigMethodCriterion: " + signature;
   }
 }

@@ -3,7 +3,7 @@ import java.nio.file.Files
 
 plugins {
     // https://plugins.gradle.org/plugin/com.github.johnrengelman.shadow
-    id 'com.github.johnrengelman.shadow' version '5.2.0'
+    id 'com.github.johnrengelman.shadow' version '6.0.0'
     id 'java'
 }
 apply plugin: 'java'
@@ -11,7 +11,7 @@ apply plugin: 'com.github.johnrengelman.shadow'
 
 group 'org.checkerframework'
 // TODO: Use this in the release process.
-version '3.8.11'
+version '3.9.10'
 
 sourceCompatibility = 1.8
 
@@ -507,9 +507,10 @@ javadoc {
 task javadocPrivate(type: Javadoc) {
   description = 'Run Javadoc in strict mode.'
   source = sourceSets.main.allJava
-  classpath = sourceSets.main.runtimeClasspath
+  classpath = sourceSets.main.compileClasspath + sourceSets.main.runtimeClasspath
   options.addStringOption('Xwerror', '-Xdoclint:all')
   options.memberLevel = JavadocMemberLevel.PRIVATE
+  options.addStringOption('Xmaxwarns', '1000')
 }
 
 configurations {
