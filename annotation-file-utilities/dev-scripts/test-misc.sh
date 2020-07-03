@@ -24,6 +24,7 @@ cd "${AFU}"
 ./gradlew assemble
 
 status=0
+
 ./gradlew checkBasicStyle || status=1
 # TODO: enable check-format when codebase is reformatted (after merging branches?)
 # ant check-format || status=1
