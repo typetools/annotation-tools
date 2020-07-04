@@ -74,6 +74,9 @@ task compileAsmx(type: Exec, group: 'Build') {
             '-Dproduct.noshrink=true',
             'bin'
     ]
+    if (gradle.startParameter.logLevel == LogLevel.QUIET) {
+      args += '-q'
+    }
 }
 
 task cleanAsmx(type: Exec) {
