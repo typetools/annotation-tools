@@ -49,7 +49,7 @@ dependencies {
         javacJar group: 'com.google.errorprone', name: 'javac', version: "9+181-r4173-1"
         implementation 'com.google.errorprone:javac:9+181-r4173-1'
     }
-    implementation 'org.plumelib:bcel-util:1.1.8'
+    implementation 'org.plumelib:bcel-util:1.1.9'
     implementation 'org.plumelib:options:1.0.4'
     implementation 'org.plumelib:plume-util:1.1.4'
     implementation 'org.plumelib:reflection-util:0.2.2'
