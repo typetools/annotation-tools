@@ -476,7 +476,7 @@ def createCheckTypeTask(checker, shortName) {
             options.compilerArgs += [
                     "-Xbootclasspath/p:${checkerDist}/jdk8.jar"
             ]
-            options.forkOptions.jvmArgs += ["-Xbootclasspath/p:${configurations.javacJar.asPath}"]
+            options.forkOptions.jvmArgs += ["-Xbootclasspath/p:${configurations.javacJar.asPath}".toString()]
         }
     }
 }
