@@ -1,5 +1,6 @@
 package scenelib.annotations.el;
 
+import org.checkerframework.checker.signature.qual.BinaryName;
 import java.io.File;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.reflect.Method;
@@ -26,7 +27,7 @@ public final class AnnotationDef extends AElement {
      * The binary name of the annotation type, such as
      * "foo.Bar$Baz" for inner class Baz in class Bar in package foo.
      */
-    public final String name;
+    public final @BinaryName String name;
 
     /**
      * A map of the names of this annotation type's fields to their types. Since
