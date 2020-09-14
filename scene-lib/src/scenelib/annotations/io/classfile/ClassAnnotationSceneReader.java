@@ -23,6 +23,7 @@ import scenelib.annotations.field.*;
 import com.sun.tools.javac.code.TargetType;
 import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
 
+import org.checkerframework.checker.signature.qual.BinaryName;
 import org.checkerframework.checker.signature.qual.ClassGetName;
 
 /**
@@ -259,7 +260,9 @@ extends EmptyVisitor {
       } catch (ClassNotFoundException e) {
         // This is an internal JDK annotation such as jdk.Profile+Annotation .
         if (annoTypeName.contains("+")) {
-          return Annotations.createValueAnnotationDef(annoTypeName,
+          @SuppressWarnings("signature:assignment.type.incompatible") // special annotation with "+" in name
+            @BinaryName String annoTypeName2 = annoTypeName;
+          return Annotations.createValueAnnotationDef(annoTypeName2,
               Annotations.noAnnotations, BasicAFT.forType(int.class),
                                                       String.format("Could not find class %s: %s",
                                                                     jvmlClassName, e.getMessage()));
@@ -269,6 +272,7 @@ extends EmptyVisitor {
         throw new Error(e);
       }
 
+      @SuppressWarnings("signature:argument.type.incompatible")  // no an array, so ClassGetName => BinaryName
       AnnotationDef ad = AnnotationDef.fromClass(annoClass, annotationDefinitions);
 
       return ad;

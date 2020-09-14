@@ -5,6 +5,8 @@ import java.util.*;
 import scenelib.annotations.field.*;
 import scenelib.annotations.el.AnnotationDef;
 
+import org.checkerframework.checker.signature.qual.BinaryName;
+
 /**
  * An {@link AnnotationBuilder} builds a single annotation object after the
  * annotation's fields have been supplied one by one.
@@ -26,7 +28,7 @@ public class AnnotationBuilder {
     // we have it before starting.
     AnnotationDef def;
 
-    private String typeName;
+    private @BinaryName String typeName;
     // The top-level meta-annotations that appear directly on the
     // annotation being built. "tl" stands for "top-level".
     Set<Annotation> tlAnnotationsHere;
@@ -45,7 +47,7 @@ public class AnnotationBuilder {
     Map<String, Object> fieldValues =
         new LinkedHashMap<>();
 
-    public String typeName() {
+    public @BinaryName String typeName() {
         if (def != null) {
             return def.name;
         } else {
@@ -227,14 +229,14 @@ public class AnnotationBuilder {
         this.source = source;
     }
 
-    AnnotationBuilder(String typeName, String source) {
+    AnnotationBuilder(@BinaryName String typeName, String source) {
         assert typeName != null;
         assert source != null;
         this.typeName = typeName;
         this.source = source;
     }
 
-    AnnotationBuilder(String typeName, Set<Annotation> tlAnnotationsHere, String source) {
+    AnnotationBuilder(@BinaryName String typeName, Set<Annotation> tlAnnotationsHere, String source) {
         assert typeName != null;
         assert source != null;
         this.typeName = typeName;

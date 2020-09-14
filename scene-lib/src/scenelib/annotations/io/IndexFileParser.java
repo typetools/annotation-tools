@@ -55,6 +55,7 @@ import scenelib.annotations.field.EnumAFT;
 import scenelib.annotations.field.ScalarAFT;
 import scenelib.annotations.util.coll.VivifyingMap;
 
+import org.plumelib.reflection.Signatures;
 import org.plumelib.util.ArraysPlume;
 import org.plumelib.util.FileIOException;
 import org.plumelib.util.Pair;
@@ -65,7 +66,11 @@ import scenelib.type.BoundedType.BoundKind;
 import scenelib.type.DeclaredType;
 import scenelib.type.Type;
 
+import org.checkerframework.checker.signature.qual.BinaryName;
 import org.checkerframework.checker.signature.qual.ClassGetName;
+import org.checkerframework.checker.signature.qual.DotSeparatedIdentifiers;
+import org.checkerframework.checker.signature.qual.Identifier;
+import org.checkerframework.framework.qual.EnsuresQualifierIf;
 
 /**
  * IndexFileParser provides static methods
@@ -194,6 +199,8 @@ public final class IndexFileParser {
         Collections.addAll(knownKeywords, knownKeywords_array);
     }
 
+    @SuppressWarnings("signature:contracts.conditional.postcondition.not.satisfied") // string parsing
+    @EnsuresQualifierIf(result = true, expression = "#1", qualifier = Identifier.class)
     private boolean isValidIdentifier(String x) {
         if (x.length() == 0 || !Character.isJavaIdentifierStart(x.charAt(0))
                 || knownKeywords.contains(x))
@@ -206,20 +213,20 @@ public final class IndexFileParser {
         return true;
     }
 
-    private String checkIdentifier() {
+    private @Identifier String checkIdentifier() {
         if (st.sval == null) {
             return null;
         } else {
             String val = st.sval;
             if (st.ttype == TT_WORD && isValidIdentifier(val)) {
-                return st.sval;
+                return val;
             } else {
                 return null;
             }
         }
     }
 
-    private String matchIdentifier() throws IOException {
+    private @Identifier String matchIdentifier() throws IOException {
         String x = checkIdentifier();
         if (x != null) {
             st.nextToken();
@@ -229,7 +236,7 @@ public final class IndexFileParser {
         }
     }
 
-    private String expectIdentifier() throws IOException, ParseException {
+    private @Identifier String expectIdentifier() throws IOException, ParseException {
         String id = matchIdentifier();
         if (id == null) { throw new ParseException("Expected an identifier"); }
         return id;
@@ -653,7 +660,8 @@ public final class IndexFileParser {
 
         expectChar('@');
         String basename = expectIdentifier();
-        String fullName = curPkgPrefix + basename;
+        @SuppressWarnings("signature")  // string concatenation
+        @BinaryName String fullName = curPkgPrefix + basename;
 
         AnnotationDef ad = new AnnotationDef(fullName, source);
         expectChar(':');

@@ -1,6 +1,7 @@
 package scenelib.annotations;
 
 import java.util.Arrays;
+
 import scenelib.annotations.el.AnnotationDef;
 import scenelib.annotations.field.AnnotationAFT;
 import scenelib.annotations.field.AnnotationFieldType;
@@ -15,6 +16,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.checkerframework.checker.signature.qual.BinaryName;
 
 /**
  * This noninstantiable class provides useful static methods related to
@@ -67,7 +70,7 @@ public abstract class Annotations {
     }
 
     // Create an annotation definition with only a value field.
-    public static AnnotationDef createValueAnnotationDef(String name, Set<Annotation> metaAnnotations, AnnotationFieldType aft, String source) {
+    public static AnnotationDef createValueAnnotationDef(@BinaryName String name, Set<Annotation> metaAnnotations, AnnotationFieldType aft, String source) {
         return new AnnotationDef(name, metaAnnotations, valueFieldTypeOnly(aft), source);
     }
 

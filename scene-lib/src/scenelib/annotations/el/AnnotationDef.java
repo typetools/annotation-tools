@@ -46,7 +46,7 @@ public final class AnnotationDef extends AElement {
      * @param name the binary name of the annotation type
      * @param source where the annotation came from, such as a filename
      */
-    public AnnotationDef(String name, String source) {
+    public AnnotationDef(@BinaryName String name, String source) {
         super("annotation: " + name);
         assert name != null;
         assert source != null;
@@ -64,7 +64,8 @@ public final class AnnotationDef extends AElement {
      * @return an AnnotationDef for the given annotation type
      */
     public static AnnotationDef fromClass(Class<? extends java.lang.annotation.Annotation> annoType, Map<String,AnnotationDef> adefs) {
-        String name = annoType.getName();
+        @SuppressWarnings("signature:assignment.type.incompatible") // not an array, so ClassGetName => BinaryName
+        @BinaryName        String name = annoType.getName();
         assert name != null;
 
         if (adefs.containsKey(name)) {
@@ -96,7 +97,7 @@ public final class AnnotationDef extends AElement {
         return result;
     }
 
-    public AnnotationDef(String name, Set<Annotation> tlAnnotationsHere, String source) {
+    public AnnotationDef(@BinaryName String name, Set<Annotation> tlAnnotationsHere, String source) {
         super("annotation: " + name);
         assert name != null;
         assert source != null;
@@ -112,11 +113,11 @@ public final class AnnotationDef extends AElement {
      * Uses {@link #setFieldTypes} to protect the
      * immutability of the annotation definition.
      *
-     * @param name the fully-qualified type name of the annotation
+     * @param name the binary name of the annotation
      * @param fieldTypes the annotation's element types
      * @param source where the annotation came from, such as a filename
      */
-    public AnnotationDef(String name, Set<Annotation> tlAnnotationsHere, Map<String, ? extends AnnotationFieldType> fieldTypes, String source) {
+    public AnnotationDef(@BinaryName String name, Set<Annotation> tlAnnotationsHere, Map<String, ? extends AnnotationFieldType> fieldTypes, String source) {
         this(name, tlAnnotationsHere, source);
         setFieldTypes(fieldTypes);
     }
