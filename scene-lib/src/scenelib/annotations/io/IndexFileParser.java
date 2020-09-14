@@ -233,7 +233,8 @@ public final class IndexFileParser {
     }
 
     /** Returns the next token, if it is an identifier.  Advances parsing past the identifier.
-     * @return the next token, so long as it is an identifier; otherwise, returns null */
+     * @return the next token, so long as it is an identifier; otherwise, returns null
+     * @throws IOException if there is trouble reading the index file */
     private @Identifier String matchIdentifier() throws IOException {
         String x = checkIdentifier();
         if (x != null) {
@@ -245,7 +246,8 @@ public final class IndexFileParser {
     }
 
     /** Returns the next token, if it is an identifier.  Advances parsing past the identifier.
-     * @return the next token, so long as it is an identifier; otherwise, throws ParseException */
+     * @return the next token, so long as it is an identifier; otherwise, throws ParseException
+     * @throws IOException if there is trouble reading the index file */
     private @Identifier String expectIdentifier() throws IOException, ParseException {
         String id = matchIdentifier();
         if (id == null) { throw new ParseException("Expected an identifier"); }

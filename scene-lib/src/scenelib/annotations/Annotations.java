@@ -69,7 +69,12 @@ public abstract class Annotations {
         return Collections.singletonMap("value", valueValue);
     }
 
-    // Create an annotation definition with only a value field.
+    /** Create an annotation definition with only a {@code value} field.
+     * @param name the name of the annotation being built
+     * @param metaAnnotations the meta-annotations that appear on the annotation definiition
+     * @param aft the value of the {@code value} field
+     * @param source where the annotation came from, such as a filename
+     */
     public static AnnotationDef createValueAnnotationDef(@BinaryName String name, Set<Annotation> metaAnnotations, AnnotationFieldType aft, String source) {
         return new AnnotationDef(name, metaAnnotations, valueFieldTypeOnly(aft), source);
     }

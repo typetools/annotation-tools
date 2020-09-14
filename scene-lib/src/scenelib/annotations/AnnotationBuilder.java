@@ -232,6 +232,11 @@ public class AnnotationBuilder {
         this.source = source;
     }
 
+    /**
+     * Create a new AnnotationBuilder.
+     * @param typeName the name of the annotation being built
+     * @param source where the annotation came from, such as a filename
+     */
     AnnotationBuilder(@BinaryName String typeName, String source) {
         assert typeName != null;
         assert source != null;
@@ -239,6 +244,13 @@ public class AnnotationBuilder {
         this.source = source;
     }
 
+    /**
+     * Create a new AnnotationBuilder.
+     * @param typeName the name of the annotation being built
+     * @param tlAnnotationsHere the top-level meta-annotations that appear directly on the
+     * annotation being built. "tl" stands for "top-level".
+     * @param source where the annotation came from, such as a filename
+     */
     AnnotationBuilder(@BinaryName String typeName, Set<Annotation> tlAnnotationsHere, String source) {
         assert typeName != null;
         assert source != null;

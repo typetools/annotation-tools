@@ -97,6 +97,13 @@ public final class AnnotationDef extends AElement {
         return result;
     }
 
+    /**
+     * Constructs an empty (so far) annotation definition.
+     *
+     * @param name the binary name of the annotation
+     * @param tlAnnotationsHere the meta-annotations that are directly on the annotation definition
+     * @param source where the annotation came from, such as a filename
+     */
     public AnnotationDef(@BinaryName String name, Set<Annotation> tlAnnotationsHere, String source) {
         super("annotation: " + name);
         assert name != null;
@@ -114,7 +121,7 @@ public final class AnnotationDef extends AElement {
      * immutability of the annotation definition.
      *
      * @param name the binary name of the annotation
-     @param tlAnnotationsHere the meta-annotations that are directly on the annotation definition
+     * @param tlAnnotationsHere the meta-annotations that are directly on the annotation definition
      * @param fieldTypes the annotation's element types
      * @param source where the annotation came from, such as a filename
      */
