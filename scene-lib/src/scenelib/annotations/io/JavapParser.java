@@ -99,6 +99,8 @@ public final class JavapParser {
 
     /** Parse the head of an annotation definition.
      * @return the binary name of the annotation
+     * @throws IOException if there is trouble reading the index file
+     * @throws ParseException if the file contents are not valid
      */
     private @BinaryName String parseAnnotationHead() throws IOException, ParseException {
         @SuppressWarnings("signature:assignment.type.incompatible") // string manipulation
