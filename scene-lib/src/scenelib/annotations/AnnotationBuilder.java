@@ -24,13 +24,14 @@ import org.checkerframework.checker.signature.qual.BinaryName;
  */
 public class AnnotationBuilder {
 
-    // Sometimes, we build the AnnotationDef at the very end, and sometimes
-    // we have it before starting.
+    /** Sometimes, we build the AnnotationDef at the very end, and sometimes
+     * we have it before starting. */
     AnnotationDef def;
 
+    /** The name of the annotation being built. */
     private @BinaryName String typeName;
-    // The top-level meta-annotations that appear directly on the
-    // annotation being built. "tl" stands for "top-level".
+    /** The top-level meta-annotations that appear directly on the
+     * annotation being built. "tl" stands for "top-level". */
     Set<Annotation> tlAnnotationsHere;
 
     /** Where the annotation came from, such as a filename. */
@@ -47,6 +48,8 @@ public class AnnotationBuilder {
     Map<String, Object> fieldValues =
         new LinkedHashMap<>();
 
+    /** Returns the name of the annotation.
+     * @return the name of the annotation */
     public @BinaryName String typeName() {
         if (def != null) {
             return def.name;

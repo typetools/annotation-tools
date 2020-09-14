@@ -199,6 +199,10 @@ public final class IndexFileParser {
         Collections.addAll(knownKeywords, knownKeywords_array);
     }
 
+    /** Returns true if the given string is an identifier.
+        @param x a string
+        @return true if the given string is an identifier
+    */
     @SuppressWarnings("signature:contracts.conditional.postcondition.not.satisfied") // string parsing
     @EnsuresQualifierIf(result = true, expression = "#1", qualifier = Identifier.class)
     private boolean isValidIdentifier(String x) {
@@ -213,6 +217,8 @@ public final class IndexFileParser {
         return true;
     }
 
+    /** Returns the next token, if it is an identifier.  Does not advance parsing past the identifier.
+     * @return the next token, so long as it is an identifier; otherwise, returns null */
     private @Identifier String checkIdentifier() {
         if (st.sval == null) {
             return null;
@@ -226,6 +232,8 @@ public final class IndexFileParser {
         }
     }
 
+    /** Returns the next token, if it is an identifier.  Advances parsing past the identifier.
+     * @return the next token, so long as it is an identifier; otherwise, returns null */
     private @Identifier String matchIdentifier() throws IOException {
         String x = checkIdentifier();
         if (x != null) {
@@ -236,6 +244,8 @@ public final class IndexFileParser {
         }
     }
 
+    /** Returns the next token, if it is an identifier.  Advances parsing past the identifier.
+     * @return the next token, so long as it is an identifier; otherwise, throws ParseException */
     private @Identifier String expectIdentifier() throws IOException, ParseException {
         String id = matchIdentifier();
         if (id == null) { throw new ParseException("Expected an identifier"); }
