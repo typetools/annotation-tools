@@ -18,6 +18,8 @@ import com.sun.tools.javac.code.TypeAnnotationPosition;
 
 import org.plumelib.util.FileIOException;
 
+import org.checkerframework.checker.signature.qual.BinaryName;
+
 /**
  * <code>JavapParser</code> provides a static method that parses a class dump
  * in the form produced by <code>xjavap -s -verbose -annotations</code> and adds
@@ -95,8 +97,14 @@ public final class JavapParser {
         }
     }
 
-    private String parseAnnotationHead() throws IOException, ParseException {
-        String annoTypeName = line.substring(
+    /** Parse the head of an annotation definition.
+     * @return the binary name of the annotation
+     * @throws IOException if there is trouble reading the index file
+     * @throws ParseException if the file contents are not valid
+     */
+    private @BinaryName String parseAnnotationHead() throws IOException, ParseException {
+        @SuppressWarnings("signature:assignment.type.incompatible") // string manipulation
+        @BinaryName String annoTypeName = line.substring(
                 line.indexOf(annotationHead) + annotationHead.length(),
                 line.length() - 1).replace('/', '.');
         nextLine();

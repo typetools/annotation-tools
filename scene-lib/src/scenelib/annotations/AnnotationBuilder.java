@@ -5,6 +5,8 @@ import java.util.*;
 import scenelib.annotations.field.*;
 import scenelib.annotations.el.AnnotationDef;
 
+import org.checkerframework.checker.signature.qual.BinaryName;
+
 /**
  * An {@link AnnotationBuilder} builds a single annotation object after the
  * annotation's fields have been supplied one by one.
@@ -22,13 +24,14 @@ import scenelib.annotations.el.AnnotationDef;
  */
 public class AnnotationBuilder {
 
-    // Sometimes, we build the AnnotationDef at the very end, and sometimes
-    // we have it before starting.
+    /** Sometimes, we build the AnnotationDef at the very end, and sometimes
+     * we have it before starting. */
     AnnotationDef def;
 
-    private String typeName;
-    // The top-level meta-annotations that appear directly on the
-    // annotation being built. "tl" stands for "top-level".
+    /** The name of the annotation being built. */
+    private @BinaryName String typeName;
+    /** The top-level meta-annotations that appear directly on the
+     * annotation being built. "tl" stands for "top-level". */
     Set<Annotation> tlAnnotationsHere;
 
     /** Where the annotation came from, such as a filename. */
@@ -45,7 +48,9 @@ public class AnnotationBuilder {
     Map<String, Object> fieldValues =
         new LinkedHashMap<>();
 
-    public String typeName() {
+    /** Returns the name of the annotation.
+     * @return the name of the annotation */
+    public @BinaryName String typeName() {
         if (def != null) {
             return def.name;
         } else {
@@ -227,14 +232,26 @@ public class AnnotationBuilder {
         this.source = source;
     }
 
-    AnnotationBuilder(String typeName, String source) {
+    /**
+     * Create a new AnnotationBuilder.
+     * @param typeName the name of the annotation being built
+     * @param source where the annotation came from, such as a filename
+     */
+    AnnotationBuilder(@BinaryName String typeName, String source) {
         assert typeName != null;
         assert source != null;
         this.typeName = typeName;
         this.source = source;
     }
 
-    AnnotationBuilder(String typeName, Set<Annotation> tlAnnotationsHere, String source) {
+    /**
+     * Create a new AnnotationBuilder.
+     * @param typeName the name of the annotation being built
+     * @param tlAnnotationsHere the top-level meta-annotations that appear directly on the
+     * annotation being built. "tl" stands for "top-level".
+     * @param source where the annotation came from, such as a filename
+     */
+    AnnotationBuilder(@BinaryName String typeName, Set<Annotation> tlAnnotationsHere, String source) {
         assert typeName != null;
         assert source != null;
         this.typeName = typeName;
