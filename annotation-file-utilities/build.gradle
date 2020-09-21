@@ -75,6 +75,9 @@ task compileAsmx(type: Exec, group: 'Build') {
             'bin'
     ]
     if (gradle.startParameter.logLevel == LogLevel.QUIET) {
+      // Note that passing '-q' does NOT prevent ant's "BUILD SUCCESSFUL" output.
+      // There doesn't seem t be a good way to do that, per
+      // https://stackoverflow.com/questions/14394390/avoid-printing-build-successful-after-ant-exits-a-target
       args += '-q'
     }
 }
