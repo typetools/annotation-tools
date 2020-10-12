@@ -27,8 +27,3 @@ fi
 (cd "${CHECKERFRAMEWORK}" && checker/bin-devel/build.sh)
 
 (cd "${CHECKERFRAMEWORK}/framework" && ../gradlew wholeProgramInferenceTests)
-
-"/tmp/$USER/plume-scripts/git-clone-related" typetools checker-framework-inference
-(cd ../checker-framework-inference && . ./.travis-build-without-test.sh)
-
-(cd ../checker-framework-inference && ./gradlew dist && ./gradlew test)
