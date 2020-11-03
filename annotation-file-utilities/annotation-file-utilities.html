@@ -22,7 +22,12 @@
         <ul>
           <li><a href="#insert-annotations">Insert-annotations</a></li>
           <li><a href="#extract-annotations">Extract-annotations</a></li>
-          <li><a href="#insert-annotations-to-source">Insert-annotations-to-source</a></li>
+          <li><a href="#insert-annotations-to-source">Insert-annotations-to-source</a>
+            <ul>
+              <li><a href="#insert-annotations-to-source-classpath">Classpath</a></a></li>
+              <li><a href="#insert-annotations-to-source-locations">Locations in source code must exist</a></a></li>
+              <li><a href="#insert-annotations-to-source-command-line-options">Command-line options</a></a></li>
+            </ul></li>
         </ul></li>
       <li><a href="#implementation">Design and Implementation Details</a>
         <ul>
@@ -314,7 +319,7 @@ for full usage information.
 </p>
 
 
-<h3 id="insert-annotations-to-source">Insert-annotations-to-source </h3>
+<h3 id="insert-annotations-to-source">Insert-annotations-to-source</h3>
 
 <p>
 To insert annotations specified by an annotation file into a Java source file,
@@ -338,13 +343,23 @@ file types freely; if the source files have no overlapping definitions
 and the program exits normally, the results are the same as if the
 program were run once for each source file, with <em>all</em> JAIFs
 given for each run.
-Run:
+</p>
+
+<p>
+The command-line arguments
+appear <a href="insert-annotations-to-source-command-line-options">below</a>,
+and usage information is also available by running
 </p>
 
 <pre><code>insert-annotations-to-source --help</code></pre>
 
+
+<h4 id="insert-annotations-to-source-classpath">Classpath</a></h4>
+
 <p>
-for full usage information.
+Your classpath must include classes that are arguments to annotations.
+For example, to insert <code>@A(element = B.class)</code>, your classpath
+must contain <code>B.class</code>.
 </p>
 
 <p>
@@ -354,10 +369,11 @@ You can insert annotations on class/field/method declarations and
 signatures without the class on your classpath.
 </p>
 
+
+<h4 id="insert-annotations-to-source-locations">Locations in source code must exist</a></h4>
+
 <p>
-In general (but see below for exceptions), your source code needs to
-contain the locations that your
-<code>.jaif</code> file references.  In particular, if the
+If the
 <code>.jaif</code> file contains annotations for a type parameter, but the
 source code uses a raw type, then you will get an error such as
 </p>
@@ -371,9 +387,10 @@ In this case, you should add type arguments, such as changing
 <pre>  public void pushNonezeroRing(Stack stack, Hashtable seen) {</pre>
 <p>to</p>
 <pre>  public void pushNonezeroRing(Stack&lt;Edge&gt; stack, Hashtable&lt;Edge, ?&gt; seen) {</pre>
+
 <p>
-In a few cases, insert-annotations-to-source will generate "default"
-code to provide a location for an annotation.  These include
+In the following cases, insert-annotations-to-source will generate
+code to provide a location for an annotation:
 </p>
 <ul>
 <li>method and constructor <a href="https://docs.oracle.com/javase/specs/jls/se8/html/jls-8.html#jls-8.4.1-220">receivers;</a></li>
@@ -382,6 +399,9 @@ code to provide a location for an annotation.  These include
 <li>nullary constructor definitions; and</li>
 <li>explicit constructor invocations for literal arrays (e.g., <code>{"a", "b"}</code> becomes <code>new String[] {"a", "b"}</code>).</li>
 </ul>
+
+
+<h4 id="insert-annotations-to-source-command-line-options">Command-line options</a></h4>
 
 <p>
 The command-line options are as follows:

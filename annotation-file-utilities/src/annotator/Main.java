@@ -643,10 +643,17 @@ public class Main {
           System.err.println("Error while parsing annotation file " + arg + " at line "
               + (e.lineNumber + 1) + ":");
           if (e.getMessage() != null) {
-            System.err.println('\t' + e.getMessage());
+            System.err.println("  " + e.getMessage());
           }
           if (e.getCause() != null && e.getCause().getMessage() != null) {
-            System.err.println('\t' + e.getCause().getMessage());
+            String causeMessage = e.getCause().getMessage();
+            System.err.println("  " + causeMessage);
+            if (causeMessage.startsWith("Could not load class: ")) {
+              System.err.println(
+                  "To fix the problem, add class "
+                      + causeMessage.substring(22)
+                      + " to the classpath.");
+            }
           }
           if (print_error_stack) {
             e.printStackTrace();
