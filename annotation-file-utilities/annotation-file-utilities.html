@@ -22,7 +22,12 @@
         <ul>
           <li><a href="#insert-annotations">Insert-annotations</a></li>
           <li><a href="#extract-annotations">Extract-annotations</a></li>
-          <li><a href="#insert-annotations-to-source">Insert-annotations-to-source</a></li>
+          <li><a href="#insert-annotations-to-source">Insert-annotations-to-source</a>
+            <ul>
+              <li><a href="#insert-annotations-to-source-classpath">Classpath</a></li>
+              <li><a href="#insert-annotations-to-source-locations">Locations in source code must exist</a></li>
+              <li><a href="#insert-annotations-to-source-command-line-options">Command-line options</a></li>
+            </ul></li>
         </ul></li>
       <li><a href="#implementation">Design and Implementation Details</a>
         <ul>
@@ -269,7 +274,10 @@ Run:
 <pre><code>insert-annotations --help</code></pre>
 
 <p>
-for full usage information.
+for usage information.
+In addition to the command-line arguments mentioned there, you can also set
+the classpath via the <code>-cp</code> or <code>--classpath</code>
+command-line option.
 </p>
 
 
@@ -299,22 +307,20 @@ run once for each class in sequence.
 </p>
 
 <p>
-The <code>-cp</code> and <code>-classpath</code> command-line options set
-the classpath to use to look up annotations.
-</p>
-
-<p>
 Run:
 </p>
 
 <pre><code>extract-annotations --help</code></pre>
 
 <p>
-for full usage information.
+for usage information.
+In addition to the command-line arguments mentioned there,
+the <code>-cp</code> and <code>-classpath</code> command-line options set
+the classpath to use to look up annotations.
 </p>
 
 
-<h3 id="insert-annotations-to-source">Insert-annotations-to-source </h3>
+<h3 id="insert-annotations-to-source">Insert-annotations-to-source</h3>
 
 <p>
 To insert annotations specified by an annotation file into a Java source file,
@@ -338,13 +344,20 @@ file types freely; if the source files have no overlapping definitions
 and the program exits normally, the results are the same as if the
 program were run once for each source file, with <em>all</em> JAIFs
 given for each run.
-Run:
 </p>
 
-<pre><code>insert-annotations-to-source --help</code></pre>
+<p>
+The command-line arguments
+appear <a href="#insert-annotations-to-source-command-line-options">below</a>.
+</p>
+
+
+<h4 id="insert-annotations-to-source-classpath">Classpath</h4>
 
 <p>
-for full usage information.
+Your classpath must include classes that are arguments to annotations.
+For example, to insert <code>@A(element = B.class)</code>, your classpath
+must contain <code>B.class</code>.
 </p>
 
 <p>
@@ -354,10 +367,11 @@ You can insert annotations on class/field/method declarations and
 signatures without the class on your classpath.
 </p>
 
+
+<h4 id="insert-annotations-to-source-locations">Locations in source code must exist</h4>
+
 <p>
-In general (but see below for exceptions), your source code needs to
-contain the locations that your
-<code>.jaif</code> file references.  In particular, if the
+If the
 <code>.jaif</code> file contains annotations for a type parameter, but the
 source code uses a raw type, then you will get an error such as
 </p>
@@ -371,9 +385,10 @@ In this case, you should add type arguments, such as changing
 <pre>  public void pushNonezeroRing(Stack stack, Hashtable seen) {</pre>
 <p>to</p>
 <pre>  public void pushNonezeroRing(Stack&lt;Edge&gt; stack, Hashtable&lt;Edge, ?&gt; seen) {</pre>
+
 <p>
-In a few cases, insert-annotations-to-source will generate "default"
-code to provide a location for an annotation.  These include
+In the following cases, insert-annotations-to-source will generate
+code to provide a location for an annotation:
 </p>
 <ul>
 <li>method and constructor <a href="https://docs.oracle.com/javase/specs/jls/se8/html/jls-8.html#jls-8.4.1-220">receivers;</a></li>
@@ -383,8 +398,14 @@ code to provide a location for an annotation.  These include
 <li>explicit constructor invocations for literal arrays (e.g., <code>{"a", "b"}</code> becomes <code>new String[] {"a", "b"}</code>).</li>
 </ul>
 
+
+<h4 id="insert-annotations-to-source-command-line-options">Command-line options</h4>
+
 <p>
-The command-line options are as follows:
+The <code>-cp</code> and <code>-classpath</code> command-line options set
+the classpath to use to look up classes and annotations.
+The other command-line options appear below and are also available by
+running <code>insert-annotations-to-source --help</code>.
 </p>
 
 <!-- start options doc (DO NOT EDIT BY HAND) -->
