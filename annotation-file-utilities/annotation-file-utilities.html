@@ -24,9 +24,9 @@
           <li><a href="#extract-annotations">Extract-annotations</a></li>
           <li><a href="#insert-annotations-to-source">Insert-annotations-to-source</a>
             <ul>
-              <li><a href="#insert-annotations-to-source-classpath">Classpath</a></a></li>
-              <li><a href="#insert-annotations-to-source-locations">Locations in source code must exist</a></a></li>
-              <li><a href="#insert-annotations-to-source-command-line-options">Command-line options</a></a></li>
+              <li><a href="#insert-annotations-to-source-classpath">Classpath</a></li>
+              <li><a href="#insert-annotations-to-source-locations">Locations in source code must exist</a></li>
+              <li><a href="#insert-annotations-to-source-command-line-options">Command-line options</a></li>
             </ul></li>
         </ul></li>
       <li><a href="#implementation">Design and Implementation Details</a>
@@ -274,7 +274,10 @@ Run:
 <pre><code>insert-annotations --help</code></pre>
 
 <p>
-for full usage information.
+for usage information.
+In addition to the command-line arguments mentioned there, you can also set
+the classpath via the <code>-cp</code> or <code>--classpath</code>
+command-line option.
 </p>
 
 
@@ -304,18 +307,16 @@ run once for each class in sequence.
 </p>
 
 <p>
-The <code>-cp</code> and <code>-classpath</code> command-line options set
-the classpath to use to look up annotations.
-</p>
-
-<p>
 Run:
 </p>
 
 <pre><code>extract-annotations --help</code></pre>
 
 <p>
-for full usage information.
+for usage information.
+In addition to the command-line arguments mentioned there,
+the <code>-cp</code> and <code>-classpath</code> command-line options set
+the classpath to use to look up annotations.
 </p>
 
 
@@ -347,14 +348,11 @@ given for each run.
 
 <p>
 The command-line arguments
-appear <a href="insert-annotations-to-source-command-line-options">below</a>,
-and usage information is also available by running
+appear <a href="insert-annotations-to-source-command-line-options">below</a>.
 </p>
 
-<pre><code>insert-annotations-to-source --help</code></pre>
 
-
-<h4 id="insert-annotations-to-source-classpath">Classpath</a></h4>
+<h4 id="insert-annotations-to-source-classpath">Classpath</h4>
 
 <p>
 Your classpath must include classes that are arguments to annotations.
@@ -370,7 +368,7 @@ signatures without the class on your classpath.
 </p>
 
 
-<h4 id="insert-annotations-to-source-locations">Locations in source code must exist</a></h4>
+<h4 id="insert-annotations-to-source-locations">Locations in source code must exist</h4>
 
 <p>
 If the
@@ -401,10 +399,13 @@ code to provide a location for an annotation:
 </ul>
 
 
-<h4 id="insert-annotations-to-source-command-line-options">Command-line options</a></h4>
+<h4 id="insert-annotations-to-source-command-line-options">Command-line options</h4>
 
 <p>
-The command-line options are as follows:
+The <code>-cp</code> and <code>-classpath</code> command-line options set
+the classpath to use to look up classes and annotations.
+The other command-line options appear below and are also available by
+running <code>insert-annotations-to-source --help</code>.
 </p>
 
 <!-- start options doc (DO NOT EDIT BY HAND) -->
