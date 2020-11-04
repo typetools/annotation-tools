@@ -98,7 +98,7 @@ jobs:
 
             git ls-remote https://github.com/${SLUGOWNER}/checker-framework.git &>/dev/null
             if [ "$?" -eq 0 ]; then
-              sh trigger-travis.sh ${SLUGOWNER} checker-framework $TRAVIS_ACCESS_TOKEN
+              sh trigger-travis.sh --pro ${SLUGOWNER} checker-framework $TRAVIS_ACCESS_TOKEN
             fi
           fi
 
