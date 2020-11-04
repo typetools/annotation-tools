@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo Entering "$(cd "$(dirname "$0")" && pwd -P)/$(basename "$0")" in `pwd`
+echo "Entering $(cd "$(dirname "$0")" && pwd -P)/$(basename "$0") in $(pwd)"
 
 # Optional argument $1 is one of:
 #   all, test, typecheck, misc, downstream
@@ -44,10 +44,11 @@ if [[ "${GROUP}" == "test" || "${GROUP}" == "all" ]]; then
 fi
 
 if [[ "${GROUP}" == "typecheck" || "${GROUP}" == "all" ]]; then
-  if [ -z ${CHECKERFRAMEWORK} ] ; then
-    export CHECKERFRAMEWORK=`realpath ../checker-framework`
-    /tmp/plume-scripts/git-clone-related typetools checker-framework ${CHECKERFRAMEWORK}
-    (cd ${CHECKERFRAMEWORK} && ./.travis-build-without-test.sh downloadjdk)
+  if [ -z "${CHECKERFRAMEWORK}" ] ; then
+    CHECKERFRAMEWORK=$(realpath ../checker-framework)
+    export CHECKERFRAMEWORK
+    /tmp/plume-scripts/git-clone-related typetools checker-framework "${CHECKERFRAMEWORK}"
+    (cd "${CHECKERFRAMEWORK}" && ./.travis-build-without-test.sh downloadjdk)
   fi
 
   (cd annotation-file-utilities && ./gradlew checkSignature)
@@ -71,11 +72,10 @@ fi
 if [[ "${GROUP}" == "downstream" || "${GROUP}" == "all" ]]; then
     # checker-framework and its downstream tests
     /tmp/plume-scripts/git-clone-related typetools checker-framework
-    /tmp/plume-scripts/git-clone-related typetools checker-framework-inference
-
-    (cd ../checker-framework-inference && ./.travis-build.sh)
-
     (cd ../checker-framework/framework && ../gradlew wholeProgramInferenceTests)
+
+    /tmp/plume-scripts/git-clone-related typetools checker-framework-inference
+    (cd ../checker-framework-inference && ./.travis-build.sh)
 fi
 
-echo Exiting "$(cd "$(dirname "$0")" && pwd -P)/$(basename "$0")" in `pwd`
+echo "Exiting $(cd "$(dirname "$0")" && pwd -P)/$(basename "$0") in $(pwd)"
