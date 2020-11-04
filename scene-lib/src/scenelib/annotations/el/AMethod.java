@@ -82,9 +82,10 @@ public class AMethod extends ADeclaration {
     }
 
     /**
-     * Sets fields from information in the methodElement.
+     * Sets return type, type parameters, and formal parameters in this AMethod,
+     * from information in the given method element.
      *
-     * @param methodElt the element whose infromation to propagate into this
+     * @param methodElt the element whose information to propagate into this
      */
     public void setFieldsFromMethodElement(ExecutableElement methodElt) {
         setReturnTypeMirror(methodElt.getReturnType());
