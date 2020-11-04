@@ -74,8 +74,8 @@ if [[ "${GROUP}" == "downstream" || "${GROUP}" == "all" ]]; then
     /tmp/plume-scripts/git-clone-related typetools checker-framework
     (cd ../checker-framework/framework && ../gradlew wholeProgramInferenceTests)
 
-    /tmp/plume-scripts/git-clone-related typetools checker-framework-inference
-    (cd ../checker-framework-inference && ./.travis-build.sh)
+    # /tmp/plume-scripts/git-clone-related typetools checker-framework-inference
+    # (cd ../checker-framework-inference && ./.travis-build.sh)
 fi
 
 echo "Exiting $(cd "$(dirname "$0")" && pwd -P)/$(basename "$0") in $(pwd)"
