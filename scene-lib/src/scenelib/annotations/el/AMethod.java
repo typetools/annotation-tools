@@ -36,6 +36,11 @@ public class AMethod extends ADeclaration {
     public final VivifyingMap<Integer, AField> parameters =
             AField.<Integer>newVivifyingLHMap_AF();
 
+    /** Expressions at entry to the method. */
+    // later: map key is the string representation of the expression
+    public final VivifyingMap<VariableElement, AField> preconditions =
+            AField.<VariableElement>newVivifyingLHMap_AF();
+
     public final VivifyingMap<TypeIndexLocation, ATypeElement> throwsException =
         ATypeElement.<TypeIndexLocation>newVivifyingLHMap_ATE();
 
@@ -149,7 +154,7 @@ public class AMethod extends ADeclaration {
      * @param i the parameter index (first parameter is zero)
      * @param type the type of the parameter
      * @param simpleName the name of the parameter
-     * @return an AFieldWrapper representing the parameter
+     * @return an AField representing the parameter
      */
     public AField vivifyAndAddTypeMirrorToParameter(int i, TypeMirror type, Name simpleName) {
         AField param = parameters.getVivify(i);
@@ -158,6 +163,25 @@ public class AMethod extends ADeclaration {
             param.setTypeMirror(type);
         }
         return param;
+    }
+
+    /**
+     * Obtain the information about an expression in scope at method entry.
+     * It can be further operated on to e.g. add a type annotation.
+     *
+     @param varElt the field
+     * @param type the type of the expression
+     * @return an AField representing the expression
+     */
+    // * @param expression the expression
+    public AField vivifyAndAddTypeMirrorToPrecondition(VariableElement varElt, TypeMirror type) {
+        AField result = preconditions.getVivify(varElt);
+        // result.setName(expression);
+        result.setName(varElt.toString());
+        if (result.getTypeMirror() == null) {
+            result.setTypeMirror(type);
+        }
+        return result;
     }
 
     /**
@@ -192,6 +216,15 @@ public class AMethod extends ADeclaration {
      */
     public Map<Integer, AField> getParameters() {
         return ImmutableMap.copyOf(parameters);
+    }
+
+    /**
+     * Get the preconditions: annotations that apply to fields on method entry.
+     *
+     * @return an immutable copy of the vivified preconditions
+     */
+    public Map<VariableElement, AField> getPreconditions() {
+        return ImmutableMap.copyOf(preconditions);
     }
 
     @Override
