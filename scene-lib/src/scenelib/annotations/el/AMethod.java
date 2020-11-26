@@ -41,6 +41,11 @@ public class AMethod extends ADeclaration {
     public final VivifyingMap<VariableElement, AField> preconditions =
             AField.<VariableElement>newVivifyingLHMap_AF();
 
+    /** Expressions at exit from the method. */
+    // later: map key is the string representation of the expression
+    public final VivifyingMap<VariableElement, AField> postconditions =
+            AField.<VariableElement>newVivifyingLHMap_AF();
+
     public final VivifyingMap<TypeIndexLocation, ATypeElement> throwsException =
         ATypeElement.<TypeIndexLocation>newVivifyingLHMap_ATE();
 
@@ -185,6 +190,25 @@ public class AMethod extends ADeclaration {
     }
 
     /**
+     * Obtain the information about an expression in scope at method entry.
+     * It can be further operated on to e.g. add a type annotation.
+     *
+     @param varElt the field
+     * @param type the type of the expression
+     * @return an AField representing the expression
+     */
+    // * @param expression the expression
+    public AField vivifyAndAddTypeMirrorToPostcondition(VariableElement varElt, TypeMirror type) {
+        AField result = postconditions.getVivify(varElt);
+        // result.setName(expression);
+        result.setName(varElt.toString());
+        if (result.getTypeMirror() == null) {
+            result.setTypeMirror(type);
+        }
+        return result;
+    }
+
+    /**
      * Get the return type.
      *
      * @return the return type, or null if the return type is unknown or void
@@ -225,6 +249,15 @@ public class AMethod extends ADeclaration {
      */
     public Map<VariableElement, AField> getPreconditions() {
         return ImmutableMap.copyOf(preconditions);
+    }
+
+    /**
+     * Get the postconditions: annotations that apply to fields on method entry.
+     *
+     * @return an immutable copy of the vivified postconditions
+     */
+    public Map<VariableElement, AField> getPostconditions() {
+        return ImmutableMap.copyOf(postconditions);
     }
 
     @Override
