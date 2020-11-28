@@ -174,14 +174,12 @@ public class AMethod extends ADeclaration {
      * Obtain the information about an expression in scope at method entry.
      * It can be further operated on to e.g. add a type annotation.
      *
-     @param varElt the field
+     * @param varElt the field
      * @param type the type of the expression
      * @return an AField representing the expression
      */
-    // * @param expression the expression
     public AField vivifyAndAddTypeMirrorToPrecondition(VariableElement varElt, TypeMirror type) {
         AField result = preconditions.getVivify(varElt);
-        // result.setName(expression);
         result.setName(varElt.toString());
         if (result.getTypeMirror() == null) {
             result.setTypeMirror(type);
@@ -193,14 +191,12 @@ public class AMethod extends ADeclaration {
      * Obtain the information about an expression in scope at method entry.
      * It can be further operated on to e.g. add a type annotation.
      *
-     @param varElt the field
+     * @param varElt the field
      * @param type the type of the expression
      * @return an AField representing the expression
      */
-    // * @param expression the expression
     public AField vivifyAndAddTypeMirrorToPostcondition(VariableElement varElt, TypeMirror type) {
         AField result = postconditions.getVivify(varElt);
-        // result.setName(expression);
         result.setName(varElt.toString());
         if (result.getTypeMirror() == null) {
             result.setTypeMirror(type);
