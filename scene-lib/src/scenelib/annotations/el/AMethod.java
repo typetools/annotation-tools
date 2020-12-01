@@ -46,6 +46,7 @@ public class AMethod extends ADeclaration {
     public final VivifyingMap<VariableElement, AField> postconditions =
             AField.<VariableElement>newVivifyingLHMap_AF();
 
+    /** Exceptions that are thrown. */
     public final VivifyingMap<TypeIndexLocation, ATypeElement> throwsException =
         ATypeElement.<TypeIndexLocation>newVivifyingLHMap_ATE();
 
