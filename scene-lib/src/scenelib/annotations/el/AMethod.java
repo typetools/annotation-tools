@@ -1,5 +1,7 @@
 package scenelib.annotations.el;
 
+import java.util.Objects;
+import java.util.ArrayList;
 import com.google.common.collect.ImmutableMap;
 import java.util.List;
 import java.util.Map;
@@ -16,18 +18,24 @@ import scenelib.annotations.util.coll.VivifyingMap;
  * An annotated method; contains bounds, return, parameters, receiver, and throws.
  */
 public class AMethod extends ADeclaration {
+    /**
+     * The method's simple name followed by its erased signature in JVML format.
+     * For example, {@code foo()V} or {@code bar(B[I[[Ljava/lang/String;)I}.
+     */
+    public final String methodSignature;
+
+    /** The type parameters of this method. */
+    private /*@Nullable*/ List<? extends TypeParameterElement> typeParameters = null;
+
     /** The method's annotated type parameter bounds */
     public final VivifyingMap<BoundLocation, ATypeElement> bounds =
             ATypeElement.<BoundLocation>newVivifyingLHMap_ATE();
 
-    /** The type parameters of this method. */
-    private List<? extends TypeParameterElement> typeParameters = null;
-
-    /** The method's annotated return type */
-    public final ATypeElement returnType; // initialized in constructor
-
     /** The return type of the method, or null if the method's return type is unknown or void. */
     private /*@Nullable*/ TypeMirror returnTypeMirror;
+
+    /** The method's annotated return type.  Non-null even if returnTypeMirror is null. */
+    public final ATypeElement returnType; // initialized in constructor
 
     /** The method's annotated receiver parameter type */
     public final AField receiver; // initialized in constructor
@@ -44,14 +52,6 @@ public class AMethod extends ADeclaration {
     public ABlock body;
 
     /**
-     * The method's simple name
-     * followed by its erased signature in JVML format.
-     * For example, {@code foo()V} or
-     * {@code bar(B[I[[Ljava/lang/String;)I}.
-     */
-    public final String methodSignature;
-
-    /**
      * Create an AMethod.
      *
      * @param methodSignature the method's name, plus its erased signature
@@ -60,26 +60,27 @@ public class AMethod extends ADeclaration {
     AMethod(String methodSignature) {
       super("method: " + methodSignature);
       this.methodSignature = methodSignature;
+      this.returnType = new ATypeElement("return type of " + methodSignature);
+      this.receiver = new AField("receiver parameter type of " + methodSignature);
       this.body = new ABlock(methodSignature);
-      returnType = new ATypeElement("return type of " + methodSignature);
-      receiver = new AField("receiver parameter type of " + methodSignature);
     }
 
     /**
-     * Create a copy on an AMethod.
+     * Create a copy of an AMethod.
      *
-     * @param method the AMethod to copy
+     * @param other the AMethod to copy
      */
-    AMethod(AMethod method) {
-      super("method: " + method.methodSignature, method);
-      methodSignature = method.methodSignature;
-      body = method.body.clone();
-      returnType = method.returnType.clone();
-      receiver = method.receiver.clone();
-      copyMapContents(method.bounds, bounds);
-      copyMapContents(method.parameters, parameters);
-      copyMapContents(method.throwsException, throwsException);
-      copyMapContents(method.bounds, bounds);
+    AMethod(AMethod other) {
+      super("method: " + other.methodSignature, other);
+      this.methodSignature = other.methodSignature;
+      this.typeParameters = other.typeParameters == null ? null : new ArrayList<>(other.typeParameters);
+      copyMapContents(other.bounds, bounds);
+      this.returnTypeMirror = other.returnTypeMirror == null ? null : other.returnTypeMirror;
+      this.returnType = other.returnType.clone();
+      this.receiver = other.receiver.clone();
+      copyMapContents(other.parameters, parameters);
+      copyMapContents(other.throwsException, throwsException);
+      this.body = other.body.clone();
     }
 
     /**
@@ -89,6 +90,7 @@ public class AMethod extends ADeclaration {
      * @param methodElt the element whose information to propagate into this
      */
     public void setFieldsFromMethodElement(ExecutableElement methodElt) {
+        // TODO: Why doesn't this method set bounds, throwsException, and maybe other fields of this?
         setReturnTypeMirror(methodElt.getReturnType());
         setTypeParameters(methodElt.getTypeParameters());
         vivifyAndAddTypeMirrorToParameters(methodElt);
@@ -171,7 +173,7 @@ public class AMethod extends ADeclaration {
     }
 
     /**
-     * Set the return type.
+     * Set the return type.  Does nothing if the argument is null.
      *
      * @param returnTypeMirror the return type
      */
@@ -211,29 +213,42 @@ public class AMethod extends ADeclaration {
         o.parameters.prune();
 
         return super.equals(o)
-            && returnType.equalsTypeElement(o.returnType)
+            && methodSignature.equals(o.methodSignature)
+            // unneeded: && typeParameters.equals(o.typeParameters)
             && bounds.equals(o.bounds)
+            // unneeded: && returnTypeMirror.equals
+            && returnType.equalsTypeElement(o.returnType)
             && receiver.equals(o.receiver)
             && parameters.equals(o.parameters)
-            && body.equals(o.body)
-            && methodSignature.equals(o.methodSignature)
-            && throwsException.equals(o.throwsException);
+            && throwsException.equals(o.throwsException)
+            && body.equals(o.body);
     }
 
     @Override
     public int hashCode() {
-        return super.hashCode()
-                + bounds.hashCode() + receiver.hashCode()
-                + parameters.hashCode() + throwsException.hashCode()
-                + body.hashCode() + methodSignature.hashCode();
+        parameters.prune();
+        return Objects.hash(
+            super.hashCode(),
+            methodSignature,
+            // unneeded: typeParameters,
+            bounds,
+            // unneeded: returnTypeMirror,
+            returnType,
+            receiver,
+            parameters,
+            throwsException,
+            body);
     }
 
     @Override
     public boolean isEmpty() {
-        return super.isEmpty() && bounds.isEmpty()
-            && returnType.isEmpty()
-            && receiver.isEmpty() && parameters.isEmpty()
-            && throwsException.isEmpty() && body.isEmpty();
+        return super.isEmpty()
+                && bounds.isEmpty()
+                && returnType.isEmpty()
+                && receiver.isEmpty()
+                && parameters.isEmpty()
+                && throwsException.isEmpty()
+                && body.isEmpty();
     }
 
     @Override
