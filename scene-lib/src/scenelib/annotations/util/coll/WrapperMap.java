@@ -92,4 +92,9 @@ public class WrapperMap<K, V> implements Map<K, V> {
     public int hashCode() {
         return back.hashCode();
     }
+
+    @Override
+    public String toString() {
+        return back.toString();
+    }
 }
