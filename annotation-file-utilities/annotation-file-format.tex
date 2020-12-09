@@ -237,7 +237,7 @@ annotations on the default package are not allowed.
 \subsubsection{Class definitions\label{class-definitions}}
 
 A class definition describes the annotations present on a class declaration,
-as well fields and methods of the class. It is organized according to
+as well as fields and methods of the class. It is organized according to
 the hierarchy of fields and methods in the class.
 Note that we use \bnfnt{class-definition} also for interfaces, enums, and
 annotation types (to specify annotations in an existing annotation type, not to
@@ -398,7 +398,7 @@ expression are valid on the field definition.
 \subsubsection{Method definitions\label{method-definitions}}
 
 A method definition can have annotations on the method declaration, in the
-method header (return type, parameters, etc.), as well as the method body.
+method signature (return type, parameters, etc.), as well as the method body.
 
 \begin{tabbing}
 \qquad \= \kill
@@ -1415,13 +1415,13 @@ described in this document primarily for method bodies.
 The Checker Framework~\cite{DietlDEMS2011,CF} defines a format
 called ``stub files''. A stub file is similar
 to the \code{.spec}/\code{.jml} files described in the previous paragraph. It
-uses Java syntax, only allows annotations on method headers and does not require
-method bodies. A stub file is used to add annotations to method headers of
+uses Java syntax, only allows annotations on method signatures and does not require
+method bodies. A stub file is used to add annotations to method signatures of
 existing Java classes. For example, the Checker Framework uses stub files to add
-annotations to method headers of libraries (such as the JDK) without modifying
+annotations to method signatures of libraries (such as the JDK) without modifying
 the source code or bytecode of the library. A single stub file can contain
 multiple packages and classes. This format only allows annotations on method
-headers, not class headers, fields, and method bodies like in a \code{.jaif}
+signatures, not class signatures, fields, and method bodies like in a \code{.jaif}
 file. Further, stub files are only used by the Checker Framework at run time,
 they cannot be used to insert annotations into a source or classfile.
 
