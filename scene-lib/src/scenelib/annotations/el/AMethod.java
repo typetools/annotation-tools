@@ -36,6 +36,7 @@ public class AMethod extends ADeclaration {
     public final VivifyingMap<Integer, AField> parameters =
             AField.<Integer>newVivifyingLHMap_AF();
 
+    /** Exceptions that are thrown. */
     public final VivifyingMap<TypeIndexLocation, ATypeElement> throwsException =
         ATypeElement.<TypeIndexLocation>newVivifyingLHMap_ATE();
 
