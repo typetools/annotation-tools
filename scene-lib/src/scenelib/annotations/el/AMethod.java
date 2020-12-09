@@ -1,5 +1,7 @@
 package scenelib.annotations.el;
 
+import java.util.Objects;
+import java.util.ArrayList;
 import com.google.common.collect.ImmutableMap;
 import java.util.List;
 import java.util.Map;
@@ -64,21 +66,21 @@ public class AMethod extends ADeclaration {
     }
 
     /**
-     * Create a copy on an AMethod.
+     * Create a copy of an AMethod.
      *
      * @param method the AMethod to copy
      */
-    AMethod(AMethod method) {
-      super("method: " + method.methodSignature, method);
-      this.methodSignature = method.methodSignature;
-      copyMapContents(method.typeParameters, typeParameters);
-      copyMapContents(method.bounds, bounds);
-      this.returnTypeMirror = method.returnTypeMirror;
-      this.returnType = method.returnType.clone();
-      this.receiver = method.receiver.clone();
-      copyMapContents(method.parameters, parameters);
-      copyMapContents(method.throwsException, throwsException);
-      this.body = method.body.clone();
+    AMethod(AMethod other) {
+      super("method: " + other.methodSignature, other);
+      this.methodSignature = other.methodSignature;
+      this.typeParameters = new ArrayList<>(other.typeParameters);
+      copyMapContents(other.bounds, bounds);
+      this.returnTypeMirror = other.returnTypeMirror;
+      this.returnType = other.returnType.clone();
+      this.receiver = other.receiver.clone();
+      copyMapContents(other.parameters, parameters);
+      copyMapContents(other.throwsException, throwsException);
+      this.body = other.body.clone();
     }
 
     /**
@@ -218,8 +220,8 @@ public class AMethod extends ADeclaration {
             && returnType.equalsTypeElement(o.returnType)
             && receiver.equals(o.receiver)
             && parameters.equals(o.parameters)
-            && throwsException.equals(o.throwsException);
-        && body.equals(o.body);
+            && throwsException.equals(o.throwsException)
+            && body.equals(o.body);
     }
 
     @Override
