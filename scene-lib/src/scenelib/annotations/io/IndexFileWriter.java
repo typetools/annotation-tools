@@ -58,6 +58,7 @@ public final class IndexFileWriter {
         pw.println();
     }
 
+    // Prints all the annotation definitions.
     private class OurDefCollector extends DefCollector {
         OurDefCollector() throws DefException {
             super(IndexFileWriter.this.scene);
@@ -113,6 +114,12 @@ public final class IndexFileWriter {
 
     private void printAnnotations(AElement e) {
         printAnnotations(e.tlAnnotationsHere);
+        if (e instanceof AMethod) {
+            for (String contractAnno : ((AMethod) e).contractsAsStrings) {
+                pw.print(' ');
+                pw.print(contractAnno);
+            }
+        }
     }
 
     private void printElement(String indentation,

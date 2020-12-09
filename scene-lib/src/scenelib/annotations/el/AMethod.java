@@ -1,5 +1,6 @@
 package scenelib.annotations.el;
 
+import java.util.Collections;
 import com.google.common.collect.ImmutableMap;
 import java.util.List;
 import java.util.Map;
@@ -36,15 +37,20 @@ public class AMethod extends ADeclaration {
     public final VivifyingMap<Integer, AField> parameters =
             AField.<Integer>newVivifyingLHMap_AF();
 
-    /** Expressions at entry to the method. */
+    /** Types of expressions at entry to the method. */
     // later: map key is the string representation of the expression
+    // TODO: This should probably map to an ATypeElement instead.
     public final VivifyingMap<VariableElement, AField> preconditions =
             AField.<VariableElement>newVivifyingLHMap_AF();
 
-    /** Expressions at exit from the method. */
+    /** Types of expressions at exit from the method. */
     // later: map key is the string representation of the expression
+    // TODO: This should probably map to an ATypeElement instead.
     public final VivifyingMap<VariableElement, AField> postconditions =
             AField.<VariableElement>newVivifyingLHMap_AF();
+
+    // Clients set this before printing the AMethod.
+    public List<String> contractsAsStrings = Collections.emptyList();
 
     /** Exceptions that are thrown. */
     public final VivifyingMap<TypeIndexLocation, ATypeElement> throwsException =
@@ -160,7 +166,7 @@ public class AMethod extends ADeclaration {
      * @param i the parameter index (first parameter is zero)
      * @param type the type of the parameter
      * @param simpleName the name of the parameter
-     * @return an AField representing the parameter
+     * @return an AFieldWrapper representing the parameter
      */
     public AField vivifyAndAddTypeMirrorToParameter(int i, TypeMirror type, Name simpleName) {
         AField param = parameters.getVivify(i);
