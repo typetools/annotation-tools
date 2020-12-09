@@ -253,7 +253,7 @@ task cleanTestAnnotator(type: Exec) {
     args("clean")
 }
 
-ext.plumeBibHome = "${projectDir}/bib"
+ext.plumeBibHome = "${projectDir}/plume-bib"
 
 task getPlumeBib() {
     description 'Obtain or update the run-google-java-format scripts.'
@@ -268,7 +268,7 @@ task getPlumeBib() {
         exec {
             workingDir "${plumeBibHome}/../"
             executable 'git'
-            args = ['clone', '-q', 'https://github.com/mernst/plume-bib.git', 'bib']
+            args = ['clone', '-q', 'https://github.com/mernst/plume-bib.git']
         }
     }
 }
@@ -357,7 +357,7 @@ task checkBasicStyle(group: 'Format') {
                                   '.plume-scripts',
                                   'annotated',
                                   'api',
-                                  'bib',
+                                  'plume-bib',
                                   'build',
                                   'jdk',
                                   'asmx',
