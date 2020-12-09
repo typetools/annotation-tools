@@ -75,7 +75,7 @@ public class AMethod extends ADeclaration {
       this.methodSignature = other.methodSignature;
       this.typeParameters = other.typeParameters == null ? null : new ArrayList<>(other.typeParameters);
       copyMapContents(other.bounds, bounds);
-      this.returnTypeMirror = other.returnTypeMirror == null ? other.returnTypeMirror;
+      this.returnTypeMirror = other.returnTypeMirror == null ? null : other.returnTypeMirror;
       this.returnType = other.returnType.clone();
       this.receiver = other.receiver.clone();
       copyMapContents(other.parameters, parameters);
