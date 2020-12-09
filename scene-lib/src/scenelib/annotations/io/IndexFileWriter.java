@@ -58,7 +58,12 @@ public final class IndexFileWriter {
         pw.println();
     }
 
+    /** A DefCollector that prints all the annotation definitions. */
     private class OurDefCollector extends DefCollector {
+        /** Creates a new OurDefCollector.
+         * @throws DefException if the scene contains two irreconcilable definitions of the same
+         *   annotation type
+         */
         OurDefCollector() throws DefException {
             super(IndexFileWriter.this.scene);
         }
