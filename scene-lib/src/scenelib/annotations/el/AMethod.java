@@ -38,18 +38,20 @@ public class AMethod extends ADeclaration {
             AField.<Integer>newVivifyingLHMap_AF();
 
     /** Types of expressions at entry to the method. */
-    // later: map key is the string representation of the expression
-    // TODO: This should probably map to an ATypeElement instead.
+    // TODO: Later, when the code handles preconditions beyond fields of `this`,
+    // the map key will probably became the string representation of the expression.
+    // TODO: The map value type should probably be ATypeElement instead.
     public final VivifyingMap<VariableElement, AField> preconditions =
             AField.<VariableElement>newVivifyingLHMap_AF();
 
     /** Types of expressions at exit from the method. */
-    // later: map key is the string representation of the expression
-    // TODO: This should probably map to an ATypeElement instead.
+    // TODO: Later, when the code handles preconditions beyond fields of `this`,
+    // the map key will probably became the string representation of the expression.
+    // TODO: The map value type should probably be ATypeElement instead.
     public final VivifyingMap<VariableElement, AField> postconditions =
             AField.<VariableElement>newVivifyingLHMap_AF();
 
-    // Clients set this before printing the AMethod.
+    /** Clients set this before printing the AMethod. */
     public List<String> contractsAsStrings = Collections.emptyList();
 
     /** Exceptions that are thrown. */
@@ -178,7 +180,7 @@ public class AMethod extends ADeclaration {
     }
 
     /**
-     * Obtain the information about an expression in scope at method entry.
+     * Obtain information about an expression at method entry.
      * It can be further operated on to e.g. add a type annotation.
      *
      * @param varElt the field
@@ -195,7 +197,7 @@ public class AMethod extends ADeclaration {
     }
 
     /**
-     * Obtain the information about an expression in scope at method entry.
+     * Obtain information about an expression at method exit.
      * It can be further operated on to e.g. add a type annotation.
      *
      * @param varElt the field
@@ -246,7 +248,7 @@ public class AMethod extends ADeclaration {
     }
 
     /**
-     * Get the preconditions: annotations that apply to fields on method entry.
+     * Get the preconditions: annotations that apply to fields at method entry.
      *
      * @return an immutable copy of the vivified preconditions
      */
@@ -255,7 +257,7 @@ public class AMethod extends ADeclaration {
     }
 
     /**
-     * Get the postconditions: annotations that apply to fields on method entry.
+     * Get the postconditions: annotations that apply to fields at method exit.
      *
      * @return an immutable copy of the vivified postconditions
      */
