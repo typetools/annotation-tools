@@ -58,8 +58,9 @@ public final class IndexFileWriter {
         pw.println();
     }
 
-    // Prints all the annotation definitions.
+    /** A DefCollector that prints all the annotation definitions. */
     private class OurDefCollector extends DefCollector {
+        /** Creates a new OurDefCollector. */
         OurDefCollector() throws DefException {
             super(IndexFileWriter.this.scene);
         }
