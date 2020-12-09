@@ -45,6 +45,10 @@ public class AMethod extends ADeclaration {
     public final VivifyingMap<Integer, AField> parameters =
             AField.<Integer>newVivifyingLHMap_AF();
 
+    /** Exceptions that are thrown. */
+    public final VivifyingMap<TypeIndexLocation, ATypeElement> throwsException =
+        ATypeElement.<TypeIndexLocation>newVivifyingLHMap_ATE();
+
     /** Types of expressions at entry to the method. */
     // TODO: Later, when the code handles preconditions beyond fields of `this`,
     // the map key will probably became the string representation of the expression.
@@ -61,10 +65,6 @@ public class AMethod extends ADeclaration {
 
     /** Clients set this before printing the AMethod. */
     public List<String> contractsAsStrings = Collections.emptyList();
-
-    /** Exceptions that are thrown. */
-    public final VivifyingMap<TypeIndexLocation, ATypeElement> throwsException =
-        ATypeElement.<TypeIndexLocation>newVivifyingLHMap_ATE();
 
     /** The body of the method. */
     public ABlock body;
@@ -98,6 +98,8 @@ public class AMethod extends ADeclaration {
       this.receiver = other.receiver.clone();
       copyMapContents(other.parameters, parameters);
       copyMapContents(other.throwsException, throwsException);
+      copyMapContents(other.preconditions, preconditions);
+      copyMapContents(other.postconditions, postconditions);
       this.body = other.body.clone();
     }
 
@@ -291,6 +293,8 @@ public class AMethod extends ADeclaration {
             && receiver.equals(o.receiver)
             && parameters.equals(o.parameters)
             && throwsException.equals(o.throwsException)
+            && preconditions.equals(o.preconditions)
+            && postconditions.equals(o.postconditions)
             && body.equals(o.body);
     }
 
@@ -307,6 +311,8 @@ public class AMethod extends ADeclaration {
             receiver,
             parameters,
             throwsException,
+            preconditions,
+            postconditions,
             body);
     }
 
@@ -318,6 +324,8 @@ public class AMethod extends ADeclaration {
                 && receiver.isEmpty()
                 && parameters.isEmpty()
                 && throwsException.isEmpty()
+                && preconditions.isEmpty()
+                && postconditions.isEmpty()
                 && body.isEmpty();
     }
 
@@ -329,6 +337,8 @@ public class AMethod extends ADeclaration {
         receiver.prune();
         parameters.prune();
         throwsException.prune();
+        preconditions.prune();
+        postconditions.prune();
         body.prune();
     }
 
