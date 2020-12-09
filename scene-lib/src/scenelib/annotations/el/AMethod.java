@@ -25,7 +25,7 @@ public class AMethod extends ADeclaration {
     public final String methodSignature;
 
     /** The type parameters of this method. */
-    private List<? extends TypeParameterElement> typeParameters = null;
+    private /*@Nullable*/ List<? extends TypeParameterElement> typeParameters = null;
 
     /** The method's annotated type parameter bounds */
     public final VivifyingMap<BoundLocation, ATypeElement> bounds =
@@ -34,7 +34,7 @@ public class AMethod extends ADeclaration {
     /** The return type of the method, or null if the method's return type is unknown or void. */
     private /*@Nullable*/ TypeMirror returnTypeMirror;
 
-    /** The method's annotated return type */
+    /** The method's annotated return type.  Non-null even if returnTypeMirror is null. */
     public final ATypeElement returnType; // initialized in constructor
 
     /** The method's annotated receiver parameter type */
@@ -68,14 +68,14 @@ public class AMethod extends ADeclaration {
     /**
      * Create a copy of an AMethod.
      *
-     * @param method the AMethod to copy
+     * @param other the AMethod to copy
      */
     AMethod(AMethod other) {
       super("method: " + other.methodSignature, other);
       this.methodSignature = other.methodSignature;
-      this.typeParameters = new ArrayList<>(other.typeParameters);
+      this.typeParameters = other.typeParameters == null ? null : new ArrayList<>(other.typeParameters);
       copyMapContents(other.bounds, bounds);
-      this.returnTypeMirror = other.returnTypeMirror;
+      this.returnTypeMirror = other.returnTypeMirror == null ? other.returnTypeMirror;
       this.returnType = other.returnType.clone();
       this.receiver = other.receiver.clone();
       copyMapContents(other.parameters, parameters);
