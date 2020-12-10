@@ -109,7 +109,6 @@ public class AElement implements Cloneable {
      * </ul>
      */
     @Override
-    // Was final.  Removed that so that AnnotationDef can redefine.
     public boolean equals(Object o) {
         return o instanceof AElement
             && ((AElement) o).equals(this);
