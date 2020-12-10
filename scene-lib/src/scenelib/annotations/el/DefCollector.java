@@ -16,8 +16,9 @@ import scenelib.annotations.field.AnnotationFieldType;
  */
 public abstract class DefCollector {
 
-    // The set of all definitions in the Scene, which the visitor iterates
-    // over.
+    // The set of all definitions in the Scene.
+    // `collect()` populates it.
+    // `visit()` iterates over it.
     private final Set<AnnotationDef> defs;
 
     /**
