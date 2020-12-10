@@ -143,6 +143,11 @@ public abstract class DefCollector {
         collect((ADeclaration) f);
     }
 
+    /**
+     * Collect annotation definitions for a method.
+     *
+     * @param m the method to collect annotation definitions from
+     */
     private void collect(AMethod m)
             throws DefException {
         collect((ADeclaration) m);
@@ -160,6 +165,11 @@ public abstract class DefCollector {
         collect(m.body);
     }
 
+    /**
+     * Collect annotation definitions for a block.
+     *
+     * @param b the block to collect annotation definitions from
+     */
     private void collect(ABlock b)
             throws DefException {
         for (AField l : b.locals.values()) {
