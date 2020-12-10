@@ -123,6 +123,12 @@ public abstract class DefCollector {
 
     }
 
+    /**
+     * Collect annotation definitions for an annotation.
+     *
+     * @param a the annotation to collect annotation definitions from
+     * @throws DefException if an annotation definition cannot be found
+     */
     private void collect(Annotation a)
             throws DefException {
         AnnotationDef d = a.def;
@@ -133,6 +139,12 @@ public abstract class DefCollector {
         }
     }
 
+    /**
+     * Collect annotation definitions for a type.
+     *
+     * @param a the type to collect annotation definitions from
+     * @throws DefException if an annotation definition cannot be found
+     */
     private void collect(ATypeElement e)
             throws DefException {
         collect((AElement) e);
