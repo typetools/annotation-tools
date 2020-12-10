@@ -160,7 +160,8 @@ public abstract class DefCollector {
         collect(m.body);
     }
 
-    private void collect(ABlock b) {
+    private void collect(ABlock b)
+            throws DefException {
         for (AField l : b.locals.values()) {
             collect(l);
         }
