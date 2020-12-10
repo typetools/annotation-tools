@@ -12,6 +12,7 @@ import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
 
+import scenelib.annotations.Annotation;
 import scenelib.annotations.el.AField;
 import scenelib.annotations.util.coll.VivifyingMap;
 
@@ -63,8 +64,15 @@ public class AMethod extends ADeclaration {
     public final VivifyingMap<VariableElement, AField> postconditions =
             AField.<VariableElement>newVivifyingLHMap_AF();
 
-    /** Clients set this before printing the AMethod. */
-    public List<String> contractsAsStrings = Collections.emptyList();
+    /**
+     * Clients set this before printing the AMethod.
+
+     * These annotations are not stored in tlAnnotationsHere because
+     * whole-program inference assumes that inferred annotations only
+     * become stronger, but these annotations might disappear as other
+     * annotations become stronger.
+     */
+    public List<Annotation> contracts = Collections.emptyList();
 
     /** The body of the method. */
     public ABlock body;
