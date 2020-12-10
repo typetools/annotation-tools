@@ -16,9 +16,11 @@ import scenelib.annotations.field.AnnotationFieldType;
  */
 public abstract class DefCollector {
 
-    // The set of all definitions in the Scene.
-    // `collect()` populates it.
-    // `visit()` iterates over it.
+    /**
+     * The set of all definitions in the Scene.
+     * {@link #collect(AScene)} populates it.
+     * {@link #visit()} iterates over it.
+     */
     private final Set<AnnotationDef> defs;
 
     /**
@@ -101,6 +103,12 @@ public abstract class DefCollector {
         // collect((AElement)d);
     }
 
+    /**
+     * Collect annotation definitions for an element.
+     *
+     * @param e the element to collect annotation definitions from
+     * @throws DefException if an annotation definition cannot be found
+     */
     private void collect(AElement e)
             throws DefException {
         if (e == null) {
