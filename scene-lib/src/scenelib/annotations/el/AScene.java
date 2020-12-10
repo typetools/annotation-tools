@@ -208,13 +208,13 @@ public class AScene implements Cloneable {
             if (s0 == s1) {
                 cloneCheckFail();
             }
-            checkElems(s0.packages, s1.packages);
-            checkElems(s0.classes, s1.classes);
+            checkCloneElems(s0.packages, s1.packages);
+            checkCloneElems(s0.classes, s1.classes);
         }
     }
 
     public static <K, V extends AElement> void
-    checkElems(VivifyingMap<K, V> m0, VivifyingMap<K, V> m1) {
+    checkCloneElems(VivifyingMap<K, V> m0, VivifyingMap<K, V> m1) {
         if (m0 == null) {
             if (m1 != null) {
                 cloneCheckFail();
@@ -223,7 +223,7 @@ public class AScene implements Cloneable {
             cloneCheckFail();
         } else {
             for (K k : m0.keySet()) {
-                checkElem(m0.get(k), m1.get(k));
+                checkCloneElem(m0.get(k), m1.get(k));
             }
         }
     }
@@ -232,8 +232,8 @@ public class AScene implements Cloneable {
      * Throw exception on visit if e0 == e1 or !e0.equals(e1).
      * (See {@link #checkClone(AScene, AScene)} for explanation.)
      */
-    public static void checkElem(AElement e0, AElement e1) {
-        checkObject(e0, e1);
+    public static void checkCloneElem(AElement e0, AElement e1) {
+        checkCloneObject(e0, e1);
         if (e0 != null) {
             if (e0 == e1) {
                 cloneCheckFail();
@@ -246,7 +246,7 @@ public class AScene implements Cloneable {
      * Throw exception on visit if !el.equals(arg) or !arg.equals(el).
      * (See {@link #checkClone(AScene, AScene)} for explanation.)
      */
-    public static void checkObject(Object o0, Object o1) {
+    public static void checkCloneObject(Object o0, Object o1) {
         if (o0 == null ? o1 != null
                 : !(o0.equals(o1) && o1.equals(o0))) {  // ok if ==
             throw new RuntimeException(
@@ -270,68 +270,69 @@ public class AScene implements Cloneable {
             @Override
             public Void visitBlock(ABlock el, AElement arg) {
                 ABlock b = (ABlock) arg;
-                checkElems(el.locals, b.locals);
+                checkCloneElems(el.locals, b.locals);
                 return null;
             }
 
             @Override
             public Void visitClass(AClass el, AElement arg) {
                 AClass c = (AClass) arg;
-                checkElems(el.bounds, c.bounds);
-                checkElems(el.extendsImplements, c.extendsImplements);
-                checkElems(el.fieldInits, c.fieldInits);
-                checkElems(el.fields, c.fields);
-                checkElems(el.instanceInits, c.instanceInits);
-                checkElems(el.methods, c.methods);
-                checkElems(el.staticInits, c.staticInits);
+                checkCloneElems(el.bounds, c.bounds);
+                checkCloneElems(el.extendsImplements, c.extendsImplements);
+                checkCloneElems(el.fieldInits, c.fieldInits);
+                checkCloneElems(el.fields, c.fields);
+                checkCloneElems(el.instanceInits, c.instanceInits);
+                checkCloneElems(el.methods, c.methods);
+                checkCloneElems(el.staticInits, c.staticInits);
                 return visitDeclaration(el, arg);
             }
 
             @Override
             public Void visitDeclaration(ADeclaration el, AElement arg) {
                 ADeclaration d = (ADeclaration) arg;
-                checkElems(el.insertAnnotations, d.insertAnnotations);
-                checkElems(el.insertTypecasts, d.insertTypecasts);
+                checkCloneElems(el.insertAnnotations, d.insertAnnotations);
+                checkCloneElems(el.insertTypecasts, d.insertTypecasts);
                 return visitElement(el, arg);
             }
 
             @Override
             public Void visitExpression(AExpression el, AElement arg) {
                 AExpression e = (AExpression) arg;
-                checkObject(el.id, e.id);
-                checkElems(el.calls, e.calls);
-                checkElems(el.funs, e.funs);
-                checkElems(el.instanceofs, e.instanceofs);
-                checkElems(el.news, e.news);
-                checkElems(el.refs, e.refs);
-                checkElems(el.typecasts, e.typecasts);
+                checkCloneObject(el.id, e.id);
+                checkCloneElems(el.calls, e.calls);
+                checkCloneElems(el.funs, e.funs);
+                checkCloneElems(el.instanceofs, e.instanceofs);
+                checkCloneElems(el.news, e.news);
+                checkCloneElems(el.refs, e.refs);
+                checkCloneElems(el.typecasts, e.typecasts);
                 return visitElement(el, arg);
             }
 
             @Override
             public Void visitField(AField el, AElement arg) {
                 AField f = (AField) arg;
-                checkElem(el.init, f.init);
+                checkCloneElem(el.init, f.init);
                 return visitDeclaration(el, arg);
             }
 
             @Override
             public Void visitMethod(AMethod el, AElement arg) {
                 AMethod m = (AMethod) arg;
-                checkObject(el.methodSignature, m.methodSignature);
-                checkElem(el.body, m.body);
-                checkElem(el.returnType, m.returnType);
-                checkElems(el.bounds, m.bounds);
-                checkElems(el.parameters, m.parameters);
-                checkElems(el.throwsException, m.throwsException);
+                checkCloneObject(el.methodSignature, m.methodSignature);
+                checkCloneElems(el.bounds, m.bounds);
+                checkCloneElem(el.returnType, m.returnType);
+                checkCloneElem(el.receiver, m.receiver);
+                checkCloneElems(el.parameters, m.parameters);
+                checkCloneElems(el.throwsException, m.throwsException);
+                checkCloneElem(el.body, m.body);
                 return null;
             }
 
             @Override
             public Void visitTypeElement(ATypeElement el, AElement arg) {
                 ATypeElement t = (ATypeElement) arg;
-                checkObject(el.description, t.description);
-                checkElems(el.innerTypes, t.innerTypes);
+                checkCloneObject(el.description, t.description);
+                checkCloneElems(el.innerTypes, t.innerTypes);
                 return null;
             }
 
@@ -339,13 +340,13 @@ public class AScene implements Cloneable {
             public Void visitTypeElementWithType(ATypeElementWithType el,
                     AElement arg) {
                 ATypeElementWithType t = (ATypeElementWithType) arg;
-                checkObject(el.getType(), t.getType());
+                checkCloneObject(el.getType(), t.getType());
                 return visitTypeElement(el, arg);
             }
 
             @Override
             public Void visitElement(AElement el, AElement arg) {
-                checkObject(el.description, arg.description);
+                checkCloneObject(el.description, arg.description);
                 if (el.tlAnnotationsHere.size() !=
                         arg.tlAnnotationsHere.size()) {
                     cloneCheckFail();
@@ -355,7 +356,7 @@ public class AScene implements Cloneable {
                         cloneCheckFail();
                     }
                 }
-                checkElem(el.type, arg.type);
+                checkCloneElem(el.type, arg.type);
                 return null;
             }
         };
