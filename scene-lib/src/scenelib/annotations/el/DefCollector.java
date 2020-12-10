@@ -143,27 +143,47 @@ public abstract class DefCollector {
         collect((ADeclaration) f);
     }
 
+    /**
+     * Collect annotation definitions for a method.
+     *
+     * @param m the method to collect annotation definitions from
+     * @throws DefException if an annotation definition cannot be found
+     */
     private void collect(AMethod m)
             throws DefException {
+        collect((ADeclaration) m);
         for (ATypeElement b : m.bounds.values()) {
             collect(b);
         }
-        collect((ADeclaration) m);
         collect(m.returnType);
         collect(m.receiver);
         for (AElement p : m.parameters.values()) {
             collect(p);
         }
-        for (AField l : m.body.locals.values()) {
+        for (AElement e : m.throwsException.values()) {
+            collect(e);
+        }
+        collect(m.body);
+    }
+
+    /**
+     * Collect annotation definitions for a block.
+     *
+     * @param b the block to collect annotation definitions from
+     * @throws DefException if an annotation definition cannot be found
+     */
+    private void collect(ABlock b)
+            throws DefException {
+        for (AField l : b.locals.values()) {
             collect(l);
         }
-        for (ATypeElement tc : m.body.typecasts.values()) {
+        for (ATypeElement tc : b.typecasts.values()) {
             collect(tc);
         }
-        for (ATypeElement i : m.body.instanceofs.values()) {
+        for (ATypeElement i : b.instanceofs.values()) {
             collect(i);
         }
-        for (ATypeElement n : m.body.news.values()) {
+        for (ATypeElement n : b.news.values()) {
             collect(n);
         }
     }
