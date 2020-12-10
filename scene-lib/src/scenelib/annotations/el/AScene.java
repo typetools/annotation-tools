@@ -220,6 +220,8 @@ public class AScene implements Cloneable {
      * Throw exception if m0 == m1 or !m0.equals(m1).
      * (See {@link #checkClone(AScene, AScene)} for explanation.)
      *
+     * @param <K> the type of map keys
+     * @param <V> the type of map values
      * @param m0 the first map to compare
      * @param m1 the second map to compare
      */
