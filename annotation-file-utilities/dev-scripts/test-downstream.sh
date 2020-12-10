@@ -8,7 +8,7 @@ export SHELLOPTS
 if [ "$(uname)" = "Darwin" ] ; then
   export JAVA_HOME=${JAVA_HOME:-$(/usr/libexec/java_home)}
 else
-  export JAVA_HOME=${JAVA_HOME:-$(dirname $(dirname $(readlink -f $(which javac))))}
+  export JAVA_HOME=${JAVA_HOME:-$(dirname "$(dirname "$(readlink -f "$(which javac)")")")}
 fi
 export AFU="${AFU:-$(cd annotation-file-utilities >/dev/null 2>&1 && pwd -P)}"
 export CHECKERFRAMEWORK="${CHECKERFRAMEWORK:-$(cd .. >/dev/null 2>&1 && pwd -P)/checker-framework}"
@@ -26,4 +26,4 @@ fi
 "/tmp/$USER/plume-scripts/git-clone-related" typetools checker-framework "${CHECKERFRAMEWORK}"
 (cd "${CHECKERFRAMEWORK}" && checker/bin-devel/build.sh)
 
-(cd "${CHECKERFRAMEWORK}/framework" && ../gradlew wholeProgramInferenceTests)
+(cd "${CHECKERFRAMEWORK}/checker" && ../gradlew wholeProgramInferenceTests)
