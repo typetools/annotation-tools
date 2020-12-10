@@ -216,7 +216,7 @@ public class AScene implements Cloneable {
         }
     }
 
-    /*
+    /**
      * Throw exception if m0 == m1 or !m0.equals(m1).
      * (See {@link #checkClone(AScene, AScene)} for explanation.)
      *
