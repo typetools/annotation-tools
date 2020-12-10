@@ -16,9 +16,11 @@ import scenelib.annotations.field.AnnotationFieldType;
  */
 public abstract class DefCollector {
 
-    // The set of all definitions in the Scene.
-    // `collect()` populates it.
-    // `visit()` iterates over it.
+    /**
+     * The set of all definitions in the Scene.
+     * {@link #collect(AScene)} populates it.
+     * {@link #visit()} iterates over it.
+     */
     private final Set<AnnotationDef> defs;
 
     /**
@@ -101,8 +103,17 @@ public abstract class DefCollector {
         // collect((AElement)d);
     }
 
+    /**
+     * Collect annotation definitions for an element.
+     *
+     * @param e the element to collect annotation definitions from
+     * @throws DefException if an annotation definition cannot be found
+     */
     private void collect(AElement e)
             throws DefException {
+        if (e == null) {
+            return;
+        }
         for (Annotation tla : e.tlAnnotationsHere) {
             AnnotationDef tld = tla.def;
             if (defs.contains(tld)) {
@@ -123,7 +134,7 @@ public abstract class DefCollector {
     private void collect(ATypeElement e)
             throws DefException {
         collect((AElement) e);
-        for (AElement it : e.innerTypes.values()) {
+        for (ATypeElement it : e.innerTypes.values()) {
             collect(it);
         }
     }
@@ -142,6 +153,7 @@ public abstract class DefCollector {
     private void collect(AField f)
             throws DefException {
         collect((ADeclaration) f);
+        collect(f.init);
     }
 
     /**
@@ -158,10 +170,10 @@ public abstract class DefCollector {
         }
         collect(m.returnType);
         collect(m.receiver);
-        for (AElement p : m.parameters.values()) {
+        for (AField p : m.parameters.values()) {
             collect(p);
         }
-        for (AElement e : m.throwsException.values()) {
+        for (ATypeElement e : m.throwsException.values()) {
             collect(e);
         }
         collect(m.body);
