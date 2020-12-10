@@ -115,20 +115,22 @@ public abstract class DefCollector {
             return;
         }
         for (Annotation tla : e.tlAnnotationsHere) {
-            AnnotationDef tld = tla.def;
-            if (defs.contains(tld)) {
-                continue;
-            }
-
-            AnnotationDef d = tld;
-            collect(d);
-
-            addToDefs(d);
+            collect(tla);
         }
         if (e.type != null) {
             collect(e.type);
         }
 
+    }
+
+    private void collect(Annotation a)
+            throws DefException {
+        AnnotationDef d = a.def;
+        if (!defs.contains(d)) {
+            // Must call collect() before addToDefs().
+            collect(d);
+            addToDefs(d);
+        }
     }
 
     private void collect(ATypeElement e)
