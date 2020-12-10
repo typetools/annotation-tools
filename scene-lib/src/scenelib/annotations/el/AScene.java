@@ -193,6 +193,9 @@ public class AScene implements Cloneable {
      * 2) are not equal() in both directions; or 3) contain
      * corresponding elements that meet either of the preceding two
      * conditions.
+     *
+     * @param s0 the first AScene to compare
+     * @param s1 the second Ascene to compare
      */
     public static void checkClone(AScene s0, AScene s1) {
         if (s0 == null) {
@@ -213,6 +216,13 @@ public class AScene implements Cloneable {
         }
     }
 
+    /*
+     * Throw exception if m0 == m1 or !m0.equals(m1).
+     * (See {@link #checkClone(AScene, AScene)} for explanation.)
+     *
+     * @param m0 the first map to compare
+     * @param m1 the second map to compare
+     */
     public static <K, V extends AElement> void
     checkCloneElems(VivifyingMap<K, V> m0, VivifyingMap<K, V> m1) {
         if (m0 == null) {
@@ -229,8 +239,11 @@ public class AScene implements Cloneable {
     }
 
     /**
-     * Throw exception on visit if e0 == e1 or !e0.equals(e1).
+     * Throw exception if e0 == e1 or !e0.equals(e1).
      * (See {@link #checkClone(AScene, AScene)} for explanation.)
+     *
+     * @param e0 the first element to compare
+     * @param e1 the second element to compare
      */
     public static void checkCloneElem(AElement e0, AElement e1) {
         checkCloneObject(e0, e1);
@@ -245,6 +258,9 @@ public class AScene implements Cloneable {
     /**
      * Throw exception on visit if !el.equals(arg) or !arg.equals(el).
      * (See {@link #checkClone(AScene, AScene)} for explanation.)
+     *
+     * @param o0 the first object to compare
+     * @param o1 the second object to compare
      */
     public static void checkCloneObject(Object o0, Object o1) {
         if (o0 == null ? o1 != null
