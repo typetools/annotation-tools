@@ -115,15 +115,7 @@ public abstract class DefCollector {
             return;
         }
         for (Annotation tla : e.tlAnnotationsHere) {
-            AnnotationDef tld = tla.def;
-            if (defs.contains(tld)) {
-                continue;
-            }
-
-            AnnotationDef d = tld;
-            collect(d);
-
-            addToDefs(d);
+            collect(tla);
         }
         if (e.type != null) {
             collect(e.type);
@@ -131,10 +123,32 @@ public abstract class DefCollector {
 
     }
 
-    private void collect(ATypeElement e)
+    /**
+     * Collect annotation definitions for an annotation.
+     *
+     * @param a the annotation to collect annotation definitions from
+     * @throws DefException if an annotation definition cannot be found
+     */
+    private void collect(Annotation a)
             throws DefException {
-        collect((AElement) e);
-        for (ATypeElement it : e.innerTypes.values()) {
+        AnnotationDef d = a.def;
+        if (!defs.contains(d)) {
+            // Must call collect() before addToDefs().
+            collect(d);
+            addToDefs(d);
+        }
+    }
+
+    /**
+     * Collect annotation definitions for a type.
+     *
+     * @param t the type to collect annotation definitions from
+     * @throws DefException if an annotation definition cannot be found
+     */
+    private void collect(ATypeElement t)
+            throws DefException {
+        collect((AElement) t);
+        for (ATypeElement it : t.innerTypes.values()) {
             collect(it);
         }
     }
