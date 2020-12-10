@@ -164,6 +164,12 @@ public abstract class DefCollector {
         for (AElement e : m.throwsException.values()) {
             collect(e);
         }
+        for (AElement e : m.preconditions.values()) {
+            collect(e);
+        }
+        for (AElement e : m.postconditions.values()) {
+            collect(e);
+        }
         collect(m.body);
     }
 

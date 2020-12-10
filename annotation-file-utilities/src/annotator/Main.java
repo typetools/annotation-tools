@@ -278,10 +278,12 @@ public class Main {
     public Void visitMethod(AMethod el0, AElement el) {
       AMethod el1 = (AMethod) el;
       filter(el0.bounds, el1.bounds);
-      filter(el0.parameters, el1.parameters);
-      filter(el0.throwsException, el1.throwsException);
       el0.returnType.accept(this, el1.returnType);
       el0.receiver.accept(this, el1.receiver);
+      filter(el0.parameters, el1.parameters);
+      filter(el0.throwsException, el1.throwsException);
+      filter(el0.preconditions, el1.preconditions);
+      filter(el0.postconditions, el1.postconditions);
       el0.body.accept(this, el1.body);
       return visitDeclaration(el0, el);
     }
