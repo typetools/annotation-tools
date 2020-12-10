@@ -142,13 +142,13 @@ public abstract class DefCollector {
     /**
      * Collect annotation definitions for a type.
      *
-     * @param a the type to collect annotation definitions from
+     * @param t the type to collect annotation definitions from
      * @throws DefException if an annotation definition cannot be found
      */
-    private void collect(ATypeElement e)
+    private void collect(ATypeElement t)
             throws DefException {
-        collect((AElement) e);
-        for (ATypeElement it : e.innerTypes.values()) {
+        collect((AElement) t);
+        for (ATypeElement it : t.innerTypes.values()) {
             collect(it);
         }
     }
