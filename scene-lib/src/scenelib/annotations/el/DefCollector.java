@@ -145,25 +145,32 @@ public abstract class DefCollector {
 
     private void collect(AMethod m)
             throws DefException {
+        collect((ADeclaration) m);
         for (ATypeElement b : m.bounds.values()) {
             collect(b);
         }
-        collect((ADeclaration) m);
         collect(m.returnType);
         collect(m.receiver);
         for (AElement p : m.parameters.values()) {
             collect(p);
         }
-        for (AField l : m.body.locals.values()) {
+        for (AElement e : m.throwsException.values()) {
+            collect(e);
+        }
+        collect(m.body);
+    }
+
+    private void collect(ABlock b) {
+        for (AField l : b.locals.values()) {
             collect(l);
         }
-        for (ATypeElement tc : m.body.typecasts.values()) {
+        for (ATypeElement tc : b.typecasts.values()) {
             collect(tc);
         }
-        for (ATypeElement i : m.body.instanceofs.values()) {
+        for (ATypeElement i : b.instanceofs.values()) {
             collect(i);
         }
-        for (ATypeElement n : m.body.news.values()) {
+        for (ATypeElement n : b.news.values()) {
             collect(n);
         }
     }
