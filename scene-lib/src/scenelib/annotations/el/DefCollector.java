@@ -103,6 +103,9 @@ public abstract class DefCollector {
 
     private void collect(AElement e)
             throws DefException {
+        if (e == null) {
+            return;
+        }
         for (Annotation tla : e.tlAnnotationsHere) {
             AnnotationDef tld = tla.def;
             if (defs.contains(tld)) {
@@ -123,7 +126,7 @@ public abstract class DefCollector {
     private void collect(ATypeElement e)
             throws DefException {
         collect((AElement) e);
-        for (AElement it : e.innerTypes.values()) {
+        for (ATypeElement it : e.innerTypes.values()) {
             collect(it);
         }
     }
@@ -142,6 +145,7 @@ public abstract class DefCollector {
     private void collect(AField f)
             throws DefException {
         collect((ADeclaration) f);
+        collect(f.init);
     }
 
     /**
@@ -158,10 +162,10 @@ public abstract class DefCollector {
         }
         collect(m.returnType);
         collect(m.receiver);
-        for (AElement p : m.parameters.values()) {
+        for (AField p : m.parameters.values()) {
             collect(p);
         }
-        for (AElement e : m.throwsException.values()) {
+        for (ATypeElement e : m.throwsException.values()) {
             collect(e);
         }
         collect(m.body);
