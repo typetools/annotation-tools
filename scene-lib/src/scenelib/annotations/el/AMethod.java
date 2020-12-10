@@ -1,5 +1,6 @@
 package scenelib.annotations.el;
 
+import java.util.Collections;
 import java.util.Objects;
 import java.util.ArrayList;
 import com.google.common.collect.ImmutableMap;
@@ -11,6 +12,7 @@ import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
 
+import scenelib.annotations.Annotation;
 import scenelib.annotations.el.AField;
 import scenelib.annotations.util.coll.VivifyingMap;
 
@@ -48,6 +50,30 @@ public class AMethod extends ADeclaration {
     public final VivifyingMap<TypeIndexLocation, ATypeElement> throwsException =
         ATypeElement.<TypeIndexLocation>newVivifyingLHMap_ATE();
 
+    /** Types of expressions at entry to the method. */
+    // TODO: Later, when the code handles preconditions beyond fields of `this`,
+    // the map key will probably became the string representation of the expression.
+    // TODO: The map value type should probably be ATypeElement instead.
+    public final VivifyingMap<VariableElement, AField> preconditions =
+            AField.<VariableElement>newVivifyingLHMap_AF();
+
+    /** Types of expressions at exit from the method. */
+    // TODO: Later, when the code handles preconditions beyond fields of `this`,
+    // the map key will probably became the string representation of the expression.
+    // TODO: The map value type should probably be ATypeElement instead.
+    public final VivifyingMap<VariableElement, AField> postconditions =
+            AField.<VariableElement>newVivifyingLHMap_AF();
+
+    /**
+     * Clients set this before printing the AMethod.
+
+     * These annotations are not stored in tlAnnotationsHere because
+     * whole-program inference assumes that inferred annotations only
+     * become stronger, but these annotations might disappear as other
+     * annotations become stronger.
+     */
+    public List<Annotation> contracts = Collections.emptyList();
+
     /** The body of the method. */
     public ABlock body;
 
@@ -80,6 +106,8 @@ public class AMethod extends ADeclaration {
       this.receiver = other.receiver.clone();
       copyMapContents(other.parameters, parameters);
       copyMapContents(other.throwsException, throwsException);
+      copyMapContents(other.preconditions, preconditions);
+      copyMapContents(other.postconditions, postconditions);
       this.body = other.body.clone();
     }
 
@@ -164,6 +192,40 @@ public class AMethod extends ADeclaration {
     }
 
     /**
+     * Obtain information about an expression at method entry.
+     * It can be further operated on to e.g. add a type annotation.
+     *
+     * @param varElt the field
+     * @param type the type of the expression
+     * @return an AField representing the expression
+     */
+    public AField vivifyAndAddTypeMirrorToPrecondition(VariableElement varElt, TypeMirror type) {
+        AField result = preconditions.getVivify(varElt);
+        result.setName(varElt.toString());
+        if (result.getTypeMirror() == null) {
+            result.setTypeMirror(type);
+        }
+        return result;
+    }
+
+    /**
+     * Obtain information about an expression at method exit.
+     * It can be further operated on to e.g. add a type annotation.
+     *
+     * @param varElt the field
+     * @param type the type of the expression
+     * @return an AField representing the expression
+     */
+    public AField vivifyAndAddTypeMirrorToPostcondition(VariableElement varElt, TypeMirror type) {
+        AField result = postconditions.getVivify(varElt);
+        result.setName(varElt.toString());
+        if (result.getTypeMirror() == null) {
+            result.setTypeMirror(type);
+        }
+        return result;
+    }
+
+    /**
      * Get the return type.
      *
      * @return the return type, or null if the return type is unknown or void
@@ -197,6 +259,24 @@ public class AMethod extends ADeclaration {
         return ImmutableMap.copyOf(parameters);
     }
 
+    /**
+     * Get the preconditions: annotations that apply to fields at method entry.
+     *
+     * @return an immutable copy of the vivified preconditions
+     */
+    public Map<VariableElement, AField> getPreconditions() {
+        return ImmutableMap.copyOf(preconditions);
+    }
+
+    /**
+     * Get the postconditions: annotations that apply to fields at method exit.
+     *
+     * @return an immutable copy of the vivified postconditions
+     */
+    public Map<VariableElement, AField> getPostconditions() {
+        return ImmutableMap.copyOf(postconditions);
+    }
+
     @Override
     public AMethod clone() {
       return new AMethod(this);
@@ -221,6 +301,8 @@ public class AMethod extends ADeclaration {
             && receiver.equals(o.receiver)
             && parameters.equals(o.parameters)
             && throwsException.equals(o.throwsException)
+            && preconditions.equals(o.preconditions)
+            && postconditions.equals(o.postconditions)
             && body.equals(o.body);
     }
 
@@ -237,6 +319,8 @@ public class AMethod extends ADeclaration {
             receiver,
             parameters,
             throwsException,
+            preconditions,
+            postconditions,
             body);
     }
 
@@ -248,6 +332,8 @@ public class AMethod extends ADeclaration {
                 && receiver.isEmpty()
                 && parameters.isEmpty()
                 && throwsException.isEmpty()
+                && preconditions.isEmpty()
+                && postconditions.isEmpty()
                 && body.isEmpty();
     }
 
@@ -259,6 +345,8 @@ public class AMethod extends ADeclaration {
         receiver.prune();
         parameters.prune();
         throwsException.prune();
+        preconditions.prune();
+        postconditions.prune();
         body.prune();
     }
 

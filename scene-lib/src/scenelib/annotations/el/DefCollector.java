@@ -115,20 +115,22 @@ public abstract class DefCollector {
             return;
         }
         for (Annotation tla : e.tlAnnotationsHere) {
-            AnnotationDef tld = tla.def;
-            if (defs.contains(tld)) {
-                continue;
-            }
-
-            AnnotationDef d = tld;
-            collect(d);
-
-            addToDefs(d);
+            collect(tla);
         }
         if (e.type != null) {
             collect(e.type);
         }
 
+    }
+
+    private void collect(Annotation a)
+            throws DefException {
+        AnnotationDef d = a.def;
+        if (!defs.contains(d)) {
+            // Must call collect() before addToDefs().
+            collect(d);
+            addToDefs(d);
+        }
     }
 
     private void collect(ATypeElement e)
@@ -175,6 +177,16 @@ public abstract class DefCollector {
         }
         for (ATypeElement e : m.throwsException.values()) {
             collect(e);
+        }
+        for (AElement e : m.preconditions.values()) {
+            System.err.println("About to collect precondition value " + e);
+            collect(e);
+        }
+        for (AElement e : m.postconditions.values()) {
+            collect(e);
+        }
+        for (Annotation a : m.contracts) {
+            collect(a);
         }
         collect(m.body);
     }

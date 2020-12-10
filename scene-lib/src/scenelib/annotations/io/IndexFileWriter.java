@@ -118,6 +118,9 @@ public final class IndexFileWriter {
 
     private void printAnnotations(AElement e) {
         printAnnotations(e.tlAnnotationsHere);
+        if (e instanceof AMethod) {
+            printAnnotations(((AMethod) e).contracts);
+        }
     }
 
     private void printElement(String indentation,
