@@ -147,6 +147,7 @@ public abstract class DefCollector {
      * Collect annotation definitions for a method.
      *
      * @param m the method to collect annotation definitions from
+     * @throws DefException if an annotation definition cannot be found
      */
     private void collect(AMethod m)
             throws DefException {
@@ -169,6 +170,7 @@ public abstract class DefCollector {
      * Collect annotation definitions for a block.
      *
      * @param b the block to collect annotation definitions from
+     * @throws DefException if an annotation definition cannot be found
      */
     private void collect(ABlock b)
             throws DefException {
