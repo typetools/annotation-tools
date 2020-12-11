@@ -116,6 +116,11 @@ public final class IndexFileWriter {
         }
     }
 
+    /**
+     * Print the annotations on the given AElement.
+     *
+     * @param e a program element
+     */
     private void printAnnotations(AElement e) {
         printAnnotations(e.tlAnnotationsHere);
         if (e instanceof AMethod) {
