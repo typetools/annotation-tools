@@ -538,7 +538,7 @@ public final class IndexFileParser {
         AnnotationDef d = defs.get(name);
         if (d == null) {
             ParseException e = new ParseException("No definition for annotation type " + name);
-            if (true) { // for debugging
+            if (false) { // for debugging
                 System.err.println("No definition for annotation type " + name);
                 System.err.printf("  defs contains %d entries%n", defs.size());
                 for (Map.Entry<String,AnnotationDef> entry : defs.entrySet()) {
