@@ -9,7 +9,7 @@ import java.util.Collection;
 public final class ArrayAFT extends AnnotationFieldType {
 
     /**
-     * The element type of the array, or <code>null</code> if it is unknown
+     * The element type of the array, or {@code null} if it is unknown
      * (see {@link scenelib.annotations.AnnotationBuilder#addEmptyArrayField}).
      */
     public final @Nullable ScalarAFT elementType;
@@ -19,6 +19,8 @@ public final class ArrayAFT extends AnnotationFieldType {
      * the given element type.  <code>elementType</code> may be
      * <code>null</code> to indicate that the element type is unknown
      * (see {@link scenelib.annotations.AnnotationBuilder#addEmptyArrayField}).
+     *
+     * @param elementType the element type of the array, or {@code null} if it is unknown
      */
     public ArrayAFT(@Nullable ScalarAFT elementType) {
         this.elementType = elementType;
