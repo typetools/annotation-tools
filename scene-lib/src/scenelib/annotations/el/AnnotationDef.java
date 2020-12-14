@@ -206,6 +206,10 @@ public final class AnnotationDef extends AElement {
      * True if this is valid in type annotation locations.
      * It was meta-annotated with @Target({ElementType.TYPE_USE, ...}).
      *
+     * Returns true if this is valid in both type annotation locations and
+     * (some) declaration locations.  To test whether this is valid only in type
+     * annotation locations, use {@link #isOnlyTypeAnnotation}.
+     *
      * @return true iff this is a type annotation
      */
     public boolean isTypeAnnotation() {
@@ -221,6 +225,7 @@ public final class AnnotationDef extends AElement {
      * or @Target({ElementType.TYPE, ElementType.TYPE_USE}).
      *
      * @return true iff this is valid only in type annotation locations
+     * @see #isTypeAnnotation
      */
     public boolean isOnlyTypeAnnotation() {
         boolean result = Annotations.onlyTypeAnnotationTargets.contains(target());
