@@ -29,7 +29,7 @@ public class AMethod extends ADeclaration {
     /** The type parameters of this method. */
     private /*@Nullable*/ List<? extends TypeParameterElement> typeParameters = null;
 
-    /** The method's annotated type parameter bounds */
+    /** The method's annotated type parameter bounds. */
     public final VivifyingMap<BoundLocation, ATypeElement> bounds =
             ATypeElement.<BoundLocation>newVivifyingLHMap_ATE();
 
@@ -39,10 +39,10 @@ public class AMethod extends ADeclaration {
     /** The method's annotated return type.  Non-null even if returnTypeMirror is null. */
     public final ATypeElement returnType; // initialized in constructor
 
-    /** The method's annotated receiver parameter type */
+    /** The method's annotated receiver parameter type. */
     public final AField receiver; // initialized in constructor
 
-    /** The method's annotated parameters; map key is parameter index */
+    /** The method's annotated parameters; map key is parameter index, starting at 0. */
     public final VivifyingMap<Integer, AField> parameters =
             AField.<Integer>newVivifyingLHMap_AF();
 

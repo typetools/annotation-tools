@@ -191,7 +191,6 @@ public abstract class DefCollector {
             collect(e);
         }
         for (AElement e : m.preconditions.values()) {
-            System.err.println("About to collect precondition value " + e);
             collect(e);
         }
         for (AElement e : m.postconditions.values()) {
