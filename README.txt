@@ -36,3 +36,6 @@ files.
 The diffs are complicated by the fact that in a few cases, a post-2.2.2
 version of a file was added to asmx.
 One example is file src/org/objectweb/asmx/optimizer/shrink.properties.
+
+
+DUMMY CHANGE TO TEST BUILD SYSTEM.
