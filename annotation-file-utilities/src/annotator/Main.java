@@ -799,6 +799,15 @@ public class Main {
             int pos = pair.a;  // reset each iteration in case of dyn adjustment
             if (iToInsert.isSeparateLine()) {
               // System.out.printf("isSeparateLine=true for insertion at pos %d: %s%n", pos, iToInsert);
+
+              // If an annotation should have its own line, first check that the insertion location
+              // is the first non-whitespace on its line. If so, then the insertion content should
+              // be the annotation, followed, by a line break, followed by a copy of the indentation
+              // of the line being inserted onto. This puts the annotation on its own line aligned
+              // with the contents of the next line.
+
+              // Number of whitespace characters preceeding the insertion position on the same line
+              // (tabs count as one).
               int indentation = 0;
               while ((pos - indentation != 0)
                      // horizontal whitespace
@@ -808,8 +817,9 @@ public class Main {
                 //                   pos, indentation, src.charAt(pos-indentation-1));
                 indentation++;
               }
+              // Checks that insertion position is the first non-whitespace on the line it occurs
+              // on.
               if ((pos - indentation == 0)
-                  // horizontal whitespace
                   || (src.charAt(pos-indentation-1) == '\f'
                       || src.charAt(pos-indentation-1) == '\n'
                       || src.charAt(pos-indentation-1) == '\r')) {
