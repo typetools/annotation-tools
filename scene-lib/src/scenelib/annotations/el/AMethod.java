@@ -66,11 +66,14 @@ public class AMethod extends ADeclaration {
 
     /**
      * Clients set this before printing the AMethod.
-
+     *
      * These annotations are not stored in tlAnnotationsHere because
      * whole-program inference assumes that inferred annotations only
      * become stronger, but these annotations might disappear as other
      * annotations become stronger.
+     *
+     * These annotations are not part of the abstract state of this
+     * AMethod (but are derived from it).
      */
     public List<Annotation> contracts = Collections.emptyList();
 

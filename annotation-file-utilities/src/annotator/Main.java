@@ -19,12 +19,25 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.google.common.collect.LinkedHashMultimap;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.SetMultimap;
+import com.sun.source.tree.CompilationUnitTree;
+import com.sun.source.tree.ExpressionTree;
+import com.sun.source.tree.Tree;
+import com.sun.source.util.TreePath;
+import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
+import com.sun.tools.javac.main.CommandLine;
+import com.sun.tools.javac.tree.JCTree;
+
 import org.plumelib.options.Option;
 import org.plumelib.options.OptionGroup;
 import org.plumelib.options.Options;
+import org.plumelib.reflection.ReflectionPlume;
 import org.plumelib.util.FileIOException;
-import org.plumelib.util.UtilPlume;
 import org.plumelib.util.Pair;
+import org.plumelib.util.UtilPlume;
+
 import scenelib.type.Type;
 import scenelib.annotations.Annotation;
 import scenelib.annotations.el.ABlock;
@@ -61,17 +74,6 @@ import annotator.find.TreeFinder;
 import annotator.find.TypedInsertion;
 import annotator.scanner.LocalVariableScanner;
 import annotator.specification.IndexFileSpecification;
-
-import com.google.common.collect.LinkedHashMultimap;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.SetMultimap;
-import com.sun.source.tree.CompilationUnitTree;
-import com.sun.source.tree.ExpressionTree;
-import com.sun.source.tree.Tree;
-import com.sun.source.util.TreePath;
-import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
-import com.sun.tools.javac.main.CommandLine;
-import com.sun.tools.javac.tree.JCTree;
 
 /**
  * This is the main class for the annotator, which inserts annotations in
@@ -655,6 +657,8 @@ public class Main {
                   "To fix the problem, add class "
                       + causeMessage.substring(22)
                       + " to the classpath.");
+              System.err.println("The classpath is:");
+              System.err.println(ReflectionPlume.classpathToString());
             }
           }
           if (print_error_stack) {
