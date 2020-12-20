@@ -8,7 +8,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.objectweb.asmx.ClassReader;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Opcodes;
 
 import org.plumelib.util.FileIOException;
 import org.plumelib.util.Pair;
@@ -26,10 +28,10 @@ import scenelib.annotations.el.ATypeElement;
 import scenelib.annotations.el.ATypeElementWithType;
 import scenelib.annotations.el.AnnotationDef;
 import scenelib.annotations.el.BoundLocation;
-import scenelib.annotations.el.InnerTypeLocation;
 import scenelib.annotations.el.LocalLocation;
 import scenelib.annotations.el.RelativeLocation;
 import scenelib.annotations.el.TypeIndexLocation;
+import scenelib.annotations.el.TypePathEntry;
 import scenelib.annotations.field.AnnotationFieldType;
 import scenelib.annotations.io.ASTPath;
 import scenelib.annotations.io.IndexFileParser;
@@ -82,7 +84,7 @@ public class IndexFileSpecification {
       for (String key : defKeys) {
         int ix = Math.max(key.lastIndexOf("."), key.lastIndexOf("$"));
         if (ix >= 0) {
-          String name = key.substring(ix+1);
+          String name = key.substring(ix + 1);
           // containsKey() would give wrong result here
           if (annotationDefs.get(name) == null) { ambiguous.add(name); }
         }
@@ -103,6 +105,14 @@ public class IndexFileSpecification {
 //    debug("---------------------------------------------------------");
     return this.insertions;
   }
+
+  /*
+  private static void debug(String s, Object... args) {
+    if (debug) {
+      System.out.printf(s, args);
+    }
+  }
+  */
 
   public Map<String, Set<String>> annotationImports() {
     return scene.imports;
@@ -150,7 +160,7 @@ public class IndexFileSpecification {
       AClass clazz = entry.getValue();
       if (key.endsWith(".package-info")) {
         // strip off suffix to get package name
-        parsePackage(clist, key.substring(0, key.length()-13), clazz);
+        parsePackage(clist, key.substring(0, key.length() - 13), clazz);
       } else {
         parseClass(clist, key, clazz);
       }
@@ -172,13 +182,14 @@ public class IndexFileSpecification {
    */
   private void parseClass(CriterionList clist, String className, AClass clazz) {
     constructorInsertion = null;  // 0 or 1 per class
-    if (! noAsm) {
+    if (!noAsm) {
       //  load extra info using asm
       debug("parseClass(" + className + ")");
       try {
         ClassReader classReader = new ClassReader(className);
-        MethodOffsetClassVisitor cv = new MethodOffsetClassVisitor(classReader);
-        classReader.accept(cv, false);
+        ClassWriter classWriter = new ClassWriter(classReader, 0);
+        MethodOffsetClassVisitor cv = new MethodOffsetClassVisitor(Opcodes.ASM7, classReader, classWriter);
+        classReader.accept(cv, 0);
         debug("Done reading " + className + ".class");
       } catch (IOException e) {
         // If .class file not found, still proceed, in case
@@ -209,10 +220,10 @@ public class IndexFileSpecification {
       BoundLocation boundLoc = entry.getKey();
       ATypeElement bound = entry.getValue();
       CriterionList boundList = clist.add(Criteria.classBound(className, boundLoc));
-      for (Entry<InnerTypeLocation, ATypeElement> innerEntry : bound.innerTypes.entrySet()) {
-        InnerTypeLocation innerLoc = innerEntry.getKey();
+      for (Entry<List<TypePathEntry>, ATypeElement> innerEntry : bound.innerTypes.entrySet()) {
+        List<TypePathEntry> innerLoc = innerEntry.getKey();
         AElement ae = innerEntry.getValue();
-        CriterionList innerBoundList = boundList.add(Criteria.atLocation(innerLoc));
+        CriterionList innerBoundList = boundList.add(Criteria.atLocation(TypePathEntry.listToTypePath(innerLoc)));
         parseElement(innerBoundList, ae);
       }
       CriterionList outerClist = boundList.add(Criteria.atLocation());
@@ -227,10 +238,10 @@ public class IndexFileSpecification {
       ATypeElement ei = entry.getValue();
       CriterionList eiList = clist.add(Criteria.atExtImplsLocation(className, eiLoc));
 
-      for (Entry<InnerTypeLocation, ATypeElement> innerEntry : ei.innerTypes.entrySet()) {
-        InnerTypeLocation innerLoc = innerEntry.getKey();
+      for (Entry<List<TypePathEntry>, ATypeElement> innerEntry : ei.innerTypes.entrySet()) {
+        List<TypePathEntry> innerLoc = innerEntry.getKey();
         AElement ae = innerEntry.getValue();
-        CriterionList innerBoundList = eiList.add(Criteria.atLocation(innerLoc));
+        CriterionList innerBoundList = eiList.add(Criteria.atLocation(TypePathEntry.listToTypePath(innerLoc)));
         parseElement(innerBoundList, ae);
       }
       parseElement(eiList, ei);
@@ -555,10 +566,10 @@ public class IndexFileSpecification {
   private void parseInnerAndOuterElements(CriterionList clist,
       ATypeElement typeElement, boolean isCastInsertion) {
     List<Insertion> innerInsertions = new ArrayList<>();
-    for (Entry<InnerTypeLocation, ATypeElement> innerEntry: typeElement.innerTypes.entrySet()) {
-      InnerTypeLocation innerLoc = innerEntry.getKey();
+    for (Entry<List<TypePathEntry>, ATypeElement> innerEntry : typeElement.innerTypes.entrySet()) {
+      List<TypePathEntry> innerLoc = innerEntry.getKey();
       AElement innerElement = innerEntry.getValue();
-      CriterionList innerClist = clist.add(Criteria.atLocation(innerLoc));
+      CriterionList innerClist = clist.add(Criteria.atLocation(TypePathEntry.listToTypePath(innerLoc)));
       innerInsertions.addAll(parseElement(innerClist, innerElement, isCastInsertion));
     }
     CriterionList outerClist = clist;

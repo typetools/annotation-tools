@@ -1,5 +1,7 @@
 package scenelib.annotations.io;
 
+import static scenelib.annotations.el.TypePathEntry.getTypePathEntryListFromBinary;
+
 import java.io.*;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
@@ -14,7 +16,6 @@ import scenelib.annotations.Annotations;
 import scenelib.annotations.el.*;
 
 import com.sun.tools.javac.code.TargetType;
-import com.sun.tools.javac.code.TypeAnnotationPosition;
 
 import org.plumelib.util.FileIOException;
 
@@ -263,8 +264,8 @@ public final class JavapParser {
             // TODO: update location representation
             // if (targetType.) {
                 List<Integer> location = parseInnerTypeLocationNums();
-                InnerTypeLocation itl = new InnerTypeLocation(TypeAnnotationPosition.getTypePathFromBinary(location));
-                subElement = subOuterType.innerTypes.getVivify(itl);
+                List<TypePathEntry> typePath = getTypePathEntryListFromBinary(location);
+                subElement = subOuterType.innerTypes.getVivify(typePath);
             // } else
             //    subElement = subOuterType;
             return subElement;

@@ -9,6 +9,7 @@ bless-files: TestClassEmpty_Expected.class \
 	TestLocalVariableGenericArray_Expected.class \
 	TestFieldSimple_Expected.class \
 	TestFieldGeneric_Expected.class \
+	TestFieldGenericSmall_Expected.class \
 	TestTypecast_Expected.class \
 	TestTypecastGenericArray_Expected.class \
 	TestTypeTest_Expected.class \

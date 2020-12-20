@@ -19,12 +19,14 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.objectweb.asm.TypePath;
 import org.plumelib.options.Option;
 import org.plumelib.options.OptionGroup;
 import org.plumelib.options.Options;
 import org.plumelib.util.FileIOException;
 import org.plumelib.util.UtilPlume;
 import org.plumelib.util.Pair;
+import scenelib.annotations.el.TypePathEntry;
 import scenelib.type.Type;
 import scenelib.annotations.Annotation;
 import scenelib.annotations.el.ABlock;
@@ -69,7 +71,6 @@ import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
-import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
 import com.sun.tools.javac.main.CommandLine;
 import com.sun.tools.javac.tree.JCTree;
 
@@ -330,8 +331,8 @@ public class Main {
     List<TypePathEntry> tpes = galc.getLocation();
     ASTPath.ASTEntry entry;
     for (TypePathEntry tpe : tpes) {
-      switch (tpe.tag) {
-      case ARRAY:
+      switch (tpe.step) {
+      case TypePath.ARRAY_ELEMENT:
         if (!astPath.isEmpty()) {
           entry = astPath.getLast();
           if (entry.getTreeKind() == Tree.Kind.NEW_ARRAY
@@ -344,20 +345,20 @@ public class Main {
         entry = new ASTPath.ASTEntry(Tree.Kind.ARRAY_TYPE,
             ASTPath.TYPE);
         break;
-      case INNER_TYPE:
+      case TypePath.INNER_TYPE:
         entry = new ASTPath.ASTEntry(Tree.Kind.MEMBER_SELECT,
             ASTPath.EXPRESSION);
         break;
-      case TYPE_ARGUMENT:
+      case TypePath.TYPE_ARGUMENT:
         entry = new ASTPath.ASTEntry(Tree.Kind.PARAMETERIZED_TYPE,
-            ASTPath.TYPE_ARGUMENT, tpe.arg);
+            ASTPath.TYPE_ARGUMENT, tpe.argument);
         break;
-      case WILDCARD:
+      case TypePath.WILDCARD_BOUND:
         entry = new ASTPath.ASTEntry(Tree.Kind.UNBOUNDED_WILDCARD,
             ASTPath.BOUND);
         break;
       default:
-        throw new IllegalArgumentException("unknown type tag " + tpe.tag);
+        throw new IllegalArgumentException("unknown type tag " + tpe.step);
       }
       astPath = astPath.extend(entry);
     }

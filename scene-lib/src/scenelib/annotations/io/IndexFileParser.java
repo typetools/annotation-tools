@@ -23,8 +23,8 @@ import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 import com.sun.source.tree.Tree.Kind;
-import com.sun.tools.javac.code.TypeAnnotationPosition;
 
+import org.objectweb.asm.TypePath;
 import scenelib.annotations.Annotation;
 import scenelib.annotations.AnnotationBuilder;
 import scenelib.annotations.AnnotationFactory;
@@ -42,10 +42,10 @@ import scenelib.annotations.el.ATypeElement;
 import scenelib.annotations.el.ATypeElementWithType;
 import scenelib.annotations.el.AnnotationDef;
 import scenelib.annotations.el.BoundLocation;
-import scenelib.annotations.el.InnerTypeLocation;
 import scenelib.annotations.el.LocalLocation;
 import scenelib.annotations.el.RelativeLocation;
 import scenelib.annotations.el.TypeIndexLocation;
+import scenelib.annotations.el.TypePathEntry;
 import scenelib.annotations.field.AnnotationAFT;
 import scenelib.annotations.field.AnnotationFieldType;
 import scenelib.annotations.field.ArrayAFT;
@@ -755,13 +755,13 @@ public final class IndexFileParser {
             while (matchChar(',')) {
                 locNumbers.add(expectNonNegative(matchNNInteger()));
             }
-            InnerTypeLocation loc;
+            TypePath typePath;
             try {
-                loc = new InnerTypeLocation(TypeAnnotationPosition.getTypePathFromBinary(locNumbers));
+                typePath = TypePathEntry.getTypePathFromBinary(locNumbers);
             } catch (AssertionError ex) {
                 throw new ParseException(ex.getMessage(), ex);
             }
-            AElement it = e.innerTypes.getVivify(loc);
+            AElement it = e.innerTypes.getVivify(TypePathEntry.typePathToList(typePath));
             expectChar(':');
             parseAnnotations(it);
         }
@@ -973,7 +973,9 @@ public final class IndexFileParser {
                     expectChar('+');
                     int scopeLength = expectNonNegative(matchNNInteger());
                     loc = new LocalLocation(index, scopeStart, scopeLength);
-                } else {
+                }
+                // TODO: Need some way to get the actual variable info from string, or deprecate this feature.
+                else {
                     // look for a valid identifier for the local variable
                     String lvar = expectIdentifier();
                     int varIndex;
@@ -1201,7 +1203,7 @@ public final class IndexFileParser {
                 // parseAnnotations(i);
                 // parseInnerTypes(i);
                 int offset = 0;
-                Pair<ASTPath, InnerTypeLocation> pair =
+                Pair<ASTPath, TypePath> pair =
                         splitNewArrayType(astPath);  // handle special case
                 ATypeElement i;
                 if (pair == null) {
@@ -1209,8 +1211,8 @@ public final class IndexFileParser {
                 } else {
                     i = decl.insertAnnotations.getVivify(pair.a);
                     if (pair.b != null) {
-                        i = i.innerTypes.getVivify(pair.b);
-                        offset = pair.b.location.size();
+                        i = i.innerTypes.getVivify(TypePathEntry.typePathToList(pair.b));
+                        offset = pair.b.getLength();
                     }
                 }
                 parseAnnotations(i);
@@ -1235,9 +1237,9 @@ public final class IndexFileParser {
     // ASTPaths to their inner array types break the usual rule that
     // an ASTPath corresponds to an AST node.  This method restores the
     // invariant by separating out the inner type information.
-    private Pair<ASTPath, InnerTypeLocation> splitNewArrayType(ASTPath astPath) {
+    private Pair<ASTPath, TypePath> splitNewArrayType(ASTPath astPath) {
         ASTPath outerPath = astPath;
-        InnerTypeLocation loc = null;
+        TypePath loc = null;
         int last = astPath.size() - 1;
 
         if (last > 0) {
@@ -1246,7 +1248,7 @@ public final class IndexFileParser {
                 int a = entry.getArgument();
                 if (a > 0) {
                     outerPath = astPath.getParentPath().extend(new ASTPath.ASTEntry(Kind.NEW_ARRAY, ASTPath.TYPE, 0));
-                    loc = new InnerTypeLocation(TypeAnnotationPosition.getTypePathFromBinary(Collections.nCopies(2 * a, 0)));
+                    loc = TypePathEntry.getTypePathFromBinary(Collections.nCopies(2 * a, 0));
                 }
             }
         }

@@ -1,18 +1,14 @@
 package scenelib.annotations.io.classfile;
 
-import org.objectweb.asmx.ClassAdapter;
-import org.objectweb.asmx.ClassReader;
-import org.objectweb.asmx.ClassVisitor;
-import org.objectweb.asmx.Handle;
-import org.objectweb.asmx.Label;
-import org.objectweb.asmx.MethodAdapter;
-import org.objectweb.asmx.MethodVisitor;
-import org.objectweb.asmx.Opcodes;
-
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.Handle;
+import org.objectweb.asm.Label;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
 import scenelib.annotations.io.DebugWriter;
-import scenelib.annotations.util.AbstractClassVisitor;
 
-public class CodeOffsetAdapter extends ClassAdapter {
+public class CodeOffsetAdapter extends ClassVisitor {
   static final DebugWriter debug;
   final ClassReader classReader;
   final char[] buffer;
@@ -25,12 +21,12 @@ public class CodeOffsetAdapter extends ClassAdapter {
     debug.setEnabled(false);
   }
 
-  public CodeOffsetAdapter(ClassReader classReader) {
-    this(classReader, new AbstractClassVisitor());
+  public CodeOffsetAdapter(int api, ClassReader classReader) {
+    this(api, classReader, null);
   }
 
-  public CodeOffsetAdapter(ClassReader classReader, ClassVisitor v) {
-    super(v);
+  public CodeOffsetAdapter(int api, ClassReader classReader, ClassVisitor v) {
+    super(api, v);
     this.classReader = classReader;
     // const pool size is (not lowest) upper bound of string length
     buffer = new char[classReader.header];
@@ -51,7 +47,7 @@ public class CodeOffsetAdapter extends ClassAdapter {
       String signature, String[] exceptions) {
     MethodVisitor methodVisitor =
         super.visitMethod(access, name, descriptor, signature, exceptions);
-    return new MethodAdapter(methodVisitor) {
+    return new MethodVisitor(api, methodVisitor) {
       private int methodEnd;
 
       {
@@ -156,12 +152,19 @@ public class CodeOffsetAdapter extends ClassAdapter {
         assert offset > 0 && methodEnd > codeStart + offset;
       }
 
+      @Deprecated
       @Override
       public void visitMethodInsn(int opcode,
           String owner, String name, String descriptor) {
         super.visitMethodInsn(opcode, owner, name, descriptor);
-        debug.debug("%d visitMethodInsn(%d, %s, %s, %s)%n", offset,
-            opcode, owner, name, descriptor);
+        debug.debug("%d visitMethodInsn(%d, %s, %s, %s)%n", offset, opcode, owner, name, descriptor);
+        offset += opcode == Opcodes.INVOKEINTERFACE ? 5 : 3;
+      }
+
+      @Override
+      public void visitMethodInsn(int opcode, String owner, String name, String descriptor, boolean isInterface) {
+        super.visitMethodInsn(opcode, owner, name, descriptor, isInterface);
+        debug.debug("%d visitMethodInsn(%d, %s, %s, %s, %s)%n", offset, opcode, owner, name, descriptor, isInterface);
         offset += opcode == Opcodes.INVOKEINTERFACE ? 5 : 3;
       }
 
@@ -175,7 +178,7 @@ public class CodeOffsetAdapter extends ClassAdapter {
 
       @Override
       public void visitTableSwitchInsn(int min, int max,
-          Label dflt, Label[] labels) {
+          Label dflt, Label... labels) {
         super.visitTableSwitchInsn(min, max, dflt, labels);
         debug.debug("%d visitTableSwitchInsn(%d, %d, %s)%n", offset,
             min, max, dflt, labels);

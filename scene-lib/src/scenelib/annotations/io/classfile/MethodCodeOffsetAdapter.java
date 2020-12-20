@@ -1,13 +1,12 @@
 package scenelib.annotations.io.classfile;
 
-import org.objectweb.asmx.ClassReader;
-import org.objectweb.asmx.Handle;
-import org.objectweb.asmx.Label;
-import org.objectweb.asmx.MethodAdapter;
-import org.objectweb.asmx.MethodVisitor;
-import org.objectweb.asmx.Opcodes;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.Handle;
+import org.objectweb.asm.Label;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
 
-class MethodCodeOffsetAdapter extends MethodAdapter {
+class MethodCodeOffsetAdapter extends MethodVisitor {
   private final ClassReader classReader;
   private final int methodStart;
   private int offset = 0;
@@ -16,7 +15,7 @@ class MethodCodeOffsetAdapter extends MethodAdapter {
 
   public MethodCodeOffsetAdapter(ClassReader classReader,
       MethodVisitor methodVisitor, int start) {
-    super(methodVisitor);
+    super(Opcodes.ASM7, methodVisitor);
     char[] buf = new char[classReader.header];
     this.methodStart = start;
     this.classReader = classReader;
@@ -96,10 +95,17 @@ class MethodCodeOffsetAdapter extends MethodAdapter {
     offset += 4 + 8 * readInt(offset);
   }
 
+  @Deprecated
   @Override
   public void visitMethodInsn(int opcode,
       String owner, String name, String descriptor) {
     super.visitMethodInsn(opcode, owner, name, descriptor);
+    offset += opcode == Opcodes.INVOKEINTERFACE ? 5 : 3;
+  }
+
+  @Override
+  public void visitMethodInsn(int opcode, String owner, String name, String descriptor, boolean isInterface) {
+    super.visitMethodInsn(opcode, owner, name, descriptor, isInterface);
     offset += opcode == Opcodes.INVOKEINTERFACE ? 5 : 3;
   }
 
@@ -111,7 +117,7 @@ class MethodCodeOffsetAdapter extends MethodAdapter {
 
   @Override
   public void visitTableSwitchInsn(int min, int max,
-      Label dflt, Label[] labels) {
+      Label dflt, Label... labels) {
     super.visitTableSwitchInsn(min, max, dflt, labels);
     offset += 8 - ((offset - codeStart) & 3);
     offset += 4 * (readInt(offset + 4) - readInt(offset) + 3);

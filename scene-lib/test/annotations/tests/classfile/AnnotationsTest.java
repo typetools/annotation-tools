@@ -11,7 +11,7 @@ import junit.framework.TestSuite;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.objectweb.asmx.ClassReader;
+import org.objectweb.asm.ClassReader;
 
 import scenelib.annotations.el.AScene;
 import scenelib.annotations.io.IndexFileParser;
@@ -74,6 +74,7 @@ public class AnnotationsTest {
     "TestClassNonEmpty",
     "TestFieldSimple",
     "TestFieldGeneric",
+    "TestFieldGenericSmall",
     "TestLocalVariable",
     "TestLocalVariableA",
     "TestLocalVariableGenericArray",
@@ -246,8 +247,8 @@ public class AnnotationsTest {
 
       AnnotationVerifier av = new AnnotationVerifier();
 
-      crCorrect.accept(av.originalVisitor(), false);
-      crGenerated.accept(av.newVisitor(), false);
+      crCorrect.accept(av.originalVisitor(), ClassReader.SKIP_CODE);
+      crGenerated.accept(av.newVisitor(), ClassReader.SKIP_CODE);
 
       try {
         av.verify();
@@ -429,6 +430,24 @@ public class AnnotationsTest {
   public void testiFieldGeneric() {
     testAgainstIndexFile(nameIndex("TestFieldGeneric.jaif"),
         nameClass("TestFieldGeneric.class"));
+  }
+
+  /**
+   * Runs a test on class files for TestFieldGenericSmall.
+   */
+  @Test
+  public void testcFieldGenericSmall() {
+    testAgainstClass(nameIndex("TestFieldGenericSmall.jaif"),
+        nameClass("TestFieldGenericSmall"));
+  }
+
+  /**
+   * Runs a test on index files for TestFieldGenericSmall.
+   */
+  @Test
+  public void testiFieldGenericSmall() {
+    testAgainstIndexFile(nameIndex("TestFieldGenericSmall.jaif"),
+        nameClass("TestFieldGenericSmall.class"));
   }
 
   /**

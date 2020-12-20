@@ -1,12 +1,12 @@
 package annotator.scanner;
 
-import org.objectweb.asmx.ClassReader;
-import org.objectweb.asmx.ClassWriter;
-import org.objectweb.asmx.Handle;
-import org.objectweb.asmx.Label;
-import org.objectweb.asmx.MethodAdapter;
-import org.objectweb.asmx.MethodVisitor;
-import org.objectweb.asmx.Opcodes;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Handle;
+import org.objectweb.asm.Label;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
 
 import scenelib.annotations.io.classfile.CodeOffsetAdapter;
 
@@ -23,7 +23,7 @@ import com.sun.tools.javac.util.Pair;
 // Note: in order to ensure all labels are visited, this class
 // needs to extend ClassWriter and not other class visitor classes.
 // There is no good reason why this is the case with ASM.
-public class MethodOffsetClassVisitor extends ClassWriter {
+public class MethodOffsetClassVisitor extends ClassVisitor {
   CodeOffsetAdapter codeOffsetAdapter;
   MethodVisitor methodCodeOffsetAdapter;
 
@@ -31,10 +31,10 @@ public class MethodOffsetClassVisitor extends ClassWriter {
   // and so all the visit* methods in LocalVariableMethodVisitor
   private String methodName;
 
-  public MethodOffsetClassVisitor(ClassReader classReader) {
-    super(true, false);
+  public MethodOffsetClassVisitor(int api, ClassReader classReader, ClassWriter classWriter) {
+    super(api, classWriter);
     this.methodName = "LocalVariableVisitor: DEFAULT_METHOD";
-    codeOffsetAdapter = new CodeOffsetAdapter(classReader);
+    codeOffsetAdapter = new CodeOffsetAdapter(api, classReader);
   }
 
   @Override
@@ -43,7 +43,7 @@ public class MethodOffsetClassVisitor extends ClassWriter {
     methodName = name + descriptor.substring(0, descriptor.indexOf(")") + 1);
     methodCodeOffsetAdapter = codeOffsetAdapter.visitMethod(access, name, descriptor, signature, exceptions);
     return new MethodOffsetMethodVisitor(
-        super.visitMethod(access, name, descriptor, signature, exceptions));
+        api, super.visitMethod(access, name, descriptor, signature, exceptions));
   }
 
   /**
@@ -52,11 +52,11 @@ public class MethodOffsetClassVisitor extends ClassWriter {
    * all the offset information by calling the appropriate static
    * methods in annotator.scanner classes.
    */
-  private class MethodOffsetMethodVisitor extends MethodAdapter {
+  private class MethodOffsetMethodVisitor extends MethodVisitor {
     private Label lastLabel;
 
-    public MethodOffsetMethodVisitor(MethodVisitor mv) {
-      super(mv);
+    public MethodOffsetMethodVisitor(int api, MethodVisitor mv) {
+      super(api, mv);
       lastLabel = null;
     }
 
@@ -124,6 +124,7 @@ public class MethodOffsetClassVisitor extends ClassWriter {
       methodCodeOffsetAdapter.visitIntInsn(opcode, operand);
     }
 
+    @Deprecated
     @Override
     public void visitMethodInsn(int opcode, String owner, String name,
         String descriptor) {
@@ -139,6 +140,21 @@ public class MethodOffsetClassVisitor extends ClassWriter {
         break;
       }
       methodCodeOffsetAdapter.visitMethodInsn(opcode, owner, name, descriptor);
+    }
+
+    @Override
+    public void visitMethodInsn(int opcode, String owner, String name, String descriptor, boolean isInterface) {
+      super.visitMethodInsn(opcode, owner, name, descriptor, isInterface);
+      switch (opcode) {
+        case Opcodes.INVOKEINTERFACE:
+        case Opcodes.INVOKESTATIC:
+        case Opcodes.INVOKEVIRTUAL:
+          MethodCallScanner.addMethodCallToMethod(methodName, labelOffset());
+          break;
+        default:
+          break;
+      }
+      methodCodeOffsetAdapter.visitMethodInsn(opcode, owner, name, descriptor, isInterface);
     }
 
     @Override
@@ -195,7 +211,7 @@ public class MethodOffsetClassVisitor extends ClassWriter {
 
     @Override
     public void visitTableSwitchInsn(int min, int max, Label dflt,
-        Label[] labels) {
+        Label... labels) {
       super.visitTableSwitchInsn(min, max, dflt, labels);
       methodCodeOffsetAdapter.visitTableSwitchInsn(min, max, dflt, labels);
     }

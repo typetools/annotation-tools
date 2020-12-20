@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import javax.lang.model.type.TypeKind;
 
-import scenelib.annotations.el.InnerTypeLocation;
+import org.objectweb.asm.TypePath;
 import annotator.Main;
 
 import com.sun.source.tree.AnnotatedTypeTree;
@@ -18,10 +18,12 @@ import com.sun.source.tree.Tree;
 import com.sun.source.tree.VariableTree;
 import com.sun.source.tree.WildcardTree;
 import com.sun.source.util.TreePath;
-import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
-import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntryKind;
 import com.sun.tools.javac.tree.JCTree.JCExpression;
 import com.sun.tools.javac.tree.JCTree.JCFieldAccess;
+import scenelib.annotations.el.TypePathEntry;
+
+import static scenelib.annotations.el.TypePathEntry.listToTypePath;
+import static scenelib.annotations.el.TypePathEntry.typePathToList;
 
 /**
  * GenericArrayLocationCriterion represents the criterion specifying the location
@@ -33,6 +35,7 @@ public class GenericArrayLocationCriterion implements Criterion {
 
   // the full location list
   private final List<TypePathEntry> location;
+  private final TypePath typePath;
 
   // represents all but the last element of the location list
   // TODO: this field is initialized, but never read!
@@ -42,25 +45,30 @@ public class GenericArrayLocationCriterion implements Criterion {
   /**
    * Creates a new GenericArrayLocationCriterion specifying that the element
    * is an outer type, such as:
-   *  <code>@A List&lt;Integer&gt;</code>
+   * <code>@A List&lt;Integer&gt;</code>
    * or
-   *  <code>Integer @A []</code>
+   * <code>Integer @A []</code>
    */
   public GenericArrayLocationCriterion() {
-    this(new ArrayList<TypePathEntry>());
+    this(null, null);
   }
 
   /**
-   * Creates a new GenericArrayLocationCriterion representing the given
-   * location.
+   * Creates a new GenericArrayLocationCriterion representing the end of the given path.
    *
-   * @param innerTypeLoc the location of the element being represented
+   * @param typePath the path to the location of the element being represented
    */
-  public GenericArrayLocationCriterion(InnerTypeLocation innerTypeLoc) {
-    this(innerTypeLoc.location);
+  public GenericArrayLocationCriterion(TypePath typePath) {
+    this(typePath, typePathToList(typePath));
   }
 
-  private GenericArrayLocationCriterion(List<TypePathEntry> location) {
+  public GenericArrayLocationCriterion(List<TypePathEntry> location) {
+    this.location = location;
+    this.typePath = listToTypePath(location);
+  }
+
+  public GenericArrayLocationCriterion(TypePath typePath, List<TypePathEntry> location) {
+    this.typePath = typePath;
     this.location = location;
   }
 
@@ -75,15 +83,15 @@ public class GenericArrayLocationCriterion implements Criterion {
 
   /**
    * Determines if the given list holds only {@link TypePathEntry}s with the tag
-   * {@link TypePathEntryKind#ARRAY}.
+   * {@link TypePath#ARRAY_ELEMENT}.
    *
    * @param location the list to check
    * @return {@code true} if the list only contains
-   *         {@link TypePathEntryKind#ARRAY}, {@code false} otherwise.
+   * {@link TypePath#ARRAY_ELEMENT}, {@code false} otherwise.
    */
   private boolean containsOnlyArray(List<TypePathEntry> location) {
     for (TypePathEntry tpe : location) {
-      if (tpe.tag != TypePathEntryKind.ARRAY) {
+      if (tpe.step != TypePath.ARRAY_ELEMENT) {
         return false;
       }
     }
@@ -101,7 +109,7 @@ public class GenericArrayLocationCriterion implements Criterion {
 
     if (debug) {
       System.out.printf("GenericArrayLocationCriterion.isSatisfiedBy():%n  leaf of path: %s%n  searched location: %s%n",
-              path.getLeaf(), location);
+          path.getLeaf(), typePath);
     }
 
     TreePath pathRemaining = path;
@@ -117,16 +125,16 @@ public class GenericArrayLocationCriterion implements Criterion {
       child = ((VariableTree) leaf).getType();
     } else if (leaf.getKind() == Tree.Kind.NEW_CLASS) {
       child = ((NewClassTree) leaf).getIdentifier();
-    } else if (leaf.getKind() == Tree.Kind.NEW_ARRAY && !location.isEmpty()) {
+    } else if (leaf.getKind() == Tree.Kind.NEW_ARRAY && typePath != null) {
       child = ((NewArrayTree) leaf).getType();
     }
     if (child != null && child.getKind() == Tree.Kind.MEMBER_SELECT) {
       JCExpression exp = ((JCFieldAccess) child).getExpression();
       if (exp.type != null && exp.type.getKind() == TypeKind.PACKAGE
-          || location.isEmpty()
-          || (location.get(location.size()-1)).tag
-              != TypePathEntryKind.INNER_TYPE) {
-          return false;
+          || typePath == null
+          || (typePath.getStep(typePath.getLength() - 1))
+          != TypePath.INNER_TYPE) {
+        return false;
       }
     }
 
@@ -134,7 +142,7 @@ public class GenericArrayLocationCriterion implements Criterion {
       JCFieldAccess fieldAccess = (JCFieldAccess) leaf;
       if (isStatic(fieldAccess)) {
         // If this MEMBER_SELECT is for a static class...
-        if (location.isEmpty()) {
+        if (typePath == null) {
           // ...and it does not go on a compound type, this is the right place.
           return true;
         } else if (isGenericOrArray(path.getParentPath().getLeaf())
@@ -152,21 +160,20 @@ public class GenericArrayLocationCriterion implements Criterion {
         JCExpression exp = fieldAccess.getExpression();
         if (exp.getKind() == Tree.Kind.MEMBER_SELECT && exp.type != null
             && exp.type.getKind() == TypeKind.PACKAGE) {
-          if (location.isEmpty()) {
+          if (typePath == null) {
             return true;
           } // else, keep going to make sure we're in the right part of the
-            // compound type
+          // compound type
         } else {
-          if (!location.isEmpty()
-              && location.get(location.size()-1).tag
-                  != TypePathEntryKind.INNER_TYPE) {
+          if (typePath != null
+              && typePath.getStep(typePath.getLength() - 1) != TypePath.INNER_TYPE) {
             return false;
           }
         }
       }
     }
 
-    if (location.isEmpty()) {
+    if (typePath == null) {
       // no inner type location, want to annotate outermost type
       // e.g.,  @Nullable List list;
       //        @Nullable List<String> list;
@@ -240,8 +247,8 @@ public class GenericArrayLocationCriterion implements Criterion {
                          locationRemaining, Main.treeToString(leaf), Main.treeToString(parent), parent.getClass());
       }
 
-      TypePathEntry loc = locationRemaining.get(locationRemaining.size()-1);
-      if (loc.tag == TypePathEntryKind.INNER_TYPE) {
+      TypePathEntry loc = locationRemaining.get(locationRemaining.size() - 1);
+      if (loc.step == TypePath.INNER_TYPE) {
         if (leaf.getKind() == Tree.Kind.PARAMETERIZED_TYPE) {
           leaf = parent;
           parentPath = parentPath.getParentPath();
@@ -253,11 +260,11 @@ public class GenericArrayLocationCriterion implements Criterion {
         if (isStatic(fieldAccess)) {
           return false;
         }
-        locationRemaining.remove(locationRemaining.size()-1);
+        locationRemaining.remove(locationRemaining.size() - 1);
         leaf = fieldAccess.selected;
         pathRemaining = parentPath;
-            // TreePath.getPath(pathRemaining.getCompilationUnit(), leaf);
-      } else if (loc.tag == TypePathEntryKind.WILDCARD
+        // TreePath.getPath(pathRemaining.getCompilationUnit(), leaf);
+      } else if (loc.step == TypePath.WILDCARD_BOUND
           && leaf.getKind() == Tree.Kind.UNBOUNDED_WILDCARD) {
         // Check if the leaf is an unbounded wildcard instead of the parent, since unbounded
         // wildcard has no members so it can't be the parent of anything.
@@ -288,7 +295,7 @@ public class GenericArrayLocationCriterion implements Criterion {
         }
         locationRemaining.remove(locationRemaining.size() - 1);
       } else if (parent.getKind() == Tree.Kind.PARAMETERIZED_TYPE) {
-        if (loc.tag != TypePathEntryKind.TYPE_ARGUMENT) {
+        if (loc.step != TypePath.TYPE_ARGUMENT) {
           return false;
         }
 
@@ -304,7 +311,7 @@ public class GenericArrayLocationCriterion implements Criterion {
           // && fieldAccess.type.tsym.isStatic()
           // TODO: check whether MEMBER_SELECT indicates inner or qualifier?
           if (i < 0) { break; }
-          if (locationRemaining.get(i).tag != TypePathEntryKind.INNER_TYPE) {
+          if (locationRemaining.get(i).step != TypePath.INNER_TYPE) {
             return false;
           }
           locationRemaining.remove(i--);
@@ -316,8 +323,8 @@ public class GenericArrayLocationCriterion implements Criterion {
             inner = ((ParameterizedTypeTree) inner).getType();
           }
         }
-        if (i >= 0 && locationRemaining.get(i).tag ==
-            TypePathEntryKind.INNER_TYPE) {
+        if (i >= 0 && locationRemaining.get(i).step ==
+            TypePath.INNER_TYPE) {
           return false;
         }
 
@@ -327,8 +334,8 @@ public class GenericArrayLocationCriterion implements Criterion {
         List<? extends Tree> childTrees =
             ((ParameterizedTypeTree) parent).getTypeArguments();
         boolean found = false;
-        if (childTrees.size() > loc.arg) {
-          Tree childi = childTrees.get(loc.arg);
+        if (childTrees.size() > loc.argument) {
+          Tree childi = childTrees.get(loc.argument);
           if (childi.getKind() == Tree.Kind.ANNOTATED_TYPE) {
             childi = ((AnnotatedTypeTree) childi).getUnderlyingType();
           }
@@ -354,13 +361,13 @@ public class GenericArrayLocationCriterion implements Criterion {
           if (debug) {
             System.out.printf("Generic failed for leaf: %s: nr children: %d loc: %s child: %s%n",
                              leaf, childTrees.size(), loc,
-                             ((childTrees.size() > loc.arg) ? childTrees.get(loc.arg) : null));
+                             ((childTrees.size() > loc.argument) ? childTrees.get(loc.argument) : null));
           }
           return false;
         }
       } else if (parent.getKind() == Tree.Kind.EXTENDS_WILDCARD
                  || parent.getKind() == Tree.Kind.SUPER_WILDCARD) {
-        if (loc.tag != TypePathEntryKind.WILDCARD || locationRemaining.size() == 1) {
+        if (loc.step != TypePath.WILDCARD_BOUND || locationRemaining.size() == 1) {
           // If there's only one location left, this can't be a match since a wildcard
           // needs to be in another kind of compound type.
           return false;
@@ -392,7 +399,7 @@ public class GenericArrayLocationCriterion implements Criterion {
           return false;
         }
       } else if (parent.getKind() == Tree.Kind.ARRAY_TYPE) {
-        if (loc.tag != TypePathEntryKind.ARRAY) {
+        if (loc.step != TypePath.ARRAY_ELEMENT) {
           return false;
         }
         locationRemaining.remove(locationRemaining.size() - 1);
@@ -403,7 +410,7 @@ public class GenericArrayLocationCriterion implements Criterion {
         //                   parent, loc);
         Tree elt = ((ArrayTypeTree) parent).getType();
         while (locationRemaining.size() > 0
-                && locationRemaining.get(locationRemaining.size() - 1).tag == TypePathEntryKind.ARRAY) {
+                && locationRemaining.get(locationRemaining.size() - 1).step == TypePath.ARRAY_ELEMENT) {
           if (elt.getKind() != Tree.Kind.ARRAY_TYPE) { // ArrayTypeTree
             if (debug) {
               System.out.printf("Element: %s is not an ArrayTypeTree and therefore false.\n", elt);
@@ -430,7 +437,7 @@ public class GenericArrayLocationCriterion implements Criterion {
           return false;
         }
       } else if (parent.getKind() == Tree.Kind.NEW_ARRAY) {
-        if (loc.tag != TypePathEntryKind.ARRAY) {
+        if (loc.step != TypePath.ARRAY_ELEMENT) {
           return false;
         }
         if (debug) {
@@ -497,9 +504,9 @@ public class GenericArrayLocationCriterion implements Criterion {
   @Override
   public String toString() {
     return "GenericArrayLocationCriterion at " +
-    ((location.isEmpty())
-     ? "outermost type"
-     : ("( " + location.toString() + " )"));
+        (typePath == null
+            ? "outermost type"
+            : ("( " + typePath.toString() + " )"));
   }
 
   /**
@@ -508,6 +515,6 @@ public class GenericArrayLocationCriterion implements Criterion {
    * @return an unmodifiable list of {@link TypePathEntry}s
    */
   public List<TypePathEntry> getLocation() {
-    return Collections.unmodifiableList(location);
+    return location == null ? Collections.emptyList() : Collections.unmodifiableList(location);
   }
 }

@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringJoiner;
 
+import org.objectweb.asm.TypePath;
 import scenelib.annotations.Annotation;
 import scenelib.annotations.el.AClass;
 import scenelib.annotations.el.AElement;
@@ -26,18 +27,16 @@ import scenelib.annotations.el.AnnotationDef;
 import scenelib.annotations.el.BoundLocation;
 import scenelib.annotations.el.DefCollector;
 import scenelib.annotations.el.DefException;
-import scenelib.annotations.el.InnerTypeLocation;
 import scenelib.annotations.el.LocalLocation;
 import scenelib.annotations.el.RelativeLocation;
 import scenelib.annotations.el.TypeIndexLocation;
+import scenelib.annotations.el.TypePathEntry;
 import scenelib.annotations.field.AnnotationAFT;
 import scenelib.annotations.field.AnnotationFieldType;
 import scenelib.annotations.field.ArrayAFT;
 import scenelib.annotations.field.BasicAFT;
 import scenelib.annotations.field.ClassTokenAFT;
 import scenelib.annotations.util.Strings;
-
-import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
 
 /**
  * IndexFileWriter provides two static methods named <code>write</code>
@@ -149,15 +148,16 @@ public final class IndexFileWriter {
     }
 
     private void printInnerTypes(String indentation, ATypeElement e) {
-      for (Map. Entry<InnerTypeLocation,
+      for (Map. Entry<List<TypePathEntry>,
               ATypeElement> ite : e.innerTypes.entrySet()) {
-          InnerTypeLocation loc = ite.getKey();
+          TypePath typePath = TypePathEntry.listToTypePath(ite.getKey());
           AElement it = ite.getValue();
           pw.print(indentation + "inner-type");
           char sep = ' ';
-          for (TypePathEntry l : loc.location) {
+          // TODO: Long term: Should change representation to mirror org.objectweb.asm.TypePath
+          for (int index = 0; typePath != null && index < typePath.getLength(); index++) {
               pw.print(sep);
-              pw.print(typePathEntryToString(l));
+              pw.print(typePathStepToString(typePath, index));
               sep = ',';
           }
           pw.print(':');
@@ -168,15 +168,16 @@ public final class IndexFileWriter {
 
     private void printInnerTypes(String indentation, ATypeElement e,
             ASTPath path) {
-        for (Map. Entry<InnerTypeLocation,
+        for (Map. Entry<List<TypePathEntry>,
                 ATypeElement> ite : e.innerTypes.entrySet()) {
-            InnerTypeLocation loc = ite.getKey();
+            TypePath typePath = TypePathEntry.listToTypePath(ite.getKey());
             AElement it = ite.getValue();
             pw.print(indentation + "inner-type");
             char sep = ' ';
-            for (TypePathEntry l : loc.location) {
+            // TODO: Long term: Should change representation to mirror org.objectweb.asm.TypePath
+            for (int index = 0; index < typePath.getLength(); index++) {
                 pw.print(sep);
-                pw.print(typePathEntryToString(l));
+                pw.print(typePathStepToString(typePath, index));
                 sep = ',';
             }
             pw.print(':');
@@ -189,8 +190,18 @@ public final class IndexFileWriter {
      * Converts the given {@link TypePathEntry} to a string of the form
      * {@code tag, arg}, where tag and arg are both integers.
      */
+    private String typePathStepToString(TypePath typePath, int index) {
+        int typePathStep = typePath.getStep(index);
+        int typePathStepArgument = typePathStep == TypePath.TYPE_ARGUMENT ? typePath.getStepArgument(index) : 0;
+        return typePathStep + ", " + typePathStepArgument;
+    }
+
+    /**
+     * Converts the given {@link TypePathEntry} to a string of the form
+     * {@code tag, arg}, where tag and arg are both integers.
+     */
     private String typePathEntryToString(TypePathEntry t) {
-        return t.tag.tag + ", " + t.arg;
+        return t.step + ", " + t.argument;
     }
 
     private void printNumberedAmbigiousElements(String indentation,
@@ -212,19 +223,19 @@ public final class IndexFileWriter {
             return;
         }
         printElement(indentation + INDENT, "type", e.type);
-        for (Map. Entry<InnerTypeLocation, ATypeElement> ite
+        for (Map. Entry<List<TypePathEntry>, ATypeElement> ite
                 : e.type.innerTypes.entrySet()) {
-            InnerTypeLocation loc = ite.getKey();
+            TypePath typePath = TypePathEntry.listToTypePath(ite.getKey());
             AElement it = ite.getValue();
             pw.print(indentation + INDENT + INDENT + "inner-type");
             boolean first = true;
-            for (TypePathEntry l : loc.location) {
+            for (int index = 0; index < typePath.getLength(); index++) {
                 if (first) {
                     pw.print(' ');
                 } else {
                     pw.print(',');
                 }
-                pw.print(typePathEntryToString(l));
+                pw.print(typePathStepToString(typePath, index));
                 first = false;
             }
             pw.print(':');
@@ -448,10 +459,9 @@ public final class IndexFileWriter {
                     LocalLocation loc = le.getKey();
                     AElement l = le.getValue();
                     StringBuilder sb = new StringBuilder("local ");
-                    sb.append(loc.varName == null
-                        ? loc.index
-                            + " #" + loc.scopeStart + "+" + loc.scopeLength
-                        : loc.varName);
+                    sb.append(loc.variableName == null
+                        ? loc.getVarIndex() + " #" + loc.getScopeStart() + "+" + loc.getScopeLength()
+                        : loc.variableName);
                     printElement(indent2, sb.toString(), l);
                     printTypeElementAndInnerTypes(indent3,
                             "type", l.type);
