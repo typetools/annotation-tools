@@ -342,6 +342,8 @@ public class AScene implements Cloneable {
                 checkCloneElem(el.receiver, m.receiver);
                 checkCloneElems(el.parameters, m.parameters);
                 checkCloneElems(el.throwsException, m.throwsException);
+                checkCloneElems(el.preconditions, m.preconditions);
+                checkCloneElems(el.postconditions, m.postconditions);
                 checkCloneElem(el.body, m.body);
                 return null;
             }

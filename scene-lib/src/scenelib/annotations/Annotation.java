@@ -83,8 +83,8 @@ public final class Annotation {
                 // No need to modify valueString.
             }
             assert aft.isValidValue(value)
-                : String.format("Bad field value%n  %s (%s)%nfor field%n  %s (%s)%nin annotation%n  %s",
-                                valueString, classString, aft, aft.getClass(), def);
+                    : String.format("isValidValue returned false.  aft=%s [%s], value=%s = %s [%s] [%s]%n  def = %s",
+                                    aft, aft.getClass(), value, valueString, value.getClass(), classString, def);
         }
     }
 

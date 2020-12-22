@@ -1,5 +1,6 @@
 package scenelib.annotations.field;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import java.util.Collection;
 
 /**
@@ -8,18 +9,20 @@ import java.util.Collection;
 public final class ArrayAFT extends AnnotationFieldType {
 
     /**
-     * The element type of the array, or <code>null</code> if it is unknown
+     * The element type of the array, or {@code null} if it is unknown
      * (see {@link scenelib.annotations.AnnotationBuilder#addEmptyArrayField}).
      */
-    public final ScalarAFT elementType;
+    public final @Nullable ScalarAFT elementType;
 
     /**
      * Constructs a new {@link ArrayAFT} representing an array type with
      * the given element type.  <code>elementType</code> may be
      * <code>null</code> to indicate that the element type is unknown
      * (see {@link scenelib.annotations.AnnotationBuilder#addEmptyArrayField}).
+     *
+     * @param elementType the element type of the array, or {@code null} if it is unknown
      */
-    public ArrayAFT(ScalarAFT elementType) {
+    public ArrayAFT(@Nullable ScalarAFT elementType) {
         this.elementType = elementType;
     }
 
