@@ -10,12 +10,20 @@ import java.util.Objects;
 /**
  * A TypePathEntry is a way to get from one node in a {@link TypePath} to another.
  * One can treat these as edges in a graph.
- * A list of TypePathEntry corresponds to a {@link TypePath}.
+ *
+ * ASM has a data structure {@link TypePath}.  {@code List<TypePathEntry>}
+ * corresponds to a {@code TypePath}.  That is, each TypePathEntry corresponds
+ * to a step in an ASM TypePath.
+
+ * {@code List<TypePathEntry>} also corresponds to the javac class
+ * {@code com.sun.tools.javac.code.TypeAnnotationPosition}.
  */
 public class TypePathEntry {
   /**
-   * How to get from the previous node in a TypePath to this one.
+   * The kind of TypePathEntry; that is, how to get from the previous node in a TypePath to this one.
    * One of TypePath.ARRAY_ELEMENT, TypePath.INNER_TYPE, TypePath.WILDCARD_BOUND, TypePath.TYPE_ARGUMENT.
+   *
+   * This corresponds to javac class {@code com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry}.
    */
   public final int step;
   /**
