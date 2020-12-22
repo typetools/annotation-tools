@@ -34,24 +34,6 @@ public final class LocalLocation {
      */
     public final String variableName;
 
-    // We now use the public ASM bytecode framework instead of our own local copy.
-    // This means the following member variables can no longer be accessed directly:
-    //   int scopeStart;
-    //   int scopeLength;
-    //   int varIndex;
-    // Instead, the following accessor methods must be used:
-    //   int getScopeStart();
-    //   int getScopeLength();
-    //   int getVarIndex();
-
-
-    /**
-     * The bytecode offset to the start of the scope. Used for backwards compatibility with ASMX stuff and JAIF files.
-     * We no longer save scopeStart; it is calculated on demand via getScopeStart().
-     */
-    private int scopeStart;
-    private int scopeEnd;
-
     /**
      * The length of the scope. Used for backwards compatibility with ASMX stuff and JAIF files.
      * We no longer save scopeLength; it is calculated on demand via getScopeLength().
@@ -109,11 +91,10 @@ public final class LocalLocation {
      */
     public int getScopeStart() {
         try {
-            scopeStart = start[0].getOffset();
+            return start[0].getOffset();
         } catch (IllegalStateException e) {
             System.err.println("Labels not resolved: " + Arrays.toString(start));
         }
-        return scopeStart;
     }
 
     /**
@@ -123,11 +104,10 @@ public final class LocalLocation {
     public int getScopeLength() {
         // Should this be end[0] instead?
         try {
-            scopeEnd = end[end.length - 1].getOffset();
+            return end[end.length - 1].getOffset() - getScopeStart();
         } catch (IllegalStateException e) {
             System.err.println("Labels not resolved: " + Arrays.toString(end));
         }
-        return scopeEnd - getScopeStart();
     }
 
     /**
