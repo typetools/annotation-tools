@@ -1090,7 +1090,7 @@ public class Main {
    */
   public static String leafString(TreePath path) {
     if (path == null) {
-      return "null";
+      return "null path";
     }
     return treeToString(path.getLeaf());
   }
