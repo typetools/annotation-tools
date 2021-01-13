@@ -586,9 +586,15 @@ public final class IndexFileParser {
                 Annotation a = parseAnnotationBody(d, ab);
                 for (Annotation other : e.tlAnnotationsHere) {
                     if (a.def.name.equals(other.def.name)) {
-                        System.err.println(
-                                "WARNING: duplicate annotation of type "
-                                        + a.def().name);
+                        // Don't output this warning, because the annotation might be repeatable.
+                        // TODO: IndexFileWriter should output the @Repeatable(EnsuresQualifier.List.class)
+                        // meta-annotation if present (and maybe other meta-annotations too), and
+                        // then this code can output the warning (or even crash) if it is not present.
+                        if (false) {
+                        System.err.printf(
+                            "WARNING: duplicate annotation of type %s on %s%n",
+                            a.def().name, e.description);
+                        }
                         continue;
                     }
                 }

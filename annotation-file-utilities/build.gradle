@@ -52,12 +52,12 @@ dependencies {
         javacJar group: 'com.google.errorprone', name: 'javac', version: "9+181-r4173-1"
         implementation 'com.google.errorprone:javac:9+181-r4173-1'
     }
-    implementation 'org.plumelib:bcel-util:1.1.9'
-    implementation 'org.plumelib:options:1.0.4'
-    implementation 'org.plumelib:plume-util:1.2.0'
-    implementation 'org.plumelib:reflection-util:1.0.2'
+    implementation 'org.plumelib:bcel-util:1.1.10'
+    implementation 'org.plumelib:options:1.0.5'
+    implementation 'org.plumelib:plume-util:1.4.1'
+    implementation 'org.plumelib:reflection-util:1.0.3'
     // Annotations in checker-qual.jar are used, but no checkers are (currently) run on the code.
-    compileOnly 'org.checkerframework:checker-qual:3.8.0'
+    compileOnly 'org.checkerframework:checker-qual:3.9.0'
     implementation 'com.google.errorprone:error_prone_annotations:2.4.0'
     implementation ('org.checkerframework.annotatedlib:guava:30.0-jre') {
         // So long as Guava only uses annotations from checker-qual, excluding it should not cause problems.
@@ -502,7 +502,7 @@ configurations {
   requireJavadoc
 }
 dependencies {
-  requireJavadoc "org.plumelib:require-javadoc:1.0.0"
+  requireJavadoc "org.plumelib:require-javadoc:1.0.1"
 }
 task requireJavadoc(type: JavaExec) {
   description = 'Ensures that Javadoc documentation exists.'

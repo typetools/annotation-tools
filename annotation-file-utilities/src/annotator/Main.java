@@ -19,14 +19,26 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.google.common.collect.LinkedHashMultimap;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.SetMultimap;
+import com.sun.source.tree.CompilationUnitTree;
+import com.sun.source.tree.ExpressionTree;
+import com.sun.source.tree.Tree;
+import com.sun.source.util.TreePath;
+import com.sun.tools.javac.main.CommandLine;
+import com.sun.tools.javac.tree.JCTree;
+
 import org.objectweb.asm.TypePath;
+
 import org.plumelib.options.Option;
 import org.plumelib.options.OptionGroup;
 import org.plumelib.options.Options;
+import org.plumelib.reflection.ReflectionPlume;
 import org.plumelib.util.FileIOException;
-import org.plumelib.util.UtilPlume;
 import org.plumelib.util.Pair;
-import scenelib.annotations.el.TypePathEntry;
+import org.plumelib.util.UtilPlume;
+
 import scenelib.type.Type;
 import scenelib.annotations.Annotation;
 import scenelib.annotations.el.ABlock;
@@ -43,6 +55,7 @@ import scenelib.annotations.el.AnnotationDef;
 import scenelib.annotations.el.DefException;
 import scenelib.annotations.el.ElementVisitor;
 import scenelib.annotations.el.LocalLocation;
+import scenelib.annotations.el.TypePathEntry;
 import scenelib.annotations.io.ASTIndex;
 import scenelib.annotations.io.ASTPath;
 import scenelib.annotations.io.ASTRecord;
@@ -63,16 +76,6 @@ import annotator.find.TreeFinder;
 import annotator.find.TypedInsertion;
 import annotator.scanner.LocalVariableScanner;
 import annotator.specification.IndexFileSpecification;
-
-import com.google.common.collect.LinkedHashMultimap;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.SetMultimap;
-import com.sun.source.tree.CompilationUnitTree;
-import com.sun.source.tree.ExpressionTree;
-import com.sun.source.tree.Tree;
-import com.sun.source.util.TreePath;
-import com.sun.tools.javac.main.CommandLine;
-import com.sun.tools.javac.tree.JCTree;
 
 /**
  * This is the main class for the annotator, which inserts annotations in
@@ -279,10 +282,12 @@ public class Main {
     public Void visitMethod(AMethod el0, AElement el) {
       AMethod el1 = (AMethod) el;
       filter(el0.bounds, el1.bounds);
-      filter(el0.parameters, el1.parameters);
-      filter(el0.throwsException, el1.throwsException);
       el0.returnType.accept(this, el1.returnType);
       el0.receiver.accept(this, el1.receiver);
+      filter(el0.parameters, el1.parameters);
+      filter(el0.throwsException, el1.throwsException);
+      filter(el0.preconditions, el1.preconditions);
+      filter(el0.postconditions, el1.postconditions);
       el0.body.accept(this, el1.body);
       return visitDeclaration(el0, el);
     }
@@ -654,6 +659,8 @@ public class Main {
                   "To fix the problem, add class "
                       + causeMessage.substring(22)
                       + " to the classpath.");
+              System.err.println("The classpath is:");
+              System.err.println(ReflectionPlume.classpathToString());
             }
           }
           if (print_error_stack) {
@@ -800,6 +807,15 @@ public class Main {
             int pos = pair.a;  // reset each iteration in case of dyn adjustment
             if (iToInsert.isSeparateLine()) {
               // System.out.printf("isSeparateLine=true for insertion at pos %d: %s%n", pos, iToInsert);
+
+              // If an annotation should have its own line, first check that the insertion location
+              // is the first non-whitespace on its line. If so, then the insertion content should
+              // be the annotation, followed, by a line break, followed by a copy of the indentation
+              // of the line being inserted onto. This puts the annotation on its own line aligned
+              // with the contents of the next line.
+
+              // Number of whitespace characters preceeding the insertion position on the same line
+              // (tabs count as one).
               int indentation = 0;
               while ((pos - indentation != 0)
                      // horizontal whitespace
@@ -809,8 +825,9 @@ public class Main {
                 //                   pos, indentation, src.charAt(pos-indentation-1));
                 indentation++;
               }
+              // Checks that insertion position is the first non-whitespace on the line it occurs
+              // on.
               if ((pos - indentation == 0)
-                  // horizontal whitespace
                   || (src.charAt(pos-indentation-1) == '\f'
                       || src.charAt(pos-indentation-1) == '\n'
                       || src.charAt(pos-indentation-1) == '\r')) {
@@ -1075,7 +1092,7 @@ public class Main {
    */
   public static String leafString(TreePath path) {
     if (path == null) {
-      return "null";
+      return "null path";
     }
     return treeToString(path.getLeaf());
   }

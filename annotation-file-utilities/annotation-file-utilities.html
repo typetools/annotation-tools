@@ -140,13 +140,13 @@ The following instructions assume either a Linux or Windows system using a comma
 
 <p>
 The current release is Annotation File Utilities version
-<!-- afu-version -->3.9.15, 01 Dec 2020<!-- /afu-version -->.
+<!-- afu-version -->3.9.16, 04 Jan 2021<!-- /afu-version -->.
 </p>
 
 <ol>
 <li>
   Download
-  <a href="annotation-tools-3.9.15.zip"><!-- annotation-tools-zip-version -->annotation-tools-3.9.15.zip<!-- /annotation-tools-zip-version --></a>.
+  <a href="annotation-tools-3.9.16.zip"><!-- annotation-tools-zip-version -->annotation-tools-3.9.16.zip<!-- /annotation-tools-zip-version --></a>.
 </li>
 
 <li>
@@ -156,7 +156,7 @@ The current release is Annotation File Utilities version
   (You will typically make <code>annotation-tools/</code> a sibling of
   <code>checker-framework/</code>.)
 
-  <pre><code>unzip annotation-tools-3.9.15.zip</code></pre>
+  <pre><code>unzip annotation-tools-3.9.16.zip</code></pre>
 
 </li>
 
@@ -212,11 +212,9 @@ Alternately, see the source code repository at
 </p>
 
 <p>
-To compile, run
-<code>ant jarfile</code> from the <code>annotation-file-utilities</code>
-subdirectory.  If the <code>javac</code> and <code>java</code> programs are
-not on your execution path, see the notes near the top of
-<code>annotation-file-utilities/tests/Makefile</code>.
+To compile and run tests, do
+<code>./gradlew build</code> from the <code>annotation-file-utilities</code>
+subdirectory.
 </p>
 
 
