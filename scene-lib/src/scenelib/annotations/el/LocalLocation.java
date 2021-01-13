@@ -34,16 +34,35 @@ public final class LocalLocation {
      */
     public final String variableName;
 
-    /**
-     * The length of the scope. Used for backwards compatibility with ASMX stuff and JAIF files.
-     * We no longer save scopeLength; it is calculated on demand via getScopeLength().
-     */
-    //private int scopeLength;
+    // We now use the public ASM bytecode framework instead of our own local copy.
+    // As part of the implementation changes, the following member variables
+    // of LocalLocation no longer exist:
+    //   int scopeStart;
+    //   int scopeLength;
+    //   int varIndex;
+    // Instead, the following accessor methods must be used:
+    //   int getScopeStart();
+    //   int getScopeLength();
+    //   int getVarIndex();
 
+    /**
+     * Construct a new LocalLocation.
+     *
+     * @param variableName the name of the local variable
+     * @param index the offset of the variable in the stack frame
+     */
     public LocalLocation(String variableName, int index) {
-        this(new Label[] {}, new Label[] {}, new int[] {index}, variableName);
+        this(new Label[] {new Label()}, new Label[] {new Label()}, new int[] {index}, variableName);
     }
 
+    /**
+     * Construct a new LocalLocation.
+     *
+     * @param start an array of Labels indicating the start of the variable's lifetime(s)
+     * @param end an array of Labels indicating the end of the variable's lifetime(s)
+     * @param index an array of ints indicating the stack offset of the variable's lifetime(s)
+     * @param variableName the name of the local variable
+     */
     public LocalLocation(Label[] start, Label[] end, int[] index, String variableName) {
         this.start = start;
         this.end = end;
@@ -51,6 +70,13 @@ public final class LocalLocation {
         this.variableName = variableName;
     }
 
+    /**
+     * Construct a new LocalLocation.
+     *
+     * @param index the offset of the variable in the stack frame
+     * @param scopeStart the bytecode offset of the start of the variable's lifetime
+     * @param scopeLength the bytecode length of the variable's lifetime
+     */
     public LocalLocation(int index, int scopeStart, int scopeLength) {
         // Only being used by Writers, not Readers for now. Should possibly deprecate this in the future.
         // Changes values reflectively.
@@ -94,6 +120,7 @@ public final class LocalLocation {
             return start[0].getOffset();
         } catch (IllegalStateException e) {
             System.err.println("Labels not resolved: " + Arrays.toString(start));
+            return -1;
         }
     }
 
@@ -107,6 +134,7 @@ public final class LocalLocation {
             return end[end.length - 1].getOffset() - getScopeStart();
         } catch (IllegalStateException e) {
             System.err.println("Labels not resolved: " + Arrays.toString(end));
+            return -1;
         }
     }
 

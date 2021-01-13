@@ -5,6 +5,7 @@
 # possible location.
 
 JAVA?=java
+JAVAC?=javac
 
 ANNCAT ?= ../../../scene-lib/anncat
 JAVAVERSION = $(shell $(JAVA) -version 2>&1)

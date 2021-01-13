@@ -30,6 +30,7 @@ import scenelib.annotations.AnnotationBuilder;
 import scenelib.annotations.AnnotationFactory;
 import scenelib.annotations.Annotations;
 import scenelib.annotations.ArrayBuilder;
+import scenelib.annotations.el.ABlock;
 import scenelib.annotations.el.AClass;
 import scenelib.annotations.el.AElement;
 import scenelib.annotations.el.AField;
@@ -48,6 +49,7 @@ import scenelib.annotations.field.BasicAFT;
 import scenelib.annotations.field.ClassTokenAFT;
 import scenelib.annotations.field.EnumAFT;
 import scenelib.annotations.field.ScalarAFT;
+import scenelib.annotations.util.coll.VivifyingMap;
 
 /**
  * A <code> ClassAnnotationSceneReader </code> is a
@@ -72,31 +74,32 @@ import scenelib.annotations.field.ScalarAFT;
  * and should not be called anywhere else, due to the order in which
  * {@link org.objectweb.asm.ClassVisitor} methods should be called.
  */
-public class ClassAnnotationSceneReader extends ClassVisitor {
+public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
   // general strategy:
   // -only "Runtime[In]visible[Type]Annotations" are supported
   // -use an empty visitor for everything besides annotations, fields and
   //  methods; for those three, use a special visitor that does all the work
   //  and inserts the annotations correctly into the specified AElement
 
-  /**
-   * Whether to output tracing information
-   */
+  /** Whether to output tracing information. */
   private static final boolean trace = false;
 
-  // Whether to output error messages for unsupported cases
+  /** Whether to output error messages for unsupported cases. */
   private static final boolean strict = false;
 
-  // Whether to include annotations on compiler-generated methods
+  /** Whether to include annotations on compiler-generated methods. */
   private final boolean ignoreBridgeMethods;
 
-  // The scene into which this class will insert annotations.
+  /** The scene into which this class will insert annotations. */
   private final AScene scene;
 
-  // The AClass that will be visited, which already contains annotations.
+  /** The AClass that will be visited, which already contains annotations. */
   private AClass aClass;
 
+  /** ClassReader for reading the class file. */
   private final ClassReader classReader;
+
+  /** ClassWriter for writing the class file. */
   private final ClassWriter classWriter;
 
   /**
@@ -124,9 +127,8 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
    * @param ignoreBridgeMethods whether to omit annotations on
    *  compiler-generated methods
    */
-  public ClassAnnotationSceneReader(int api, ClassReader classReader, AScene scene,
-      boolean ignoreBridgeMethods) {
-    super(api);
+  public ClassAnnotationSceneReader(int api, ClassReader classReader, AScene scene, boolean ignoreBridgeMethods) {
+    super(api, classReader);
     this.classReader = classReader;
     this.classWriter = new ClassWriter(classReader, api);
     super.cv = classWriter;
@@ -196,7 +198,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
     }
     if (trace) { System.out.printf("visitMethod(%s, %s, %s, %s, %s) in %s (%s)%n", access, name, descriptor, signature, Arrays.toString(exceptions), this, this.getClass()); }
     AMethod aMethod = aClass.methods.getVivify(name+descriptor);
-    MethodVisitor methodWriter = classWriter.visitMethod(access, name, descriptor, signature, exceptions);
+    MethodVisitor methodWriter = super.visitMethod(access, name, descriptor, signature, exceptions);
     return new MethodAnnotationSceneReader(this.api, name, descriptor, signature, aMethod, methodWriter);
   }
 
@@ -241,17 +243,27 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
     //  properly call the right annotationBuilder methods on its visitEnd().
     // For type annotations, see TypeAnnotationSceneReader.
 
-    // The AElement into which the annotation visited should be inserted.
+    /** The AElement into which the annotation visited should be inserted. */
     protected AElement aElement;
 
-    // Whether or not this annotation is visible at runtime.
+    /** Whether or not this annotation is visible at runtime. */
     protected boolean visible;
 
-    // The AnnotationBuilder used to create this annotation.
+    /** The AnnotationBuilder used to create this annotation. */
     private AnnotationBuilder annotationBuilder;
 
+    /** The AnnotationVisitor used to visit this annotation. */
     protected AnnotationVisitor annotationWriter;
 
+    /** The current offset into a method's bytecodes. */
+    protected int xOffset;
+
+    /**
+     * Retrieve annotation definition, including retention policy.
+     *
+     * @param jvmlClassName class to inspect
+     * @return an annotation definition for the class
+     */
     @SuppressWarnings("unchecked")
     private AnnotationDef getAnnotationDef(String jvmlClassName) {
       String annoTypeName = classDescToName(jvmlClassName);
@@ -286,6 +298,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
      * visibility.  Calling visitEnd() will ensure that this writes out the
      * annotation it visits into aElement.
      *
+     * @param api the ASM API version to use
      * @param descriptor the class descriptor of the enumeration class.
      * @param visible whether or not this annotation is visible at runtime.
      * @param aElement the AElement into which the annotation visited should be inserted.
@@ -446,6 +459,15 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
     }
 
     /**
+     * Save the current offset into a method's bytecodes.
+     *
+     * @param offset bytecode offset
+     */
+    protected void visitXOffset(int offset) {
+      xOffset = offset;
+    }
+
+    /**
      * Visits the end of the annotation, and actually writes out the
      *  annotation into aElement.
      *
@@ -477,7 +499,8 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
 
     /**
      * Returns an annotation, ready to be placed into the scene, from
-     *  the information visited.
+     * the information visited.
+     *
      * @return the annotation to be placed into the scene
      */
     Annotation makeAnnotation() {
@@ -487,6 +510,9 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
     /**
      * Hook for NestedAnnotationSceneReader; overridden by
      * ArrayAnnotationSceneReader to add an array element instead of a field
+     *
+     * @param fieldName name of field
+     * @param annotation annotation to be added to the field
      */
     void supplySubannotation(String fieldName, Annotation annotation) {
       annotationBuilder.addScalarField(fieldName,
@@ -512,7 +538,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
     // For type annotation information, store all arguments passed in and on
     //  this.visitEnd(), handle all the information based on target type.
 
-    // A reference to the annotated type.
+    /** A reference to the annotated type. */
     private final TypeReference typeReference;
 
     /**
@@ -540,11 +566,6 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
     private final int[] index;
 
     /**
-     * The current Label being visited.
-     */
-    private final Label currentLabel;
-
-    /**
      * The name of the local variable being visited.
      */
     private final String localVariableName;
@@ -553,8 +574,14 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
      * Constructs a new TypeAnnotationSceneReader with the given description and
      * visibility.  Calling visitEnd() will ensure that this writes out the
      * annotation it visits into aElement.
+     *
+     * @param api the ASM API version to use
+     * @param descriptor the descriptor of the reader
+     * @param visible whether or not this annotation is visible at runtime
+     * @param aElement the AElement into which the annotation visited should be inserted
+     * @param annotationWriter the AnnotationWriter passed by the caller
      * @param typeRef A reference to the annotated type. This has information about the target type, param index and
-     *                bound index for the type annotation. {@see org.objectweb.asm.TypeReference}
+     *                bound index for the type annotation. @see org.objectweb.asm.TypeReference
      * @param typePath The path to the annotated type argument, wildcard bound, array element type, or static inner
      *                 type within 'typeRef'. May be null if the annotation targets 'typeRef' as a whole.
      * @param start the start of the scopes of the element being visited. Used only for TypeReference#LOCAL_VARIABLE
@@ -563,21 +590,36 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
      *            and TypeReference#RESOURCE_VARIABLE.
      * @param index The indices of the element being visited in the classfile. Used only for TypeReference#LOCAL_VARIABLE
      *              and TypeReference#RESOURCE_VARIABLE.
-     * @param currentLabel The current Label being visited.
      */
     TypeAnnotationSceneReader(int api, String descriptor, boolean visible, AElement aElement, AnnotationVisitor annotationWriter,
-                              int typeRef, TypePath typePath, Label[] start, Label[] end, int[] index, Label currentLabel) {
-      this(api, descriptor, visible, aElement, annotationWriter, typeRef, typePath, start, end, index, currentLabel, null);
+                              int typeRef, TypePath typePath, Label[] start, Label[] end, int[] index) {
+      this(api, descriptor, visible, aElement, annotationWriter, typeRef, typePath, start, end, index, null);
     }
 
     /**
      * Constructs a new AnnotationScene reader with the given description and
      * visibility.  Calling visitEnd() will ensure that this writes out the
      * annotation it visits into aElement.
-     * @param localVariableName the name of the local variable being visited.
+     *
+     * @param api the ASM API version to use
+     * @param descriptor the descriptor of the reader
+     * @param visible whether or not this annotation is visible at runtime
+     * @param aElement the AElement into which the annotation visited should be inserted
+     * @param annotationWriter the AnnotationWriter passed by the caller
+     * @param typeRef A reference to the annotated type. This has information about the target type, param index and
+     *                bound index for the type annotation. @see org.objectweb.asm.TypeReference
+     * @param typePath The path to the annotated type argument, wildcard bound, array element type, or static inner
+     *                 type within 'typeRef'. May be null if the annotation targets 'typeRef' as a whole.
+     * @param start the start of the scopes of the element being visited. Used only for TypeReference#LOCAL_VARIABLE
+     *              and TypeReference#RESOURCE_VARIABLE.
+     * @param end the end of the scopes of the element being visited. Used only for TypeReference#LOCAL_VARIABLE
+     *            and TypeReference#RESOURCE_VARIABLE.
+     * @param index The indices of the element being visited in the classfile. Used only for TypeReference#LOCAL_VARIABLE
+     *              and TypeReference#RESOURCE_VARIABLE.
+     * @param localVariableName the name of the local variable being visited
      */
     TypeAnnotationSceneReader(int api, String descriptor, boolean visible, AElement aElement, AnnotationVisitor annotationWriter,
-                              int typeRef, TypePath typePath, Label[] start, Label[] end, int[] index, Label currentLabel,
+                              int typeRef, TypePath typePath, Label[] start, Label[] end, int[] index,
                               String localVariableName) {
       super(api, descriptor, visible, aElement, annotationWriter);
       this.typeReference = new TypeReference(typeRef);
@@ -585,7 +627,6 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
       this.start = start;
       this.end = end;
       this.index = index;
-      this.currentLabel = currentLabel;
       if (typeReference.getSort() != TypeReference.LOCAL_VARIABLE && typeReference.getSort() != TypeReference.RESOURCE_VARIABLE) {
         if (start != null || end != null || index != null) {
           System.err.printf("Error: LOCAL_VARIABLE and RESOURCE_VARIABLE TypeReference with start = %s, end = %s, index = %s",
@@ -626,7 +667,14 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
             break;
           case TypeReference.LOCAL_VARIABLE:
           case TypeReference.RESOURCE_VARIABLE:
-            handleMethodLocalVariable((AMethod) aElement);
+            if (aElement instanceof AMethod) {
+              handleMethodLocalVariable((AMethod) aElement);
+            } else {
+              // TODO: in field initializers
+              if (strict) {
+                System.err.println("Unhandled local variable annotation for " + aElement);
+              }
+            }
             break;
           case TypeReference.NEW:
             if (aElement instanceof AMethod) {
@@ -868,6 +916,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
    * @param aMethod the annotatable method in which annotation will be inserted
    */
   private void handleMethodObjectCreation(AMethod aMethod) {
+    visitXOffset(getPreviousCodeOffset());
     if (typePath == null) {
       aMethod.body.news.getVivify(makeOffset(false))
           .tlAnnotationsHere.add(makeAnnotation());
@@ -884,6 +933,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
    * @param aMethod the annotatable method in which annotation will be inserted
    */
   private void handleMethodInstanceOf(AMethod aMethod) {
+    visitXOffset(getPreviousCodeOffset());
     if (typePath == null) {
       aMethod.body.instanceofs.getVivify(makeOffset(false))
           .tlAnnotationsHere.add(makeAnnotation());
@@ -915,6 +965,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
    * @param aMethod the annotatable method in which annotation will be inserted
    */
   private void handleMethodTypecast(AMethod aMethod) {
+    visitXOffset(getPreviousCodeOffset());
     if (typePath == null) {
       aMethod.body.typecasts.getVivify(makeOffset(true))
           .tlAnnotationsHere.add(makeAnnotation());
@@ -987,10 +1038,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
    * @return a RelativeLocation for this annotation
    */
   private RelativeLocation makeOffset(boolean needTypeIndex) {
-    if (currentLabel == null) {
-      throw new RuntimeException("Can not makeOffset if currentLabel is null");
-    }
-    int offset = currentLabel.getOffset();
+    int offset = xOffset;
     int typeIndex = needTypeIndex ? typeReference.getTypeArgumentIndex() : -1;
     return RelativeLocation.createOffset(offset, typeIndex);
   }
@@ -1020,6 +1068,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
           ", start=" + Arrays.toString(start) +
           ", end=" + Arrays.toString(end) +
           ", index=" + Arrays.toString(index) +
+          ", localVariableName=" + localVariableName +
           '}';
     }
   }
@@ -1033,13 +1082,21 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
    * (visitAnnotation()), it no longer needs to worry about that field.
    */
   private class NestedAnnotationSceneReader extends AnnotationSceneReader {
+
+    /** Parent of current scene. */
     private final AnnotationSceneReader parent;
+
+    /** Name of the field to visit. */
     private final String name;
-    // private final String descriptor;
 
     /**
      * {@inheritDoc}
-     * @param parent the parent AnnotationSceneReader.
+     *
+     * @param api the ASM API version to use
+     * @param parent the parent AnnotationSceneReader
+     * @param name the name of the field
+     * @param descriptor the descriptor of the field
+     * @param annotationWriter the writer to output the annotations
      */
     NestedAnnotationSceneReader(int api, AnnotationSceneReader parent, String name, String descriptor, AnnotationVisitor annotationWriter) {
       super(api, descriptor, parent.visible, parent.aElement, annotationWriter);
@@ -1079,9 +1136,14 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
   // in the superclass constructor to
   // disable superclass behaviors that would otherwise cause trouble.
   private class ArrayAnnotationSceneReader extends AnnotationSceneReader {
+
+    /** Parent of current scene. */
     private final AnnotationSceneReader parent;
+
+    /** The ArrayBuilder used to create this annotation. */
     private ArrayBuilder arrayBuilder;
-    // private ScalarAFT elementType;
+
+    /** Name of the array to be visisted. */
     private final String arrayName;
 
     // The element type may be unknown when this is called.
@@ -1187,15 +1249,19 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
    */
   private class FieldAnnotationSceneReader extends FieldVisitor {
 
-    /*
-    private final String name;
-    private final String descriptor;
-    private final String signature;
-    private final Object value;
-    */
+    /** Field to be visisted. */
     private final AElement aField;
+
+    /** FieldVisitor for writing the current field. */
     private final FieldVisitor fieldWriter;
 
+    /**
+     * Constructs a new FieldAnnotationScene reader.
+     *
+     * @param api the ASM API version to use
+     * @param aField the Field to be visisted
+     * @param fieldWriter a FieldWriter for writing the current field
+     */
     FieldAnnotationSceneReader(int api, AElement aField, FieldVisitor fieldWriter) {
       super(api, fieldWriter);
       this.aField = aField;
@@ -1229,14 +1295,25 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
    */
   private class MethodAnnotationSceneReader extends MethodVisitor {
 
-    // private final String name;
-    // private final String descriptor;
-    // private final String signature;
+    /** Method to be visited. */
     private final AElement aMethod;
+
+    /** MethodVisitor for writing the current method. */
     private final MethodVisitor methodWriter;
-    private Label currentLabel;
+
+    /** Name of the local variable being visited. */
     private String localVariableName;
 
+    /**
+     * Constructs a new MethodAnnotationScene reader.
+     *
+     * @param api the ASM API version to use
+     * @param name (unused)
+     * @param descriptor (unused)
+     * @param signature (unused)
+     * @param aMethod the Method to be visisted
+     * @param methodWriter a MethodWriter for writing the current field
+     */
     MethodAnnotationSceneReader(int api, String name, String descriptor, String signature, AElement aMethod, MethodVisitor methodWriter) {
       super(api, methodWriter);
       // this.name = name;
@@ -1244,7 +1321,6 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
       // this.signature = signature;
       this.aMethod = aMethod;
       this.methodWriter = methodWriter;
-      this.currentLabel = null;
     }
 
     @Override
@@ -1269,19 +1345,13 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
     }
 
     @Override
-    public void visitLabel(Label label) {
-      methodWriter.visitLabel(label);
-      this.currentLabel = label;
-    }
-
-    @Override
     public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String descriptor, boolean visible) {
       if (trace) {
         System.out.printf("visitTypeAnnotation(%s, %s, %s, %s) method=%s in %s (%s)%n", typeRef, typePath, descriptor,
             visible, aMethod, this, this.getClass());
       }
       AnnotationVisitor annotationWriter = methodWriter.visitTypeAnnotation(typeRef, typePath, descriptor, visible);
-      return new TypeAnnotationSceneReader(this.api, descriptor, visible, aMethod, annotationWriter, typeRef, typePath, null, null, null, currentLabel);
+      return new TypeAnnotationSceneReader(this.api, descriptor, visible, aMethod, annotationWriter, typeRef, typePath, null, null, null);
     }
 
     @Override
@@ -1292,7 +1362,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
       }
       // TODO: Need to send offset from here
       AnnotationVisitor annotationWriter = methodWriter.visitInsnAnnotation(typeRef, typePath, descriptor, visible);
-      return new TypeAnnotationSceneReader(this.api, descriptor, visible, aMethod, annotationWriter, typeRef, typePath, null, null, null, currentLabel);
+      return new TypeAnnotationSceneReader(this.api, descriptor, visible, aMethod, annotationWriter, typeRef, typePath, null, null, null);
     }
 
     @Override
@@ -1302,7 +1372,7 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
             descriptor, visible, aMethod, this, this.getClass());
       }
       AnnotationVisitor annotationWriter = methodWriter.visitTryCatchAnnotation(typeRef, typePath, descriptor, visible);
-      return new TypeAnnotationSceneReader(this.api, descriptor, visible, aMethod, annotationWriter, typeRef, typePath, null, null, null, currentLabel);
+      return new TypeAnnotationSceneReader(this.api, descriptor, visible, aMethod, annotationWriter, typeRef, typePath, null, null, null);
     }
 
     @Override
@@ -1314,12 +1384,15 @@ public class ClassAnnotationSceneReader extends ClassVisitor {
             aMethod, this, this.getClass());
       }
       AnnotationVisitor annotationWriter = methodWriter.visitLocalVariableAnnotation(typeRef, typePath, start, end, index, descriptor, visible);
-      return new TypeAnnotationSceneReader(this.api, descriptor, visible, aMethod, annotationWriter, typeRef, typePath, start, end, index, currentLabel, localVariableName);
+      return new TypeAnnotationSceneReader(this.api, descriptor, visible, aMethod, annotationWriter, typeRef, typePath, start, end, index, localVariableName);
     }
 
     // TODO: visit code!
   }
 
+  /**
+   * Debug code to print a Classpath.
+   */
   private static void printClasspath() {
     System.out.println("\nClasspath:");
     StringTokenizer tokenizer =
