@@ -32,6 +32,12 @@ public class TypePathEntry {
    */
   public final int argument;
 
+  /**
+   * Construct a new TypePathEntry.
+   *
+   * @param step the type of the TypePathEntry
+   * @param argument index of the type argument or 0
+   */
   public TypePathEntry(int step, int argument) {
     this.step = step;
     this.argument = argument;

@@ -1239,10 +1239,15 @@ public final class IndexFileParser {
         return matched;
     }
 
-    // Due to the unfortunate representation of new array expressions,
-    // ASTPaths to their inner array types break the usual rule that
-    // an ASTPath corresponds to an AST node.  This method restores the
-    // invariant by separating out the inner type information.
+    /**
+     * Due to the unfortunate representation of new array expressions,
+     * ASTPaths to their inner array types break the usual rule that
+     * an ASTPath corresponds to an AST node.  This method restores the
+     * invariant by separating out the inner type information.
+     *
+     * @param astPath the ASTPath to process
+     * @return Pair of modified ASTPath and extracted TypePath
+     */
     private Pair<ASTPath, TypePath> splitNewArrayType(ASTPath astPath) {
         ASTPath outerPath = astPath;
         TypePath loc = null;

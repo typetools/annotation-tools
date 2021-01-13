@@ -26,10 +26,21 @@ public class MethodRecorder extends ClassVisitor {
    */
   private List<String> fields;
 
+  /**
+   * Construct a new MethodRecorder.
+   *
+   * @param api version of ASM api to use
+   */
   public MethodRecorder(int api) {
     this(api, null);
   }
 
+  /**
+   * Construct a new MethodRecorder.
+   *
+   * @param api version of ASM api to use
+   * @param classVisitor ClassVisitor to use
+   */
   public MethodRecorder(int api, ClassVisitor classVisitor) {
     super(api, classVisitor);
     this.methods = new ArrayList<>();
@@ -79,7 +90,13 @@ public class MethodRecorder extends ClassVisitor {
     return super.visitField(access, name, descriptor, signature, value);
   }
 
-  public static void main(String[] args) throws IOException {
+  /**
+   * (Used for testing.)
+   *
+   * @param args input arguments
+   * @throws IOException
+   */
+   public static void main(String[] args) throws IOException {
     ClassReader classReader = new ClassReader("com.google.common.annotations.GwtCompatible");
     MethodRecorder methodRecorder = new MethodRecorder(Opcodes.ASM7);
     classReader.accept(methodRecorder, 0);

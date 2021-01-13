@@ -199,7 +199,7 @@ public class ClassFileReader {
   }
 
   /**
-   * Reads the annotations from the class file <code> fileName </code>
+   * Reads the annotations from the class file indicated by the InputStream
    * and inserts them into <code> scene </code>.
    *
    * @param scene the scene into which the annotations should be inserted
@@ -211,6 +211,14 @@ public class ClassFileReader {
     read(scene, new ClassReader(input));
   }
 
+  /**
+   * Reads the annotations from the class file indicated by the ClassReader
+   * and inserts them into <code> scene </code>.
+   *
+   * @param scene the scene into which the annotations should be inserted
+   * @param classReader the ClassReader for the class thet the annotations
+   *              should be read from
+   */
   public static void read(AScene scene, ClassReader classReader) {
     ClassAnnotationSceneReader ca = new ClassAnnotationSceneReader(Opcodes.ASM7, classReader, scene, ignore_bridge_methods);
     classReader.accept(ca, 0);

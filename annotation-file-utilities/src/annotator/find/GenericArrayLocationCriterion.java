@@ -33,8 +33,9 @@ import static scenelib.annotations.el.TypePathEntry.typePathToList;
 public class GenericArrayLocationCriterion implements Criterion {
   private static final boolean debug = false;
 
-  // the full location list
+  /** The location as a list of TypePathEntrys. */
   private final List<TypePathEntry> location;
+  /** The location as a full TypePath. */
   private final TypePath typePath;
 
   // represents all but the last element of the location list
@@ -62,11 +63,22 @@ public class GenericArrayLocationCriterion implements Criterion {
     this(typePath, typePathToList(typePath));
   }
 
+  /**
+   * Creates a new GenericArrayLocationCriterion representing the end of the given path.
+   *
+   * @param location a list of TypePathEntrys to the location of the element being represented
+   */
   public GenericArrayLocationCriterion(List<TypePathEntry> location) {
     this.location = location;
     this.typePath = listToTypePath(location);
   }
 
+  /**
+   * Creates a new GenericArrayLocationCriterion representing the end of the given path.
+   *
+   * @param typePath the path to the location of the element being represented
+   * @param location a list of TypePathEntrys to the location of the element being represented
+   */
   public GenericArrayLocationCriterion(TypePath typePath, List<TypePathEntry> location) {
     this.typePath = typePath;
     this.location = location;

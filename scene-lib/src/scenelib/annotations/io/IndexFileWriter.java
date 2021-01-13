@@ -156,6 +156,12 @@ public final class IndexFileWriter {
         printInnerTypes(indentation + INDENT, e);
     }
 
+    /**
+     * Prints the innerType annotations for anATypeELement.
+     *
+     * @param indentation string containing indentation spaces
+     * @param e ATypeElement to search for innner ty pes
+     */
     private void printInnerTypes(String indentation, ATypeElement e) {
       for (Map. Entry<List<TypePathEntry>,
               ATypeElement> ite : e.innerTypes.entrySet()) {
@@ -175,6 +181,13 @@ public final class IndexFileWriter {
       }
     }
 
+    /**
+     * Prints the innerType annotations for anATypeELement.
+     *
+     * @param indentation string containing indentation spaces
+     * @param e ATypeElement to search for innner ty pes
+     * @param path (unused ?)
+     */
     private void printInnerTypes(String indentation, ATypeElement e,
             ASTPath path) {
         for (Map. Entry<List<TypePathEntry>,
@@ -198,6 +211,10 @@ public final class IndexFileWriter {
     /**
      * Converts the given {@link TypePathEntry} to a string of the form
      * {@code tag, arg}, where tag and arg are both integers.
+     *
+     * @param typePath TypePathto be processed
+     * @param index dentifies the TypePathEntry to convert
+     * @return String representing the TypePathEntry
      */
     private String typePathStepToString(TypePath typePath, int index) {
         int typePathStep = typePath.getStep(index);
@@ -208,11 +225,21 @@ public final class IndexFileWriter {
     /**
      * Converts the given {@link TypePathEntry} to a string of the form
      * {@code tag, arg}, where tag and arg are both integers.
+     *
+     * @param t TypePathEntry to be converted
+     * @return String representing the TypePathEntry
      */
     private String typePathEntryToString(TypePathEntry t) {
         return t.step + ", " + t.argument;
     }
 
+    /**
+     * Outputs a string representaion of a set of AElements to a PrintWriter.
+     *
+     * @param indentation string containing indentation spaces
+     * @param descriptor description of Type being printed
+     * @param nels map containing AElements to be printed
+     */
     private void printNumberedAmbigiousElements(String indentation,
             String descriptor,
             Map<Integer, ? extends AElement> nels) {
@@ -224,6 +251,13 @@ public final class IndexFileWriter {
         }
     }
 
+    /**
+     * Outputs a string representaion of an AElement to a PrintWriter.
+     *
+     * @param indentation string containing indentation spaces
+     * @param descriptor description of Type being printed
+     * @param e AElement to be printed
+     */
     private void printAmbElementAndInnerTypes(String indentation,
             String descriptor,
             AElement e) {

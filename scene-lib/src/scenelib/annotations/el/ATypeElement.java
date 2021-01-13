@@ -32,10 +32,20 @@ public class ATypeElement extends AElement {
     public final VivifyingMap<List<TypePathEntry>, ATypeElement> innerTypes =
         ATypeElement.newVivifyingLHMap_ATE();
 
+    /**
+     * Construct a new ATypeElement from its description.
+     *
+     * @param description the description of the type element.
+     */
     ATypeElement(Object description) {
-        super(description);
+      super(description);
     }
 
+    /**
+     * Construct a new ATypeElement from another.
+     *
+     * @param elem the ATypeElement to copy
+     */
     ATypeElement(ATypeElement elem) {
       super(elem);
       copyMapContents(elem.innerTypes, innerTypes);

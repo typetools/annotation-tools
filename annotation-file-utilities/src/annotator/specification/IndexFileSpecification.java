@@ -114,6 +114,11 @@ public class IndexFileSpecification {
   }
   */
 
+  /**
+   * Return the map of annotation imports.
+   *
+   * @return a map of annotation imports
+   */
   public Map<String, Set<String>> annotationImports() {
     return scene.imports;
   }
@@ -177,8 +182,12 @@ public class IndexFileSpecification {
 
 
 
-  /** Fill in this.insertions with insertion pairs.
-   * @param className is fully qualified
+  /**
+   * Fill in this.insertions with insertion pairs.
+   *
+   * @param clist where to store the Criteria
+   * @param className fully qualified name of class to be parsed
+   * @param clazz where to store the class information
    */
   private void parseClass(CriterionList clist, String className, AClass clazz) {
     constructorInsertion = null;  // 0 or 1 per class
