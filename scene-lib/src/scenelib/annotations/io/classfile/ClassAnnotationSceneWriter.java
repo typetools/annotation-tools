@@ -1192,6 +1192,13 @@ public class ClassAnnotationSceneWriter extends CodeOffsetAdapter {
       }
     }
 
+    /**
+     * Search for TypeAnnotations on a TypeElement.
+     *
+     * @param typeReference the type of annotation to search for
+     * @param aTypeElement the element to search for annotations
+     * @param maybeSkip whether the annotation might be skipped
+     */
     private void visitTypeAnnotationsOnTypeElement(TypeReference typeReference, ATypeElement aTypeElement, boolean maybeSkip) {
       for (Annotation tla : aTypeElement.tlAnnotationsHere) {
         if (maybeSkip && shouldSkip(tla)) {
@@ -1216,6 +1223,13 @@ public class ClassAnnotationSceneWriter extends CodeOffsetAdapter {
       });
     }
 
+    /**
+     * Search for InsnAnnotations on a TypeElement.
+     *
+     * @param typeReference the type of annotation to search for
+     * @param aTypeElement the element to search for annotations
+     * @param maybeSkip whether the annotation might be skipped
+     */
     private void visitInsnAnnotationsOnTypeElement(TypeReference typeReference, ATypeElement aTypeElement, boolean maybeSkip) {
       for (Annotation tla : aTypeElement.tlAnnotationsHere) {
         if (maybeSkip && shouldSkip(tla)) {
@@ -1250,11 +1264,25 @@ public class ClassAnnotationSceneWriter extends CodeOffsetAdapter {
 
   }
 
+  /**
+   * A MethodCodeIndexer is a MethodVisitor that is used
+   * to calculate the bytecode offsets to constructor invocations
+   * and to lambda invocations.
+   */
   class MethodCodeIndexer extends ClassVisitor {
-    private int codeStart;
-    Set<Integer> constrs;  // distinguishes constructors from methods
-    Set<Integer> lambdas;  // distinguishes lambda exprs from member refs
 
+    /** Offset from start of class file to code attribute for method. */
+    private int codeStart;
+    /** A set of bytecode offsets to constructor invocations. */
+    Set<Integer> constrs;
+    /** A set of bytecode offsets to lambda invocations. */
+    Set<Integer> lambdas;
+
+    /**
+     * Constructs a new MethodCodeIndexer.
+     *
+     * @param api the ASM API version to use
+     */
     MethodCodeIndexer(int api) {
       super(api);
       int fieldCount;

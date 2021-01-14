@@ -77,6 +77,7 @@ public class CodeOffsetAdapter extends ClassVisitor {
     MethodVisitor methodVisitor =
         super.visitMethod(access, name, descriptor, signature, exceptions);
     return new MethodVisitor(api, methodVisitor) {
+      /** Offset from start of class file to end of current method. */
       private int methodEnd;
 
       {
@@ -112,7 +113,13 @@ public class CodeOffsetAdapter extends ClassVisitor {
         previousOffset = -1;
       }
 
-      // convenience method to read from code attribute offset
+      /**
+       * Convenience method to read an int from the class file
+       * at a particular code attribute offset.
+       *
+       * @param i bytecode offset to read
+       * @return int read
+       */
       private int readInt(int i) {
         return classReader.readInt(codeStart + i);
       }
@@ -247,13 +254,33 @@ public class CodeOffsetAdapter extends ClassVisitor {
     };
   }
 
+  /**
+   * Fetch previousOffset.
+   *
+   * @return previousOffset
+   */
   public int getPreviousCodeOffset() { return previousOffset; }
 
+  /**
+   * Fetch offset.
+   *
+   * @return offset
+   */
   public int getMethodCodeOffset() { return offset; }
 
+  /**
+   * Fetch bytecode offset.
+   *
+   * @return bytecode offset
+   */
   public int getBytecodeOffset() { return codeStart + offset; }
 
   // move ahead, marking previous position
+  /**
+   * Save offset to previousOffset and advance offset.
+   *
+   * @param n amount to advance offset
+   */
   private void advance(int n) {
     previousOffset = offset;
     offset += n;

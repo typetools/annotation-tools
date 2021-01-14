@@ -31,8 +31,9 @@ import static scenelib.annotations.el.TypePathEntry.typePathToList;
  * JSR 308 proposal.
  */
 public class GenericArrayLocationCriterion implements Criterion {
-  private static final boolean debug = false;
 
+  /** Whether or not to output debug information. */
+  private static final boolean debug = false;
   /** The location as a list of TypePathEntrys. */
   private final List<TypePathEntry> location;
   /** The location as a full TypePath. */

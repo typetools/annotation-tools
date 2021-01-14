@@ -1146,8 +1146,17 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
     /** Name of the array to be visisted. */
     private final String arrayName;
 
-    // The element type may be unknown when this is called.
-    // But AnnotationSceneReader expects to know the element type.
+    /**
+     * Constructs an ArrayAnnotationSceneReader.
+     * The element type may be unknown when this is called,
+     * but AnnotationSceneReader expects to know the element type.
+     *
+     * @param api the ASM API version to use
+     * @param parent the parent AnnotationSceneReader
+     * @param fieldName the name of the field
+     * @param eltType the type of the field
+     * @param annotationWriter the writer to output the annotations
+     */
     ArrayAnnotationSceneReader(int api, AnnotationSceneReader parent,
         String fieldName, AnnotationFieldType eltType, AnnotationVisitor annotationWriter) {
       super(api, dummyDesc, parent.visible, parent.aElement, annotationWriter);

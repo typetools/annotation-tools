@@ -94,7 +94,7 @@ public class MethodRecorder extends ClassVisitor {
    * (Used for testing.)
    *
    * @param args input arguments
-   * @throws IOException
+   * @throws IOException if a problem occurs during ClassReader construction
    */
    public static void main(String[] args) throws IOException {
     ClassReader classReader = new ClassReader("com.google.common.annotations.GwtCompatible");
