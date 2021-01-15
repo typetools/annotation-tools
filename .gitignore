@@ -64,8 +64,6 @@ annotation-file-utilities/tests/system-test/out4.class
 annotation-file-utilities/tests/system-test/out5.diff
 annotation-file-utilities/tests/system-test/out5.jaif
 
-asmx/output
-
 scene-lib/javadoc
 scene-lib/reports
 scene-lib/test/annotations/tests/executable/example-output.jaif

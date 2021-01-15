@@ -2,9 +2,8 @@
 
 # Concatenates multiple descriptions of annotations into a single one.
 
-SCENE_LIB=$(dirname $0)
+SCENE_LIB=$(dirname "$0")
 WORKSPACE=$SCENE_LIB/..
-ASMX=$WORKSPACE/asmx
 
 export CLASSPATH=$WORKSPACE/annotation-file-utilities/annotation-file-utilities-all.jar:$CLASSPATH
 java scenelib.annotations.tools.Anncat "$@"

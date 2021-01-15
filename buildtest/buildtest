@@ -20,14 +20,13 @@ rm -rf reports
 rm -rf build-current*
 mkdir reports
 
-ant checkout-all 2>&1 > checkout-all.log
-ant build-all 2>&1 > build-all.log
+ant checkout-all > checkout-all.log 2>&1
+ant build-all > build-all.log 2>&1
 
 # Each of the following four commands places the results in the reports folder,
 # The TestWrapper reads them and outputs any that have errors.
-ant test-asmx 2>&1 > test-asmx.log
-ant test-annotation-scene-lib 2>&1 > test-annotation-scene-lib.log
-ant test-annotator 2>&1 > test-annotator.log
+ant test-annotation-scene-lib > test-annotation-scene-lib.log 2>&1
+ant test-annotator > test-annotator.log 2>&1
 
 # TestWrapper examines all reports and only displays those files that contain
 # failing test cases.
@@ -38,4 +37,4 @@ java TestWrapper reports/*
 
 # The .log files aren't part of the tests, so don't put them in reports
 # until all the tests have been analyzed.
-mv *.log reports
+mv ./*.log reports

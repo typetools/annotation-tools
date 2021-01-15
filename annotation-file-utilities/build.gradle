@@ -139,7 +139,7 @@ task allButJavacJar(type: ShadowJar, dependsOn: compileJava) {
 }
 
 task skinnyJar(type: ShadowJar, dependsOn: compileJava) {
-    description 'Builds annotation-file-utilities.jar with only scene-lib and annotation-file-utility classes.'
+    description 'Builds annotation-file-utilities.jar with only scene-lib and annotation-file-utilities classes.'
     includeEmptyDirs = false
     destinationDirectory = projectDir
     archiveFileName = 'annotation-file-utilities.jar'
@@ -338,7 +338,6 @@ task checkBasicStyle(group: 'Format') {
                                   'plume-bib',
                                   'build',
                                   'jdk',
-                                  'asmx',
                                   'javadoc',
                                   "tests"]
 
