@@ -145,13 +145,6 @@ task skinnyJar(type: ShadowJar, dependsOn: compileJava) {
     archiveFileName = 'annotation-file-utilities.jar'
     include 'scenelib/**/*.class'
     include 'annotator/**/*.class'
-    doFirst {
-    // TODO: The release fails because of this, so skip it for now.
-    if (project.hasProperty('release') && false) {
-            println 'Relocating packages.'
-            relocate 'org.objectweb.asm', 'org.checkerframework.org.objectweb.asm'
-        }
-    }
 }
 
 test {
