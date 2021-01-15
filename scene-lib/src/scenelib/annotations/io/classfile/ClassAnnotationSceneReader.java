@@ -315,7 +315,6 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
         AnnotationDef ad = getAnnotationDef(descriptor);
 
         AnnotationBuilder ab = AnnotationFactory.saf.beginAnnotation(ad,
-                                                                     // This method is not in ASMX
                                                                      // "ClassReader " + cr.getClassName()
                                                                      "TODO: ClassAnnotationSceneReader"
                                                                      );
