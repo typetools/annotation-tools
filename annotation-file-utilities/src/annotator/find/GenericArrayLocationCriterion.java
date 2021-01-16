@@ -22,9 +22,6 @@ import com.sun.tools.javac.tree.JCTree.JCExpression;
 import com.sun.tools.javac.tree.JCTree.JCFieldAccess;
 import scenelib.annotations.el.TypePathEntry;
 
-import static scenelib.annotations.el.TypePathEntry.listToTypePath;
-import static scenelib.annotations.el.TypePathEntry.typePathToList;
-
 /**
  * GenericArrayLocationCriterion represents the criterion specifying the location
  * of an element in the generic/array hierarchy as specified by the
@@ -61,7 +58,7 @@ public class GenericArrayLocationCriterion implements Criterion {
    * @param typePath the path to the location of the element being represented
    */
   public GenericArrayLocationCriterion(TypePath typePath) {
-    this(typePath, typePathToList(typePath));
+    this(typePath, TypePathEntry.typePathToList(typePath));
   }
 
   /**
@@ -71,7 +68,7 @@ public class GenericArrayLocationCriterion implements Criterion {
    */
   public GenericArrayLocationCriterion(List<TypePathEntry> location) {
     this.location = location;
-    this.typePath = listToTypePath(location);
+    this.typePath = TypePathEntry.listToTypePath(location);
   }
 
   /**

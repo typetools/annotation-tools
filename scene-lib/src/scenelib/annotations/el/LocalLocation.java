@@ -6,19 +6,21 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Objects;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 /**
  * A {@link LocalLocation} holds location information for a local
  * variable: slot index, scope start, and scope end.
  */
 public final class LocalLocation {
     /**
-     * The start of the scopes of the element being visited.
+     * The starts of the scopes of the element being visited.
      * Used only for TypeReference#LOCAL_VARIABLE and TypeReference#RESOURCE_VARIABLE.
      */
     public final Label[] start;
 
     /**
-     * The end of the scopes of the element being visited.
+     * The ends of the scopes of the element being visited.
      * Used only for TypeReference#LOCAL_VARIABLE and TypeReference#RESOURCE_VARIABLE.
      */
     public final Label[] end;
@@ -32,7 +34,7 @@ public final class LocalLocation {
     /**
      * The name of the local variable being visited.
      */
-    public final String variableName;
+    public final @Nullable String variableName;
 
     // We now use the public ASM bytecode framework instead of our own local copy.
     // As part of the implementation changes, the following member variables
@@ -58,9 +60,9 @@ public final class LocalLocation {
     /**
      * Construct a new LocalLocation.
      *
-     * @param start an array of Labels indicating the start of the variable's lifetime(s)
-     * @param end an array of Labels indicating the end of the variable's lifetime(s)
-     * @param index an array of ints indicating the stack offset of the variable's lifetime(s)
+     * @param start thes start of the variable's lifetime(s)
+     * @param end the ends of the variable's lifetime(s)
+     * @param index the stack offsets of the variable's lifetime(s)
      * @param variableName the name of the local variable
      */
     public LocalLocation(Label[] start, Label[] end, int[] index, String variableName) {
@@ -71,7 +73,7 @@ public final class LocalLocation {
     }
 
     /**
-     * Construct a new LocalLocation.
+     * Construct a new LocalLocation representing a single scope/lifetime.
      *
      * @param index the offset of the variable in the stack frame
      * @param scopeStart the bytecode offset of the start of the variable's lifetime
@@ -126,7 +128,7 @@ public final class LocalLocation {
 
     /**
      * Returns the length of the scope (in bytes).
-     * @return The length of the scope (in bytes)
+     * @return the length of the scope (in bytes)
      */
     public int getScopeLength() {
         // Should this be end[0] instead?
@@ -140,7 +142,7 @@ public final class LocalLocation {
 
     /**
      * Returns the local variable index.
-     * @return The local variable index
+     * @return the local variable index
      */
     public int getVarIndex() {
         return index[0];

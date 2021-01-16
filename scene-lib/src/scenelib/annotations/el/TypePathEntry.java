@@ -14,9 +14,11 @@ import java.util.Objects;
  * ASM has a data structure {@link TypePath}.  {@code List<TypePathEntry>}
  * corresponds to a {@code TypePath}.  That is, each TypePathEntry corresponds
  * to a step in an ASM TypePath.
-
+ *
  * {@code List<TypePathEntry>} also corresponds to the javac class
  * {@code com.sun.tools.javac.code.TypeAnnotationPosition}.
+ *
+ * {@code TypePathEntry} is immutable.
  */
 public class TypePathEntry {
   /**
@@ -63,7 +65,8 @@ public class TypePathEntry {
    * Converts a type path represented by a list of integers to a {@link TypePath}.
    * @param integerList the integer list in the form [step1, argument1, step2, argument2, ...] where step1 and argument1
    *                   are the step and argument of the first entry (or edge) of a type path.
-   * @return the {@link TypePath} corresponding with the <code>integerList</code>.
+   *    Each step is a {@link TypePath} constant; see {@link #step}.
+   * @return the {@link TypePath} corresponding to the <code>integerList</code>.
    */
   public static TypePath getTypePathFromBinary(List<Integer> integerList) {
     if (integerList == null) {
@@ -74,7 +77,7 @@ public class TypePathEntry {
     while (iterator.hasNext()) {
       int step = iterator.next();
       if (!iterator.hasNext()) {
-        throw new IllegalArgumentException("Could not decode type path: " + integerList);
+        throw new IllegalArgumentException("Odd number of elements: " + integerList);
       }
       int argument = iterator.next();
       switch (step) {
@@ -91,7 +94,7 @@ public class TypePathEntry {
           stringBuilder.append(argument).append(';');
           break;
         default:
-          throw new Error("This can't happen");
+          throw new Error("Bad step " + step);
       }
     }
     return TypePath.fromString(stringBuilder.toString());
@@ -101,7 +104,9 @@ public class TypePathEntry {
    * Converts a type path represented by a list of integers to a list of {@link TypePathEntry} elements.
    * @param integerList the integer list in the form [step1, argument1, step2, argument2, ...] where step1 and argument1
    *                   are the step and argument of the first entry (or edge) of a type path.
-   * @return the list of {@link TypePathEntry} elements corresponding with the <code>integerList</code>.
+   *    Each step is a {@link TypePath} constant; see {@link #step}.
+   * @return the list of {@link TypePathEntry} elements corresponding to the <code>integerList</code>,
+   *  or null if the argument is null
    */
   public static List<TypePathEntry> getTypePathEntryListFromBinary(List<Integer> integerList) {
     if (integerList == null) {
@@ -122,8 +127,8 @@ public class TypePathEntry {
 
   /**
    * Converts a type path represented by a list of integers to a {@link TypePath}.
-   * @param typePathEntryList the {@link TypePathEntry} list corresponding to the location of some type annotation.
-   * @return the {@link TypePath} corresponding with the <code>typePathEntryList</code>.
+   * @param typePathEntryList the {@link TypePathEntry} list corresponding to the location of some type annotation
+   * @return the {@link TypePath} corresponding to the <code>typePathEntryList</code>.
    */
   public static TypePath listToTypePath(List<TypePathEntry> typePathEntryList) {
     if (typePathEntryList == null || typePathEntryList.isEmpty()) {
@@ -153,8 +158,9 @@ public class TypePathEntry {
 
   /**
    * Converts a {@link TypePath} to a list of {@link TypePathEntry} elements.
-   * @param typePath the {@link TypePath} corresponding to the location of some type annotation.
-   * @return the list of {@link TypePathEntry} elements corresponding with the <code>typePath</code>.
+   * @param typePath the {@link TypePath} corresponding to the location of some type annotation
+   * @return the list of {@link TypePathEntry} elements corresponding to the <code>typePath</code>,
+   *   or null if the argument is null
    */
   public static List<TypePathEntry> typePathToList(TypePath typePath) {
     if (typePath == null) {

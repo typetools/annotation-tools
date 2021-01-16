@@ -3,8 +3,6 @@
 // an AScene.
 package scenelib.annotations.io.classfile;
 
-import static scenelib.annotations.el.TypePathEntry.typePathToList;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,6 +40,7 @@ import scenelib.annotations.el.BoundLocation;
 import scenelib.annotations.el.LocalLocation;
 import scenelib.annotations.el.RelativeLocation;
 import scenelib.annotations.el.TypeIndexLocation;
+import scenelib.annotations.el.TypePathEntry;
 import scenelib.annotations.field.AnnotationAFT;
 import scenelib.annotations.field.AnnotationFieldType;
 import scenelib.annotations.field.ArrayAFT;
@@ -539,13 +538,13 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
     private final TypePath typePath;
 
     /**
-     * The start of the scopes of the element being visited.
+     * The starts of the scopes of the element being visited.
      * Used only for TypeReference#LOCAL_VARIABLE and TypeReference#RESOURCE_VARIABLE.
      */
     private final Label[] start;
 
     /**
-     * The end of the scopes of the element being visited.
+     * The ends of the scopes of the element being visited.
      * Used only for TypeReference#LOCAL_VARIABLE and TypeReference#RESOURCE_VARIABLE.
      */
     private final Label[] end;
@@ -767,7 +766,7 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
           .tlAnnotationsHere.add(makeAnnotation());
     } else {
       aClass.bounds.getVivify(makeBoundLocation())
-          .innerTypes.getVivify(typePathToList(typePath))
+          .innerTypes.getVivify(TypePathEntry.typePathToList(typePath))
           .tlAnnotationsHere.add(makeAnnotation());
     }
   }
@@ -784,7 +783,7 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
           .tlAnnotationsHere.add(makeAnnotation());
     } else {
       aClass.extendsImplements.getVivify(typeIndexLocation)
-          .innerTypes.getVivify(typePathToList(typePath))
+          .innerTypes.getVivify(TypePathEntry.typePathToList(typePath))
           .tlAnnotationsHere.add(makeAnnotation());
     }
   }
@@ -807,7 +806,7 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
             .tlAnnotationsHere.add(makeAnnotation());
       } else {
         aTypeElement
-            .innerTypes.getVivify(typePathToList(typePath))
+            .innerTypes.getVivify(TypePathEntry.typePathToList(typePath))
             .tlAnnotationsHere.add(makeAnnotation());
       }
     } else {
@@ -826,7 +825,7 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
           .type.tlAnnotationsHere.add(makeAnnotation());
     } else {
       aMethod.parameters.getVivify(typeReference.getFormalParameterIndex())
-          .type.innerTypes.getVivify(typePathToList(typePath))
+          .type.innerTypes.getVivify(TypePathEntry.typePathToList(typePath))
           .tlAnnotationsHere.add(makeAnnotation());
     }
   }
@@ -852,7 +851,7 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
           .tlAnnotationsHere.add(makeAnnotation());
     } else {
       aMethod.bounds.getVivify(makeBoundLocation())
-          .innerTypes.getVivify(typePathToList(typePath))
+          .innerTypes.getVivify(TypePathEntry.typePathToList(typePath))
           .tlAnnotationsHere.add(makeAnnotation());
     }
   }
@@ -870,7 +869,7 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
           .tlAnnotationsHere.add(makeAnnotation());
     } else {
       aMethod.returnType
-          .innerTypes.getVivify(typePathToList(typePath))
+          .innerTypes.getVivify(TypePathEntry.typePathToList(typePath))
           .tlAnnotationsHere.add(makeAnnotation());
     }
   }
@@ -886,7 +885,7 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
           .tlAnnotationsHere.add(makeAnnotation());
     } else {
       aMethod.receiver.type
-          .innerTypes.getVivify(typePathToList(typePath))
+          .innerTypes.getVivify(TypePathEntry.typePathToList(typePath))
           .tlAnnotationsHere.add(makeAnnotation());
     }
   }
@@ -913,7 +912,7 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
           .tlAnnotationsHere.add(makeAnnotation());
     } else {
       aMethod.body.news.getVivify(makeOffset(false))
-          .innerTypes.getVivify(typePathToList(typePath))
+          .innerTypes.getVivify(TypePathEntry.typePathToList(typePath))
           .tlAnnotationsHere.add(makeAnnotation());
     }
   }
@@ -930,7 +929,7 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
           .tlAnnotationsHere.add(makeAnnotation());
     } else {
       aMethod.body.instanceofs.getVivify(makeOffset(false))
-          .innerTypes.getVivify(typePathToList(typePath))
+          .innerTypes.getVivify(TypePathEntry.typePathToList(typePath))
           .tlAnnotationsHere.add(makeAnnotation());
     }
   }
@@ -945,7 +944,7 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
           .tlAnnotationsHere.add(makeAnnotation());
     } else {
       aMethod.body.refs.getVivify(makeOffset(false))
-          .innerTypes.getVivify(typePathToList(typePath))
+          .innerTypes.getVivify(TypePathEntry.typePathToList(typePath))
           .tlAnnotationsHere.add(makeAnnotation());
     }
   }
@@ -962,7 +961,7 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
           .tlAnnotationsHere.add(makeAnnotation());
     } else {
       aMethod.body.typecasts.getVivify(makeOffset(true))
-          .innerTypes.getVivify(typePathToList(typePath))
+          .innerTypes.getVivify(TypePathEntry.typePathToList(typePath))
           .tlAnnotationsHere.add(makeAnnotation());
     }
   }
@@ -977,7 +976,7 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
           .tlAnnotationsHere.add(makeAnnotation());
     } else {
       aMethod.body.calls.getVivify(makeOffset(true))
-          .innerTypes.getVivify(typePathToList(typePath))
+          .innerTypes.getVivify(TypePathEntry.typePathToList(typePath))
           .tlAnnotationsHere.add(makeAnnotation());
     }
   }
@@ -993,7 +992,7 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
           .tlAnnotationsHere.add(makeAnnotation());
     } else {
       aMethod.body.refs.getVivify(makeOffset(true))
-          .innerTypes.getVivify(typePathToList(typePath))
+          .innerTypes.getVivify(TypePathEntry.typePathToList(typePath))
           .tlAnnotationsHere.add(makeAnnotation());
     }
   }
@@ -1009,7 +1008,7 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
           .type.tlAnnotationsHere.add(makeAnnotation());
     } else {
       aMethod.body.locals.getVivify(makeLocalLocation())
-          .type.innerTypes.getVivify(typePathToList(typePath))
+          .type.innerTypes.getVivify(TypePathEntry.typePathToList(typePath))
           .tlAnnotationsHere.add(makeAnnotation());
     }
   }
