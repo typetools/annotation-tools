@@ -115,7 +115,7 @@ public class IndexFileSpecification {
   */
 
   /**
-   * Return the map of annotation imports.
+   * Returns the map of annotation imports.
    *
    * @return a map of annotation imports
    */

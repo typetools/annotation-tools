@@ -80,7 +80,7 @@ public class GenericArrayLocationCriterion implements Criterion {
    * @param typePath the path to the location of the element being represented
    * @param location a list of TypePathEntrys to the location of the element being represented
    */
-  public GenericArrayLocationCriterion(TypePath typePath, List<TypePathEntry> location) {
+  private GenericArrayLocationCriterion(TypePath typePath, List<TypePathEntry> location) {
     this.typePath = typePath;
     this.location = location;
   }

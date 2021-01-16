@@ -447,10 +447,10 @@ public final class Criteria {
   }
 
   /**
-   * Creates a GenericArrayLocationCriterion.
+   * Creates a GenericArrayLocationCriterion for a location.
    *
    * @param loc location of the generic array
-   * @return a GenericArrayLocationCriterion
+   * @return a GenericArrayLocationCriterion for the given location
    */
   public final static Criterion atLocation(TypePath loc) {
     return new GenericArrayLocationCriterion(loc);

@@ -157,7 +157,7 @@ public final class IndexFileWriter {
     }
 
     /**
-     * Prints the innerType annotations for anATypeELement.
+     * Prints the innerType annotations for an ATypeELement.
      *
      * @param indentation string containing indentation spaces
      * @param e ATypeElement to search for innner ty pes
@@ -185,7 +185,7 @@ public final class IndexFileWriter {
      * Prints the innerType annotations for anATypeELement.
      *
      * @param indentation string containing indentation spaces
-     * @param e ATypeElement to search for innner ty pes
+     * @param e ATypeElement to search for innner types
      * @param path (unused ?)
      */
     private void printInnerTypes(String indentation, ATypeElement e,
@@ -212,7 +212,7 @@ public final class IndexFileWriter {
      * Converts the given {@link TypePathEntry} to a string of the form
      * {@code tag, arg}, where tag and arg are both integers.
      *
-     * @param typePath TypePathto be processed
+     * @param typePath TypePath to be processed
      * @param index dentifies the TypePathEntry to convert
      * @return String representing the TypePathEntry
      */
@@ -224,7 +224,7 @@ public final class IndexFileWriter {
 
     /**
      * Converts the given {@link TypePathEntry} to a string of the form
-     * {@code tag, arg}, where tag and arg are both integers.
+     * "tag, arg", where tag and arg are both integers.
      *
      * @param t TypePathEntry to be converted
      * @return String representing the TypePathEntry

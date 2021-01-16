@@ -200,7 +200,7 @@ public class ClassFileReader {
 
   /**
    * Reads the annotations from the class file indicated by the InputStream
-   * and inserts them into <code> scene </code>.
+   * and inserts them into {@code scene}.
    *
    * @param scene the scene into which the annotations should be inserted
    * @param input an input stream containing the class that the annotations
@@ -213,7 +213,7 @@ public class ClassFileReader {
 
   /**
    * Reads the annotations from the class file indicated by the ClassReader
-   * and inserts them into <code> scene </code>.
+   * and inserts them into {@code scene}.
    *
    * @param scene the scene into which the annotations should be inserted
    * @param classReader the ClassReader for the class thet the annotations

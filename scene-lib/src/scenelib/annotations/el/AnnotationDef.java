@@ -89,7 +89,7 @@ public final class AnnotationDef extends AElement {
             methods = null;
             e.printStackTrace();
         }
-        methods.forEach(m -> fieldTypes.put(m, null)); // preserves order
+        methods.forEach(m -> fieldTypes.put(m, null)); // dummy initialization sets order for the map
 
         for (Method m : annoType.getDeclaredMethods()) {
             AnnotationFieldType aft = AnnotationFieldType.fromClass(m.getReturnType(), adefs);

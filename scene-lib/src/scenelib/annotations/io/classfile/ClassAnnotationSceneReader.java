@@ -52,17 +52,17 @@ import scenelib.annotations.field.ScalarAFT;
 import scenelib.annotations.util.coll.VivifyingMap;
 
 /**
- * A <code> ClassAnnotationSceneReader </code> is a
+ * A {@code ClassAnnotationSceneReader} is a
  * {@link org.objectweb.asm.ClassVisitor} that will insert all annotations it
  * encounters while visiting a class into a given {@link AScene}.
  *
- * The "read" in <code>ClassAnnotationSceneReader</code> refers to a class
+ * The "read" in {@code ClassAnnotationSceneReader} refers to a class
  * file being read into a scene.  Also see {@link ClassAnnotationSceneWriter}.
  *
  * <p>
  *
  * The proper usage of this class is to construct a
- * <code>ClassAnnotationSceneReader}</code> with an {@link AScene} into which
+ * {@code ClassAnnotationSceneReader} with an {@link AScene} into which
  * annotations should be inserted, then pass this as a
  * {@link org.objectweb.asm.ClassVisitor} to
  * {@link org.objectweb.asm.ClassReader#accept}
@@ -121,7 +121,7 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
    * insert all the annotations in the class that it visits into
    * <code>scene</code>.
    * @param api the ASM API version to use
-   * @param classReader the {@link ClassReader} that visits this <code>ClassAnnotationSceneReader</code>.
+   * @param classReader the {@link ClassReader} that visits this {@code ClassAnnotationSceneReader}
    * @param scene the annotation scene into which annotations this visits
    *  will be inserted
    * @param ignoreBridgeMethods whether to omit annotations on
@@ -277,6 +277,7 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
         System.out.printf("Could not find class: %s%n", e.getMessage());
         printClasspath();
         if (annoTypeName.contains("+")) {
+          // This is an internal JDK annotation such as jdk.Profile+Annotation .
           @SuppressWarnings("signature:assignment.type.incompatible") // special annotation with "+" in name
             @BinaryName String annoTypeName2 = annoTypeName;
           return Annotations.createValueAnnotationDef(annoTypeName2,
@@ -326,7 +327,7 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
       }
     }
 
-      /*
+    /*
      * @see org.objectweb.asm.AnnotationVisitor#visit(java.lang.String, java.lang.Object)
      */
     @SuppressWarnings("signature") // ASM is not annotated yet
@@ -426,18 +427,12 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
       return objects;
     }
 
-    /**
-     * @see org.objectweb.asm.AnnotationVisitor#visitEnum(java.lang.String, java.lang.String, java.lang.String)
-     */
     @Override
     public void visitEnum(String name, String descriptor, String value) {
       if (trace) { System.out.printf("visitEnum(%s, %s) in %s (%s)%n", name, descriptor, this, this.getClass()); }
       annotationBuilder.addScalarField(name, new EnumAFT(descriptor), value);
     }
 
-    /**
-     * @see org.objectweb.asm.AnnotationVisitor#visitAnnotation(java.lang.String, java.lang.String)
-     */
     @Override
     public AnnotationVisitor visitAnnotation(String name, String descriptor) {
       if (trace) { System.out.printf("visitAnnotation(%s, %s) in %s (%s)%n", name, descriptor, this, this.getClass()); }
@@ -445,9 +440,6 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
       return new NestedAnnotationSceneReader(this.api, this, name, descriptor, annotationWriter);
     }
 
-    /**
-     * @see org.objectweb.asm.AnnotationVisitor#visitArray(java.lang.String)
-     */
     @Override
     public AnnotationVisitor visitArray(String name) {
       if (trace) { System.out.printf("visitArray(%s) in %s (%s)%n", name, this, this.getClass()); }

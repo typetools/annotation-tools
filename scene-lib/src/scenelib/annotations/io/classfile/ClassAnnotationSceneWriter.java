@@ -345,10 +345,10 @@ public class ClassAnnotationSceneWriter extends CodeOffsetAdapter {
 
   /**
    * Returns an TypeAnnotationVisitor over the given top-level annotation.
-   * The sort of the typeReference should be CLASS_TYPE_PARAMETER, CLASS_TYPE_PARAMETER_BOUND or CLASS_EXTENDS.
    *
    * @param tla the Annotation to visit
-   * @param typeReference the type of the annotation
+   * @param typeReference the type of the annotation.
+   *   Its sort should be CLASS_TYPE_PARAMETER, CLASS_TYPE_PARAMETER_BOUND or CLASS_EXTENDS.
    * @param typePath full path to the annotation
    * @return an AnnotationVisitor for tla
    */
