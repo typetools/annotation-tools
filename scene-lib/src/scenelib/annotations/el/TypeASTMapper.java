@@ -89,7 +89,7 @@ public abstract class TypeASTMapper<N> {
             // at least one array layer to confuse us
             int layers = 0;
             while ((elType = getElementType(n)) != null) {
-                ls.add(new TypePathEntry(TypePath.ARRAY_ELEMENT, 0));
+                ls.add(TypePathEntry.ARRAY_ELEMENT);
                 // System.out.printf("layers=%d, map(%s, getInnerType(%s, %s)=%s)%n",
                 //                   layers, elType, te, ls, getInnerType(te, ls));
                 map(elType, getInnerType(te, ls));

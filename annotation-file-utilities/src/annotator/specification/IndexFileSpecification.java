@@ -106,14 +106,6 @@ public class IndexFileSpecification {
     return this.insertions;
   }
 
-  /*
-  private static void debug(String s, Object... args) {
-    if (debug) {
-      System.out.printf(s, args);
-    }
-  }
-  */
-
   /**
    * Returns the map of annotation imports.
    *
@@ -136,14 +128,6 @@ public class IndexFileSpecification {
       System.out.println(s);
     }
   }
-
-  /*
-  private static void debug(String s, Object... args) {
-    if (debug) {
-      System.out.printf(s, args);
-    }
-  }
-  */
 
   public AScene getScene() { return scene; }
 

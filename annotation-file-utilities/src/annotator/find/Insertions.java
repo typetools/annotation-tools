@@ -346,7 +346,7 @@ public class Insertions implements Iterable<Insertion> {
                     && !node.toString().startsWith("{")) {
                   rec = rec.replacePath(p.getParentPath());
 
-                  Collections.fill(loc0, new TypePathEntry(TypePath.ARRAY_ELEMENT, 0));
+                  Collections.fill(loc0, TypePathEntry.ARRAY_ELEMENT);
                   // irec = rec;
                   // if (node.getKind() == Tree.Kind.NEW_ARRAY) {
                   rec0 = rec.extend(Tree.Kind.NEW_ARRAY,
@@ -696,9 +696,9 @@ public class Insertions implements Iterable<Insertion> {
           if (expectedDepth == 0 && node.getKind() == kind) {
             node = ((ArrayTypeTree) node).getType();
             while (--actualDepth >= 0) {
-              tpes.add(new TypePathEntry(TypePath.INNER_TYPE, 0));
+              tpes.add(TypePathEntry.INNER_TYPE);
             }
-            tpes.add(new TypePathEntry(TypePath.ARRAY_ELEMENT, 0));
+            tpes.add(TypePathEntry.ARRAY_ELEMENT);
             break;
           }
           throw new RuntimeException();
@@ -720,10 +720,10 @@ public class Insertions implements Iterable<Insertion> {
               int arg = entry.getArgument();
               if (arg > 0) {
                 node = ((JCTree.JCNewArray) node).elemtype;
-                tpes.add(new TypePathEntry(TypePath.ARRAY_ELEMENT, 0));
+                tpes.add(TypePathEntry.ARRAY_ELEMENT);
                 while (--arg > 0 && node instanceof JCTree.JCArrayTypeTree) {
                   node = ((JCTree.JCArrayTypeTree) node).elemtype;
-                  tpes.add(new TypePathEntry(TypePath.ARRAY_ELEMENT, 0));
+                  tpes.add(TypePathEntry.ARRAY_ELEMENT);
                 }
                 if (arg > 0) { throw new RuntimeException(); }
               } else {
@@ -751,7 +751,7 @@ public class Insertions implements Iterable<Insertion> {
                 actualDepth = 0;
                 expectedDepth = localDepth(ptt.getType());
                 while (--expectedDepth >= 0) {
-                  tpes.add(new TypePathEntry(TypePath.INNER_TYPE, 0));
+                  tpes.add(TypePathEntry.INNER_TYPE);
                 }
                 node = typeArgs.get(j);
                 tpes.add(
@@ -770,9 +770,9 @@ public class Insertions implements Iterable<Insertion> {
                 && (i < 2
                     || localTypePath.get(i-2).getTreeKind() != Tree.Kind.ARRAY_TYPE)) {
               while (--actualDepth >= 0) {
-                tpes.add(new TypePathEntry(TypePath.INNER_TYPE, 0));
+                tpes.add(TypePathEntry.INNER_TYPE);
               }
-              tpes.add(new TypePathEntry(TypePath.WILDCARD_BOUND, 0));
+              tpes.add(TypePathEntry.WILDCARD_BOUND);
               break;
             }
           }
@@ -787,7 +787,7 @@ public class Insertions implements Iterable<Insertion> {
       }
 
       while (--actualDepth >= 0) {
-        tpes.add(new TypePathEntry(TypePath.INNER_TYPE, 0));
+        tpes.add(TypePathEntry.INNER_TYPE);
       }
 
       organized.add(ins);

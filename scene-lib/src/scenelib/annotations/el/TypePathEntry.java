@@ -1,5 +1,6 @@
 package scenelib.annotations.el;
 
+import org.checkerframework.checker.interning.qual.InternedDistinct;
 import org.objectweb.asm.TypePath;
 
 import java.util.ArrayList;
@@ -33,6 +34,10 @@ public class TypePathEntry {
    * Otherwise, 0.
    */
   public final int argument;
+
+  public static final @InternedDistinct TypePathEntry ARRAY_ELEMENT = new TypePathEntry(TypePath.ARRAY_ELEMENT, 0);
+  public static final @InternedDistinct TypePathEntry INNER_TYPE = new TypePathEntry(TypePath.INNER_TYPE, 0);
+  public static final @InternedDistinct TypePathEntry WILDCARD_BOUND = new TypePathEntry(TypePath.WILDCARD_BOUND, 0);
 
   /**
    * Construct a new TypePathEntry.

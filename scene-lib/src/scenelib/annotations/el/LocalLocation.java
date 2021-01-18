@@ -9,8 +9,12 @@ import java.util.Objects;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
- * A {@link LocalLocation} holds location information for a local
- * variable: slot index, scope start, and scope end.
+ * A {@link LocalLocation} holds information about a local variable.
+ * As a variable may have multiple lifetimes, we store this information
+ * the same way ASM does as a series of parallel arrays:
+ * start for Labels holding the bytecode offset to the starts of the variable's lifetime(s)
+ * end for Labels holding the bytecode offset to the ends of the variable's lifetime(s)
+ * index for ints holding the stack offset for the variable's lifetime(s)
  */
 public final class LocalLocation {
     /**
@@ -36,17 +40,6 @@ public final class LocalLocation {
      */
     public final @Nullable String variableName;
 
-    // We now use the public ASM bytecode framework instead of our own local copy.
-    // As part of the implementation changes, the following member variables
-    // of LocalLocation no longer exist:
-    //   int scopeStart;
-    //   int scopeLength;
-    //   int varIndex;
-    // Instead, the following accessor methods must be used:
-    //   int getScopeStart();
-    //   int getScopeLength();
-    //   int getVarIndex();
-
     /**
      * Construct a new LocalLocation.
      *
@@ -60,8 +53,8 @@ public final class LocalLocation {
     /**
      * Construct a new LocalLocation.
      *
-     * @param start thes start of the variable's lifetime(s)
-     * @param end the ends of the variable's lifetime(s)
+     * @param start the code offsets to the starts of the variable's lifetime(s)
+     * @param end the code offsets to the ends of the variable's lifetime(s)
      * @param index the stack offsets of the variable's lifetime(s)
      * @param variableName the name of the local variable
      */

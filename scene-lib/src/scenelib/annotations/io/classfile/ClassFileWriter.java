@@ -180,7 +180,7 @@ public class ClassFileWriter {
     in.close();
 
     ClassAnnotationSceneWriter classAnnotationSceneWriter =
-        new ClassAnnotationSceneWriter(Opcodes.ASM7, classReader, scene, null, overwrite);
+        new ClassAnnotationSceneWriter(Opcodes.ASM7, classReader, scene, overwrite);
     classReader.accept(classAnnotationSceneWriter, 0);
 
     OutputStream fos = new FileOutputStream(fileName);
@@ -210,7 +210,7 @@ public class ClassFileWriter {
     ClassReader classReader = new ClassReader(input);
 
     ClassAnnotationSceneWriter classAnnotationSceneWriter =
-        new ClassAnnotationSceneWriter(Opcodes.ASM7, classReader, scene, null, overwrite);
+        new ClassAnnotationSceneWriter(Opcodes.ASM7, classReader, scene, overwrite);
 
     classReader.accept(classAnnotationSceneWriter, 0);
 
@@ -239,7 +239,7 @@ public class ClassFileWriter {
     ClassReader classReader = new ClassReader(className);
 
     ClassAnnotationSceneWriter classAnnotationSceneWriter =
-        new ClassAnnotationSceneWriter(Opcodes.ASM7, classReader, scene, null, overwrite);
+        new ClassAnnotationSceneWriter(Opcodes.ASM7, classReader, scene, overwrite);
 
     classReader.accept(classAnnotationSceneWriter, 0);
 

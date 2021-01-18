@@ -254,8 +254,8 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
     /** The AnnotationVisitor used to visit this annotation. */
     protected AnnotationVisitor annotationWriter;
 
-    /** The current offset into a method's bytecodes. */
-    protected int xOffset;
+    /** An offset into the method's bytecodes. */
+    protected int savedOffset;
 
     /**
      * Retrieve annotation definition, including retention policy.
@@ -273,8 +273,7 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
       try {
         annoClass = (Class<? extends java.lang.annotation.Annotation>) Class.forName(annoTypeName);
       } catch (ClassNotFoundException e) {
-        System.out.printf("Could not find class: %s%n", e.getMessage());
-        printClasspath();
+        // This is an internal JDK annotation such as jdk.Profile+Annotation .
         if (annoTypeName.contains("+")) {
           // This is an internal JDK annotation such as jdk.Profile+Annotation .
           @SuppressWarnings("signature:assignment.type.incompatible") // special annotation with "+" in name
@@ -284,6 +283,8 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
                                                       String.format("Could not find class %s: %s",
                                                                     jvmlClassName, e.getMessage()));
         }
+        System.out.printf("Could not find class: %s%n", e.getMessage());
+        printClasspath();
         throw new Error(e);
       }
 
@@ -449,12 +450,12 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
     }
 
     /**
-     * Save the current offset into a method's bytecodes.
+     * Save the offset into a method's bytecodes.
      *
      * @param offset bytecode offset
      */
-    protected void visitXOffset(int offset) {
-      xOffset = offset;
+    protected void saveOffset(int offset) {
+      savedOffset = offset;
     }
 
     /**
@@ -906,7 +907,7 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
    * @param aMethod the annotatable method in which annotation will be inserted
    */
   private void handleMethodObjectCreation(AMethod aMethod) {
-    visitXOffset(getPreviousCodeOffset());
+    saveOffset(getPreviousCodeOffset());
     if (typePath == null) {
       aMethod.body.news.getVivify(makeOffset(false))
           .tlAnnotationsHere.add(makeAnnotation());
@@ -923,7 +924,7 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
    * @param aMethod the annotatable method in which annotation will be inserted
    */
   private void handleMethodInstanceOf(AMethod aMethod) {
-    visitXOffset(getPreviousCodeOffset());
+    saveOffset(getPreviousCodeOffset());
     if (typePath == null) {
       aMethod.body.instanceofs.getVivify(makeOffset(false))
           .tlAnnotationsHere.add(makeAnnotation());
@@ -955,7 +956,7 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
    * @param aMethod the annotatable method in which annotation will be inserted
    */
   private void handleMethodTypecast(AMethod aMethod) {
-    visitXOffset(getPreviousCodeOffset());
+    saveOffset(getPreviousCodeOffset());
     if (typePath == null) {
       aMethod.body.typecasts.getVivify(makeOffset(true))
           .tlAnnotationsHere.add(makeAnnotation());
@@ -1028,9 +1029,8 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
    * @return a RelativeLocation for this annotation
    */
   private RelativeLocation makeOffset(boolean needTypeIndex) {
-    int offset = xOffset;
     int typeIndex = needTypeIndex ? typeReference.getTypeArgumentIndex() : -1;
-    return RelativeLocation.createOffset(offset, typeIndex);
+    return RelativeLocation.createOffset(savedOffset, typeIndex);
   }
 
     /**

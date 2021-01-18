@@ -133,10 +133,9 @@ public class ClassAnnotationSceneWriter extends CodeOffsetAdapter {
    * @param api the ASM API version to use
    * @param classReader the reader for the class being modified
    * @param scene the annotation scene containing annotations to be inserted into the class this visits
-   * @param typePath (unused)
    * @param overwrite whether or not to overwrite existing annotations on the same element
    */
-  public ClassAnnotationSceneWriter(int api, ClassReader classReader, AScene scene, TypePath typePath, boolean overwrite) {
+  public ClassAnnotationSceneWriter(int api, ClassReader classReader, AScene scene, boolean overwrite) {
     super(api, classReader);
     this.scene = scene;
     this.hasVisitedClassAnnotationsInScene = false;
@@ -257,9 +256,6 @@ public class ClassAnnotationSceneWriter extends CodeOffsetAdapter {
             ? TypeReference.newTypeParameterReference(TypeReference.CLASS_TYPE_PARAMETER, bloc.paramIndex)
             : TypeReference.newTypeParameterBoundReference(TypeReference.CLASS_TYPE_PARAMETER_BOUND,
             bloc.paramIndex, bloc.boundIndex);
-//        TypeReference typeReference = TypeReference.newTypeParameterBoundReference(typeReferenceSort,
-//            bloc.paramIndex, bloc.boundIndex);
-
         for (Annotation tla : bound.tlAnnotationsHere) {
           // For ClassVisitor. So typeRef: CLASS_TYPE_PARAMETER, CLASS_TYPE_PARAMETER_BOUND or CLASS_EXTENDS.
           AnnotationVisitor xav = visitTypeAnnotation(tla, typeReference, null);

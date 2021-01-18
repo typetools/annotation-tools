@@ -59,6 +59,27 @@ public final class AnnotationDef extends AElement {
         this.source = source;
     }
 
+    /**
+     * Returns a list of method names for a class in the order in which they occur in the .class
+     * file. Note that the java method Class.getDeclaredMethods() does not preserve this order.
+     *
+     * @param name the ifully qualified name of the class to be read
+     * @return a list of methods for the class
+     */
+    public static List<String> getDeclaredMethods(String name) {
+        List<String> methods;
+        try {
+            ClassReader classReader = new ClassReader(name);
+            MethodRecorder methodRecorder = new MethodRecorder(Opcodes.ASM7);
+            classReader.accept(methodRecorder, 0);
+            methods = methodRecorder.getMethods();
+        } catch (IOException e) {
+            methods = null;
+            e.printStackTrace();
+        }
+        return methods;
+    }
+
     // Problem:  I am not sure how to handle circularities (annotations meta-annotated with themselves)
     /**
      * Returns an AnnotationDef for the given annotation type.
@@ -78,18 +99,7 @@ public final class AnnotationDef extends AElement {
         }
 
         Map<String,AnnotationFieldType> fieldTypes = new LinkedHashMap<>();
-        // Preserves order of members, which getDeclaredMethods does not do.
-        List<String> methods;
-        try {
-            ClassReader classReader = new ClassReader(name);
-            MethodRecorder methodRecorder = new MethodRecorder(Opcodes.ASM7);
-            classReader.accept(methodRecorder, 0);
-            methods = methodRecorder.getMethods();
-        } catch (IOException e) {
-            methods = null;
-            e.printStackTrace();
-        }
-        methods.forEach(m -> fieldTypes.put(m, null)); // dummy initialization sets order for the map
+        getDeclaredMethods(name).forEach(m -> fieldTypes.put(m, null)); // dummy initialization sets order for the map
 
         for (Method m : annoType.getDeclaredMethods()) {
             AnnotationFieldType aft = AnnotationFieldType.fromClass(m.getReturnType(), adefs);
