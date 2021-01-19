@@ -129,6 +129,11 @@ public class IndexFileSpecification {
     }
   }
 
+  /**
+   * Returns the current scene.
+   *
+   * @return the current scene
+   */
   public AScene getScene() { return scene; }
 
   /** Fill in this.insertions with insertion pairs. */
