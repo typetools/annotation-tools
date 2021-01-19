@@ -35,8 +35,11 @@ public class TypePathEntry {
    */
   public final int argument;
 
+  /** Constant ARRAY_ELEMENT TypePathEntry for building TypePaths. */
   public static final @InternedDistinct TypePathEntry ARRAY_ELEMENT = new TypePathEntry(TypePath.ARRAY_ELEMENT, 0);
+  /** Constant INNER_TYPE TypePathEntry for building TypePaths. */
   public static final @InternedDistinct TypePathEntry INNER_TYPE = new TypePathEntry(TypePath.INNER_TYPE, 0);
+  /** Constant WILDCARD_BOUND TypePathEntry for building TypePaths. */
   public static final @InternedDistinct TypePathEntry WILDCARD_BOUND = new TypePathEntry(TypePath.WILDCARD_BOUND, 0);
 
   /**
@@ -67,6 +70,29 @@ public class TypePathEntry {
   }
 
   /**
+   * Converts a TypePathEntry to a String.  The TypePathEntry is passed in as its
+   * component parts: step and argument.
+   *
+   * @param step the kind of TypePathEntry
+   * @param argument a type index if the step == TYPE_ARGUMENT, otherwise ignored
+   * @return the String reresentaion of the TypePathEntry
+   */
+  public static String stepToString(int step, int argument) {
+    switch (step) {
+      case TypePath.ARRAY_ELEMENT:
+        return "[";
+      case TypePath.INNER_TYPE:
+        return ".";
+      case TypePath.WILDCARD_BOUND:
+        return "*";
+      case TypePath.TYPE_ARGUMENT:
+        return String.valueOf(argument) + ";";
+      default:
+        throw new Error("Bad step " + step);
+    }
+  }
+
+  /**
    * Converts a type path represented by a list of integers to a {@link TypePath}.
    * @param integerList the integer list in the form [step1, argument1, step2, argument2, ...] where step1 and argument1
    *                   are the step and argument of the first entry (or edge) of a type path.
@@ -84,23 +110,7 @@ public class TypePathEntry {
       if (!iterator.hasNext()) {
         throw new IllegalArgumentException("Odd number of elements: " + integerList);
       }
-      int argument = iterator.next();
-      switch (step) {
-        case TypePath.ARRAY_ELEMENT:
-          stringBuilder.append('[');
-          break;
-        case TypePath.INNER_TYPE:
-          stringBuilder.append('.');
-          break;
-        case TypePath.WILDCARD_BOUND:
-          stringBuilder.append('*');
-          break;
-        case TypePath.TYPE_ARGUMENT:
-          stringBuilder.append(argument).append(';');
-          break;
-        default:
-          throw new Error("Bad step " + step);
-      }
+      stringBuilder.append(stepToString(step, iterator.next()));
     }
     return TypePath.fromString(stringBuilder.toString());
   }
@@ -141,22 +151,7 @@ public class TypePathEntry {
     }
     StringBuilder stringBuilder = new StringBuilder();
     for (TypePathEntry typePathEntry : typePathEntryList) {
-      switch (typePathEntry.step) {
-        case TypePath.ARRAY_ELEMENT:
-          stringBuilder.append('[');
-          break;
-        case TypePath.INNER_TYPE:
-          stringBuilder.append('.');
-          break;
-        case TypePath.WILDCARD_BOUND:
-          stringBuilder.append('*');
-          break;
-        case TypePath.TYPE_ARGUMENT:
-          stringBuilder.append(typePathEntry.argument).append(';');
-          break;
-        default:
-          throw new Error("This can't happen");
-      }
+      stringBuilder.append(stepToString(typePathEntry.step, typePathEntry.argument));
     }
     return TypePath.fromString(stringBuilder.toString());
   }
