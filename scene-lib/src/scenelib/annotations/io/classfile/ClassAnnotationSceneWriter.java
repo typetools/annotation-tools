@@ -257,7 +257,7 @@ public class ClassAnnotationSceneWriter extends CodeOffsetAdapter {
             : TypeReference.newTypeParameterBoundReference(TypeReference.CLASS_TYPE_PARAMETER_BOUND,
             bloc.paramIndex, bloc.boundIndex);
         for (Annotation tla : bound.tlAnnotationsHere) {
-          // For ClassVisitor. So typeRef: CLASS_TYPE_PARAMETER, CLASS_TYPE_PARAMETER_BOUND or CLASS_EXTENDS.
+          // For ClassVisitor. typeReference has sort: CLASS_TYPE_PARAMETER, CLASS_TYPE_PARAMETER_BOUND or CLASS_EXTENDS.
           AnnotationVisitor xav = visitTypeAnnotation(tla, typeReference, null);
           visitFields(xav, tla);
           xav.visitEnd();
@@ -271,7 +271,7 @@ public class ClassAnnotationSceneWriter extends CodeOffsetAdapter {
           ATypeElement innerType = e2.getValue();
 
           for (Annotation tla : innerType.tlAnnotationsHere) {
-            // For ClassVisitor. So typeRef: CLASS_TYPE_PARAMETER, CLASS_TYPE_PARAMETER_BOUND or CLASS_EXTENDS.
+            // For ClassVisitor. typeReference has sort: CLASS_TYPE_PARAMETER, CLASS_TYPE_PARAMETER_BOUND or CLASS_EXTENDS.
             AnnotationVisitor xav = visitTypeAnnotation(tla, typeReference, typePath);
             visitFields(xav, tla);
             xav.visitEnd();
@@ -349,7 +349,7 @@ public class ClassAnnotationSceneWriter extends CodeOffsetAdapter {
    * @return an AnnotationVisitor for tla
    */
   private AnnotationVisitor visitTypeAnnotation(Annotation tla, TypeReference typeReference, TypePath typePath) {
-    // For ClassVisitor. So typeRef: CLASS_TYPE_PARAMETER, CLASS_TYPE_PARAMETER_BOUND or CLASS_EXTENDS.
+    // For ClassVisitor. typeReference has sort: CLASS_TYPE_PARAMETER, CLASS_TYPE_PARAMETER_BOUND or CLASS_EXTENDS.
     return super.visitTypeAnnotation(typeReference.getValue(), typePath, classNameToDesc(name(tla)), isRuntimeRetention(tla));
   }
 
