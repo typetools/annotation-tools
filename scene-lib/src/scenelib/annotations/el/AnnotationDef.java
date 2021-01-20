@@ -61,7 +61,7 @@ public final class AnnotationDef extends AElement {
 
     /**
      * Returns a list of method names for a class in the order in which they occur in the .class
-     * file. Note that the java method Class.getDeclaredMethods() does not preserve this order.
+     * file. Note that the JDK method Class.getDeclaredMethods() does not preserve this order.
      *
      * @param name the ifully qualified name of the class to be read
      * @return a list of methods for the class

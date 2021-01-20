@@ -182,7 +182,7 @@ public final class IndexFileWriter {
     }
 
     /**
-     * Prints the innerType annotations for anATypeELement.
+     * Prints the innerType annotations for an ATypeELement.
      *
      * @param indentation string containing indentation spaces
      * @param e ATypeElement to search for innner types

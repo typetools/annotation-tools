@@ -35,7 +35,7 @@ public class MethodOffsetClassVisitor extends ClassVisitor {
   private String methodName;
 
   /**
-   * Constructs a new <code>MethodOffsetClassVisitor</code>.
+   * Constructs a new {@code MethodOffsetClassVisitor}.
    *
    * @param api which ASM api set to use
    * @param classReader the ClassReader to use
@@ -64,7 +64,7 @@ public class MethodOffsetClassVisitor extends ClassVisitor {
    */
   private class MethodOffsetMethodVisitor extends MethodVisitor {
     /**
-     * Constructs a new <code>MethodOffsetMethodVisitor</code>.
+     * Constructs a new {@code MethodOffsetMethodVisitor}.
      *
      * @param api which ASM api set to use
      * @param mv the MethodVisitor to be extended
