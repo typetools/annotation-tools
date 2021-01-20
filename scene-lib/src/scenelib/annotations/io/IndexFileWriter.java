@@ -181,32 +181,6 @@ public final class IndexFileWriter {
       }
     }
 
-    /**
-     * Prints the innerType annotations for an ATypeELement.
-     *
-     * @param indentation string containing indentation spaces
-     * @param e ATypeElement to search for innner types
-     * @param path (unused ?)
-     */
-    private void printInnerTypes(String indentation, ATypeElement e,
-            ASTPath path) {
-        for (Map. Entry<List<TypePathEntry>,
-                ATypeElement> ite : e.innerTypes.entrySet()) {
-            TypePath typePath = TypePathEntry.listToTypePath(ite.getKey());
-            AElement it = ite.getValue();
-            pw.print(indentation + "inner-type");
-            char sep = ' ';
-            // TODO: Long term: Should change representation to mirror org.objectweb.asm.TypePath
-            for (int index = 0; index < typePath.getLength(); index++) {
-                pw.print(sep);
-                pw.print(typePathStepToString(typePath, index));
-                sep = ',';
-            }
-            pw.print(':');
-            printAnnotations(it);
-            pw.println();
-        }
-    }
 
     /**
      * Converts the given {@link TypePathEntry} to a string of the form
@@ -369,7 +343,7 @@ public final class IndexFileWriter {
             pw.print(indentation + "insert-annotation " + path + ":");
             printAnnotations(el);
             pw.println();
-            printInnerTypes(INDENT, el, path);
+            printInnerTypes(INDENT, el);
         }
         for (Map. Entry<ASTPath,
                     ATypeElementWithType> e :
@@ -381,7 +355,7 @@ public final class IndexFileWriter {
             pw.print(" ");
             printType(el.getType());
             pw.println();
-            printInnerTypes(INDENT, el, path);
+            printInnerTypes(INDENT, el);
         }
     }
 
