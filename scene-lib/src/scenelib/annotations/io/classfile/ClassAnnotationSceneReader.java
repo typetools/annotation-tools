@@ -368,6 +368,9 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
      * Method that accepts an Object whose actual type is c[], where c is a
      * primitive, and returns an equivalent {@code List<Object>} that contains
      * the same elements as in primitiveArray.
+     *
+     * @param primitiveArray an array of primitive type
+     * @return a list containing the contents of {@code primitiveArray}
      */
     private List<Object> asList(Object primitiveArray) {
       List<Object> objects = new ArrayList<>();
