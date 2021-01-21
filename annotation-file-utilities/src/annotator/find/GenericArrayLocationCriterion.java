@@ -423,7 +423,7 @@ public class GenericArrayLocationCriterion implements Criterion {
                 && locationRemaining.get(locationRemaining.size() - 1).step == TypePath.ARRAY_ELEMENT) {
           if (elt.getKind() != Tree.Kind.ARRAY_TYPE) { // ArrayTypeTree
             if (debug) {
-              System.out.printf("Element: %s is not an ArrayTypeTree and therefore false.\n", elt);
+              System.out.printf("Element: %s is not an ArrayTypeTree and therefore false.%n", elt);
             }
             return false;
           }

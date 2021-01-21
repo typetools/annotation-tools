@@ -1,4 +1,4 @@
-// This class is a complete ClassVisitor with many hidden classes that do
+// This class is a complete ClassVisitor with many nested classes that do
 // the work of parsing an AScene and inserting them into a class file, as
 // the original class file is being read.
 
@@ -34,14 +34,14 @@ import org.checkerframework.checker.signature.qual.ClassGetName;
  * A ClassAnnotationSceneWriter is a {@link org.objectweb.asm.ClassVisitor}
  * that can be used to write a class file that is the combination of an
  * existing class file and annotations in an {@link AScene}.  The "write"
- * in <code> ClassAnnotationSceneWriter </code> refers to a class file
+ * in {@code ClassAnnotationSceneWriter} refers to a class file
  * being rewritten with information from a scene.  Also see {@link
  * ClassAnnotationSceneReader}.
  *
  * <p>
  *
  * The proper usage of this class is to construct a
- * <code>ClassAnnotationSceneWriter</code> with a {@link AScene} that
+ * {@code ClassAnnotationSceneWriter} with a {@link AScene} that
  * already contains all its annotations, pass this as a {@link
  * org.objectweb.asm.ClassVisitor} to {@link
  * org.objectweb.asm.ClassReader#accept}, and then obtain the resulting
@@ -70,7 +70,7 @@ public class ClassAnnotationSceneWriter extends CodeOffsetAdapter {
   // A ClassAnnotationSceneWriter is a ClassAdapter around a ClassWriter.
   //  - To visit the class' annotations in the scene, right before the code for
   //     ClassWriter.visit{InnerClass, Field, Method, End} is called,
-  //     ensure that all extended annotations in the scene are visited once.
+  //     ensure that all annotations in the scene are visited once.
   //  - To visit every field's annotations,
   //     ClassAnnotationSceneWriter.visitField() returns a
   //     FieldAnnotationSceneWriter that in a similar fashion makes sure
@@ -82,10 +82,10 @@ public class ClassAnnotationSceneWriter extends CodeOffsetAdapter {
   //     annotations in the scene at the first call of visit{Code, End}.
   //
 
-  // Whether to output error messages for unsupported cases
+  /** Whether to output error messages for unsupported cases. */
   private static final boolean strict = false;
 
-  // None of these classes fields should be null, except for aClass, which
+  // None of these fields should be null, except for aClass, which
   //  can't be vivified until the first visit() is called.
 
   /**
@@ -125,9 +125,9 @@ public class ClassAnnotationSceneWriter extends CodeOffsetAdapter {
   private ClassReader classReader;
 
   /**
-   * Constructs a new <code> ClassAnnotationSceneWriter </code> that will
-   * insert all the annotations in <code> scene </code> into the class that
-   * it visits.  <code> scene </code> must be an {@link AScene} over the
+   * Constructs a new {@code ClassAnnotationSceneWriter} that will
+   * insert all the annotations in {@code scene} into the class that
+   * it visits.  {@code scene} must be an {@link AScene} over the
    * class that this will visit.
    *
    * @param api the ASM API version to use
@@ -326,6 +326,8 @@ public class ClassAnnotationSceneWriter extends CodeOffsetAdapter {
   // TODO Can/should this use a method in reflection-util instead?
   @SuppressWarnings("signature")  // TODO unverified, but clients use it as a ClassGetName
   private static @ClassGetName String classDescToName(String descriptor) {
+    assert descriptor.startsWith("L");
+    assert descriptor.endsWith(";");
     return descriptor.substring(1, descriptor.length() - 1).replace('/', '.');
   }
 
@@ -521,7 +523,7 @@ public class ClassAnnotationSceneWriter extends CodeOffsetAdapter {
    * A MethodAnnotationSceneWriter is to a MethodAdapter exactly
    * what ClassAnnotationSceneWriter is to a ClassAdapter:
    * it will ensure that the MethodVisitor behind MethodAdapter
-   * visits each of the extended annotations in scene in the correct
+   * visits each of the annotations in scene in the correct
    * sequence, before any of the later data is visited.
    */
   private class MethodAnnotationSceneWriter extends MethodVisitor {
@@ -729,7 +731,7 @@ public class ClassAnnotationSceneWriter extends CodeOffsetAdapter {
     }
 
     /**
-     * Has this visit the extended annotation in tla and returns the
+     * Has this visit the annotation in tla and returns the
      * resulting visitor. The sort of the typeReference should be METHOD_TYPE_PARAMETER, METHOD_TYPE_PARAMETER_BOUND,
      * METHOD_RETURN, METHOD_RECEIVER, METHOD_FORMAL_PARAMETER or THROWS.
      *
@@ -744,7 +746,7 @@ public class ClassAnnotationSceneWriter extends CodeOffsetAdapter {
     }
 
     /**
-     * Has this visit the extended annotation in tla and returns the
+     * Has this visit the annotation in tla and returns the
      * resulting visitor. The sort of the typeReference should be LOCAL_VARIABLE or RESOURCE_VARIABLE
      *
      * @param tla the Annotation to visit
@@ -760,7 +762,7 @@ public class ClassAnnotationSceneWriter extends CodeOffsetAdapter {
     }
 
     /**
-     * Has this visit the extended annotation in tla and returns the
+     * Has this visit the annotation in tla and returns the
      * resulting visitor.
      *
      * @param typeSort the type of the annotation
@@ -774,7 +776,7 @@ public class ClassAnnotationSceneWriter extends CodeOffsetAdapter {
     }
 
     /**
-     * Has this visit the extended annotation in tla and returns the
+     * Has this visit the annotation in tla and returns the
      * resulting visitor.
      *
      * @param typeSort the type of the annotation
@@ -1172,7 +1174,7 @@ public class ClassAnnotationSceneWriter extends CodeOffsetAdapter {
 
         // Now iterate through method's locals, news, parameter, receiver,
         // typecasts, and type argument annotations, which will all be
-        // extended annotations
+        // annotations.
         ensureVisitTypeParameterBoundAnnotations();
         ensureVisitLocalVariablesAnnotations();
         //ensureVisitObjectCreationAnnotations();

@@ -1651,7 +1651,7 @@ loop:
     System.err.println("\t" + i);
     if (e.getMessage() != null) {
       // If the message has multiple lines, indent them so it's easier to read.
-      System.err.println("\tError: " + e.getMessage().replace("\n", "\n\t\t"));
+      System.err.println("\tError: " + e.getMessage().replace(System.lineSeparator(), System.lineSeparator() + "\t\t"));
     }
     if (dbug.or(stak).isEnabled()) {
       e.printStackTrace();

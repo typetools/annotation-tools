@@ -1,4 +1,4 @@
-// This class is a complete ClassVisitor with many hidden classes that do
+// This class is a complete ClassVisitor with many nested classes that do
 // the work of reading annotations from a class file and inserting them into
 // an AScene.
 package scenelib.annotations.io.classfile;
@@ -116,9 +116,9 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
   }
 
   /**
-   * Constructs a new <code> ClassAnnotationSceneReader </code> that will
+   * Constructs a new {@code ClassAnnotationSceneReader} that will
    * insert all the annotations in the class that it visits into
-   * <code>scene</code>.
+   * {@code scene}.
    * @param api the ASM API version to use
    * @param classReader the {@link ClassReader} that visits this {@code ClassAnnotationSceneReader}
    * @param scene the annotation scene into which annotations this visits
@@ -135,9 +135,6 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
     this.ignoreBridgeMethods = ignoreBridgeMethods;
   }
 
-  /**
-   * @see org.objectweb.asm.ClassVisitor#visit(int, int, java.lang.String, java.lang.String, java.lang.String, java.lang.String[])
-   */
   @Override
   public void visit(int version, int access, String name, String signature,
       String superName, String[] interfaces) {
@@ -145,9 +142,6 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
     aClass = scene.classes.getVivify(name.replace('/', '.'));
   }
 
-  /**
-   * @see org.objectweb.asm.ClassVisitor#visitAnnotation(java.lang.String, boolean)
-   */
   @Override
   public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
     if (trace) { System.out.printf("visitAnnotation(%s, %s) in %s (%s)%n", descriptor, visible, this, this.getClass()); }
@@ -155,9 +149,6 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
     return new AnnotationSceneReader(this.api, descriptor, visible, aClass, annotationWriter);
   }
 
-  /**
-   * @see org.objectweb.asm.ClassVisitor#visitTypeAnnotation(int, TypePath, java.lang.String, boolean)
-   */
   @Override
   public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String descriptor, boolean visible) {
     if (trace) { System.out.printf("visitTypeAnnotation(%s, %s, %s, %s); aClass=%s in %s (%s)%n", typeRef, typePath, descriptor, visible, aClass, this, this.getClass()); }
@@ -166,9 +157,6 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
     return new TypeAnnotationSceneReader(this.api, descriptor, visible, aClass, annotationWriter, typeRef, typePath, null, null, null, null);
   }
 
-  /**
-   * @see org.objectweb.asm.ClassVisitor#visitField(int, java.lang.String, java.lang.String, java.lang.String, java.lang.Object)
-   */
   @Override
   public FieldVisitor visitField(
       int access,
@@ -182,9 +170,6 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
     return new FieldAnnotationSceneReader(this.api, aField, fieldWriter);
   }
 
-  /**
-   * @see org.objectweb.asm.ClassVisitor#visitMethod
-   */
   @Override
   public MethodVisitor visitMethod(
       int access,
@@ -208,6 +193,8 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
   // TODO Can/should this use a method in reflection-util instead?
   @SuppressWarnings("signature")  // TODO unverified, but clients use it as a ClassGetName
   private static @ClassGetName String classDescToName(String descriptor) {
+    assert descriptor.startsWith("L");
+    assert descriptor.endsWith(";");
     return descriptor.substring(1, descriptor.length() - 1).replace('/', '.');
   }
 
@@ -221,21 +208,19 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
   String dummyDesc = "dummy";
 
   /**
-   * Most of the complexity behind reading annotations from a class file into
-   * a scene is in AnnotationSceneReader, which fully implements the
-   * AnnotationVisitor interface.  It keeps an AElement of the
+   * AnnotationSceneReader contains most of the complexity behind reading annotations from a class file into
+   * a scene.  It keeps an AElement of the
    * element into which this should insert the annotations it visits in
    * a class file.  Thus, constructing an AnnotationSceneReader with an
    * AElement of the right type is sufficient for writing out annotations
    * to that element, which will be done once visitEnd() is called.  Note that
-   * for when inner annotations are expected, the aElement passed in must be
-   * of the correct form (ATypeElement, or AMethod depending on the
-   * target type of the extended annotation).
+   * for when inner annotations are expected, the AElement passed in must be
+   * of the correct form (ATypeElement or AMethod depending on the
+   * target type of the annotation).
    */
   private class AnnotationSceneReader extends AnnotationVisitor {
     // Implementation strategy:
-    // For field values and enums, simply pass the information
-    //  onto annotationBuilder.
+    // For field values and enums, delegate to field annotationBuilder, which does the work.
     // For arrays, use an ArrayAnnotationBuilder that will
     //  properly call the right annotationBuilder methods on its visitEnd().
     // For nested annotations, use a NestedAnnotationSceneReader that will
@@ -245,7 +230,7 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
     /** The AElement into which the annotation visited should be inserted. */
     protected AElement aElement;
 
-    /** Whether or not this annotation is visible at runtime. */
+    /** Whether or not this annotation is visible at run time. */
     protected boolean visible;
 
     /** The AnnotationBuilder used to create this annotation. */
@@ -260,7 +245,7 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
     /**
      * Retrieve annotation definition, including retention policy.
      *
-     * @param jvmlClassName class to inspect
+     * @param jvmlClassName the name of an annotation class
      * @return an annotation definition for the class
      */
     @SuppressWarnings("unchecked")
@@ -273,7 +258,6 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
       try {
         annoClass = (Class<? extends java.lang.annotation.Annotation>) Class.forName(annoTypeName);
       } catch (ClassNotFoundException e) {
-        // This is an internal JDK annotation such as jdk.Profile+Annotation .
         if (annoTypeName.contains("+")) {
           // This is an internal JDK annotation such as jdk.Profile+Annotation .
           @SuppressWarnings("signature:assignment.type.incompatible") // special annotation with "+" in name
@@ -300,9 +284,9 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
      * annotation it visits into aElement.
      *
      * @param api the ASM API version to use
-     * @param descriptor the class descriptor of the enumeration class.
-     * @param visible whether or not this annotation is visible at runtime.
-     * @param aElement the AElement into which the annotation visited should be inserted.
+     * @param descriptor the class descriptor of the enumeration class
+     * @param visible whether or not this annotation is visible at run time
+     * @param aElement the AElement into which the annotation visited should be inserted
      * @param annotationWriter the AnnotationWriter passed by the caller
      */
     AnnotationSceneReader(int api, String descriptor, boolean visible, AElement aElement, AnnotationVisitor annotationWriter) {
@@ -320,21 +304,19 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
                                                                      "TODO: ClassAnnotationSceneReader"
                                                                      );
         if (ab == null) {
-          throw new IllegalArgumentException("bad description: " + descriptor);
+          throw new IllegalArgumentException("bad descriptor: " + descriptor);
         } else {
           this.annotationBuilder = ab;
         }
       }
     }
 
-    /*
-     * @see org.objectweb.asm.AnnotationVisitor#visit(java.lang.String, java.lang.Object)
-     */
+    // Adds a field to the annotation being built.
     @SuppressWarnings("signature") // ASM is not annotated yet
     @Override
     public void visit(String name, Object value) {
       if (trace) { System.out.printf("visit(%s, %s) on %s%n", name, value, this); }
-      // BasicAFT.forType(Class) expects int.class instead of Integer.class,
+      // BasicAFT.forType(Class) expects primitive int.class instead of boxed Integer.class,
       // and so on for all primitives.  String.class is ok, since it has no
       // primitive type.
       Class<?> c = value.getClass();
@@ -384,45 +366,45 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
     /**
      * Method that accepts an Object whose actual type is c[], where c is a
      * primitive, and returns an equivalent {@code List<Object>} that contains
-     * the same elements as in hiddenArray.
+     * the same elements as in primitiveArray.
      */
-    private List<Object> asList(Object hiddenArray) {
+    private List<Object> asList(Object primitiveArray) {
       List<Object> objects = new ArrayList<>();
-      Class<?> c = hiddenArray.getClass().getComponentType();
+      Class<?> c = primitiveArray.getClass().getComponentType();
       if (c.equals(boolean.class)) {
-        for (boolean o : (boolean[]) hiddenArray) {
+        for (boolean o : (boolean[]) primitiveArray) {
           objects.add(o);
         }
       } else if (c.equals(byte.class)) {
-        for (byte o : (byte[]) hiddenArray) {
+        for (byte o : (byte[]) primitiveArray) {
           objects.add(o);
         }
       } else if (c.equals(char.class)) {
-        for (char o : (char[]) hiddenArray) {
+        for (char o : (char[]) primitiveArray) {
           objects.add(o);
         }
       } else if (c.equals(short.class)) {
-        for (short o : (short[]) hiddenArray) {
+        for (short o : (short[]) primitiveArray) {
           objects.add(o);
         }
       } else if (c.equals(int.class)) {
-        for (int o : (int[]) hiddenArray) {
+        for (int o : (int[]) primitiveArray) {
           objects.add(o);
         }
       } else if (c.equals(long.class)) {
-        for (long o : (long[]) hiddenArray) {
+        for (long o : (long[]) primitiveArray) {
           objects.add(o);
         }
       } else if (c.equals(float.class)) {
-        for (float o : (float[]) hiddenArray) {
+        for (float o : (float[]) primitiveArray) {
           objects.add(o);
         }
       } else if (c.equals(double.class)) {
-        for (double o : (double[]) hiddenArray) {
+        for (double o : (double[]) primitiveArray) {
           objects.add(o);
         }
       } else {
-        throw new RuntimeException("Array has unknown type: " + hiddenArray);
+        throw new RuntimeException("Array has non-primitive type " + c + ": " + primitiveArray);
       }
       return objects;
     }
@@ -500,7 +482,7 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
 
     /**
      * Hook for NestedAnnotationSceneReader; overridden by
-     * ArrayAnnotationSceneReader to add an array element instead of a field
+     * ArrayAnnotationSceneReader to add an array element instead of a field.
      *
      * @param fieldName name of field
      * @param annotation annotation to be added to the field
@@ -559,7 +541,7 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
     /**
      * The name of the local variable being visited.
      */
-    private final String localVariableName;
+    private final @Nullable String localVariableName;
 
     /**
      * Constructs a new TypeAnnotationSceneReader with the given description and
@@ -568,7 +550,7 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
      *
      * @param api the ASM API version to use
      * @param descriptor the descriptor of the reader
-     * @param visible whether or not this annotation is visible at runtime
+     * @param visible whether or not this annotation is visible at run time
      * @param aElement the AElement into which the annotation visited should be inserted
      * @param annotationWriter the AnnotationWriter passed by the caller
      * @param typeRef A reference to the annotated type. This has information about the target type, param index and
@@ -594,7 +576,7 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
      *
      * @param api the ASM API version to use
      * @param descriptor the descriptor of the reader
-     * @param visible whether or not this annotation is visible at runtime
+     * @param visible whether or not this annotation is visible at run time
      * @param aElement the AElement into which the annotation visited should be inserted
      * @param annotationWriter the AnnotationWriter passed by the caller
      * @param typeRef A reference to the annotated type. This has information about the target type, param index and
@@ -607,11 +589,11 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
      *            and TypeReference#RESOURCE_VARIABLE.
      * @param index The indices of the element being visited in the classfile. Used only for TypeReference#LOCAL_VARIABLE
      *              and TypeReference#RESOURCE_VARIABLE.
-     * @param localVariableName the name of the local variable being visited
+     * @param localVariableName the name of the local variable being visited; may be null
      */
     TypeAnnotationSceneReader(int api, String descriptor, boolean visible, AElement aElement, AnnotationVisitor annotationWriter,
                               int typeRef, TypePath typePath, Label[] start, Label[] end, int[] index,
-                              String localVariableName) {
+                              @Nullable String localVariableName) {
       super(api, descriptor, visible, aElement, annotationWriter);
       this.typeReference = new TypeReference(typeRef);
       this.typePath = typePath;
@@ -639,7 +621,7 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
       annotationWriter.visitEnd();
       // TEMP
       // If the expression used to initialize a field contains annotations
-      // on instanceOfs, typecasts, or news, the extended compiler enters
+      // on instanceOfs, typecasts, or news, javac enters
       // those annotations on the field.  If we get such an annotation and
       // aElement is a field, skip the annotation for now to avoid crashing.
       try {
@@ -746,7 +728,7 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
 
   /**
    * Creates the class type parameter bound annotation on aClass.
-   * Works for {@link TypeReference#CLASS_TYPE_PARAMETER}
+   * Works for {@link TypeReference#CLASS_TYPE_PARAMETER}.
    * @param aClass the annotatable class in which annotation will be inserted
    */
   private void handleClassTypeParameter(AClass aClass) {
@@ -758,7 +740,7 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
 
   /**
    * Creates the class type parameter bound annotation on aClass.
-   * Works for {@link TypeReference#CLASS_TYPE_PARAMETER_BOUND}
+   * Works for {@link TypeReference#CLASS_TYPE_PARAMETER_BOUND}.
    * @param aClass the annotatable class in which annotation will be inserted
    */
   private void handleClassTypeParameterBound(AClass aClass) {
@@ -774,7 +756,7 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
 
   /**
    * Creates the class extends annotation on aClass.
-   * Works for {@link TypeReference#CLASS_EXTENDS}
+   * Works for {@link TypeReference#CLASS_EXTENDS}.
    * @param aClass the annotatable class in which annotation will be inserted
    */
   private void handleClassExtends(AClass aClass) {
@@ -791,7 +773,7 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
 
   /**
    * Creates the inner annotation on aElement.innerTypes.
-   * Works for {@link TypeReference#FIELD}
+   * Works for {@link TypeReference#FIELD}.
    * @param aElement the annotatable element in which annotation will be inserted
    */
   private void handleField(AElement aElement) {
@@ -817,7 +799,7 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
 
   /**
    * Creates the method parameter type generic/array annotation on aMethod.
-   * Works for {@link TypeReference#METHOD_FORMAL_PARAMETER}
+   * Works for {@link TypeReference#METHOD_FORMAL_PARAMETER}.
    * @param aMethod the annotatable method in which annotation will be inserted
    */
   private void handleMethodFormalParameter(AMethod aMethod) {
@@ -833,7 +815,7 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
 
   /**
    * Creates the method type parameter bound annotation on aMethod.
-   * Works for {@link TypeReference#METHOD_TYPE_PARAMETER}
+   * Works for {@link TypeReference#METHOD_TYPE_PARAMETER}.
    * @param aMethod the annotatable method in which annotation will be inserted
    */
   private void handleMethodTypeParameter(AMethod aMethod) {
@@ -843,7 +825,7 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
 
   /**
    * Creates the method type parameter bound annotation on aMethod.
-   * Works for {@link TypeReference#METHOD_TYPE_PARAMETER_BOUND}
+   * Works for {@link TypeReference#METHOD_TYPE_PARAMETER_BOUND}.
    * @param aMethod the annotatable method in which annotation will be inserted
    */
   private void handleMethodTypeParameterBound(AMethod aMethod) {
@@ -859,7 +841,7 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
 
   /**
    * Creates the method return type generic/array annotation on aMethod.
-   * Works for {@link TypeReference#METHOD_RETURN}
+   * Works for {@link TypeReference#METHOD_RETURN}.
    * @param aMethod the annotatable method in which annotation will be inserted
    */
   private void handleMethodReturnType(AMethod aMethod) {
@@ -892,7 +874,7 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
   }
 
   /**
-   * Works for {@link TypeReference#THROWS}
+   * Works for {@link TypeReference#THROWS}.
    * @param aMethod the annotatable method in which annotation will be inserted
    */
   private void handleThrows(AMethod aMethod) {
@@ -903,7 +885,7 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
 
   /**
    * Creates the object creation annotation on aMethod.
-   * Works for {@link TypeReference#NEW}
+   * Works for {@link TypeReference#NEW}.
    * @param aMethod the annotatable method in which annotation will be inserted
    */
   private void handleMethodObjectCreation(AMethod aMethod) {
@@ -920,7 +902,7 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
 
   /**
    * Creates the method instance of annotation on aMethod.
-   * Works for {@link TypeReference#INSTANCEOF}
+   * Works for {@link TypeReference#INSTANCEOF}.
    * @param aMethod the annotatable method in which annotation will be inserted
    */
   private void handleMethodInstanceOf(AMethod aMethod) {
@@ -952,7 +934,7 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
 
   /**
    * Creates the typecast annotation on aMethod.
-   * Works for {@link TypeReference#CAST}
+   * Works for {@link TypeReference#CAST}.
    * @param aMethod the annotatable method in which annotation will be inserted
    */
   private void handleMethodTypecast(AMethod aMethod) {
@@ -968,7 +950,7 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
   }
 
   /**
-   * Works for {@link TypeReference#METHOD_INVOCATION_TYPE_ARGUMENT} and {@link TypeReference#CONSTRUCTOR_INVOCATION_TYPE_ARGUMENT}
+   * Works for {@link TypeReference#METHOD_INVOCATION_TYPE_ARGUMENT} and {@link TypeReference#CONSTRUCTOR_INVOCATION_TYPE_ARGUMENT}.
    * @param aMethod the annotatable method in which annotation will be inserted
    */
   private void handleInvocationTypeArgument(AMethod aMethod) {
@@ -1240,7 +1222,7 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
 
   /**
    * A FieldAnnotationSceneReader is a FieldVisitor that only cares about
-   * visiting [extended]annotations.  Attributes are ignored and visitEnd() has
+   * visiting annotations.  Attributes are ignored and visitEnd() has
    * no effect.  An AnnotationSceneReader is returned for declaration and type
    * AnnotationVisitors.  The AnnotationSceneReaders have a reference to
    * an ATypeElement that this is visiting, and they will write out
@@ -1284,7 +1266,7 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
 
   /**
    * Similarly to FieldAnnotationSceneReader, this is a MethodVisitor that
-   * only cares about visiting [extended]annotations.  Attributes other than
+   * only cares about visiting annotations.  Attributes other than
    * BootstrapMethods are ignored, all code is ignored, and visitEnd() has no
    * effect.  An AnnotationSceneReader
    * is returned for declaration and type AnnotationVisitors.  The
@@ -1393,7 +1375,8 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
    * Debug code to print a Classpath.
    */
   private static void printClasspath() {
-    System.out.println("\nClasspath:");
+    System.out.println();
+    System.out.println("Classpath:");
     StringTokenizer tokenizer =
         new StringTokenizer(System.getProperty("java.class.path"),
             File.pathSeparator);
