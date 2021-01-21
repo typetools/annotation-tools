@@ -10,11 +10,8 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * A {@link LocalLocation} holds information about a local variable.
- * As a variable may have multiple lifetimes, we store this information
- * the same way ASM does as a series of parallel arrays:
- * start for Labels holding the bytecode offset to the starts of the variable's lifetime(s)
- * end for Labels holding the bytecode offset to the ends of the variable's lifetime(s)
- * index for ints holding the stack offset for the variable's lifetime(s)
+ * A variable may have multiple lifetimes.
+ * We store this information the same way ASM does, as 3 parallel arrays.
  */
 public final class LocalLocation {
     /**
@@ -37,13 +34,16 @@ public final class LocalLocation {
 
     /**
      * The name of the local variable being visited.
+     *
+     * This is not part of the abstract state of the LocalLocation:
+     * it is not read by equals(), hashCode(), or toString().
      */
     public final @Nullable String variableName;
 
     /**
-     * Construct a new LocalLocation. Note that this constructor does not assign meaningful
+     * Construct a new LocalLocation.  This constructor does not assign meaningful
      * values to start or end.  Thus, the getScopeStart and getScopeLenth methods must not
-     * be used for such a variable.
+     * be used on the result.
      *
      * @param variableName the name of the local variable
      * @param index the offset of the variable in the stack frame
@@ -112,7 +112,7 @@ public final class LocalLocation {
     /**
      * Returns the bytecode offset to the start of the first scope/lifetime.
      *
-     * @return The bytecode offset to the start of the first scope/lifetime
+     * @return the bytecode offset to the start of the first scope/lifetime
      */
     public int getScopeStart() {
         try {
@@ -123,13 +123,13 @@ public final class LocalLocation {
         }
     }
 
+    // This is used only in IndexFileWriter.
     /**
-     * Returns the length of the scope/lifetime (in bytes).
+     * Returns the length of all the scopes/lifetimes (in bytes).
      *
-     * @return the length of the scope/lifetime (in bytes)
+     * @return the length of all the scopes/lifetimes (in bytes)
      */
     public int getScopeLength() {
-        // Should this be end[0] instead?
         try {
             return end[end.length - 1].getOffset() - getScopeStart();
         } catch (IllegalStateException e) {
