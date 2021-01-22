@@ -15,25 +15,26 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  */
 public final class LocalLocation {
     /**
-     * The starts of the lifetimes of the element being visited.
+     * The starts of the lifetimes for the variable.
      * Used only for TypeReference#LOCAL_VARIABLE and TypeReference#RESOURCE_VARIABLE.
      */
     public final Label[] start;
 
     /**
-     * The ends of the lifetimes of the element being visited.
+     * The ends of the lifetimes for the variable.
      * Used only for TypeReference#LOCAL_VARIABLE and TypeReference#RESOURCE_VARIABLE.
      */
     public final Label[] end;
 
     /**
-     * The indices of the element being visited in the classfile.
+     * The indices for the variable. Each element of the index array contains the
+     * local variable's offset from the stack frame for the corresponding lifetime.
      * Used only for TypeReference#LOCAL_VARIABLE and TypeReference#RESOURCE_VARIABLE.
      */
     public final int[] index;
 
     /**
-     * The name of the local variable being visited.
+     * The name of the variable.
      *
      * This is not part of the abstract state of the LocalLocation:
      * it is not read by equals(), hashCode(), or toString().
@@ -45,10 +46,10 @@ public final class LocalLocation {
      * values to start or end.  Thus, the getScopeStart and getScopeLenth methods must not
      * be used on the result.
      *
-     * @param variableName the name of the local variable
      * @param index the offset of the variable in the stack frame
+     * @param variableName the name of the local variable
      */
-    public LocalLocation(String variableName, int index) {
+    public LocalLocation(int index, String variableName) {
         this(new Label[] {new Label()}, new Label[] {new Label()}, new int[] {index}, variableName);
     }
 
@@ -57,7 +58,7 @@ public final class LocalLocation {
      *
      * @param start the code offsets to the starts of the variable's lifetime(s)
      * @param end the code offsets to the ends of the variable's lifetime(s)
-     * @param index the stack offsets of the variable's lifetime(s)
+     * @param index the stack frame offsets of the variable's lifetime(s)
      * @param variableName the name of the local variable
      */
     public LocalLocation(Label[] start, Label[] end, int[] index, String variableName) {
@@ -72,11 +73,11 @@ public final class LocalLocation {
      * Only being used by Writers, not Readers for now. Should possibly deprecate this in the future.
      * Changes values reflectively.
      *
-     * @param index the offset of the variable in the stack frame
      * @param scopeStart the bytecode offset of the start of the variable's lifetime
      * @param scopeLength the bytecode length of the variable's lifetime
+     * @param index the offset of the variable in the stack frame
      */
-    public LocalLocation(int index, int scopeStart, int scopeLength) {
+    public LocalLocation(int scopeStart, int scopeLength, int index) {
         Label startLabel = new Label();
         Label endLabel = new Label();
 
@@ -113,6 +114,7 @@ public final class LocalLocation {
      * Returns the bytecode offset to the start of the first scope/lifetime.
      *
      * @return the bytecode offset to the start of the first scope/lifetime
+     *         or -1 if the Label at start[0] is not resolved
      */
     public int getScopeStart() {
         try {
@@ -128,6 +130,7 @@ public final class LocalLocation {
      * Returns the length of all the scopes/lifetimes (in bytes).
      *
      * @return the length of all the scopes/lifetimes (in bytes)
+     *         or -1 if the Label at start[0] or end[end.length-1] is not resolved
      */
     public int getScopeLength() {
         try {
@@ -139,21 +142,32 @@ public final class LocalLocation {
     }
 
     /**
-     * Returns the local variable index.
+     * Returns the local variable index of its first scope/lifetime.
      * @return the local variable index
      */
     public int getVarIndex() {
         return index[0];
     }
 
+    /**
+     * Returns whether this {@link LocalLocation} equals <code>o</code>; a
+     * slightly faster variant of {@link #equals(Object)} for when the argument
+     * is statically known to be another nonnull {@link LocalLocation}.
+     *
+     * @param o the {@code LocalLocation} to compare to this
+     * @return true if this equals {@code o}
+     */
+    public boolean equals(LocalLocation o) {
+        return Arrays.equals(start, o.start) &&
+            Arrays.equals(end, o.end) &&
+            Arrays.equals(index, o.index) &&
+            (variableName==null || variableName.equals(o.variableName));
+    }
+
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        LocalLocation that = (LocalLocation) o;
-        return Arrays.equals(start, that.start) &&
-            Arrays.equals(end, that.end) &&
-            Arrays.equals(index, that.index);
+    public boolean equals(/*@ReadOnly*/ Object o) {
+        return o instanceof LocalLocation
+            && equals((LocalLocation) o);
     }
 
     @Override

@@ -99,7 +99,7 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
   /** ClassReader for reading the class file. */
   private final ClassReader classReader;
 
-  /** ClassWriter for writing the class file. */
+  /** ClassWriter for generating the modified class file. */
   private final ClassWriter classWriter;
 
   /**
@@ -505,8 +505,8 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
   }
 
   /**
-   * Handles all the logic related to reading Type Annotations and creating the appropriate scenes. The
-   * visitEnd() method chooses the appropriate scene element for the correct TypeReference.getSort()
+   * Handles all the logic related to reading Type Annotations and creating the appropriate scene element.
+   * The visitEnd() method chooses the appropriate scene element for the correct TypeReference.getSort()
    * (which is the target type of the type annotation). So if new target types are added, the visitEnd method
    * needs to be updated accordingly.
    */
@@ -717,10 +717,7 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
             throw new Error("EXCEPTION_PARAMETER TypeReference case.");
             // TODO: ensure all cases covered.
           default:
-            System.err.println("ERROR: Either this is a bug, or this particular TypeReference is not supported yet: "
-                + Integer.toHexString(typeReference.getValue()));
-            Annotation a = makeAnnotation();
-            aElement.tlAnnotationsHere.add(a);
+            throw new RuntimeException("Unknown TypeReference: " + typeReference.getSort());
         }
       } catch (ClassCastException e) {
         System.err.println("Exception trace: " + e.getMessage());
@@ -731,13 +728,13 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
     }
 
   /**
-   * Creates the class type parameter bound annotation on aClass.
+   * Creates the class type parameter annotation on aClass.
    * Works for {@link TypeReference#CLASS_TYPE_PARAMETER}.
    * @param aClass the annotatable class in which annotation will be inserted
    */
   private void handleClassTypeParameter(AClass aClass) {
-    // TODO: Any reason this does not need the "innerTypes.getVivify(typePath)" part that is there in
-    //  handleClassTypeParameterBound()?
+    // TODO: Any reason this does not need to check for non-null typePath as in
+    // handleClassTypeParameterBound()?
     aClass.bounds.getVivify(makeBoundLocation())
         .tlAnnotationsHere.add(makeAnnotation());
   }
@@ -1286,7 +1283,10 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
     /** MethodVisitor for writing the current method. */
     private final MethodVisitor methodWriter;
 
-    /** Name of the local variable being visited. */
+    /**
+     * The name of a local variable being visited. Used to capture the local variable name seen in
+     * visitLocalVariable so that it can be used in visitLocalVariableTypeAnnotation.
+     */
     private String localVariableName;
 
     /**

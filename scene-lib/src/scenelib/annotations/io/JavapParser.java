@@ -235,7 +235,7 @@ public final class JavapParser {
                 scopeStart = Integer.parseInt(m.group(2));
                 scopeLength = Integer.parseInt(m.group(3));
                 LocalLocation ll =
-                    new LocalLocation(index, scopeStart, scopeLength);
+                    new LocalLocation(scopeStart, scopeLength, index);
                 nextLine();
                 subOuterType = ((AMethod) member).body.locals.getVivify(ll).type;
                 break;

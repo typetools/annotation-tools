@@ -159,7 +159,7 @@ public class TestSceneLib {
             .getTypePathEntryListFromBinary(Arrays.asList(0, 0)));
         Assert.assertNotNull(i.lookup("p2.C"));
         AField l2 =
-                constructor.body.locals.get(new LocalLocation(1, 3, 6));
+                constructor.body.locals.get(new LocalLocation(3, 6, 1));
         Assert.assertNull(l2);
     }
 

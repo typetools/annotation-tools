@@ -755,7 +755,7 @@ public class Insertions implements Iterable<Insertion> {
                 }
                 node = typeArgs.get(j);
                 tpes.add(
-                    new TypePathEntry(TypePath.TYPE_ARGUMENT, j));
+                    TypePathEntry.createTypePathEntry(TypePath.TYPE_ARGUMENT, j));
                 break;
               }
             }

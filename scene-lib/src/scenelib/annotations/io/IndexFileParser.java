@@ -978,7 +978,7 @@ public final class IndexFileParser {
                     int scopeStart = expectNonNegative(matchNNInteger());
                     expectChar('+');
                     int scopeLength = expectNonNegative(matchNNInteger());
-                    loc = new LocalLocation(index, scopeStart, scopeLength);
+                    loc = new LocalLocation(scopeStart, scopeLength, index);
                 }
                 // TODO: Need some way to get the actual variable info from string, or deprecate this feature.
                 else {
@@ -992,7 +992,7 @@ public final class IndexFileParser {
                         // default the variable index to 0, the most common case
                         varIndex = 0;
                     }
-                    loc = new LocalLocation(lvar, varIndex);
+                    loc = new LocalLocation(varIndex, lvar);
                 }
                 AField l = bl.locals.getVivify(loc);
                 expectChar(':');

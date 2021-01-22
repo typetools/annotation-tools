@@ -48,20 +48,51 @@ public class TypePathEntry {
    * @param step the type of the TypePathEntry
    * @param argument index of the type argument or 0
    */
-  public TypePathEntry(int step, int argument) {
+  private TypePathEntry(int step, int argument) {
     this.step = step;
     this.argument = argument;
+  }
 
-    assert step == TypePath.ARRAY_ELEMENT || step == TypePath.INNER_TYPE
-        || step == TypePath.WILDCARD_BOUND || step == TypePath.TYPE_ARGUMENT;
+  /**
+   * Create a TypePathEntry. If step is TYPE_ARGUMENT, returns
+   * a new TypePathEntry(step, argument); otherwise, returns a
+   * canonical TypePathEntry of the appropriate type.
+   *
+   * @param step the type of the TypePathEntry
+   * @param argument index of the type argument or 0
+   * @return a TypePathEntry
+   */
+  public static TypePathEntry createTypePathEntry(int step, int argument) {
+    switch (step) {
+      case TypePath.ARRAY_ELEMENT:
+        return ARRAY_ELEMENT;
+      case TypePath.INNER_TYPE:
+        return INNER_TYPE;
+      case TypePath.WILDCARD_BOUND:
+        return WILDCARD_BOUND;
+      case TypePath.TYPE_ARGUMENT:
+        return new TypePathEntry(step, argument);
+      default:
+        throw new Error("Bad step " + step);
+    }
+  }
+
+  /**
+   * Returns whether this {@link TypePathEntry} equals <code>o</code>; a
+   * slightly faster variant of {@link #equals(Object)} for when the argument
+   * is statically known to be another nonnull {@link TypePathEntry}.
+   *
+   * @param o the {@code TypePathEntry} to compare to this
+   * @return true if this equals {@code o}
+   */
+  public boolean equals(TypePathEntry o) {
+    return step == o.step && argument == o.argument;
   }
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-    TypePathEntry that = (TypePathEntry) o;
-    return step == that.step && argument == that.argument;
+    return o instanceof TypePathEntry
+        && equals((TypePathEntry) o);
   }
 
   @Override
@@ -77,7 +108,7 @@ public class TypePathEntry {
    * @param argument a type index if the step == TYPE_ARGUMENT, otherwise ignored
    * @return the String reresentaion of the TypePathEntry
    */
-  public static String stepToString(int step, int argument) {
+  public static String toString(int step, int argument) {
     switch (step) {
       case TypePath.ARRAY_ELEMENT:
         return "[";
@@ -112,18 +143,19 @@ public class TypePathEntry {
         throw new IllegalArgumentException("Odd number of elements: " + integerList);
       }
       int argument = iterator.next();
-      stringBuilder.append(stepToString(step, argument));
+      stringBuilder.append(toString(step, argument));
     }
     return TypePath.fromString(stringBuilder.toString());
   }
 
   /**
-   * Converts a type path represented by a list of integers to a list of {@link TypePathEntry} elements.
-   * @param integerList the integer list in the form [step1, argument1, step2, argument2, ...] where step1 and argument1
-   *                   are the step and argument of the first entry (or edge) of a type path.
-   *    Each step is a {@link TypePath} constant; see {@link #step}.
+   * Converts a type path represented by a list of Integers to a list of {@link TypePathEntry} elements.
+   *
+   * @param integerList the Integer list in the form [step1, argument1, step2, argument2, ...]
+   *   where step1 and argument1 are the step and argument of the first entry (or edge) of a type path.
+   *   Each step is a {@link TypePath} constant; see {@link #step}.
    * @return the list of {@link TypePathEntry} elements corresponding to {@code integerList},
-   *  or null if the argument is null
+   *   or null if the argument is null
    */
   public static List<TypePathEntry> getTypePathEntryListFromBinary(List<Integer> integerList) {
     if (integerList == null) {
@@ -144,6 +176,7 @@ public class TypePathEntry {
 
   /**
    * Converts a type path represented by a list of integers to a {@link TypePath}.
+   *
    * @param typePathEntryList the {@link TypePathEntry} list corresponding to the location of some type annotation
    * @return the {@link TypePath} corresponding to {@code typePathEntryList},
    *   or null if the argument is null or empty
@@ -154,7 +187,7 @@ public class TypePathEntry {
     }
     StringBuilder stringBuilder = new StringBuilder();
     for (TypePathEntry typePathEntry : typePathEntryList) {
-      stringBuilder.append(stepToString(typePathEntry.step, typePathEntry.argument));
+      stringBuilder.append(toString(typePathEntry.step, typePathEntry.argument));
     }
     return TypePath.fromString(stringBuilder.toString());
   }
