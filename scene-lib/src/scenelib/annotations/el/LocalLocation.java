@@ -37,7 +37,7 @@ public final class LocalLocation {
      * The name of the variable.
      *
      * This is not part of the abstract state of the LocalLocation:
-     * it is not read by equals(), hashCode(), or toString().
+     * it is not read by hashCode() or toString().
      */
     public final @Nullable String variableName;
 
