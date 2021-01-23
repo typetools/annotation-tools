@@ -37,7 +37,7 @@ public final class LocalLocation {
      * The name of the variable.
      *
      * This is not part of the abstract state of the LocalLocation:
-     * it is not read by hashCode() or toString().
+     * it is not read by equals(), hashCode(), or toString().
      */
     public final @Nullable String variableName;
 
@@ -56,9 +56,9 @@ public final class LocalLocation {
     /**
      * Construct a new LocalLocation.
      *
-     * @param start the code offsets to the starts of the variable's lifetime(s)
-     * @param end the code offsets to the ends of the variable's lifetime(s)
-     * @param index the stack frame offsets of the variable's lifetime(s)
+     * @param start the code offsets to the starts of the variable's lifetimes
+     * @param end the code offsets to the ends of the variable's lifetimes
+     * @param index the stack frame offsets of the variable's lifetimes
      * @param variableName the name of the local variable
      */
     public LocalLocation(Label[] start, Label[] end, int[] index, String variableName) {
