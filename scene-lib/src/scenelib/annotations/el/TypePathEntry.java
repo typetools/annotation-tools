@@ -54,15 +54,13 @@ public class TypePathEntry {
   }
 
   /**
-   * Create a TypePathEntry. If step is TYPE_ARGUMENT, returns
-   * a new TypePathEntry(step, argument); otherwise, returns a
-   * canonical TypePathEntry of the appropriate type.
+   * Create a TypePathEntry.
    *
    * @param step the type of the TypePathEntry
    * @param argument index of the type argument or 0
    * @return a TypePathEntry
    */
-  public static TypePathEntry createTypePathEntry(int step, int argument) {
+  public static TypePathEntry create(int step, int argument) {
     switch (step) {
       case TypePath.ARRAY_ELEMENT:
         return ARRAY_ELEMENT;

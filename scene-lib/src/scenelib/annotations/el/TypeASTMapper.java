@@ -77,7 +77,7 @@ public abstract class TypeASTMapper<N> {
             map(n, getInnerType(te, ls));
             int nta = numTypeArguments(n);
             for (int tai = 0; tai < nta; tai++) {
-                ls.add(TypePathEntry.createTypePathEntry(TypePath.TYPE_ARGUMENT, tai));
+                ls.add(TypePathEntry.create(TypePath.TYPE_ARGUMENT, tai));
                 traverse1(getTypeArgument(n, tai), te, new ArrayList<>(ls));
                 ls.remove(ls.size() - 1);
             }
@@ -102,7 +102,7 @@ public abstract class TypeASTMapper<N> {
 
             int nta = numTypeArguments(n);
             for (int tai = 0; tai < nta; tai++) {
-                ls.add(TypePathEntry.createTypePathEntry(TypePath.TYPE_ARGUMENT, tai));
+                ls.add(TypePathEntry.create(TypePath.TYPE_ARGUMENT, tai));
                 traverse1(getTypeArgument(n, tai), te, ls);
                 ls.remove(ls.size() - 1);
             }
