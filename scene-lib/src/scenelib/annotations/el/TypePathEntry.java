@@ -63,10 +63,13 @@ public class TypePathEntry {
   public static TypePathEntry create(int step, int argument) {
     switch (step) {
       case TypePath.ARRAY_ELEMENT:
+        assert argument == 0;
         return ARRAY_ELEMENT;
       case TypePath.INNER_TYPE:
+        assert argument == 0;
         return INNER_TYPE;
       case TypePath.WILDCARD_BOUND:
+        assert argument == 0;
         return WILDCARD_BOUND;
       case TypePath.TYPE_ARGUMENT:
         return new TypePathEntry(step, argument);
@@ -76,7 +79,7 @@ public class TypePathEntry {
   }
 
   /**
-   * Returns whether this {@link TypePathEntry} equals <code>o</code>; a
+   * Returns whether this {@link TypePathEntry} equals {@code o}; a
    * slightly faster variant of {@link #equals(Object)} for when the argument
    * is statically known to be another nonnull {@link TypePathEntry}.
    *
@@ -173,7 +176,7 @@ public class TypePathEntry {
   }
 
   /**
-   * Converts a type path represented by a list of integers to a {@link TypePath}.
+   * Converts a type path represented by a list of {@link TypePathEntry} to a {@link TypePath}.
    *
    * @param typePathEntryList the {@link TypePathEntry} list corresponding to the location of some type annotation
    * @return the {@link TypePath} corresponding to {@code typePathEntryList},
