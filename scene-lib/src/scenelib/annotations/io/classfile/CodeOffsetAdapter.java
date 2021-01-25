@@ -1,39 +1,64 @@
 package scenelib.annotations.io.classfile;
 
-import org.objectweb.asmx.ClassAdapter;
-import org.objectweb.asmx.ClassReader;
-import org.objectweb.asmx.ClassVisitor;
-import org.objectweb.asmx.Handle;
-import org.objectweb.asmx.Label;
-import org.objectweb.asmx.MethodAdapter;
-import org.objectweb.asmx.MethodVisitor;
-import org.objectweb.asmx.Opcodes;
-
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Handle;
+import org.objectweb.asm.Label;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
 import scenelib.annotations.io.DebugWriter;
-import scenelib.annotations.util.AbstractClassVisitor;
 
-public class CodeOffsetAdapter extends ClassAdapter {
+/**
+ * Tracks offset within a method's Code attribute as its instructions
+ * are visited.  ASM really should expose this information but doesn't.
+ * Class implementation simply does the same arithmetic ASM does under
+ * the hood, staying synchronized with the {@link ClassReader}.
+ *
+ * UNDONE: Why both CodeOffsetAdapter and MethodCodeOffsetAdapter?
+ */
+public class CodeOffsetAdapter extends ClassVisitor {
+
+  /** Writer for outputting debug information. */
   static final DebugWriter debug;
+
+  /** ClassReader for reading the class file. */
   final ClassReader classReader;
+
+  /** Buffer for calls to ClassReader read methods. */
   final char[] buffer;
+
+  /** Offset from start of class file to current method. */
   int methodStart;
+
+  /** Offset from start of class file to code attribute for method. */
   int codeStart;
+
+  /** Offset from start of bytecodes to current instruction. */
   int offset;
+
+  /** Offset from start of bytecodes to previous instruction. */
+  int previousOffset;
 
   static {
     debug = new DebugWriter();
     debug.setEnabled(false);
   }
 
-  public CodeOffsetAdapter(ClassReader classReader) {
-    this(classReader, new AbstractClassVisitor());
-  }
-
-  public CodeOffsetAdapter(ClassReader classReader, ClassVisitor v) {
-    super(v);
+  /**
+   * Constructs a new CodeOffsetAdapter.
+   * For some reason, it is necessary to use ClassWriter to ensure that
+   * all labels are visited.
+   *
+   * @param api the ASM API version to use
+   * @param classReader the ClassReader for the class
+   */
+  public CodeOffsetAdapter(int api, ClassReader classReader) {
+    super(api, new ClassWriter(classReader, 0));
     this.classReader = classReader;
     // const pool size is (not lowest) upper bound of string length
     buffer = new char[classReader.header];
+    // find beginning of methods
     methodStart = classReader.header + 6;
     methodStart += 4 + 2 * classReader.readUnsignedShort(methodStart);
     for (int i = classReader.readUnsignedShort(methodStart-2); i > 0; --i) {
@@ -51,7 +76,8 @@ public class CodeOffsetAdapter extends ClassAdapter {
       String signature, String[] exceptions) {
     MethodVisitor methodVisitor =
         super.visitMethod(access, name, descriptor, signature, exceptions);
-    return new MethodAdapter(methodVisitor) {
+    return new MethodVisitor(api, methodVisitor) {
+      /** Offset from start of class file to end of current method. */
       private int methodEnd;
 
       {
@@ -84,38 +110,51 @@ public class CodeOffsetAdapter extends ClassAdapter {
           }
         }
         offset = 0;
+        previousOffset = -1;
       }
 
+      /**
+       * Convenience method to read an int from the class file
+       * at a particular code attribute offset.
+       *
+       * @param i bytecode offset to read
+       * @return int read
+       */
       private int readInt(int i) {
         return classReader.readInt(codeStart + i);
+      }
+
+      @Override
+      public void visitLabel(Label label) {
+        super.visitLabel(label);
       }
 
       @Override
       public void visitFieldInsn(int opcode, String owner, String name, String descriptor) {
         super.visitFieldInsn(opcode, owner, name, descriptor);
         debug.debug("%d visitFieldInsn(%d, %s, %s, %s)%n", offset, opcode, owner, name, descriptor);
-        offset += 3;
+        advance(3);
       }
 
       @Override
       public void visitIincInsn(int var, int increment) {
         super.visitIincInsn(var, increment);
         debug.debug("%d visitIincInsn(%d, %d)%n", offset, var, increment);
-        offset += 3;
+        advance(3);
       }
 
       @Override
       public void visitInsn(int opcode) {
         super.visitInsn(opcode);
         debug.debug("%d visitInsn(%d)%n", offset, opcode);
-        ++offset;
+        advance(1);
       }
 
       @Override
       public void visitIntInsn(int opcode, int operand) {
         super.visitIntInsn(opcode, operand);
         debug.debug("%d visitIntInsn(%d, %d)%n", offset, opcode, operand);
-        offset += opcode == Opcodes.SIPUSH ? 3 : 2;
+        advance(opcode == Opcodes.SIPUSH ? 3 : 2);
       }
 
       @Override
@@ -124,7 +163,7 @@ public class CodeOffsetAdapter extends ClassAdapter {
         super.visitInvokeDynamicInsn(name, descriptor, bsm, bsmArgs);
         debug.debug("%d visitInvokeDynamicInsn(%s, %s)%n", offset,
             name, descriptor, bsm, bsmArgs);
-        offset += 5;
+        advance(5);
       }
 
       @Override
@@ -132,7 +171,7 @@ public class CodeOffsetAdapter extends ClassAdapter {
         super.visitJumpInsn(opcode, label);
         debug.debug("%d visitJumpInsn(%d, %s)%n", offset, opcode, label);
         // account for wide instructions goto_w (200) and jsr_w (201)
-        offset += classReader.readByte(codeStart + offset) < 200 ? 3 : 4;
+        advance(classReader.readByte(codeStart + offset) < 200 ? 3 : 4);
         assert offset > 0 && methodEnd > codeStart + offset;
       }
 
@@ -141,7 +180,7 @@ public class CodeOffsetAdapter extends ClassAdapter {
         super.visitLdcInsn(cst);
         debug.debug("%d visitLdcInsn(%s)%n", offset, cst);
         // account for wide instructions ldc_w (19) and ldc2_w (20)
-        offset += classReader.readByte(codeStart + offset) > 18 ? 3 : 2;
+        advance(classReader.readByte(codeStart + offset) > 18 ? 3 : 2);
         assert offset > 0 && methodEnd > codeStart + offset;
       }
 
@@ -151,18 +190,26 @@ public class CodeOffsetAdapter extends ClassAdapter {
         super.visitLookupSwitchInsn(dflt, keys, labels);
         debug.debug("%d visitLookupSwitchInsn(%s)%n", offset,
             dflt, keys, labels);
+        previousOffset = offset;
         offset += 8 - (offset & 3);
         offset += 4 + 8 * readInt(offset);
         assert offset > 0 && methodEnd > codeStart + offset;
       }
 
+      @Deprecated
       @Override
       public void visitMethodInsn(int opcode,
           String owner, String name, String descriptor) {
         super.visitMethodInsn(opcode, owner, name, descriptor);
-        debug.debug("%d visitMethodInsn(%d, %s, %s, %s)%n", offset,
-            opcode, owner, name, descriptor);
-        offset += opcode == Opcodes.INVOKEINTERFACE ? 5 : 3;
+        debug.debug("%d visitMethodInsn(%d, %s, %s, %s)%n", offset, opcode, owner, name, descriptor);
+        advance(opcode == Opcodes.INVOKEINTERFACE ? 5 : 3);
+      }
+
+      @Override
+      public void visitMethodInsn(int opcode, String owner, String name, String descriptor, boolean isInterface) {
+        super.visitMethodInsn(opcode, owner, name, descriptor, isInterface);
+        debug.debug("%d visitMethodInsn(%d, %s, %s, %s, %s)%n", offset, opcode, owner, name, descriptor, isInterface);
+        advance(opcode == Opcodes.INVOKEINTERFACE ? 5 : 3);
       }
 
       @Override
@@ -170,15 +217,16 @@ public class CodeOffsetAdapter extends ClassAdapter {
         super.visitMultiANewArrayInsn(descriptor, dims);
         debug.debug("%d visitMultiANewArrayInsn(%s, %d)%n", offset,
             descriptor, dims);
-        offset += 4;
+        advance(4);
       }
 
       @Override
       public void visitTableSwitchInsn(int min, int max,
-          Label dflt, Label[] labels) {
+          Label dflt, Label... labels) {
         super.visitTableSwitchInsn(min, max, dflt, labels);
         debug.debug("%d visitTableSwitchInsn(%d, %d, %s)%n", offset,
             min, max, dflt, labels);
+        previousOffset = offset;
         offset += 8 - (offset & 3);
         offset += 4 * (readInt(offset + 4) - readInt(offset) + 3);
         assert offset > 0 && methodEnd > codeStart + offset;
@@ -188,24 +236,53 @@ public class CodeOffsetAdapter extends ClassAdapter {
       public void visitTypeInsn(int opcode, String descriptor) {
         super.visitTypeInsn(opcode, descriptor);
         debug.debug("%d visitTypeInsn(%d, %s)%n", offset, opcode, descriptor);
-        offset += 3;
+        advance(3);
       }
 
       @Override
       public void visitVarInsn(int opcode, int var) {
         super.visitVarInsn(opcode, var);
         debug.debug("%d visitVarInsn(%d, %d)%n", offset, opcode, var);
-        offset += var < 4 ? 1 : 2;
+        advance(var < 4 ? 1 : 2);
       }
 
       @Override
       public void visitEnd() {
+        super.visitEnd();
         methodStart = methodEnd;
       }
     };
   }
 
+  /**
+   * Fetch previousOffset.
+   *
+   * @return previousOffset
+   */
+  public int getPreviousCodeOffset() { return previousOffset; }
+
+  /**
+   * Fetch offset.
+   *
+   * @return offset
+   */
   public int getMethodCodeOffset() { return offset; }
 
+  /**
+   * Fetch bytecode offset.
+   *
+   * @return bytecode offset
+   */
   public int getBytecodeOffset() { return codeStart + offset; }
+
+  // move ahead, marking previous position
+  /**
+   * Save offset to previousOffset and advance offset.
+   *
+   * @param n amount to advance offset
+   */
+  private void advance(int n) {
+    previousOffset = offset;
+    offset += n;
+  }
 }

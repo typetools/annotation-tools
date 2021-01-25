@@ -1,10 +1,11 @@
 package scenelib.annotations.el;
 
+import org.objectweb.asm.TypePath;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
-import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntryKind;
+import static scenelib.annotations.el.TypePathEntry.listToTypePath;
 
 /**
  * A {@link TypeASTMapper} traverses a client-maintained abstract syntax
@@ -42,7 +43,7 @@ public abstract class TypeASTMapper<N> {
         if (ls.isEmpty()) {
             return te;
         } else {
-            return te.innerTypes.getVivify(new InnerTypeLocation(ls));
+            return te.innerTypes.getVivify(ls);
         }
     }
 
@@ -76,8 +77,8 @@ public abstract class TypeASTMapper<N> {
             map(n, getInnerType(te, ls));
             int nta = numTypeArguments(n);
             for (int tai = 0; tai < nta; tai++) {
-                ls.add(new TypePathEntry(TypePathEntryKind.TYPE_ARGUMENT, tai));
-                traverse1(getTypeArgument(n, tai), te, ls);
+                ls.add(TypePathEntry.create(TypePath.TYPE_ARGUMENT, tai));
+                traverse1(getTypeArgument(n, tai), te, new ArrayList<>(ls));
                 ls.remove(ls.size() - 1);
             }
         } else {
@@ -88,7 +89,7 @@ public abstract class TypeASTMapper<N> {
             // at least one array layer to confuse us
             int layers = 0;
             while ((elType = getElementType(n)) != null) {
-                ls.add(TypePathEntry.ARRAY);
+                ls.add(TypePathEntry.ARRAY_ELEMENT);
                 // System.out.printf("layers=%d, map(%s, getInnerType(%s, %s)=%s)%n",
                 //                   layers, elType, te, ls, getInnerType(te, ls));
                 map(elType, getInnerType(te, ls));
@@ -101,7 +102,7 @@ public abstract class TypeASTMapper<N> {
 
             int nta = numTypeArguments(n);
             for (int tai = 0; tai < nta; tai++) {
-                ls.add(new TypePathEntry(TypePathEntryKind.TYPE_ARGUMENT, tai));
+                ls.add(TypePathEntry.create(TypePath.TYPE_ARGUMENT, tai));
                 traverse1(getTypeArgument(n, tai), te, ls);
                 ls.remove(ls.size() - 1);
             }

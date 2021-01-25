@@ -48,7 +48,7 @@ public class ConstructorInsertion extends TypedInsertion {
       typeString = typeString.substring(ix+1);
 
       for (Insertion i : declarationInsertions) {
-        b.append(i.getText(commentAnnotation, abbreviate)).append("\n");
+        b.append(i.getText(commentAnnotation, abbreviate)).append(System.lineSeparator());
         if (abbreviate) {
           packageNames.addAll(i.getPackageNames());
         }

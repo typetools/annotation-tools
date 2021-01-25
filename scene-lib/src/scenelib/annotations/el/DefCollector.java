@@ -190,6 +190,15 @@ public abstract class DefCollector {
         for (ATypeElement e : m.throwsException.values()) {
             collect(e);
         }
+        for (AElement e : m.preconditions.values()) {
+            collect(e);
+        }
+        for (AElement e : m.postconditions.values()) {
+            collect(e);
+        }
+        for (Annotation a : m.contracts) {
+            collect(a);
+        }
         collect(m.body);
     }
 

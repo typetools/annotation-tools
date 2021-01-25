@@ -1,11 +1,14 @@
 package scenelib.annotations.field;
 
+import javax.lang.model.element.VariableElement;
+
 /**
  * An {@link EnumAFT} is the type of an annotation field that can hold an
  * constant from a certain enumeration type.
  */
 public final class EnumAFT extends ScalarAFT {
 
+    // TODO: Is this a fully-qualified name or a binary name?
     /**
      * The name of the enumeration type whose constants the annotation field
      * can hold.
@@ -23,7 +26,7 @@ public final class EnumAFT extends ScalarAFT {
     @Override
     public boolean isValidValue(Object o) {
         // return o instanceof Enum;
-        return o instanceof String;
+        return o instanceof String || o instanceof VariableElement;
     }
 
     @Override

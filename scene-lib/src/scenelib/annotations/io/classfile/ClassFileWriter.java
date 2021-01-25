@@ -3,9 +3,8 @@ package scenelib.annotations.io.classfile;
 import java.io.*;
 
 import com.sun.tools.javac.main.CommandLine;
-
-import org.objectweb.asmx.ClassReader;
-
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.Opcodes;
 import org.plumelib.options.Option;
 import org.plumelib.options.Options;
 
@@ -172,9 +171,7 @@ public class ClassFileWriter {
    * @throws IOException if there is a problem reading from or writing to
    * <code> fileName </code>
    */
-  public static void insert(
-      AScene scene, String fileName, boolean overwrite)
-  throws IOException {
+  public static void insert(AScene scene, String fileName, boolean overwrite) throws IOException {
     assert fileName.endsWith(".class");
 
     // can't just call other insert, because this closes the input stream
@@ -183,8 +180,8 @@ public class ClassFileWriter {
     in.close();
 
     ClassAnnotationSceneWriter classAnnotationSceneWriter =
-      new ClassAnnotationSceneWriter(classReader, scene, overwrite);
-    classReader.accept(classAnnotationSceneWriter, false);
+        new ClassAnnotationSceneWriter(Opcodes.ASM7, classReader, scene, overwrite);
+    classReader.accept(classAnnotationSceneWriter, 0);
 
     OutputStream fos = new FileOutputStream(fileName);
     fos.write(classAnnotationSceneWriter.toByteArray());
@@ -213,9 +210,9 @@ public class ClassFileWriter {
     ClassReader classReader = new ClassReader(input);
 
     ClassAnnotationSceneWriter classAnnotationSceneWriter =
-      new ClassAnnotationSceneWriter(classReader, scene, overwrite);
+        new ClassAnnotationSceneWriter(Opcodes.ASM7, classReader, scene, overwrite);
 
-    classReader.accept(classAnnotationSceneWriter, false);
+    classReader.accept(classAnnotationSceneWriter, 0);
 
     out.write(classAnnotationSceneWriter.toByteArray());
   }
@@ -237,14 +234,14 @@ public class ClassFileWriter {
    * @throws IOException if there is a problem reading from <code> in </code> or
    * writing to <code> out </code>
    */
-  public static void insert(AScene scene,
-      String className, String outputFileName, boolean overwrite) throws IOException {
+  public static void insert(AScene scene, String className, String outputFileName, boolean overwrite)
+      throws IOException {
     ClassReader classReader = new ClassReader(className);
 
     ClassAnnotationSceneWriter classAnnotationSceneWriter =
-      new ClassAnnotationSceneWriter(classReader, scene, overwrite);
+        new ClassAnnotationSceneWriter(Opcodes.ASM7, classReader, scene, overwrite);
 
-    classReader.accept(classAnnotationSceneWriter, false);
+    classReader.accept(classAnnotationSceneWriter, 0);
 
     OutputStream fos = new FileOutputStream(outputFileName);
     fos.write(classAnnotationSceneWriter.toByteArray());
