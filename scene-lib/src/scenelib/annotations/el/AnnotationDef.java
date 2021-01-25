@@ -2,6 +2,7 @@ package scenelib.annotations.el;
 
 import org.checkerframework.checker.signature.qual.BinaryName;
 import java.io.File;
+import java.io.IOException;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -9,11 +10,15 @@ import java.util.StringJoiner;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.Opcodes;
+
 import scenelib.annotations.el.AElement;
 import scenelib.annotations.AnnotationBuilder;
 import scenelib.annotations.field.*;
 import scenelib.annotations.Annotation;
 import scenelib.annotations.Annotations;
+import scenelib.annotations.util.MethodRecorder;
 
 /**
  * An annotation type definition, consisting of the annotation name,
@@ -54,6 +59,27 @@ public final class AnnotationDef extends AElement {
         this.source = source;
     }
 
+    /**
+     * Returns a list of method names for a class in the order in which they occur in the .class
+     * file. Note that the JDK method Class.getDeclaredMethods() does not preserve this order.
+     *
+     * @param name the ifully qualified name of the class to be read
+     * @return a list of methods for the class
+     */
+    public static List<String> getDeclaredMethods(String name) {
+        List<String> methods;
+        try {
+            ClassReader classReader = new ClassReader(name);
+            MethodRecorder methodRecorder = new MethodRecorder(Opcodes.ASM7);
+            classReader.accept(methodRecorder, 0);
+            methods = methodRecorder.getMethods();
+        } catch (IOException e) {
+            methods = null;
+            e.printStackTrace();
+        }
+        return methods;
+    }
+
     // Problem:  I am not sure how to handle circularities (annotations meta-annotated with themselves)
     /**
      * Returns an AnnotationDef for the given annotation type.
@@ -73,6 +99,8 @@ public final class AnnotationDef extends AElement {
         }
 
         Map<String,AnnotationFieldType> fieldTypes = new LinkedHashMap<>();
+        getDeclaredMethods(name).forEach(m -> fieldTypes.put(m, null)); // dummy initialization sets order for the map
+
         for (Method m : annoType.getDeclaredMethods()) {
             AnnotationFieldType aft = AnnotationFieldType.fromClass(m.getReturnType(), adefs);
             fieldTypes.put(m.getName(), aft);

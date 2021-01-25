@@ -1,8 +1,10 @@
 package scenelib.annotations.el;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.objectweb.asm.TypePath;
 import scenelib.annotations.Annotation;
 import scenelib.annotations.util.coll.VivifyingMap;
 
@@ -27,13 +29,23 @@ public class ATypeElement extends AElement {
     /**
      * The annotated inner types; map key is the inner type location.
      */
-    public final VivifyingMap<InnerTypeLocation, ATypeElement> innerTypes =
-        ATypeElement.<InnerTypeLocation>newVivifyingLHMap_ATE();
+    public final VivifyingMap<List<TypePathEntry>, ATypeElement> innerTypes =
+        ATypeElement.newVivifyingLHMap_ATE();
 
+    /**
+     * Construct a new ATypeElement from its description.
+     *
+     * @param description the description of the type element.
+     */
     ATypeElement(Object description) {
-        super(description);
+      super(description);
     }
 
+    /**
+     * Construct a new ATypeElement from another.
+     *
+     * @param elem the ATypeElement to copy
+     */
     ATypeElement(ATypeElement elem) {
       super(elem);
       copyMapContents(elem.innerTypes, innerTypes);
@@ -92,7 +104,7 @@ public class ATypeElement extends AElement {
         }
         sb.append("{");
         String linePrefix = "  ";
-        for (Map.Entry<InnerTypeLocation, ATypeElement> entry : innerTypes.entrySet()) {
+        for (Map.Entry<List<TypePathEntry>, ATypeElement> entry : innerTypes.entrySet()) {
             sb.append(linePrefix);
             sb.append(entry.getKey().toString());
             sb.append(" => ");

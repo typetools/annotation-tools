@@ -1,91 +1,186 @@
 package scenelib.annotations.el;
 
+import org.objectweb.asm.Label;
+
+import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.Objects;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 /**
- * A {@link LocalLocation} holds location information for a local
- * variable: slot index, scope start, and scope length.
+ * A {@link LocalLocation} holds information about a local variable.
+ * A variable may have multiple lifetimes.
+ * We store this information the same way ASM does, as 3 parallel arrays.
  */
 public final class LocalLocation {
     /**
-     * The slot index of the local variable.
+     * The starts of the lifetimes for the variable.
+     * Used only for TypeReference#LOCAL_VARIABLE and TypeReference#RESOURCE_VARIABLE.
      */
-    public final int index;
+    public final Label[] start;
 
     /**
-     * The start of the local variable's scope (or live range), as an offset
-     * from the beginning of the method code in bytes.
+     * The ends of the lifetimes for the variable.
+     * Used only for TypeReference#LOCAL_VARIABLE and TypeReference#RESOURCE_VARIABLE.
      */
-    public final int scopeStart;
+    public final Label[] end;
 
     /**
-     * The length of the local variable's scope (or live range), in bytes.
+     * The indices for the variable. Each element of the index array contains the
+     * local variable's offset from the stack frame for the corresponding lifetime.
+     * Used only for TypeReference#LOCAL_VARIABLE and TypeReference#RESOURCE_VARIABLE.
      */
-    public final int scopeLength;
-
-    public final String varName;
-    public final int varIndex;
+    public final int[] index;
 
     /**
-     * Constructs a new {@link LocalLocation}; the arguments are assigned to
-     * the fields of the same names.
+     * The name of the variable.
+     *
+     * This is not part of the abstract state of the LocalLocation:
+     * it is not read by equals(), hashCode(), or toString().
      */
-    public LocalLocation(int index, int scopeStart, int scopeLength) {
+    public final @Nullable String variableName;
+
+    /**
+     * Construct a new LocalLocation.  This constructor does not assign meaningful
+     * values to start or end.  Thus, the getScopeStart and getScopeLenth methods must not
+     * be used on the result.
+     *
+     * @param index the offset of the variable in the stack frame
+     * @param variableName the name of the local variable
+     */
+    public LocalLocation(int index, String variableName) {
+        this(new Label[] {new Label()}, new Label[] {new Label()}, new int[] {index}, variableName);
+    }
+
+    /**
+     * Construct a new LocalLocation.
+     *
+     * @param start the code offsets to the starts of the variable's lifetimes
+     * @param end the code offsets to the ends of the variable's lifetimes
+     * @param index the stack frame offsets of the variable's lifetimes
+     * @param variableName the name of the local variable
+     */
+    public LocalLocation(Label[] start, Label[] end, int[] index, String variableName) {
+        this.start = start;
+        this.end = end;
         this.index = index;
-        this.scopeStart = scopeStart;
-        this.scopeLength = scopeLength;
-        this.varName = null;
-        this.varIndex = -1;
+        this.variableName = variableName;
     }
-
-    public LocalLocation(String varName, int varIndex) {
-        this.index = -1;
-        this.scopeStart = -1;
-        this.scopeLength = -1;
-        this.varName = varName;
-        this.varIndex = varIndex;
-    }
-
 
     /**
-     * Returns whether this {@link LocalLocation} equals <code>o</code>; a
+     * Construct a new LocalLocation representing a single scope/lifetime.
+     * Only being used by Writers, not Readers for now. Should possibly deprecate this in the future.
+     * Changes values reflectively.
+     *
+     * @param scopeStart the bytecode offset of the start of the variable's lifetime
+     * @param scopeLength the bytecode length of the variable's lifetime
+     * @param index the offset of the variable in the stack frame
+     */
+    public LocalLocation(int scopeStart, int scopeLength, int index) {
+        Label startLabel = new Label();
+        Label endLabel = new Label();
+
+        try {
+            Field flagsField = Label.class.getDeclaredField("flags");
+            Field bytecodeOffsetField = Label.class.getDeclaredField("bytecodeOffset");
+            Field FLAG_RESOLVED_FIELD = Label.class.getDeclaredField("FLAG_RESOLVED");
+
+            flagsField.setAccessible(true);
+            bytecodeOffsetField.setAccessible(true);
+            FLAG_RESOLVED_FIELD.setAccessible(true);
+            int FLAG_RESOLVED = (Integer) FLAG_RESOLVED_FIELD.get(null);
+
+            short flags = (Short) flagsField.get(startLabel);
+            flags |= FLAG_RESOLVED;
+            flagsField.set(startLabel, flags);
+            bytecodeOffsetField.set(startLabel, scopeStart);
+
+            flags = (Short) flagsField.get(endLabel);
+            flags |= FLAG_RESOLVED;
+            flagsField.set(endLabel, flags);
+            bytecodeOffsetField.set(endLabel, scopeStart + scopeLength);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        this.start = new Label[] {startLabel};
+        this.end = new Label[] {endLabel};
+        this.index = new int[] {index};
+        this.variableName = null;
+    }
+
+    /**
+     * Returns the bytecode offset to the start of the first scope/lifetime.
+     *
+     * @return the bytecode offset to the start of the first scope/lifetime
+     *         or -1 if the Label at start[0] is not resolved
+     */
+    public int getScopeStart() {
+        try {
+            return start[0].getOffset();
+        } catch (IllegalStateException e) {
+            System.err.println("Labels not resolved: " + Arrays.toString(start));
+            return -1;
+        }
+    }
+
+    // This is used only in IndexFileWriter.
+    /**
+     * Returns the length of all the scopes/lifetimes (in bytes).
+     *
+     * @return the length of all the scopes/lifetimes (in bytes)
+     *         or -1 if the Label at start[0] or end[end.length-1] is not resolved
+     */
+    public int getScopeLength() {
+        try {
+            return end[end.length - 1].getOffset() - getScopeStart();
+        } catch (IllegalStateException e) {
+            System.err.println("Labels not resolved: " + Arrays.toString(end));
+            return -1;
+        }
+    }
+
+    /**
+     * Returns the local variable index of its first scope/lifetime.
+     * @return the local variable index
+     */
+    public int getVarIndex() {
+        return index[0];
+    }
+
+    /**
+     * Returns whether this {@link LocalLocation} equals {@code o}; a
      * slightly faster variant of {@link #equals(Object)} for when the argument
      * is statically known to be another nonnull {@link LocalLocation}.
+     *
+     * @param o the {@code LocalLocation} to compare to this
+     * @return true if this equals {@code o}
      */
-    public boolean equals(LocalLocation l) {
-        return index == l.index && scopeStart == l.scopeStart
-                && scopeLength == l.scopeLength &&
-                (varName==null || varName.equals(l.varName)) &&
-                varIndex==l.varIndex;
+    public boolean equals(LocalLocation o) {
+        return Arrays.equals(start, o.start) &&
+            Arrays.equals(end, o.end) &&
+            Arrays.equals(index, o.index) &&
+            (variableName==null || variableName.equals(o.variableName));
     }
 
-    /**
-     * This {@link LocalLocation} equals <code>o</code> if and only if
-     * <code>o</code> is another nonnull {@link LocalLocation} and
-     * <code>this</code> and <code>o</code> have equal {@link #index},
-     * {@link #scopeStart}, and {@link #scopeLength}.
-     */
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(/*@ReadOnly*/ Object o) {
         return o instanceof LocalLocation
-                && equals((LocalLocation) o);
+            && equals((LocalLocation) o);
     }
 
     @Override
     public int hashCode() {
-        if (varName==null) {
-            return Objects.hash(index, scopeStart, scopeLength);
-        } else {
-            return Objects.hash(varName, varIndex);
-        }
+        return Objects.hash(Arrays.hashCode(start), Arrays.hashCode(end), Arrays.hashCode(index));
     }
 
     @Override
     public String toString() {
-        if (varName==null) {
-            return "LocalLocation(" + index + ", " + scopeStart + ", " + scopeLength + ")";
-        } else {
-            return "LocalLocation(\"" + varName + "\" #" + varIndex + ")";
-        }
+        return "LocalLocation{" +
+            "start=" + Arrays.toString(start) +
+            ", end=" + Arrays.toString(end) +
+            ", index=" + Arrays.toString(index) +
+            '}';
     }
 }

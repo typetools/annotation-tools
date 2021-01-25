@@ -1,20 +1,23 @@
 package scenelib.annotations.io.classfile;
 
-import java.io.*;
-
 import com.sun.tools.javac.main.CommandLine;
 
 import org.plumelib.options.Option;
 import org.plumelib.options.Options;
 
-import org.objectweb.asmx.ClassReader;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.Opcodes;
 
 import scenelib.annotations.el.AScene;
 import scenelib.annotations.io.IndexFileWriter;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
 /**
  * A <code> ClassFileReader </code> provides methods for reading in annotations
- *  from a class file into an {@link scenelib.annotations.el.AScene}.
+ * from a class file into an {@link scenelib.annotations.el.AScene}.
  */
 public class ClassFileReader {
   public static final String INDEX_UTILS_VERSION = "Annotation File Utilities v3.9.14";
@@ -174,12 +177,11 @@ public class ClassFileReader {
    *
    * @param scene the scene into which the annotations should be inserted
    * @param fileName the file name of the class the annotations should be
-   * read from
+   *                 read from
    * @throws IOException if there is a problem reading from
-   * <code> fileName </code>
+   *                     <code> fileName </code>
    */
-  public static void read(AScene scene, String fileName)
-  throws IOException {
+  public static void read(AScene scene, String fileName) throws IOException {
     read(scene, new FileInputStream(fileName));
   }
 
@@ -197,8 +199,8 @@ public class ClassFileReader {
   }
 
   /**
-   * Reads the annotations from the class file <code> fileName </code>
-   * and inserts them into <code> scene </code>.
+   * Reads the annotations from the class file indicated by the InputStream
+   * and inserts them into {@code scene}.
    *
    * @param scene the scene into which the annotations should be inserted
    * @param input an input stream containing the class that the annotations
@@ -209,8 +211,16 @@ public class ClassFileReader {
     read(scene, new ClassReader(input));
   }
 
+  /**
+   * Reads the annotations from the class file indicated by the ClassReader
+   * and inserts them into {@code scene}.
+   *
+   * @param scene the scene into which the annotations should be inserted
+   * @param classReader the ClassReader for the class thet the annotations
+   *              should be read from
+   */
   public static void read(AScene scene, ClassReader classReader) {
-    ClassAnnotationSceneReader ca = new ClassAnnotationSceneReader(classReader, scene, ignore_bridge_methods);
-    classReader.accept(ca, true);
+    ClassAnnotationSceneReader ca = new ClassAnnotationSceneReader(Opcodes.ASM7, classReader, scene, ignore_bridge_methods);
+    classReader.accept(ca, 0);
   }
 }

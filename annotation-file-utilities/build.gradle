@@ -5,6 +5,9 @@ plugins {
     // https://plugins.gradle.org/plugin/com.github.johnrengelman.shadow
     id 'com.github.johnrengelman.shadow' version '6.1.0'
     id 'java'
+
+     // To show task list as a tree, run: ./gradlew <taskname> taskTree
+     id 'com.dorongold.task-tree' version '1.5'
 }
 apply plugin: 'java'
 apply plugin: 'com.github.johnrengelman.shadow'
@@ -60,37 +63,14 @@ dependencies {
         // So long as Guava only uses annotations from checker-qual, excluding it should not cause problems.
         exclude group: 'org.checkerframework'
     }
-    implementation files('../asmx/bin/')
+    implementation 'org.ow2.asm:asm:7.2'
 
     testImplementation group: 'junit', name: 'junit', version: '4.13.1'
     testImplementation 'org.checkerframework:checker-qual:3.9.1'
 }
 
-task compileAsmx(type: Exec, group: 'Build') {
-    description 'Compile asmx.'
-    workingDir '../asmx'
-    executable 'ant'
-    args = [
-            '-Dproduct.noshrink=true',
-            'bin'
-    ]
-    if (gradle.startParameter.logLevel == LogLevel.QUIET) {
-      // Note that passing '-q' does NOT prevent ant's "BUILD SUCCESSFUL" output.
-      // There doesn't seem t be a good way to do that, per
-      // https://stackoverflow.com/questions/14394390/avoid-printing-build-successful-after-ant-exits-a-target
-      args += '-q'
-    }
-}
-
-task cleanAsmx(type: Exec) {
-    description 'Clean asmx.'
-    workingDir '../asmx'
-    executable 'ant'
-    args = ['clean']
-}
 
 compileJava {
-    dependsOn compileAsmx
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
     options.failOnError = true
@@ -159,21 +139,12 @@ task allButJavacJar(type: ShadowJar, dependsOn: compileJava) {
 }
 
 task skinnyJar(type: ShadowJar, dependsOn: compileJava) {
-    description 'Builds annotation-file-utilities.jar with only asmx, scene-lib, and annotation-file-utility classes.'
+    description 'Builds annotation-file-utilities.jar with only scene-lib and annotation-file-utilities classes.'
     includeEmptyDirs = false
     destinationDirectory = projectDir
-    from files(sourceSets.main.output, '../asmx/bin/')
     archiveFileName = 'annotation-file-utilities.jar'
     include 'scenelib/**/*.class'
     include 'annotator/**/*.class'
-    include 'org/objectweb/asmx/**/*.class'
-    doFirst {
-    // TODO: The release fails because of this, so skip it for now.
-    if (project.hasProperty('release') && false) {
-            println 'Relocating packages.'
-            relocate 'org.objectweb.asmx', 'org.checkerframework.org.objectweb.asm'
-        }
-    }
 }
 
 test {
@@ -360,7 +331,6 @@ task checkBasicStyle(group: 'Format') {
                                   'plume-bib',
                                   'build',
                                   'jdk',
-                                  'asmx',
                                   'javadoc',
                                   "tests"]
 
@@ -557,7 +527,7 @@ artifacts {
 }
 
 clean {
-    dependsOn(cleanTestAnnotator, cleanAnnotationFileFormat, cleanTestExample, cleanAsmx)
+    dependsOn(cleanTestAnnotator, cleanAnnotationFileFormat, cleanTestExample)
     delete('annotation-file-utilities.jar','annotation-file-utilities-all.jar', 'annotation-tools.zip')
 }
 

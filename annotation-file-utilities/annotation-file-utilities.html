@@ -31,7 +31,6 @@
         </ul></li>
       <li><a href="#implementation">Design and Implementation Details</a>
         <ul>
-          <li><a href="#asmx">Asmx</a></li>
           <li><a href="#scene-lib">Scene-lib</a>
             <ul>
               <li><a href="#bytecode-insertion">Bytecode Insertion</a></li>
@@ -464,27 +463,13 @@ components of the Annotation File Utilities and how they fit together.
 It is intended for someone who is beginning work on the Annotation File
 Utilities or is curious about how the Annotation File Utilities work.</p>
 
-<p>The Annotation File Utilities is composed of three sub-projects:
-<code>asmx</code>, <code>scene-lib</code>, and
-<code>annotation-file-utilities</code>.  The <code>asmx</code>
-sub-project provides methods for reading and writing class files.  The
+<p>The Annotation File Utilities is composed of two sub-projects:
+<code>scene-lib</code> and
+<code>annotation-file-utilities</code>.  The
 <code>scene-lib</code> sub-project represents a <code>.jaif</code> file
 and inserts and extracts annotations to/from bytecode.  The
 <code>annotation-file-utilities</code> sub-project inserts annotations
 into source code.</p>
-
-<h3 id="asmx" class="subsection">Asmx</h3>
-
-<p>The <code>asmx</code> sub-project provides methods for reading and
-writing class files.  <code>asmx</code> is based on an old version
-(2.2.2) of the <a href="https://asm.ow2.io/">ASM Framework</a>. It has been modified to
-allow it to read and
-write <a href="https://checkerframework.org/jsr308/specification/java-annotation-design.html">type
-annotations</a> in <code>.class</code> files.  However, it is far behind the current ASM
-version (5.0), which provides support for type annotations. We should
-discard the custom <code>asmx</code> in the Annotation File Utilities
-and adapt the Annotation File Utilities to use the official, supported
-version of ASM.</p>
 
 <h3 id="scene-lib" class="subsection">Scene-lib</h3>
 
@@ -533,8 +518,8 @@ specified in the <code>.jaif</code> file are inserted into the
 classfile directly before the <code>.jaif</code> file in the argument
 list.</p><p>First, each <code>.jaif</code> file is parsed into an
 <code>AScene</code> (as described in
-<a href="#scene-lib">Scene-lib</a>). Then,
-<code>asmx/src/org/objectweb/asmx/ClassReader.java</code> parses the
+<a href="#scene-lib">Scene-lib</a>). Then, ASM's
+<code>ClassReader.java</code> parses the
 classfile.  As it is parsing the classfile, it passes the parsed
 bytecode off to the
 <code>scene-lib/src/annotations/io/classfile/ClassAnnotationSceneWriter.java</code>
@@ -552,7 +537,7 @@ script. This script takes one or more class names as arguments and
 outputs the annotations found in those classes to <code>.jaif</code>
 files.</p><p>First, an empty <code>AScene</code> is constructed to store
 the annotations.
-<code>asmx/src/org/objectweb/asmx/ClassReader.java</code> parses the
+ASM's <code>ClassReader.java</code> parses the
 classfile and passes the parsed bytecode off to the
 <code>scene-lib/src/annotations/io/classfile/ClassAnnotationSceneReader.java</code>
 class. This class filters out the annotations in the bytecode and adds
@@ -674,7 +659,7 @@ The <a href="changelog.html">changelog</a> describes what is new in each release
 </body>
 </html>
 
-<!--  LocalWords:  utils bashrc tcsh tcshrc cshrc classpath Asmx zipfile
+<!--  LocalWords:  utils bashrc tcsh tcshrc cshrc classpath zipfile
  -->
 <!--  LocalWords:  MacOS argfile JAIFs nl GenericArrayLocationCriterion un
  -->

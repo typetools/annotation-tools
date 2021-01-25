@@ -26,9 +26,10 @@ import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
-import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
 import com.sun.tools.javac.main.CommandLine;
 import com.sun.tools.javac.tree.JCTree;
+
+import org.objectweb.asm.TypePath;
 
 import org.plumelib.options.Option;
 import org.plumelib.options.OptionGroup;
@@ -54,6 +55,7 @@ import scenelib.annotations.el.AnnotationDef;
 import scenelib.annotations.el.DefException;
 import scenelib.annotations.el.ElementVisitor;
 import scenelib.annotations.el.LocalLocation;
+import scenelib.annotations.el.TypePathEntry;
 import scenelib.annotations.io.ASTIndex;
 import scenelib.annotations.io.ASTPath;
 import scenelib.annotations.io.ASTRecord;
@@ -334,8 +336,8 @@ public class Main {
     List<TypePathEntry> tpes = galc.getLocation();
     ASTPath.ASTEntry entry;
     for (TypePathEntry tpe : tpes) {
-      switch (tpe.tag) {
-      case ARRAY:
+      switch (tpe.step) {
+      case TypePath.ARRAY_ELEMENT:
         if (!astPath.isEmpty()) {
           entry = astPath.getLast();
           if (entry.getTreeKind() == Tree.Kind.NEW_ARRAY
@@ -348,20 +350,20 @@ public class Main {
         entry = new ASTPath.ASTEntry(Tree.Kind.ARRAY_TYPE,
             ASTPath.TYPE);
         break;
-      case INNER_TYPE:
+      case TypePath.INNER_TYPE:
         entry = new ASTPath.ASTEntry(Tree.Kind.MEMBER_SELECT,
             ASTPath.EXPRESSION);
         break;
-      case TYPE_ARGUMENT:
+      case TypePath.TYPE_ARGUMENT:
         entry = new ASTPath.ASTEntry(Tree.Kind.PARAMETERIZED_TYPE,
-            ASTPath.TYPE_ARGUMENT, tpe.arg);
+            ASTPath.TYPE_ARGUMENT, tpe.argument);
         break;
-      case WILDCARD:
+      case TypePath.WILDCARD_BOUND:
         entry = new ASTPath.ASTEntry(Tree.Kind.UNBOUNDED_WILDCARD,
             ASTPath.BOUND);
         break;
       default:
-        throw new IllegalArgumentException("unknown type tag " + tpe.tag);
+        throw new IllegalArgumentException("unknown type tag " + tpe.step);
       }
       astPath = astPath.extend(entry);
     }
@@ -515,7 +517,7 @@ public class Main {
     }
 
     Options options = new Options(
-        "java annotator.Main [options] { jaif-file | java-file | @arg-file } ...\n"
+        "java annotator.Main [options] { jaif-file | java-file | @arg-file } ..." + System.lineSeparator()
             + "(Contents of argfiles are expanded into the argument list.)",
         Main.class);
     String[] cl_args;

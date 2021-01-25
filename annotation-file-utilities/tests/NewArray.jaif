@@ -75,6 +75,6 @@ inner-type 0, 0: @C
 inner-type 0, 0, 3, 0: @D
 
 method <clinit>()V:
-new #0:
+new #2:
 inner-type 0, 0: @Nullable
 

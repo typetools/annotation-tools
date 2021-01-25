@@ -9,7 +9,6 @@
         <property name="builddir" location="build-current-${DSTAMP}" />
         <mkdir dir="${builddir}"/>
 
-        <property name="asmx" location="${builddir}/annotations/asmx" />
         <property name="scene-lib" location="${builddir}/annotations/scene-lib" />
         <property name="annotations-disassembler" location="${builddir}/annotations/disassembler" />
         <property name="annotator" location="${builddir}/annotations/annotator" />
@@ -42,10 +41,6 @@
     <!--
         Targets to build all the projects.
     -->
-    <target name="build-asmx" depends="checkout-annotations">
-        <ant dir="${asmx}" inheritAll="false" target="bin"/>
-    </target>
-
     <target name="build-scene-lib" depends="checkout-annotations">
         <ant dir="${scene-lib}" inheritAll="false" target="bin"/>
     </target>
@@ -62,23 +57,13 @@
     <target name="build-annotator" depends="checkout-annotations">
         <ant dir="${annotator}" inheritAll="false" target="bin"/>
     </target>
-    <target name="build-all" depends="build-asmx,
-        build-scene-lib,
+    <target name="build-all" depends="build-scene-lib,
         build-annotated-jdk, build-annotator">
     </target>
 
     <!--
         Targets to actually run the tests.
     -->
-    <!-- Runs the tests on the extensions to ASM. -->
-    <target name="test-asmx" depends="build-asmx">
-        <ant dir="${asmx}" inheritAll="false" target="test">
-            <property name="test.group" value="conform/xannotation"/>
-        </ant>
-        <copy todir="./reports">
-            <fileset dir="${asmx}/output/test/reports" includes="**/*"/>
-        </copy>
-    </target>
 
     <!-- Runs the tests on the annotation scene library, and also
         on the classfile to index file and vice versa part of the
@@ -100,7 +85,7 @@
         </exec>
     </target>
 
-    <target name="test-all-annotations" depends="test-asmx, test-scene-lib, test-annotator"/>
+    <target name="test-all-annotations" depends="test-scene-lib, test-annotator"/>
 
     <target name="test-all" depends="test-all-annotations"/>
 

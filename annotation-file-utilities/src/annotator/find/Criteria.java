@@ -3,8 +3,8 @@ package annotator.find;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.objectweb.asm.TypePath;
 import scenelib.annotations.el.BoundLocation;
-import scenelib.annotations.el.InnerTypeLocation;
 import scenelib.annotations.el.LocalLocation;
 import scenelib.annotations.el.RelativeLocation;
 import scenelib.annotations.el.TypeIndexLocation;
@@ -446,7 +446,13 @@ public final class Criteria {
     return new GenericArrayLocationCriterion();
   }
 
-  public final static Criterion atLocation(InnerTypeLocation loc) {
+  /**
+   * Creates a GenericArrayLocationCriterion for a location.
+   *
+   * @param loc location of the generic array
+   * @return a GenericArrayLocationCriterion for the given location
+   */
+  public final static Criterion atLocation(TypePath loc) {
     return new GenericArrayLocationCriterion(loc);
   }
 

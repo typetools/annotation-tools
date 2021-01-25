@@ -26,6 +26,7 @@ annotation-file-utilities/design.log
 annotation-file-utilities/design.pdf
 
 annotation-file-utilities/build
+annotation-file-utilities/.gradle
 
 annotation-file-utilities/javadoc
 
@@ -62,8 +63,6 @@ annotation-file-utilities/tests/system-test/out3
 annotation-file-utilities/tests/system-test/out4.class
 annotation-file-utilities/tests/system-test/out5.diff
 annotation-file-utilities/tests/system-test/out5.jaif
-
-asmx/output
 
 scene-lib/javadoc
 scene-lib/reports
