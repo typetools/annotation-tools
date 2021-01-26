@@ -33,15 +33,18 @@ status=0
 ./gradlew htmlValidate --console=plain --warning-mode=all --no-daemon || status=1
 
 # Javadoc documentation
-./gradlew javadoc --console=plain --warning-mode=all --no-daemon || status=1
-(./gradlew javadocPrivate --console=plain --warning-mode=all --no-daemon > /tmp/warnings.txt 2>&1) || true
-"$PLUME_SCRIPTS/ci-lint-diff" /tmp/warnings.txt || status=1
 # For refactorings that touch a lot of code that you don't understand, create
 # top-level file SKIP-REQUIRE-JAVADOC.  Delete it after the pull request is merged.
-if [ ! -f SKIP-REQUIRE-JAVADOC ]; then
+if [ ! -f ../SKIP-REQUIRE-JAVADOC ]; then
+  # TODO: Move this first line outside the loop.
+  "$PLUME_SCRIPTS/ci-lint-diff" /tmp/warnings.txt || status=1
   (./gradlew requireJavadoc --console=plain --warning-mode=all --no-daemon > /tmp/warnings-rjp.txt 2>&1) || true
   "$PLUME_SCRIPTS"/ci-lint-diff /tmp/warnings-rjp.txt || status=1
-  (./gradlew javadocDoclintAll --console=plain --warning-mode=all --no-daemon > /tmp/warnings-jda.txt 2>&1) || true
-  "$PLUME_SCRIPTS"/ci-lint-diff /tmp/warnings-jda.txt || status=1
+  (./gradlew javadoc --console=plain --warning-mode=all --no-daemon > /tmp/warnings-javadoc.txt 2>&1) || true
+  "$PLUME_SCRIPTS"/ci-lint-diff /tmp/warnings-javadoc.txt || status=1
+  (./gradlew javadocPrivate --console=plain --warning-mode=all --no-daemon > /tmp/warnings-javadocPrivate.txt 2>&1) || true
+  "$PLUME_SCRIPTS"/ci-lint-diff /tmp/warnings-javadocPrivate.txt || status=1
+else
+  echo "Skipping require-javadoc because file SKIP-REQUIRE-JAVADOC exists"
 fi
 if [ $status -ne 0 ]; then exit $status; fi

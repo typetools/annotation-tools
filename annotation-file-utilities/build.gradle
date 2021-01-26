@@ -488,15 +488,16 @@ task allTests(type: GradleBuild, group: 'Verification') {
 javadoc {
     options.memberLevel = JavadocMemberLevel.PUBLIC
     options.addStringOption('Xdoclint:all', '-quiet')
+    options.addStringOption('Xmaxwarns', '10000')
 }
 
 task javadocPrivate(type: Javadoc) {
   description = 'Run Javadoc in strict mode.'
   source = sourceSets.main.allJava
   classpath = sourceSets.main.compileClasspath + sourceSets.main.runtimeClasspath
-  options.addStringOption('Xwerror', '-Xdoclint:all')
+  options.addStringOption('-Xdoclint:all', '-quiet')
   options.memberLevel = JavadocMemberLevel.PRIVATE
-  options.addStringOption('Xmaxwarns', '1000')
+  options.addStringOption('Xmaxwarns', '10000')
 }
 
 configurations {
