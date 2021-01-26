@@ -1,9 +1,9 @@
 package scenelib.annotations.toys;
 
 public @interface FancyAnnotation {
-    int myInt();
+  int myInt();
 
-    String left();
+  String left();
 
-    SimplerAnnotation[] friends();
+  SimplerAnnotation[] friends();
 }

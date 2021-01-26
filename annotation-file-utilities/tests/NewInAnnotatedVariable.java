@@ -2,6 +2,7 @@ import java.lang.annotation.*;
 
 @Target(ElementType.TYPE_USE)
 @interface Nullable {}
+
 @Target(ElementType.TYPE_USE)
 @interface NonNull {}
 
@@ -11,4 +12,3 @@ public class NewInAnnotatedVariable {
   @NonNull Runnable b3 = new @NonNull Thread();
   ThreadLocal[] b4 = new InheritableThreadLocal[3];
 }
-

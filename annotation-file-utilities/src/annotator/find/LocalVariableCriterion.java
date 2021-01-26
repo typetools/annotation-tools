@@ -1,22 +1,20 @@
 package annotator.find;
 
-import java.util.Objects;
-import java.util.List;
-
-import scenelib.annotations.el.LocalLocation;
 import annotator.scanner.LocalVariableScanner;
-
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.tree.VariableTree;
 import com.sun.source.util.TreePath;
 import com.sun.tools.javac.util.Pair;
+import java.util.List;
+import java.util.Objects;
+import scenelib.annotations.el.LocalLocation;
 
 /**
  * Criterion for being a specific local variable.
  *
- * This matches the variable itself (in the local variable definition), and
- * also anywhere in its type, but should not match in the initializer.
+ * <p>This matches the variable itself (in the local variable definition), and also anywhere in its
+ * type, but should not match in the initializer.
  */
 public class LocalVariableCriterion implements Criterion {
 
@@ -72,19 +70,17 @@ public class LocalVariableCriterion implements Criterion {
       }
 
       Pair<String, Pair<Integer, Integer>> key =
-              Pair.of(fullMethodName, Pair.of(loc.getVarIndex(), loc.getScopeStart()));
-      String potentialVarName =
-              LocalVariableScanner.getFromMethodNameIndexMap(key);
+          Pair.of(fullMethodName, Pair.of(loc.getVarIndex(), loc.getScopeStart()));
+      String potentialVarName = LocalVariableScanner.getFromMethodNameIndexMap(key);
       if (potentialVarName != null) {
         if (varName.equals(potentialVarName)) {
           // now use methodNameCounter to ensure that if this is the
           // i'th variable of this name, its offset is the i'th offset
           // of all variables with this name
           List<Integer> allOffsetsWithThisName =
-                  LocalVariableScanner.getFromMethodNameCounter(fullMethodName, potentialVarName);
+              LocalVariableScanner.getFromMethodNameCounter(fullMethodName, potentialVarName);
           //      methodNameCounter.get(fullMethodName).get(potentialVarName);
-          Integer thisVariablesOffset =
-                  allOffsetsWithThisName.indexOf(loc.getScopeStart());
+          Integer thisVariablesOffset = allOffsetsWithThisName.indexOf(loc.getScopeStart());
 
           // now you need to make sure that this is the
           // thisVariablesOffset'th variable tree in the entire source
@@ -110,7 +106,6 @@ public class LocalVariableCriterion implements Criterion {
       return this.isSatisfiedBy(parentPath);
     }
   }
-
 
   @Override
   public Kind getKind() {

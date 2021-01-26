@@ -3,11 +3,11 @@ package scenelib.annotations.toys;
 import java.util.*;
 
 public @interface SimplerAnnotation {
-    BalanceEnum be();
+  BalanceEnum be();
 
-    int height();
+  int height();
 
-    int[] wrappedHeight();
+  int[] wrappedHeight();
 
-    Class<? super HashMap<String, String>> favoriteClass();
+  Class<? super HashMap<String, String>> favoriteClass();
 }

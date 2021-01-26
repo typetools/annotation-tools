@@ -1,6 +1,5 @@
 package annotator.tests;
 
 public class DeclarationAnnotation {
-  public void foo() {
-  }
+  public void foo() {}
 }

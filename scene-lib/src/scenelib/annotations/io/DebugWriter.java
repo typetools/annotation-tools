@@ -18,7 +18,9 @@ public class DebugWriter {
 
   public static boolean anyEnabled(DebugWriter... debugs) {
     for (DebugWriter debug : debugs) {
-      if (debug.isEnabled()) { return true; }
+      if (debug.isEnabled()) {
+        return true;
+      }
     }
     return false;
   }

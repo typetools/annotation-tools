@@ -2,7 +2,5 @@
 // name.  Results should be the same whether _abbreviate_ is set to true
 // or to false.
 class Abbreviation {
-  public Abbreviation(Object o) {
-  }
+  public Abbreviation(Object o) {}
 }
-

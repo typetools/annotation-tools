@@ -26,5 +26,4 @@ public class InnerClassAnonymous {
       private static final long serialVersionUID = 0;
     };
   }
-
 }

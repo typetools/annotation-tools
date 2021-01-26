@@ -6,5 +6,6 @@ import java.lang.annotation.*;
 @java.lang.annotation.Target(java.lang.annotation.ElementType.TYPE_USE)
 public @interface F {
   int fieldA();
-  @B(value="value from annotation @F") String fieldB();
+
+  @B(value = "value from annotation @F") String fieldB();
 }

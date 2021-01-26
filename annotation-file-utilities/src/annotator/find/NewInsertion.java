@@ -3,36 +3,30 @@ package annotator.find;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import scenelib.type.DeclaredType;
 import scenelib.type.Type;
 
 public class NewInsertion extends TypedInsertion {
-  private final static Pattern qualifiers = Pattern.compile("(?:\\w++\\.)*+");
+  private static final Pattern qualifiers = Pattern.compile("(?:\\w++\\.)*+");
 
-  /**
-   * If true, the type will be qualified with the name of the superclass.
-   */
+  /** If true, the type will be qualified with the name of the superclass. */
   protected boolean qualifyType;
 
   /**
    * Construct a NewInsertion.
-   * <p>
-   * If "new" already exists in the initializer, then pass a
-   * {@link DeclaredType} thats name is the empty String. This will only
-   * insert an annotation on the existing type.
-   * <p>
-   * To insert the annotation along with "new" and the type (for example,
-   * {@code @Anno new Type[] \{...\}}), set the name to the type to insert.
-   * This can be done either before calling this constructor, or by modifying
-   * the return value of {@link #getType()}.
+   *
+   * <p>If "new" already exists in the initializer, then pass a {@link DeclaredType} thats name is
+   * the empty String. This will only insert an annotation on the existing type.
+   *
+   * <p>To insert the annotation along with "new" and the type (for example, {@code @Anno new Type[]
+   * \{...\}}), set the name to the type to insert. This can be done either before calling this
+   * constructor, or by modifying the return value of {@link #getType()}.
    *
    * @param type the type to use when inserting the receiver
    * @param criteria where to insert the text
    * @param innerTypeInsertions the inner types to go on this receiver
    */
-  public NewInsertion(Type type, Criteria criteria,
-      List<Insertion> innerTypeInsertions) {
+  public NewInsertion(Type type, Criteria criteria, List<Insertion> innerTypeInsertions) {
     super(type, criteria, innerTypeInsertions);
     annotationsOnly = false;
     qualifyType = false;
@@ -43,12 +37,14 @@ public class NewInsertion extends TypedInsertion {
     if (annotationsOnly || type.getKind() != Type.Kind.ARRAY) {
       StringBuilder b = new StringBuilder();
       List<String> annotations = type.getAnnotations();
-      if (annotations.isEmpty()) { return ""; }
-      for (String a : annotations) {
-        b.append(' ').append(a);  // initial space removed below
+      if (annotations.isEmpty()) {
+        return "";
       }
-      AnnotationInsertion aIns =  new AnnotationInsertion(b.substring(1), getCriteria(),
-                                                          isSeparateLine());
+      for (String a : annotations) {
+        b.append(' ').append(a); // initial space removed below
+      }
+      AnnotationInsertion aIns =
+          new AnnotationInsertion(b.substring(1), getCriteria(), isSeparateLine());
       String result = aIns.getText(comments, abbreviate);
       // This is a hack.  There might be other side effects that are needed too.
       // We should avoid making temporary Insertions, due to the design of this program.
@@ -85,18 +81,16 @@ public class NewInsertion extends TypedInsertion {
   }
 
   /**
-   * If {@code true}, qualify {@code type} with the name of the superclass.
-   * This will only happen if a "new" is inserted.
+   * If {@code true}, qualify {@code type} with the name of the superclass. This will only happen if
+   * a "new" is inserted.
    */
   public void setQualifyType(boolean qualifyType) {
     this.qualifyType = qualifyType;
   }
 
   @Override
-  protected boolean addLeadingSpace(boolean gotSeparateLine, int pos,
-      char precedingChar) {
-    if ((precedingChar == '.' || precedingChar == '(')
-        && getBaseType().getName().isEmpty()) {
+  protected boolean addLeadingSpace(boolean gotSeparateLine, int pos, char precedingChar) {
+    if ((precedingChar == '.' || precedingChar == '(') && getBaseType().getName().isEmpty()) {
       // If only the annotation is being inserted then don't insert a
       // space if it's immediately after a '.' or '('
       return false;

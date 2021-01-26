@@ -13,8 +13,5 @@ public class BoundMethodSimple {
     System.out.println(t);
   }
 
-  public static <T> void
-  foo3(List<T> list, Comparator<? super T> c) {
-  }
+  public static <T> void foo3(List<T> list, Comparator<? super T> c) {}
 }
-

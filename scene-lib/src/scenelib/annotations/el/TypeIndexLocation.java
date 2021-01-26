@@ -7,27 +7,25 @@ public class TypeIndexLocation {
   public final int typeIndex;
 
   public TypeIndexLocation(int typeIndex) {
-      this.typeIndex = typeIndex;
+    this.typeIndex = typeIndex;
   }
 
   public boolean equals(TypeIndexLocation l) {
-      return typeIndex == l.typeIndex;
+    return typeIndex == l.typeIndex;
   }
 
   @Override
   public boolean equals(Object o) {
-      return o instanceof TypeIndexLocation
-              && equals((TypeIndexLocation) o);
+    return o instanceof TypeIndexLocation && equals((TypeIndexLocation) o);
   }
 
   @Override
   public int hashCode() {
-      return typeIndex;
+    return typeIndex;
   }
 
   @Override
   public String toString() {
-      return "TypeIndexLocation(" + typeIndex + ")";
+    return "TypeIndexLocation(" + typeIndex + ")";
   }
-
 }

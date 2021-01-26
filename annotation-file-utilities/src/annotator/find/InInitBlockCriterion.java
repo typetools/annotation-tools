@@ -2,13 +2,10 @@ package annotator.find;
 
 import annotator.scanner.CommonScanner;
 import annotator.scanner.InitBlockScanner;
-
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
 
-/**
- * Criterion for being within a specific initializer.
- */
+/** Criterion for being within a specific initializer. */
 public class InInitBlockCriterion implements Criterion {
   public final int blockID;
   public final boolean isStatic;
@@ -48,7 +45,6 @@ public class InInitBlockCriterion implements Criterion {
 
   @Override
   public String toString() {
-    return "In " + (isStatic ? "static" : "instance")
-        + " initializer with index " + blockID;
+    return "In " + (isStatic ? "static" : "instance") + " initializer with index " + blockID;
   }
 }

@@ -10,7 +10,11 @@ public class StaticInit {
     }
   }
 
-  void m() { if (true) {} else {} }
+  void m() {
+    if (true) {
+    } else {
+    }
+  }
 
   static {
     StaticInit si = new StaticInit();
