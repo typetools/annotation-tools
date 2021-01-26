@@ -2,33 +2,46 @@
 
 # This file will be used as .git/hooks/pre-commit .
 # However, it should be edited as .git.pre-commit .
-# You can install it by running: ant prep
+# You can install it by running: ./gradlew installGitHooks
 
 # Fail if any command fails
 set -e
 
-# "ant -e check-style" would check every file; on commit we only need to
-# check files that changed.
-# Need to keep checked files in sync with formatted.java.files in
-# build.xml. Otherwise `ant reformat` might not reformat a file that this
+# On commit we only need to check files that changed.
+# Need to keep checked files in sync with getJavaFilesToFormat in build.gradle.
+# Otherwise `./gradlew reformat` might not reformat a file that this
 # hook complains about.
-CHANGED_JAVA_FILES=`git diff --staged --name-only --diff-filter=ACM | grep '\.java$' | grep -v '/jdk/' | grep -v 'stubparser/' | grep -v '/eclipse/' ` || true
-# echo CHANGED_JAVA_FILES "'"${CHANGED_JAVA_FILES}"'"
-if [ ! -z "$CHANGED_JAVA_FILES" ]; then
-    if [ -d ".run-google-java-format" ] ; then
-        git -C .run-google-java-format pull -q > /dev/null 2>&1
-    else
-        git clone -q https://github.com/plume-lib/run-google-java-format.git .run-google-java-format
-    fi
+CHANGED_JAVA_FILES=$(git diff --staged --name-only --diff-filter=ACM | grep '\.java$' ) || true
+# echo "CHANGED_JAVA_FILES=${CHANGED_JAVA_FILES}"
+if [ -n "$CHANGED_JAVA_FILES" ]; then
+    ./gradlew getCodeFormatScripts -q
     ## For debugging:
     # echo "CHANGED_JAVA_FILES: ${CHANGED_JAVA_FILES}"
-    python .run-google-java-format/check-google-java-format.py --aosp ${CHANGED_JAVA_FILES}
+    # shellcheck disable=SC2086
+    python3 checker/bin-devel/.run-google-java-format/check-google-java-format.py ${CHANGED_JAVA_FILES} || (echo "Problem in pre-commit.  Try running: ./gradlew reformat" && /bin/false)
+
+    BRANCH=$(git rev-parse --abbrev-ref HEAD)
+    if [ "$BRANCH" = "master" ]; then
+        git diff --staged > /tmp/diff.txt
+        ./gradlew getPlumeScripts -q
+        (./gradlew requireJavadoc > /tmp/warnings-rjp.txt 2>&1) || true
+        checker/bin-devel/.plume-scripts/lint-diff.py --guess-strip /tmp/diff.txt /tmp/warnings-rjp.txt
+        (./gradlew javadocDoclintAll > /tmp/warnings-jda.txt 2>&1) || true
+        checker/bin-devel/.plume-scripts/lint-diff.py --guess-strip /tmp/diff.txt /tmp/warnings-jda.txt
+    fi
 fi
 
 # This is to handle non-.java files, since the above already handled .java files.
-# May need to remove files that are allowed to have trailing whitespace.
-CHANGED_STYLE_FILES=`git diff --staged --name-only --diff-filter=ACM | grep -v '.png$' | grep -v '.xcf$'` || true
-if [ ! -z "$CHANGED_STYLE_FILES" ]; then
-    # echo "CHANGED_STYLE_FILES: ${CHANGED_STYLE_FILES}"
-    grep -q '[[:blank:]]$' ${CHANGED_STYLE_FILES} 2>&1 && (echo "Some files have trailing whitespace:" && grep -l '[[:blank:]]$' ${CHANGED_STYLE_FILES} && exit 1)
+# May need to remove files that are allowed to have trailing whitespace or are
+# not text files.
+CHANGED_FILES=$(git diff --staged --name-only --diff-filter=ACM | grep -v '\.class$' | grep -v '\.gz$' | grep -v '\.jar$' | grep -v '\.pdf$' | grep -v '\.png$' | grep -v '\.xcf$') || true
+if [ -n "$CHANGED_FILES" ]; then
+    ## For debugging:
+    # echo "CHANGED_FILES: ${CHANGED_FILES}"
+
+    # shellcheck disable=SC2086
+    FILES_WITH_TRAILING_SPACES=$(grep -l -s '[[:blank:]]$' ${CHANGED_FILES} 2>&1) || true
+    if [ -n "$FILES_WITH_TRAILING_SPACES" ]; then
+        echo "Some files have trailing whitespace: ${FILES_WITH_TRAILING_SPACES}" && exit 1
+    fi
 fi
