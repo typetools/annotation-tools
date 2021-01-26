@@ -26,9 +26,8 @@ cd "${AFU}"
 status=0
 
 # Code style and formatting
+./gradlew checkFormat --console=plain --warning-mode=all --no-daemon || status=1
 ./gradlew checkBasicStyle --console=plain --warning-mode=all --no-daemon || status=1
-# TODO: enable check-format when codebase is reformatted (after merging branches?)
-# ant check-format || status=1
 
 # HTML legality
 ./gradlew htmlValidate --console=plain --warning-mode=all --no-daemon || status=1
