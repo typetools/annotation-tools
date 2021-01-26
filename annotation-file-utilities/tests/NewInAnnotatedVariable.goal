@@ -13,4 +13,3 @@ public class NewInAnnotatedVariable {
   @NonNull
   ThreadLocal @NonNull [] b4 = new @NonNull InheritableThreadLocal @NonNull [3];
 }
-

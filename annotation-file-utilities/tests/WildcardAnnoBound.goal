@@ -4,8 +4,7 @@ import java.util.Map;
 @interface Bla {}
 
 public class WildcardAnnoBound<X extends List<? extends @Bla Object>> {
-  WildcardAnnoBound(@Bla WildcardAnnoBound<X> n, X p) {
-  }
+  WildcardAnnoBound(@Bla WildcardAnnoBound<X> n, X p) {}
 }
 
 class NoBound<X extends @A Object> {}

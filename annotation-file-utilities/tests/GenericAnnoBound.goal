@@ -4,6 +4,5 @@ import java.lang.annotation.*;
 @interface Bla {}
 
 public class GenericAnnoBound<X extends @Bla Object> {
-  GenericAnnoBound(@Bla GenericAnnoBound<X> n, X p) {
-  }
+  GenericAnnoBound(@Bla GenericAnnoBound<X> n, X p) {}
 }

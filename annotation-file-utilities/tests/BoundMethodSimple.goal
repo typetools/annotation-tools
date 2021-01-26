@@ -13,8 +13,5 @@ public class BoundMethodSimple {
     System.out.println(t);
   }
 
-  public static <T extends @org.checkerframework.checker.nullness.qual.Nullable @org.checkerframework.checker.nullness.qual.UnknownKeyFor Object> void
-  foo3(List<T> list, Comparator<? super T> c) {
-  }
+  public static <T extends @org.checkerframework.checker.nullness.qual.Nullable @org.checkerframework.checker.nullness.qual.UnknownKeyFor Object> void foo3(List<T> list, Comparator<? super T> c) {}
 }
-

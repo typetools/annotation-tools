@@ -579,7 +579,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     //
     // The AST depth of the initializer is correct unless all arrays are
     // empty, in which case it is arbitary.  This is legal:
-    // String[][][][][] names4 = new String[][][][][] { { { } } };
+    // String[][][][][] names4 = new String[][][][][] { { {} } };
     //
     // Array initializers can also be multi-dimensional, but this is not
     // relevant to us:

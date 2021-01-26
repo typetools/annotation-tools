@@ -98,4 +98,3 @@ public class MemberReference<T> {
         .collect(java.util.stream.Collectors.joining(" ")));
   }
 }
-
