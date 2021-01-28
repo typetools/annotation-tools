@@ -1,29 +1,23 @@
 package scenelib.annotations.util;
 
-import org.objectweb.asm.*;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import org.objectweb.asm.*;
 
 /**
- * A MethodRecorder is a {@link ClassVisitor} which simply keeps track of the methods, fields and declaration annotations
- * inside a class. The main use of this class is to get this information in the order it is visited by {@link ClassWriter},
- * which is the order in which they occur in the classfile.
+ * A MethodRecorder is a {@link ClassVisitor} which simply keeps track of the methods, fields and
+ * declaration annotations inside a class. The main use of this class is to get this information in
+ * the order it is visited by {@link ClassWriter}, which is the order in which they occur in the
+ * classfile.
  */
 public class MethodRecorder extends ClassVisitor {
-  /**
-   * Methods of the class.
-   */
+  /** Methods of the class. */
   private List<String> methods;
-  /**
-   * Declaration annotations of the class.
-   */
+  /** Declaration annotations of the class. */
   private List<String> annotations;
-  /**
-   * Fields of the class.
-   */
+  /** Fields of the class. */
   private List<String> fields;
 
   /**
@@ -49,7 +43,8 @@ public class MethodRecorder extends ClassVisitor {
   }
 
   @Override
-  public MethodVisitor visitMethod(int access, String name, String descriptor, String signature, String[] exceptions) {
+  public MethodVisitor visitMethod(
+      int access, String name, String descriptor, String signature, String[] exceptions) {
     methods.add(name);
     return super.visitMethod(access, name, descriptor, signature, exceptions);
   }
@@ -62,6 +57,7 @@ public class MethodRecorder extends ClassVisitor {
 
   /**
    * Returns the methods in the class in the order that they occur in the classfile.
+   *
    * @return list containing names of methods in the class.
    */
   public List<String> getMethods() {
@@ -70,6 +66,7 @@ public class MethodRecorder extends ClassVisitor {
 
   /**
    * Returns the declaration annotations in the class in the order that they occur in the classfile.
+   *
    * @return list containing names of declaration annotations in the class.
    */
   public List<String> getAnnotations() {
@@ -78,6 +75,7 @@ public class MethodRecorder extends ClassVisitor {
 
   /**
    * Returns the fields in the class in the order that they occur in the classfile.
+   *
    * @return list containing names of fields in the class.
    */
   public List<String> getFields() {
@@ -85,7 +83,8 @@ public class MethodRecorder extends ClassVisitor {
   }
 
   @Override
-  public FieldVisitor visitField(int access, String name, String descriptor, String signature, Object value) {
+  public FieldVisitor visitField(
+      int access, String name, String descriptor, String signature, Object value) {
     fields.add(name);
     return super.visitField(access, name, descriptor, signature, value);
   }
@@ -96,7 +95,7 @@ public class MethodRecorder extends ClassVisitor {
    * @param args input arguments
    * @throws IOException if a problem occurs during ClassReader construction
    */
-   public static void main(String[] args) throws IOException {
+  public static void main(String[] args) throws IOException {
     ClassReader classReader = new ClassReader("com.google.common.annotations.GwtCompatible");
     MethodRecorder methodRecorder = new MethodRecorder(Opcodes.ASM7);
     classReader.accept(methodRecorder, 0);

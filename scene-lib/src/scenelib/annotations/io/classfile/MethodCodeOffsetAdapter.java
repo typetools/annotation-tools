@@ -7,12 +7,11 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
 /**
- * Tracks offset within a method's Code attribute as its instructions
- * are visited.  ASM really should expose this information but doesn't.
- * Class implementation simply does the same arithmetic ASM does under
- * the hood, staying synchronized with the {@link ClassReader}.
+ * Tracks offset within a method's Code attribute as its instructions are visited. ASM really should
+ * expose this information but doesn't. Class implementation simply does the same arithmetic ASM
+ * does under the hood, staying synchronized with the {@link ClassReader}.
  *
- * UNDONE: Why both CodeOffsetAdapter and MethodCodeOffsetAdapter?
+ * <p>UNDONE: Why both CodeOffsetAdapter and MethodCodeOffsetAdapter?
  */
 class MethodCodeOffsetAdapter extends MethodVisitor {
 
@@ -38,8 +37,7 @@ class MethodCodeOffsetAdapter extends MethodVisitor {
    * @param methodVisitor the MethodVisitor for this method
    * @param start the offset to the start of the class attributes
    */
-  public MethodCodeOffsetAdapter(ClassReader classReader,
-      MethodVisitor methodVisitor, int start) {
+  public MethodCodeOffsetAdapter(ClassReader classReader, MethodVisitor methodVisitor, int start) {
     super(Opcodes.ASM7, methodVisitor);
     char[] buf = new char[classReader.header];
     this.classReader = classReader;
@@ -51,7 +49,9 @@ class MethodCodeOffsetAdapter extends MethodVisitor {
     codeStart += 8;
     while (attrCount > 0) {
       String attrName = classReader.readUTF8(codeStart, buf);
-      if ("Code".equals(attrName)) { break; }
+      if ("Code".equals(attrName)) {
+        break;
+      }
       codeStart += 6 + classReader.readInt(codeStart + 2);
       --attrCount;
     }
@@ -66,8 +66,7 @@ class MethodCodeOffsetAdapter extends MethodVisitor {
   }
 
   /**
-   * Record current {@link #offset} as {@link #previousOffset} and
-   * increment by {@code i}.
+   * Record current {@link #offset} as {@link #previousOffset} and increment by {@code i}.
    *
    * @param i amount to advance offset
    */
@@ -76,31 +75,26 @@ class MethodCodeOffsetAdapter extends MethodVisitor {
     offset += i;
   }
 
-  /**
-   * @return class offset of code attribute; 0 for abstract methods
-   */
+  /** @return class offset of code attribute; 0 for abstract methods */
   public int getCodeStart() {
     return codeStart;
   }
 
-  /**
-   * @return offset of instruction just visited; -1 before first visit
-   */
+  /** @return offset of instruction just visited; -1 before first visit */
   public int getPreviousOffset() {
     return previousOffset;
   }
 
   /**
-   * @return offset after instruction just visited; 0 before first
-   *          visit, -1 if {@link #visitEnd()} has been called
+   * @return offset after instruction just visited; 0 before first visit, -1 if {@link #visitEnd()}
+   *     has been called
    */
   public int getCurrentOffset() {
     return offset;
   }
 
   @Override
-  public void visitFieldInsn(int opcode,
-      String owner, String name, String descriptor) {
+  public void visitFieldInsn(int opcode, String owner, String name, String descriptor) {
     super.visitFieldInsn(opcode, owner, name, descriptor);
     advance(3);
   }
@@ -124,8 +118,8 @@ class MethodCodeOffsetAdapter extends MethodVisitor {
   }
 
   @Override
-  public void visitInvokeDynamicInsn(String name, String descriptor,
-      Handle bsm, Object... bsmArgs) {
+  public void visitInvokeDynamicInsn(
+      String name, String descriptor, Handle bsm, Object... bsmArgs) {
     super.visitInvokeDynamicInsn(name, descriptor, bsm, bsmArgs);
     advance(5);
   }
@@ -143,8 +137,7 @@ class MethodCodeOffsetAdapter extends MethodVisitor {
   }
 
   @Override
-  public void visitLookupSwitchInsn(Label dflt, int[] keys,
-      Label[] labels) {
+  public void visitLookupSwitchInsn(Label dflt, int[] keys, Label[] labels) {
     super.visitLookupSwitchInsn(dflt, keys, labels);
     previousOffset = offset;
     offset += 8 - ((offset - codeStart) & 3);
@@ -153,14 +146,14 @@ class MethodCodeOffsetAdapter extends MethodVisitor {
 
   @Deprecated
   @Override
-  public void visitMethodInsn(int opcode,
-      String owner, String name, String descriptor) {
+  public void visitMethodInsn(int opcode, String owner, String name, String descriptor) {
     super.visitMethodInsn(opcode, owner, name, descriptor);
     advance(opcode == Opcodes.INVOKEINTERFACE ? 5 : 3);
   }
 
   @Override
-  public void visitMethodInsn(int opcode, String owner, String name, String descriptor, boolean isInterface) {
+  public void visitMethodInsn(
+      int opcode, String owner, String name, String descriptor, boolean isInterface) {
     super.visitMethodInsn(opcode, owner, name, descriptor, isInterface);
     advance(opcode == Opcodes.INVOKEINTERFACE ? 5 : 3);
   }
@@ -172,8 +165,7 @@ class MethodCodeOffsetAdapter extends MethodVisitor {
   }
 
   @Override
-  public void visitTableSwitchInsn(int min, int max,
-      Label dflt, Label... labels) {
+  public void visitTableSwitchInsn(int min, int max, Label dflt, Label... labels) {
     super.visitTableSwitchInsn(min, max, dflt, labels);
     previousOffset = offset;
     offset += 8 - ((offset - codeStart) & 3);
@@ -194,6 +186,6 @@ class MethodCodeOffsetAdapter extends MethodVisitor {
 
   @Override
   public void visitEnd() {
-    offset = -1;  // invalidated
+    offset = -1; // invalidated
   }
 }

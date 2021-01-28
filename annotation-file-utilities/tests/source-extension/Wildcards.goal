@@ -9,4 +9,3 @@ public class Wildcards {
   Map<? extends @GUT.quals.Peer Object, ? extends @GUT.quals.Rep Object> l3;
   Map<@GUT.quals.Rep ? extends @GUT.quals.Peer Map<@GUT.quals.Rep ? extends @GUT.quals.Peer Object, @GUT.quals.Rep String>, @GUT.quals.Peer Object> l4;
 }
-

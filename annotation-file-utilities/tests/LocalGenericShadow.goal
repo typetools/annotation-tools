@@ -2,7 +2,6 @@ package annotator.tests;
 
 import java.util.List;
 
-
 public class LocalGenericShadow {
   public List<String> foo = null;
 

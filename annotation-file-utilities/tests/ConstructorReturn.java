@@ -6,37 +6,37 @@ package annotator.tests;
 @interface ADecl {}
 
 public class ConstructorReturn {
-    public ConstructorReturn() {}
+  public ConstructorReturn() {}
 }
 
 class ConstructorReturn_2_1 {
-    ConstructorReturn_2_1() {}
+  ConstructorReturn_2_1() {}
 
-    Object foo() {
-        return null;
-    }
+  Object foo() {
+    return null;
+  }
 }
 
 class ConstructorReturn_2_2 {
-    ConstructorReturn_2_2() {}
+  ConstructorReturn_2_2() {}
 
-    Object foo() {
-        return null;
-    }
+  Object foo() {
+    return null;
+  }
 }
 
 class ConstructorReturn_3_1 {
-    ConstructorReturn_3_1() {}
+  ConstructorReturn_3_1() {}
 
-    Object foo() {
-        return null;
-    }
+  Object foo() {
+    return null;
+  }
 }
 
 class ConstructorReturn_3_2 {
-    ConstructorReturn_3_2() {}
+  ConstructorReturn_3_2() {}
 
-    Object foo() {
-        return null;
-    }
+  Object foo() {
+    return null;
+  }
 }

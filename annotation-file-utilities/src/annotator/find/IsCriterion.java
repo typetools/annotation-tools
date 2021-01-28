@@ -1,14 +1,10 @@
 package annotator.find;
 
 import annotator.scanner.CommonScanner;
-
 import com.sun.source.tree.*;
 import com.sun.source.util.TreePath;
 
-/**
- * Represents the criterion that a program element has a particular type and
- * name.
- */
+/** Represents the criterion that a program element has a particular type and name. */
 final class IsCriterion implements Criterion {
 
   private final Tree.Kind kind;
@@ -46,16 +42,16 @@ final class IsCriterion implements Criterion {
       return false;
     }
     switch (tree.getKind()) {
-    case VARIABLE:
-      String varName = ((VariableTree)tree).getName().toString();
-      return varName.equals(name);
-    case METHOD:
-      String methodName = ((MethodTree)tree).getName().toString();
-      return methodName.equals(name);
-    // case CLASS:
-    //  return InClassCriterion.isSatisfiedBy(path, name, /*exactMatch=*/ true);
-    default:
-      throw new Error("unknown tree kind " + kind);
+      case VARIABLE:
+        String varName = ((VariableTree) tree).getName().toString();
+        return varName.equals(name);
+      case METHOD:
+        String methodName = ((MethodTree) tree).getName().toString();
+        return methodName.equals(name);
+        // case CLASS:
+        //  return InClassCriterion.isSatisfiedBy(path, name, /*exactMatch=*/ true);
+      default:
+        throw new Error("unknown tree kind " + kind);
     }
   }
 
@@ -63,5 +59,4 @@ final class IsCriterion implements Criterion {
   public String toString() {
     return "is " + kind.toString().toLowerCase() + " '" + name + "'";
   }
-
 }

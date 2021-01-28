@@ -1,8 +1,10 @@
 package annotator.find;
 
+import annotator.Main;
+import com.sun.source.tree.Tree;
+import com.sun.source.util.TreePath;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
 import org.objectweb.asm.TypePath;
 import scenelib.annotations.el.BoundLocation;
 import scenelib.annotations.el.LocalLocation;
@@ -10,18 +12,11 @@ import scenelib.annotations.el.RelativeLocation;
 import scenelib.annotations.el.TypeIndexLocation;
 import scenelib.annotations.io.ASTPath;
 import scenelib.annotations.io.DebugWriter;
-import annotator.Main;
-
-import com.sun.source.tree.Tree;
-import com.sun.source.util.TreePath;
 
 /**
- * Represents a set of Criterion objects for locating a program element in
- * a source tree.
- * <p>
+ * Represents a set of Criterion objects for locating a program element in a source tree.
  *
- * This class also contains static factory methods for creating a {@code
- * Criterion}.
+ * <p>This class also contains static factory methods for creating a {@code Criterion}.
  */
 public final class Criteria {
   public static DebugWriter dbug = new DebugWriter();
@@ -29,9 +24,7 @@ public final class Criteria {
   /** The set of criterion objects, indexed by kind. */
   private final Map<Criterion.Kind, Criterion> criteria;
 
-  /**
-   * Creates a new {@code Criteria} without any {@code Criterion}.
-   */
+  /** Creates a new {@code Criteria} without any {@code Criterion}. */
   public Criteria() {
     this.criteria = new LinkedHashMap<>();
   }
@@ -46,14 +39,13 @@ public final class Criteria {
   }
 
   /**
-   * Determines whether or not the program element at the leaf of the
-   * specified path is satisfied by these criteria.
+   * Determines whether or not the program element at the leaf of the specified path is satisfied by
+   * these criteria.
    *
    * @param path the tree path to check against
-   * @param leaf the tree at the leaf of the path; only relevant when the path
-   *        is null, in which case the leaf is a CompilationUnitTree
-   * @return true if all of these criteria are satisfied by the given path,
-   * false otherwise
+   * @param leaf the tree at the leaf of the path; only relevant when the path is null, in which
+   *     case the leaf is a CompilationUnitTree
+   * @return true if all of these criteria are satisfied by the given path, false otherwise
    */
   public boolean isSatisfiedBy(TreePath path, Tree leaf) {
     if (path == null) {
@@ -61,12 +53,14 @@ public final class Criteria {
     }
     assert path.getLeaf() == leaf;
     for (Criterion c : criteria.values()) {
-      if (! c.isSatisfiedBy(path, leaf)) {
-        dbug.debug("UNsatisfied criterion of type %s [%s]:%n    leaf=%s%n",
+      if (!c.isSatisfiedBy(path, leaf)) {
+        dbug.debug(
+            "UNsatisfied criterion of type %s [%s]:%n    leaf=%s%n",
             c, c.getClass(), Main.leafString(path));
         return false;
       } else {
-        dbug.debug("satisfied criterion of type %s [%s]:%n    leaf=%s%n",
+        dbug.debug(
+            "satisfied criterion of type %s [%s]:%n    leaf=%s%n",
             c, c.getClass(), Main.leafString(path));
       }
     }
@@ -74,16 +68,15 @@ public final class Criteria {
   }
 
   /**
-   * Determines whether or not the program element at the leaf of the
-   * specified path is satisfied by these criteria.
+   * Determines whether or not the program element at the leaf of the specified path is satisfied by
+   * these criteria.
    *
    * @param path the tree path to check against
-   * @return true if all of these criteria are satisfied by the given path,
-   * false otherwise
+   * @return true if all of these criteria are satisfied by the given path, false otherwise
    */
   public boolean isSatisfiedBy(TreePath path) {
     for (Criterion c : criteria.values()) {
-      if (! c.isSatisfiedBy(path)) {
+      if (!c.isSatisfiedBy(path)) {
         dbug.debug("UNsatisfied criterion: %s%n", c);
         return false;
       } else {
@@ -153,10 +146,7 @@ public final class Criteria {
     return false;
   }
 
-  /**
-   * Determines whether this is the criteria on the RHS of an occurrence
-   * of 'instanceof'.
-   */
+  /** Determines whether this is the criteria on the RHS of an occurrence of 'instanceof'. */
   public boolean isOnInstanceof() {
     for (Criterion c : criteria.values()) {
       if (c.getKind() == Criterion.Kind.INSTANCE_OF) {
@@ -166,9 +156,7 @@ public final class Criteria {
     return false;
   }
 
-  /**
-   * Determines whether this is the criteria on an object initializer.
-   */
+  /** Determines whether this is the criteria on an object initializer. */
   public boolean isOnNew() {
     for (Criterion c : criteria.values()) {
       if (c.getKind() == Criterion.Kind.NEW) {
@@ -178,9 +166,7 @@ public final class Criteria {
     return false;
   }
 
-  /**
-   * Determines whether this is the criteria on a class {@code extends} bound.
-   */
+  /** Determines whether this is the criteria on a class {@code extends} bound. */
   public boolean isOnTypeDeclarationExtendsClause() {
     for (Criterion c : criteria.values()) {
       if (c.getKind() == Criterion.Kind.EXTIMPLS_LOCATION) {
@@ -190,9 +176,7 @@ public final class Criteria {
     return false;
   }
 
-  /**
-   * Returns true if this Criteria is on the given method.
-   */
+  /** Returns true if this Criteria is on the given method. */
   public boolean isOnMethod(String methodname) {
     for (Criterion c : criteria.values()) {
       if (c.getKind() == Criterion.Kind.IN_METHOD) {
@@ -204,13 +188,10 @@ public final class Criteria {
     return false;
   }
 
-  /**
-   * Returns true if this Criteria is on a field declaration.
-   */
+  /** Returns true if this Criteria is on a field declaration. */
   public boolean isOnFieldDeclaration() {
     for (Criterion c : criteria.values()) {
-      if (c.getKind() == Criterion.Kind.FIELD
-          && ((FieldCriterion) c).isDeclaration) {
+      if (c.getKind() == Criterion.Kind.FIELD && ((FieldCriterion) c).isDeclaration) {
         return true;
       }
     }
@@ -218,9 +199,8 @@ public final class Criteria {
   }
 
   /**
-   * Determines whether this is the criteria on a variable declaration:  a
-   * local variable or a field declaration, but not a formal parameter
-   * declaration.
+   * Determines whether this is the criteria on a variable declaration: a local variable or a field
+   * declaration, but not a formal parameter declaration.
    *
    * @return true iff this is the criteria on a local variable
    */
@@ -228,7 +208,6 @@ public final class Criteria {
     // Could fuse the loops for efficiency, but is it important to do so?
     return isOnLocalVariable() || isOnFieldDeclaration();
   }
-
 
   /**
    * Gives the AST path specified in the criteria, if any.
@@ -290,9 +269,7 @@ public final class Criteria {
     return null;
   }
 
-  /**
-   * @return a GenericArrayLocationCriterion if this has one, else null
-   */
+  /** @return a GenericArrayLocationCriterion if this has one, else null */
   public GenericArrayLocationCriterion getGenericArrayLocation() {
     for (Criterion c : criteria.values()) {
       if (c.getKind() == Criterion.Kind.GENERIC_ARRAY_LOCATION) {
@@ -302,9 +279,7 @@ public final class Criteria {
     return null;
   }
 
-  /**
-   * @return a RelativeCriterion if this has one, else null
-   */
+  /** @return a RelativeCriterion if this has one, else null */
   public RelativeLocation getCastRelativeLocation() {
     RelativeLocation result = null;
     for (Criterion c : criteria.values()) {
@@ -317,9 +292,7 @@ public final class Criteria {
 
   // Returns the last one. Should really return the outermost one.
   // However, there should not be more than one unless all are equivalent.
-  /**
-   * @return an InClassCriterion if this has one, else null
-   */
+  /** @return an InClassCriterion if this has one, else null */
   public InClassCriterion getInClass() {
     InClassCriterion result = null;
     for (Criterion c : criteria.values()) {
@@ -330,32 +303,33 @@ public final class Criteria {
     return result;
   }
 
-  /**
-   * @return true if this is on the zeroth bound of a type
-   */
+  /** @return true if this is on the zeroth bound of a type */
   // Used when determining whether an annotation is on an implicit upper
   // bound (the "extends Object" that is customarily omitted).
   public boolean onBoundZero() {
     for (Criterion c : criteria.values()) {
       switch (c.getKind()) {
-      case CLASS_BOUND:
-        if (((ClassBoundCriterion) c).boundLoc.boundIndex != 0) { break; }
-        return true;
-      case METHOD_BOUND:
-        if (((MethodBoundCriterion) c).boundLoc.boundIndex != 0) { break; }
-        return true;
-      case AST_PATH:
-        ASTPath astPath = ((ASTPathCriterion) c).astPath;
-        if (!astPath.isEmpty()) {
-          ASTPath.ASTEntry entry = astPath.getLast();
-          if (entry.childSelectorIs(ASTPath.BOUND)
-              && entry.getArgument() == 0) {
-            return true;
+        case CLASS_BOUND:
+          if (((ClassBoundCriterion) c).boundLoc.boundIndex != 0) {
+            break;
           }
-        }
-        break;
-      default:
-        break;
+          return true;
+        case METHOD_BOUND:
+          if (((MethodBoundCriterion) c).boundLoc.boundIndex != 0) {
+            break;
+          }
+          return true;
+        case AST_PATH:
+          ASTPath astPath = ((ASTPathCriterion) c).astPath;
+          if (!astPath.isEmpty()) {
+            ASTPath.ASTEntry entry = astPath.getLast();
+            if (entry.childSelectorIs(ASTPath.BOUND) && entry.getArgument() == 0) {
+              return true;
+            }
+          }
+          break;
+        default:
+          break;
       }
     }
     return false;
@@ -366,83 +340,77 @@ public final class Criteria {
     return criteria.toString();
   }
 
-
   ///////////////////////////////////////////////////////////////////////////
   /// Factory methods
   ///
 
   /**
-   * Creates an "is" criterion: that a program element has the specified
-   * kind and name.
+   * Creates an "is" criterion: that a program element has the specified kind and name.
    *
    * @param kind the program element's kind
    * @param name the program element's name
    * @return an "is" criterion
    */
-  public final static Criterion is(Tree.Kind kind, String name) {
+  public static final Criterion is(Tree.Kind kind, String name) {
     return new IsCriterion(kind, name);
   }
 
   /**
-   * Creates an "enclosed by" criterion: that a program element is enclosed
-   * by the specified kind of program element.
+   * Creates an "enclosed by" criterion: that a program element is enclosed by the specified kind of
+   * program element.
    *
    * @param kind the kind of enclosing program element
    * @return an "enclosed by" criterion
    */
-  public final static Criterion enclosedBy(Tree.Kind kind) {
+  public static final Criterion enclosedBy(Tree.Kind kind) {
     return new EnclosedByCriterion(kind);
   }
 
   /**
-   * Creates an "in package" criterion: that a program element is enclosed
-   * by the specified package.
+   * Creates an "in package" criterion: that a program element is enclosed by the specified package.
    *
    * @param name the name of the enclosing package
    * @return an "in package" criterion
    */
-  public final static Criterion inPackage(String name) {
+  public static final Criterion inPackage(String name) {
     return new InPackageCriterion(name);
   }
 
   /**
-   * Creates an "in class" criterion: that a program element is enclosed
-   * by the specified class.
+   * Creates an "in class" criterion: that a program element is enclosed by the specified class.
    *
    * @param name the name of the enclosing class
    * @param exact whether to match only in the class itself, not in its inner classes
    * @return an "in class" criterion
    */
-  public final static Criterion inClass(String name, boolean exact) {
+  public static final Criterion inClass(String name, boolean exact) {
     return new InClassCriterion(name, /*exactmatch=*/ true);
   }
 
   /**
-   * Creates an "in method" criterion: that a program element is enclosed
-   * by the specified method.
+   * Creates an "in method" criterion: that a program element is enclosed by the specified method.
    *
    * @param name the name of the enclosing method
    * @return an "in method" criterion
    */
-  public final static Criterion inMethod(String name) {
+  public static final Criterion inMethod(String name) {
     return new InMethodCriterion(name);
   }
 
   /**
-   * Creates a "not in method" criterion: that a program element is not
-   * enclosed by any method.
+   * Creates a "not in method" criterion: that a program element is not enclosed by any method.
    *
    * @return a "not in method" criterion
    */
-  public final static Criterion notInMethod() {
+  public static final Criterion notInMethod() {
     return new NotInMethodCriterion();
   }
 
-  public final static Criterion packageDecl(String packageName) {
+  public static final Criterion packageDecl(String packageName) {
     return new PackageCriterion(packageName);
   }
 
-  public final static Criterion atLocation() {
+  public static final Criterion atLocation() {
     return new GenericArrayLocationCriterion();
   }
 
@@ -452,65 +420,64 @@ public final class Criteria {
    * @param loc location of the generic array
    * @return a GenericArrayLocationCriterion for the given location
    */
-  public final static Criterion atLocation(TypePath loc) {
+  public static final Criterion atLocation(TypePath loc) {
     return new GenericArrayLocationCriterion(loc);
   }
 
   @Deprecated
-  public final static Criterion field(String varName) {
+  public static final Criterion field(String varName) {
     return new FieldCriterion(varName);
   }
 
-  public final static Criterion field(String varName, boolean isOnDeclaration) {
+  public static final Criterion field(String varName, boolean isOnDeclaration) {
     return new FieldCriterion(varName, isOnDeclaration);
   }
 
-  public final static Criterion inStaticInit(int blockID) {
+  public static final Criterion inStaticInit(int blockID) {
     return new InInitBlockCriterion(blockID, true);
   }
 
-  public final static Criterion inInstanceInit(int blockID) {
+  public static final Criterion inInstanceInit(int blockID) {
     return new InInitBlockCriterion(blockID, false);
   }
 
-  public final static Criterion inFieldInit(String varName) {
+  public static final Criterion inFieldInit(String varName) {
     return new InFieldInitCriterion(varName);
   }
 
-  public final static Criterion receiver(String methodName) {
+  public static final Criterion receiver(String methodName) {
     return new ReceiverCriterion(methodName);
   }
 
-  public final static Criterion returnType(String className, String methodName) {
+  public static final Criterion returnType(String className, String methodName) {
     return new ReturnTypeCriterion(className, methodName);
   }
 
-  public final static Criterion isSigMethod(String methodName) {
+  public static final Criterion isSigMethod(String methodName) {
     return new IsSigMethodCriterion(methodName);
   }
 
-
-  public final static Criterion param(String methodName, Integer pos) {
+  public static final Criterion param(String methodName, Integer pos) {
     return new ParamCriterion(methodName, pos);
   }
 
-//  public final static Criterion param(String methodName, Integer pos, InnerTypeLocation loc) {
-//    return new ParamCriterion(methodName, pos, loc);
-//  }
+  //  public final static Criterion param(String methodName, Integer pos, InnerTypeLocation loc) {
+  //    return new ParamCriterion(methodName, pos, loc);
+  //  }
 
-  public final static Criterion local(String methodName, LocalLocation loc) {
+  public static final Criterion local(String methodName, LocalLocation loc) {
     return new LocalVariableCriterion(methodName, loc);
   }
 
-  public final static Criterion cast(String methodName, RelativeLocation loc) {
+  public static final Criterion cast(String methodName, RelativeLocation loc) {
     return new CastCriterion(methodName, loc);
   }
 
-  public final static Criterion newObject(String methodName, RelativeLocation loc) {
+  public static final Criterion newObject(String methodName, RelativeLocation loc) {
     return new NewCriterion(methodName, loc);
   }
 
-  public final static Criterion instanceOf(String methodName, RelativeLocation loc) {
+  public static final Criterion instanceOf(String methodName, RelativeLocation loc) {
     return new InstanceOfCriterion(methodName, loc);
   }
 
@@ -522,31 +489,31 @@ public final class Criteria {
     return new CallCriterion(methodName, loc);
   }
 
-  public final static Criterion typeArgument(String methodName, RelativeLocation loc) {
+  public static final Criterion typeArgument(String methodName, RelativeLocation loc) {
     return new TypeArgumentCriterion(methodName, loc);
   }
 
-  public final static Criterion lambda(String methodName, RelativeLocation loc) {
+  public static final Criterion lambda(String methodName, RelativeLocation loc) {
     return new LambdaCriterion(methodName, loc);
   }
 
-  public final static Criterion atBoundLocation(BoundLocation loc) {
+  public static final Criterion atBoundLocation(BoundLocation loc) {
     return new BoundLocationCriterion(loc);
   }
 
-  public final static Criterion atExtImplsLocation(String className, TypeIndexLocation loc) {
+  public static final Criterion atExtImplsLocation(String className, TypeIndexLocation loc) {
     return new ExtImplsLocationCriterion(className, loc);
   }
 
-  public final static Criterion methodBound(String methodName, BoundLocation boundLoc) {
+  public static final Criterion methodBound(String methodName, BoundLocation boundLoc) {
     return new MethodBoundCriterion(methodName, boundLoc);
   }
 
-  public final static Criterion classBound(String className, BoundLocation boundLoc) {
+  public static final Criterion classBound(String className, BoundLocation boundLoc) {
     return new ClassBoundCriterion(className, boundLoc);
   }
 
-  public final static Criterion astPath(ASTPath astPath) {
+  public static final Criterion astPath(ASTPath astPath) {
     return new ASTPathCriterion(astPath);
   }
 }

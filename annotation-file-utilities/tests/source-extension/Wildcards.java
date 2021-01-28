@@ -7,4 +7,3 @@ public class Wildcards {
   Map<?, ?> l3;
   Map<? extends Map<?, String>, Object> l4;
 }
-

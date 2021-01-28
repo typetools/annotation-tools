@@ -1,13 +1,12 @@
 package annotator.find;
 
-import scenelib.annotations.io.ASTPath;
-
 import com.sun.source.tree.*;
 import com.sun.source.util.TreePath;
+import scenelib.annotations.io.ASTPath;
 
 /**
- * Represents the criterion that a program element is not enclosed by any
- * method (i.e. it's a field, class type parameter, etc.).
+ * Represents the criterion that a program element is not enclosed by any method (i.e. it's a field,
+ * class type parameter, etc.).
  */
 final class NotInMethodCriterion implements Criterion {
 
@@ -45,5 +44,4 @@ final class NotInMethodCriterion implements Criterion {
   public String toString() {
     return "not in method";
   }
-
 }

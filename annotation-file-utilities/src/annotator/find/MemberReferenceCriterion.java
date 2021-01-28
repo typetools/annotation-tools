@@ -1,10 +1,9 @@
 package annotator.find;
 
-import scenelib.annotations.el.RelativeLocation;
 import annotator.scanner.MemberReferenceScanner;
-
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
+import scenelib.annotations.el.RelativeLocation;
 
 public class MemberReferenceCriterion implements Criterion {
   private final String methodName;
@@ -33,13 +32,10 @@ public class MemberReferenceCriterion implements Criterion {
     Tree leaf = path.getLeaf();
 
     if (leaf.getKind() == Tree.Kind.MEMBER_REFERENCE) {
-      int indexInSource =
-          MemberReferenceScanner.indexOfMemberReferenceTree(path, leaf);
+      int indexInSource = MemberReferenceScanner.indexOfMemberReferenceTree(path, leaf);
       boolean b;
       if (loc.isBytecodeOffset()) {
-        int indexInClass =
-            MemberReferenceScanner.getMemberReferenceIndex(methodName,
-                loc.offset);
+        int indexInClass = MemberReferenceScanner.getMemberReferenceIndex(methodName, loc.offset);
         b = (indexInSource == indexInClass);
       } else {
         b = (indexInSource == loc.index);

@@ -1,8 +1,5 @@
-class ExplicitUpper<X extends Object> extends Object {
-}
+class ExplicitUpper<X extends Object> extends Object {}
 
-public class ImplicitUpper<Y> {
-}
+public class ImplicitUpper<Y> {}
 
-class Monomorphic {
-}
+class Monomorphic {}

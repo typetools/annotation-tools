@@ -1,14 +1,10 @@
 package annotator.find;
 
 import annotator.Main;
-
 import com.sun.source.tree.*;
 import com.sun.source.util.TreePath;
 
-/**
- * Represents the criterion that a program element is in a package with a
- * certain name.
- */
+/** Represents the criterion that a program element is in a package with a certain name. */
 final class InPackageCriterion implements Criterion {
 
   private final String name;
@@ -37,13 +33,13 @@ final class InPackageCriterion implements Criterion {
       return false;
     }
 
-    Criteria.dbug.debug("InPackageCriterion.isSatisfiedBy(%s); this=%s",
-        Main.leafString(path), this.toString());
+    Criteria.dbug.debug(
+        "InPackageCriterion.isSatisfiedBy(%s); this=%s", Main.leafString(path), this.toString());
 
     do {
       Tree tree = path.getLeaf();
       if (tree.getKind() == Tree.Kind.COMPILATION_UNIT) {
-        CompilationUnitTree cu = (CompilationUnitTree)tree;
+        CompilationUnitTree cu = (CompilationUnitTree) tree;
         ExpressionTree pn = cu.getPackageName();
         if (pn == null) {
           return name == null || name.equals("");

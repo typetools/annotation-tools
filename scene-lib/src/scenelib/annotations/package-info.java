@@ -1,6 +1,5 @@
 /**
- * <code>annotations</code> provides classes that represent annotations,
- * their definitions, and their factories.
+ * <code>annotations</code> provides classes that represent annotations, their definitions, and
+ * their factories.
  */
 package scenelib.annotations;
-

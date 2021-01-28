@@ -1,5 +1,5 @@
 package pkg.name.here;
 
 class Package {
-    @A Object o;
+  @A Object o;
 }

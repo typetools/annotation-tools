@@ -1,18 +1,14 @@
 package annotator.find;
 
-import java.util.List;
-
-import scenelib.annotations.el.TypeIndexLocation;
 import annotator.scanner.CommonScanner;
-
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
 import com.sun.tools.javac.tree.JCTree;
+import java.util.List;
+import scenelib.annotations.el.TypeIndexLocation;
 
-/**
- * A criterion to find a given extends or implements clause.
- */
+/** A criterion to find a given extends or implements clause. */
 public class ExtImplsLocationCriterion implements Criterion {
 
   private final String classname;
@@ -44,7 +40,8 @@ public class ExtImplsLocationCriterion implements Criterion {
 
     Tree leaf = path.getLeaf();
 
-    // System.out.printf("ExtImplsLocationCriterion.isSatisfiedBy(%s):%n  leaf=%s (%s)%n", path, leaf, leaf.getClass());
+    // System.out.printf("ExtImplsLocationCriterion.isSatisfiedBy(%s):%n  leaf=%s (%s)%n", path,
+    // leaf, leaf.getClass());
 
     TreePath parentPath = path.getParentPath();
     if (parentPath == null) {
@@ -56,33 +53,34 @@ public class ExtImplsLocationCriterion implements Criterion {
       return false;
     }
 
-    // System.out.printf("ExtImplsLocationCriterion.isSatisfiedBy(%s):%n  leaf=%s (%s)%n  parent=%s (%s)%n", path, leaf, leaf.getClass(), parent, parent.getClass());
+    // System.out.printf("ExtImplsLocationCriterion.isSatisfiedBy(%s):%n  leaf=%s (%s)%n  parent=%s
+    // (%s)%n", path, leaf, leaf.getClass(), parent, parent.getClass());
 
     boolean returnValue = false;
 
     if (index == -1 && leaf.getKind() == Tree.Kind.CLASS) {
-        return ((JCTree.JCClassDecl) leaf).getExtendsClause() == null;
+      return ((JCTree.JCClassDecl) leaf).getExtendsClause() == null;
     }
     if (CommonScanner.hasClassKind(parent)) {
-        ClassTree ct = (ClassTree) parent;
+      ClassTree ct = (ClassTree) parent;
 
-        if (index==-1) {
-            Tree ext = ct.getExtendsClause();
-            if (ext == leaf) {
-                returnValue = true;
-            }
-        } else {
-            List<? extends Tree> impls = ct.getImplementsClause();
-            if (index < impls.size() && impls.get(index) == leaf) {
-                returnValue = true;
-            }
+      if (index == -1) {
+        Tree ext = ct.getExtendsClause();
+        if (ext == leaf) {
+          returnValue = true;
         }
+      } else {
+        List<? extends Tree> impls = ct.getImplementsClause();
+        if (index < impls.size() && impls.get(index) == leaf) {
+          returnValue = true;
+        }
+      }
     }
 
     if (!returnValue) {
-        return this.isSatisfiedBy(parentPath);
+      return this.isSatisfiedBy(parentPath);
     } else {
-        return true;
+      return true;
     }
   }
 

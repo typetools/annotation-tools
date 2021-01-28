@@ -1,17 +1,13 @@
 package annotator.find;
 
-import java.util.List;
-
-import scenelib.annotations.el.RelativeLocation;
-import scenelib.annotations.io.ASTPath;
-
 import com.sun.source.tree.IntersectionTypeTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
+import java.util.List;
+import scenelib.annotations.el.RelativeLocation;
+import scenelib.annotations.io.ASTPath;
 
-/**
- * @author dan
- */
+/** @author dan */
 public class IntersectionTypeLocationCriterion implements Criterion {
   private final int typeIndex;
 
@@ -37,8 +33,7 @@ public class IntersectionTypeLocationCriterion implements Criterion {
         IntersectionTypeTree itt = (IntersectionTypeTree) parent;
         List<? extends Tree> bounds = itt.getBounds();
         Tree leaf = path.getLeaf();
-        if (typeIndex < bounds.size()
-            && leaf == bounds.get(typeIndex)) {
+        if (typeIndex < bounds.size() && leaf == bounds.get(typeIndex)) {
           return true;
         }
       }

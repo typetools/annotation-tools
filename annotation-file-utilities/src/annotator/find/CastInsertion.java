@@ -3,30 +3,26 @@ package annotator.find;
 import scenelib.type.Type;
 
 /**
- * Specifies an insertion of a cast into a source file. Stores the type of cast
- * to insert in addition to the annotation and location.
- * <p>
- * In order to restrict the cast to only the specified expression, a cast
- * insertion is of the form:
+ * Specifies an insertion of a cast into a source file. Stores the type of cast to insert in
+ * addition to the annotation and location.
+ *
+ * <p>In order to restrict the cast to only the specified expression, a cast insertion is of the
+ * form:
  *
  * <pre>
  * ((<em>cast type</em>) (<em>original expression</em>))
  * </pre>
  *
- * This insertion inserts the cast type and parentheses that go before the
- * original expression. A {@link CloseParenthesisInsertion} must be used
- * after the expression to close the parentheses left open by this insertion.
+ * This insertion inserts the cast type and parentheses that go before the original expression. A
+ * {@link CloseParenthesisInsertion} must be used after the expression to close the parentheses left
+ * open by this insertion.
  */
 public class CastInsertion extends Insertion {
 
-  /**
-   * The type to cast to.
-   */
+  /** The type to cast to. */
   private Type type;
 
-  /**
-   * Whether insertion is to take place on a bare array literal.
-   */
+  /** Whether insertion is to take place on a bare array literal. */
   public boolean onArrayLiteral = false;
 
   /**
@@ -41,32 +37,32 @@ public class CastInsertion extends Insertion {
   }
 
   /**
-   * Gets the type for this insertion. It is assumed that the returned value will be modified
-   * to update the type to be inserted.
+   * Gets the type for this insertion. It is assumed that the returned value will be modified to
+   * update the type to be inserted.
+   *
    * @return the type
    */
   public Type getType() {
-      return type;
+    return type;
   }
 
   protected void setType(Type t) {
-      type = t;
+    type = t;
   }
 
   @Override
   protected String getText(boolean comments, boolean abbreviate) {
-    String result = onArrayLiteral
-        ? "((new " + typeToString(type, comments, abbreviate) + " "
-        : "((" + typeToString(type, comments, abbreviate) + ") (";
+    String result =
+        onArrayLiteral
+            ? "((new " + typeToString(type, comments, abbreviate) + " "
+            : "((" + typeToString(type, comments, abbreviate) + ") (";
     return result;
   }
 
   @Override
-  protected boolean addLeadingSpace(boolean gotSeparateLine, int pos,
-      char precedingChar) {
+  protected boolean addLeadingSpace(boolean gotSeparateLine, int pos, char precedingChar) {
     // Don't add a leading space if this cast is on the index of an array access.
-    return super.addLeadingSpace(gotSeparateLine, pos, precedingChar)
-           && precedingChar != '[';
+    return super.addLeadingSpace(gotSeparateLine, pos, precedingChar) && precedingChar != '[';
   }
 
   @Override

@@ -2,9 +2,13 @@ package annotator.tests;
 
 public class ExtImpl {
   class Top<X, Y> {}
+
   interface Iface<A, B> {}
+
   interface Iface2<C, D> {}
+
   interface Iface3 {}
+
   interface Iface4<T, S extends Iface4<T, S>> {}
 
   class C1 extends Top<Object, String> implements Iface<Integer, String> {}
@@ -50,4 +54,3 @@ public class ExtImpl {
     }
   }
 }
-

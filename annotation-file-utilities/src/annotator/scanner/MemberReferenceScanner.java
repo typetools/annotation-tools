@@ -1,19 +1,18 @@
 package annotator.scanner;
 
+import com.sun.source.tree.MemberReferenceTree;
+import com.sun.source.tree.Tree;
+import com.sun.source.util.TreePath;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.sun.source.tree.MemberReferenceTree;
-import com.sun.source.tree.Tree;
-import com.sun.source.util.TreePath;
-
 public class MemberReferenceScanner extends CommonScanner {
 
   /**
-   * Computes the index of the given method invocation amongst all
-   * method invocation trees inside its method, using 0-based indexing.
+   * Computes the index of the given method invocation amongst all method invocation trees inside
+   * its method, using 0-based indexing.
    *
    * @param origpath the path ending in the given method invocation tree
    * @param tree the method invocation tree to search for
@@ -35,8 +34,9 @@ public class MemberReferenceScanner extends CommonScanner {
   private final Tree tree;
 
   /**
-   * Creates an InstanceOfScanner that will scan the source tree for the
-   *  given node representing the method invocation to find.
+   * Creates an InstanceOfScanner that will scan the source tree for the given node representing the
+   * method invocation to find.
+   *
    * @param tree the given method invocation to search for
    */
   private MemberReferenceScanner(Tree tree) {
@@ -58,20 +58,17 @@ public class MemberReferenceScanner extends CommonScanner {
 
   // Map from name of a method to a list of bytecode offsets of all
   // lambda expressions in that method.
-  private static Map<String, List<Integer>> methodNameToMemberReferenceOffsets =
-      new HashMap<>();
+  private static Map<String, List<Integer>> methodNameToMemberReferenceOffsets = new HashMap<>();
 
   /**
-   * Adds a member reference bytecode offset to the current list of
-   * offsets for methodName.  This method must be called with
-   * monotonically increasing offsets for any one method.
+   * Adds a member reference bytecode offset to the current list of offsets for methodName. This
+   * method must be called with monotonically increasing offsets for any one method.
    *
    * @param methodName the name of the method
    * @param offset the offset to add
    */
   public static void addMemberReferenceToMethod(String methodName, Integer offset) {
-    List<Integer> offsetList =
-        methodNameToMemberReferenceOffsets.get(methodName);
+    List<Integer> offsetList = methodNameToMemberReferenceOffsets.get(methodName);
     if (offsetList == null) {
       offsetList = new ArrayList<Integer>();
       methodNameToMemberReferenceOffsets.put(methodName, offsetList);
@@ -80,19 +77,17 @@ public class MemberReferenceScanner extends CommonScanner {
   }
 
   /**
-   * Returns the index of the given offset within the list of offsets
-   * for the given method, using 0-based indexing, or returns a negative
-   * number if the offset is not one of the offsets in the context.
+   * Returns the index of the given offset within the list of offsets for the given method, using
+   * 0-based indexing, or returns a negative number if the offset is not one of the offsets in the
+   * context.
    *
    * @param methodName the name of the method
    * @param offset the offset of the lambda expression
-   * @return the index of the given offset, or a negative number
-   *  if the offset does not exist inside the context
+   * @return the index of the given offset, or a negative number if the offset does not exist inside
+   *     the context
    */
-  public static Integer
-  getMemberReferenceIndex(String methodName, Integer offset) {
-    List<Integer> offsetList =
-        methodNameToMemberReferenceOffsets.get(methodName);
+  public static Integer getMemberReferenceIndex(String methodName, Integer offset) {
+    List<Integer> offsetList = methodNameToMemberReferenceOffsets.get(methodName);
     if (offsetList == null) {
       return -1;
     }

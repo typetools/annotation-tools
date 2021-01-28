@@ -8,25 +8,39 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.IntFunction;
-import java.util.function.IntSupplier;
 import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 import java.util.function.ToIntFunction;
 import java.util.function.UnaryOperator;
 
-@Target(ElementType.TYPE_USE) @interface A {}
-@Target(ElementType.TYPE_USE) @interface B {}
-@Target(ElementType.TYPE_USE) @interface C {}
-@Target(ElementType.TYPE_USE) @interface D {}
+@Target(ElementType.TYPE_USE)
+@interface A {}
+
+@Target(ElementType.TYPE_USE)
+@interface B {}
+
+@Target(ElementType.TYPE_USE)
+@interface C {}
+
+@Target(ElementType.TYPE_USE)
+@interface D {}
 
 public class MemberReference<T> {
   class Inner<U> implements Map.Entry<T, U> {
     @Override
-    public T getKey() { return null; }
+    public T getKey() {
+      return null;
+    }
+
     @Override
-    public U getValue() { return null; }
+    public U getValue() {
+      return null;
+    }
+
     @Override
-    public U setValue(U u) { throw new UnsupportedOperationException(); }
+    public U setValue(U u) {
+      throw new UnsupportedOperationException();
+    }
   }
 
   boolean test = false;
@@ -55,44 +69,39 @@ public class MemberReference<T> {
 
   Function<T, String> o6 = T::toString;
 
-  //IntSupplier o7 = ((String) "abc")::length;
-  //IntSupplier o8 = ((List<String>) foo[0])::size;
+  // IntSupplier o7 = ((String) "abc")::length;
+  // IntSupplier o8 = ((List<String>) foo[0])::size;
 
-  Supplier<Iterator<T>> o9 =
-      (test ? list : Collections.<T>emptyList()) :: iterator;
+  Supplier<Iterator<T>> o9 = (test ? list : Collections.<T>emptyList())::iterator;
 
   // constructor for parameterized type
-  Supplier<ArrayList<String>> o10 =
-      ArrayList<String>::new;
+  Supplier<ArrayList<String>> o10 = ArrayList<String>::new;
 
   // inferred type arguments for generic class
-  Supplier<ArrayList<String>> o11 =
-      ArrayList::new;
+  Supplier<ArrayList<String>> o11 = ArrayList::new;
 
   // explicit type arguments for generic constructor
-  IntFunction<List<Integer>> o12 =
-      ArrayList<Integer>::<Integer>new;
+  IntFunction<List<Integer>> o12 = ArrayList<Integer>::<Integer>new;
 
   // generic class + constructor
-  Function<String, MemberReference<CharSequence>> o13 =
-      MemberReference<CharSequence>::<String>new;
+  Function<String, MemberReference<CharSequence>> o13 = MemberReference<CharSequence>::<String>new;
 
   // inner class constructor
   Supplier<MemberReference<Object>.Inner<Long>> o14 =
       MemberReference<Object>.Inner<Long>::<String>new;
 
   // array creation
-  Function<Integer, Integer[]> o15 =
-      Integer[]::new;
+  Function<Integer, Integer[]> o15 = Integer[]::new;
 
-  //Consumer<String> o16 = System.out::println;
-  //Supplier<String> o17 = ((Object) super)::toString;
-  //Supplier<String> o18 = ((Object) MemberReference.super)::toString;
+  // Consumer<String> o16 = System.out::println;
+  // Supplier<String> o17 = ((Object) super)::toString;
+  // Supplier<String> o18 = ((Object) MemberReference.super)::toString;
 
   public static void main(String[] args) {
     String[] ss = {"a", "b"};
-    System.out.println(java.util.Arrays.asList(ss).stream()
-        .map(String::toUpperCase)
-        .collect(java.util.stream.Collectors.joining(" ")));
+    System.out.println(
+        java.util.Arrays.asList(ss).stream()
+            .map(String::toUpperCase)
+            .collect(java.util.stream.Collectors.joining(" ")));
   }
 }

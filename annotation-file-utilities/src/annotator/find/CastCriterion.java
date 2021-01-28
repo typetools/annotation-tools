@@ -1,14 +1,11 @@
 package annotator.find;
 
-import scenelib.annotations.el.RelativeLocation;
 import annotator.scanner.CastScanner;
-
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
+import scenelib.annotations.el.RelativeLocation;
 
-/**
- * Criterion for being a specific type cast expression.
- */
+/** Criterion for being a specific type cast expression. */
 public class CastCriterion implements Criterion {
 
   private final String methodName;
@@ -53,7 +50,9 @@ public class CastCriterion implements Criterion {
     }
   }
 
-  public RelativeLocation getLocation() { return loc; }
+  public RelativeLocation getLocation() {
+    return loc;
+  }
 
   @Override
   public Kind getKind() {

@@ -1,7 +1,5 @@
 package annotator.tests;
 
 public class StringEscape {
-  public void foo(String orig) {
-  }
+  public void foo(String orig) {}
 }
-

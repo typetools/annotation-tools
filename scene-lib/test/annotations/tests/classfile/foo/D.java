@@ -6,6 +6,8 @@ import java.lang.annotation.*;
 @java.lang.annotation.Target(java.lang.annotation.ElementType.TYPE_USE)
 public @interface D {
   int fieldA();
+
   String fieldB();
+
   int[] fieldC();
 }

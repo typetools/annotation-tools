@@ -32,10 +32,10 @@ public class ReceiverCriterion implements Criterion {
 
     if (path.getLeaf().getKind() == Tree.Kind.METHOD) {
       if (isSigMethodCriterion.isSatisfiedBy(path)) {
-          MethodTree leaf = (MethodTree) path.getLeaf();
-          // If the method already has a receiver, then insert directly on the
-          // receiver, not on the method.
-          return leaf.getReceiverParameter() == null;
+        MethodTree leaf = (MethodTree) path.getLeaf();
+        // If the method already has a receiver, then insert directly on the
+        // receiver, not on the method.
+        return leaf.getReceiverParameter() == null;
       }
       return false;
     } else {

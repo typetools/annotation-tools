@@ -5,8 +5,8 @@ import qual.Q1;
 import qual.Q2;
 
 class Issue155 {
-    void foo() {
-       @Q2
-       B result @Q1 [] = new @Q4 B @Q3 [2];
-    }
+  void foo() {
+    @Q2
+    B result @Q1 [] = new @Q4 B @Q3 [2];
+  }
 }

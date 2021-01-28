@@ -1,13 +1,10 @@
 package annotator.find;
 
 import annotator.scanner.CommonScanner;
-
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
 
-/**
- * Criterion for being within a specific field initializer.
- */
+/** Criterion for being within a specific field initializer. */
 public class InFieldInitCriterion implements Criterion {
 
   public final String varName;

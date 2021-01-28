@@ -1,10 +1,9 @@
 package annotator.find;
 
-import scenelib.annotations.el.RelativeLocation;
 import annotator.scanner.LambdaScanner;
-
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
+import scenelib.annotations.el.RelativeLocation;
 
 public class LambdaCriterion implements Criterion {
   private final String methodName;
