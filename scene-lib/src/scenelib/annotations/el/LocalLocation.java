@@ -106,17 +106,29 @@ public final class LocalLocation {
   }
 
   /**
+   * Test if the bytecode offset to the start of the first scope/lifetime is defined.
+   *
+   * @return if the Label at start[0] is resolved
+   */
+  public boolean scopeStartDefined() {
+    try {
+      start[0].getOffset();
+    } catch (IllegalStateException e) {
+      return false;
+    }
+    return true;
+  }
+
+  /**
    * Returns the bytecode offset to the start of the first scope/lifetime.
    *
-   * @return the bytecode offset to the start of the first scope/lifetime or -1 if the Label at
-   *     start[0] is not resolved
+   * @return the bytecode offset to the start of the first scope/lifetime
    */
   public int getScopeStart() {
     try {
       return start[0].getOffset();
     } catch (IllegalStateException e) {
-      System.err.println("Labels not resolved: " + Arrays.toString(start));
-      return -1;
+      throw new Error("Labels not resolved: " + Arrays.toString(start));
     }
   }
 
@@ -124,15 +136,13 @@ public final class LocalLocation {
   /**
    * Returns the length of all the scopes/lifetimes (in bytes).
    *
-   * @return the length of all the scopes/lifetimes (in bytes) or -1 if the Label at start[0] or
-   *     end[end.length-1] is not resolved
+   * @return the length of all the scopes/lifetimes (in bytes)
    */
   public int getScopeLength() {
     try {
       return end[end.length - 1].getOffset() - getScopeStart();
     } catch (IllegalStateException e) {
-      System.err.println("Labels not resolved: " + Arrays.toString(end));
-      return -1;
+      throw new Error("Labels not resolved: " + Arrays.toString(start));
     }
   }
 

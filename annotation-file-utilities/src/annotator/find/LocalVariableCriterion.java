@@ -69,25 +69,27 @@ public class LocalVariableCriterion implements Criterion {
         return (loc.getVarIndex() == varIndex);
       }
 
-      Pair<String, Pair<Integer, Integer>> key =
+      if (loc.scopeStartDefined()) {
+        Pair<String, Pair<Integer, Integer>> key =
           Pair.of(fullMethodName, Pair.of(loc.getVarIndex(), loc.getScopeStart()));
-      String potentialVarName = LocalVariableScanner.getFromMethodNameIndexMap(key);
-      if (potentialVarName != null) {
-        if (varName.equals(potentialVarName)) {
-          // now use methodNameCounter to ensure that if this is the
-          // i'th variable of this name, its offset is the i'th offset
-          // of all variables with this name
-          List<Integer> allOffsetsWithThisName =
-              LocalVariableScanner.getFromMethodNameCounter(fullMethodName, potentialVarName);
-          //      methodNameCounter.get(fullMethodName).get(potentialVarName);
-          Integer thisVariablesOffset = allOffsetsWithThisName.indexOf(loc.getScopeStart());
+        String potentialVarName = LocalVariableScanner.getFromMethodNameIndexMap(key);
+        if (potentialVarName != null) {
+          if (varName.equals(potentialVarName)) {
+            // now use methodNameCounter to ensure that if this is the
+            // i'th variable of this name, its offset is the i'th offset
+            // of all variables with this name
+            List<Integer> allOffsetsWithThisName =
+                LocalVariableScanner.getFromMethodNameCounter(fullMethodName, potentialVarName);
+            //      methodNameCounter.get(fullMethodName).get(potentialVarName);
+            Integer thisVariablesOffset = allOffsetsWithThisName.indexOf(loc.getScopeStart());
 
-          // now you need to make sure that this is the
-          // thisVariablesOffset'th variable tree in the entire source
-          int i = LocalVariableScanner.indexOfVarTree(path, parent, potentialVarName);
+            // now you need to make sure that this is the
+            // thisVariablesOffset'th variable tree in the entire source
+            int i = LocalVariableScanner.indexOfVarTree(path, parent, potentialVarName);
 
-          if (i == thisVariablesOffset) {
-            return true;
+            if (i == thisVariablesOffset) {
+              return true;
+            }
           }
         }
       }
