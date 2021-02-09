@@ -71,7 +71,7 @@ public class LocalVariableCriterion implements Criterion {
 
       if (loc.scopeStartDefined()) {
         Pair<String, Pair<Integer, Integer>> key =
-          Pair.of(fullMethodName, Pair.of(loc.getVarIndex(), loc.getScopeStart()));
+            Pair.of(fullMethodName, Pair.of(loc.getVarIndex(), loc.getScopeStart()));
         String potentialVarName = LocalVariableScanner.getFromMethodNameIndexMap(key);
         if (potentialVarName != null) {
           if (varName.equals(potentialVarName)) {
