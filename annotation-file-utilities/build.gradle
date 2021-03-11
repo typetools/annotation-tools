@@ -471,11 +471,14 @@ task htmlValidate(type: Exec) {
     workingDir '../'
     executable 'html5validator'
     args = [
+    	    // The --ignore command-line argument applies to everything until the next
+	    // command-line argument; that is, everything listed here is ignored.
             "--ignore",
+            "/annotation-file-utilities/annotation-file-format.html",
             "/api/",
             "/build/",
             "/javadoc/",
-            "/annotation-file-utilities/annotation-file-format.html",
+            "/plume-bib/",
             "/scene-lib/javadoc/"
     ]
 }
