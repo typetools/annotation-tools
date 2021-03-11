@@ -207,6 +207,7 @@ public class AMethod extends ADeclaration {
     return result;
   }
 
+  // TODO: `type` is ignored if information is already present.  Is that desirable??
   /**
    * Obtain information about an expression at method exit. It can be further operated on to e.g.
    * add a type annotation.
