@@ -41,7 +41,9 @@ public final class Annotation {
       for (String s : fieldValues.keySet()) {
         assert def.fieldTypes.containsKey(s)
             : String.format(
-                "Annotation contains field %s but AnnotationDef does not%n  annotation: %s%n  def: %s%n",
+                "Annotation contains field %s but AnnotationDef does not%n"
+                    + "  annotation: %s%n"
+                    + "  def: %s%n",
                 s, this, this.def);
       }
       // TODO: Faulty assertions, fails when default value is used
@@ -142,7 +144,8 @@ public final class Annotation {
         }
         assert aft.isValidValue(val)
             : String.format(
-                "invalid value \"%s\" for field \"%s\" of class \"%s\" and expected type \"%s\"; ja=%s",
+                "invalid value \"%s\" for field \"%s\" of class \"%s\" and expected type \"%s\";"
+                    + " ja=%s",
                 val, val.getClass(), fieldname, aft, ja);
         fieldValues.put(fieldname, val);
       }

@@ -114,7 +114,9 @@ public class GenericArrayLocationCriterion implements Criterion {
 
     if (debug) {
       System.out.printf(
-          "GenericArrayLocationCriterion.isSatisfiedBy():%n  leaf of path: %s%n  searched location: %s%n",
+          "GenericArrayLocationCriterion.isSatisfiedBy():%n"
+              + "  leaf of path: %s%n"
+              + "  searched location: %s%n",
           path.getLeaf(), typePath);
     }
 
@@ -207,7 +209,10 @@ public class GenericArrayLocationCriterion implements Criterion {
                   && !isGenericOrArray(parent)));
       if (debug) {
         System.out.printf(
-            "GenericArrayLocationCriterion.isSatisfiedBy: locationInParent==null%n  leaf=%s (%s)%n  parent=%s (%s)%n  => %s (%s %s)%n",
+            "GenericArrayLocationCriterion.isSatisfiedBy: locationInParent==null%n"
+                + "  leaf=%s (%s)%n"
+                + "  parent=%s (%s)%n"
+                + "  => %s (%s %s)%n",
             leaf,
             leaf.getClass(),
             parent,

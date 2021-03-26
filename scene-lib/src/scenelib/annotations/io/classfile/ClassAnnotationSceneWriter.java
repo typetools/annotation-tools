@@ -943,7 +943,8 @@ public class ClassAnnotationSceneWriter extends CodeOffsetAdapter {
           // TODO: output a warning or translate
           if (strict) {
             System.err.println(
-                "ClassAnnotationSceneWriter.ensureVisitObjectCreationAnnotation: no bytecode offset found!");
+                "ClassAnnotationSceneWriter.ensureVisitObjectCreationAnnotation:"
+                    + " no bytecode offset found!");
           }
         }
         int offset = entry.getKey().offset;
@@ -990,7 +991,8 @@ public class ClassAnnotationSceneWriter extends CodeOffsetAdapter {
           // TODO: output a warning or translate
           if (strict) {
             System.err.println(
-                "ClassAnnotationSceneWriter.ensureVisitTypecastAnnotation: no bytecode offset found!");
+                "ClassAnnotationSceneWriter.ensureVisitTypecastAnnotation:"
+                    + " no bytecode offset found!");
           }
         }
         int offset = entry.getKey().offset;
@@ -1011,7 +1013,8 @@ public class ClassAnnotationSceneWriter extends CodeOffsetAdapter {
           // TODO: output a warning or translate
           if (strict) {
             System.err.println(
-                "ClassAnnotationSceneWriter.ensureVisitTypeTestAnnotation: no bytecode offset found!");
+                "ClassAnnotationSceneWriter.ensureVisitTypeTestAnnotation:"
+                    + " no bytecode offset found!");
           }
         }
         int offset = entry.getKey().offset;
@@ -1029,7 +1032,8 @@ public class ClassAnnotationSceneWriter extends CodeOffsetAdapter {
           // TODO: output a warning or translate
           if (strict) {
             System.err.println(
-                "ClassAnnotationSceneWriter.ensureMemberReferenceAnnotations: no bytecode offset found!");
+                "ClassAnnotationSceneWriter.ensureMemberReferenceAnnotations:"
+                    + " no bytecode offset found!");
           }
           continue;
         }
@@ -1092,7 +1096,8 @@ public class ClassAnnotationSceneWriter extends CodeOffsetAdapter {
           // TODO: output a warning or translate
           if (strict) {
             System.err.println(
-                "ClassAnnotationSceneWriter.ensureMemberReferenceAnnotations: no bytecode offset found!");
+                "ClassAnnotationSceneWriter.ensureMemberReferenceAnnotations:"
+                    + " no bytecode offset found!");
           }
           continue;
         }
@@ -1123,7 +1128,8 @@ public class ClassAnnotationSceneWriter extends CodeOffsetAdapter {
           // TODO: output a warning or translate
           if (strict) {
             System.err.println(
-                "ClassAnnotationSceneWriter.ensureVisitMethodInvocationAnnotations: no bytecode offset found!");
+                "ClassAnnotationSceneWriter.ensureVisitMethodInvocationAnnotations:"
+                    + " no bytecode offset found!");
           }
         }
         int offset = entry.getKey().offset;

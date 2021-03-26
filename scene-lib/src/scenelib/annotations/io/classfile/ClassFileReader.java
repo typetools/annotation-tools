@@ -30,30 +30,25 @@ public class ClassFileReader {
   @Option("print progress messages")
   public static boolean verbose = false;
 
-  private static String linesep = System.getProperty("line.separator");
+  private static String linesep = System.lineSeparator();
 
   static String usage =
-      "extract-annotations [options] class1 class2 ..."
-          + linesep
-          + "Each argument is a class a.b.C (that is on the classpath) or a class file"
-          + linesep
-          + "a/b/C.class.  Extracts the annotations from each such argument and prints"
-          + linesep
-          + "them in index-file format to a.b.C.jaif .  Arguments beginning with a"
-          + linesep
-          + "single '@' are interpreted as argument files to be read and expanded into"
-          + linesep
-          + "the command line.  A few options are available only when invoked via the"
-          + linesep
-          + "script extract-annotations, not when invoked as a Java program:"
-          + linesep
-          + "  --debug-script                       - make the extract-annotations script output debugging information"
-          + linesep
-          + "  -cp <classpath>                      - use the given classpath instead of the CLASSPATH environment variable"
-          + linesep
-          + "  -classpath <classpath>               - use the given classpath instead of the CLASSPATH environment variable"
-          + linesep
-          + "Options that are always available:";
+      String.join(
+          linesep,
+          "extract-annotations [options] class1 class2 ...",
+          "Each argument is a class a.b.C (that is on the classpath) or a class file",
+          "a/b/C.class.  Extracts the annotations from each such argument and prints",
+          "them in index-file format to a.b.C.jaif .  Arguments beginning with a",
+          "single '@' are interpreted as argument files to be read and expanded into",
+          "the command line.  A few options are available only when invoked via the",
+          "script extract-annotations, not when invoked as a Java program:",
+          "  --debug-script               - make the extract-annotations script output debugging"
+              + " information",
+          "  -cp <classpath>              - use the given classpath instead of the CLASSPATH"
+              + " environment variable",
+          "  -classpath <classpath>       - use the given classpath instead of the CLASSPATH"
+              + " environment variable",
+          "Options that are always available:");
 
   /**
    * From the command line, read annotations from a class file and write them to an index file. Also

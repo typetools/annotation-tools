@@ -227,7 +227,8 @@ public class AnnotationsTest {
       } catch (AnnotationVerifier.AnnotationMismatchException e) {
         String message =
             String.format(
-                "assertClassAnnotations (consider running javap on the two .class files):%n  correctClass %s%n  generatedClass %s%n%s",
+                "assertClassAnnotations (consider running javap on the two .class files):%n"
+                    + "  correctClass %s%n  generatedClass %s%n%s",
                 correctClass, generatedClass, e.toString());
         System.out.println();
         System.out.println(message);
@@ -301,7 +302,11 @@ public class AnnotationsTest {
       writeScene(fname2, generatedScene);
       Assert.fail(
           String.format(
-              "For annotations read from %s :%n  After writing to class file and re-reading, result differed.%n  Scene read from index file is in %s .%n  Scene generated from class file is in %s .%n  Also consider running javap -v on %s .%n",
+              "For annotations read from %s :%n"
+                  + "  After writing to class file and re-reading, result differed.%n"
+                  + "  Scene read from index file is in %s .%n"
+                  + "  Scene generated from class file is in %s .%n"
+                  + "  Also consider running javap -v on %s .%n",
               indexFileName, fname1, fname2, tempFile));
     }
 

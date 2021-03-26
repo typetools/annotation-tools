@@ -99,7 +99,8 @@ public final class InClassCriterion implements Criterion {
               cname = cname.substring(declaredPackage.length() + 1);
             } else {
               debug(
-                  "false[COMPILATION_UNIT; bad declaredPackage = %s] InClassCriterion.isSatisfiedBy:%n  cname=%s%n  tree=%s%n",
+                  "false[COMPILATION_UNIT; bad declaredPackage = %s]"
+                      + " InClassCriterion.isSatisfiedBy:%n  cname=%s%n  tree=%s%n",
                   declaredPackage, cname, tree);
               return false;
             }

@@ -668,7 +668,8 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
           && typeReference.getSort() != TypeReference.RESOURCE_VARIABLE) {
         if (start != null || end != null || index != null) {
           System.err.printf(
-              "Error: LOCAL_VARIABLE and RESOURCE_VARIABLE TypeReference with start = %s, end = %s, index = %s",
+              "Error: LOCAL_VARIABLE and RESOURCE_VARIABLE TypeReference"
+                  + " with start = %s, end = %s, index = %s",
               Arrays.toString(start), Arrays.toString(end), Arrays.toString(index));
         }
       }
