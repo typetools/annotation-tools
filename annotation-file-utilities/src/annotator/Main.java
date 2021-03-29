@@ -46,8 +46,8 @@ import org.plumelib.options.OptionGroup;
 import org.plumelib.options.Options;
 import org.plumelib.reflection.ReflectionPlume;
 import org.plumelib.util.FileIOException;
+import org.plumelib.util.FilesPlume;
 import org.plumelib.util.Pair;
-import org.plumelib.util.UtilPlume;
 import scenelib.annotations.Annotation;
 import scenelib.annotations.el.ABlock;
 import scenelib.annotations.el.AClass;
@@ -689,7 +689,7 @@ public class Main {
       // Get the source file, and use it to obtain parse trees.
       try {
         // fileLineSep is set here so that exceptions can be caught
-        fileLineSep = UtilPlume.inferLineSeparator(javafilename);
+        fileLineSep = FilesPlume.inferLineSeparator(javafilename);
         src = new Source(javafilename);
         verb.debug("Parsed %s%n", javafilename);
       } catch (Source.CompilerException e) {
