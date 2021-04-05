@@ -87,6 +87,10 @@ public final class BasicAFT extends ScalarAFT {
       return "\"" + charEscaper.escape((String) o) + "\"";
     } else if (type == long.class) {
       return o.toString() + "L";
+    } else if (type == double.class && Double.isNaN((double) o)) {
+      return "Double.NaN";
+    } else if (type == float.class && Float.isNaN((float) o)) {
+      return "Float.NaN";
     } else {
       return o.toString();
     }
