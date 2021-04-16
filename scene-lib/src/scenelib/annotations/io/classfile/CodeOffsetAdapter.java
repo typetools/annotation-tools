@@ -19,7 +19,7 @@ import scenelib.annotations.io.DebugWriter;
 public class CodeOffsetAdapter extends ClassVisitor {
 
   /** Writer for outputting debug information. */
-  static final DebugWriter debug;
+  static final DebugWriter debug = new DebugWriter(false);
 
   /** ClassReader for reading the class file. */
   final ClassReader classReader;
@@ -38,11 +38,6 @@ public class CodeOffsetAdapter extends ClassVisitor {
 
   /** Offset from start of bytecodes to previous instruction. */
   int previousOffset;
-
-  static {
-    debug = new DebugWriter();
-    debug.setEnabled(false);
-  }
 
   /**
    * Constructs a new CodeOffsetAdapter. For some reason, it is necessary to use ClassWriter to

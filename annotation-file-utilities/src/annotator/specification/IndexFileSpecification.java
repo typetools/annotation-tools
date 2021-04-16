@@ -129,6 +129,18 @@ public class IndexFileSpecification {
   }
 
   /**
+   * Prints to standard out, if the {@code debug} flag is set.
+   *
+   * @param format a format string
+   * @param args the format string arguments
+   */
+  private static void debug(String format, Object... args) {
+    if (debug) {
+      System.out.printf(format, args);
+    }
+  }
+
+  /**
    * Returns the current scene.
    *
    * @return the current scene
@@ -181,14 +193,14 @@ public class IndexFileSpecification {
     constructorInsertion = null; // 0 or 1 per class
     if (!noAsm) {
       //  load extra info using asm
-      debug("parseClass(" + className + ")");
+      debug("parseClass(%s)", className);
       try {
         ClassReader classReader = new ClassReader(className);
         ClassWriter classWriter = new ClassWriter(classReader, 0);
         MethodOffsetClassVisitor cv =
             new MethodOffsetClassVisitor(Opcodes.ASM7, classReader, classWriter);
         classReader.accept(cv, 0);
-        debug("Done reading " + className + ".class");
+        debug("Done reading %s.class", className);
       } catch (IOException e) {
         // If .class file not found, still proceed, in case
         // user only wants method signature annotations.
@@ -268,7 +280,7 @@ public class IndexFileSpecification {
       parseFieldInit(clist, className, entry.getKey(), entry.getValue());
     }
 
-    debug("parseClass(" + className + "):  done");
+    debug("parseClass(%s):  done", className);
   }
 
   /** Fill in this.insertions with insertion pairs. */
@@ -358,7 +370,7 @@ public class IndexFileSpecification {
     // Use at most one receiver and one cast insertion and add all of the
     // annotations to the one insertion.
     ReceiverInsertion receiver = null;
-    NewInsertion neu = null;
+    NewInsertion newI = null;
     CastInsertion cast = null;
     CloseParenthesisInsertion closeParen = null;
     List<Insertion> annotationInsertions = new ArrayList<>();
@@ -378,7 +390,7 @@ public class IndexFileSpecification {
         if (isOnReceiver(criteria)) {
           receiver = new ReceiverInsertion(new DeclaredType(), criteria, innerTypeInsertions);
         } else if (isOnNew(criteria)) {
-          neu = new NewInsertion(new DeclaredType(), criteria, innerTypeInsertions);
+          newI = new NewInsertion(new DeclaredType(), criteria, innerTypeInsertions);
         }
       }
     }
@@ -401,15 +413,15 @@ public class IndexFileSpecification {
         }
         addInsertionSource(receiver, annotation);
       } else if (noTypePath(criteria) && isOnNew(criteria)) {
-        if (neu == null) {
+        if (newI == null) {
           DeclaredType type = new DeclaredType();
           type.addAnnotation(annotationString);
-          neu = new NewInsertion(type, criteria, innerTypeInsertions);
-          elementInsertions.add(neu);
+          newI = new NewInsertion(type, criteria, innerTypeInsertions);
+          elementInsertions.add(newI);
         } else {
-          neu.getType().addAnnotation(annotationString);
+          newI.getType().addAnnotation(annotationString);
         }
-        addInsertionSource(neu, annotation);
+        addInsertionSource(newI, annotation);
       } else if (element instanceof ATypeElementWithType) {
         if (cast == null) {
           Pair<CastInsertion, CloseParenthesisInsertion> insertions =
@@ -434,7 +446,7 @@ public class IndexFileSpecification {
         }
         Insertion ins =
             new AnnotationInsertion(annotationString, criteria, !isTypeAnnotationOnly, annotation);
-        debug("parsed: " + ins);
+        debug("parsed: %s", ins);
         if (!isCastInsertion) {
           // Annotations on compound types of a cast insertion will be
           // inserted directly on the cast insertion.
@@ -478,8 +490,8 @@ public class IndexFileSpecification {
     if (receiver != null) {
       this.insertions.add(receiver);
     }
-    if (neu != null) {
-      this.insertions.add(neu);
+    if (newI != null) {
+      this.insertions.add(newI);
     }
     if (cast != null) {
       this.insertions.add(cast);

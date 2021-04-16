@@ -2,6 +2,7 @@ package scenelib.type;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringJoiner;
 
 /**
  * A Java type with optional type parameters and inner type. For example:
@@ -150,5 +151,18 @@ public class DeclaredType extends Type {
       throw new IllegalStateException(
           "This method can't be called " + "since this DeclaredType is a wildcard.");
     }
+  }
+
+  @Override
+  public String toString() {
+    StringJoiner result = new StringJoiner(", ", "DeclaredType[", "]");
+    result.add("name=" + name);
+    if (!typeParameters.isEmpty()) {
+      result.add("typeParameters=" + typeParameters);
+    }
+    if (innerType != null) {
+      result.add("innerType=" + innerType);
+    }
+    return result.toString();
   }
 }
