@@ -483,10 +483,8 @@ task htmlValidate(type: Exec) {
     ]
 }
 
-task allTests(type: GradleBuild, group: 'Verification') {
-    description 'Run all tests.'
-    dependsOn('test', 'testExample', 'testAnnotator')
-}
+test.dependsOn testExample
+test.dependsOn testAnnotator
 
 javadoc {
     options.memberLevel = JavadocMemberLevel.PUBLIC
