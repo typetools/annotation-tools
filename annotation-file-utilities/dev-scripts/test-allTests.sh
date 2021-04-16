@@ -14,4 +14,4 @@ export AFU="${AFU:-$(cd annotation-file-utilities >/dev/null 2>&1 && pwd -P)}"
 export CHECKERFRAMEWORK="${CHECKERFRAMEWORK:-$(cd .. >/dev/null 2>&1 && pwd -P)/checker-framework}"
 export PATH=$AFU/scripts:$JAVA_HOME/bin:$PATH
 
-(cd "${AFU}" && ./gradlew build allTests)
+(cd "${AFU}" && ./gradlew build)
