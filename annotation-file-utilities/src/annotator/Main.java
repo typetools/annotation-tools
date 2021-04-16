@@ -170,7 +170,7 @@ public class Main {
 
   // Instead of doing insertions, create new JAIFs using AST paths
   //  extracted from existing JAIFs and source files they match
-  @Option("Convert JAIFs to AST Path format")
+  @Option("Convert JAIFs to AST Path format, but do no insertion into source")
   public static boolean convert_jaifs = false;
 
   @Option("-h Print usage information and exit")
