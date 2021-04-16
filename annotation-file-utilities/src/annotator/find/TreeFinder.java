@@ -1681,7 +1681,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
           "\tError: "
               + e.getMessage().replace(System.lineSeparator(), System.lineSeparator() + "\t\t"));
     }
-    if (dbug.or(stak).isEnabled()) {
+    if (dbug.isEnabled() || stak.isEnabled()) {
       e.printStackTrace();
     } else {
       System.err.println("\tRun with --print_error_stack to see the stack trace.");
