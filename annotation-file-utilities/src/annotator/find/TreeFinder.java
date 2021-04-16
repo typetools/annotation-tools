@@ -1258,7 +1258,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
           // looking for the declaration
           pos = dpf.scan(node, null);
           insertRecord = astRecord(node);
-          dbug.debug("pos = %s at declaration: %s%n", pos, node.getClass());
+          dbug.debug("pos=%s at declaration: %s%n", pos, node.getClass());
         }
       }
 
