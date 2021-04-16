@@ -1,0 +1,10 @@
+public class MethodLocalClass {
+  public void method() {
+    @A
+    class Local {
+      Object o = null;
+    @A
+public Local() { super(); }
+    }
+  }
+}
