@@ -185,7 +185,8 @@ public class Insertions implements Iterable<Insertion> {
   public Iterator<Insertion> iterator() {
     return new Iterator<Insertion>() {
       private Iterator<Map<String, Set<Insertion>>> miter = store.values().iterator();
-      // These two fields are initially empty, but are set the first time that hasNext is called.
+      // These two fields are initially empty iterators, but are set the first time that hasNext is
+      // called.
       private Iterator<Set<Insertion>> siter = Collections.<Set<Insertion>>emptySet().iterator();
       private Iterator<Insertion> iiter = Collections.<Insertion>emptySet().iterator();
 
