@@ -40,8 +40,21 @@ public class ConstructorInsertion extends TypedInsertion {
     } else {
       boolean commentAnnotation = comments && getBaseType().getName().isEmpty();
       String typeString = typeToString(type, commentAnnotation, true);
-      int dollarPos = typeString.lastIndexOf('$'); // FIXME: exclude '$' in source
-      typeString = typeString.substring(dollarPos + 1);
+      int dollarPos = typeString.lastIndexOf('$');
+      if (dollarPos != -1) {
+        typeString = typeString.substring(dollarPos + 1);
+        if (typeString.startsWith("1")) {
+          // HACK: A named class `Local` within a method is recorded in the classfile as
+          // Outer$1Local rather than as Outer$Local.
+          // This hack doesn't handle when there are multiple such named classes in different
+          // methods, nor when a nested class's name really starts with "1".  (I could do the latter
+          // by checking
+          //   String outerName = typeString.substring(0, dollarPos);
+          //   Class<?> outer = Class.forName(outerName);
+          //   Class<?>[] nested = outer.getClasses();
+          typeString = typeString.substring(1);
+        }
+      }
 
       for (Insertion i : declarationInsertions) {
         b.append(i.getText(commentAnnotation, abbreviate)).append(System.lineSeparator());
