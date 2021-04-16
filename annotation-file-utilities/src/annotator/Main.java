@@ -513,9 +513,8 @@ public class Main {
       System.err.println("(For non-argfile beginning with \"@\", use \"@@\" for initial \"@\".");
       System.err.println("Alternative for filenames: indicate directory, e.g. as './@file'.");
       System.err.println("Alternative for flags: use '=', as in '-o=@Deprecated'.)");
-      cl_args = null; // convince compiler that variables are initialized
-      file_args = null; // Eclipse compiler issue workaround
       System.exit(1);
+      throw new Error("Unreachable");
     }
 
     DebugWriter dbug = new DebugWriter();
