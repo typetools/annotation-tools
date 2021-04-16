@@ -517,13 +517,9 @@ public class Main {
       throw new Error("Unreachable");
     }
 
-    DebugWriter dbug = new DebugWriter();
-    DebugWriter verb = new DebugWriter();
-    DebugWriter both = dbug.or(verb);
-    dbug.setEnabled(debug);
-    verb.setEnabled(verbose);
+    DebugWriter dbug = new DebugWriter(debug);
+    DebugWriter verb = new DebugWriter(verbose);
     TreeFinder.warn.setEnabled(!nowarn);
-    TreeFinder.stak.setEnabled(print_error_stack);
     TreeFinder.dbug.setEnabled(debug);
     Criteria.dbug.setEnabled(debug);
 
@@ -598,7 +594,7 @@ public class Main {
             }
             insertionIndex.get(arg).putAll(spec.insertionSources());
           }
-          both.debug("Read %d annotations from %s%n", parsedSpec.size(), arg);
+          verb.debug("Read %d annotations from %s%n", parsedSpec.size(), arg);
           if (omit_annotation != null) {
             List<Insertion> filtered = new ArrayList<Insertion>(parsedSpec.size());
             for (Insertion insertion : parsedSpec) {
@@ -610,7 +606,7 @@ public class Main {
               }
             }
             parsedSpec = filtered;
-            both.debug("After filtering: %d annotations from %s%n", parsedSpec.size(), arg);
+            verb.debug("After filtering: %d annotations from %s%n", parsedSpec.size(), arg);
           }
           insertions.addAll(parsedSpec);
           annotationImports.putAll(spec.annotationImports());
@@ -746,11 +742,8 @@ public class Main {
         }
 
         // Apply the positions to the source file.
-        if (both.isEnabled()) {
-          System.err.printf(
-              "getPositions returned %d positions in tree for %s%n",
-              positions.size(), javafilename);
-        }
+        verb.debug(
+            "getPositions returned %d positions in tree for %s%n", positions.size(), javafilename);
 
         Set<Pair<Integer, ASTPath>> positionKeysUnsorted = positions.keySet();
         Set<Pair<Integer, ASTPath>> positionKeysSorted =

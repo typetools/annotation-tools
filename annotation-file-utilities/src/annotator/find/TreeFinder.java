@@ -80,9 +80,10 @@ import scenelib.type.Type;
  * returns a mapping of source positions (as character offsets) to insertion text.
  */
 public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
-  public static final DebugWriter dbug = new DebugWriter();
-  public static final DebugWriter stak = new DebugWriter();
-  public static final DebugWriter warn = new DebugWriter();
+  /** Debugging logger. */
+  public static final DebugWriter dbug = new DebugWriter(false);
+  /** Warning logger. */
+  public static final DebugWriter warn = new DebugWriter(false);
 
   /**
    * String representation of regular expression matching a comment in Java code. The part before
@@ -1681,7 +1682,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
           "\tError: "
               + e.getMessage().replace(System.lineSeparator(), System.lineSeparator() + "\t\t"));
     }
-    if (dbug.or(stak).isEnabled()) {
+    if (dbug.isEnabled() || Main.print_error_stack) {
       e.printStackTrace();
     } else {
       System.err.println("\tRun with --print_error_stack to see the stack trace.");

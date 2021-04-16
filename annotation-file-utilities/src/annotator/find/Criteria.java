@@ -19,7 +19,8 @@ import scenelib.annotations.io.DebugWriter;
  * <p>This class also contains static factory methods for creating a {@code Criterion}.
  */
 public final class Criteria {
-  public static DebugWriter dbug = new DebugWriter();
+  /** Debugging logger. */
+  public static DebugWriter dbug = new DebugWriter(false);
 
   /** The set of criterion objects, indexed by kind. */
   private final Map<Criterion.Kind, Criterion> criteria;
