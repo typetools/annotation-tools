@@ -518,10 +518,8 @@ public class Main {
       System.exit(1);
     }
 
-    DebugWriter dbug = new DebugWriter();
-    DebugWriter verb = new DebugWriter();
-    dbug.setEnabled(debug);
-    verb.setEnabled(verbose);
+    DebugWriter dbug = new DebugWriter(debug);
+    DebugWriter verb = new DebugWriter(verbose);
     TreeFinder.warn.setEnabled(!nowarn);
     TreeFinder.stak.setEnabled(print_error_stack);
     TreeFinder.dbug.setEnabled(debug);

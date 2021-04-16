@@ -643,7 +643,7 @@ public class ASTPath extends ImmutableStack<ASTPath.ASTEntry>
   static class Matcher {
     // adapted from IndexFileParser.parseASTPath et al.
     // TODO: refactor switch statement into TreeVisitor?
-    public static final DebugWriter dbug = new DebugWriter();
+    public static final DebugWriter dbug = new DebugWriter(false);
     private ASTPath astPath;
 
     Matcher(ASTPath astPath) {
