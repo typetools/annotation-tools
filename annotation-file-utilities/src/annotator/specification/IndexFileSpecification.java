@@ -358,7 +358,7 @@ public class IndexFileSpecification {
     // Use at most one receiver and one cast insertion and add all of the
     // annotations to the one insertion.
     ReceiverInsertion receiver = null;
-    NewInsertion neu = null;
+    NewInsertion newI = null;
     CastInsertion cast = null;
     CloseParenthesisInsertion closeParen = null;
     List<Insertion> annotationInsertions = new ArrayList<>();
@@ -378,7 +378,7 @@ public class IndexFileSpecification {
         if (isOnReceiver(criteria)) {
           receiver = new ReceiverInsertion(new DeclaredType(), criteria, innerTypeInsertions);
         } else if (isOnNew(criteria)) {
-          neu = new NewInsertion(new DeclaredType(), criteria, innerTypeInsertions);
+          newI = new NewInsertion(new DeclaredType(), criteria, innerTypeInsertions);
         }
       }
     }
@@ -401,15 +401,15 @@ public class IndexFileSpecification {
         }
         addInsertionSource(receiver, annotation);
       } else if (noTypePath(criteria) && isOnNew(criteria)) {
-        if (neu == null) {
+        if (newI == null) {
           DeclaredType type = new DeclaredType();
           type.addAnnotation(annotationString);
-          neu = new NewInsertion(type, criteria, innerTypeInsertions);
-          elementInsertions.add(neu);
+          newI = new NewInsertion(type, criteria, innerTypeInsertions);
+          elementInsertions.add(newI);
         } else {
-          neu.getType().addAnnotation(annotationString);
+          newI.getType().addAnnotation(annotationString);
         }
-        addInsertionSource(neu, annotation);
+        addInsertionSource(newI, annotation);
       } else if (element instanceof ATypeElementWithType) {
         if (cast == null) {
           Pair<CastInsertion, CloseParenthesisInsertion> insertions =
@@ -478,8 +478,8 @@ public class IndexFileSpecification {
     if (receiver != null) {
       this.insertions.add(receiver);
     }
-    if (neu != null) {
-      this.insertions.add(neu);
+    if (newI != null) {
+      this.insertions.add(newI);
     }
     if (cast != null) {
       this.insertions.add(cast);
