@@ -521,7 +521,6 @@ public class Main {
     DebugWriter dbug = new DebugWriter(debug);
     DebugWriter verb = new DebugWriter(verbose);
     TreeFinder.warn.setEnabled(!nowarn);
-    TreeFinder.stak.setEnabled(print_error_stack);
     TreeFinder.dbug.setEnabled(debug);
     Criteria.dbug.setEnabled(debug);
 

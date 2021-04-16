@@ -2,6 +2,10 @@ package scenelib.annotations.io;
 
 import java.io.PrintWriter;
 
+/**
+ * Performs output to System.out. Has a flag {@code enabled} that controls whether output is
+ * performed.
+ */
 public class DebugWriter {
   /** A PrintWriter for System.out. */
   private PrintWriter out = new PrintWriter(System.out);
