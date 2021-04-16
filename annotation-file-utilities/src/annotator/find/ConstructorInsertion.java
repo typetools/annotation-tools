@@ -105,4 +105,9 @@ public class ConstructorInsertion extends TypedInsertion {
       insertion.setInserted(false);
     }
   }
+
+  @Override
+  public String toString() {
+    return "\"" + getText() + "\" " + super.toString();
+  }
 }
