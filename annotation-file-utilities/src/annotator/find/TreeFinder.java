@@ -1017,8 +1017,8 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       Insertion i = it.next();
       dbug.debug("Considering insertion at tree:%n");
       dbug.debug("  Insertion: %s%n", i);
-      dbug.debug("  First line of node: %s%n", Main.firstLine(node.toString()));
-      dbug.debug("  Type of node: %s%n", node.getClass());
+      dbug.debug("  At tree: %s%n", Main.firstLine(node.toString()));
+      dbug.debug("  Tree info: %s %s%n", node.getClass(), System.identityHashCode(node));
       if (i.isInserted()) {
         // Skip this insertion if it has already been inserted. See
         // the ReceiverInsertion class for details.
@@ -1032,7 +1032,8 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       } else {
         dbug.debug("  ... satisfied!%n");
         dbug.debug("    First line of node: %s%n", Main.firstLine(node.toString()));
-        dbug.debug("    Type of node: %s%n", node.getClass());
+        dbug.debug("  At tree: %s%n", Main.firstLine(node.toString()));
+        dbug.debug("  Tree info: %s %s%n", node.getClass(), System.identityHashCode(node));
 
         ASTPath astPath = i.getCriteria().getASTPath();
         dbug.debug(
