@@ -40,8 +40,8 @@ public class ConstructorInsertion extends TypedInsertion {
     } else {
       boolean commentAnnotation = comments && getBaseType().getName().isEmpty();
       String typeString = typeToString(type, commentAnnotation, true);
-      int ix = typeString.lastIndexOf('$'); // FIXME: exclude '$' in source
-      typeString = typeString.substring(ix + 1);
+      int dollarPos = typeString.lastIndexOf('$'); // FIXME: exclude '$' in source
+      typeString = typeString.substring(dollarPos + 1);
 
       for (Insertion i : declarationInsertions) {
         b.append(i.getText(commentAnnotation, abbreviate)).append(System.lineSeparator());
