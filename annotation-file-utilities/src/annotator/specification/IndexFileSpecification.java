@@ -129,6 +129,18 @@ public class IndexFileSpecification {
   }
 
   /**
+   * Prints to standard out, if the {@code debug} flag is set.
+   *
+   * @param format a format string
+   * @param args the format string arguments
+   */
+  private static void debug(String format, Object... args) {
+    if (debug) {
+      System.out.printf(format, args);
+    }
+  }
+
+  /**
    * Returns the current scene.
    *
    * @return the current scene
@@ -181,14 +193,14 @@ public class IndexFileSpecification {
     constructorInsertion = null; // 0 or 1 per class
     if (!noAsm) {
       //  load extra info using asm
-      debug("parseClass(" + className + ")");
+      debug("parseClass(%s)", className);
       try {
         ClassReader classReader = new ClassReader(className);
         ClassWriter classWriter = new ClassWriter(classReader, 0);
         MethodOffsetClassVisitor cv =
             new MethodOffsetClassVisitor(Opcodes.ASM7, classReader, classWriter);
         classReader.accept(cv, 0);
-        debug("Done reading " + className + ".class");
+        debug("Done reading %s.class", className);
       } catch (IOException e) {
         // If .class file not found, still proceed, in case
         // user only wants method signature annotations.
@@ -268,7 +280,7 @@ public class IndexFileSpecification {
       parseFieldInit(clist, className, entry.getKey(), entry.getValue());
     }
 
-    debug("parseClass(" + className + "):  done");
+    debug("parseClass(%s):  done", className);
   }
 
   /** Fill in this.insertions with insertion pairs. */
@@ -434,7 +446,7 @@ public class IndexFileSpecification {
         }
         Insertion ins =
             new AnnotationInsertion(annotationString, criteria, !isTypeAnnotationOnly, annotation);
-        debug("parsed: " + ins);
+        debug("parsed: %s", ins);
         if (!isCastInsertion) {
           // Annotations on compound types of a cast insertion will be
           // inserted directly on the cast insertion.
