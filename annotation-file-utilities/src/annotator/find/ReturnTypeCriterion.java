@@ -19,9 +19,8 @@ public class ReturnTypeCriterion implements Criterion {
   /**
    * Creates a new ReturnTypeCriterion.
    *
+   * @param className matches the containing class
    * @param methodName the method name
-   * @param inClassCriterion matches the containing class
-   * @param sigMethodCriterion matches the method's signature
    */
   public ReturnTypeCriterion(@ClassGetName String className, String methodName) {
     this.methodName = methodName;

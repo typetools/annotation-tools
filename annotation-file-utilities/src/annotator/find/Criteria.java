@@ -455,7 +455,7 @@ public final class Criteria {
   /**
    * Returns a ReturnTypeCriterion.
    *
-   * @param methodName the class name
+   * @param className the class name
    * @param methodName the method name
    * @return a new ReturnTypeCriterion
    */
