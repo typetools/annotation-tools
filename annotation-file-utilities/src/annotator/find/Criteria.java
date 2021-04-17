@@ -5,6 +5,7 @@ import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.objectweb.asm.TypePath;
 import scenelib.annotations.el.BoundLocation;
 import scenelib.annotations.el.LocalLocation;
@@ -230,14 +231,20 @@ public final class Criteria {
    *
    * @return class name from {@link InClassCriterion}, or null if none present
    */
-  public String getClassName() {
+  public @Nullable String getClassName() {
+    String result = null;
     for (Criterion c : criteria.values()) {
       if (c.getKind() == Criterion.Kind.IN_CLASS) {
-        return ((InClassCriterion) c).className;
+        if (result == null) {
+          result = ((InClassCriterion) c).className;
+        } else {
+          throw new Error(
+              String.format("In two classes: %s %s", result, ((InClassCriterion) c).className));
+        }
       }
     }
 
-    return null;
+    return result;
   }
 
   /**
