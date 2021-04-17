@@ -49,7 +49,7 @@ import scenelib.annotations.util.coll.VivifyingMap;
 import scenelib.type.DeclaredType;
 import scenelib.type.Type;
 
-/** Represents the annotations in an index file (.jaif file). */
+/** Represents the annotations in an index file (a .jaif file). */
 public class IndexFileSpecification {
   /** Insertion sources. */
   private final Multimap<Insertion, Annotation> insertionSources =
