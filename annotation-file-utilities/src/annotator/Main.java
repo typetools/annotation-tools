@@ -180,7 +180,7 @@ public class Main {
 
   @OptionGroup("Debugging options")
   @Option("-v Verbose (print progress information)")
-  public static boolean verbose;
+  public static boolean verbose = false;
 
   @Option("Debug (print debug information)")
   public static boolean debug = false;
