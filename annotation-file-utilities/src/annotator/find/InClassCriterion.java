@@ -35,9 +35,9 @@ public final class InClassCriterion implements Criterion {
   private final boolean exactMatch;
 
   /**
-   * The argument is a fully-qualified class name.
+   * Creates a new InClassCriterion.
    *
-   * @param className the class name public final @ClassGetName String ;
+   * @param className the class name
    * @param exactMatch if true, require an exact match
    */
   public InClassCriterion(String className, boolean exactMatch) {
