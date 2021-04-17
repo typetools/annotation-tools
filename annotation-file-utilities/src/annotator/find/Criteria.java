@@ -233,13 +233,19 @@ public final class Criteria {
    * @return class name from {@link InClassCriterion}, or null if none present
    */
   public @Nullable @ClassGetName String getClassName() {
+    String result = null;
     for (Criterion c : criteria.values()) {
       if (c.getKind() == Criterion.Kind.IN_CLASS) {
-        return ((InClassCriterion) c).className;
+        if (result == null) {
+          result = ((InClassCriterion) c).className;
+        } else {
+          throw new Error(
+              String.format("In two classes: %s %s", result, ((InClassCriterion) c).className));
+        }
       }
     }
 
-    return null;
+    return result;
   }
 
   /**
