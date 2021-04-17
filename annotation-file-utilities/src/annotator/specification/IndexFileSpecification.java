@@ -280,7 +280,7 @@ public class IndexFileSpecification {
       parseFieldInit(clist, className, entry.getKey(), entry.getValue());
     }
 
-    debug("parseClass(%s):  done", className);
+    debug("parseClass(%s):  done%n", className);
   }
 
   /** Fill in this.insertions with insertion pairs. */
@@ -367,6 +367,16 @@ public class IndexFileSpecification {
       AElement element,
       List<Insertion> innerTypeInsertions,
       boolean isCastInsertion) {
+    // if (debug) {
+    //   String elementToString = element.toString();
+    //   if (elementToString.length() > 23) {
+    //     elementToString = elementToString.substring(0, 20) + "...";
+    //   }
+    //   debug(
+    //       "entering parseElement(..., \"%s\", %s, %s)%n",
+    //       elementToString, innerTypeInsertions, isCastInsertion);
+    // }
+
     // Use at most one receiver and one cast insertion and add all of the
     // annotations to the one insertion.
     ReceiverInsertion receiver = null;
@@ -446,7 +456,7 @@ public class IndexFileSpecification {
         }
         Insertion ins =
             new AnnotationInsertion(annotationString, criteria, !isTypeAnnotationOnly, annotation);
-        debug("parsed: %s", ins);
+        debug("parsed: %s%n", ins);
         if (!isCastInsertion) {
           // Annotations on compound types of a cast insertion will be
           // inserted directly on the cast insertion.
@@ -456,6 +466,15 @@ public class IndexFileSpecification {
         annotationInsertions.add(ins);
         addInsertionSource(ins, annotation);
       }
+      // if (debug) {
+      //   if (!(annotationInsertions.isEmpty() && elementInsertions.isEmpty())) {
+      //     debug(
+      //         "About to call this.insertions.addAll(elementInsertions):%n"
+      //             + "  elementInsertions = %s%n"
+      //             + "  annotationInsertions = %s%n",
+      //         elementInsertions, annotationInsertions);
+      //   }
+      // }
       this.insertions.addAll(elementInsertions);
 
       // exclude expression annotations
@@ -465,6 +484,9 @@ public class IndexFileSpecification {
           constructorInsertion =
               new ConstructorInsertion(type, criteria, new ArrayList<Insertion>());
           this.insertions.add(constructorInsertion);
+          // debug(
+          //     "Added constructorInsertion to this.insertions, which is now %s%n",
+          //     Insertion.listToString(this.insertions));
         } else {
           if (annotator.Main.temporaryDebug) {
             System.out.printf(
@@ -482,6 +504,7 @@ public class IndexFileSpecification {
             constructorInsertion.addDeclarationInsertion(i);
           } else {
             annotationInsertions.add(i);
+            // debug("Added to annotationInsertions: %s%n", i);
           }
         }
       }
