@@ -26,12 +26,20 @@ import javax.lang.model.element.Name;
 /** Represents the criterion that a program element is in a class with a particular name. */
 public final class InClassCriterion implements Criterion {
 
+  /** If true, print diagnostic information. */
   static boolean debug = false;
 
+  /** The class name. */
   public final String className;
+  /** If true, require an exact match. */
   private final boolean exactMatch;
 
-  /** The argument is a fully-qualified class name. */
+  /**
+   * The argument is a fully-qualified class name.
+   *
+   * @param className the class name public final @ClassGetName String ;
+   * @param exactMatch if true, require an exact match
+   */
   public InClassCriterion(String className, boolean exactMatch) {
     this.className = className;
     this.exactMatch = exactMatch;
