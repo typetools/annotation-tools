@@ -107,7 +107,7 @@ jobs:
 - job: misc_jdk8
   pool:
     vmImage: 'ubuntu-latest'
-  container: mdernst/cf-ubuntu-jdk11-plus:latest
+  container: mdernst/cf-ubuntu-jdk8-plus:latest
   dependsOn:
     - like_travis_build_without_test_jdk11
     - ant_test_jdk11
