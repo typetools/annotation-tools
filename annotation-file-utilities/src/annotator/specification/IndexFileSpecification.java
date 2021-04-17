@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import org.checkerframework.checker.signature.qual.ClassGetName;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
@@ -161,8 +162,9 @@ public class IndexFileSpecification {
       parsePackage(clist, entry.getKey(), entry.getValue());
     }
 
-    VivifyingMap<String, AClass> classes = scene.classes;
-    for (Map.Entry<String, AClass> entry : classes.entrySet()) {
+    @SuppressWarnings("signature:assignment.type.incompatible") // scene-lib is not fully annotated
+    VivifyingMap<@ClassGetName String, AClass> classes = scene.classes;
+    for (Map.Entry<@ClassGetName String, AClass> entry : classes.entrySet()) {
       String key = entry.getKey();
       AClass clazz = entry.getValue();
       if (key.endsWith(".package-info")) {
@@ -189,7 +191,7 @@ public class IndexFileSpecification {
    * @param className fully qualified name of class to be parsed
    * @param clazz where to store the class information
    */
-  private void parseClass(CriterionList clist, String className, AClass clazz) {
+  private void parseClass(CriterionList clist, @ClassGetName String className, AClass clazz) {
     constructorInsertion = null; // 0 or 1 per class
     if (!noAsm) {
       //  load extra info using asm
@@ -639,8 +641,16 @@ public class IndexFileSpecification {
     return fieldType.format(a.fieldValues.get(field));
   }
 
+  /**
+   * Parses a method and fills in this.insertions.
+   *
+   * @param clist a criterion for the class containing the method being parsed
+   * @param className the name of the containing class
+   * @param methodName the name of the method
+   * @param method the method's annotations (in scene-lib format)
+   */
   private void parseMethod(
-      CriterionList clist, String className, String methodName, AMethod method) {
+      CriterionList clist, @ClassGetName String className, String methodName, AMethod method) {
     // Being "in" a method refers to being somewhere in the
     // method's tree, which includes return types, parameters, receiver, and
     // elements inside the method body.

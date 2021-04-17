@@ -4,14 +4,26 @@ import annotator.Main;
 import annotator.scanner.CommonScanner;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
+import org.checkerframework.checker.signature.qual.ClassGetName;
 
+/** Matches a return type. */
 public class ReturnTypeCriterion implements Criterion {
 
+  /** The method name. */
   private final String methodName;
+  /** Matches the containing class. */
   private final Criterion inClassCriterion;
+  /** Matches the method's signature. */
   private final Criterion sigMethodCriterion;
 
-  public ReturnTypeCriterion(String className, String methodName) {
+  /**
+   * Creates a new ReturnTypeCriterion.
+   *
+   * @param methodName the method name
+   * @param inClassCriterion matches the containing class
+   * @param sigMethodCriterion matches the method's signature
+   */
+  public ReturnTypeCriterion(@ClassGetName String className, String methodName) {
     this.methodName = methodName;
     this.inClassCriterion = Criteria.inClass(className, false);
     this.sigMethodCriterion = methodName.isEmpty() ? null : Criteria.isSigMethod(methodName);
