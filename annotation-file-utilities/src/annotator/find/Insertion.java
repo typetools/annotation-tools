@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 import org.objectweb.asm.TypePath;
 import org.plumelib.util.Pair;
+import org.plumelib.util.StringsPlume;
 import scenelib.annotations.el.TypePathEntry;
 import scenelib.annotations.io.ASTPath;
 import scenelib.type.ArrayType;
@@ -215,7 +216,24 @@ public abstract class Insertion {
 
   @Override
   public String toString() {
+    return getClass().getSimpleName() + " " + toStringWithoutClass();
+  }
+
+  public String toStringWithoutClass() {
     return String.format("(nl=%b) @ %s", separateLine, criteria);
+  }
+
+  public static String listToString(List<? extends Insertion> list) {
+    if (list.isEmpty()) {
+      return "[]";
+    } else {
+      return "["
+          + System.lineSeparator()
+          + "  "
+          + StringsPlume.join(System.lineSeparator() + "  ", list)
+          + System.lineSeparator()
+          + "]";
+    }
   }
 
   /**

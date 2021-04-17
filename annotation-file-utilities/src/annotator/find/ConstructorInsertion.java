@@ -108,6 +108,6 @@ public class ConstructorInsertion extends TypedInsertion {
 
   @Override
   public String toString() {
-    return "\"" + getText() + "\" " + super.toString();
+    return "\"" + getText().replace(System.lineSeparator(), " ") + "\" " + super.toString();
   }
 }
