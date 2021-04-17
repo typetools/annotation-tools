@@ -195,6 +195,7 @@ public class AnnotationInsertion extends Insertion {
     return Kind.ANNOTATION;
   }
 
+  @Override
   public String toString() {
     return fullyQualifiedAnnotationText + " " + super.toStringWithoutClass();
   }
