@@ -40,7 +40,7 @@ else
 fi
 
 if [[ "${GROUP}" == "test" || "${GROUP}" == "all" ]]; then
-  (cd annotation-file-utilities && ./gradlew allTests)
+  (cd annotation-file-utilities && ./gradlew build)
 fi
 
 if [[ "${GROUP}" == "typecheck" || "${GROUP}" == "all" ]]; then

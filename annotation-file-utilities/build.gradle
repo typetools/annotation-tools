@@ -184,7 +184,7 @@ test {
 task testExample(dependsOn: compileTestJava, group: 'Verification') {
     description 'Run the scene-lib example test.'
     doLast {
-        String testDir = '../scene-lib/test/annotations/tests/executable/'
+        String testDir = "${projectDir}/../scene-lib/test/annotations/tests/executable/"
         javaexec {
             classpath = files(sourceSets.test.java.outputDir)
             classpath += sourceSets.test.compileClasspath
@@ -213,7 +213,7 @@ task testExample(dependsOn: compileTestJava, group: 'Verification') {
 task cleanTestExample {
     description 'Clean the scene-lib example test.'
     doLast {
-        String testDir = '../scene-lib/test/annotations/tests/executable/'
+        String testDir = "${projectDir}/../scene-lib/test/annotations/tests/executable/"
         delete "${testDir}/example-output.jaif"
         delete "${testDir}/example-stdout.jaif"
     }
@@ -483,10 +483,8 @@ task htmlValidate(type: Exec) {
     ]
 }
 
-task allTests(type: GradleBuild, group: 'Verification') {
-    description 'Run all tests.'
-    dependsOn('test', 'testExample', 'testAnnotator')
-}
+test.dependsOn testExample
+test.dependsOn testAnnotator
 
 javadoc {
     options.memberLevel = JavadocMemberLevel.PUBLIC
