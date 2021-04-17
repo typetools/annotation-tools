@@ -219,10 +219,21 @@ public abstract class Insertion {
     return getClass().getSimpleName() + " " + toStringWithoutClass();
   }
 
+  /**
+   * Format this without reporting its class name.
+   *
+   * @return a representation of this, without its class name
+   */
   public String toStringWithoutClass() {
     return String.format("(nl=%b) @ %s", separateLine, criteria);
   }
 
+  /**
+   * Format a list of insertions, with one insertion on each line.
+   *
+   * @param list a list of insertions
+   * @return a multi-line string representation of the list
+   */
   public static String listToString(List<? extends Insertion> list) {
     if (list.isEmpty()) {
       return "[]";
