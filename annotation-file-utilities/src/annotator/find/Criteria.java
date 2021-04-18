@@ -6,6 +6,7 @@ import com.sun.source.util.TreePath;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.signature.qual.ClassGetName;
 import org.objectweb.asm.TypePath;
 import scenelib.annotations.el.BoundLocation;
 import scenelib.annotations.el.LocalLocation;
@@ -231,7 +232,7 @@ public final class Criteria {
    *
    * @return class name from {@link InClassCriterion}, or null if none present
    */
-  public @Nullable String getClassName() {
+  public @Nullable @ClassGetName String getClassName() {
     String result = null;
     for (Criterion c : criteria.values()) {
       if (c.getKind() == Criterion.Kind.IN_CLASS) {
@@ -391,7 +392,7 @@ public final class Criteria {
    * @param exact whether to match only in the class itself, not in its inner classes
    * @return an "in class" criterion
    */
-  public static final Criterion inClass(String name, boolean exact) {
+  public static final Criterion inClass(@ClassGetName String name, boolean exact) {
     return new InClassCriterion(name, /*exactmatch=*/ true);
   }
 
@@ -457,7 +458,14 @@ public final class Criteria {
     return new ReceiverCriterion(methodName);
   }
 
-  public static final Criterion returnType(String className, String methodName) {
+  /**
+   * Returns a ReturnTypeCriterion.
+   *
+   * @param className the class name
+   * @param methodName the method name
+   * @return a new ReturnTypeCriterion
+   */
+  public static final Criterion returnType(@ClassGetName String className, String methodName) {
     return new ReturnTypeCriterion(className, methodName);
   }
 

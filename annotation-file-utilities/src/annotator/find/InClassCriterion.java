@@ -11,6 +11,7 @@ import com.sun.source.util.TreePath;
 import java.util.*;
 import java.util.regex.*;
 import javax.lang.model.element.Name;
+import org.checkerframework.checker.signature.qual.ClassGetName;
 
 // If there are dollar signs in a name, then there are two
 // possibilities regarding how the dollar sign got there.
@@ -30,7 +31,7 @@ public final class InClassCriterion implements Criterion {
   static boolean debug = false;
 
   /** The class name. */
-  public final String className;
+  public final @ClassGetName String className;
   /** If true, require an exact match. */
   private final boolean exactMatch;
 
@@ -40,7 +41,7 @@ public final class InClassCriterion implements Criterion {
    * @param className the class name
    * @param exactMatch if true, require an exact match
    */
-  public InClassCriterion(String className, boolean exactMatch) {
+  public InClassCriterion(@ClassGetName String className, boolean exactMatch) {
     this.className = className;
     this.exactMatch = exactMatch;
   }
