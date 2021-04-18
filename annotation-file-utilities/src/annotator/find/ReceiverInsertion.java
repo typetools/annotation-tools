@@ -21,11 +21,11 @@ public class ReceiverInsertion extends TypedInsertion {
    * Construct a ReceiverInsertion.
    *
    * <p>If the receiver parameter already exists in the method declaration, then pass a DeclaredType
-   * thats name is the empty String. This will only insert an annotation on the existing receiver.
+   * whose name is the empty String. This will only insert an annotation on the existing receiver.
    *
-   * <p>To insert the annotation and the receiver (for example, {@code @Anno Type this}) the name
-   * should be set to the type to insert. This can either be done before calling this constructor,
-   * or by modifying the return value of {@link #getType()}.
+   * <p>To insert the annotation and the receiver (for example, {@code @Anno Type this}) the
+   * DeclaredType's name should be set to the type to insert. This can either be done before calling
+   * this constructor, or by modifying the return value of {@link #getType()}.
    *
    * <p>A comma will not be added to the end of the receiver. In the case that there is a parameter
    * following the inserted receiver pass {@code true} to {@link #setAddComma(boolean)} to add a

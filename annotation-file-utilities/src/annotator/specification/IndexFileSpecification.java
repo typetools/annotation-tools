@@ -50,11 +50,14 @@ import scenelib.annotations.util.coll.VivifyingMap;
 import scenelib.type.DeclaredType;
 import scenelib.type.Type;
 
+/** Represents the annotations in an index file (a .jaif file). */
 public class IndexFileSpecification {
+  /** Insertion sources. */
   private final Multimap<Insertion, Annotation> insertionSources =
       LinkedHashMultimap.<Insertion, Annotation>create();
+  /** The state of this object. */
   private final List<Insertion> insertions = new ArrayList<>();
-  /** Is a member of insertions (if non-null). */
+  /** An insertion for the default constructor, or null. Is a member of insertions if non-null. */
   private ConstructorInsertion constructorInsertion = null;
 
   private final AScene scene;
@@ -319,7 +322,8 @@ public class IndexFileSpecification {
   }
 
   /**
-   * Fill in this.insertions with insertion pairs.
+   * Fills in this.insertions with insertion pairs, and returns the ones that are
+   * AnnotationInsertions.
    *
    * @param clist the criteria specifying the location of the insertions
    * @param element holds the annotations to be inserted
@@ -330,7 +334,8 @@ public class IndexFileSpecification {
   }
 
   /**
-   * Fill in this.insertions with insertion pairs.
+   * Fills in this.insertions with insertion pairs, and returns the ones that are
+   * AnnotationInsertions.
    *
    * @param clist the criteria specifying the location of the insertions
    * @param element holds the annotations to be inserted
@@ -343,7 +348,8 @@ public class IndexFileSpecification {
   }
 
   /**
-   * Fill in this.insertions with insertion pairs.
+   * Fills in this.insertions with insertion pairs, and returns the ones that are
+   * AnnotationInsertions.
    *
    * @param clist the criteria specifying the location of the insertions
    * @param element holds the annotations to be inserted
@@ -355,7 +361,8 @@ public class IndexFileSpecification {
   }
 
   /**
-   * Fill in this.insertions with insertion pairs.
+   * Fills in this.insertions with insertion pairs, and returns the ones that are
+   * AnnotationInsertions.
    *
    * @param clist the criteria specifying the location of the insertions
    * @param element holds the annotations to be inserted
