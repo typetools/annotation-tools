@@ -1,6 +1,7 @@
 package annotator.find;
 
 import com.sun.source.tree.Tree;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -231,10 +232,10 @@ public abstract class Insertion {
   /**
    * Format a list of insertions, with one insertion on each line.
    *
-   * @param list a list of insertions
+   * @param list a collection of insertions
    * @return a multi-line string representation of the list
    */
-  public static String listToString(List<? extends Insertion> list) {
+  public static String collectionToString(Collection<? extends Insertion> list) {
     if (list.isEmpty()) {
       return "[]";
     } else {
