@@ -1,5 +1,6 @@
 package annotator.specification;
 
+import annotator.Main;
 import annotator.find.AnnotationInsertion;
 import annotator.find.CastInsertion;
 import annotator.find.CloseParenthesisInsertion;
@@ -484,10 +485,21 @@ public class IndexFileSpecification {
       //         elementInsertions, annotationInsertions);
       //   }
       // }
+      // If an insertion will be on an inserted constructor, it will be removed later.
       this.insertions.addAll(elementInsertions);
 
-      // exclude expression annotations
-      if (noTypePath(criteria) && isOnNullaryConstructor(criteria)) {
+      if (debug) {
+        if (!this.insertions.isEmpty()) {
+          debug(
+              "now this.insertions (size %d) = %s%n",
+              insertions.size(), Insertion.collectionToString(insertions));
+        }
+      }
+
+      // Handle elementInsertions.
+
+      if (noTypePath(criteria) && isOnImplicitDefaultConstructor(criteria)) {
+
         if (constructorInsertion == null) {
           DeclaredType type = new DeclaredType(criteria.getClassName());
           constructorInsertion =
@@ -507,10 +519,12 @@ public class IndexFileSpecification {
         for (Insertion i : elementInsertions) {
           if (i.getKind() == Insertion.Kind.RECEIVER) {
             constructorInsertion.addReceiverInsertion((ReceiverInsertion) i);
+            this.insertions.remove(i);
           } else if (criteria.isOnReturnType()) {
             ((DeclaredType) constructorInsertion.getType()).addAnnotation(annotationString);
           } else if (!isTypeAnnotationOnly) {
             constructorInsertion.addDeclarationInsertion(i);
+            this.insertions.remove(i);
           } else {
             annotationInsertions.add(i);
             // debug("Added to annotationInsertions: %s%n", i);
@@ -532,6 +546,10 @@ public class IndexFileSpecification {
     if (constructorInsertion != null) {
       constructorInsertion.setInserted(false);
     }
+
+    // debug("Final this.insertions: %s%n", Insertion.collectionToString(this.insertions));
+    // debug("parseElement(...) => %s%n", Insertion.collectionToString(annotationInsertions));
+
     return annotationInsertions;
   }
 
@@ -576,6 +594,23 @@ public class IndexFileSpecification {
           && (entry.childSelectorIs(ASTPath.TYPE) || isOnReceiver(criteria));
     }
     return false;
+  }
+
+  /**
+   * Returns true if the Criteria is on an implicit default constructor. Such a constructor was not
+   * defined in source code. It is not considered synthetic, however; the isSynthetic() method
+   * returns false.
+   *
+   * @param criteria the Criteria
+   * @return true if the Criteria is on a synthethic constructor
+   */
+  private static boolean isOnImplicitDefaultConstructor(Criteria criteria) {
+    if (!criteria.isOnMethod("<init>()V")) {
+      return false;
+    }
+    String className = criteria.getClassName();
+    Boolean classHasExplicitConstructor = Main.hasExplicitConstructor.get(className);
+    return Boolean.FALSE.equals(classHasExplicitConstructor);
   }
 
   /**
@@ -628,6 +663,9 @@ public class IndexFileSpecification {
           clist.add(Criteria.atLocation(TypePathEntry.listToTypePath(innerLoc)));
       innerInsertions.addAll(parseElement(innerClist, innerElement, isCastInsertion));
     }
+    // if (!innerInsertions.isEmpty()) {
+    //   debug("parseInnerAndOuterElements: innerInsertions = %s%n", innerInsertions);
+    // }
     CriterionList outerClist = clist;
     if (!isCastInsertion) {
       // Cast insertion is never on an existing type.
