@@ -237,8 +237,7 @@ public class Insertions implements Iterable<Insertion> {
    * location does not always exist prior to the top-level type insertion.
    *
    * <p>This method attaches {@link scenelib.annotations.io.ASTPath}-based inner type {@link
-   * Insertion}s to a {@link TypedInsertion} on the outer type if one exists (see {@link
-   * #organizeTypedInsertions(CompilationUnitTree, String, Collection)}.
+   * Insertion}s to a {@link TypedInsertion} on the outer type if one exists.
    */
   private Set<Insertion> organizeTypedInsertions(
       CompilationUnitTree cut, String className, Collection<Insertion> insertions) {
