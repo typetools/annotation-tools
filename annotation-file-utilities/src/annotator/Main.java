@@ -692,17 +692,16 @@ public class Main {
         }
       }
 
+      Source src = fileToSource(javafilename);
+      if (src == null) {
+        return;
+      } else {
+        verb.debug("Parsed %s%n", javafilename);
+      }
       String fileLineSep;
-      Source src;
-      // Get the source file, and use it to obtain parse trees.
       try {
         // fileLineSep is set here so that exceptions can be caught
         fileLineSep = FilesPlume.inferLineSeparator(javafilename);
-        src = new Source(javafilename);
-        verb.debug("Parsed %s%n", javafilename);
-      } catch (Source.CompilerException e) {
-        e.printStackTrace();
-        return;
       } catch (IOException e) {
         e.printStackTrace();
         return;
@@ -1038,6 +1037,27 @@ public class Main {
         e.printStackTrace();
         System.exit(1);
       }
+    }
+  }
+
+  /**
+   * Given a Java file name, creates a Source, or returns null.
+   *
+   * @param javaFileName a Java file name
+   * @return a Source for the Java file, or null
+   */
+  private static Source fileToSource(String javafilename) {
+    Source src;
+    // Get the source file, and use it to obtain parse trees.
+    try {
+      src = new Source(javafilename);
+      return src;
+    } catch (Source.CompilerException e) {
+      e.printStackTrace();
+      return null;
+    } catch (IOException e) {
+      e.printStackTrace();
+      return null;
     }
   }
 
