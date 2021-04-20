@@ -26,7 +26,7 @@ public class LocalVariableScanner extends CommonScanner {
    * @return the index of the variable tree with respect to the given local variable name
    */
   public static int indexOfVarTree(TreePath origpath, Tree varTree, String varName) {
-    TreePath path = findCountingContext(origpath);
+    TreePath path = TreePathUtil.findCountingContext(origpath);
     if (path == null) {
       return -1;
     }

@@ -1,7 +1,7 @@
 package annotator.find;
 
 import annotator.Main;
-import annotator.scanner.CommonScanner;
+import annotator.scanner.TreePathUtil;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
 import org.checkerframework.checker.signature.qual.ClassGetName;
@@ -52,7 +52,7 @@ public class ReturnTypeCriterion implements Criterion {
           // Method and return type verified; now check class.
           path = path.getParentPath();
           while (path != null && path.getLeaf() != null) {
-            if (CommonScanner.hasClassKind(path.getLeaf())) {
+            if (TreePathUtil.hasClassKind(path.getLeaf())) {
               if (!inClassCriterion.isSatisfiedBy(path)) {
                 break;
               }

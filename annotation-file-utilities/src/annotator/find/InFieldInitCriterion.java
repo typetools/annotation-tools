@@ -1,6 +1,6 @@
 package annotator.find;
 
-import annotator.scanner.CommonScanner;
+import annotator.scanner.TreePathUtil;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
 
@@ -27,7 +27,7 @@ public class InFieldInitCriterion implements Criterion {
   @Override
   public boolean isSatisfiedBy(TreePath path) {
     while (path != null) {
-      if (CommonScanner.isFieldInit(path)) {
+      if (TreePathUtil.isFieldInit(path)) {
         return varCriterion.isSatisfiedBy(path);
       }
       path = path.getParentPath();

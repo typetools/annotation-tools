@@ -1,7 +1,7 @@
 package annotator.find;
 
-import annotator.scanner.CommonScanner;
 import annotator.scanner.InitBlockScanner;
+import annotator.scanner.TreePathUtil;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
 
@@ -29,7 +29,7 @@ public class InInitBlockCriterion implements Criterion {
   @Override
   public boolean isSatisfiedBy(TreePath path) {
     while (path != null) {
-      if (CommonScanner.isInitBlock(path, isStatic)) {
+      if (TreePathUtil.isInitBlock(path, isStatic)) {
         int indexInSource = InitBlockScanner.indexOfInitTree(path, isStatic);
         return indexInSource == blockID;
       }

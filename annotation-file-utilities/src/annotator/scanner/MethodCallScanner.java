@@ -19,7 +19,7 @@ public class MethodCallScanner extends CommonScanner {
    * @return the index of the given method invocation tree
    */
   public static int indexOfMethodCallTree(TreePath origpath, Tree tree) {
-    TreePath path = findCountingContext(origpath);
+    TreePath path = TreePathUtil.findCountingContext(origpath);
     if (path == null) {
       return -1;
     }
