@@ -134,6 +134,11 @@ import scenelib.type.Type;
  */
 public class Main {
 
+  /** The system-specific file separator. */
+  private static String fileSep = System.getProperty("file.separator");
+
+  // Options
+
   /** Directory in which output files are written. */
   @OptionGroup("General options")
   @Option("-d <directory> Directory in which output files are written")
@@ -544,10 +549,25 @@ public class Main {
       System.exit(1);
     }
 
-    // The insertions specified by the annotation files.
-    Insertions insertions = new Insertions();
+    // The names of annotation files (.jaif files).
+    List<String> jaifFiles = new ArrayList<>();
     // The Java files into which to insert.
     List<String> javafiles = new ArrayList<>();
+
+    for (String arg : file_args) {
+      if (arg.endsWith(".java")) {
+        javafiles.add(arg);
+      } else if (arg.endsWith(".jaif") || arg.endsWith(".jann")) {
+        jaifFiles.add(arg);
+      } else {
+        System.out.println("Unrecognized file extension: " + arg);
+        System.exit(1);
+        throw new Error("unreachable");
+      }
+    }
+
+    // The insertions specified by the annotation files.
+    Insertions insertions = new Insertions();
 
     // Indices to maintain insertion source traces.
     Map<String, Multimap<Insertion, Annotation>> insertionIndex = new HashMap<>();
@@ -560,93 +580,87 @@ public class Main {
     Map<String, Set<String>> annotationImports = new HashMap<>();
 
     IndexFileParser.setAbbreviate(abbreviate);
-    for (String arg : file_args) {
-      if (arg.endsWith(".java")) {
-        javafiles.add(arg);
-      } else if (arg.endsWith(".jaif") || arg.endsWith(".jann")) {
-        IndexFileSpecification spec = new IndexFileSpecification(arg);
-        try {
-          List<Insertion> parsedSpec = spec.parse();
-          if (temporaryDebug) {
-            System.out.printf("parsedSpec (size %d):%n", parsedSpec.size());
-            for (Insertion insertion : parsedSpec) {
-              System.out.printf("  %s, isInserted=%s%n", insertion, insertion.isInserted());
-            }
+    for (String jaifFile : jaifFiles) {
+      IndexFileSpecification spec = new IndexFileSpecification(jaifFile);
+      try {
+        List<Insertion> parsedSpec = spec.parse();
+        if (temporaryDebug) {
+          System.out.printf("parsedSpec (size %d):%n", parsedSpec.size());
+          for (Insertion insertion : parsedSpec) {
+            System.out.printf("  %s, isInserted=%s%n", insertion, insertion.isInserted());
           }
-          AScene scene = spec.getScene();
-          Collections.sort(
-              parsedSpec,
-              new Comparator<Insertion>() {
-                @Override
-                public int compare(Insertion i1, Insertion i2) {
-                  ASTPath p1 = i1.getCriteria().getASTPath();
-                  ASTPath p2 = i2.getCriteria().getASTPath();
-                  return p1 == null ? p2 == null ? 0 : -1 : p2 == null ? 1 : p1.compareTo(p2);
-                }
-              });
-          if (convert_jaifs) {
-            scenes.put(arg, filteredScene(scene));
-            for (Insertion ins : parsedSpec) {
-              insertionOrigins.put(ins, arg);
-            }
-            if (!insertionIndex.containsKey(arg)) {
-              insertionIndex.put(arg, LinkedHashMultimap.<Insertion, Annotation>create());
-            }
-            insertionIndex.get(arg).putAll(spec.insertionSources());
-          }
-          verb.debug("Read %d annotations from %s%n", parsedSpec.size(), arg);
-          if (omit_annotation != null) {
-            List<Insertion> filtered = new ArrayList<Insertion>(parsedSpec.size());
-            for (Insertion insertion : parsedSpec) {
-              // TODO: this won't omit annotations if the insertion is more than
-              // just the annotation (such as if the insertion is a cast
-              // insertion or a 'this' parameter in a method declaration).
-              if (!omit_annotation.equals(insertion.getText())) {
-                filtered.add(insertion);
-              }
-            }
-            parsedSpec = filtered;
-            verb.debug("After filtering: %d annotations from %s%n", parsedSpec.size(), arg);
-          }
-          insertions.addAll(parsedSpec);
-          annotationImports.putAll(spec.annotationImports());
-        } catch (RuntimeException e) {
-          if (e.getCause() != null && e.getCause() instanceof FileNotFoundException) {
-            System.err.println("File not found: " + arg);
-            System.exit(1);
-          } else {
-            throw e;
-          }
-        } catch (FileIOException e) {
-          // Add 1 to the line number since line numbers in text editors are usually one-based.
-          System.err.println(
-              "Error while parsing annotation file "
-                  + arg
-                  + " at line "
-                  + (e.lineNumber + 1)
-                  + ":");
-          if (e.getMessage() != null) {
-            System.err.println("  " + e.getMessage());
-          }
-          if (e.getCause() != null && e.getCause().getMessage() != null) {
-            String causeMessage = e.getCause().getMessage();
-            System.err.println("  " + causeMessage);
-            if (causeMessage.startsWith("Could not load class: ")) {
-              System.err.println(
-                  "To fix the problem, add class "
-                      + causeMessage.substring(22)
-                      + " to the classpath.");
-              System.err.println("The classpath is:");
-              System.err.println(ReflectionPlume.classpathToString());
-            }
-          }
-          if (print_error_stack) {
-            e.printStackTrace();
-          }
-          System.exit(1);
         }
-      } else {
-        throw new Error("Unrecognized file extension: " + arg);
+        AScene scene = spec.getScene();
+        Collections.sort(
+            parsedSpec,
+            new Comparator<Insertion>() {
+              @Override
+              public int compare(Insertion i1, Insertion i2) {
+                ASTPath p1 = i1.getCriteria().getASTPath();
+                ASTPath p2 = i2.getCriteria().getASTPath();
+                return p1 == null ? p2 == null ? 0 : -1 : p2 == null ? 1 : p1.compareTo(p2);
+              }
+            });
+        if (convert_jaifs) {
+          scenes.put(jaifFile, filteredScene(scene));
+          for (Insertion ins : parsedSpec) {
+            insertionOrigins.put(ins, jaifFile);
+          }
+          if (!insertionIndex.containsKey(jaifFile)) {
+            insertionIndex.put(jaifFile, LinkedHashMultimap.<Insertion, Annotation>create());
+          }
+          insertionIndex.get(jaifFile).putAll(spec.insertionSources());
+        }
+        verb.debug("Read %d annotations from %s%n", parsedSpec.size(), jaifFile);
+        if (omit_annotation != null) {
+          List<Insertion> filtered = new ArrayList<Insertion>(parsedSpec.size());
+          for (Insertion insertion : parsedSpec) {
+            // TODO: this won't omit annotations if the insertion is more than
+            // just the annotation (such as if the insertion is a cast
+            // insertion or a 'this' parameter in a method declaration).
+            if (!omit_annotation.equals(insertion.getText())) {
+              filtered.add(insertion);
+            }
+          }
+          parsedSpec = filtered;
+          verb.debug("After filtering: %d annotations from %s%n", parsedSpec.size(), jaifFile);
+        }
+        insertions.addAll(parsedSpec);
+        annotationImports.putAll(spec.annotationImports());
+      } catch (RuntimeException e) {
+        if (e.getCause() != null && e.getCause() instanceof FileNotFoundException) {
+          System.err.println("File not found: " + jaifFile);
+          System.exit(1);
+        } else {
+          throw e;
+        }
+      } catch (FileIOException e) {
+        // Add 1 to the line number since line numbers in text editors are usually one-based.
+        System.err.println(
+            "Error while parsing annotation file "
+                + jaifFile
+                + " at line "
+                + (e.lineNumber + 1)
+                + ":");
+        if (e.getMessage() != null) {
+          System.err.println("  " + e.getMessage());
+        }
+        if (e.getCause() != null && e.getCause().getMessage() != null) {
+          String causeMessage = e.getCause().getMessage();
+          System.err.println("  " + causeMessage);
+          if (causeMessage.startsWith("Could not load class: ")) {
+            System.err.println(
+                "To fix the problem, add class "
+                    + causeMessage.substring(22)
+                    + " to the classpath.");
+            System.err.println("The classpath is:");
+            System.err.println(ReflectionPlume.classpathToString());
+          }
+        }
+        if (print_error_stack) {
+          e.printStackTrace();
+        }
+        System.exit(1);
       }
     }
 
@@ -678,18 +692,16 @@ public class Main {
         }
       }
 
-      String fileSep = System.getProperty("file.separator");
-      String fileLineSep = System.getProperty("line.separator");
-      Source src;
-      // Get the source file, and use it to obtain parse trees.
+      Source src = fileToSource(javafilename);
+      if (src == null) {
+        return;
+      } else {
+        verb.debug("Parsed %s%n", javafilename);
+      }
+      String fileLineSep;
       try {
         // fileLineSep is set here so that exceptions can be caught
         fileLineSep = FilesPlume.inferLineSeparator(javafilename);
-        src = new Source(javafilename);
-        verb.debug("Parsed %s%n", javafilename);
-      } catch (Source.CompilerException e) {
-        e.printStackTrace();
-        return;
       } catch (IOException e) {
         e.printStackTrace();
         return;
@@ -1025,6 +1037,27 @@ public class Main {
         e.printStackTrace();
         System.exit(1);
       }
+    }
+  }
+
+  /**
+   * Given a Java file name, creates a Source, or returns null.
+   *
+   * @param javaFileName a Java file name
+   * @return a Source for the Java file, or null
+   */
+  private static Source fileToSource(String javafilename) {
+    Source src;
+    // Get the source file, and use it to obtain parse trees.
+    try {
+      src = new Source(javafilename);
+      return src;
+    } catch (Source.CompilerException e) {
+      e.printStackTrace();
+      return null;
+    } catch (IOException e) {
+      e.printStackTrace();
+      return null;
     }
   }
 
