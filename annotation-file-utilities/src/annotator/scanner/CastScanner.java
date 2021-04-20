@@ -24,7 +24,7 @@ public class CastScanner extends CommonScanner {
    * @return the index of the given cast tree
    */
   public static int indexOfCastTree(TreePath origpath, Tree tree) {
-    TreePath path = findCountingContext(origpath);
+    TreePath path = TreePathUtil.findCountingContext(origpath);
     if (path == null) {
       return -1;
     }

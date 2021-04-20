@@ -33,7 +33,7 @@ public class AnonymousClassScanner extends TreePathScanner<Void, Integer> {
         anonclassFound = true;
       }
       path = path.getParentPath();
-      if (anonclassFound && CommonScanner.hasClassKind(path.getLeaf())) {
+      if (anonclassFound && TreePathUtil.hasClassKind(path.getLeaf())) {
         classesFound++;
       }
     }
@@ -71,7 +71,7 @@ public class AnonymousClassScanner extends TreePathScanner<Void, Integer> {
   @Override
   public Void visitClass(ClassTree node, Integer level) {
     if (level < 2) {
-      if (!found && CommonScanner.hasClassKind(anonclass)) {
+      if (!found && TreePathUtil.hasClassKind(anonclass)) {
         if (anonclass == node) {
           found = true;
         } else if (node.getSimpleName().toString().trim().isEmpty()) {

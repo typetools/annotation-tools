@@ -25,7 +25,7 @@ public class LambdaScanner extends CommonScanner {
    * @return the index of the given lambda expression tree
    */
   public static int indexOfLambdaExpressionTree(TreePath origpath, Tree tree) {
-    TreePath path = findCountingContext(origpath);
+    TreePath path = TreePathUtil.findCountingContext(origpath);
     if (path == null) {
       return -1;
     }

@@ -25,7 +25,7 @@ public class InstanceOfScanner extends CommonScanner {
    * @return the index of the given instanceof tree
    */
   public static int indexOfInstanceOfTree(TreePath origpath, Tree tree) {
-    TreePath path = findCountingContext(origpath);
+    TreePath path = TreePathUtil.findCountingContext(origpath);
     if (path == null) {
       return -1;
     }

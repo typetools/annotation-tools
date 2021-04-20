@@ -1,7 +1,7 @@
 package annotator.find;
 
 import annotator.Main;
-import annotator.scanner.CommonScanner;
+import annotator.scanner.TreePathUtil;
 import annotator.specification.IndexFileSpecification;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimaps;
@@ -1169,7 +1169,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       ASTRecord insertRecord = astIndex.get(node);
       dbug.debug("TreeFinder.scan: node=%s%n  critera=%s%n", node, i.getCriteria());
 
-      if (CommonScanner.hasClassKind(node)
+      if (TreePathUtil.hasClassKind(node)
           && i.getCriteria().isOnTypeDeclarationExtendsClause()
           && ((ClassTree) node).getExtendsClause() == null) {
         return implicitClassBoundPosition((JCClassDecl) node, i);
@@ -1236,7 +1236,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
         if (node.getKind() == Tree.Kind.METHOD) { // MethodTree
           // looking for the receiver or the declaration
           typeScan = i.getCriteria().isOnReceiver();
-        } else if (CommonScanner.hasClassKind(node)) { // ClassTree
+        } else if (TreePathUtil.hasClassKind(node)) { // ClassTree
           typeScan = !i.isSeparateLine(); // hacky check
         }
         if (typeScan) {
@@ -1353,7 +1353,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       ASTRecord insertRecord = astIndex.get(node);
       dbug.debug("TreeFinder.scan: node=%s%n  criteria=%s%n", node, i.getCriteria());
 
-      if (CommonScanner.hasClassKind(node)
+      if (TreePathUtil.hasClassKind(node)
           && entry.childSelectorIs(ASTPath.BOUND)
           && entry.getArgument() < 0
           && ((ClassTree) node).getExtendsClause() == null) {

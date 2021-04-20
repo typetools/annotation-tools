@@ -15,9 +15,9 @@ public class InitBlockScanner extends TreePathScanner<Void, Boolean> {
   public static int indexOfInitTree(TreePath path, boolean isStatic) {
     // we allow to start with any path/tree within an initializer.
     // first go to the enclosing initializer
-    Tree tree = CommonScanner.findEnclosingInitBlock(path, isStatic).getLeaf();
+    Tree tree = TreePathUtil.findEnclosingInitBlock(path, isStatic).getLeaf();
     // find the enclosing class
-    path = CommonScanner.findEnclosingClass(path);
+    path = TreePathUtil.findEnclosingClass(path);
     if (tree == null || path == null) {
       return -1;
     }

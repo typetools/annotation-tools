@@ -1,6 +1,6 @@
 package annotator.find;
 
-import annotator.scanner.CommonScanner;
+import annotator.scanner.TreePathUtil;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
@@ -61,7 +61,7 @@ public class ExtImplsLocationCriterion implements Criterion {
     if (index == -1 && leaf.getKind() == Tree.Kind.CLASS) {
       return ((JCTree.JCClassDecl) leaf).getExtendsClause() == null;
     }
-    if (CommonScanner.hasClassKind(parent)) {
+    if (TreePathUtil.hasClassKind(parent)) {
       ClassTree ct = (ClassTree) parent;
 
       if (index == -1) {

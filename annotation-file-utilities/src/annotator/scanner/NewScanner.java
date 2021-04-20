@@ -36,7 +36,7 @@ public class NewScanner extends CommonScanner {
       return cache.get(args);
     }
 
-    TreePath path = findCountingContext(origpath);
+    TreePath path = TreePathUtil.findCountingContext(origpath);
     if (path == null) {
       return -1;
     }
