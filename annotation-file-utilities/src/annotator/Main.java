@@ -134,6 +134,11 @@ import scenelib.type.Type;
  */
 public class Main {
 
+  /** The system-specific file separator. */
+  private static String fileSep = System.getProperty("file.separator");
+
+  // Options
+
   /** Directory in which output files are written. */
   @OptionGroup("General options")
   @Option("-d <directory> Directory in which output files are written")
@@ -190,9 +195,6 @@ public class Main {
 
   // TODO: remove this.
   public static boolean temporaryDebug = false;
-
-  /** The system-specific file separator. */
-  private static String fileSep = System.getProperty("file.separator");
 
   private static ElementVisitor<Void, AElement> classFilter =
       new ElementVisitor<Void, AElement>() {
