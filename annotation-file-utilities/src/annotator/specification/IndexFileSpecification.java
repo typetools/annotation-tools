@@ -495,7 +495,7 @@ public class IndexFileSpecification {
           this.insertions.add(constructorInsertion);
           // debug(
           //     "Added constructorInsertion to this.insertions, which is now %s%n",
-          //     Insertion.listToString(this.insertions));
+          //     Insertion.collectionToString(this.insertions));
         } else {
           if (annotator.Main.temporaryDebug) {
             System.out.printf(
