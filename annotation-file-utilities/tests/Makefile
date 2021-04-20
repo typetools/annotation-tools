@@ -37,7 +37,7 @@ DEBUG :=
 default : all
 
 .PHONY: all
-all : $(DIFFS) abbreviated converted enum-imports ad-hoc issue155 system-test source-extension results
+all : $(DIFFS) abbreviated converted enum-imports ad-hoc issue155 system-test source-extension showdiffs results
 
 .PHONY: abbreviated
 abbreviated:
@@ -67,13 +67,18 @@ source-extension:
 system-test:
 	${MAKE} -C system-test
 
-# Display results of all .diff files.
+# Display results (OK or FAILED) for all .diff files.
 .PHONY: results
 results: bin/VerifyDiffs.class
 	@echo ""
 	@echo "=== RESULTS ==="
 	@echo ""
 	@$(JAVA) -cp bin VerifyDiffs --show_all
+
+# Show all .diff files; good for running under CI.
+.PHONY: showdiffs
+showdiffs: bin/VerifyDiffs.class
+	cat *.diff
 
 # Remakes the little Java program that checks and compares diffs.
 bin/VerifyDiffs.class : VerifyDiffs.java
