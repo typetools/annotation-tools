@@ -485,7 +485,10 @@ public class IndexFileSpecification {
       //         elementInsertions, annotationInsertions);
       //   }
       // }
-      // If an insertion will be on an inserted constructor, it will be removed later.
+
+      // If an insertion I is on the implicit default constructor, then the no-argument constructor
+      // will itself be inserted into the source code, the insertion I will be added to it, and the
+      // insertion I will be removed from the list.
       this.insertions.addAll(elementInsertions);
 
       if (debug) {
