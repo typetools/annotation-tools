@@ -56,7 +56,7 @@ configurations {
 
 dependencies {
     if (isJava8) {
-        javacJar group: 'com.google.errorprone', name: 'javac', version: "9+181-r4173-1"
+        javacJar group: 'com.google.errorprone', name: 'javac', version: "1+"
         implementation 'com.google.errorprone:javac:9+181-r4173-1'
     }
     implementation 'org.plumelib:bcel-util:1.1.10'
