@@ -35,14 +35,17 @@ status=0
 # Javadoc documentation
 # For refactorings that touch a lot of code that you don't understand, create
 # top-level file SKIP-REQUIRE-JAVADOC.  Delete it after the pull request is merged.
-if [ ! -f ../SKIP-REQUIRE-JAVADOC ]; then
+if [ -f ../SKIP-REQUIRE-JAVADOC ]; then
+  echo "Skipping Javadoc tasks because file SKIP-REQUIRE-JAVADOC exists"
+elif [ "11" = "$(java -version 2>&1 | head -1 | cut -d'"' -f2 | sed '/^1\./s///' | cut -d'.' -f1)" ] ; then
+  # Under JDK 11, error "package com.sun.tools.javac.tree is not visible"
+  echo "Skipping Javadoc tasks under Java 11"
+else
   (./gradlew requireJavadoc --console=plain --warning-mode=all --no-daemon > /tmp/warnings-rjp.txt 2>&1) || true
   "$PLUME_SCRIPTS"/ci-lint-diff /tmp/warnings-rjp.txt || status=1
   (./gradlew javadoc --console=plain --warning-mode=all --no-daemon > /tmp/warnings-javadoc.txt 2>&1) || true
   "$PLUME_SCRIPTS"/ci-lint-diff /tmp/warnings-javadoc.txt || status=1
   (./gradlew javadocPrivate --console=plain --warning-mode=all --no-daemon > /tmp/warnings-javadocPrivate.txt 2>&1) || true
   "$PLUME_SCRIPTS"/ci-lint-diff /tmp/warnings-javadocPrivate.txt || status=1
-else
-  echo "Skipping Javadoc tasks because file SKIP-REQUIRE-JAVADOC exists"
 fi
 if [ $status -ne 0 ]; then exit $status; fi

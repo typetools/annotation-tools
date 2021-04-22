@@ -12,14 +12,17 @@ import annotator.find.ReceiverInsertion;
 import annotator.find.TreeFinder;
 import annotator.find.TypedInsertion;
 import annotator.scanner.LocalVariableScanner;
+import annotator.scanner.TreePathUtil;
 import annotator.specification.IndexFileSpecification;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.SetMultimap;
+import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
+import com.sun.source.util.TreePathScanner;
 import com.sun.tools.javac.main.CommandLine;
 import com.sun.tools.javac.tree.JCTree;
 import java.io.File;
@@ -566,6 +569,8 @@ public class Main {
       }
     }
 
+    computeConstructors(javafiles);
+
     // The insertions specified by the annotation files.
     Insertions insertions = new Insertions();
 
@@ -625,6 +630,12 @@ public class Main {
           parsedSpec = filtered;
           verb.debug("After filtering: %d annotations from %s%n", parsedSpec.size(), jaifFile);
         }
+        // if (dbug.isEnabled()) {
+        //   dbug.debug("parsedSpec:%n");
+        //   for (Insertion insertion : parsedSpec) {
+        //     dbug.debug("  %s, isInserted=%s%n", insertion, insertion.isInserted());
+        //   }
+        // }
         insertions.addAll(parsedSpec);
         annotationImports.putAll(spec.annotationImports());
       } catch (RuntimeException e) {
@@ -1058,6 +1069,35 @@ public class Main {
     } catch (IOException e) {
       e.printStackTrace();
       return null;
+    }
+  }
+
+  /** Maps from binary class name to whether the class has any explicit constructor. */
+  public static Map<String, Boolean> hasExplicitConstructor = new HashMap<>();
+
+  /**
+   * Fills in the {@link hasExplicitConstructor} map.
+   *
+   * @param javaFiles the Java files that were passed on the command line
+   */
+  static void computeConstructors(List<String> javaFiles) {
+    for (String javaFile : javaFiles) {
+      Source src = fileToSource(javaFile);
+      if (src == null) {
+        continue;
+      }
+      for (CompilationUnitTree cut : src.parse()) {
+        TreePathScanner<Void, Void> constructorsScanner =
+            new TreePathScanner<Void, Void>() {
+              @Override
+              public Void visitClass(ClassTree ct, Void p) {
+                String className = TreePathUtil.getBinaryName(getCurrentPath());
+                hasExplicitConstructor.put(className, TreePathUtil.hasConstructor(ct));
+                return super.visitClass(ct, p);
+              }
+            };
+        constructorsScanner.scan(cut, null);
+      }
     }
   }
 
