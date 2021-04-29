@@ -9,11 +9,3 @@ updates:
   - dependency-name: com.google.errorprone:javac
     versions:
     - 1.8.0-u20
-  - dependency-name: org.checkerframework:checker-qual
-    versions:
-    - 3.10.0
-    - 3.11.0
-    - 3.12.0
-  - dependency-name: org.plumelib:plume-util
-    versions:
-    - 1.5.1
