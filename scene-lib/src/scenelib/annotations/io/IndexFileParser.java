@@ -253,7 +253,7 @@ public final class IndexFileParser {
    * @param x a string
    * @return true if the given string is an identifier
    */
-  @SuppressWarnings("signature:contracts.conditional.postcondition.not.satisfied") // string parsing
+  @SuppressWarnings("signature:contracts.conditional.postcondition") // string parsing
   @EnsuresQualifierIf(result = true, expression = "#1", qualifier = Identifier.class)
   private boolean isValidIdentifier(String x) {
     if (x.length() == 0

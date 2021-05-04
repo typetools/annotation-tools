@@ -87,8 +87,7 @@ public final class AnnotationDef extends AElement {
    */
   public static AnnotationDef fromClass(
       Class<? extends java.lang.annotation.Annotation> annoType, Map<String, AnnotationDef> adefs) {
-    @SuppressWarnings(
-        "signature:assignment.type.incompatible") // not an array, so ClassGetName => BinaryName
+    @SuppressWarnings("signature:assignment") // not an array, so ClassGetName => BinaryName
     @BinaryName String name = annoType.getName();
     assert name != null;
 

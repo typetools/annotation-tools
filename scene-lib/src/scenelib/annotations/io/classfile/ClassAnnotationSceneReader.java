@@ -278,7 +278,7 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
         if (annoTypeName.contains("+")) {
           // This is an internal JDK annotation such as jdk.Profile+Annotation .
           @SuppressWarnings(
-              "signature:assignment.type.incompatible") // special annotation with "+" in name
+              "signature:assignment") // special annotation with "+" in name
           @BinaryName String annoTypeName2 = annoTypeName;
           return Annotations.createValueAnnotationDef(
               annoTypeName2,
@@ -292,7 +292,7 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
       }
 
       @SuppressWarnings(
-          "signature:argument.type.incompatible") // no an array, so ClassGetName => BinaryName
+          "signature:argument") // no an array, so ClassGetName => BinaryName
       AnnotationDef ad = AnnotationDef.fromClass(annoClass, annotationDefinitions);
       return ad;
     }

@@ -99,7 +99,7 @@ public final class JavapParser {
    * @throws ParseException if the file contents are not valid
    */
   private @BinaryName String parseAnnotationHead() throws IOException, ParseException {
-    @SuppressWarnings("signature:assignment.type.incompatible") // string manipulation
+    @SuppressWarnings("signature:assignment") // string manipulation
     @BinaryName String annoTypeName =
         line.substring(line.indexOf(annotationHead) + annotationHead.length(), line.length() - 1)
             .replace('/', '.');
