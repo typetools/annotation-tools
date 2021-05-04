@@ -166,7 +166,7 @@ public class IndexFileSpecification {
       parsePackage(clist, entry.getKey(), entry.getValue());
     }
 
-    @SuppressWarnings("signature:assignment.type.incompatible") // scene-lib is not fully annotated
+    @SuppressWarnings("signature:assignment") // scene-lib is not fully annotated
     VivifyingMap<@ClassGetName String, AClass> classes = scene.classes;
     for (Map.Entry<@ClassGetName String, AClass> entry : classes.entrySet()) {
       String key = entry.getKey();
