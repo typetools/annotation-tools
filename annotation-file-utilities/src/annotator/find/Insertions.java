@@ -405,6 +405,7 @@ public class Insertions implements Iterable<Insertion> {
                     criteria.add(new ASTPathCriterion(irec.astPath));
                     criteria.add(new GenericArrayLocationCriterion());
                   } catch (RuntimeException e) {
+                    throw new Error(e);
                   }
                 }
               }

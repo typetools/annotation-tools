@@ -1021,6 +1021,7 @@ public class ASTPathCriterion implements Criterion {
         ++i;
       }
     } catch (RuntimeException ex) {
+      throw ex;
     }
     return false;
   }
