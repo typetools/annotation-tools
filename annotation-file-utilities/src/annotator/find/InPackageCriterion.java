@@ -45,7 +45,7 @@ final class InPackageCriterion implements Criterion {
           return name == null || name.equals("");
         } else {
           String packageName = pn.toString();
-          return name != null && (name.equals(packageName));
+          return name != null && name.equals(packageName);
         }
       }
       path = path.getParentPath();

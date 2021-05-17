@@ -278,7 +278,11 @@ public final class Criteria {
     return null;
   }
 
-  /** @return a GenericArrayLocationCriterion if this has one, else null */
+  /**
+   * Returns a GenericArrayLocationCriterion if this has one, else null.
+   *
+   * @return a GenericArrayLocationCriterion if this has one, else null
+   */
   public GenericArrayLocationCriterion getGenericArrayLocation() {
     for (Criterion c : criteria.values()) {
       if (c.getKind() == Criterion.Kind.GENERIC_ARRAY_LOCATION) {
@@ -288,7 +292,11 @@ public final class Criteria {
     return null;
   }
 
-  /** @return a RelativeCriterion if this has one, else null */
+  /**
+   * Returns a RelativeCriterion if this has one, else null.
+   *
+   * @return a RelativeCriterion if this has one, else null
+   */
   public RelativeLocation getCastRelativeLocation() {
     RelativeLocation result = null;
     for (Criterion c : criteria.values()) {
@@ -301,7 +309,11 @@ public final class Criteria {
 
   // Returns the last one. Should really return the outermost one.
   // However, there should not be more than one unless all are equivalent.
-  /** @return an InClassCriterion if this has one, else null */
+  /**
+   * Returns an InClassCriterion if this has one, else null.
+   *
+   * @return an InClassCriterion if this has one, else null
+   */
   public InClassCriterion getInClass() {
     InClassCriterion result = null;
     for (Criterion c : criteria.values()) {
@@ -312,7 +324,11 @@ public final class Criteria {
     return result;
   }
 
-  /** @return true if this is on the zeroth bound of a type */
+  /**
+   * Returns true if this is on the zeroth bound of a type.
+   *
+   * @return true if this is on the zeroth bound of a type
+   */
   // Used when determining whether an annotation is on an implicit upper
   // bound (the "extends Object" that is customarily omitted).
   public boolean onBoundZero() {
@@ -389,11 +405,11 @@ public final class Criteria {
    * Creates an "in class" criterion: that a program element is enclosed by the specified class.
    *
    * @param name the name of the enclosing class
-   * @param exact whether to match only in the class itself, not in its inner classes
+   * @param exactMatch whether to match only in the class itself, not in its inner classes
    * @return an "in class" criterion
    */
-  public static final Criterion inClass(@ClassGetName String name, boolean exact) {
-    return new InClassCriterion(name, /*exactmatch=*/ true);
+  public static final Criterion inClass(@ClassGetName String name, boolean exactMatch) {
+    return new InClassCriterion(name, /*exactMatch=*/ true);
   }
 
   /**

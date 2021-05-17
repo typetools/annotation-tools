@@ -16,11 +16,7 @@ import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import org.plumelib.reflection.Signatures;
 
-/**
- * Class to generate class formatted names from Trees.
- *
- * @author mcarthur
- */
+/** Class to generate class formatted names from Trees. */
 public class JVMNames {
 
   /**

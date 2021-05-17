@@ -86,6 +86,7 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
   private AClass aClass;
 
   /** ClassReader for reading the class file. */
+  @SuppressWarnings("HidingField") // TODO!!
   private final ClassReader classReader;
 
   /** ClassWriter for generating the modified class file. */
@@ -120,7 +121,7 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
       int api, ClassReader classReader, AScene scene, boolean ignoreBridgeMethods) {
     super(api, classReader);
     this.classReader = classReader;
-    this.classWriter = new ClassWriter(classReader, api);
+    this.classWriter = new ClassWriter(this.classReader, api);
     super.cv = classWriter;
     this.scene = scene;
     this.ignoreBridgeMethods = ignoreBridgeMethods;
@@ -303,6 +304,7 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
      * @param aElement the AElement into which the annotation visited should be inserted
      * @param annotationWriter the AnnotationWriter passed by the caller
      */
+    @SuppressWarnings("ReferenceEquality") // interned comparison
     AnnotationSceneReader(
         int api,
         String descriptor,
@@ -1219,7 +1221,7 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
     private final String name;
 
     /**
-     * {@inheritDoc}
+     * Creates a NestedAnnotationSceneReader.
      *
      * @param api the ASM API version to use
      * @param parent the parent AnnotationSceneReader

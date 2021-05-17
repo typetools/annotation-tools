@@ -1,5 +1,9 @@
 package scenelib.annotations.io;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
+import java.io.BufferedWriter;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 
 /**
@@ -8,7 +12,8 @@ import java.io.PrintWriter;
  */
 public class DebugWriter {
   /** A PrintWriter for System.out. */
-  private PrintWriter out = new PrintWriter(System.out);
+  private PrintWriter out =
+      new PrintWriter(new BufferedWriter(new OutputStreamWriter(System.out, UTF_8)));
 
   /** Whether this DebugWriter is enabled. */
   private boolean enabled;
@@ -46,6 +51,7 @@ public class DebugWriter {
    * @param format a format string
    * @param args the format string arguments
    */
+  @com.google.errorprone.annotations.FormatMethod
   public void debug(String format, Object... args) {
     if (isEnabled()) {
       out.print(String.format(format, args));

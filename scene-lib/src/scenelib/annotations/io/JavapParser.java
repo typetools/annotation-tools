@@ -1,10 +1,13 @@
 package scenelib.annotations.io;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static scenelib.annotations.el.TypePathEntry.getTypePathEntryListFromBinary;
 
 import com.sun.tools.javac.code.TargetType;
 import java.io.*;
 import java.lang.annotation.RetentionPolicy;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -120,7 +123,7 @@ public final class JavapParser {
       if (line2.startsWith("target") || line2.startsWith("parameter")) {
         break;
       }
-      String fieldName = line2.substring(line2.indexOf("//") + "//".length());
+      // String fieldName = line2.substring(line2.indexOf("//") + "//".length());
       nextLine();
       char tag = line.charAt(line.indexOf(tagHead) + tagHead.length());
       switch (tag) {
@@ -405,7 +408,8 @@ public final class JavapParser {
   }
 
   public static void parse(String filename, AScene scene) throws IOException, FileIOException {
-    LineNumberReader lnr = new LineNumberReader(new FileReader(filename));
+    LineNumberReader lnr =
+        new LineNumberReader(Files.newBufferedReader(Paths.get(filename), UTF_8));
     try {
       parse(lnr, scene);
     } catch (ParseException e) {

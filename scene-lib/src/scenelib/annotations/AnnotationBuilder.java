@@ -80,6 +80,7 @@ public class AnnotationBuilder {
       this.aft = aft;
     }
 
+    @Override
     public void appendElement(Object x) {
       if (!abActive) {
         throw new IllegalStateException("Array is finished");
@@ -93,6 +94,7 @@ public class AnnotationBuilder {
       arrayElements.add(x);
     }
 
+    @Override
     public void finish() {
       if (!abActive) {
         throw new IllegalStateException("Array is finished");
@@ -249,6 +251,7 @@ public class AnnotationBuilder {
     this.source = source;
   }
 
+  @Override
   public String toString() {
     if (def != null) {
       return String.format("AnnotationBuilder %s", def);

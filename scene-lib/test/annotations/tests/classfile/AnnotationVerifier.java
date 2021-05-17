@@ -111,10 +111,6 @@ public class AnnotationVerifier {
     private Map<String, AnnotationRecorder> anns;
     private Map<String, AnnotationRecorder> xanns;
 
-    // method specific annotations
-    private Set<AnnotationRecorder> danns; // default annotations
-    private Map<ParameterDescription, AnnotationRecorder> panns; // parameter annotations
-
     public ClassRecorder(int api) {
       this(api, "class: ", "", "");
     }
@@ -130,9 +126,6 @@ public class AnnotationVerifier {
 
       anns = new HashMap<>();
       xanns = new HashMap<>();
-
-      danns = new HashSet<>();
-      panns = new HashMap<>();
     }
 
     @Override
@@ -315,6 +308,7 @@ public class AnnotationVerifier {
       }
     }
 
+    @Override
     public String toString() {
       return description;
     }
@@ -518,6 +512,7 @@ public class AnnotationVerifier {
       }
     }
 
+    @Override
     public String toString() {
       return description;
     }
@@ -570,10 +565,6 @@ public class AnnotationVerifier {
     private Map<String, AnnotationRecorder> anns;
     private Map<String, AnnotationRecorder> xanns;
 
-    // method specific annotations
-    private Set<AnnotationRecorder> danns; // default annotations
-    private Map<ParameterDescription, AnnotationRecorder> panns; // parameter annotations
-
     public FieldRecorder(int api) {
       this(api, "class: ", "", "");
     }
@@ -586,9 +577,6 @@ public class AnnotationVerifier {
 
       anns = new HashMap<>();
       xanns = new HashMap<>();
-
-      danns = new HashSet<>();
-      panns = new HashMap<>();
     }
 
     @Override
@@ -645,6 +633,7 @@ public class AnnotationVerifier {
       }
     }
 
+    @Override
     public String toString() {
       return description;
     }
@@ -758,11 +747,13 @@ public class AnnotationVerifier {
       }
     }
 
+    @Override
     public void visit(String name, Object value) {
       fieldArgsName.add(name);
       fieldArgsValue.add(value);
     }
 
+    @Override
     public AnnotationVisitor visitAnnotation(String name, String descriptor) {
       innerAnnotationArgsName.add(name);
       innerAnnotationArgsDesc.add(descriptor);
@@ -772,6 +763,7 @@ public class AnnotationVerifier {
       return av;
     }
 
+    @Override
     public AnnotationVisitor visitArray(String name) {
       arrayArgs.add(name);
       AnnotationRecorder av = new AnnotationRecorder(api, description + name);
@@ -779,14 +771,17 @@ public class AnnotationVerifier {
       return av;
     }
 
+    @Override
     public void visitEnd() {}
 
+    @Override
     public void visitEnum(String name, String descriptor, String value) {
       enumArgsName.add(name);
       enumArgsDesc.add(descriptor);
       enumArgsValue.add(value);
     }
 
+    @Override
     public String toString() {
       return description;
     }
@@ -837,8 +832,8 @@ public class AnnotationVerifier {
       }
       verifyArray(sb, "<one of the type annotation methods>", 5, thisIndexArray, arIndexArray);
 
-      verifyInnerAnnotationRecorder(sb, this.innerAnnotationMap, ar.innerAnnotationMap);
-      verifyInnerAnnotationRecorder(sb, this.arrayMap, ar.arrayMap);
+      verifyInnerAnnotationRecorder(this.innerAnnotationMap, ar.innerAnnotationMap);
+      verifyInnerAnnotationRecorder(this.arrayMap, ar.arrayMap);
 
       if (sb.length() > 0) {
         throw new AnnotationMismatchException(sb.toString());
@@ -893,10 +888,9 @@ public class AnnotationVerifier {
               "Expected (%s): %s%n", correct == null ? null : correct.getClass(), correct));
     }
 
+    @SuppressWarnings("CollectionIncompatibleType") // TODO!!
     private void verifyInnerAnnotationRecorder(
-        StringBuilder sb,
-        Map<String, AnnotationRecorder> questionableAR,
-        Map<String, AnnotationRecorder> correctAR) {
+        Map<String, AnnotationRecorder> questionableAR, Map<String, AnnotationRecorder> correctAR) {
       // checks on arguments passed in to the methods that created these
       // AnnotationRecorders (i.e. the checks on the String keys on these maps)
       // ensure that these have identical keys
@@ -910,7 +904,7 @@ public class AnnotationVerifier {
    * A ParameterDescription is a convenient class used to keep information about method parameters.
    * Parameters are equal if they have the same index, regardless of their description.
    */
-  private class ParameterDescription {
+  private static class ParameterDescription {
     public final int parameter;
     public final String descriptor;
     public final boolean visible;
@@ -921,6 +915,7 @@ public class AnnotationVerifier {
       this.visible = visible;
     }
 
+    @Override
     public boolean equals(@Nullable Object o) {
       if (o instanceof ParameterDescription) {
         ParameterDescription p = (ParameterDescription) o;
@@ -929,10 +924,12 @@ public class AnnotationVerifier {
       return false;
     }
 
+    @Override
     public int hashCode() {
       return parameter * 17;
     }
 
+    @Override
     public String toString() {
       return "parameter index: "
           + parameter
@@ -947,7 +944,7 @@ public class AnnotationVerifier {
    * An AnnotationMismatchException is an Exception that indicates that two versions of the same
    * class do not have the same annotations on either the class, its field, or its methods.
    */
-  public class AnnotationMismatchException extends RuntimeException {
+  public static class AnnotationMismatchException extends RuntimeException {
     private static final long serialVersionUID = 20060714L; // today's date
 
     /**

@@ -12,6 +12,7 @@ import scenelib.type.Type;
 public class ATypeElementWithType extends ATypeElement {
 
   /** The un-annotated type. */
+  @SuppressWarnings("HidingField") // TODO!!
   private Type type;
 
   ATypeElementWithType(Object description) {

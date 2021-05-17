@@ -626,6 +626,7 @@ public class ASTIndex extends WrapperMap<Tree, ASTRecord> {
     }
   }
 
+  @SuppressWarnings("EmptyCatch") // TODO
   public static Integer getParameterIndex(
       CompilationUnitTree cut, String className, String methodName, String varName) {
     if (cut != null && className != null && methodName != null && varName != null) {

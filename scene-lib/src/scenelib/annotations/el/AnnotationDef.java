@@ -277,11 +277,13 @@ public final class AnnotationDef extends AElement {
     boolean sameMetaAnnotations = equalsElement(o);
     boolean sameFieldTypes = fieldTypes.equals(o.fieldTypes);
     // Can be useful for debugging
-    if (false && sameName && (!(sameMetaAnnotations && sameFieldTypes))) {
-      String message =
-          String.format(
-              "Warning: incompatible definitions of annotation %s%n  %s%n  %s%n", name, this, o);
-      new Exception(message).printStackTrace(System.out);
+    if (false) {
+      if (sameName && !(sameMetaAnnotations && sameFieldTypes)) {
+        String message =
+            String.format(
+                "Warning: incompatible definitions of annotation %s%n  %s%n  %s%n", name, this, o);
+        new Exception(message).printStackTrace(System.out);
+      }
     }
     return sameName && sameMetaAnnotations && sameFieldTypes;
   }

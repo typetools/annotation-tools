@@ -99,6 +99,7 @@ public class ClassAnnotationSceneWriter extends CodeOffsetAdapter {
   private final Map<String, Set<Integer>> lambdaExpressions;
 
   /** ClassReader for reading the class file. */
+  @SuppressWarnings("HidingField") // TODO!!
   private ClassReader classReader;
 
   /**
@@ -218,7 +219,7 @@ public class ClassAnnotationSceneWriter extends CodeOffsetAdapter {
       for (Annotation tla : aClass.tlAnnotationsHere) {
         // If not in overwrite mode and annotation already exists in classfile,
         //  ignore tla.
-        if ((!overwrite) && existingClassAnnotations.contains(name(tla))) {
+        if (!overwrite && existingClassAnnotations.contains(name(tla))) {
           continue;
         }
 
@@ -460,7 +461,7 @@ public class ClassAnnotationSceneWriter extends CodeOffsetAdapter {
     private void ensureVisitSceneFieldAnnotations() {
       // First do declaration annotations on a field.
       for (Annotation tla : aField.tlAnnotationsHere) {
-        if ((!overwrite) && existingFieldAnnotations.contains(name(tla))) {
+        if (!overwrite && existingFieldAnnotations.contains(name(tla))) {
           continue;
         }
         AnnotationVisitor av =
@@ -472,7 +473,7 @@ public class ClassAnnotationSceneWriter extends CodeOffsetAdapter {
       TypeReference typeReference = TypeReference.newTypeReference(TypeReference.FIELD);
       // Then do the type annotations on the field
       for (Annotation tla : aField.type.tlAnnotationsHere) {
-        if ((!overwrite) && existingFieldAnnotations.contains(name(tla))) {
+        if (!overwrite && existingFieldAnnotations.contains(name(tla))) {
           continue;
         }
         AnnotationVisitor av =
@@ -489,7 +490,7 @@ public class ClassAnnotationSceneWriter extends CodeOffsetAdapter {
       for (Map.Entry<List<TypePathEntry>, ATypeElement> fieldInnerEntry :
           aField.type.innerTypes.entrySet()) {
         for (Annotation tla : fieldInnerEntry.getValue().tlAnnotationsHere) {
-          if ((!overwrite) && existingFieldAnnotations.contains(name(tla))) {
+          if (!overwrite && existingFieldAnnotations.contains(name(tla))) {
             continue;
           }
           AnnotationVisitor xav =
@@ -681,7 +682,7 @@ public class ClassAnnotationSceneWriter extends CodeOffsetAdapter {
      * @return whether the annotation should be skipped
      */
     private boolean shouldSkip(Annotation tla) {
-      return ((!overwrite) && existingMethodAnnotations.contains(name(tla)));
+      return (!overwrite && existingMethodAnnotations.contains(name(tla)));
     }
 
     /**
@@ -692,7 +693,7 @@ public class ClassAnnotationSceneWriter extends CodeOffsetAdapter {
      * @return whether the annotation should be skipped
      */
     private boolean shouldSkipExisting(String name) {
-      return ((!overwrite) && aMethod.lookup(name) != null);
+      return (!overwrite && aMethod.lookup(name) != null);
     }
 
     /**
@@ -933,26 +934,6 @@ public class ClassAnnotationSceneWriter extends CodeOffsetAdapter {
       }
     }
 
-    /** Has this visit the object creation (new) annotations on this method. */
-    private void ensureVisitObjectCreationAnnotations() {
-      TypeReference typeReference = TypeReference.newTypeReference(TypeReference.NEW);
-      for (Map.Entry<RelativeLocation, ATypeElement> entry : aMethod.body.news.entrySet()) {
-        if (!entry.getKey().isBytecodeOffset()) {
-          // if the RelativeLocation is a source index, we cannot insert it
-          // into bytecode
-          // TODO: output a warning or translate
-          if (strict) {
-            System.err.println(
-                "ClassAnnotationSceneWriter.ensureVisitObjectCreationAnnotation:"
-                    + " no bytecode offset found!");
-          }
-        }
-        int offset = entry.getKey().offset;
-        ATypeElement aNew = entry.getValue();
-        visitInsnAnnotationsOnTypeElement(typeReference, aNew, true);
-      }
-    }
-
     /** Has this visit the parameter annotations on this method. */
     private void ensureVisitParameterAnnotations() {
       for (Map.Entry<Integer, AField> entry : aMethod.parameters.entrySet()) {
@@ -982,48 +963,6 @@ public class ClassAnnotationSceneWriter extends CodeOffsetAdapter {
       visitTypeAnnotationsOnTypeElement(typeReference, aReceiver.type, true);
     }
 
-    /** Has this visit the typecast annotations on this method. */
-    private void ensureVisitTypecastAnnotations() {
-      for (Map.Entry<RelativeLocation, ATypeElement> entry : aMethod.body.typecasts.entrySet()) {
-        if (!entry.getKey().isBytecodeOffset()) {
-          // if the RelativeLocation is a source index, we cannot insert it
-          // into bytecode
-          // TODO: output a warning or translate
-          if (strict) {
-            System.err.println(
-                "ClassAnnotationSceneWriter.ensureVisitTypecastAnnotation:"
-                    + " no bytecode offset found!");
-          }
-        }
-        int offset = entry.getKey().offset;
-        int typeIndex = entry.getKey().type_index;
-        TypeReference typeReference =
-            TypeReference.newTypeArgumentReference(TypeReference.CAST, typeIndex);
-        ATypeElement aTypecast = entry.getValue();
-        visitInsnAnnotationsOnTypeElement(typeReference, aTypecast, true);
-      }
-    }
-
-    /** Has this visit the typetest annotations on this method. */
-    private void ensureVisitTypeTestAnnotations() {
-      for (Map.Entry<RelativeLocation, ATypeElement> entry : aMethod.body.instanceofs.entrySet()) {
-        if (!entry.getKey().isBytecodeOffset()) {
-          // if the RelativeLocation is a source index, we cannot insert it
-          // into bytecode
-          // TODO: output a warning or translate
-          if (strict) {
-            System.err.println(
-                "ClassAnnotationSceneWriter.ensureVisitTypeTestAnnotation:"
-                    + " no bytecode offset found!");
-          }
-        }
-        int offset = entry.getKey().offset;
-        ATypeElement aTypeTest = entry.getValue();
-        TypeReference typeReference = TypeReference.newTypeReference(TypeReference.INSTANCEOF);
-        visitInsnAnnotationsOnTypeElement(typeReference, aTypeTest, true);
-      }
-    }
-
     private void ensureVisitLambdaExpressionAnnotations() {
       for (Map.Entry<RelativeLocation, AMethod> entry : aMethod.body.funs.entrySet()) {
         if (!entry.getKey().isBytecodeOffset()) {
@@ -1037,7 +976,6 @@ public class ClassAnnotationSceneWriter extends CodeOffsetAdapter {
           }
           continue;
         }
-        RelativeLocation relativeLocation = entry.getKey();
         AMethod aLambda = entry.getValue();
 
         for (Map.Entry<Integer, AField> e0 : aLambda.parameters.entrySet()) {
