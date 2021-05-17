@@ -714,8 +714,7 @@ public class Main {
         // fileLineSep is set here so that exceptions can be caught
         fileLineSep = FilesPlume.inferLineSeparator(javafilename);
       } catch (IOException e) {
-        e.printStackTrace();
-        return;
+        throw new Error("Cannot read " + javafilename, e);
       }
 
       // Imports required to resolve annotations (when abbreviate==true).

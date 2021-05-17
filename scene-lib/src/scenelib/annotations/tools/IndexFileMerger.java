@@ -93,7 +93,7 @@ public class IndexFileMerger {
           System.err.println("IndexFileMerger: can't read " + inputPath);
           System.exit(1);
         } catch (FileIOException e) {
-          e.printStackTrace(); // TODO
+          e.printStackTrace();
           System.exit(1);
         }
       }
