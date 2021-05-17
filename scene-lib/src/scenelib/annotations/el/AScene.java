@@ -173,6 +173,7 @@ public class AScene implements Cloneable {
    * @param s0 the first AScene to compare
    * @param s1 the second Ascene to compare
    */
+  @SuppressWarnings("ReferenceEquality") // testing that cloned value is different
   public static void checkClone(AScene s0, AScene s1) {
     if (s0 == null) {
       if (s1 != null) {
@@ -223,6 +224,7 @@ public class AScene implements Cloneable {
    * @param e0 the first element to compare
    * @param e1 the second element to compare
    */
+  @SuppressWarnings("ReferenceEquality") // testing that cloned value is different
   public static void checkCloneElem(AElement e0, AElement e1) {
     checkCloneObject(e0, e1);
     if (e0 != null) {

@@ -109,6 +109,7 @@ public class ConstructorInsertion extends TypedInsertion {
    * @param inserted {@code true} if this insertion has already been inserted, {@code false}
    *     otherwise.
    */
+  @Override
   public void setInserted(boolean inserted) {
     super.setInserted(false);
     if (receiverInsertion != null) {

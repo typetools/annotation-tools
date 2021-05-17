@@ -1,5 +1,6 @@
 package scenelib.annotations.io.classfile;
 
+import java.util.Arrays;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
@@ -153,7 +154,9 @@ public class CodeOffsetAdapter extends ClassVisitor {
       public void visitInvokeDynamicInsn(
           String name, String descriptor, Handle bsm, Object... bsmArgs) {
         super.visitInvokeDynamicInsn(name, descriptor, bsm, bsmArgs);
-        debug.debug("%d visitInvokeDynamicInsn(%s, %s)%n", offset, name, descriptor, bsm, bsmArgs);
+        debug.debug(
+            "%d visitInvokeDynamicInsn(%s, %s, %s, %s)%n",
+            offset, name, descriptor, bsm, Arrays.toString(bsmArgs));
         advance(5);
       }
 
@@ -178,7 +181,9 @@ public class CodeOffsetAdapter extends ClassVisitor {
       @Override
       public void visitLookupSwitchInsn(Label dflt, int[] keys, Label[] labels) {
         super.visitLookupSwitchInsn(dflt, keys, labels);
-        debug.debug("%d visitLookupSwitchInsn(%s)%n", offset, dflt, keys, labels);
+        debug.debug(
+            "%d visitLookupSwitchInsn(%s, %s, %s)%n",
+            offset, dflt, Arrays.toString(keys), Arrays.toString(labels));
         previousOffset = offset;
         offset += 8 - (offset & 3);
         offset += 4 + 8 * readInt(offset);
@@ -214,7 +219,9 @@ public class CodeOffsetAdapter extends ClassVisitor {
       @Override
       public void visitTableSwitchInsn(int min, int max, Label dflt, Label... labels) {
         super.visitTableSwitchInsn(min, max, dflt, labels);
-        debug.debug("%d visitTableSwitchInsn(%d, %d, %s)%n", offset, min, max, dflt, labels);
+        debug.debug(
+            "%d visitTableSwitchInsn(%d, %d, %s, %s)%n",
+            offset, min, max, dflt, Arrays.toString(labels));
         previousOffset = offset;
         offset += 8 - (offset & 3);
         offset += 4 * (readInt(offset + 4) - readInt(offset) + 3);

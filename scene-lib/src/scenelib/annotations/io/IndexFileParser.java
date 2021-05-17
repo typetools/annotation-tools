@@ -3,14 +3,16 @@ package scenelib.annotations.io;
 import static java.io.StreamTokenizer.TT_EOF;
 import static java.io.StreamTokenizer.TT_NUMBER;
 import static java.io.StreamTokenizer.TT_WORD;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.sun.source.tree.Tree.Kind;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.io.Reader;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1325,25 +1327,6 @@ public final class IndexFileParser {
     return Pair.of(outerPath, loc);
   }
 
-  private ASTPath fixNewArrayType(ASTPath astPath) {
-    ASTPath outerPath = astPath;
-    int last = astPath.size() - 1;
-
-    if (last > 0) {
-      ASTPath.ASTEntry entry = astPath.get(last);
-      if (entry.getTreeKind() == Kind.NEW_ARRAY && entry.childSelectorIs(ASTPath.TYPE)) {
-        int a = entry.getArgument();
-        outerPath =
-            astPath.getParentPath().extend(new ASTPath.ASTEntry(Kind.NEW_ARRAY, ASTPath.TYPE, 0));
-        while (--a >= 0) {
-          outerPath = outerPath.extend(new ASTPath.ASTEntry(Kind.ARRAY_TYPE, ASTPath.TYPE));
-        }
-      }
-    }
-
-    return outerPath;
-  }
-
   /**
    * Parses an AST path.
    *
@@ -1712,10 +1695,8 @@ public final class IndexFileParser {
         matchChar(':');
       } else {
         pkg = expectQualifiedName();
-        // AElement p = scene.packages.getVivify(pkg);
-        AClass p = scene.classes.getVivify(pkg + ".package-info");
         expectChar(':');
-        p = scene.classes.getVivify(pkg + ".package-info");
+        AClass p = scene.classes.getVivify(pkg + ".package-info");
         parseAnnotations(p);
       }
 
@@ -1858,7 +1839,7 @@ public final class IndexFileParser {
    */
   public static Map<String, AnnotationDef> parseFile(String filename, AScene scene)
       throws IOException {
-    LineNumberReader in = new LineNumberReader(new FileReader(filename));
+    LineNumberReader in = new LineNumberReader(Files.newBufferedReader(Paths.get(filename), UTF_8));
     IndexFileParser parser = new IndexFileParser(in, filename, scene);
     return parseAndReturnAnnotationDefs(filename, in, parser);
   }

@@ -580,23 +580,10 @@ public class IndexFileSpecification {
     }
     ASTPath.ASTEntry entry = astPath.getLast();
     Tree.Kind kind = entry.getTreeKind();
-    return kind == Tree.Kind.NEW_ARRAY
+    return (kind == Tree.Kind.NEW_ARRAY
             && entry.childSelectorIs(ASTPath.TYPE)
-            && entry.getArgument() == 0
-        || kind == Tree.Kind.NEW_CLASS && entry.childSelectorIs(ASTPath.IDENTIFIER);
-  }
-
-  private static boolean isOnNullaryConstructor(Criteria criteria) {
-    if (criteria.isOnMethod("<init>()V")) {
-      ASTPath astPath = criteria.getASTPath();
-      if (astPath == null || astPath.isEmpty()) {
-        return !criteria.isOnNew(); // exclude expression annotations
-      }
-      ASTPath.ASTEntry entry = astPath.get(0);
-      return entry.getTreeKind() == Tree.Kind.METHOD
-          && (entry.childSelectorIs(ASTPath.TYPE) || isOnReceiver(criteria));
-    }
-    return false;
+            && entry.getArgument() == 0)
+        || (kind == Tree.Kind.NEW_CLASS && entry.childSelectorIs(ASTPath.IDENTIFIER));
   }
 
   /**

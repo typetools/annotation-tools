@@ -158,7 +158,7 @@ public final class InClassCriterion implements Criterion {
               return true;
             }
           } else if (cname.startsWith(treeClassName + "$")
-              || (cname.startsWith(treeClassName + "."))) {
+              || cname.startsWith(treeClassName + ".")) {
             cname = cname.substring(treeClassName.length() + 1);
           } else if (!treeClassName.isEmpty()) {
             // treeClassName is empty for anonymous inner class

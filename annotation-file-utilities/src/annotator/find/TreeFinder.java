@@ -843,7 +843,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
    * Determine the insertion position for declaration annotations on various elements. For instance,
    * method declaration annotations should be placed before all the other modifiers and annotations.
    */
-  private class DeclarationPositionFinder extends TreeScanner<Integer, Void> {
+  private static class DeclarationPositionFinder extends TreeScanner<Integer, Void> {
 
     // When a method is visited, it is visited for the declaration itself.
     @Override
@@ -1151,7 +1151,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
         NewArrayTree newArray = (NewArrayTree) node;
 
         if (newArray.toString().startsWith("{")) {
-          addNewType(path, neu, newArray);
+          addNewType(neu, newArray);
         }
       }
 
@@ -1192,11 +1192,11 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
           assert handled(node);
           dbug.debug("pos=%d at return type node: %s%n", pos, returnType.getClass());
         }
-      } else if (node.getKind() == Tree.Kind.TYPE_PARAMETER
+      } else if ((node.getKind() == Tree.Kind.TYPE_PARAMETER
               && i.getCriteria().onBoundZero()
               && (((TypeParameterTree) node).getBounds().isEmpty()
-                  || (((JCExpression) ((TypeParameterTree) node).getBounds().get(0)))
-                      .type.tsym.isInterface())
+                  || ((JCExpression) ((TypeParameterTree) node).getBounds().get(0))
+                      .type.tsym.isInterface()))
           || (node instanceof WildcardTree
               && ((WildcardTree) node).getBound() == null
               && wildcardLast(i.getCriteria().getGenericArrayLocation().getLocation()))) {
@@ -1335,7 +1335,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
         NewArrayTree newArray = (NewArrayTree) node;
 
         if (newArray.toString().startsWith("{")) {
-          addNewType(path, neu, newArray);
+          addNewType(neu, newArray);
         }
       }
 
@@ -1387,16 +1387,16 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
           assert handled(node);
           dbug.debug("pos=%d at return type node: %s%n", pos, returnType.getClass());
         }
-      } else if (node.getKind() == Tree.Kind.TYPE_PARAMETER
+      } else if ((node.getKind() == Tree.Kind.TYPE_PARAMETER
               && entry.getTreeKind() == Tree.Kind.TYPE_PARAMETER // TypeParameter.bound
               && (((TypeParameterTree) node).getBounds().isEmpty()
-                  || (((JCExpression) ((TypeParameterTree) node).getBounds().get(0)))
-                      .type.tsym.isInterface())
-          || ASTPath.isWildcard(node.getKind())
+                  || ((JCExpression) ((TypeParameterTree) node).getBounds().get(0))
+                      .type.tsym.isInterface()))
+          || (ASTPath.isWildcard(node.getKind())
               && (entry.getTreeKind() == Tree.Kind.TYPE_PARAMETER
                   || ASTPath.isWildcard(entry.getTreeKind()))
               && entry.childSelectorIs(ASTPath.BOUND)
-              && (!entry.hasArgument() || entry.getArgument() == 0)) {
+              && (!entry.hasArgument() || entry.getArgument() == 0))) {
         Pair<ASTRecord, Integer> pair = tpf.scan(node, i);
         insertRecord = pair.a;
         pos = pair.b;
@@ -1793,7 +1793,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     receiver.setAddComma(method.getParameters().size() > 0);
   }
 
-  private void addNewType(TreePath path, NewInsertion neu, NewArrayTree newArray) {
+  private void addNewType(NewInsertion neu, NewArrayTree newArray) {
     DeclaredType baseType = neu.getBaseType();
     if (baseType.getName().isEmpty()) {
       List<String> annotations = neu.getType().getAnnotations();
@@ -1809,7 +1809,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
 
   private void addConstructor(TreePath path, ConstructorInsertion cons, MethodTree method) {
     ReceiverInsertion recv = cons.getReceiverInsertion();
-    MethodTree leaf = (MethodTree) path.getLeaf();
+    assert method == (MethodTree) path.getLeaf();
     ClassTree parent = (ClassTree) path.getParentPath().getLeaf();
     DeclaredType baseType = cons.getBaseType();
     if (baseType.getName().isEmpty()) {
@@ -1824,7 +1824,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     if (recv != null) {
       Iterator<Insertion> iter = cons.getInnerTypeInsertions().iterator();
       List<Insertion> recvInner = new ArrayList<>();
-      addReceiverType(path, recv, leaf);
+      addReceiverType(path, recv, method);
       while (iter.hasNext()) {
         Insertion i = iter.next();
         if (i.getCriteria().isOnReceiver()) {

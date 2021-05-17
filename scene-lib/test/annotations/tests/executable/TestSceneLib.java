@@ -1,5 +1,7 @@
 package annotations.tests.executable;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import java.io.*;
 import java.lang.annotation.RetentionPolicy;
 import java.util.*;
@@ -17,7 +19,7 @@ import scenelib.annotations.io.*;
 public class TestSceneLib {
   LineNumberReader openPackagedIndexFile(String name) {
     return new LineNumberReader(
-        new InputStreamReader((InputStream) TestSceneLib.class.getResourceAsStream(name)));
+        new InputStreamReader((InputStream) TestSceneLib.class.getResourceAsStream(name), UTF_8));
   }
 
   static final String fooIndexContents =
@@ -190,7 +192,7 @@ public class TestSceneLib {
     Assert.assertTrue(sawConstructor);
   }
 
-  class TestDefCollector extends DefCollector {
+  static class TestDefCollector extends DefCollector {
     AnnotationDef a, b, c, d, e;
 
     AnnotationDef f;

@@ -1,11 +1,15 @@
 package scenelib.annotations.tools;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
 import com.sun.tools.javac.main.CommandLine;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.Collections;
@@ -32,6 +36,7 @@ import scenelib.annotations.io.IndexFileWriter;
 
 /** Utility for merging index files, including multiple versions for the same class. */
 public class IndexFileMerger {
+  @SuppressWarnings("CatchAndPrintStackTrace") // TODO
   public static void main(String[] args) {
     if (args.length < 1) {
       System.exit(0);
@@ -266,7 +271,9 @@ public class IndexFileMerger {
       annotatedFor.clear(); // for gc
 
       try {
-        IndexFileWriter.write(scene, new PrintWriter(System.out, true));
+        IndexFileWriter.write(
+            scene,
+            new PrintWriter(new BufferedWriter(new OutputStreamWriter(System.out, UTF_8)), true));
       } catch (SecurityException e) {
         e.printStackTrace();
         System.exit(1);

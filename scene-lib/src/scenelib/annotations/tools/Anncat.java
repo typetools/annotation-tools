@@ -1,5 +1,7 @@
 package scenelib.annotations.tools;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import java.io.*;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.plumelib.util.FileIOException;
@@ -80,7 +82,7 @@ public class Anncat {
       // Write the scene
       if (idx == args.length) {
         System.err.println("Writing index file to standard output...");
-        IndexFileWriter.write(theScene, new OutputStreamWriter(System.out));
+        IndexFileWriter.write(theScene, new OutputStreamWriter(System.out, UTF_8));
         System.err.println("Finished.");
       } else {
         idx++;
@@ -92,7 +94,7 @@ public class Anncat {
           idx++;
           usageAssert(idx == args.length);
           System.err.println("Writing index file to " + outfile + "...");
-          IndexFileWriter.write(theScene, new FileWriter(outfile));
+          IndexFileWriter.write(theScene, new FileWriter(outfile, UTF_8));
           System.err.println("Finished.");
         } else if (args[idx].equals("--class")) {
           idx++;

@@ -1,11 +1,14 @@
 package scenelib.annotations.io;
 
-import java.io.FileWriter;
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -186,17 +189,6 @@ public final class IndexFileWriter {
     int typePathStepArgument =
         typePathStep == TypePath.TYPE_ARGUMENT ? typePath.getStepArgument(index) : 0;
     return typePathStep + ", " + typePathStepArgument;
-  }
-
-  /**
-   * Converts the given {@link TypePathEntry} to a string of the form "tag, arg", where tag and arg
-   * are both integers.
-   *
-   * @param t TypePathEntry to be converted
-   * @return String representing the TypePathEntry
-   */
-  private String typePathEntryToString(TypePathEntry t) {
-    return t.step + ", " + t.argument;
   }
 
   /**
@@ -565,6 +557,6 @@ public final class IndexFileWriter {
    * </code> in index file format; see {@link #write(AScene, Writer)}.
    */
   public static void write(AScene scene, String filename) throws IOException, DefException {
-    write(scene, new FileWriter(filename));
+    write(scene, Files.newBufferedWriter(Paths.get(filename), UTF_8));
   }
 }
