@@ -75,7 +75,7 @@ public class BoundLocationCriterion implements Criterion {
         if (!bounds.isEmpty() && isInterface((JCExpression) bounds.get(0))) {
           --ix;
         }
-        if (ix < 0 || ix < bounds.size() && bounds.get(ix) == leaf) {
+        if (ix < 0 || (ix < bounds.size() && bounds.get(ix) == leaf)) {
           returnValue = parentCriterion.isSatisfiedBy(parentPath);
         }
       } else if (boundIndex == 0 && leaf instanceof TypeParameterTree) {

@@ -1,5 +1,7 @@
 package annotator;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.util.JavacTask;
 import com.sun.tools.javac.api.JavacTaskImpl;
@@ -93,7 +95,11 @@ public final class Source {
     fileManager.close();
   }
 
-  /** @return an object that provides utility methods for types */
+  /**
+   * Returns an object that provides utility methods for types.
+   *
+   * @return an object that provides utility methods for types
+   */
   public Types getTypes() {
     return types;
   }
@@ -181,7 +187,7 @@ public final class Source {
    * @throws IOException if the source file couldn't be written
    */
   public void write(OutputStream out) throws IOException {
-    out.write(source.toString().getBytes());
+    out.write(source.toString().getBytes(UTF_8));
     out.flush();
     out.close();
   }

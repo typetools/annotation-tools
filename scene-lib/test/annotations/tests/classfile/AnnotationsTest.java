@@ -58,6 +58,7 @@ public class AnnotationsTest {
    * .jaif file in {@link #INDEX_FILE_BASE} and .class and _Expected.class files in {@link
    * #CLASS_FILE_BASE}
    */
+  @SuppressWarnings("MutablePublicArray") // TODO
   public static final String[] allTests = {
     "TestClassEmpty",
     "TestClassNonEmpty",
@@ -137,20 +138,8 @@ public class AnnotationsTest {
   }
 
   /**
-   * Reads in the class file from the given filename, inserts the annotations from scene, and writes
-   * out the result into the same file.
-   *
-   * @param filename the class file to insert annotations into
-   * @param scene the scene that contains annotations to be inserted
-   * @param overwrite whether to overwrite existing annotations
-   */
-  private void writeClass(String filename, AScene scene, boolean overwrite) {
-    writeClass(filename, filename, scene, overwrite);
-  }
-
-  /**
-   * Like {@link #writeClass(String, AScene, boolean)}, except the class will be read from and
-   * written to different files.
+   * Reads in the class file from a file, inserts the annotations from scene, and writes out the
+   * result into a file (possibly the same file).
    *
    * @param oldFileName the class file to read from
    * @param newFileName the class file to write to
@@ -311,17 +300,6 @@ public class AnnotationsTest {
     }
 
     tempFile.delete();
-  }
-
-  /**
-   * Runs both types of tests (against class file and index file), on all classes specified by
-   * {@link #allTests}
-   */
-  public void testAll() throws Exception {
-    //    for (String s : allTests) {
-    //      testAgainstIndexFile(nameIndex(s + ".jaif"), nameClass(s+".class"));
-    //      testAgainstClass(nameIndex(s + ".jaif"), nameClass(s));
-    //    }
   }
 
   /** Runs a test on class files for package-info. */

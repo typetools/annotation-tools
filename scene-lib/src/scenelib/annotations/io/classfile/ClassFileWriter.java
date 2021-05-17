@@ -62,6 +62,7 @@ public class ClassFileWriter {
    * @param args options and classes and index files to analyze;
    * @throws IOException if a class file or index file cannot be opened/written
    */
+  @SuppressWarnings("IncrementInForLoopAndHeader") // array contains alternating elements
   public static void main(String[] args) throws IOException {
     Options options = new Options(usage, ClassFileWriter.class);
     String[] file_args;
@@ -74,8 +75,8 @@ public class ClassFileWriter {
       System.err.println("(For non-argfile beginning with \"@\", use \"@@\" for initial \"@\".");
       System.err.println("Alternative for filenames: indicate directory, e.g. as './@file'.");
       System.err.println("Alternative for flags: use '=', as in '-o=@Deprecated'.)");
-      file_args = null; // Eclipse compiler issue workaround
       System.exit(1);
+      throw new Error("unreachable");
     }
 
     if (version) {

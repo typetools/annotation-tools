@@ -70,8 +70,10 @@ public class MethodOffsetClassVisitor extends ClassVisitor {
     }
 
     /**
-     * @return the current scan position, given as an offset from the beginning of the method's code
-     *     attribute
+     * Returns the current scan position, given as an offset from the beginning of the method's code
+     * attribute.
+     *
+     * @return the current scan position
      */
     public int getOffset() {
       return codeOffsetAdapter.getMethodCodeOffset();

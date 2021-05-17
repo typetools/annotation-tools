@@ -214,11 +214,9 @@ public abstract class Annotations {
         String fieldName = fieldDef.getKey();
         AnnotationFieldType fieldType = fieldDef.getValue();
         Object fieldValue = a.getFieldValue(fieldName);
-
-        Object nnFieldValue;
-        if (fieldValue != null) {
-          nnFieldValue = fieldValue;
-        } else throw new IllegalArgumentException("annotation has no field value");
+        if (fieldValue == null) {
+          throw new IllegalArgumentException("annotation has no field value");
+        }
 
         if (fieldType instanceof ArrayAFT) {
           ArrayAFT aFieldType = (ArrayAFT) fieldType;
