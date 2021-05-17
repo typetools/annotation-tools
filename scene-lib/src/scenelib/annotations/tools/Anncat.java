@@ -3,6 +3,8 @@ package scenelib.annotations.tools;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.plumelib.util.FileIOException;
 import scenelib.annotations.el.AScene;
@@ -94,7 +96,8 @@ public class Anncat {
           idx++;
           usageAssert(idx == args.length);
           System.err.println("Writing index file to " + outfile + "...");
-          IndexFileWriter.write(theScene, new FileWriter(outfile, UTF_8));
+          // In Java 11, use: new FileWriter(outfile, UTF_8)
+          IndexFileWriter.write(theScene, Files.newBufferedWriter(Paths.get(outfile), UTF_8));
           System.err.println("Finished.");
         } else if (args[idx].equals("--class")) {
           idx++;
