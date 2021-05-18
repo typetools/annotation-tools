@@ -516,7 +516,7 @@ public class Main {
     String[] cl_args;
     String[] file_args;
     try {
-      cl_args = CommandLine.parse(args);
+      cl_args = CommandLine.parse(java.util.Arrays.asList(args)).toArray(new String[0]);
       file_args = options.parse(true, cl_args);
     } catch (IOException ex) {
       System.err.println(ex);

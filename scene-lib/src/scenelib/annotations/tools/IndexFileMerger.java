@@ -11,6 +11,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -49,7 +50,7 @@ public class IndexFileMerger {
     // collect annotations into scene
     try {
       try {
-        inputArgs = CommandLine.parse(args);
+        inputArgs = CommandLine.parse(Arrays.asList(args)).toArray(new String[0]);
       } catch (IOException ex) {
         System.err.println(ex);
         System.err.println("(For non-argfile beginning with \"@\", use \"@@\" for initial \"@\".");

@@ -4,6 +4,7 @@ import com.sun.tools.javac.main.CommandLine;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Opcodes;
 import org.plumelib.options.Option;
@@ -68,7 +69,7 @@ public class ClassFileReader {
     String[] file_args;
 
     try {
-      String[] cl_args = CommandLine.parse(args);
+      String[] cl_args = CommandLine.parse(Arrays.asList(args)).toArray(new String[0]);
       file_args = options.parse(true, cl_args);
     } catch (IOException ex) {
       System.err.println(ex);
