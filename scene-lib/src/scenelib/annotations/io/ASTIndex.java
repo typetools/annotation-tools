@@ -227,7 +227,7 @@ public class ASTIndex extends WrapperMap<Tree, ASTRecord> {
           @Override
           public Void visitCase(CaseTree node, ASTRecord rec) {
             Kind kind = node.getKind();
-            save(node.getExpression(), rec, kind, ASTPath.EXPRESSION);
+            saveAll(node.getExpressions(), rec, kind, ASTPath.EXPRESSION);
             saveAll(node.getStatements(), rec, kind, ASTPath.STATEMENT);
             return defaultAction(node, rec);
           }
