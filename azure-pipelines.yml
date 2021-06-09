@@ -134,3 +134,88 @@ jobs:
     fetchDepth: 25
   - bash: ./annotation-file-utilities/dev-scripts/test-downstream.sh
     displayName: test-downstream.sh
+- job: like_travis_build_without_test_jdk16
+  pool:
+    vmImage: 'ubuntu-latest'
+  container: mdernst/cf-ubuntu-jdk16:latest
+  ## Temporarily commented out so that JDK 16 tests run in the pull request
+  ## despite JDK 11 failures.  Uncomment when JDK 11 tests pass, before merging.
+  # dependsOn:
+  #   - like_travis_build_without_test_jdk11
+  #   - ant_test_jdk11
+  #   - typecheck_jdk11
+  #   - misc_jdk11
+  #   - downstream_jdk11
+  steps:
+  - checkout: self
+    fetchDepth: 25
+  - bash: ./.travis-build-without-test.sh
+    displayName: .travis-build-without-test.sh
+- job: ant_test_jdk16
+  pool:
+    vmImage: 'ubuntu-latest'
+  container: mdernst/cf-ubuntu-jdk16:latest
+  ## Temporarily commented out so that JDK 16 tests run in the pull request
+  ## despite JDK 11 failures.  Uncomment when JDK 11 tests pass, before merging.
+  # dependsOn:
+  #   - like_travis_build_without_test_jdk11
+  #   - ant_test_jdk11
+  #   - typecheck_jdk11
+  #   - misc_jdk11
+  #   - downstream_jdk11
+  steps:
+  - checkout: self
+    fetchDepth: 25
+  - bash: ./annotation-file-utilities/dev-scripts/test-allTests.sh
+    displayName: test-allTests.sh
+- job: typecheck_jdk16
+  pool:
+    vmImage: 'ubuntu-latest'
+  container: mdernst/cf-ubuntu-jdk16:latest
+  ## Temporarily commented out so that JDK 16 tests run in the pull request
+  ## despite JDK 11 failures.  Uncomment when JDK 11 tests pass, before merging.
+  # dependsOn:
+  #   - like_travis_build_without_test_jdk11
+  #   - ant_test_jdk11
+  #   - typecheck_jdk11
+  #   - misc_jdk11
+  #   - downstream_jdk11
+  steps:
+  - checkout: self
+    fetchDepth: 25
+  - bash: ./annotation-file-utilities/dev-scripts/test-typecheck.sh
+    displayName: test-typecheck.sh
+- job: misc_jdk16
+  pool:
+    vmImage: 'ubuntu-latest'
+  container: mdernst/cf-ubuntu-jdk16-plus:latest
+  ## Temporarily commented out so that JDK 16 tests run in the pull request
+  ## despite JDK 11 failures.  Uncomment when JDK 11 tests pass, before merging.
+  # dependsOn:
+  #   - like_travis_build_without_test_jdk11
+  #   - ant_test_jdk11
+  #   - typecheck_jdk11
+  #   - misc_jdk11
+  #   - downstream_jdk11
+  steps:
+  - checkout: self
+    fetchDepth: 25
+  - bash: ./annotation-file-utilities/dev-scripts/test-misc.sh
+    displayName: test-misc.sh
+- job: downstream_jdk16
+  pool:
+    vmImage: 'ubuntu-latest'
+  container: mdernst/cf-ubuntu-jdk16:latest
+  ## Temporarily commented out so that JDK 16 tests run in the pull request
+  ## despite JDK 11 failures.  Uncomment when JDK 11 tests pass, before merging.
+  # dependsOn:
+  #   - like_travis_build_without_test_jdk11
+  #   - ant_test_jdk11
+  #   - typecheck_jdk11
+  #   - misc_jdk11
+  #   - downstream_jdk11
+  steps:
+  - checkout: self
+    fetchDepth: 25
+  - bash: ./annotation-file-utilities/dev-scripts/test-downstream.sh
+    displayName: test-downstream.sh
