@@ -13,4 +13,17 @@ class IOUtils {
     int lastdot = className.lastIndexOf('.');
     return (lastdot == -1) ? className : className.substring(lastdot + 1);
   }
+  
+  static String[] parseCommandLine(String[] args) {
+    try {
+      Method method = CommandLine.class.getDeclaredMethod(
+              "parse", List.class);
+      return ((List)method.invoke(null, Arrays.asList(args))).toArray(new String[0]);
+    }
+    catch (NoSuchMethodException e) {
+      Method method = CommandLine.class.getDeclaredMethod(
+              "parse", String[].class);
+      return (String[])method.invoke(null, args);
+    }
+  }
 }

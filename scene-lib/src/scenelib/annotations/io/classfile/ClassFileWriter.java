@@ -2,6 +2,7 @@ package scenelib.annotations.io.classfile;
 
 import com.sun.tools.javac.main.CommandLine;
 import java.io.*;
+import java.util.Arrays;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Opcodes;
 import org.plumelib.options.Option;
@@ -68,7 +69,7 @@ public class ClassFileWriter {
     String[] file_args;
 
     try {
-      String[] cl_args = CommandLine.parse(args);
+      String[] cl_args = IOUtils.parseCommandLine(args);
       file_args = options.parse(true, cl_args);
     } catch (IOException ex) {
       System.err.println(ex);

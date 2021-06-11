@@ -516,7 +516,7 @@ public class Main {
     String[] cl_args;
     String[] file_args;
     try {
-      cl_args = CommandLine.parse(args);
+      cl_args = parseCommandLine(args);
       file_args = options.parse(true, cl_args);
     } catch (IOException ex) {
       System.err.println(ex);
@@ -1226,5 +1226,18 @@ public class Main {
     return (pidx == -1)
         ? Pair.of(s, (String) null)
         : Pair.of(s.substring(0, pidx), s.substring(pidx));
+  }
+
+  private static String[] parseCommandLine(String[] args) {
+    try {
+      Method method = CommandLine.class.getDeclaredMethod(
+              "parse", List.class);
+      return ((List)method.invoke(null, Arrays.asList(args))).toArray(new String[0]);
+    }
+    catch (NoSuchMethodException e) {
+      Method method = CommandLine.class.getDeclaredMethod(
+              "parse", String[].class);
+      return (String[])method.invoke(null, args);
+    }
   }
 }
