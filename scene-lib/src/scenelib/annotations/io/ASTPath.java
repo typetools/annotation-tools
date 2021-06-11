@@ -780,10 +780,15 @@ public class ASTPath extends ImmutableStack<ASTPath.ASTEntry>
           case CASE:
             {
               CaseTree caze = (CaseTree) actualNode;
+              int arg = astNode.getArgument();
               if (astNode.childSelectorIs(ASTPath.EXPRESSION)) {
-                next = caze.getExpression();
+                List<? extends ExpressionTree> expressions = org.checkerframework.javacutil.TreeUtils.caseTreeGetExpressions(caze);
+                // If expressions is empty, it means default case:
+                if (!expressions.isEmpty() && arg >= expressions.size()) {
+                  return false;
+                }
+                next = expressions.get(arg);
               } else {
-                int arg = astNode.getArgument();
                 List<? extends StatementTree> statements = caze.getStatements();
                 if (arg >= statements.size()) {
                   return false;
