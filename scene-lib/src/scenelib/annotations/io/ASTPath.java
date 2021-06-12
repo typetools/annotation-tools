@@ -1,5 +1,6 @@
 package scenelib.annotations.io;
 
+import annotator.find.CaseUtils;
 import com.sun.source.tree.AnnotatedTypeTree;
 import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.ArrayAccessTree;
@@ -782,7 +783,7 @@ public class ASTPath extends ImmutableStack<ASTPath.ASTEntry>
               CaseTree caze = (CaseTree) actualNode;
               int arg = astNode.getArgument();
               if (astNode.childSelectorIs(ASTPath.EXPRESSION)) {
-                List<? extends ExpressionTree> expressions = org.checkerframework.javacutil.TreeUtils.caseTreeGetExpressions(caze);
+                List<? extends ExpressionTree> expressions = CaseUtils.caseTreeGetExpressions(caze);
                 // If expressions is empty, it means default case:
                 if (!expressions.isEmpty() && arg >= expressions.size()) {
                   return false;
