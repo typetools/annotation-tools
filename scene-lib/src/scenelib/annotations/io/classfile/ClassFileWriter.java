@@ -9,6 +9,7 @@ import org.plumelib.options.Option;
 import org.plumelib.options.Options;
 import scenelib.annotations.el.AScene;
 import scenelib.annotations.io.IndexFileParser;
+import scenelib.annotations.util.CommandLineUtils;
 
 /**
  * A <code> ClassFileWriter </code> provides methods for inserting annotations from an {@link
@@ -69,9 +70,9 @@ public class ClassFileWriter {
     String[] file_args;
 
     try {
-      String[] cl_args = IOUtils.parseCommandLine(args);
+      String[] cl_args = CommandLineUtils.parseCommandLine(args);
       file_args = options.parse(true, cl_args);
-    } catch (IOException ex) {
+    } catch (Exception ex) {
       System.err.println(ex);
       System.err.println("(For non-argfile beginning with \"@\", use \"@@\" for initial \"@\".");
       System.err.println("Alternative for filenames: indicate directory, e.g. as './@file'.");

@@ -30,6 +30,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -73,6 +74,7 @@ import scenelib.annotations.io.ASTRecord;
 import scenelib.annotations.io.DebugWriter;
 import scenelib.annotations.io.IndexFileParser;
 import scenelib.annotations.io.IndexFileWriter;
+import scenelib.annotations.util.CommandLineUtils;
 import scenelib.annotations.util.coll.VivifyingMap;
 
 /**
@@ -516,9 +518,9 @@ public class Main {
     String[] cl_args;
     String[] file_args;
     try {
-      cl_args = parseCommandLine(args);
+      cl_args = CommandLineUtils.parseCommandLine(args);
       file_args = options.parse(true, cl_args);
-    } catch (IOException ex) {
+    } catch (Exception ex) {
       System.err.println(ex);
       System.err.println("(For non-argfile beginning with \"@\", use \"@@\" for initial \"@\".");
       System.err.println("Alternative for filenames: indicate directory, e.g. as './@file'.");
@@ -1226,18 +1228,5 @@ public class Main {
     return (pidx == -1)
         ? Pair.of(s, (String) null)
         : Pair.of(s.substring(0, pidx), s.substring(pidx));
-  }
-
-  private static String[] parseCommandLine(String[] args) {
-    try {
-      Method method = CommandLine.class.getDeclaredMethod(
-              "parse", List.class);
-      return ((List)method.invoke(null, Arrays.asList(args))).toArray(new String[0]);
-    }
-    catch (NoSuchMethodException e) {
-      Method method = CommandLine.class.getDeclaredMethod(
-              "parse", String[].class);
-      return (String[])method.invoke(null, args);
-    }
   }
 }

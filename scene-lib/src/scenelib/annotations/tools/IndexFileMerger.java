@@ -34,6 +34,7 @@ import scenelib.annotations.el.ElementVisitor;
 import scenelib.annotations.field.AnnotationFieldType;
 import scenelib.annotations.io.IndexFileParser;
 import scenelib.annotations.io.IndexFileWriter;
+import scenelib.annotations.util.CommandLineUtils;
 
 /** Utility for merging index files, including multiple versions for the same class. */
 public class IndexFileMerger {
@@ -50,8 +51,8 @@ public class IndexFileMerger {
     // collect annotations into scene
     try {
       try {
-        inputArgs = IOUtils.parseCommandLine(args);
-      } catch (IOException ex) {
+        inputArgs = CommandLineUtils.parseCommandLine(args);
+      } catch (Exception ex) {
         System.err.println(ex);
         System.err.println("(For non-argfile beginning with \"@\", use \"@@\" for initial \"@\".");
         System.err.println("Alternative for filenames: indicate directory, e.g. as './@file'.");
