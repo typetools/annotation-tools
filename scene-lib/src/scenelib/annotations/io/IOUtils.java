@@ -1,7 +1,5 @@
 package scenelib.annotations.io;
 
-
-
 /** <code>IOUtils</code> has some static methods useful to scene I/O code. */
 class IOUtils {
   private IOUtils() {}
