@@ -1,10 +1,8 @@
 package scenelib.annotations.io.classfile;
 
-import com.sun.tools.javac.main.CommandLine;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Opcodes;
 import org.plumelib.options.Option;

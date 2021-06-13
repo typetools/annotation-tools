@@ -1,10 +1,6 @@
 package scenelib.annotations.io;
 
-import com.sun.tools.javac.main.CommandLine;
 
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.List;
 
 /** <code>IOUtils</code> has some static methods useful to scene I/O code. */
 class IOUtils {
@@ -19,5 +15,4 @@ class IOUtils {
     int lastdot = className.lastIndexOf('.');
     return (lastdot == -1) ? className : className.substring(lastdot + 1);
   }
-
 }
