@@ -8,6 +8,9 @@ import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Utility class for dealing with CaseTree
+ */
 public class CaseUtils {
   /**
    * Copy of the method from checker-framework's TreeUtils
