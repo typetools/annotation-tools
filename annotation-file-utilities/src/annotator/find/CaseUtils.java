@@ -7,16 +7,15 @@ import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.List;
 
-/** Utility class for dealing with CaseTree */
+/** Utility class for dealing with CaseTree. */
 public class CaseUtils {
+  // This is a copy of a method from checker-framework's {@code TreeUtils}.  Keep them in sync.
   /**
-   * Copy of the method from checker-framework's TreeUtils
-   *
-   * <p>Get the list of expressions from a case expression. In JDK 11 and earlier, this will be a
+   * Get the list of expressions from a case expression. In JDK 11 and earlier, this will be a
    * singleton list. In JDK 12 onwards, there can be multiple expressions per case.
    *
-   * @param caseTree The case expression to get the expressions from.
-   * @return The list of expressions in the case.
+   * @param caseTree the case expression to get the expressions from
+   * @return the list of expressions in the case
    */
   public static List<? extends ExpressionTree> caseTreeGetExpressions(CaseTree caseTree) {
     try {
@@ -26,13 +25,12 @@ public class CaseUtils {
           (List<? extends ExpressionTree>) method.invoke(caseTree);
       return result;
     } catch (NoSuchMethodException e) {
-      // Must be on JDK 11 or earlier
+      // Must be on JDK 11 or earlier.
     } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-      // May as well fall back to old method
+      // May as well fall back to old method.
     }
 
-    // Need to suppress deprecation on JDK 12 and later:
-    @SuppressWarnings("deprecation")
+    @SuppressWarnings("deprecation") // getExpression() is deprecatde on JDK 12 and later
     ExpressionTree expression = caseTree.getExpression();
     return Collections.singletonList(expression);
   }
