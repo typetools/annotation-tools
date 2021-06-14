@@ -5,7 +5,15 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 
+/** Handle javac class {@code CommandLine} under all versions of the JDK. */
 public class CommandLineUtils {
+  /**
+   * Calls {@code CommandLine.parse}, handling both JDK 8-11 (where it takes and returns arrays) and
+   * later JDKs, where it takes and returns a list.
+   *
+   * @param args the command line
+   * @return the result of calling {@code CommandLine.parse}
+   */
   public static String[] parseCommandLine(String[] args) throws Exception {
     try {
       Method method = CommandLine.class.getDeclaredMethod("parse", List.class);
