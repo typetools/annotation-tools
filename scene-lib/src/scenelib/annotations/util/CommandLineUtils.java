@@ -1,6 +1,7 @@
 package scenelib.annotations.util;
 
 import com.sun.tools.javac.main.CommandLine;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
@@ -14,13 +15,17 @@ public class CommandLineUtils {
    * @param args the command line
    * @return the result of calling {@code CommandLine.parse}
    */
-  public static String[] parseCommandLine(String[] args) throws Exception {
+  public static String[] parseCommandLine(String[] args) {
     try {
-      Method method = CommandLine.class.getDeclaredMethod("parse", List.class);
-      return ((List<?>) method.invoke(null, Arrays.asList(args))).toArray(new String[0]);
-    } catch (NoSuchMethodException e) {
-      Method method = CommandLine.class.getDeclaredMethod("parse", String[].class);
-      return (String[]) method.invoke(null, (Object) args);
+      try {
+        Method method = CommandLine.class.getDeclaredMethod("parse", List.class);
+        return ((List<?>) method.invoke(null, Arrays.asList(args))).toArray(new String[0]);
+      } catch (NoSuchMethodException e) {
+        Method method = CommandLine.class.getDeclaredMethod("parse", String[].class);
+        return (String[]) method.invoke(null, (Object) args);
+      }
+    } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+      throw new Error("Cannot access CommandLine.parse", e);
     }
   }
 }
