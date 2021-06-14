@@ -30,7 +30,7 @@ public class CaseUtils {
       // May as well fall back to old method.
     }
 
-    @SuppressWarnings("deprecation") // getExpression() is deprecatde on JDK 12 and later
+    @SuppressWarnings("deprecation") // getExpression() is deprecated on JDK 12 and later
     ExpressionTree expression = caseTree.getExpression();
     return Collections.singletonList(expression);
   }
