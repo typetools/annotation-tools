@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.List;
 
 public class CommandLineUtils {
-  @SuppressWarnings("unchecked")
   public static String[] parseCommandLine(String[] args) throws Exception {
     try {
       Method method = CommandLine.class.getDeclaredMethod("parse", List.class);
