@@ -23,7 +23,7 @@ jobs:
     fetchDepth: 25
   - bash: ./.build-without-test.sh
     displayName: .build-without-test.sh
-- job: ant_test_jdk11
+- job: test_jdk11
   pool:
     vmImage: 'ubuntu-latest'
   container: mdernst/cf-ubuntu-jdk11:latest
@@ -65,7 +65,7 @@ jobs:
   container: mdernst/cf-ubuntu-jdk8:latest
   dependsOn:
     - build_without_test_jdk11
-    - ant_test_jdk11
+    - test_jdk11
     - typecheck_jdk11
     - misc_jdk11
     - downstream_jdk11
@@ -74,13 +74,13 @@ jobs:
     fetchDepth: 25
   - bash: ./.build-without-test.sh
     displayName: .build-without-test.sh
-- job: ant_test_jdk8
+- job: test_jdk8
   pool:
     vmImage: 'ubuntu-latest'
   container: mdernst/cf-ubuntu-jdk8:latest
   dependsOn:
     - build_without_test_jdk11
-    - ant_test_jdk11
+    - test_jdk11
     - typecheck_jdk11
     - misc_jdk11
     - downstream_jdk11
@@ -95,7 +95,7 @@ jobs:
   container: mdernst/cf-ubuntu-jdk8:latest
   dependsOn:
     - build_without_test_jdk11
-    - ant_test_jdk11
+    - test_jdk11
     - typecheck_jdk11
     - misc_jdk11
     - downstream_jdk11
@@ -110,7 +110,7 @@ jobs:
   container: mdernst/cf-ubuntu-jdk8-plus:latest
   dependsOn:
     - build_without_test_jdk11
-    - ant_test_jdk11
+    - test_jdk11
     - typecheck_jdk11
     - misc_jdk11
     - downstream_jdk11
@@ -125,7 +125,7 @@ jobs:
   container: mdernst/cf-ubuntu-jdk8:latest
   dependsOn:
     - build_without_test_jdk11
-    - ant_test_jdk11
+    - test_jdk11
     - typecheck_jdk11
     - misc_jdk11
     - downstream_jdk11
