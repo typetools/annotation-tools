@@ -23,7 +23,6 @@ import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
 import com.sun.source.util.TreePathScanner;
-import com.sun.tools.javac.main.CommandLine;
 import com.sun.tools.javac.tree.JCTree;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -73,6 +72,7 @@ import scenelib.annotations.io.ASTRecord;
 import scenelib.annotations.io.DebugWriter;
 import scenelib.annotations.io.IndexFileParser;
 import scenelib.annotations.io.IndexFileWriter;
+import scenelib.annotations.util.CommandLineUtils;
 import scenelib.annotations.util.coll.VivifyingMap;
 
 /**
@@ -516,9 +516,9 @@ public class Main {
     String[] cl_args;
     String[] file_args;
     try {
-      cl_args = CommandLine.parse(args);
+      cl_args = CommandLineUtils.parseCommandLine(args);
       file_args = options.parse(true, cl_args);
-    } catch (IOException ex) {
+    } catch (Exception ex) {
       System.err.println(ex);
       System.err.println("(For non-argfile beginning with \"@\", use \"@@\" for initial \"@\".");
       System.err.println("Alternative for filenames: indicate directory, e.g. as './@file'.");
