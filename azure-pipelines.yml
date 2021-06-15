@@ -21,8 +21,8 @@ jobs:
   steps:
   - checkout: self
     fetchDepth: 25
-  - bash: ./.travis-build-without-test.sh
-    displayName: .travis-build-without-test.sh
+  - bash: ./.build-without-test.sh
+    displayName: .build-without-test.sh
 - job: ant_test_jdk11
   pool:
     vmImage: 'ubuntu-latest'
@@ -72,8 +72,8 @@ jobs:
   steps:
   - checkout: self
     fetchDepth: 25
-  - bash: ./.travis-build-without-test.sh
-    displayName: .travis-build-without-test.sh
+  - bash: ./.build-without-test.sh
+    displayName: .build-without-test.sh
 - job: ant_test_jdk8
   pool:
     vmImage: 'ubuntu-latest'
