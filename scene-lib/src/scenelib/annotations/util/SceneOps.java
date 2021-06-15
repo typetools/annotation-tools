@@ -1,7 +1,11 @@
 package scenelib.annotations.util;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import com.sun.tools.javac.util.Pair;
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
@@ -39,7 +43,7 @@ public class SceneOps {
    * "minuend" and the "subtrahend" (see {@link #diff(AScene, AScene)}). If successful, the diff
    * subcommand writes the scene it calculates to {@link System#out}.
    *
-   * @throws IOException
+   * @throws IOException if there is trouble reading a file
    */
   public static void main(String[] args) throws IOException {
     if (args.length != 3 || !"diff".equals(args[0])) {
@@ -55,7 +59,8 @@ public class SceneOps {
       IndexFileParser.parseFile(args[2], s2);
       AScene diff = diff(s1, s2);
 
-      try (Writer w = new PrintWriter(System.out)) {
+      try (Writer w =
+          new PrintWriter(new BufferedWriter(new OutputStreamWriter(System.out, UTF_8)))) {
         IndexFileWriter.write(diff, w);
       } catch (DefException e) {
         exitWithException(e);

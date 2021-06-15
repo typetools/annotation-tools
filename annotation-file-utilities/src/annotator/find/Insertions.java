@@ -98,6 +98,7 @@ public class Insertions implements Iterable<Insertion> {
    * @return set of {@link Insertion}s with an {@link InClassCriterion} for the given outer class or
    *     one of its local classes
    */
+  @SuppressWarnings("MixedMutabilityReturnType") // clients do not modify the result
   public Set<Insertion> forOuterClass(CompilationUnitTree cut, String qualifiedOuterClassName) {
     Map<String, Set<Insertion>> map = store.get(qualifiedOuterClassName);
     if (map == null || map.isEmpty()) {
@@ -239,6 +240,7 @@ public class Insertions implements Iterable<Insertion> {
    * <p>This method attaches {@link scenelib.annotations.io.ASTPath}-based inner type {@link
    * Insertion}s to a {@link TypedInsertion} on the outer type if one exists.
    */
+  @SuppressWarnings("CatchAndPrintStackTrace") // maybe rethrow the exception
   private Set<Insertion> organizeTypedInsertions(
       CompilationUnitTree cut, String className, Collection<Insertion> insertions) {
     Map<ASTRecord, TypedInsertion> outerInsertions = new HashMap<>();
@@ -813,51 +815,6 @@ public class Insertions implements Iterable<Insertion> {
 
   /**
    * Find an {@link ASTRecord} for the tree corresponding to a nested type of the type (use) to
-   * which the given record corresponds.
-   *
-   * @param rec record of (outer) type AST to be annotated
-   * @param loc inner type path
-   * @return record that locates the (nested) type in the source
-   */
-  private ASTRecord extendToInnerType(ASTRecord rec, List<TypePathEntry> loc) {
-    ASTRecord r = rec;
-    Iterator<TypePathEntry> iter = loc.iterator();
-    int depth = 0;
-
-    while (iter.hasNext()) {
-      TypePathEntry tpe = iter.next();
-      switch (tpe.step) {
-        case TypePath.ARRAY_ELEMENT:
-          while (depth-- > 0) {
-            r = r.extend(Tree.Kind.MEMBER_SELECT, ASTPath.EXPRESSION);
-          }
-          r = r.extend(Tree.Kind.ARRAY_TYPE, ASTPath.TYPE);
-          break;
-        case TypePath.INNER_TYPE:
-          ++depth;
-          break;
-        case TypePath.TYPE_ARGUMENT:
-          depth = 0;
-          r = r.extend(Tree.Kind.PARAMETERIZED_TYPE, ASTPath.TYPE_ARGUMENT, tpe.argument);
-          break;
-        case TypePath.WILDCARD_BOUND:
-          while (depth-- > 0) {
-            r = r.extend(Tree.Kind.MEMBER_SELECT, ASTPath.EXPRESSION);
-          }
-          r = r.extend(Tree.Kind.UNBOUNDED_WILDCARD, ASTPath.BOUND);
-          break;
-        default:
-          throw new RuntimeException();
-      }
-    }
-    while (depth-- > 0) {
-      r = r.extend(Tree.Kind.MEMBER_SELECT, ASTPath.EXPRESSION);
-    }
-    return r;
-  }
-
-  /**
-   * Find an {@link ASTRecord} for the tree corresponding to a nested type of the type (use) to
    * which the given tree and record correspond.
    *
    * @param rec record that locates {@code node} in the source
@@ -1281,7 +1238,7 @@ public class Insertions implements Iterable<Insertion> {
                   (com.sun.tools.javac.code.Type.ClassType) t;
               d = new DeclaredType(ct.tsym.name.toString());
               d.setInnerType(d0);
-              d0 = d;
+              // d0 = d;
               for (com.sun.tools.javac.code.Type a : ct.getTypeArguments()) {
                 d.addTypeParameter(javacTypeToType(a));
               }

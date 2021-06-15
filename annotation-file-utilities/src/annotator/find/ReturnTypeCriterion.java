@@ -44,7 +44,7 @@ public class ReturnTypeCriterion implements Criterion {
     }
 
     Criteria.dbug.debug(
-        "ReturnTypeCriterion.isSatisfiedBy(%s); this=%n", Main.leafString(path), this.toString());
+        "ReturnTypeCriterion.isSatisfiedBy(%s); this=%s%n", Main.leafString(path), this.toString());
 
     do {
       if (path.getLeaf().getKind() == Tree.Kind.METHOD) {

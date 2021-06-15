@@ -1,6 +1,5 @@
 package scenelib.annotations.io.classfile;
 
-import com.sun.tools.javac.main.CommandLine;
 import java.io.*;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Opcodes;
@@ -8,6 +7,7 @@ import org.plumelib.options.Option;
 import org.plumelib.options.Options;
 import scenelib.annotations.el.AScene;
 import scenelib.annotations.io.IndexFileParser;
+import scenelib.annotations.util.CommandLineUtils;
 
 /**
  * A <code> ClassFileWriter </code> provides methods for inserting annotations from an {@link
@@ -62,20 +62,21 @@ public class ClassFileWriter {
    * @param args options and classes and index files to analyze;
    * @throws IOException if a class file or index file cannot be opened/written
    */
+  @SuppressWarnings("IncrementInForLoopAndHeader") // array contains alternating elements
   public static void main(String[] args) throws IOException {
     Options options = new Options(usage, ClassFileWriter.class);
     String[] file_args;
 
     try {
-      String[] cl_args = CommandLine.parse(args);
+      String[] cl_args = CommandLineUtils.parseCommandLine(args);
       file_args = options.parse(true, cl_args);
-    } catch (IOException ex) {
+    } catch (Exception ex) {
       System.err.println(ex);
       System.err.println("(For non-argfile beginning with \"@\", use \"@@\" for initial \"@\".");
       System.err.println("Alternative for filenames: indicate directory, e.g. as './@file'.");
       System.err.println("Alternative for flags: use '=', as in '-o=@Deprecated'.)");
-      file_args = null; // Eclipse compiler issue workaround
       System.exit(1);
+      throw new Error("unreachable");
     }
 
     if (version) {

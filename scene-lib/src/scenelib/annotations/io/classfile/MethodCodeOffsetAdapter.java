@@ -75,17 +75,28 @@ class MethodCodeOffsetAdapter extends MethodVisitor {
     offset += i;
   }
 
-  /** @return class offset of code attribute; 0 for abstract methods */
+  /**
+   * Returns the class offset of the code attribute; 0 for abstract methods.
+   *
+   * @return class offset of code attribute; 0 for abstract methods
+   */
   public int getCodeStart() {
     return codeStart;
   }
 
-  /** @return offset of instruction just visited; -1 before first visit */
+  /**
+   * Returns the offset of the instruction just visited; -1 before first visit.
+   *
+   * @return offset of instruction just visited; -1 before first visit
+   */
   public int getPreviousOffset() {
     return previousOffset;
   }
 
   /**
+   * Returns the offset after instruction just visited; 0 before first visit, -1 if {@link
+   * #visitEnd()} has been called
+   *
    * @return offset after instruction just visited; 0 before first visit, -1 if {@link #visitEnd()}
    *     has been called
    */

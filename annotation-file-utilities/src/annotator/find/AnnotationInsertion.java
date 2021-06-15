@@ -106,6 +106,7 @@ public class AnnotationInsertion extends Insertion {
    * @param abbreviate if true, the package name will be removed from the annotation.
    * @return the text to insert
    */
+  @Override
   protected String getText(boolean comments, boolean abbreviate) {
     // The method body will build up the result by modifying this variable.
     String result = fullyQualifiedAnnotationText;
@@ -178,6 +179,7 @@ public class AnnotationInsertion extends Insertion {
     return fullyQualifiedAnnotationName;
   }
 
+  @Override
   protected boolean addLeadingSpace(boolean gotSeparateLine, int pos, char precedingChar) {
     if (generateExtends || precedingChar == '.') {
       return false;
@@ -191,6 +193,7 @@ public class AnnotationInsertion extends Insertion {
     return !wasGenerateExtends && super.addTrailingSpace(gotSeparateLine);
   }
 
+  @Override
   public Kind getKind() {
     return Kind.ANNOTATION;
   }

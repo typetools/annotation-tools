@@ -1,6 +1,10 @@
 package annotations.tests.executable;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 import scenelib.annotations.*;
 import scenelib.annotations.el.*;
@@ -66,7 +70,7 @@ public class Example {
 
     // System.out.println("Writing out " + args[2]);
     try {
-      IndexFileWriter.write(scene, new FileWriter(args[2]));
+      IndexFileWriter.write(scene, Files.newBufferedWriter(Paths.get(args[2]), UTF_8));
     } catch (IOException e) {
       e.printStackTrace(System.err);
       return;

@@ -48,13 +48,10 @@ import com.sun.source.tree.WhileLoopTree;
 import com.sun.source.tree.WildcardTree;
 import com.sun.source.util.SimpleTreeVisitor;
 import com.sun.source.util.TreePath;
-import com.sun.tools.javac.code.Flags;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.tree.JCTree;
 import java.util.ArrayList;
 import java.util.List;
-import javax.lang.model.element.Modifier;
-import javax.lang.model.type.TypeKind;
 import scenelib.annotations.io.ASTPath;
 
 /** A criterion to determine if a node matches a path through the AST. */
@@ -115,8 +112,8 @@ public class ASTPathCriterion implements Criterion {
     // MethodTree or ClassTree on actualPath.
     if (path != null && !astPath.isEmpty()) {
       Tree.Kind entryKind = astPath.get(0).getTreeKind();
-      if (entryKind == Tree.Kind.METHOD && kind == Tree.Kind.METHOD
-          || entryKind == Tree.Kind.CLASS && ASTPath.isClassEquiv(kind)) {
+      if ((entryKind == Tree.Kind.METHOD && kind == Tree.Kind.METHOD)
+          || (entryKind == Tree.Kind.CLASS && ASTPath.isClassEquiv(kind))) {
         actualPath.add(0, leaf);
       }
     }
@@ -189,8 +186,8 @@ public class ASTPathCriterion implements Criterion {
       }
     }
 
-    if (i < actualPathLen && matchNext(next, actualPath.get(i))
-        || i <= actualPathLen && next.getKind() == Tree.Kind.NEW_ARRAY) {
+    if ((i < actualPathLen && matchNext(next, actualPath.get(i)))
+        || (i <= actualPathLen && next.getKind() == Tree.Kind.NEW_ARRAY)) {
       return true;
     }
 
@@ -341,10 +338,14 @@ public class ASTPathCriterion implements Criterion {
         case CASE:
           {
             CaseTree caze = (CaseTree) actualNode;
+            int arg = astNode.getArgument();
             if (astNode.childSelectorIs(ASTPath.EXPRESSION)) {
-              return caze.getExpression();
+              List<? extends ExpressionTree> expressions = CaseUtils.caseTreeGetExpressions(caze);
+              if (arg >= expressions.size()) {
+                return null;
+              }
+              return expressions.get(arg);
             } else {
-              int arg = astNode.getArgument();
               List<? extends StatementTree> statements = caze.getStatements();
               if (arg >= statements.size()) {
                 return null;
@@ -875,119 +876,7 @@ public class ASTPathCriterion implements Criterion {
     }
   }
 
-  private boolean checkReceiverType(int i, Type t) {
-    if (t == null) {
-      return false;
-    }
-    while (++i < astPath.size()) {
-      ASTPath.ASTEntry entry = astPath.get(i);
-      switch (entry.getTreeKind()) {
-        case ANNOTATED_TYPE:
-          break;
-        case ARRAY_TYPE:
-          if (t.getKind() != TypeKind.ARRAY) {
-            return false;
-          }
-          t = ((Type.ArrayType) t).getComponentType();
-          break;
-        case MEMBER_SELECT:
-          // TODO
-          break;
-        case PARAMETERIZED_TYPE:
-          if (entry.childSelectorIs(ASTPath.TYPE_PARAMETER)) {
-            if (!t.isParameterized()) {
-              return false;
-            }
-            List<Type> args = t.getTypeArguments();
-            int a = entry.getArgument();
-            if (a >= args.size()) {
-              return false;
-            }
-            t = args.get(a);
-          } // else TYPE -- stay?
-          break;
-        case TYPE_PARAMETER:
-          if (t.getKind() != TypeKind.WILDCARD) {
-            return false;
-          }
-          t = t.getLowerBound();
-          break;
-        case EXTENDS_WILDCARD:
-          if (t.getKind() != TypeKind.WILDCARD) {
-            return false;
-          }
-          t = ((Type.WildcardType) t).getExtendsBound();
-          break;
-        case SUPER_WILDCARD:
-          if (t.getKind() != TypeKind.WILDCARD) {
-            return false;
-          }
-          t = ((Type.WildcardType) t).getSuperBound();
-          break;
-        case UNBOUNDED_WILDCARD:
-          if (t.getKind() != TypeKind.WILDCARD) {
-            return false;
-          }
-          t = t.getLowerBound();
-          break;
-        default:
-          return false;
-      }
-      if (t == null) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  private static ClassTree methodReceiverType(TreePath path) {
-    Tree t = path.getLeaf();
-    if (t.getKind() != Tree.Kind.METHOD) {
-      return null;
-    }
-    JCTree.JCMethodDecl method = (JCTree.JCMethodDecl) t;
-    if ((method.mods.flags & Flags.STATIC) != 0) {
-      return null;
-    }
-
-    // Find the name of the class with type parameters to create the
-    // receiver. Walk up the tree and pick up class names to add to
-    // the receiver type. Since we're starting from the innermost
-    // class, the classes we get to at earlier iterations of the loop
-    // are inside of the classes we get to at later iterations.
-    TreePath parent = path.getParentPath();
-    Tree leaf = parent.getLeaf();
-    Tree.Kind kind = leaf.getKind();
-
-    // For an inner class constructor, the receiver comes from the
-    // superclass, so skip past the first type definition.
-    boolean skip = method.getReturnType() == null;
-
-    while (kind != Tree.Kind.COMPILATION_UNIT && kind != Tree.Kind.NEW_CLASS) {
-      if (kind == Tree.Kind.CLASS
-          || kind == Tree.Kind.INTERFACE
-          || kind == Tree.Kind.ENUM
-          || kind == Tree.Kind.ANNOTATION_TYPE) {
-        JCTree.JCClassDecl clazz = (JCTree.JCClassDecl) leaf;
-        boolean isStatic =
-            kind == Tree.Kind.INTERFACE
-                || kind == Tree.Kind.ENUM
-                || clazz.getModifiers().getFlags().contains(Modifier.STATIC);
-        skip &= !isStatic;
-        if (!skip || isStatic) {
-          return clazz;
-        }
-        skip = false;
-      }
-
-      parent = path.getParentPath();
-      leaf = parent.getLeaf();
-      kind = leaf.getKind();
-    }
-
-    throw new IllegalArgumentException("no receiver for non-inner constructor");
-  }
-
+  @SuppressWarnings("EmptyCatch") // TODO
   private boolean checkTypePath(int i, Tree typeTree) {
     try {
       loop:

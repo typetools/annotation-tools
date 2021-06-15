@@ -1,5 +1,6 @@
 package scenelib.annotations.io;
 
+import annotator.find.CaseUtils;
 import com.sun.source.tree.AnnotatedTypeTree;
 import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.ArrayAccessTree;
@@ -343,7 +344,7 @@ public class ASTPath extends ImmutableStack<ASTPath.ASTEntry>
    *
    * @param s formatted string as in JAIF {@code insert-\{cast,annotation\}}
    * @return the corresponding {@code ASTPath}
-   * @throws ParseException
+   * @throws ParseException if there is trouble parsing the string
    */
   public static ASTPath parse(final String s) throws ParseException {
     return new Parser(s).parseASTPath();
@@ -780,10 +781,15 @@ public class ASTPath extends ImmutableStack<ASTPath.ASTEntry>
           case CASE:
             {
               CaseTree caze = (CaseTree) actualNode;
+              int arg = astNode.getArgument();
               if (astNode.childSelectorIs(ASTPath.EXPRESSION)) {
-                next = caze.getExpression();
+                List<? extends ExpressionTree> expressions = CaseUtils.caseTreeGetExpressions(caze);
+                // If expressions is empty, it means default case:
+                if (!expressions.isEmpty() && arg >= expressions.size()) {
+                  return false;
+                }
+                next = expressions.get(arg);
               } else {
-                int arg = astNode.getArgument();
                 List<? extends StatementTree> statements = caze.getStatements();
                 if (arg >= statements.size()) {
                   return false;
@@ -1371,6 +1377,7 @@ public class ASTPath extends ImmutableStack<ASTPath.ASTEntry>
     return compareTo(astPath) == 0;
   }
 
+  @SuppressWarnings("JdkObsolete") // TODO: don't use LinkedList
   @Override
   public int compareTo(ASTPath o) {
     // hacky fix: remove {Method,Class}.body for comparison
@@ -1378,7 +1385,6 @@ public class ASTPath extends ImmutableStack<ASTPath.ASTEntry>
     ImmutableStack<ASTEntry> s1 = canonical(o);
     Deque<ASTEntry> d0 = new LinkedList<ASTEntry>();
     Deque<ASTEntry> d1 = new LinkedList<ASTEntry>();
-    int c = 0;
     while (!s0.isEmpty()) {
       d0.push(s0.peek());
       s0 = s0.pop();
@@ -1389,7 +1395,7 @@ public class ASTPath extends ImmutableStack<ASTPath.ASTEntry>
     }
     int n0 = d0.size();
     int n1 = d1.size();
-    c = Integer.compare(n0, n1);
+    int c = Integer.compare(n0, n1);
     if (c == 0) {
       Iterator<ASTEntry> i0 = d0.iterator();
       Iterator<ASTEntry> i1 = d1.iterator();
@@ -1492,6 +1498,7 @@ class ImmutableStack<E> {
     return s.peek();
   }
 
+  @Override
   public String toString() {
     if (size > 0) {
       StringBuilder sb = new StringBuilder("]").insert(0, peek());

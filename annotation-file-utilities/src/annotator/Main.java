@@ -23,7 +23,6 @@ import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
 import com.sun.source.util.TreePathScanner;
-import com.sun.tools.javac.main.CommandLine;
 import com.sun.tools.javac.tree.JCTree;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -73,8 +72,8 @@ import scenelib.annotations.io.ASTRecord;
 import scenelib.annotations.io.DebugWriter;
 import scenelib.annotations.io.IndexFileParser;
 import scenelib.annotations.io.IndexFileWriter;
+import scenelib.annotations.util.CommandLineUtils;
 import scenelib.annotations.util.coll.VivifyingMap;
-import scenelib.type.Type;
 
 /**
  * This is the main class for the annotator, which inserts annotations in Java source code. You can
@@ -322,7 +321,7 @@ public class Main {
   }
 
   private static ATypeElement findInnerTypeElement(
-      Tree t, ASTRecord rec, ADeclaration decl, Type type, Insertion ins) {
+      ASTRecord rec, ADeclaration decl, Insertion ins) {
     ASTPath astPath = rec.astPath;
     GenericArrayLocationCriterion galc = ins.getCriteria().getGenericArrayLocation();
     assert astPath != null && galc != null;
@@ -404,7 +403,6 @@ public class Main {
             TreePath path = ASTIndex.getTreePath(tree, rec);
             JCTree.JCVariableDecl varTree = null;
             JCTree.JCMethodDecl methTree = null;
-            JCTree.JCClassDecl classTree = null;
             loop:
             while (path != null) {
               Tree leaf = path.getLeaf();
@@ -438,7 +436,7 @@ public class Main {
                 break;
               }
               if (ASTPath.isClassEquiv(kind)) {
-                classTree = (JCTree.JCClassDecl) leaf;
+                // classTree = (JCTree.JCClassDecl) leaf;
                 // ???
                 break;
               }
@@ -470,7 +468,7 @@ public class Main {
           for (Insertion inner : ti.getInnerTypeInsertions()) {
             Tree t = ASTIndex.getNode(tree, rec);
             if (t != null) {
-              ATypeElement elem = findInnerTypeElement(t, rec, decl, ti.getType(), inner);
+              ATypeElement elem = findInnerTypeElement(rec, decl, inner);
               for (Annotation a : insertionSources.get(inner)) {
                 elem.tlAnnotationsHere.add(a);
               }
@@ -497,6 +495,10 @@ public class Main {
    *
    * @param args .jaif files and/or .java files and/or @arg-files, in any order
    */
+  @SuppressWarnings({
+    "ReferenceEquality", // interned operand
+    "EmptyCatch", // TODO
+  })
   public static void main(String[] args) throws IOException {
 
     if (verbose) {
@@ -514,9 +516,9 @@ public class Main {
     String[] cl_args;
     String[] file_args;
     try {
-      cl_args = CommandLine.parse(args);
+      cl_args = CommandLineUtils.parseCommandLine(args);
       file_args = options.parse(true, cl_args);
-    } catch (IOException ex) {
+    } catch (Exception ex) {
       System.err.println(ex);
       System.err.println("(For non-argfile beginning with \"@\", use \"@@\" for initial \"@\".");
       System.err.println("Alternative for filenames: indicate directory, e.g. as './@file'.");
@@ -933,7 +935,7 @@ public class Main {
                 System.out.println(); // terminate the line that contains dots
               }
             }
-            dbug.debug("Post-insertion source: %n" + src.getString());
+            dbug.debug("Post-insertion source: %s%n", src.getString());
 
             Collection<String> packageNames = nonJavaLangClasses(iToInsert.getPackageNames());
             if (!packageNames.isEmpty()) {
@@ -1027,6 +1029,7 @@ public class Main {
           if (pkg.isEmpty()) {
             outfile = new File(outdir, javafile.getName());
           } else {
+            @SuppressWarnings("StringSplitter") // false positive because pkg is non-empty
             String[] pkgPath = pkg.split("\\.");
             StringBuilder sb = new StringBuilder(outdir);
             for (int i = 0; i < pkgPath.length; i++) {
@@ -1056,11 +1059,11 @@ public class Main {
    * @param javaFileName a Java file name
    * @return a Source for the Java file, or null
    */
-  private static Source fileToSource(String javafilename) {
+  private static Source fileToSource(String javaFileName) {
     Source src;
     // Get the source file, and use it to obtain parse trees.
     try {
-      src = new Source(javafilename);
+      src = new Source(javaFileName);
       return src;
     } catch (Source.CompilerException e) {
       e.printStackTrace();

@@ -27,6 +27,7 @@ public class CloseParenthesisInsertion extends Insertion {
     return false;
   }
 
+  @Override
   public Kind getKind() {
     return Kind.CLOSE_PARENTHESIS;
   }
