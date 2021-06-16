@@ -4,6 +4,7 @@ public class StaticInit {
   static void blabla() {}
 
   static {
+    @SuppressWarnings({"deprecation", "removal"})
     Object o = new Integer(5);
     if (o instanceof Integer) {
       Object o2 = new Object();

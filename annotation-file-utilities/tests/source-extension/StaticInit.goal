@@ -4,6 +4,7 @@ public class StaticInit {
   static void blabla() {}
 
   static {
+    @SuppressWarnings({"deprecation", "removal"})
     @GUT.quals.Peer
     Object o = new @GUT.quals.Peer Integer(5);
     if (o instanceof Integer) {
