@@ -134,13 +134,13 @@ jobs:
     fetchDepth: 25
   - bash: ./annotation-file-utilities/dev-scripts/test-downstream.sh
     displayName: test-downstream.sh
-- job: like_travis_build_without_test_jdk16
+- job: build_without_test_jdk16
   pool:
     vmImage: 'ubuntu-latest'
   container: mdernst/cf-ubuntu-jdk16:latest
   dependsOn:
-    - like_travis_build_without_test_jdk11
-    - ant_test_jdk11
+    - build_without_test_jdk11
+    - test_jdk11
     - typecheck_jdk11
     - misc_jdk11
     - downstream_jdk11
@@ -154,8 +154,8 @@ jobs:
     vmImage: 'ubuntu-latest'
   container: mdernst/cf-ubuntu-jdk16:latest
   dependsOn:
-    - like_travis_build_without_test_jdk11
-    - ant_test_jdk11
+    - build_without_test_jdk11
+    - test_jdk11
     - typecheck_jdk11
     - misc_jdk11
     - downstream_jdk11
@@ -169,8 +169,8 @@ jobs:
     vmImage: 'ubuntu-latest'
   container: mdernst/cf-ubuntu-jdk16:latest
   dependsOn:
-    - like_travis_build_without_test_jdk11
-    - ant_test_jdk11
+    - build_without_test_jdk11
+    - test_jdk11
     - typecheck_jdk11
     - misc_jdk11
     - downstream_jdk11
@@ -184,8 +184,8 @@ jobs:
     vmImage: 'ubuntu-latest'
   container: mdernst/cf-ubuntu-jdk16-plus:latest
   dependsOn:
-    - like_travis_build_without_test_jdk11
-    - ant_test_jdk11
+    - build_without_test_jdk11
+    - test_jdk11
     - typecheck_jdk11
     - misc_jdk11
     - downstream_jdk11
@@ -199,8 +199,8 @@ jobs:
     vmImage: 'ubuntu-latest'
   container: mdernst/cf-ubuntu-jdk16:latest
   dependsOn:
-    - like_travis_build_without_test_jdk11
-    - ant_test_jdk11
+    - build_without_test_jdk11
+    - test_jdk11
     - typecheck_jdk11
     - misc_jdk11
     - downstream_jdk11
