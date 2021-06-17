@@ -149,7 +149,7 @@ jobs:
     fetchDepth: 25
   - bash: ./.travis-build-without-test.sh
     displayName: .travis-build-without-test.sh
-- job: ant_test_jdk16
+- job: test_jdk16
   pool:
     vmImage: 'ubuntu-latest'
   container: mdernst/cf-ubuntu-jdk16:latest
