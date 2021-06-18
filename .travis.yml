@@ -80,7 +80,7 @@ script:
      export TRAVIS_PULL_REQUEST_BRANCH=${TRAVIS_PULL_REQUEST_BRANCH} &&
      export TRAVIS_PULL_REQUEST_SLUG=${TRAVIS_PULL_REQUEST_SLUG} &&
      export TRAVIS_REPO_SLUG=$TRAVIS_REPO_SLUG &&
-     ./.travis-build.sh $GROUP"
+     ./.build.sh $GROUP"
 
 jobs:
   include:
