@@ -22,7 +22,7 @@ ifeq ($(shell java -version 2>&1 | grep version | grep 1.8 > /dev/null; printf $
 export JAVA:=$(JAVA) -Xbootclasspath/p:../../lib/javac-9+181-r4173-1.jar
 else
 # Need open to access CommandLine.parse dynamically to check its type:
-export JAVA:=$(JAVA) --add-opens jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED
+export JAVA:=$(JAVA) --add-opens jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED --add-opens jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED --add-opens jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED --add-opens jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED  --add-opens jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED
 endif
 
 export SHELL=/bin/bash -o pipefail
