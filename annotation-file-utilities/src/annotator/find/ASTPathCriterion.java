@@ -876,7 +876,7 @@ public class ASTPathCriterion implements Criterion {
     }
   }
 
-  @SuppressWarnings("EmptyCatch") // TODO
+  @SuppressWarnings("EmptyCatch") // See comment at the catch block
   private boolean checkTypePath(int i, Tree typeTree) {
     try {
       loop:
@@ -910,6 +910,8 @@ public class ASTPathCriterion implements Criterion {
         ++i;
       }
     } catch (RuntimeException ex) {
+      // Ignore the exception.  We think this is the right behavior based on comments above the call
+      // to `checkNull` (which calls this) in `isSatisfiedBy`.
     }
     return false;
   }
