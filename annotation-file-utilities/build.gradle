@@ -201,7 +201,7 @@ task testExample(dependsOn: compileTestJava, group: 'Verification') {
         javaexec {
             classpath = files(sourceSets.test.java.outputDir)
             classpath += sourceSets.test.compileClasspath
-            main = 'annotations.tests.executable.Example'
+            mainClass = 'annotations.tests.executable.Example'
             standardOutput = new FileOutputStream("${testDir}/example-stdout.jaif")
 
             args = ["${testDir}/example-input.jaif",
