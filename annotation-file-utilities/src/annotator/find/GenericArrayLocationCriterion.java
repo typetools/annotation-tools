@@ -506,6 +506,11 @@ public class GenericArrayLocationCriterion implements Criterion {
     return !isGenericOrArray(parent);
   }
 
+  @Override
+  public boolean isOnlyTypeAnnotationCriterion() {
+    return true;
+  }
+
   /**
    * @param fieldAccess a field access expression
    * @return true if the field is static

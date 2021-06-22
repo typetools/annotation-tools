@@ -39,6 +39,11 @@ public class InInitBlockCriterion implements Criterion {
   }
 
   @Override
+  public boolean isOnlyTypeAnnotationCriterion() {
+    return false;
+  }
+
+  @Override
   public Kind getKind() {
     return isStatic ? Kind.IN_STATIC_INIT : Kind.IN_INSTANCE_INIT;
   }

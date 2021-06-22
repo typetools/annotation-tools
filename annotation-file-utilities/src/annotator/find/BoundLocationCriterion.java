@@ -118,6 +118,11 @@ public class BoundLocationCriterion implements Criterion {
     }
   }
 
+  @Override
+  public boolean isOnlyTypeAnnotationCriterion() {
+    return true;
+  }
+
   private boolean isInterface(JCExpression bound) {
     Type type = bound.type;
     return type != null && type.tsym != null && type.tsym.isInterface();

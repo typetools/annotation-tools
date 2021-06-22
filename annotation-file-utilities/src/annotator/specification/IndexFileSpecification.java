@@ -420,7 +420,11 @@ public class IndexFileSpecification {
       String annotationString = p.a;
       Annotation annotation = p.b;
       Criteria criteria = clist.criteria();
-      boolean isTypeAnnotationOnly = annotation.def.isOnlyTypeAnnotation();
+      // If the annotation is only a type annotation, it will be inserted on the same line as the
+      // following type.  If the annotation is also a declaration annotation, always insert it on
+      // its own line.
+      boolean isTypeAnnotationOnly =
+          annotation.def.isOnlyTypeAnnotation() || criteria.isOnlyTypeAnnotationCriterion();
 
       if (noTypePath(criteria) && isOnReceiver(criteria)) {
         if (receiver == null) {

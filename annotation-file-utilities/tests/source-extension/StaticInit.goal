@@ -4,11 +4,9 @@ public class StaticInit {
   static void blabla() {}
 
   static {
-    @GUT.quals.Peer
-    Object o = new @GUT.quals.Peer Integer(5);
+    @GUT.quals.Peer Object o = new @GUT.quals.Peer Integer(5);
     if (o instanceof Integer) {
-      @GUT.quals.Peer
-      Object o2 = new @GUT.quals.Peer Object();
+      @GUT.quals.Peer Object o2 = new @GUT.quals.Peer Object();
     }
   }
 
@@ -19,7 +17,6 @@ public class StaticInit {
   }
 
   static {
-    @GUT.quals.Rep
-    StaticInit si = new @GUT.quals.Rep StaticInit();
+    @GUT.quals.Rep StaticInit si = new @GUT.quals.Rep StaticInit();
   }
 }

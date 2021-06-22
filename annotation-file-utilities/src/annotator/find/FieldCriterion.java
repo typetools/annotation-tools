@@ -44,6 +44,11 @@ public class FieldCriterion implements Criterion {
   }
 
   @Override
+  public boolean isOnlyTypeAnnotationCriterion() {
+    return false;
+  }
+
+  @Override
   public Kind getKind() {
     return Kind.FIELD;
   }

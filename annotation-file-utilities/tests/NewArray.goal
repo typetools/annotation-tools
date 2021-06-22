@@ -28,6 +28,5 @@ public class NewArray {
   Object names14 = new String[][][][] @D [] {{{}}};
   Object names15 = new @E String[][][][][] {{{}}};
 
-  @Z
-  List<@A ?> @B [] lists = new @C ArrayList<@D ?> @E [2];
+  @Z List<@A ?> @B [] lists = new @C ArrayList<@D ?> @E [2];
 }

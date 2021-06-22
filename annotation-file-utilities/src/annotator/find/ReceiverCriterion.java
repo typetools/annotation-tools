@@ -70,6 +70,12 @@ public class ReceiverCriterion implements Criterion {
   }
 
   @Override
+  public boolean isOnlyTypeAnnotationCriterion() {
+    // Declaration annotations are not allowed on the receiver (per JLS 8.4.1).
+    return true;
+  }
+
+  @Override
   public Kind getKind() {
     return Kind.RECEIVER;
   }
