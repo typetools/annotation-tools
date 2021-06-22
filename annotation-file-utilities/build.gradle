@@ -455,7 +455,7 @@ def createCheckTypeTask(checker, shortName) {
         source = sourceSets.main.java
         classpath = files("${checkerDist}/checker-qual.jar")
         classpath += sourceSets.main.compileClasspath
-        destinationDir = file("${buildDir}/typecheck/${shortName}")
+        destinationDirectory = file("${buildDir}/typecheck/${shortName}")
 
         options.annotationProcessorPath = files("${checkerDist}/checker.jar")
         options.compilerArgs += [
@@ -523,7 +523,7 @@ dependencies {
 }
 task requireJavadoc(type: JavaExec) {
   description = 'Ensures that Javadoc documentation exists.'
-  main = "org.plumelib.javadoc.RequireJavadoc"
+  mainClass = "org.plumelib.javadoc.RequireJavadoc"
   classpath = configurations.requireJavadoc
   args "annotation-file-utilities/src", "scene-lib/src"
   workingDir = "${projectDir}/.."
