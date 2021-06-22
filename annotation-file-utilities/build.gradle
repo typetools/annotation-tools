@@ -201,7 +201,7 @@ task testExample(dependsOn: compileTestJava, group: 'Verification') {
         javaexec {
             classpath = files(sourceSets.test.java.outputDir)
             classpath += sourceSets.test.compileClasspath
-            main = 'annotations.tests.executable.Example'
+            mainClass = 'annotations.tests.executable.Example'
             standardOutput = new FileOutputStream("${testDir}/example-stdout.jaif")
 
             args = ["${testDir}/example-input.jaif",
@@ -455,7 +455,7 @@ def createCheckTypeTask(checker, shortName) {
         source = sourceSets.main.java
         classpath = files("${checkerDist}/checker-qual.jar")
         classpath += sourceSets.main.compileClasspath
-        destinationDir = file("${buildDir}/typecheck/${shortName}")
+        destinationDirectory = file("${buildDir}/typecheck/${shortName}")
 
         options.annotationProcessorPath = files("${checkerDist}/checker.jar")
         options.compilerArgs += [
@@ -523,7 +523,7 @@ dependencies {
 }
 task requireJavadoc(type: JavaExec) {
   description = 'Ensures that Javadoc documentation exists.'
-  main = "org.plumelib.javadoc.RequireJavadoc"
+  mainClass = "org.plumelib.javadoc.RequireJavadoc"
   classpath = configurations.requireJavadoc
   args "annotation-file-utilities/src", "scene-lib/src"
   workingDir = "${projectDir}/.."
@@ -728,7 +728,7 @@ task checkFormat(type: Exec, dependsOn: [getCodeFormatScripts, pythonIsInstalled
     }
     ignoreExitValue = true
     doLast {
-        if (execResult.exitValue != 0) {
+        if (!executionResult.isPresent() || executionResult.get().getExitValue() != 0) {
             throw new RuntimeException('Found improper formatting, try running:  ./gradlew reformat"')
         }
     }
