@@ -1078,7 +1078,7 @@ public class Main {
   }
 
   /**
-   * First sort criterion: put declaration annotations (which go on a separate line) last, so that
+   * Primary sort criterion: put declaration annotations (which go on a separate line) last, so that
    * they *precede* type annotations when inserted.
    *
    * <p>Secondary sort criterion: for determinism, put annotations in reverse alphabetic order (so
