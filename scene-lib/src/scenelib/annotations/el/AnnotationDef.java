@@ -372,6 +372,7 @@ public final class AnnotationDef extends AElement {
         + String.format("; source=%s, tlAnnotationsHere=%s", source, tlAnnotationsHere);
   }
 
+  /** Prints the classpath. */
   public static void printClasspath() {
     System.out.println("Classpath:");
     StringTokenizer tokenizer =

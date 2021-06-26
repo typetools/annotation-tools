@@ -55,6 +55,11 @@ public class CastCriterion implements Criterion {
     return true;
   }
 
+  /**
+   * Returns the location of this.
+   *
+   * @return the location of this
+   */
   public RelativeLocation getLocation() {
     return loc;
   }
