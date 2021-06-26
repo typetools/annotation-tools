@@ -84,6 +84,16 @@ public class ExtImplsLocationCriterion implements Criterion {
     }
   }
 
+  @Override
+  public boolean isOnlyTypeAnnotationCriterion() {
+    return true;
+  }
+
+  /**
+   * Returns the index of this.
+   *
+   * @return the index of this
+   */
   public Integer getIndex() {
     return index;
   }

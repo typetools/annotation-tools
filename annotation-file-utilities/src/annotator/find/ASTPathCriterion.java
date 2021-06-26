@@ -197,6 +197,19 @@ public class ASTPathCriterion implements Criterion {
     return false;
   }
 
+  @Override
+  public boolean isOnlyTypeAnnotationCriterion() {
+    // TODO: This return value is conservative.  Can do better by examining the path.
+    return false;
+  }
+
+  /**
+   * Returns true if the given trees match.
+   *
+   * @param next a tree
+   * @param node a tree
+   * @return true if the given trees match.
+   */
   private boolean matchNext(Tree next, Tree node) {
     boolean b1 = next instanceof JCTree;
     boolean b2 = node instanceof JCTree;

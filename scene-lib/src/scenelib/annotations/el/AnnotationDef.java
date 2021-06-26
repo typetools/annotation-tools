@@ -362,6 +362,17 @@ public final class AnnotationDef extends AElement {
     return metaAnnos.toString() + "@" + name + args.toString();
   }
 
+  /**
+   * Returns a string representation of this object, useful for debugging.
+   *
+   * @return a string representation of this object, useful for debugging
+   */
+  public String toStringDebug() {
+    return toString()
+        + String.format("; source=%s, tlAnnotationsHere=%s", source, tlAnnotationsHere);
+  }
+
+  /** Prints the classpath. */
   public static void printClasspath() {
     System.out.println("Classpath:");
     StringTokenizer tokenizer =

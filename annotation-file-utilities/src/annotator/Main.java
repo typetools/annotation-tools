@@ -791,8 +791,11 @@ public class Main {
           boolean constructorInserted = false;
           Set<String> seen = new TreeSet<>();
           List<Insertion> toInsertList = new ArrayList<>(positions.get(pair));
-          Collections.reverse(toInsertList);
+          // The Multimap interface doesn't seem to have a way to specify the order of elements in
+          // the collection, so sort them here.
+          toInsertList.sort(insertionSorter);
           dbug.debug("insertion pos: %d%n", pair.a);
+          dbug.debug("insertions sorted: %s%n", toInsertList);
           assert pair.a >= 0
               : "pos is negative: " + pair.a + " " + toInsertList.get(0) + " " + javafilename;
           for (Insertion iToInsert : toInsertList) {
@@ -1073,6 +1076,29 @@ public class Main {
       return null;
     }
   }
+
+  /**
+   * Primary sort criterion: put declaration annotations (which go on a separate line) last, so that
+   * they *precede* type annotations when inserted.
+   *
+   * <p>Secondary sort criterion: for determinism, put annotations in reverse alphabetic order (so
+   * that they are alphabetized when inserted).
+   */
+  private static Comparator<Insertion> insertionSorter =
+      new Comparator<Insertion>() {
+        @Override
+        public int compare(Insertion i1, Insertion i2) {
+          boolean separateLine1 = i1.isSeparateLine();
+          boolean separateLine2 = i2.isSeparateLine();
+          if (separateLine1 && !separateLine2) {
+            return 1;
+          } else if (separateLine2 && !separateLine1) {
+            return -1;
+          } else {
+            return -i1.getText().compareTo(i2.getText());
+          }
+        }
+      };
 
   /** Maps from binary class name to whether the class has any explicit constructor. */
   public static Map<String, Boolean> hasExplicitConstructor = new HashMap<>();

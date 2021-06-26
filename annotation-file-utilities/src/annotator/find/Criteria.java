@@ -90,6 +90,20 @@ public final class Criteria {
   }
 
   /**
+   * Returns true if this Criteria only permits type annotations, not declaration annotations.
+   *
+   * @return true if this Criteria only permits type annotations, not declaration annotations
+   */
+  public boolean isOnlyTypeAnnotationCriterion() {
+    for (Criterion c : criteria.values()) {
+      if (c.isOnlyTypeAnnotationCriterion()) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
    * Determines whether this is the criteria on a receiver.
    *
    * @return true iff this is the criteria on a receiver

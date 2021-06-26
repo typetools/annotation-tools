@@ -46,6 +46,11 @@ public class IntersectionTypeLocationCriterion implements Criterion {
   }
 
   @Override
+  public boolean isOnlyTypeAnnotationCriterion() {
+    return true;
+  }
+
+  @Override
   public Kind getKind() {
     return Kind.INTERSECT_LOCATION;
   }

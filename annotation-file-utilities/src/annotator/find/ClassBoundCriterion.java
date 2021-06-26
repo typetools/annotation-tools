@@ -37,6 +37,11 @@ public class ClassBoundCriterion implements Criterion {
   }
 
   @Override
+  public boolean isOnlyTypeAnnotationCriterion() {
+    return true;
+  }
+
+  @Override
   public Kind getKind() {
     return Kind.CLASS_BOUND;
   }

@@ -56,6 +56,11 @@ final class IsCriterion implements Criterion {
   }
 
   @Override
+  public boolean isOnlyTypeAnnotationCriterion() {
+    return false;
+  }
+
+  @Override
   public String toString() {
     return "is " + kind.toString().toLowerCase() + " '" + name + "'";
   }
