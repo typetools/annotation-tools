@@ -52,6 +52,11 @@ public class TypeArgumentCriterion implements Criterion {
   }
 
   @Override
+  public boolean isOnlyTypeAnnotationCriterion() {
+    return true;
+  }
+
+  @Override
   public Kind getKind() {
     return Kind.TYPE_ARGUMENT;
   }

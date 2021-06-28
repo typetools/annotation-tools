@@ -50,6 +50,16 @@ public class CastCriterion implements Criterion {
     }
   }
 
+  @Override
+  public boolean isOnlyTypeAnnotationCriterion() {
+    return true;
+  }
+
+  /**
+   * Returns the location of this.
+   *
+   * @return the location of this
+   */
   public RelativeLocation getLocation() {
     return loc;
   }

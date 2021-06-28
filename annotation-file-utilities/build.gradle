@@ -68,16 +68,16 @@ dependencies {
     implementation 'org.plumelib:plume-util:1.5.5'
     implementation 'org.plumelib:reflection-util:1.0.3'
     // Annotations in checker-qual.jar are used, but no checkers are (currently) run on the code.
-    compileOnly 'org.checkerframework:checker-qual:3.14.0'
+    compileOnly 'org.checkerframework:checker-qual:3.15.0'
     implementation 'com.google.errorprone:error_prone_annotations:2.6.0'
     implementation ('org.checkerframework.annotatedlib:guava:30.1.1-jre') {
         // So long as Guava only uses annotations from checker-qual, excluding it should not cause problems.
         exclude group: 'org.checkerframework'
     }
-    implementation 'org.ow2.asm:asm:9.1'
+    implementation 'org.ow2.asm:asm:9.2'
 
     testImplementation group: 'junit', name: 'junit', version: '4.13.2'
-    testImplementation 'org.checkerframework:checker-qual:3.13.0'
+    testImplementation 'org.checkerframework:checker-qual:3.15.0'
 
     errorprone("com.google.errorprone:error_prone_core:2.7.1")
 }
@@ -201,7 +201,7 @@ task testExample(dependsOn: compileTestJava, group: 'Verification') {
         javaexec {
             classpath = files(sourceSets.test.java.outputDir)
             classpath += sourceSets.test.compileClasspath
-            main = 'annotations.tests.executable.Example'
+            mainClass = 'annotations.tests.executable.Example'
             standardOutput = new FileOutputStream("${testDir}/example-stdout.jaif")
 
             args = ["${testDir}/example-input.jaif",
@@ -455,7 +455,7 @@ def createCheckTypeTask(checker, shortName) {
         source = sourceSets.main.java
         classpath = files("${checkerDist}/checker-qual.jar")
         classpath += sourceSets.main.compileClasspath
-        destinationDir = file("${buildDir}/typecheck/${shortName}")
+        destinationDirectory = file("${buildDir}/typecheck/${shortName}")
 
         options.annotationProcessorPath = files("${checkerDist}/checker.jar")
         options.compilerArgs += [
@@ -534,7 +534,7 @@ dependencies {
 }
 task requireJavadoc(type: JavaExec) {
   description = 'Ensures that Javadoc documentation exists.'
-  main = "org.plumelib.javadoc.RequireJavadoc"
+  mainClass = "org.plumelib.javadoc.RequireJavadoc"
   classpath = configurations.requireJavadoc
   args "annotation-file-utilities/src", "scene-lib/src"
   workingDir = "${projectDir}/.."
@@ -739,7 +739,7 @@ task checkFormat(type: Exec, dependsOn: [getCodeFormatScripts, pythonIsInstalled
     }
     ignoreExitValue = true
     doLast {
-        if (execResult.exitValue != 0) {
+        if (!executionResult.isPresent() || executionResult.get().getExitValue() != 0) {
             throw new RuntimeException('Found improper formatting, try running:  ./gradlew reformat"')
         }
     }

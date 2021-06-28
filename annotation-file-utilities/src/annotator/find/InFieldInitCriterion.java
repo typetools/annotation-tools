@@ -36,6 +36,11 @@ public class InFieldInitCriterion implements Criterion {
   }
 
   @Override
+  public boolean isOnlyTypeAnnotationCriterion() {
+    return false;
+  }
+
+  @Override
   public Kind getKind() {
     return Kind.IN_FIELD_INIT;
   }

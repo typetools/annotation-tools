@@ -74,6 +74,14 @@ public interface Criterion {
    */
   public boolean isSatisfiedBy(TreePath path);
 
+  // Maybe a better name would be "canBeDeclarationAnnotation", with the opposite sense.
+  /**
+   * Returns true if this Criterion only permits type annotations, not declaration annotations.
+   *
+   * @return true if this Criterion only permits type annotations, not declaration annotations
+   */
+  public boolean isOnlyTypeAnnotationCriterion();
+
   /**
    * Gets the type of this criterion.
    *

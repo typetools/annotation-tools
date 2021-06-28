@@ -33,6 +33,11 @@ public class MethodBoundCriterion implements Criterion {
   }
 
   @Override
+  public boolean isOnlyTypeAnnotationCriterion() {
+    return true;
+  }
+
+  @Override
   public Kind getKind() {
     return Kind.METHOD_BOUND;
   }

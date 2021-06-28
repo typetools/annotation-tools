@@ -72,6 +72,11 @@ public class ReturnTypeCriterion implements Criterion {
   }
 
   @Override
+  public boolean isOnlyTypeAnnotationCriterion() {
+    return true;
+  }
+
+  @Override
   public Kind getKind() {
     return Kind.RETURN_TYPE;
   }

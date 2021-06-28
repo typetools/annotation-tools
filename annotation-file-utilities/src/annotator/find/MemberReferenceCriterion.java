@@ -48,6 +48,13 @@ public class MemberReferenceCriterion implements Criterion {
   }
 
   @Override
+  public boolean isOnlyTypeAnnotationCriterion() {
+    // This can probably return true?  No annotations go on it directly,
+    // so rely on some other Criterion in the Criteria to return true.
+    return false;
+  }
+
+  @Override
   public Kind getKind() {
     return Kind.METHOD_REFERENCE;
   }

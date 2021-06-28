@@ -408,6 +408,11 @@ public class IsSigMethodCriterion implements Criterion {
     return true;
   }
 
+  @Override
+  public boolean isOnlyTypeAnnotationCriterion() {
+    return false;
+  }
+
   /* This is a copy of the method from the Checker Framework
    * TreeUtils.enclosingClass.
    * We cannot have a dependency on the Checker Framework.

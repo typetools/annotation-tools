@@ -97,7 +97,7 @@ public final class LocalLocation {
       flagsField.set(endLabel, flags);
       bytecodeOffsetField.set(endLabel, scopeStart + scopeLength);
     } catch (Exception e) {
-      e.printStackTrace();
+      throw new Error(e);
     }
 
     this.start = new Label[] {startLabel};

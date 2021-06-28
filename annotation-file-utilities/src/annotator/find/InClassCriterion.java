@@ -264,6 +264,11 @@ public final class InClassCriterion implements Criterion {
   }
 
   @Override
+  public boolean isOnlyTypeAnnotationCriterion() {
+    return false;
+  }
+
+  @Override
   public String toString() {
     return "In class '" + className + "'" + (exactMatch ? " (exactly)" : "");
   }

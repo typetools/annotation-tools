@@ -56,6 +56,11 @@ final class InPackageCriterion implements Criterion {
   }
 
   @Override
+  public boolean isOnlyTypeAnnotationCriterion() {
+    return false;
+  }
+
+  @Override
   public String toString() {
     return "in package '" + name + "'";
   }
