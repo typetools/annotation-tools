@@ -126,6 +126,11 @@ public class TypePathEntry {
     }
   }
 
+  @Override
+  public String toString() {
+    return "\"" + toString(step, argument) + "\"";
+  }
+
   /**
    * Converts a type path represented by a list of integers to a {@link TypePath}.
    *
