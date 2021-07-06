@@ -23,9 +23,8 @@ public class TestObjectCreation {
     o = new HashMap();
   }
 
-  @SuppressWarnings({"deprecation", "removal"})
   public void test4() {
-    o = new Integer(2);
+    o = new String("hello");
     o = new TestObjectCreation();
   }
 }
