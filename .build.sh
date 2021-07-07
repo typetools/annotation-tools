@@ -72,7 +72,7 @@ fi
 if [[ "${GROUP}" == "downstream" || "${GROUP}" == "all" ]]; then
     # checker-framework and its downstream tests
     /tmp/plume-scripts/git-clone-related typetools checker-framework
-    (cd ../checker-framework/framework && ../gradlew ainferTests)
+    (cd ../checker-framework/framework && ../gradlew ainferTest)
 
     # /tmp/plume-scripts/git-clone-related typetools checker-framework-inference
     # (cd ../checker-framework-inference && ./.build.sh)
