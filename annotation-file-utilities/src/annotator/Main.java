@@ -100,13 +100,14 @@ import scenelib.annotations.util.coll.VivifyingMap;
  *         <li id="option:in-place"><b>-i</b> <b>--in-place=</b><i>boolean</i>. If true, overwrite
  *             original source files (making a backup first). Furthermore, if the backup files
  *             already exist, they are used instead of the .java files. This behavior permits a user
- *             to tweak the {@code .jaif} file and re-run the annotator. <p>Note that if the user
- *             runs the annotator with --in-place, makes edits, and then re-runs the annotator with
- *             this --in-place option, those edits are lost. Similarly, if the user runs the
- *             annotator twice in a row with --in-place, only the last set of annotations will
- *             appear in the codebase at the end. <p>To preserve changes when using the --in-place
- *             option, first remove the backup files. Or, use the {@code -d .} option, which makes
- *             (and reads) no backup, instead of --in-place. [default: false]
+ *             to tweak the {@code .jaif} file and re-run the annotator.
+ *             <p>Note that if the user runs the annotator with --in-place, makes edits, and then
+ *             re-runs the annotator with this --in-place option, those edits are lost. Similarly,
+ *             if the user runs the annotator twice in a row with --in-place, only the last set of
+ *             annotations will appear in the codebase at the end.
+ *             <p>To preserve changes when using the --in-place option, first remove the backup
+ *             files. Or, use the {@code -d .} option, which makes (and reads) no backup, instead of
+ *             --in-place. [default: false]
  *         <li id="option:abbreviate"><b>-a</b> <b>--abbreviate=</b><i>boolean</i>. If true, insert
  *             {@code import} statements as necessary. [default: true]
  *         <li id="option:comments"><b>-c</b> <b>--comments=</b><i>boolean</i>. Insert annotations
