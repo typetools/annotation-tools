@@ -473,8 +473,7 @@ def createCheckTypeTask(checker, shortName) {
                     "-Xbootclasspath/p:${checkerDist}/jdk8.jar"
             ]
             options.forkOptions.jvmArgs += ["-Xbootclasspath/p:${configurations.javacJar.asPath}".toString()]
-        }
-        else {
+        } else {
             options.forkOptions.jvmArgs += [
                     "--add-opens", "jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED",
                     "--add-opens", "jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED",
