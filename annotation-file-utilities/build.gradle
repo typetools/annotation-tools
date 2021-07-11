@@ -64,6 +64,11 @@ dependencies {
         errorproneJavac("com.google.errorprone:javac:$errorproneJavacVersion")
     }
     implementation 'org.plumelib:bcel-util:1.1.12'
+    if (JavaVersion.current() == JavaVersion.VERSION_1_8) {
+        implementation 'org.plumelib:options:1.0.5'
+    } else {
+        implementation 'org.plumelib:options:2.0.0'
+    }
     implementation 'org.plumelib:options:1.0.5'
     implementation 'org.plumelib:plume-util:1.5.5'
     implementation 'org.plumelib:reflection-util:1.0.3'
@@ -533,7 +538,7 @@ task requireJavadoc(type: JavaExec) {
 task updateUserOptions(type: Javadoc, dependsOn: 'assemble') {
   description "Updates printed documentation of command-line arguments."
 
-  // source = sourceSets.main.allJava.files.sort()
+  source = sourceSets.main.allJava.files.sort()
   exclude 'scenelib.annotations.io.classfile/**'
   classpath = project.sourceSets.main.compileClasspath + project.sourceSets.main.runtimeClasspath
   options.memberLevel = JavadocMemberLevel.PRIVATE
@@ -542,6 +547,7 @@ task updateUserOptions(type: Javadoc, dependsOn: 'assemble') {
   options.addStringOption("docfile", "${projectDir}/src/annotator/Main.java")
   options.addStringOption("format", "javadoc")
   options.addStringOption("i", "-quiet")
+  options.noTimestamp(false)
   title = ""
 }
 
