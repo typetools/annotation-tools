@@ -64,7 +64,7 @@ dependencies {
         errorproneJavac("com.google.errorprone:javac:$errorproneJavacVersion")
     }
     implementation 'org.plumelib:bcel-util:1.1.12'
-    implementation 'org.plumelib:options:1.0.5'
+    implementation 'org.plumelib:options:2.0.0'
     implementation 'org.plumelib:plume-util:1.5.5'
     implementation 'org.plumelib:reflection-util:1.0.3'
     // Annotations in checker-qual.jar are used, but no checkers are (currently) run on the code.
