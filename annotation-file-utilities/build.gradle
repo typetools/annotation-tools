@@ -512,6 +512,7 @@ test.dependsOn testAnnotator
 
 javadoc {
     options.memberLevel = JavadocMemberLevel.PUBLIC
+    options.addStringOption('source', '8')
     options.addStringOption('Xdoclint:all', '-quiet')
     options.addStringOption('Xmaxwarns', '10000')
 }
@@ -540,10 +541,13 @@ task requireJavadoc(type: JavaExec) {
 }
 // check.dependsOn requireJavadoc
 
-task updateUserOptions(type: Javadoc, dependsOn: 'assemble') {
-  description "Updates printed documentation of command-line arguments."
+task updateUserOptions(dependsOn: ['updateUserOptionsJavadoc', 'updateUserOptionsHtml']) {}
 
-  // source = sourceSets.main.allJava.files.sort()
+task updateUserOptionsJavadoc(type: Javadoc, dependsOn: 'assemble') {
+  description "Updates documentation of command-line arguments in Javadoc."
+
+  // Include only sources from annotation-file-utilities, not from scene-lib.
+  source = fileTree(dir: 'src', include: '**/*.java')
   exclude 'scenelib.annotations.io.classfile/**'
   classpath = project.sourceSets.main.compileClasspath + project.sourceSets.main.runtimeClasspath
   options.memberLevel = JavadocMemberLevel.PRIVATE
@@ -552,6 +556,24 @@ task updateUserOptions(type: Javadoc, dependsOn: 'assemble') {
   options.addStringOption("docfile", "${projectDir}/src/annotator/Main.java")
   options.addStringOption("format", "javadoc")
   options.addStringOption("i", "-quiet")
+  options.noTimestamp(false)
+  title = ""
+}
+
+task updateUserOptionsHtml(type: Javadoc, dependsOn: 'assemble') {
+  description "Updates documentation of command-line arguments in the manual."
+
+  // Include only sources from annotation-file-utilities, not from scene-lib.
+  source = fileTree(dir: 'src', include: '**/*.java')
+  exclude 'scenelib.annotations.io.classfile/**'
+  classpath = project.sourceSets.main.compileClasspath + project.sourceSets.main.runtimeClasspath
+  options.memberLevel = JavadocMemberLevel.PRIVATE
+  options.docletpath = project.sourceSets.main.runtimeClasspath as List
+  options.doclet = "org.plumelib.options.OptionsDoclet"
+  options.addStringOption("docfile", "${projectDir}/annotation-file-utilities.html")
+  options.addStringOption("format", "html")
+  options.addStringOption("i", "-quiet")
+  options.noTimestamp(false)
   title = ""
 }
 
