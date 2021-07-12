@@ -502,6 +502,7 @@ test.dependsOn testAnnotator
 
 javadoc {
     options.memberLevel = JavadocMemberLevel.PUBLIC
+    options.addStringOption('source', '8')
     options.addStringOption('Xdoclint:all', '-quiet')
     options.addStringOption('Xmaxwarns', '10000')
 }
