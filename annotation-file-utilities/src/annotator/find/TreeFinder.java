@@ -57,6 +57,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.lang.model.element.ElementKind;
@@ -77,7 +78,8 @@ import scenelib.type.Type;
 /**
  * A {@link TreeScanner} that is able to locate program elements in an AST based on {@code
  * Criteria}. {@link #getInsertionsByPosition(JCTree.JCCompilationUnit,List)} scans a tree and
- * returns a mapping of source positions (as character offsets) to insertion text.
+ * creates (in field {@code insertions}) a mapping of source positions (as character offsets) to
+ * insertion text.
  */
 public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
   /** Debugging logger. */
@@ -1068,6 +1070,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
           }
         }
 
+        // These method calls may side-effect modify the insertion i.
         Integer pos =
             astPath == null
                 ? findPosition(path, i)
@@ -1932,5 +1935,73 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       }
     }
     return getInsertionsByPosition(node, list);
+  }
+
+  ///
+  /// TreePath Formatting, for debugging
+  ///
+
+  /**
+   * Return a printed representation of a TreePath.
+   *
+   * @param path a TreePath
+   * @return a printed representation of the given TreePath
+   */
+  public static String toString(TreePath path) {
+    StringJoiner result = new StringJoiner(System.lineSeparator() + "    ");
+    result.add("TreePath:");
+    for (Tree t : path) {
+      result.add(toStringTruncated(t, 65) + " " + t.getKind());
+    }
+    return result.toString();
+  }
+
+  /**
+   * Returns a string representation of the leaf of the given path, using {@link
+   * #toStringTruncated}.
+   *
+   * @param path a path
+   * @param length the maximum length for the result; must be at least 6
+   * @return a one-line string representation of the leaf of the given path that is no longer than
+   *     {@code length} characters long
+   */
+  public static String leafToStringTruncated(TreePath path, int length) {
+    if (path == null) {
+      return "null";
+    }
+    return toStringTruncated(path.getLeaf(), length);
+  }
+
+  /**
+   * Return toString(), but without line separators.
+   *
+   * @param tree a tree
+   * @return a one-line string representation of the tree
+   */
+  public static String toStringOneLine(Tree tree) {
+    return tree.toString().trim().replaceAll("\\s+", " ");
+  }
+
+  /**
+   * Return either {@link #toStringOneLine} if it is no more than {@code length} characters, or
+   * {@link #toStringOneLine} quoted and truncated.
+   *
+   * @param tree a tree
+   * @param length the maximum length for the result; must be at least 6
+   * @return a one-line string representation of the tree that is no longer than {@code length}
+   *     characters long
+   */
+  public static String toStringTruncated(Tree tree, int length) {
+    if (length < 6) {
+      throw new IllegalArgumentException("bad length " + length);
+    }
+    String result = toStringOneLine(tree);
+    if (result.length() > length) {
+      // The quoting increases the likelihood that all delimiters are balanced in the result.
+      // That makes it easier to manipulate the result (such as skipping over it) in an
+      // editor.  The quoting also makes clear that the value is truncated.
+      result = "\"" + result.substring(0, length - 5) + "...\"";
+    }
+    return result;
   }
 }
