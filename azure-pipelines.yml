@@ -134,3 +134,78 @@ jobs:
     fetchDepth: 25
   - bash: ./annotation-file-utilities/dev-scripts/test-downstream.sh
     displayName: test-downstream.sh
+- job: build_without_test_jdk16
+  pool:
+    vmImage: 'ubuntu-latest'
+  container: mdernst/cf-ubuntu-jdk16:latest
+  dependsOn:
+    - build_without_test_jdk11
+    - test_jdk11
+    - typecheck_jdk11
+    - misc_jdk11
+    - downstream_jdk11
+  steps:
+  - checkout: self
+    fetchDepth: 25
+  - bash: ./.travis-build-without-test.sh
+    displayName: .travis-build-without-test.sh
+- job: test_jdk16
+  pool:
+    vmImage: 'ubuntu-latest'
+  container: mdernst/cf-ubuntu-jdk16:latest
+  dependsOn:
+    - build_without_test_jdk11
+    - test_jdk11
+    - typecheck_jdk11
+    - misc_jdk11
+    - downstream_jdk11
+  steps:
+  - checkout: self
+    fetchDepth: 25
+  - bash: ./annotation-file-utilities/dev-scripts/test-allTests.sh
+    displayName: test-allTests.sh
+- job: typecheck_jdk16
+  pool:
+    vmImage: 'ubuntu-latest'
+  container: mdernst/cf-ubuntu-jdk16:latest
+  dependsOn:
+    - build_without_test_jdk11
+    - test_jdk11
+    - typecheck_jdk11
+    - misc_jdk11
+    - downstream_jdk11
+  steps:
+  - checkout: self
+    fetchDepth: 25
+  - bash: ./annotation-file-utilities/dev-scripts/test-typecheck.sh
+    displayName: test-typecheck.sh
+- job: misc_jdk16
+  pool:
+    vmImage: 'ubuntu-latest'
+  container: mdernst/cf-ubuntu-jdk16-plus:latest
+  dependsOn:
+    - build_without_test_jdk11
+    - test_jdk11
+    - typecheck_jdk11
+    - misc_jdk11
+    - downstream_jdk11
+  steps:
+  - checkout: self
+    fetchDepth: 25
+  - bash: ./annotation-file-utilities/dev-scripts/test-misc.sh
+    displayName: test-misc.sh
+- job: downstream_jdk16
+  pool:
+    vmImage: 'ubuntu-latest'
+  container: mdernst/cf-ubuntu-jdk16:latest
+  dependsOn:
+    - build_without_test_jdk11
+    - test_jdk11
+    - typecheck_jdk11
+    - misc_jdk11
+    - downstream_jdk11
+  steps:
+  - checkout: self
+    fetchDepth: 25
+  - bash: ./annotation-file-utilities/dev-scripts/test-downstream.sh
+    displayName: test-downstream.sh
