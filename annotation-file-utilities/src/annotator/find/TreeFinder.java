@@ -1704,12 +1704,10 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
    * @param method the method the receiver is being inserted into
    */
   private void addReceiverType(TreePath path, ReceiverInsertion receiver, MethodTree method) {
-    // Find the name of the class
-    // with type parameters to create the receiver. Walk up the tree and
-    // pick up class names to add to the receiver type. Since we're
-    // starting from the innermost class, the classes we get to at earlier
-    // iterations of the loop are inside of the classes we get to at later
-    // iterations.
+    // Find the name of the class with type parameters to create the receiver. Walk up the tree and
+    // pick up class names to add to the receiver type. Since we're starting from the innermost
+    // class, the classes we get to at earlier iterations of the loop are inside of the classes we
+    // get to at later iterations.
     TreePath parent = path;
     Tree leaf = parent.getLeaf();
     Tree.Kind kind = leaf.getKind();
@@ -1722,7 +1720,9 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     DeclaredType staticType = null;
     // For an inner class constructor, the receiver comes from the
     // superclass, so skip past the first type definition.
-    boolean isCon = ((MethodTree) parent.getLeaf()).getReturnType() == null;
+    // In JDK 11, the constructor's return type is null; in JDK 16, the return type is void.
+    boolean isCon = ((MethodTree) leaf).getName().contentEquals("<init>");
+
     boolean skip = isCon;
 
     while (kind != Tree.Kind.COMPILATION_UNIT && kind != Tree.Kind.NEW_CLASS) {
