@@ -16,7 +16,7 @@ apply plugin: 'com.github.johnrengelman.shadow'
 
 group 'org.checkerframework'
 // TODO: Use this in the release process.
-version '3.9.15'
+version '3.16.0'
 
 sourceCompatibility = 1.8
 
