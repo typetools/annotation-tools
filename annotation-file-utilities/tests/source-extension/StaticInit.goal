@@ -1,5 +1,6 @@
 package annotator.tests;
 
+@SuppressWarnings({"deprecation", "removal"})
 public class StaticInit {
   static void blabla() {}
 

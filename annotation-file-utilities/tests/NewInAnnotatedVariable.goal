@@ -7,7 +7,9 @@ import java.lang.annotation.*;
 
 @skip-test
 public class NewInAnnotatedVariable {
+  @SuppressWarnings({"deprecation", "removal"})
   Number b1 = new @NonNull Integer(0);
+
   @NonNull Object b2 = new @Nullable @NonNull Double(1);
   @NonNull Runnable b3 = new @NonNull Thread();
   @NonNull
