@@ -64,6 +64,11 @@ dependencies {
         errorproneJavac("com.google.errorprone:javac:$errorproneJavacVersion")
     }
     implementation 'org.plumelib:bcel-util:1.1.12'
+    if (JavaVersion.current() == JavaVersion.VERSION_1_8) {
+        implementation 'org.plumelib:options:1.0.5'
+    } else {
+        implementation 'org.plumelib:options:2.0.0'
+    }
     implementation 'org.plumelib:options:1.0.5'
     implementation 'org.plumelib:plume-util:1.5.5'
     implementation 'org.plumelib:reflection-util:1.0.3'
@@ -556,6 +561,9 @@ task updateUserOptionsJavadoc(type: Javadoc, dependsOn: 'assemble') {
   options.addStringOption("docfile", "${projectDir}/src/annotator/Main.java")
   options.addStringOption("format", "javadoc")
   options.addStringOption("i", "-quiet")
+  if (JavaVersion.current().compareTo(org.gradle.api.JavaVersion.VERSION_1_9) >= 0) {
+    options.addStringOption('source', '8')
+  }
   options.noTimestamp(false)
   title = ""
 }
@@ -573,6 +581,9 @@ task updateUserOptionsHtml(type: Javadoc, dependsOn: 'assemble') {
   options.addStringOption("docfile", "${projectDir}/annotation-file-utilities.html")
   options.addStringOption("format", "html")
   options.addStringOption("i", "-quiet")
+  if (JavaVersion.current().compareTo(org.gradle.api.JavaVersion.VERSION_1_9) >= 0) {
+    options.addStringOption('source', '8')
+  }
   options.noTimestamp(false)
   title = ""
 }
