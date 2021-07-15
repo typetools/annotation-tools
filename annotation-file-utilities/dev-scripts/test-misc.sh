@@ -37,9 +37,6 @@ status=0
 # top-level file SKIP-REQUIRE-JAVADOC.  Delete it after the pull request is merged.
 if [ -f ../SKIP-REQUIRE-JAVADOC ]; then
   echo "Skipping Javadoc tasks because file SKIP-REQUIRE-JAVADOC exists"
-elif [ "11" = "$(java -version 2>&1 | head -1 | cut -d'"' -f2 | sed '/^1\./s///' | cut -d'.' -f1)" ] ; then
-  # Under JDK 11, error "package com.sun.tools.javac.tree is not visible"
-  echo "Skipping Javadoc tasks under Java 11"
 else
   (./gradlew requireJavadoc --console=plain --warning-mode=all --no-daemon > /tmp/warnings-rjp.txt 2>&1) || true
   "$PLUME_SCRIPTS"/ci-lint-diff /tmp/warnings-rjp.txt || status=1
