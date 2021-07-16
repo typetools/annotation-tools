@@ -7,9 +7,9 @@ import com.sun.source.util.TreePath;
 import com.sun.source.util.TreePathScanner;
 
 /**
- * AnonymousClassScanner determine the index of a tree for an anonymous
- * class.  If the index is i, it is the ith anonymous class in the file.
- * Thus, if i = 2, it will have a name of the form NamedClass$2.
+ * AnonymousClassScanner determine the index of a tree for an anonymous class. If the index is i, it
+ * is the ith anonymous class in the file. Thus, if i = 2, it will have a name of the form
+ * NamedClass$2.
  */
 public class AnonymousClassScanner extends TreePathScanner<Void, Integer> {
 
@@ -33,7 +33,7 @@ public class AnonymousClassScanner extends TreePathScanner<Void, Integer> {
         anonclassFound = true;
       }
       path = path.getParentPath();
-      if (anonclassFound && CommonScanner.hasClassKind(path.getLeaf())) {
+      if (anonclassFound && TreePathUtil.hasClassKind(path.getLeaf())) {
         classesFound++;
       }
     }
@@ -52,13 +52,13 @@ public class AnonymousClassScanner extends TreePathScanner<Void, Integer> {
   private Tree anonclass;
 
   /**
-   * Creates a new AnonymousClassScanner that searches for the index of the given
-   * tree, representing an anonymous class.
+   * Creates a new AnonymousClassScanner that searches for the index of the given tree, representing
+   * an anonymous class.
    *
    * @param anonclass the anonymous class to search for
    */
   private AnonymousClassScanner(Tree anonclass) {
-    this.index = 1;             // start counting at 1
+    this.index = 1; // start counting at 1
     this.found = false;
     this.anonclass = anonclass;
   }
@@ -71,7 +71,7 @@ public class AnonymousClassScanner extends TreePathScanner<Void, Integer> {
   @Override
   public Void visitClass(ClassTree node, Integer level) {
     if (level < 2) {
-      if (!found && CommonScanner.hasClassKind(anonclass)) {
+      if (!found && TreePathUtil.hasClassKind(anonclass)) {
         if (anonclass == node) {
           found = true;
         } else if (node.getSimpleName().toString().trim().isEmpty()) {
@@ -87,18 +87,18 @@ public class AnonymousClassScanner extends TreePathScanner<Void, Integer> {
   @Override
   public Void visitNewClass(NewClassTree node, Integer level) {
     // if (level < 2) {
-      if (!found && anonclass.getKind() == Tree.Kind.NEW_CLASS) {
-        if (anonclass == node) {
-          found = true;
-        } else if (node.getClassBody() != null) {
-          // Need to make sure you actually are creating anonymous inner class,
-          // not just object creation.
-          index++;
-        } else {
-          return null;
-        }
+    if (!found && anonclass.getKind() == Tree.Kind.NEW_CLASS) {
+      if (anonclass == node) {
+        found = true;
+      } else if (node.getClassBody() != null) {
+        // Need to make sure you actually are creating anonymous inner class,
+        // not just object creation.
+        index++;
+      } else {
+        return null;
       }
-      super.visitNewClass(node, level + 1);
+    }
+    super.visitNewClass(node, level + 1);
     // }
     return null;
   }

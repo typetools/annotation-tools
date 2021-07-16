@@ -1,16 +1,6 @@
 package annotator.find;
 
 import annotator.Main;
-
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.plumelib.reflection.Signatures;
-
 import com.sun.source.tree.AnnotatedTypeTree;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.CompilationUnitTree;
@@ -21,13 +11,19 @@ import com.sun.source.tree.Tree;
 import com.sun.source.tree.TypeParameterTree;
 import com.sun.source.tree.VariableTree;
 import com.sun.source.util.TreePath;
-
-import org.checkerframework.checker.signature.qual.BinaryName;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.signature.qual.BinaryName;
+import org.plumelib.reflection.Signatures;
 
 /**
- * A criterion that matches a method with a specific signature
- * (name, argument types, and return type).
+ * A criterion that matches a method with a specific signature (name, argument types, and return
+ * type).
  */
 public class IsSigMethodCriterion implements Criterion {
 
@@ -35,6 +31,7 @@ public class IsSigMethodCriterion implements Criterion {
   private static class Context {
     public final String packageName;
     public final List<String> imports;
+
     public Context(String packageName, List<String> imports) {
       this.packageName = packageName;
       this.imports = imports;
@@ -50,36 +47,36 @@ public class IsSigMethodCriterion implements Criterion {
   private final String simpleMethodName;
   /** List of parameters in Java, not JVML, format. */
   private final List<@BinaryName String> fullyQualifiedParams;
-  /** Return type in Java, not JVML, format.  null if return type is "void". */
+  /** Return type in Java, not JVML, format. null if return type is "void". */
   private final @Nullable @BinaryName String returnType;
 
-  /** Creates a new IsSigMethodCriterion.
+  /**
+   * Creates a new IsSigMethodCriterion.
    *
    * @param fullSignature the full JVML signature
    */
   public IsSigMethodCriterion(String fullSignature) {
     this.signature = fullSignature.substring(0, fullSignature.indexOf(")") + 1);
     this.simpleMethodName = fullSignature.substring(0, fullSignature.indexOf("("));
-//    this.fullyQualifiedParams = new ArrayList<String>();
-//    for (String s : fullSignature.substring(
-//        fullSignature.indexOf("(") + 1, fullSignature.indexOf(")")).split(",")) {
-//      if (s.length() > 0) {
-//        fullyQualifiedParams.add(s);
-//      }
-//    }
+    //    this.fullyQualifiedParams = new ArrayList<String>();
+    //    for (String s : fullSignature.substring(
+    //        fullSignature.indexOf("(") + 1, fullSignature.indexOf(")")).split(",")) {
+    //      if (s.length() > 0) {
+    //        fullyQualifiedParams.add(s);
+    //      }
+    //    }
     this.fullyQualifiedParams = new ArrayList<>();
     try {
       parseParams(
-        fullSignature.substring(fullSignature.indexOf("(") + 1,
-            fullSignature.indexOf(")")));
+          fullSignature.substring(fullSignature.indexOf("(") + 1, fullSignature.indexOf(")")));
     } catch (Exception e) {
-      throw new RuntimeException("Caught exception while parsing method: " +
-          fullSignature, e);
+      throw new RuntimeException("Caught exception while parsing method: " + fullSignature, e);
     }
     String returnTypeJvml = fullSignature.substring(fullSignature.indexOf(")") + 1);
-    this.returnType = (returnTypeJvml.equals("V")
-                       ? null
-                       : Signatures.fieldDescriptorToBinaryName(returnTypeJvml));
+    this.returnType =
+        (returnTypeJvml.equals("V")
+            ? null
+            : Signatures.fieldDescriptorToBinaryName(returnTypeJvml));
   }
 
   // params is in JVML format
@@ -102,7 +99,8 @@ public class IsSigMethodCriterion implements Criterion {
     } else if (firstChar.equals("L")) {
       return "L" + restOfParams.substring(1, restOfParams.indexOf(";") + 1);
     } else {
-      throw new RuntimeException("Unknown method params: " + signature + " with remainder: " + restOfParams);
+      throw new RuntimeException(
+          "Unknown method params: " + signature + " with remainder: " + restOfParams);
     }
   }
 
@@ -135,17 +133,15 @@ public class IsSigMethodCriterion implements Criterion {
 
   // Abstracts out the inner loop of matchTypeParams.
   // goalType is fully-qualified.
-  private boolean matchTypeParam(String goalType, Tree type,
-                                 Map<String, String> typeToClassMap,
-                                 Context context) {
+  private boolean matchTypeParam(
+      String goalType, Tree type, Map<String, String> typeToClassMap, Context context) {
     String simpleType = type.toString();
 
     boolean haveMatch = matchSimpleType(goalType, simpleType, context);
     if (!haveMatch) {
       if (!typeToClassMap.isEmpty()) {
         for (Map.Entry<String, String> p : typeToClassMap.entrySet()) {
-          simpleType = simpleType.replaceAll("\\b" + p.getKey() + "\\b",
-              p.getValue());
+          simpleType = simpleType.replaceAll("\\b" + p.getKey() + "\\b", p.getValue());
           haveMatch = matchSimpleType(goalType, simpleType, context);
           if (!haveMatch) {
             Criteria.dbug.debug("matchTypeParams() => false:%n");
@@ -159,32 +155,29 @@ public class IsSigMethodCriterion implements Criterion {
     return haveMatch;
   }
 
-
-  private boolean matchTypeParams(List<? extends VariableTree> sourceParams,
-                                  Map<String, String> typeToClassMap,
-                                  Context context) {
+  private boolean matchTypeParams(
+      List<? extends VariableTree> sourceParams,
+      Map<String, String> typeToClassMap,
+      Context context) {
     assert sourceParams.size() == fullyQualifiedParams.size();
     for (int i = 0; i < sourceParams.size(); i++) {
       String fullType = fullyQualifiedParams.get(i);
       VariableTree vt = sourceParams.get(i);
       Tree vtType = vt.getType();
-      if (! matchTypeParam(fullType, vtType, typeToClassMap, context)) {
+      if (!matchTypeParam(fullType, vtType, typeToClassMap, context)) {
         Criteria.dbug.debug(
-            "matchTypeParam() => false:%n  i=%d vt = %s%n  fullType = %s%n",
-            i, vt, fullType);
+            "matchTypeParam() => false:%n  i=%d vt = %s%n  fullType = %s%n", i, vt, fullType);
         return false;
       }
     }
     return true;
   }
 
-
   // simpleType is the name as it appeared in the source code.
   // fullType is fully-qualified.
   // Both are in Java, not JVML, format.
   private boolean matchSimpleType(String fullType, String simpleType, Context context) {
-    Criteria.dbug.debug("matchSimpleType(%s, %s, %s)%n",
-        fullType, simpleType, context);
+    Criteria.dbug.debug("matchSimpleType(%s, %s, %s)%n", fullType, simpleType, context);
 
     // must strip off generics, is all of this necessary, though?
     // do you ever have generics anywhere but at the end?
@@ -194,7 +187,6 @@ public class IsSigMethodCriterion implements Criterion {
       String afterBracket = simpleType.substring(simpleType.indexOf(">", bracketIndex) + 1);
       simpleType = beforeBracket + afterBracket;
     }
-
 
     // TODO: arrays?
 
@@ -247,8 +239,7 @@ public class IsSigMethodCriterion implements Criterion {
         } else {
           // if you imported a specific class, you can only use that import
           // if the last part matches the simple type
-          String importSimpleType =
-            someImport.substring(someImport.lastIndexOf(".") + 1);
+          String importSimpleType = someImport.substring(someImport.lastIndexOf(".") + 1);
 
           // Remove array brackets from simpleType if it has them
           int arrayBracket = simpleType.indexOf('[');
@@ -280,8 +271,7 @@ public class IsSigMethodCriterion implements Criterion {
   }
 
   // simpleType can be in JVML format ??  Is that really possible?
-  private boolean matchWithPrefixOneWay(String fullType, String simpleType,
-      String prefix) {
+  private boolean matchWithPrefixOneWay(String fullType, String simpleType, String prefix) {
 
     // maybe simpleType is in JVML format
     String simpleType2 = simpleType.replace("/", ".");
@@ -289,16 +279,16 @@ public class IsSigMethodCriterion implements Criterion {
     String fullType2 = fullType.replace("$", ".");
 
     /* unused String prefix2 = (prefix.endsWith(".")
-                      ? prefix.substring(0, prefix.length() - 1)
-                      : prefix); */
-    boolean b = (fullType2.equals(prefix + simpleType2)
-                 // Hacky way to handle the possibility that fulltype is an
-                 // inner type but simple type is unqualified.
-                 || (fullType.startsWith(prefix)
-                     && (fullType.endsWith("$" + simpleType2)
-                         || fullType2.endsWith("." + simpleType2))));
-    Criteria.dbug.debug("matchWithPrefix(%s, %s, %s) => %b)%n",
-        fullType2, simpleType, prefix, b);
+    ? prefix.substring(0, prefix.length() - 1)
+    : prefix); */
+    boolean b =
+        (fullType2.equals(prefix + simpleType2)
+            // Hacky way to handle the possibility that fulltype is an
+            // inner type but simple type is unqualified.
+            || (fullType.startsWith(prefix)
+                && (fullType.endsWith("$" + simpleType2)
+                    || fullType2.endsWith("." + simpleType2))));
+    Criteria.dbug.debug("matchWithPrefix(%s, %s, %s) => %b)%n", fullType2, simpleType, prefix, b);
     return b;
   }
 
@@ -336,14 +326,15 @@ public class IsSigMethodCriterion implements Criterion {
 
     MethodTree mt = (MethodTree) leaf;
 
-    if (! simpleMethodName.equals(mt.getName().toString())) {
+    if (!simpleMethodName.equals(mt.getName().toString())) {
       Criteria.dbug.debug("IsSigMethodCriterion.isSatisfiedBy => false: Names don't match%n");
       return false;
     }
 
     List<? extends VariableTree> sourceParams = mt.getParameters();
     if (fullyQualifiedParams.size() != sourceParams.size()) {
-      Criteria.dbug.debug("IsSigMethodCriterion.isSatisfiedBy => false: Number of parameters don't match%n");
+      Criteria.dbug.debug(
+          "IsSigMethodCriterion.isSatisfiedBy => false: Number of parameters don't match%n");
       return false;
     }
 
@@ -382,7 +373,7 @@ public class IsSigMethodCriterion implements Criterion {
     {
       TreePath classpath = path;
       ClassTree ct = enclosingClass(classpath);
-      while (ct!=null) {
+      while (ct != null) {
         for (TypeParameterTree param : ct.getTypeParameters()) {
           String paramName = param.getName().toString();
           String paramClass = "Object";
@@ -390,7 +381,7 @@ public class IsSigMethodCriterion implements Criterion {
           if (paramBounds != null && paramBounds.size() >= 1) {
             Tree pb = paramBounds.get(0);
             if (pb.getKind() == Tree.Kind.ANNOTATED_TYPE) {
-                pb = ((AnnotatedTypeTree)pb).getUnderlyingType();
+              pb = ((AnnotatedTypeTree) pb).getUnderlyingType();
             }
             paramClass = pb.toString();
           }
@@ -401,14 +392,14 @@ public class IsSigMethodCriterion implements Criterion {
       }
     }
 
-    if (! matchTypeParams(sourceParams, typeToClassMap, context)) {
+    if (!matchTypeParams(sourceParams, typeToClassMap, context)) {
       Criteria.dbug.debug("IsSigMethodCriterion => false: Parameter types don't match%n");
       return false;
     }
 
-    if ((mt.getReturnType() != null) // must be a constructor
-        && (returnType != null)
-        && (! matchTypeParam(returnType, mt.getReturnType(), typeToClassMap, context))) {
+    if (mt.getReturnType() != null // must be a constructor
+        && returnType != null
+        && !matchTypeParam(returnType, mt.getReturnType(), typeToClassMap, context)) {
       Criteria.dbug.debug("IsSigMethodCriterion => false: Return types don't match%n");
       return false;
     }
@@ -417,18 +408,19 @@ public class IsSigMethodCriterion implements Criterion {
     return true;
   }
 
+  @Override
+  public boolean isOnlyTypeAnnotationCriterion() {
+    return false;
+  }
+
   /* This is a copy of the method from the Checker Framework
    * TreeUtils.enclosingClass.
    * We cannot have a dependency on the Checker Framework.
    * TODO: as is the case there, anonymous classes are not handled correctly.
    */
   private static ClassTree enclosingClass(final TreePath path) {
-    final Set<Tree.Kind> kinds = EnumSet.of(
-            Tree.Kind.CLASS,
-            Tree.Kind.ENUM,
-            Tree.Kind.INTERFACE,
-            Tree.Kind.ANNOTATION_TYPE
-    );
+    final Set<Tree.Kind> kinds =
+        EnumSet.of(Tree.Kind.CLASS, Tree.Kind.ENUM, Tree.Kind.INTERFACE, Tree.Kind.ANNOTATION_TYPE);
     TreePath p = path;
 
     while (p != null) {
@@ -448,58 +440,58 @@ public class IsSigMethodCriterion implements Criterion {
     return Kind.SIG_METHOD;
   }
 
-//  public static String getSignature(MethodTree mt) {
-//    String sig = mt.getName().toString().trim(); // method name, no parameters
-//    sig += "(";
-//    boolean first = true;
-//    for (VariableTree vt : mt.getParameters()) {
-//      if (!first) {
-//        sig += ",";
-//      }
-//      sig += getType(vt.getType());
-//      first = false;
-//    }
-//    sig += ")";
-//
-//    return sig;
-//  }
-//
-//  private static String getType(Tree t) {
-//    if (t.getKind() == Tree.Kind.PRIMITIVE_TYPE) {
-//      return getPrimitiveType((PrimitiveTypeTree) t);
-//    } else if (t.getKind() == Tree.Kind.IDENTIFIER) {
-//      return "L" + ((IdentifierTree) t).getName().toString();
-//    } else if (t.getKind() == Tree.Kind.PARAMETERIZED_TYPE) {
-//      // don't care about generics due to erasure
-//      return getType(((ParameterizedTypeTree) t).getType());
-//    }
-//    throw new RuntimeException("unable to get type of: " + t);
-//  }
-//
-//  private static String getPrimitiveType(PrimitiveTypeTree pt) {
-//    TypeKind tk = pt.getPrimitiveTypeKind();
-//    if (tk == TypeKind.ARRAY) {
-//      return "[";
-//    } else if (tk == TypeKind.BOOLEAN) {
-//      return "Z";
-//    } else if (tk == TypeKind.BYTE) {
-//      return "B";
-//    } else if (tk == TypeKind.CHAR) {
-//      return "C";
-//    } else if (tk == TypeKind.DOUBLE) {
-//      return "D";
-//    } else if (tk == TypeKind.FLOAT) {
-//      return "F";
-//    } else if (tk == TypeKind.INT) {
-//      return "I";
-//    } else if (tk == TypeKind.LONG) {
-//      return "J";
-//    } else if (tk == TypeKind.SHORT) {
-//      return "S";
-//    }
-//
-//    throw new RuntimeException("Invalid TypeKind: " + tk);
-//  }
+  //  public static String getSignature(MethodTree mt) {
+  //    String sig = mt.getName().toString().trim(); // method name, no parameters
+  //    sig += "(";
+  //    boolean first = true;
+  //    for (VariableTree vt : mt.getParameters()) {
+  //      if (!first) {
+  //        sig += ",";
+  //      }
+  //      sig += getType(vt.getType());
+  //      first = false;
+  //    }
+  //    sig += ")";
+  //
+  //    return sig;
+  //  }
+  //
+  //  private static String getType(Tree t) {
+  //    if (t.getKind() == Tree.Kind.PRIMITIVE_TYPE) {
+  //      return getPrimitiveType((PrimitiveTypeTree) t);
+  //    } else if (t.getKind() == Tree.Kind.IDENTIFIER) {
+  //      return "L" + ((IdentifierTree) t).getName().toString();
+  //    } else if (t.getKind() == Tree.Kind.PARAMETERIZED_TYPE) {
+  //      // don't care about generics due to erasure
+  //      return getType(((ParameterizedTypeTree) t).getType());
+  //    }
+  //    throw new RuntimeException("unable to get type of: " + t);
+  //  }
+  //
+  //  private static String getPrimitiveType(PrimitiveTypeTree pt) {
+  //    TypeKind tk = pt.getPrimitiveTypeKind();
+  //    if (tk == TypeKind.ARRAY) {
+  //      return "[";
+  //    } else if (tk == TypeKind.BOOLEAN) {
+  //      return "Z";
+  //    } else if (tk == TypeKind.BYTE) {
+  //      return "B";
+  //    } else if (tk == TypeKind.CHAR) {
+  //      return "C";
+  //    } else if (tk == TypeKind.DOUBLE) {
+  //      return "D";
+  //    } else if (tk == TypeKind.FLOAT) {
+  //      return "F";
+  //    } else if (tk == TypeKind.INT) {
+  //      return "I";
+  //    } else if (tk == TypeKind.LONG) {
+  //      return "J";
+  //    } else if (tk == TypeKind.SHORT) {
+  //      return "S";
+  //    }
+  //
+  //    throw new RuntimeException("Invalid TypeKind: " + tk);
+  //  }
 
   /*
   private boolean isPrimitive(String s) {
@@ -516,15 +508,14 @@ public class IsSigMethodCriterion implements Criterion {
   */
 
   private boolean isPrimitiveLetter(String s) {
-    return
-      s.equals("Z") ||
-      s.equals("B") ||
-      s.equals("C") ||
-      s.equals("D") ||
-      s.equals("F") ||
-      s.equals("I") ||
-      s.equals("J") ||
-      s.equals("S");
+    return s.equals("Z")
+        || s.equals("B")
+        || s.equals("C")
+        || s.equals("D")
+        || s.equals("F")
+        || s.equals("I")
+        || s.equals("J")
+        || s.equals("S");
   }
 
   /*

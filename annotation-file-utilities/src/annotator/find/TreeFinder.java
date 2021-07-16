@@ -1,21 +1,8 @@
 package annotator.find;
 
-import scenelib.annotations.el.AnnotationDef;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.Modifier;
-import javax.lang.model.element.Name;
-import javax.lang.model.type.NullType;
-
+import annotator.Main;
+import annotator.scanner.TreePathUtil;
+import annotator.specification.IndexFileSpecification;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.SetMultimap;
@@ -41,7 +28,6 @@ import com.sun.source.tree.VariableTree;
 import com.sun.source.tree.WildcardTree;
 import com.sun.source.util.TreePath;
 import com.sun.source.util.TreeScanner;
-
 import com.sun.tools.javac.code.Flags;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Types;
@@ -64,39 +50,50 @@ import com.sun.tools.javac.tree.JCTree.JCTypeParameter;
 import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
 import com.sun.tools.javac.tree.JCTree.JCWildcard;
 import com.sun.tools.javac.util.Position;
-
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.StringJoiner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.Modifier;
+import javax.lang.model.element.Name;
+import javax.lang.model.type.NullType;
 import org.objectweb.asm.TypePath;
+import org.plumelib.util.Pair;
+import scenelib.annotations.el.AnnotationDef;
 import scenelib.annotations.el.TypePathEntry;
 import scenelib.annotations.io.ASTIndex;
 import scenelib.annotations.io.ASTPath;
 import scenelib.annotations.io.ASTRecord;
 import scenelib.annotations.io.DebugWriter;
-import annotator.Main;
-import annotator.scanner.CommonScanner;
-import annotator.specification.IndexFileSpecification;
-
-import org.plumelib.util.Pair;
-
 import scenelib.type.DeclaredType;
 import scenelib.type.Type;
 
 /**
- * A {@link TreeScanner} that is able to locate program elements in an
- * AST based on {@code Criteria}. {@link #getInsertionsByPosition(JCTree.JCCompilationUnit,List)}
- * scans a tree and returns a
- * mapping of source positions (as character offsets) to insertion text.
+ * A {@link TreeScanner} that is able to locate program elements in an AST based on {@code
+ * Criteria}. {@link #getInsertionsByPosition(JCTree.JCCompilationUnit,List)} scans a tree and
+ * creates (in field {@code insertions}) a mapping of source positions (as character offsets) to
+ * insertion text.
  */
 public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
-  public static final DebugWriter dbug = new DebugWriter();
-  public static final DebugWriter stak = new DebugWriter();
-  public static final DebugWriter warn = new DebugWriter();
+  /** Debugging logger. */
+  public static final DebugWriter dbug = new DebugWriter(false);
+  /** Warning logger. */
+  public static final DebugWriter warn = new DebugWriter(false);
 
   /**
-   * String representation of regular expression matching a comment in
-   * Java code.  The part before {@code |} matches a single-line
-   * comment, and the part after matches a multi-line comment, which
-   * breaks down as follows (adapted from
-   * <a href="http://perldoc.perl.org/perlfaq6.html#How-do-I-use-a-regular-expression-to-strip-C-style-comments-from-a-file%3f">Perl FAQ</a>):
+   * String representation of regular expression matching a comment in Java code. The part before
+   * {@code |} matches a single-line comment, and the part after matches a multi-line comment, which
+   * breaks down as follows (adapted from <a
+   * href="http://perldoc.perl.org/perlfaq6.html#How-do-I-use-a-regular-expression-to-strip-C-style-comments-from-a-file%3f">Perl
+   * FAQ</a>):
+   *
    * <pre>
    *          /\*         ##  Start of comment
    *          [^*]*\*+    ##  Non-* followed by 1-or-more *s
@@ -106,49 +103,53 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
    *                      ##    but do end with '*'
    *          /           ##  End of comment
    * </pre>
-   * Note: Care must be taken to avoid false comment matches starting
-   * inside a string literal.  Ensuring that the code segment being
-   * matched starts at an AST node boundary is sufficient to prevent
-   * this complication.
+   *
+   * Note: Care must be taken to avoid false comment matches starting inside a string literal.
+   * Ensuring that the code segment being matched starts at an AST node boundary is sufficient to
+   * prevent this complication.
    */
-  private final static String comment =
-      "//.*$|/\\*[^*]*+\\*++(?:[^*/][^*]*+\\*++)*+/";
+  private static final String comment = "//.*$|/\\*[^*]*+\\*++(?:[^*/][^*]*+\\*++)*+/";
 
-  /**
-   * Regular expression matching a character or string literal.
-   */
-  private final static String literal =
+  /** Regular expression matching a character or string literal. */
+  private static final String literal =
       "'(?:(?:\\\\(?:'|[^']*+))|[^\\\\'])'|\"(?:\\\\.|[^\\\\\"])*\"";
 
   /**
-   * Regular expression matching a non-commented instance of {@code /}
-   * that is not part of a comment-starting delimiter.
+   * Regular expression matching a non-commented instance of {@code /} that is not part of a
+   * comment-starting delimiter.
    */
-  private final static String nonDelimSlash = "/(?=[^*/])";
+  private static final String nonDelimSlash = "/(?=[^*/])";
 
   /**
-   * Returns regular expression matching "anything but" {@code c}: a
-   * single comment, character or string literal, or non-{@code c}
-   * character.
+   * Returns regular expression matching "anything but" {@code c}: a single comment, character or
+   * string literal, or non-{@code c} character.
    */
-  private final static String otherThan(char c) {
+  private static final String otherThan(char c) {
     String cEscaped;
 
     // escape if necessary for use in character class
     switch (c) {
-    case '/':
-    case '"':
-    case '\'':
-      cEscaped = ""; break;  // already present in class defn
-    case '\\':
-    case '[':
-    case ']':
-      cEscaped = "\\" + c; break;  // escape!
-    default:
-      cEscaped = "" + c;
+      case '/':
+      case '"':
+      case '\'':
+        cEscaped = "";
+        break; // already present in class defn
+      case '\\':
+      case '[':
+      case ']':
+        cEscaped = "\\" + c;
+        break; // escape!
+      default:
+        cEscaped = "" + c;
     }
 
-    return "[^/'" + cEscaped + "\"]|" + "|" + literal + "|" + comment
+    return "[^/'"
+        + cEscaped
+        + "\"]|"
+        + "|"
+        + literal
+        + "|"
+        + comment
         + (c == '/' ? "" : nonDelimSlash);
   }
 
@@ -168,11 +169,11 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
   }
 
   /**
-   * Returns the position of the first (non-commented) instance of a
-   * character at or after the given position.
+   * Returns the position of the first (non-commented) instance of a character at or after the given
+   * position.
    *
    * @param c the character to search for
-   * @param start the position at which to start searching.  Must not be inside a comment.
+   * @param start the position at which to start searching. Must not be inside a comment.
    * @return the position of the first instance of {@code c} after position {@code start}
    * @see #getNthInstanceInRange(char, int, int, int)
    */
@@ -181,17 +182,15 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
   }
 
   /**
-   * Returns the position of the {@code n}th (non-commented, non-quoted)
-   * instance of a character between the given positions, or the last
-   * instance if {@code n==0}.  (Assumes position is not inside a
-   * comment.)
+   * Returns the position of the {@code n}th (non-commented, non-quoted) instance of a character
+   * between the given positions, or the last instance if {@code n==0}. (Assumes position is not
+   * inside a comment.)
    *
    * @param c the character being sought
    * @param start position at which the search starts (inclusive)
    * @param end position at which the search ends (exclusive)
    * @param n number of repetitions, or 0 for last occurrence
-   * @return position of match in {@code tree}, or
-   *          -1 if match not found
+   * @return position of match in {@code tree}, or -1 if match not found
    */
   private int getNthInstanceInRange(char c, int start, int end, int n) {
     if (end < 0) {
@@ -215,7 +214,9 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       // false, (reasonably) assuming no underflow
       while (m.find()) {
         pos = m.end() - 1;
-        if (--count == 0) { break; }
+        if (--count == 0) {
+          break;
+        }
       }
       // positive count means search halted before nth instance was found
       return count > 0 ? Position.NOPOS : pos;
@@ -230,10 +231,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     return (parentPath == null) ? null : parentPath.getLeaf();
   }
 
-  /**
-   * An alternative to TreePath.getPath(CompilationUnitTree,Tree) that
-   * caches its results.
-   */
+  /** An alternative to TreePath.getPath(CompilationUnitTree,Tree) that caches its results. */
   public TreePath getPath(Tree target) {
     if (treePathCache.containsKey(target)) {
       return treePathCache.get(target);
@@ -251,12 +249,10 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
   }
 
   /**
-   * Determines the insertion position for type annotations on various
-   * elements.  For instance, type annotations for a declaration should be
-   * placed before the type rather than the variable name.
+   * Determines the insertion position for type annotations on various elements. For instance, type
+   * annotations for a declaration should be placed before the type rather than the variable name.
    */
-  private class TypePositionFinder
-  extends TreeScanner<Pair<ASTRecord, Integer>, Insertion> {
+  private class TypePositionFinder extends TreeScanner<Pair<ASTRecord, Integer>, Insertion> {
     private Pair<ASTRecord, Integer> pathAndPos(JCTree t) {
       return Pair.of(astRecord(t), t.pos);
     }
@@ -269,54 +265,54 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     private Pair<ASTRecord, Integer> getBaseTypePosition(JCTree t) {
       while (true) {
         switch (t.getKind()) {
-        case IDENTIFIER:
-        case PRIMITIVE_TYPE:
-          return pathAndPos(t);
-        case MEMBER_SELECT:
-          JCTree exp = t;
-          do {  // locate pkg name, if any
-            JCFieldAccess jfa = (JCFieldAccess) exp;
-            exp = jfa.getExpression();
-            if (jfa.sym.isStatic()) {
-              return pathAndPos(exp,
-                  getFirstInstanceAfter('.',
-                      exp.getEndPosition(tree.endPositions)) + 1);
-            }
-          } while (exp instanceof JCFieldAccess
-              && ((JCFieldAccess) exp).sym.getKind() != ElementKind.PACKAGE);
-          if (exp != null) {
-            if (exp.getKind() == Tree.Kind.IDENTIFIER) {
-              Symbol sym = ((JCIdent) exp).sym;
-              if (!(sym.isStatic() || sym.getKind() == ElementKind.PACKAGE)) {
-                return pathAndPos(t, t.getStartPosition());
+          case IDENTIFIER:
+          case PRIMITIVE_TYPE:
+            return pathAndPos(t);
+          case MEMBER_SELECT:
+            JCTree exp = t;
+            do { // locate pkg name, if any
+              JCFieldAccess jfa = (JCFieldAccess) exp;
+              exp = jfa.getExpression();
+              if (jfa.sym.isStatic()) {
+                return pathAndPos(
+                    exp, getFirstInstanceAfter('.', exp.getEndPosition(tree.endPositions)) + 1);
               }
+            } while (exp instanceof JCFieldAccess
+                && ((JCFieldAccess) exp).sym.getKind() != ElementKind.PACKAGE);
+            if (exp != null) {
+              if (exp.getKind() == Tree.Kind.IDENTIFIER) {
+                Symbol sym = ((JCIdent) exp).sym;
+                if (!(sym.isStatic() || sym.getKind() == ElementKind.PACKAGE)) {
+                  return pathAndPos(t, t.getStartPosition());
+                }
+              }
+              t = exp;
             }
-            t = exp;
-          }
-          return pathAndPos(t,
-              getFirstInstanceAfter('.',
-                  t.getEndPosition(tree.endPositions)) + 1);
-        case ARRAY_TYPE:
-          t = ((JCArrayTypeTree) t).elemtype;
-          break;
-        case PARAMETERIZED_TYPE:
-          return pathAndPos(t, t.getStartPosition());
-        case EXTENDS_WILDCARD:
-        case SUPER_WILDCARD:
-          t = ((JCWildcard) t).inner;
-          break;
-        case UNBOUNDED_WILDCARD:
-          // This is "?" as in "List<?>".  ((JCWildcard) t).inner is null.
-          // There is nowhere to attach the annotation, so for now return
-          // the "?" tree itself.
-          return pathAndPos(t);
-        case ANNOTATED_TYPE:
-          // If this type already has annotations on it, get the underlying
-          // type, without annotations.
-          t = ((JCAnnotatedType) t).underlyingType;
-          break;
-        default:
-          throw new RuntimeException(String.format("Unrecognized type (kind=%s, class=%s): %s", t.getKind(), t.getClass(), t));
+            return pathAndPos(
+                t, getFirstInstanceAfter('.', t.getEndPosition(tree.endPositions)) + 1);
+          case ARRAY_TYPE:
+            t = ((JCArrayTypeTree) t).elemtype;
+            break;
+          case PARAMETERIZED_TYPE:
+            return pathAndPos(t, t.getStartPosition());
+          case EXTENDS_WILDCARD:
+          case SUPER_WILDCARD:
+            t = ((JCWildcard) t).inner;
+            break;
+          case UNBOUNDED_WILDCARD:
+            // This is "?" as in "List<?>".  ((JCWildcard) t).inner is null.
+            // There is nowhere to attach the annotation, so for now return
+            // the "?" tree itself.
+            return pathAndPos(t);
+          case ANNOTATED_TYPE:
+            // If this type already has annotations on it, get the underlying
+            // type, without annotations.
+            t = ((JCAnnotatedType) t).underlyingType;
+            break;
+          default:
+            throw new RuntimeException(
+                String.format(
+                    "Unrecognized type (kind=%s, class=%s): %s", t.getKind(), t.getClass(), t));
         }
       }
     }
@@ -347,19 +343,21 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
 
       JCMethodDecl jcnode = (JCMethodDecl) node;
       JCVariableDecl jcvar = (JCVariableDecl) node.getReceiverParameter();
-      if (jcvar != null) { return pathAndPos(jcvar); }
+      if (jcvar != null) {
+        return pathAndPos(jcvar);
+      }
 
       int pos = Position.NOPOS;
-      ASTRecord astPath = astRecord(jcnode)
-          .extend(Tree.Kind.METHOD, ASTPath.PARAMETER, -1);
+      ASTRecord astPath = astRecord(jcnode).extend(Tree.Kind.METHOD, ASTPath.PARAMETER, -1);
 
       if (node.getParameters().isEmpty()) {
         // no parameters; find first (uncommented) '(' after method name
         pos = findMethodName(jcnode);
-        if (pos >= 0) { pos = getFirstInstanceAfter('(', pos); }
+        if (pos >= 0) {
+          pos = getFirstInstanceAfter('(', pos);
+        }
         if (++pos <= 0) {
-          throw new RuntimeException("Couldn't find param opening paren for: "
-              + jcnode);
+          throw new RuntimeException("Couldn't find param opening paren for: " + jcnode);
         }
       } else {
         pos = ((JCTree) node.getParameters().get(0)).getStartPosition();
@@ -386,14 +384,15 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
           entry = new ASTPath.ASTEntry(Tree.Kind.NEW_ARRAY, ASTPath.TYPE, 0);
           astPath = astRecord(parent).extend(entry).astPath;
         } else {
-          entry = astPath.get(astPath.size() - 1);  // kind is NewArray
+          entry = astPath.get(astPath.size() - 1); // kind is NewArray
         }
         if (entry.childSelectorIs(ASTPath.TYPE)) {
           int n = entry.getArgument();
           i = jcnode.getStartPosition();
-          if (n < getDimsSize((JCExpression) parent)) {  // else n == #dims
-            i = getNthInstanceInRange('[', i,
-                ((JCNewArray) parent).getEndPosition(tree.endPositions), n+1);
+          if (n < getDimsSize((JCExpression) parent)) { // else n == #dims
+            i =
+                getNthInstanceInRange(
+                    '[', i, ((JCNewArray) parent).getEndPosition(tree.endPositions), n + 1);
           }
         }
         if (i == null) {
@@ -415,8 +414,8 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
         i = ((JCIdent) node).pos;
       }
 
-      dbug.debug("visitIdentifier(%s) => %d where parent (%s) = %s%n",
-          node, i, parent.getClass(), parent);
+      dbug.debug(
+          "visitIdentifier(%s) => %d where parent (%s) = %s%n", node, i, parent.getClass(), parent);
       return Pair.of(rec.replacePath(astPath), i);
     }
 
@@ -424,8 +423,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     public Pair<ASTRecord, Integer> visitMemberSelect(MemberSelectTree node, Insertion ins) {
       dbug.debug("TypePositionFinder.visitMemberSelect(%s)%n", node);
       JCFieldAccess raw = (JCFieldAccess) node;
-      return Pair.of(astRecord(node),
-          raw.getEndPosition(tree.endPositions) - raw.name.length());
+      return Pair.of(astRecord(node), raw.getEndPosition(tree.endPositions) - raw.name.length());
     }
 
     @Override
@@ -447,30 +445,32 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     }
 
     @Override
-    public Pair<ASTRecord, Integer> visitParameterizedType(ParameterizedTypeTree node, Insertion ins) {
+    public Pair<ASTRecord, Integer> visitParameterizedType(
+        ParameterizedTypeTree node, Insertion ins) {
       Tree parent = parent(node);
-      dbug.debug("TypePositionFinder.visitParameterizedType %s parent=%s%n",
-          node, parent);
+      dbug.debug("TypePositionFinder.visitParameterizedType %s parent=%s%n", node, parent);
       Integer pos = getBaseTypePosition(((JCTypeApply) node).getType()).b;
       return Pair.of(astRecord(node), pos);
     }
 
     /**
-     * Returns the number of array levels that are in the given array type tree,
-     * or 0 if the given node is not an array type tree.
+     * Returns the number of array levels that are in the given array type tree, or 0 if the given
+     * node is not an array type tree.
      */
     private int arrayLevels(com.sun.tools.javac.code.Type t) {
-      return t.accept(new Types.SimpleVisitor<Integer, Integer>() {
-        @Override
-        public Integer visitArrayType(com.sun.tools.javac.code.Type.ArrayType t,
-            Integer i) {
-          return t.elemtype.accept(this, i+1);
-        }
-        @Override
-        public Integer visitType(com.sun.tools.javac.code.Type t, Integer i) {
-          return i;
-        }
-      }, 0);
+      return t.accept(
+          new Types.SimpleVisitor<Integer, Integer>() {
+            @Override
+            public Integer visitArrayType(com.sun.tools.javac.code.Type.ArrayType t, Integer i) {
+              return t.elemtype.accept(this, i + 1);
+            }
+
+            @Override
+            public Integer visitType(com.sun.tools.javac.code.Type t, Integer i) {
+              return i;
+            }
+          },
+          0);
     }
 
     private int arrayLevels(Tree node) {
@@ -501,7 +501,8 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     public Pair<ASTRecord, Integer> visitArrayType(ArrayTypeTree node, Insertion ins) {
       dbug.debug("TypePositionFinder.visitArrayType(%s)%n", node);
       JCArrayTypeTree att = (JCArrayTypeTree) node;
-      dbug.debug("TypePositionFinder.visitArrayType(%s) preferred = %s%n",
+      dbug.debug(
+          "TypePositionFinder.visitArrayType(%s) preferred = %s%n",
           node, att.getPreferredPosition());
       // If the code has a type like "String[][][]", then this gets called
       // three times:  for String[][][], String[][], and String[]
@@ -514,8 +515,8 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       int pos = arrayInsertPos(start, end);
 
       dbug.debug("  levels=%d largestLevels=%d%n", levels, largestLevels);
-      for (int i=levels; i<largestLevels; i++) {
-        pos = getFirstInstanceAfter('[', pos+1);
+      for (int i = levels; i < largestLevels; i++) {
+        pos = getFirstInstanceAfter('[', pos + 1);
         dbug.debug("  pos %d at i=%d%n", pos, i);
       }
       return Pair.of(astRecord(node), pos);
@@ -526,7 +527,6 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
      *
      * @param start beginning of range to be matched
      * @param end end of range to be matched
-     *
      * @return position for annotation insertion
      */
     private int arrayInsertPos(int start, int end) {
@@ -544,7 +544,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
           if (m.find()) {
             pos = m.start(1);
           }
-          if (pos < 0) {  // should never happen
+          if (pos < 0) { // should never happen
             throw new RuntimeException("no \"[\" or \"...\" in array type");
           }
         }
@@ -582,7 +582,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     //
     // The AST depth of the initializer is correct unless all arrays are
     // empty, in which case it is arbitary.  This is legal:
-    // String[][][][][] names4 = new String[][][][][] { { { } } };
+    // String[][][][][] names4 = new String[][][][][] { { {} } };
     //
     // Array initializers can also be multi-dimensional, but this is not
     // relevant to us:
@@ -604,7 +604,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
         int maxDimsSize = 0;
         for (JCExpression elem : na.elems) {
           if (elem instanceof JCNewArray) {
-            int elemDimsSize = getDimsSize((JCNewArray)elem);
+            int elemDimsSize = getDimsSize((JCNewArray) elem);
             maxDimsSize = Math.max(maxDimsSize, elemDimsSize);
           } else if (elem instanceof JCArrayTypeTree) {
             // Does this ever happen?  javac's Pretty.java handles it.
@@ -621,7 +621,6 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       }
     }
 
-
     // Visit an expression of one of these forms:
     //   new int[5][10]
     //   new int[][] {...}
@@ -630,8 +629,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     public Pair<ASTRecord, Integer> visitNewArray(NewArrayTree node, Insertion ins) {
       dbug.debug("TypePositionFinder.visitNewArray%n");
       JCNewArray na = (JCNewArray) node;
-      GenericArrayLocationCriterion galc =
-          ins.getCriteria().getGenericArrayLocation();
+      GenericArrayLocationCriterion galc = ins.getCriteria().getGenericArrayLocation();
       ASTRecord rec = ASTIndex.indexOf(tree).get(node);
       ASTPath astPath = ins.getCriteria().getASTPath();
       String childSelector = null;
@@ -651,10 +649,12 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
         // find matching node = last path entry w/kind NEW_ARRAY
         while (--i >= 0) {
           lastEntry = astPath.get(i);
-          if (lastEntry.getTreeKind() == Tree.Kind.NEW_ARRAY) { break; }
+          if (lastEntry.getTreeKind() == Tree.Kind.NEW_ARRAY) {
+            break;
+          }
         }
         assert i >= 0 : "no matching path entry (kind=NEW_ARRAY)";
-        if (n > i+1) {
+        if (n > i + 1) {
           // find correct node further down and visit if present
           assert dim + 1 == dimsSize;
           Tree typeTree = na.elemtype;
@@ -662,37 +662,39 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
           while (--dim >= 0) {
             typeTree = ((ArrayTypeTree) typeTree).getType();
           }
-loop:
+          loop:
           while (j < n) {
             ASTPath.ASTEntry entry = astPath.get(j);
             switch (entry.getTreeKind()) {
-            case ANNOTATED_TYPE:
-              typeTree = ((AnnotatedTypeTree) typeTree).getUnderlyingType();
-              continue;  // no increment
-            case ARRAY_TYPE:
-              typeTree = ((ArrayTypeTree) typeTree).getType();
-              break;
-            case MEMBER_SELECT:
-              if (typeTree instanceof JCTree.JCFieldAccess) {
-                JCTree.JCFieldAccess jfa = (JCTree.JCFieldAccess) typeTree;
-                typeTree = jfa.getExpression();
-                // if just a qualifier, don't increment loop counter
-                if (jfa.sym.getKind() == ElementKind.PACKAGE) { continue; }
+              case ANNOTATED_TYPE:
+                typeTree = ((AnnotatedTypeTree) typeTree).getUnderlyingType();
+                continue; // no increment
+              case ARRAY_TYPE:
+                typeTree = ((ArrayTypeTree) typeTree).getType();
                 break;
-              }
-              break loop;
-            case PARAMETERIZED_TYPE:
-              if (entry.childSelectorIs(ASTPath.TYPE_ARGUMENT)) {
-                int arg = entry.getArgument();
-                List<? extends Tree> typeArgs =
-                    ((ParameterizedTypeTree) typeTree).getTypeArguments();
-                typeTree = typeArgs.get(arg);
-              } else {  // ASTPath.TYPE
-                typeTree = ((ParameterizedTypeTree) typeTree).getType();
-              }
-              break;
-            default:
-              break loop;
+              case MEMBER_SELECT:
+                if (typeTree instanceof JCTree.JCFieldAccess) {
+                  JCTree.JCFieldAccess jfa = (JCTree.JCFieldAccess) typeTree;
+                  typeTree = jfa.getExpression();
+                  // if just a qualifier, don't increment loop counter
+                  if (jfa.sym.getKind() == ElementKind.PACKAGE) {
+                    continue;
+                  }
+                  break;
+                }
+                break loop;
+              case PARAMETERIZED_TYPE:
+                if (entry.childSelectorIs(ASTPath.TYPE_ARGUMENT)) {
+                  int arg = entry.getArgument();
+                  List<? extends Tree> typeArgs =
+                      ((ParameterizedTypeTree) typeTree).getTypeArguments();
+                  typeTree = typeArgs.get(arg);
+                } else { // ASTPath.TYPE
+                  typeTree = ((ParameterizedTypeTree) typeTree).getType();
+                }
+                break;
+              default:
+                break loop;
             }
             ++j;
           }
@@ -710,14 +712,13 @@ loop:
           ASTPath newPath = ASTPath.empty();
           int j = 0;
           dim += lastEntry.getArgument();
-          while (j < i) {  // [0,i)
+          while (j < i) { // [0,i)
             newPath = newPath.extend(astPath.get(j));
             j++;
           }
-          lastEntry = new ASTPath.ASTEntry(Tree.Kind.NEW_ARRAY,
-              ASTPath.TYPE, dim);  // i
+          lastEntry = new ASTPath.ASTEntry(Tree.Kind.NEW_ARRAY, ASTPath.TYPE, dim); // i
           newPath = newPath.extend(lastEntry);
-          while (j < n) {  // [i,n)
+          while (j < n) { // [i,n)
             newPath = newPath.extend(astPath.get(j));
             j++;
           }
@@ -728,68 +729,71 @@ loop:
       }
 
       if (ASTPath.TYPE.equals(childSelector)) {
-      if (na.toString().startsWith("{")) {
-        if (ins.getKind() == Insertion.Kind.ANNOTATION) {
-          TreePath parentPath = TreePath.getPath(tree, na).getParentPath();
-          if (parentPath != null) {
-            Tree parent = parentPath.getLeaf();
-            if (parent.getKind() == Tree.Kind.VARIABLE) {
-              AnnotationInsertion ai = (AnnotationInsertion) ins;
-              JCTree typeTree = ((JCVariableDecl) parent).getType();
-              ai.setType(typeTree.toString());
-              return Pair.of(rec.replacePath(astPath), na.getStartPosition());
+        if (na.toString().startsWith("{")) {
+          if (ins.getKind() == Insertion.Kind.ANNOTATION) {
+            TreePath parentPath = TreePath.getPath(tree, na).getParentPath();
+            if (parentPath != null) {
+              Tree parent = parentPath.getLeaf();
+              if (parent.getKind() == Tree.Kind.VARIABLE) {
+                AnnotationInsertion ai = (AnnotationInsertion) ins;
+                JCTree typeTree = ((JCVariableDecl) parent).getType();
+                ai.setType(typeTree.toString());
+                return Pair.of(rec.replacePath(astPath), na.getStartPosition());
+              }
             }
+            System.err.println(
+                "WARNING: array initializer "
+                    + node
+                    + " has no explicit type; skipping insertion "
+                    + ins);
+            return null;
+          } else {
+            return Pair.of(rec.replacePath(astPath), na.getStartPosition());
           }
-          System.err.println("WARNING: array initializer " + node +
-              " has no explicit type; skipping insertion " + ins);
-          return null;
+        }
+        if (dim == dimsSize) {
+          if (na.elemtype == null) {
+            System.err.println(
+                "WARNING: array initializer "
+                    + node
+                    + " has no explicit type; skipping insertion "
+                    + ins);
+            return null;
+          }
+          return getBaseTypePosition(na.elemtype);
+        }
+        if (na.dims.size() != 0) {
+          int startPos = na.getStartPosition();
+          int endPos = na.getEndPosition(tree.endPositions);
+          int pos = getNthInstanceInRange('[', startPos, endPos, dim + 1);
+          return Pair.of(rec.replacePath(astPath), pos);
+        }
+        // In a situation like
+        //   node=new String[][][][][]{{{}}}
+        // Also see Pretty.printBrackets.
+        if (dim == 0) {
+          if (na.elemtype == null) {
+            return Pair.of(rec.replacePath(astPath), na.getStartPosition());
+          }
+          // na.elemtype.getPreferredPosition(); seems to be at the end,
+          //  after the brackets.
+          // na.elemtype.getStartPosition(); is before the type name itself.
+          int startPos = na.elemtype.getStartPosition();
+          return Pair.of(rec.replacePath(astPath), getFirstInstanceAfter('[', startPos + 1));
+        } else if (dim == dimsSize) {
+          return Pair.of(rec.replacePath(astPath), na.getType().pos().getStartPosition());
         } else {
-          return Pair.of(rec.replacePath(astPath), na.getStartPosition());
-        }
-      }
-      if (dim == dimsSize) {
-        if (na.elemtype == null) {
-          System.err.println("WARNING: array initializer " + node +
-              " has no explicit type; skipping insertion " + ins);
-          return null;
-        }
-        return getBaseTypePosition(na.elemtype);
-      }
-      if (na.dims.size() != 0) {
-        int startPos = na.getStartPosition();
-        int endPos = na.getEndPosition(tree.endPositions);
-        int pos = getNthInstanceInRange('[', startPos, endPos, dim + 1);
-        return Pair.of(rec.replacePath(astPath), pos);
-      }
-      // In a situation like
-      //   node=new String[][][][][]{{{}}}
-      // Also see Pretty.printBrackets.
-      if (dim == 0) {
-        if (na.elemtype == null) {
-          return Pair.of(rec.replacePath(astPath), na.getStartPosition());
-        }
-        // na.elemtype.getPreferredPosition(); seems to be at the end,
-        //  after the brackets.
-        // na.elemtype.getStartPosition(); is before the type name itself.
-        int startPos = na.elemtype.getStartPosition();
-        return Pair.of(rec.replacePath(astPath),
-            getFirstInstanceAfter('[', startPos+1));
-      } else if (dim == dimsSize) {
-        return Pair.of(rec.replacePath(astPath),
-            na.getType().pos().getStartPosition());
-      } else {
-        JCArrayTypeTree jcatt = (JCArrayTypeTree) na.elemtype;
-        for (int i=1; i<dim; i++) {
-          JCTree elem = jcatt.elemtype;
-          if (elem.hasTag(JCTree.Tag.ANNOTATED_TYPE)) {
-            elem = ((JCAnnotatedType) elem).underlyingType;
+          JCArrayTypeTree jcatt = (JCArrayTypeTree) na.elemtype;
+          for (int i = 1; i < dim; i++) {
+            JCTree elem = jcatt.elemtype;
+            if (elem.hasTag(JCTree.Tag.ANNOTATED_TYPE)) {
+              elem = ((JCAnnotatedType) elem).underlyingType;
+            }
+            assert elem.hasTag(JCTree.Tag.TYPEARRAY);
+            jcatt = (JCArrayTypeTree) elem;
           }
-          assert elem.hasTag(JCTree.Tag.TYPEARRAY);
-          jcatt = (JCArrayTypeTree) elem;
+          return Pair.of(rec.replacePath(astPath), jcatt.pos().getPreferredPosition());
         }
-        return Pair.of(rec.replacePath(astPath),
-            jcatt.pos().getPreferredPosition());
-      }
       } else if (ASTPath.DIMENSION.equals(childSelector)) {
         List<JCExpression> inits = na.getInitializers();
         if (dim < inits.size()) {
@@ -801,8 +805,9 @@ loop:
         JCExpression expr = na.getDimensions().get(dim);
         return Pair.of(astRecord(expr), expr.getStartPosition());
       } else {
-        assert false : "Unexpected child selector in AST path: "
-            + (childSelector == null ? "null" : "\"" + childSelector + "\"");
+        assert false
+            : "Unexpected child selector in AST path: "
+                + (childSelector == null ? "null" : "\"" + childSelector + "\"");
         return null;
       }
     }
@@ -812,7 +817,7 @@ loop:
       JCNewClass na = (JCNewClass) node;
       JCExpression className = na.clazz;
       // System.out.printf("classname %s (%s)%n", className, className.getClass());
-      while (! (className.getKind() == Tree.Kind.IDENTIFIER)) { // IdentifierTree
+      while (!(className.getKind() == Tree.Kind.IDENTIFIER)) { // IdentifierTree
         if (className instanceof JCAnnotatedType) {
           className = ((JCAnnotatedType) className).underlyingType;
         } else if (className instanceof JCTypeApply) {
@@ -823,8 +828,11 @@ loop:
           // be a type mismatch. It seems to work, see NewPackage test case.
           className = ((JCFieldAccess) className).selected;
         } else {
-          throw new Error(String.format("unrecognized JCNewClass.clazz (%s): %s%n" +
-                  "   surrounding new class tree: %s%n", className.getClass(), className, node));
+          throw new Error(
+              String.format(
+                  "unrecognized JCNewClass.clazz (%s): %s%n"
+                      + "   surrounding new class tree: %s%n",
+                  className.getClass(), className, node));
         }
         // System.out.printf("classname %s (%s)%n", className, className.getClass());
       }
@@ -834,11 +842,10 @@ loop:
   }
 
   /**
-   * Determine the insertion position for declaration annotations on
-   * various elements.  For instance, method declaration annotations should
-   * be placed before all the other modifiers and annotations.
+   * Determine the insertion position for declaration annotations on various elements. For instance,
+   * method declaration annotations should be placed before all the other modifiers and annotations.
    */
-  private class DeclarationPositionFinder extends TreeScanner<Integer, Void> {
+  private static class DeclarationPositionFinder extends TreeScanner<Integer, Void> {
 
     // When a method is visited, it is visited for the declaration itself.
     @Override
@@ -867,7 +874,7 @@ loop:
 
       // There is no source code location information for Modifiers, so
       // cannot iterate through the modifiers.  But we don't have to.
-      int modsPos = ((JCModifiers)mt).pos().getStartPosition();
+      int modsPos = ((JCModifiers) mt).pos().getStartPosition();
       if (modsPos != Position.NOPOS) {
         declPos = Math.min(declPos, modsPos);
       }
@@ -885,19 +892,16 @@ loop:
     public Integer visitClass(ClassTree node, Void p) {
       JCClassDecl cd = (JCClassDecl) node;
       int result = -1;
-      if (cd.mods != null
-          && (cd.mods.flags != 0 || cd.mods.annotations.size() > 0)) {
+      if (cd.mods != null && (cd.mods.flags != 0 || cd.mods.annotations.size() > 0)) {
         result = cd.mods.getPreferredPosition();
       }
       if (result < 0) {
         result = cd.getPreferredPosition();
       }
       assert result >= 0 || cd.name.isEmpty()
-        : String.format("%d %d %d%n", cd.getStartPosition(),
-                        cd.getPreferredPosition(), cd.pos);
+          : String.format("%d %d %d%n", cd.getStartPosition(), cd.getPreferredPosition(), cd.pos);
       return result < 0 ? null : result;
     }
-
   }
 
   private final TypePositionFinder tpf;
@@ -922,51 +926,50 @@ loop:
   // which nodes are possible insertion sites
   boolean handled(Tree node) {
     switch (node.getKind()) {
-    case ANNOTATION:
-    case ARRAY_TYPE:
-    case CLASS:
-    case COMPILATION_UNIT:
-    case ENUM:
-    case EXPRESSION_STATEMENT:
-    case EXTENDS_WILDCARD:
-    case IDENTIFIER:
-    case INTERFACE:
-    case METHOD:
-    case NEW_ARRAY:
-    case NEW_CLASS:
-    case PARAMETERIZED_TYPE:
-    case PRIMITIVE_TYPE:
-    case SUPER_WILDCARD:
-    case TYPE_PARAMETER:
-    case UNBOUNDED_WILDCARD:
-    case VARIABLE:
-      return true;
-    default:
-      return node instanceof ExpressionTree;
+      case ANNOTATION:
+      case ARRAY_TYPE:
+      case CLASS:
+      case COMPILATION_UNIT:
+      case ENUM:
+      case EXPRESSION_STATEMENT:
+      case EXTENDS_WILDCARD:
+      case IDENTIFIER:
+      case INTERFACE:
+      case METHOD:
+      case NEW_ARRAY:
+      case NEW_CLASS:
+      case PARAMETERIZED_TYPE:
+      case PRIMITIVE_TYPE:
+      case SUPER_WILDCARD:
+      case TYPE_PARAMETER:
+      case UNBOUNDED_WILDCARD:
+      case VARIABLE:
+        return true;
+      default:
+        return node instanceof ExpressionTree;
     }
   }
 
   /**
-   * Determines if the last {@link TypePathEntry} in the given list is a
-   * {@link TypePath#WILDCARD_BOUND}.
+   * Determines if the last {@link TypePathEntry} in the given list is a {@link
+   * TypePath#WILDCARD_BOUND}.
    *
    * @param location the list to check
-   * @return {@code true} if the last {@link TypePathEntry} is a
-   *         {@link TypePath#WILDCARD_BOUND}, {@code false} otherwise.
+   * @return {@code true} if the last {@link TypePathEntry} is a {@link TypePath#WILDCARD_BOUND},
+   *     {@code false} otherwise.
    */
   private boolean wildcardLast(List<TypePathEntry> location) {
     return location.get(location.size() - 1).step == TypePath.WILDCARD_BOUND;
   }
 
   /**
-   * Scans this tree, using the list of insertions to generate the source
-   * position to insertion text mapping.  Insertions are removed from the
-   * list when positions are found for them.  Thus, they are inserted at the
-   * first location (the leftmost highest in the tree) that they match.
+   * Scans this tree, using the list of insertions to generate the source position to insertion text
+   * mapping. Insertions are removed from the list when positions are found for them. Thus, they are
+   * inserted at the first location (the leftmost highest in the tree) that they match.
    *
-   * <p>When a match is found, this routine removes the insertion from p and
-   * adds it to the insertions map as a value, with a key that is a pair.
-   * On return, p contains only the insertions for which no match was found.
+   * <p>When a match is found, this routine removes the insertion from p and adds it to the
+   * insertions map as a value, with a key that is a pair. On return, p contains only the insertions
+   * for which no match was found.
    *
    * @param node AST node being considered for annotation insertions
    * @param p list of insertions not yet placed
@@ -977,20 +980,23 @@ loop:
       return null;
     }
 
-    dbug.debug("TreeFinder.scan(kind=%s, %d insertions): %s%n", node.getKind(), p.size(), Main.treeToString(node));
+    dbug.debug(
+        "TreeFinder.scan(kind=%s, %d insertions): %s%n",
+        node.getKind(), p.size(), Main.treeToString(node));
     if (annotator.Main.temporaryDebug) {
       new Error("backtrace at TreeFinder.scan()").printStackTrace();
     }
-    if (! handled(node)) {
-      dbug.debug("TreeFinder.scan(%s) skipping, unhandled: %s%n", node.getClass(), Main.treeToString(node));
+    if (!handled(node)) {
+      dbug.debug(
+          "TreeFinder.scan(%s) skipping, unhandled: %s%n",
+          node.getClass(), Main.treeToString(node));
       // nothing to do
       return super.scan(node, p);
     }
 
     TreePath path = getPath(node);
-    assert path == null || path.getLeaf() == node :
-      String.format("Mismatch: '%s' '%s' '%s'%n",
-          path, path.getLeaf(), node);
+    assert path == null || path.getLeaf() == node
+        : String.format("Mismatch: '%s' '%s' '%s'%n", path, path.getLeaf(), node);
 
     // To avoid annotating existing annotations right before
     // the element you wish to annotate, skip anything inside of
@@ -1014,8 +1020,8 @@ loop:
       Insertion i = it.next();
       dbug.debug("Considering insertion at tree:%n");
       dbug.debug("  Insertion: %s%n", i);
-      dbug.debug("  First line of node: %s%n", Main.firstLine(node.toString()));
-      dbug.debug("  Type of node: %s%n", node.getClass());
+      dbug.debug("  At tree: %s%n", Main.firstLine(node.toString()));
+      dbug.debug("  Tree info: %s%n", node.getClass());
       if (i.isInserted()) {
         // Skip this insertion if it has already been inserted. See
         // the ReceiverInsertion class for details.
@@ -1028,11 +1034,12 @@ loop:
         continue;
       } else {
         dbug.debug("  ... satisfied!%n");
-        dbug.debug("    First line of node: %s%n", Main.firstLine(node.toString()));
-        dbug.debug("    Type of node: %s%n", node.getClass());
+        dbug.debug("    At tree: %s%n", Main.firstLine(node.toString()));
+        dbug.debug("    Tree info: %s%n", node.getClass());
 
         ASTPath astPath = i.getCriteria().getASTPath();
-        dbug.debug("    astPath = %s [%s]%n", astPath, (astPath == null) ? null : astPath.getClass());
+        dbug.debug(
+            "    astPath = %s [%s]%n", astPath, (astPath == null) ? null : astPath.getClass());
 
         // If the annotation is not applicable to this location, then
         // continue looking elsewhere for a match.
@@ -1043,7 +1050,7 @@ loop:
 
           switch (node.getKind()) {
             case NEW_CLASS:
-              if (! isTypeAnnotation) {
+              if (!isTypeAnnotation) {
                 continue;
               }
               break;
@@ -1063,11 +1070,16 @@ loop:
           }
         }
 
-        Integer pos = astPath == null ? findPosition(path, i)
-            : Main.convert_jaifs ? null  // already in correct form
-            : findPositionByASTPath(astPath, path, i);
+        // These method calls may side-effect modify the insertion i.
+        Integer pos =
+            astPath == null
+                ? findPosition(path, i)
+                : Main.convert_jaifs
+                    ? null // already in correct form
+                    : findPositionByASTPath(astPath, path, i);
         if (pos != null) {
-          dbug.debug("  ... satisfied! at %d for node of type %s: %s%n",
+          dbug.debug(
+              "  ... satisfied! at %d for node of type %s: %s%n",
               pos, node.getClass(), Main.treeToString(node));
           insertions.put(Pair.of(pos, astPath), i);
         }
@@ -1087,9 +1099,11 @@ loop:
       // on method declarations of anonymous inner classes.
       if (i.getCriteria().isOnReceiver()
           && path.getParentPath().getParentPath().getLeaf().getKind() == Tree.Kind.NEW_CLASS) {
-        warn.debug("WARNING: Cannot insert a receiver parameter "
-            + "on a method declaration of an anonymous inner class.  "
-            + "This insertion will be skipped.%n    Insertion: %s%n", i);
+        warn.debug(
+            "WARNING: Cannot insert a receiver parameter "
+                + "on a method declaration of an anonymous inner class.  "
+                + "This insertion will be skipped.%n    Insertion: %s%n",
+            i);
         return null;
       }
 
@@ -1107,14 +1121,18 @@ loop:
         if (node.getKind() == Tree.Kind.METHOD) {
           JCMethodDecl method = (JCMethodDecl) node;
           // TODO: account for the following situation in matching phase instead
-          if (method.sym.owner.isAnonymous()) { return null; }
+          if (method.sym.owner.isAnonymous()) {
+            return null;
+          }
           if ((method.mods.flags & Flags.GENERATEDCONSTR) != 0) {
             addConstructor(path, cons, method);
           } else {
             cons.setAnnotationsOnly(true);
             cons.setInserted(true);
             i = cons.getReceiverInsertion();
-            if (i == null) { return null; }
+            if (i == null) {
+              return null;
+            }
           }
         } else {
           cons.setAnnotationsOnly(true);
@@ -1136,7 +1154,7 @@ loop:
         NewArrayTree newArray = (NewArrayTree) node;
 
         if (newArray.toString().startsWith("{")) {
-          addNewType(path, neu, newArray);
+          addNewType(neu, newArray);
         }
       }
 
@@ -1152,44 +1170,39 @@ loop:
       // created) receiver.
       Map<Tree, ASTRecord> astIndex = ASTIndex.indexOf(tree);
       ASTRecord insertRecord = astIndex.get(node);
-      dbug.debug("TreeFinder.scan: node=%s%n  critera=%s%n",
-          node, i.getCriteria());
+      dbug.debug("TreeFinder.scan: node=%s%n  critera=%s%n", node, i.getCriteria());
 
-      if (CommonScanner.hasClassKind(node)
+      if (TreePathUtil.hasClassKind(node)
           && i.getCriteria().isOnTypeDeclarationExtendsClause()
           && ((ClassTree) node).getExtendsClause() == null) {
         return implicitClassBoundPosition((JCClassDecl) node, i);
       }
-      if (node.getKind() == Tree.Kind.METHOD
-          && i.getCriteria().isOnReturnType()) {
+      if (node.getKind() == Tree.Kind.METHOD && i.getCriteria().isOnReturnType()) {
         JCMethodDecl jcnode = (JCMethodDecl) node;
         Tree returnType = jcnode.getReturnType();
         insertRecord = insertRecord.extend(Tree.Kind.METHOD, ASTPath.TYPE);
         if (returnType == null) {
           // find constructor name instead
           pos = findMethodName(jcnode);
-          if (pos < 0) {  // skip -- inserted w/generated constructor
+          if (pos < 0) { // skip -- inserted w/generated constructor
             return null;
           }
-          dbug.debug("pos = %d at constructor name: %s%n",
-              pos, jcnode.sym.toString());
+          dbug.debug("pos=%d at constructor name: %s%n", pos, jcnode.sym.toString());
         } else {
           Pair<ASTRecord, Integer> pair = tpf.scan(returnType, i);
           insertRecord = pair.a;
           pos = pair.b;
           assert handled(node);
-          dbug.debug("pos = %d at return type node: %s%n",
-              pos, returnType.getClass());
+          dbug.debug("pos=%d at return type node: %s%n", pos, returnType.getClass());
         }
-      } else if (node.getKind() == Tree.Kind.TYPE_PARAMETER
-          && i.getCriteria().onBoundZero()
-          && (((TypeParameterTree) node).getBounds().isEmpty()
-              || (((JCExpression) ((TypeParameterTree) node)
-                      .getBounds().get(0))).type.tsym.isInterface())
+      } else if ((node.getKind() == Tree.Kind.TYPE_PARAMETER
+              && i.getCriteria().onBoundZero()
+              && (((TypeParameterTree) node).getBounds().isEmpty()
+                  || ((JCExpression) ((TypeParameterTree) node).getBounds().get(0))
+                      .type.tsym.isInterface()))
           || (node instanceof WildcardTree
               && ((WildcardTree) node).getBound() == null
-              && wildcardLast(i.getCriteria()
-                      .getGenericArrayLocation().getLocation()))) {
+              && wildcardLast(i.getCriteria().getGenericArrayLocation().getLocation()))) {
         Pair<ASTRecord, Integer> pair = tpf.scan(node, i);
         insertRecord = pair.a;
         pos = pair.b;
@@ -1202,8 +1215,8 @@ loop:
             ((AnnotationInsertion) i).setGenerateBound(true);
           } else {
             int limit = ((JCTree) parent(node)).getEndPosition(tree.endPositions);
-            Integer nextpos1 = getNthInstanceInRange(',', pos+1, limit, 1);
-            Integer nextpos2 = getNthInstanceInRange('>', pos+1, limit, 1);
+            Integer nextpos1 = getNthInstanceInRange(',', pos + 1, limit, 1);
+            Integer nextpos2 = getNthInstanceInRange('>', pos + 1, limit, 1);
             pos = (nextpos1 != Position.NOPOS && nextpos1 < nextpos2) ? nextpos1 : nextpos2;
             ((AnnotationInsertion) i).setGenerateExtends(true);
           }
@@ -1215,8 +1228,7 @@ loop:
         if (t.getKind() == Type.Kind.DECLARED) {
           DeclaredType dt = (DeclaredType) t;
           if (dt.getName().isEmpty()) {
-            dt.setName(jcTree.type instanceof NullType ? "Object"
-                : jcTree.type.toString());
+            dt.setName(jcTree.type instanceof NullType ? "Object" : jcTree.type.toString());
           }
         }
       } else if (i.getKind() == Insertion.Kind.CLOSE_PARENTHESIS) {
@@ -1227,8 +1239,8 @@ loop:
         if (node.getKind() == Tree.Kind.METHOD) { // MethodTree
           // looking for the receiver or the declaration
           typeScan = i.getCriteria().isOnReceiver();
-        } else if (CommonScanner.hasClassKind(node)) { // ClassTree
-          typeScan = ! i.isSeparateLine(); // hacky check
+        } else if (TreePathUtil.hasClassKind(node)) { // ClassTree
+          typeScan = !i.isSeparateLine(); // hacky check
         }
         if (typeScan) {
           // looking for the type
@@ -1237,25 +1249,25 @@ loop:
           insertRecord = pair.a;
           pos = pair.b;
           assert handled(node);
-          dbug.debug("pos = %d (insertRecord=%s) at type: %s (%s)%n",
-                     pos, insertRecord, node.toString(), node.getClass());
+          dbug.debug(
+              "pos=%d (insertRecord=%s) at type: %s (%s)%n",
+              pos, insertRecord, node.toString(), node.getClass());
         } else if (node.getKind() == Tree.Kind.METHOD
             && i.getKind() == Insertion.Kind.CONSTRUCTOR
             && (((JCMethodDecl) node).mods.flags & Flags.GENERATEDCONSTR) != 0) {
           Tree parent = path.getParentPath().getLeaf();
           pos = ((JCClassDecl) parent).getEndPosition(tree.endPositions) - 1;
-          insertRecord = null;  // TODO
+          insertRecord = null; // TODO
         } else {
           // looking for the declaration
           pos = dpf.scan(node, null);
           insertRecord = astRecord(node);
-          dbug.debug("pos = %s at declaration: %s%n", pos, node.getClass());
+          dbug.debug("pos=%s at declaration: %s%n", pos, node.getClass());
         }
       }
 
       if (pos != null) {
-        assert pos >= 0 :
-          String.format("pos: %s%nnode: %s%ninsertion: %s%n", pos, node, i);
+        assert pos >= 0 : String.format("pos: %s%nnode: %s%ninsertion: %s%n", pos, node, i);
         astInsertions.put(insertRecord, i);
       }
       return pos;
@@ -1277,11 +1289,12 @@ loop:
       if (entry.getTreeKind() == Tree.Kind.METHOD
           && entry.childSelectorIs(ASTPath.PARAMETER)
           && entry.getArgument() == -1
-          && path.getParentPath().getParentPath().getLeaf().getKind()
-          == Tree.Kind.NEW_CLASS) {
-        warn.debug("WARNING: Cannot insert a receiver parameter "
-            + "on a method declaration of an anonymous inner class.  "
-            + "This insertion will be skipped.%n    Insertion: %s%n", i);
+          && path.getParentPath().getParentPath().getLeaf().getKind() == Tree.Kind.NEW_CLASS) {
+        warn.debug(
+            "WARNING: Cannot insert a receiver parameter "
+                + "on a method declaration of an anonymous inner class.  "
+                + "This insertion will be skipped.%n    Insertion: %s%n",
+            i);
         return null;
       }
 
@@ -1302,7 +1315,9 @@ loop:
             cons.setAnnotationsOnly(true);
             cons.setInserted(true);
             i = cons.getReceiverInsertion();
-            if (i == null) { return null; }
+            if (i == null) {
+              return null;
+            }
           }
         } else {
           cons.setAnnotationsOnly(true);
@@ -1323,7 +1338,7 @@ loop:
         NewArrayTree newArray = (NewArrayTree) node;
 
         if (newArray.toString().startsWith("{")) {
-          addNewType(path, neu, newArray);
+          addNewType(neu, newArray);
         }
       }
 
@@ -1339,10 +1354,9 @@ loop:
       // created) receiver.
       Map<Tree, ASTRecord> astIndex = ASTIndex.indexOf(tree);
       ASTRecord insertRecord = astIndex.get(node);
-      dbug.debug("TreeFinder.scan: node=%s%n  criteria=%s%n",
-          node, i.getCriteria());
+      dbug.debug("TreeFinder.scan: node=%s%n  criteria=%s%n", node, i.getCriteria());
 
-      if (CommonScanner.hasClassKind(node)
+      if (TreePathUtil.hasClassKind(node)
           && entry.childSelectorIs(ASTPath.BOUND)
           && entry.getArgument() < 0
           && ((ClassTree) node).getExtendsClause() == null) {
@@ -1352,41 +1366,40 @@ loop:
           && i.getCriteria().isOnMethod("<init>()V")
           && entry.childSelectorIs(ASTPath.PARAMETER)
           && entry.getArgument() < 0) {
-        if (i.getKind() != Insertion.Kind.CONSTRUCTOR) { return null; }
+        if (i.getKind() != Insertion.Kind.CONSTRUCTOR) {
+          return null;
+        }
         Tree parent = path.getParentPath().getLeaf();
         insertRecord = insertRecord.extend(Tree.Kind.METHOD, ASTPath.PARAMETER, -1);
         pos = ((JCTree) parent).getEndPosition(tree.endPositions) - 1;
-      } else if (node.getKind() == Tree.Kind.METHOD
-          && entry.childSelectorIs(ASTPath.TYPE)) {
+      } else if (node.getKind() == Tree.Kind.METHOD && entry.childSelectorIs(ASTPath.TYPE)) {
         JCMethodDecl jcnode = (JCMethodDecl) node;
         Tree returnType = jcnode.getReturnType();
         insertRecord = insertRecord.extend(Tree.Kind.METHOD, ASTPath.TYPE);
         if (returnType == null) {
           // find constructor name instead
           pos = findMethodName(jcnode);
-          if (pos < 0) {  // skip -- inserted w/generated constructor
+          if (pos < 0) { // skip -- inserted w/generated constructor
             return null;
           }
-          dbug.debug("pos = %d at constructor name: %s%n",
-              pos, jcnode.sym.toString());
+          dbug.debug("pos=%d at constructor name: %s%n", pos, jcnode.sym.toString());
         } else {
           Pair<ASTRecord, Integer> pair = tpf.scan(returnType, i);
           insertRecord = pair.a;
           pos = pair.b;
           assert handled(node);
-          dbug.debug("pos = %d at return type node: %s%n",
-              pos, returnType.getClass());
+          dbug.debug("pos=%d at return type node: %s%n", pos, returnType.getClass());
         }
-      } else if (node.getKind() == Tree.Kind.TYPE_PARAMETER
-          && entry.getTreeKind() == Tree.Kind.TYPE_PARAMETER  // TypeParameter.bound
-          && (((TypeParameterTree) node).getBounds().isEmpty()
-              || (((JCExpression) ((TypeParameterTree) node)
-                      .getBounds().get(0))).type.tsym.isInterface())
-          || ASTPath.isWildcard(node.getKind())
-          && (entry.getTreeKind() == Tree.Kind.TYPE_PARAMETER
-              || ASTPath.isWildcard(entry.getTreeKind()))
-          && entry.childSelectorIs(ASTPath.BOUND)
-          && (!entry.hasArgument() || entry.getArgument() == 0)) {
+      } else if ((node.getKind() == Tree.Kind.TYPE_PARAMETER
+              && entry.getTreeKind() == Tree.Kind.TYPE_PARAMETER // TypeParameter.bound
+              && (((TypeParameterTree) node).getBounds().isEmpty()
+                  || ((JCExpression) ((TypeParameterTree) node).getBounds().get(0))
+                      .type.tsym.isInterface()))
+          || (ASTPath.isWildcard(node.getKind())
+              && (entry.getTreeKind() == Tree.Kind.TYPE_PARAMETER
+                  || ASTPath.isWildcard(entry.getTreeKind()))
+              && entry.childSelectorIs(ASTPath.BOUND)
+              && (!entry.hasArgument() || entry.getArgument() == 0))) {
         Pair<ASTRecord, Integer> pair = tpf.scan(node, i);
         insertRecord = pair.a;
         pos = pair.b;
@@ -1399,8 +1412,8 @@ loop:
             ((AnnotationInsertion) i).setGenerateBound(true);
           } else {
             int limit = ((JCTree) parent(node)).getEndPosition(tree.endPositions);
-            Integer nextpos1 = getNthInstanceInRange(',', pos+1, limit, 1);
-            Integer nextpos2 = getNthInstanceInRange('>', pos+1, limit, 1);
+            Integer nextpos1 = getNthInstanceInRange(',', pos + 1, limit, 1);
+            Integer nextpos2 = getNthInstanceInRange('>', pos + 1, limit, 1);
             pos = (nextpos1 != Position.NOPOS && nextpos1 < nextpos2) ? nextpos1 : nextpos2;
             ((AnnotationInsertion) i).setGenerateExtends(true);
           }
@@ -1408,31 +1421,37 @@ loop:
       } else if (i.getKind() == Insertion.Kind.CAST) {
         Type t = ((CastInsertion) i).getType();
         JCTree jcTree = (JCTree) node;
-        if (jcTree.getKind() == Tree.Kind.VARIABLE && !astPath.isEmpty()
+        if (jcTree.getKind() == Tree.Kind.VARIABLE
+            && !astPath.isEmpty()
             && astPath.getLast().childSelectorIs(ASTPath.INITIALIZER)) {
           node = ((JCVariableDecl) node).getInitializer();
-          if (node == null) { return null; }
+          if (node == null) {
+            return null;
+          }
           jcTree = (JCTree) node;
         }
         pos = jcTree.getStartPosition();
         if (t.getKind() == Type.Kind.DECLARED) {
           DeclaredType dt = (DeclaredType) t;
           if (dt.getName().isEmpty()) {
-              if (jcTree.type instanceof NullType) {
-                dt.setName("Object");
-              } else {
-                t = Insertions.TypeTree.javacTypeToType(jcTree.type);
-                t.setAnnotations(dt.getAnnotations());
-                ((CastInsertion) i).setType(t);
-              }
+            if (jcTree.type instanceof NullType) {
+              dt.setName("Object");
+            } else {
+              t = Insertions.TypeTree.javacTypeToType(jcTree.type);
+              t.setAnnotations(dt.getAnnotations());
+              ((CastInsertion) i).setType(t);
+            }
           }
         }
       } else if (i.getKind() == Insertion.Kind.CLOSE_PARENTHESIS) {
         JCTree jcTree = (JCTree) node;
-        if (jcTree.getKind() == Tree.Kind.VARIABLE && !astPath.isEmpty()
+        if (jcTree.getKind() == Tree.Kind.VARIABLE
+            && !astPath.isEmpty()
             && astPath.getLast().childSelectorIs(ASTPath.INITIALIZER)) {
           node = ((JCVariableDecl) node).getInitializer();
-          if (node == null) { return null; }
+          if (node == null) {
+            return null;
+          }
           jcTree = (JCTree) node;
         }
         pos = jcTree.getEndPosition(tree.endPositions);
@@ -1442,7 +1461,7 @@ loop:
           // looking for the receiver or the declaration
           typeScan = IndexFileSpecification.isOnReceiver(i.getCriteria());
         } else if (node.getKind() == Tree.Kind.CLASS) { // ClassTree
-          typeScan = ! i.isSeparateLine(); // hacky check
+          typeScan = !i.isSeparateLine(); // hacky check
         }
         if (typeScan) {
           // looking for the type
@@ -1451,26 +1470,24 @@ loop:
           insertRecord = pair.a;
           pos = pair.b;
           assert handled(node);
-          dbug.debug("pos = %d at type: %s (%s)%n",
-              pos, node.toString(), node.getClass());
+          dbug.debug("pos=%d at type: %s (%s)%n", pos, node.toString(), node.getClass());
         } else if (node.getKind() == Tree.Kind.METHOD
             && i.getKind() == Insertion.Kind.CONSTRUCTOR
             && (((JCMethodDecl) node).mods.flags & Flags.GENERATEDCONSTR) != 0) {
           Tree parent = path.getParentPath().getLeaf();
           pos = ((JCClassDecl) parent).getEndPosition(tree.endPositions) - 1;
-          insertRecord = null;  // TODO
+          insertRecord = null; // TODO
         } else {
           // looking for the declaration
           pos = dpf.scan(node, null);
           insertRecord = astRecord(node);
           assert pos != null;
-          dbug.debug("pos = %d at declaration: %s%n", pos, node.getClass());
+          dbug.debug("pos=%d at declaration: %s%n", pos, node.getClass());
         }
       }
 
       if (pos != null) {
-        assert pos >= 0 :
-          String.format("pos: %s%nnode: %s%ninsertion: %s%n", pos, node, i);
+        assert pos >= 0 : String.format("pos: %s%nnode: %s%ninsertion: %s%n", pos, node, i);
         astInsertions.put(insertRecord, i);
       }
       return pos;
@@ -1482,25 +1499,31 @@ loop:
 
   private Integer implicitClassBoundPosition(JCClassDecl cd, Insertion i) {
     Integer pos;
-    if (cd.sym == null || cd.sym.isAnonymous()
-        || i.getKind() != Insertion.Kind.ANNOTATION) {
+    if (cd.sym == null || cd.sym.isAnonymous() || i.getKind() != Insertion.Kind.ANNOTATION) {
       return null;
     }
     JCModifiers mods = cd.getModifiers();
     String name = cd.getSimpleName().toString();
     if (cd.typarams == null || cd.typarams.isEmpty()) {
       int start = cd.getStartPosition();
-      int offset = Math.max(start,
-          mods.getEndPosition(tree.endPositions) + 1);
+      int offset = Math.max(start, mods.getEndPosition(tree.endPositions) + 1);
       String s = cd.toString().substring(offset - start);
-      Pattern p = Pattern.compile("(?:\\s|" + comment
-          + ")*+class(?:\\s|" + comment
-          + ")++" + Pattern.quote(name) + "\\b");
+      Pattern p =
+          Pattern.compile(
+              "(?:\\s|"
+                  + comment
+                  + ")*+class(?:\\s|"
+                  + comment
+                  + ")++"
+                  + Pattern.quote(name)
+                  + "\\b");
       Matcher m = p.matcher(s);
-      if (!m.find() || m.start() != 0) { return null; }
+      if (!m.find() || m.start() != 0) {
+        return null;
+      }
       pos = offset + m.end() - 1;
-    } else {  // generic class
-      JCTypeParameter param = cd.typarams.get(cd.typarams.length()-1);
+    } else { // generic class
+      JCTypeParameter param = cd.typarams.get(cd.typarams.length() - 1);
       int start = param.getEndPosition(tree.endPositions);
       pos = getFirstInstanceAfter('>', start) + 1;
     }
@@ -1509,9 +1532,9 @@ loop:
   }
 
   /**
-   * Returns the start position of the method's name.  In particular,
-   * works properly for constructors, for which the name field in the
-   * AST is always {@code <init>} instead of the name from the source.
+   * Returns the start position of the method's name. In particular, works properly for
+   * constructors, for which the name field in the AST is always {@code <init>} instead of the name
+   * from the source.
    *
    * @param node AST node of method declaration
    * @return position of method name (from {@link JCMethodDecl#sym}) in source
@@ -1521,22 +1544,27 @@ loop:
     String name = sym.substring(0, sym.indexOf('('));
     JCModifiers mods = node.getModifiers();
     JCBlock body = node.body;
-    if ((mods.flags & Flags.GENERATEDCONSTR) != 0) { return Position.NOPOS; }
+    if ((mods.flags & Flags.GENERATEDCONSTR) != 0) {
+      return Position.NOPOS;
+    }
     int nodeStart = node.getStartPosition();
     int nodeEnd = node.getEndPosition(tree.endPositions);
     int nodeLength = nodeEnd - nodeStart;
-    int modsLength = mods.getEndPosition(tree.endPositions)
-        - mods.getStartPosition();  // can't trust string length!
-    int bodyLength = body == null ? 1
-        : body.getEndPosition(tree.endPositions) - body.getStartPosition();
+    int modsLength =
+        mods.getEndPosition(tree.endPositions)
+            - mods.getStartPosition(); // can't trust string length!
+    int bodyLength =
+        body == null ? 1 : body.getEndPosition(tree.endPositions) - body.getStartPosition();
     int start = nodeStart + modsLength;
     int end = nodeStart + nodeLength - bodyLength;
-    int angle = name.lastIndexOf('>');  // check for type params
-    if (angle >= 0) { name = name.substring(angle + 1); }
+    int angle = name.lastIndexOf('>'); // check for type params
+    if (angle >= 0) {
+      name = name.substring(angle + 1);
+    }
 
     try {
       CharSequence s = tree.getSourceFile().getCharContent(true);
-      String regex = "\\b" + Pattern.quote(name) + "\\b";  // sufficient?
+      String regex = "\\b" + Pattern.quote(name) + "\\b"; // sufficient?
       Pattern pat = Pattern.compile(regex, Pattern.MULTILINE);
       Matcher mat = pat.matcher(s).region(start, end);
       return mat.find() ? mat.start() : Position.NOPOS;
@@ -1546,13 +1574,13 @@ loop:
   }
 
   /**
-   * Determines if the annotation in the given insertion is already present
-   * at the given location in the AST.
+   * Determines if the annotation in the given insertion is already present at the given location in
+   * the AST.
    *
    * @param path the location in the AST to check for the annotation
    * @param ins the annotation to check for
-   * @return {@code true} if the given annotation is already at the given
-   *         location in the AST, {@code false} otherwise.
+   * @return {@code true} if the given annotation is already at the given location in the AST,
+   *     {@code false} otherwise.
    */
   private boolean alreadyPresent(TreePath path, Insertion ins) {
     List<? extends AnnotationTree> alreadyPresent = null;
@@ -1613,7 +1641,9 @@ loop:
 
     if (annotator.Main.temporaryDebug) {
       Tree leaf = path.getLeaf();
-      System.out.printf("alreadyPresent(%s, %s)%n  leaf (%s) = %s%n  => %s%n", path, ins, leaf.getKind(), leaf, alreadyPresent);
+      System.out.printf(
+          "alreadyPresent(%s, %s)%n  leaf (%s) = %s%n  => %s%n",
+          path, ins, leaf.getKind(), leaf, alreadyPresent);
     }
 
     if (alreadyPresent != null) {
@@ -1628,8 +1658,7 @@ loop:
         String ann = at.getAnnotationType().toString();
         // strip off leading @ along w/any leading or trailing whitespace
         String text = ins.getText();
-        String iann = Main.removeArgs(text).a.trim()
-            .substring(text.startsWith("@") ? 1 : 0);
+        String iann = Main.removeArgs(text).a.trim().substring(text.startsWith("@") ? 1 : 0);
         String iannNoPackage = Insertion.removePackage(iann).b;
         // System.out.printf("Comparing: %s %s %s%n", ann, iann, iannNoPackage);
         if (ann.equals(iann) || ann.equals(iannNoPackage)) {
@@ -1643,6 +1672,7 @@ loop:
 
   /**
    * Reports an error inserting an insertion to {@code System.err}.
+   *
    * @param i the insertion that caused the error
    * @param e the error. If there's a message it will be printed.
    */
@@ -1651,9 +1681,11 @@ loop:
     System.err.println("\t" + i);
     if (e.getMessage() != null) {
       // If the message has multiple lines, indent them so it's easier to read.
-      System.err.println("\tError: " + e.getMessage().replace(System.lineSeparator(), System.lineSeparator() + "\t\t"));
+      System.err.println(
+          "\tError: "
+              + e.getMessage().replace(System.lineSeparator(), System.lineSeparator() + "\t\t"));
     }
-    if (dbug.or(stak).isEnabled()) {
+    if (dbug.isEnabled() || Main.print_error_stack) {
       e.printStackTrace();
     } else {
       System.err.println("\tRun with --print_error_stack to see the stack trace.");
@@ -1662,24 +1694,20 @@ loop:
   }
 
   /**
-   * Modifies the given receiver insertion so that it contains the type
-   * information necessary to insert a full method declaration receiver
-   * parameter. This is for receiver insertions where a receiver does not
-   * already exist in the source code. This will also add the annotations to be
+   * Modifies the given receiver insertion so that it contains the type information necessary to
+   * insert a full method declaration receiver parameter. This is for receiver insertions where a
+   * receiver does not already exist in the source code. This will also add the annotations to be
    * inserted to the correct part of the receiver type.
    *
    * @param path the location in the AST to insert the receiver
    * @param receiver details of the receiver to insert
    * @param method the method the receiver is being inserted into
    */
-  private void addReceiverType(TreePath path, ReceiverInsertion receiver,
-      MethodTree method) {
-    // Find the name of the class
-    // with type parameters to create the receiver. Walk up the tree and
-    // pick up class names to add to the receiver type. Since we're
-    // starting from the innermost class, the classes we get to at earlier
-    // iterations of the loop are inside of the classes we get to at later
-    // iterations.
+  private void addReceiverType(TreePath path, ReceiverInsertion receiver, MethodTree method) {
+    // Find the name of the class with type parameters to create the receiver. Walk up the tree and
+    // pick up class names to add to the receiver type. Since we're starting from the innermost
+    // class, the classes we get to at earlier iterations of the loop are inside of the classes we
+    // get to at later iterations.
     TreePath parent = path;
     Tree leaf = parent.getLeaf();
     Tree.Kind kind = leaf.getKind();
@@ -1692,20 +1720,22 @@ loop:
     DeclaredType staticType = null;
     // For an inner class constructor, the receiver comes from the
     // superclass, so skip past the first type definition.
-    boolean isCon = ((MethodTree) parent.getLeaf()).getReturnType() == null;
+    // In JDK 11, the constructor's return type is null; in JDK 16, the return type is void.
+    boolean isCon = ((MethodTree) leaf).getName().contentEquals("<init>");
+
     boolean skip = isCon;
 
-    while (kind != Tree.Kind.COMPILATION_UNIT
-        && kind != Tree.Kind.NEW_CLASS) {
+    while (kind != Tree.Kind.COMPILATION_UNIT && kind != Tree.Kind.NEW_CLASS) {
       if (kind == Tree.Kind.CLASS
           || kind == Tree.Kind.INTERFACE
           || kind == Tree.Kind.ENUM
           || kind == Tree.Kind.ANNOTATION_TYPE) {
         ClassTree clazz = (ClassTree) leaf;
         String className = clazz.getSimpleName().toString();
-        boolean isStatic = kind == Tree.Kind.INTERFACE
-            || kind == Tree.Kind.ENUM
-            || clazz.getModifiers().getFlags().contains(Modifier.STATIC);
+        boolean isStatic =
+            kind == Tree.Kind.INTERFACE
+                || kind == Tree.Kind.ENUM
+                || clazz.getModifiers().getFlags().contains(Modifier.STATIC);
         skip &= !isStatic;
         if (skip) {
           skip = false;
@@ -1759,33 +1789,30 @@ loop:
     }
 
     Type type = (staticType == null) ? baseType : staticType;
-    Insertion.decorateType(receiver.getInnerTypeInsertions(), type,
-        receiver.getCriteria().getASTPath());
+    Insertion.decorateType(
+        receiver.getInnerTypeInsertions(), type, receiver.getCriteria().getASTPath());
 
     // If the method doesn't have parameters, don't add a comma.
     receiver.setAddComma(method.getParameters().size() > 0);
   }
 
-  private void addNewType(TreePath path, NewInsertion neu,
-      NewArrayTree newArray) {
+  private void addNewType(NewInsertion neu, NewArrayTree newArray) {
     DeclaredType baseType = neu.getBaseType();
     if (baseType.getName().isEmpty()) {
       List<String> annotations = neu.getType().getAnnotations();
-      Type newType = Insertions.TypeTree.javacTypeToType(
-          ((JCTree.JCNewArray) newArray).type);
+      Type newType = Insertions.TypeTree.javacTypeToType(((JCTree.JCNewArray) newArray).type);
       for (String ann : annotations) {
         newType.addAnnotation(ann);
       }
       neu.setType(newType);
     }
-    Insertion.decorateType(neu.getInnerTypeInsertions(), neu.getType(),
-        neu.getCriteria().getASTPath());
+    Insertion.decorateType(
+        neu.getInnerTypeInsertions(), neu.getType(), neu.getCriteria().getASTPath());
   }
 
-  private void addConstructor(TreePath path, ConstructorInsertion cons,
-      MethodTree method) {
+  private void addConstructor(TreePath path, ConstructorInsertion cons, MethodTree method) {
     ReceiverInsertion recv = cons.getReceiverInsertion();
-    MethodTree leaf = (MethodTree) path.getLeaf();
+    assert method == (MethodTree) path.getLeaf();
     ClassTree parent = (ClassTree) path.getParentPath().getLeaf();
     DeclaredType baseType = cons.getBaseType();
     if (baseType.getName().isEmpty()) {
@@ -1800,7 +1827,7 @@ loop:
     if (recv != null) {
       Iterator<Insertion> iter = cons.getInnerTypeInsertions().iterator();
       List<Insertion> recvInner = new ArrayList<>();
-      addReceiverType(path, recv, leaf);
+      addReceiverType(path, recv, method);
       while (iter.hasNext()) {
         Insertion i = iter.next();
         if (i.getCriteria().isOnReceiver()) {
@@ -1808,11 +1835,10 @@ loop:
           iter.remove();
         }
       }
-      Insertion.decorateType(recvInner, recv.getType(),
-          cons.getCriteria().getASTPath());
+      Insertion.decorateType(recvInner, recv.getType(), cons.getCriteria().getASTPath());
     }
-    Insertion.decorateType(cons.getInnerTypeInsertions(), cons.getType(),
-        cons.getCriteria().getASTPath());
+    Insertion.decorateType(
+        cons.getInnerTypeInsertions(), cons.getType(), cons.getCriteria().getASTPath());
   }
 
   public SetMultimap<ASTRecord, Insertion> getPaths() {
@@ -1820,20 +1846,18 @@ loop:
   }
 
   /**
-   * Scans the given tree with the given insertion list and returns the
-   * mapping from source position to insertion text.  The positions are sorted
-   * in decreasing order of index, so that inserting one doesn't throw
-   * off the index for a subsequent one.
+   * Scans the given tree with the given insertion list and returns the mapping from source position
+   * to insertion text. The positions are sorted in decreasing order of index, so that inserting one
+   * doesn't throw off the index for a subsequent one.
    *
-   * <p>
-   * <i>N.B.:</i> This method calls {@code scan()} internally.
+   * <p><i>N.B.:</i> This method calls {@code scan()} internally.
    *
    * @param node the tree to scan
    * @param p the list of insertion criteria
    * @return the source position to insertion text mapping
    */
-  public SetMultimap<Pair<Integer, ASTPath>, Insertion>
-  getInsertionsByPosition(JCCompilationUnit node, List<Insertion> p) {
+  public SetMultimap<Pair<Integer, ASTPath>, Insertion> getInsertionsByPosition(
+      JCCompilationUnit node, List<Insertion> p) {
     List<Insertion> uninserted = new ArrayList<>(p);
     this.scan(node, uninserted);
     // There may be many extra annotations in a .jaif file.  For instance,
@@ -1853,10 +1877,10 @@ loop:
           // This test is too coarse, but is good enough for now.
           // There are also synthetic local variables; maybe suppress
           // warnings about them, too.
-          if (! (i.getCriteria().isOnMethod("<init>()V")
-                 || i.getCriteria().isOnLocalVariable())) {
+          if (!(i.getCriteria().isOnMethod("<init>()V") || i.getCriteria().isOnLocalVariable())) {
             // Should be made more user-friendly
-            System.err.printf("Found class %s, but unable to insert %s:%n  %s%n", c.className, i.getText(), i);
+            System.err.printf(
+                "Found class %s, but unable to insert %s:%n  %s%n", c.className, i.getText(), i);
           }
         }
       }
@@ -1872,24 +1896,23 @@ loop:
   }
 
   /**
-   * Scans the given tree with the given {@link Insertions} and returns
-   * the mapping from source position to insertion text.
+   * Scans the given tree with the given {@link Insertions} and returns the mapping from source
+   * position to insertion text.
    *
-   * <p>
-   * <i>N.B.:</i> This method calls {@code scan()} internally.
-   * </p>
+   * <p><i>N.B.:</i> This method calls {@code scan()} internally.
    *
    * @param node the tree to scan
    * @param insertions the insertion criteria
    * @return the source position to insertion text mapping
    */
-  public SetMultimap<Pair<Integer, ASTPath>, Insertion>
-  getPositions(JCCompilationUnit node, Insertions insertions) {
+  public SetMultimap<Pair<Integer, ASTPath>, Insertion> getPositions(
+      JCCompilationUnit node, Insertions insertions) {
     List<Insertion> list = new ArrayList<>();
     treePathCache.clear();
     if (annotator.Main.temporaryDebug) {
       System.out.println("insertions size: " + insertions.size());
-      System.out.println("insertions.forOuterClass(\"\") size: " + insertions.forOuterClass(node, "").size());
+      System.out.println(
+          "insertions.forOuterClass(\"\") size: " + insertions.forOuterClass(node, "").size());
       System.out.println("list pre-size: " + list.size());
     }
     list.addAll(insertions.forOuterClass(node, ""));
@@ -1902,7 +1925,7 @@ loop:
         Collection<Insertion> forClass = insertions.forOuterClass(node, name);
         if (annotator.Main.temporaryDebug) {
           System.out.println("insertions size: " + insertions.size());
-          System.out.println("insertions.forOuterClass("+name+") size: " + forClass.size());
+          System.out.println("insertions.forOuterClass(" + name + ") size: " + forClass.size());
           System.out.println("list pre-size: " + list.size());
         }
         list.addAll(forClass);
@@ -1912,5 +1935,73 @@ loop:
       }
     }
     return getInsertionsByPosition(node, list);
+  }
+
+  ///
+  /// TreePath Formatting, for debugging
+  ///
+
+  /**
+   * Return a printed representation of a TreePath.
+   *
+   * @param path a TreePath
+   * @return a printed representation of the given TreePath
+   */
+  public static String toString(TreePath path) {
+    StringJoiner result = new StringJoiner(System.lineSeparator() + "    ");
+    result.add("TreePath:");
+    for (Tree t : path) {
+      result.add(toStringTruncated(t, 65) + " " + t.getKind());
+    }
+    return result.toString();
+  }
+
+  /**
+   * Returns a string representation of the leaf of the given path, using {@link
+   * #toStringTruncated}.
+   *
+   * @param path a path
+   * @param length the maximum length for the result; must be at least 6
+   * @return a one-line string representation of the leaf of the given path that is no longer than
+   *     {@code length} characters long
+   */
+  public static String leafToStringTruncated(TreePath path, int length) {
+    if (path == null) {
+      return "null";
+    }
+    return toStringTruncated(path.getLeaf(), length);
+  }
+
+  /**
+   * Return toString(), but without line separators.
+   *
+   * @param tree a tree
+   * @return a one-line string representation of the tree
+   */
+  public static String toStringOneLine(Tree tree) {
+    return tree.toString().trim().replaceAll("\\s+", " ");
+  }
+
+  /**
+   * Return either {@link #toStringOneLine} if it is no more than {@code length} characters, or
+   * {@link #toStringOneLine} quoted and truncated.
+   *
+   * @param tree a tree
+   * @param length the maximum length for the result; must be at least 6
+   * @return a one-line string representation of the tree that is no longer than {@code length}
+   *     characters long
+   */
+  public static String toStringTruncated(Tree tree, int length) {
+    if (length < 6) {
+      throw new IllegalArgumentException("bad length " + length);
+    }
+    String result = toStringOneLine(tree);
+    if (result.length() > length) {
+      // The quoting increases the likelihood that all delimiters are balanced in the result.
+      // That makes it easier to manipulate the result (such as skipping over it) in an
+      // editor.  The quoting also makes clear that the value is truncated.
+      result = "\"" + result.substring(0, length - 5) + "...\"";
+    }
+    return result;
   }
 }

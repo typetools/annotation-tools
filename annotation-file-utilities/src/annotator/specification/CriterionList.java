@@ -17,12 +17,11 @@ import annotator.find.Criterion;
 // tree (at the CompilationUnit). -MDE 9/2009
 
 /**
- * A CriterionList is a singly-linked list of Criterion meant to be treated
- * as a stack.  It is useful for creating base criteria and passing
- * independent copies to different parts of a specification that creates
- * all the criterion.  A CriterionList is immutable, and so copies
- * created by the add() function can safely be passed anywhere.
- * It is supposed to be easier to manipulate than a Criteria.
+ * A CriterionList is a singly-linked list of Criterion meant to be treated as a stack. It is useful
+ * for creating base criteria and passing independent copies to different parts of a specification
+ * that creates all the criterion. A CriterionList is immutable, and so copies created by the add()
+ * function can safely be passed anywhere. It is supposed to be easier to manipulate than a
+ * Criteria.
  */
 public class CriterionList {
   // This really is a simple data structure to facilitate creation
@@ -30,9 +29,7 @@ public class CriterionList {
   private Criterion current;
   private CriterionList next;
 
-  /**
-   * Creates a new CriterionList with no criterion.
-   */
+  /** Creates a new CriterionList with no criterion. */
   public CriterionList() {
     next = null;
     current = null;
@@ -54,13 +51,12 @@ public class CriterionList {
   }
 
   /**
-   * Adds the given criterion to the present list and returns a
-   * newly-allocated list containing the result.  Does not modify its
-   * argument.
+   * Adds the given criterion to the present list and returns a newly-allocated list containing the
+   * result. Does not modify its argument.
    *
    * @param c the criterion to add
-   * @return a new list containing the given criterion and the rest of the
-   *  criterion already in this list
+   * @return a new list containing the given criterion and the rest of the criterion already in this
+   *     list
    */
   public CriterionList add(Criterion c) {
     return new CriterionList(c, this);
@@ -85,9 +81,11 @@ public class CriterionList {
 
   @Override
   public String toString() {
-    if (current == null) { return "[]"; }
+    if (current == null) {
+      return "[]";
+    }
     StringBuilder sb = new StringBuilder("[").append(current);
-    for (CriterionList n = next; n.next != null ; n = n.next) {
+    for (CriterionList n = next; n.next != null; n = n.next) {
       sb.append(", ").append(n.current);
     }
     return sb.append("]").toString();

@@ -1,3 +1,3 @@
 public class C {
-    Object f;
+  Object f;
 }

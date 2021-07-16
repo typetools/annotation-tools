@@ -1,12 +1,11 @@
 package annotator.find;
 
-import java.util.List;
-
 import com.sun.source.tree.LambdaExpressionTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.tree.VariableTree;
 import com.sun.source.util.TreePath;
+import java.util.List;
 
 public class ParamCriterion implements Criterion {
 
@@ -42,21 +41,27 @@ public class ParamCriterion implements Criterion {
       Tree parent = path.getParentPath().getLeaf();
       List<? extends VariableTree> params;
       switch (parent.getKind()) {
-      case METHOD:
-        params = ((MethodTree) parent).getParameters();
-        break;
-      case LAMBDA_EXPRESSION:
-        params = ((LambdaExpressionTree) parent).getParameters();
-        break;
-      default:
-        params = null;
-        break;
+        case METHOD:
+          params = ((MethodTree) parent).getParameters();
+          break;
+        case LAMBDA_EXPRESSION:
+          params = ((LambdaExpressionTree) parent).getParameters();
+          break;
+        default:
+          params = null;
+          break;
       }
-      return params != null && params.size() > paramPos
-          && params.get(paramPos).equals(leaf);
+      return params != null && params.size() > paramPos && params.get(paramPos).equals(leaf);
     }
 
     return this.isSatisfiedBy(path.getParentPath());
+  }
+
+  @Override
+  public boolean isOnlyTypeAnnotationCriterion() {
+    // This can probably return true?  No annotations go on it directly,
+    // so rely on some other Criterion in the Criteria to return true.
+    return false;
   }
 
   @Override
@@ -66,7 +71,6 @@ public class ParamCriterion implements Criterion {
 
   @Override
   public String toString() {
-    return "ParamCriterion for method: " + methodName + " at position: " +
-            paramPos;
+    return "ParamCriterion for method: " + methodName + " at position: " + paramPos;
   }
 }

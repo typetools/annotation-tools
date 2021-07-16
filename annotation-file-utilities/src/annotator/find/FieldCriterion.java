@@ -32,17 +32,20 @@ public class FieldCriterion implements Criterion {
 
   @Override
   public boolean isSatisfiedBy(TreePath path) {
-    if (path == null || (isDeclaration
-            && path.getLeaf().getKind() != Tree.Kind.VARIABLE)) {
+    if (path == null || (isDeclaration && path.getLeaf().getKind() != Tree.Kind.VARIABLE)) {
       return false;
     }
 
-    if (varCriterion.isSatisfiedBy(path) &&
-        notInMethodCriterion.isSatisfiedBy(path)) {
+    if (varCriterion.isSatisfiedBy(path) && notInMethodCriterion.isSatisfiedBy(path)) {
       return true;
     } else {
       return this.isSatisfiedBy(path.getParentPath());
     }
+  }
+
+  @Override
+  public boolean isOnlyTypeAnnotationCriterion() {
+    return false;
   }
 
   @Override

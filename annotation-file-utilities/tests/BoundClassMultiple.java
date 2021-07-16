@@ -5,7 +5,4 @@ import java.util.Date;
 import java.util.List;
 
 public class BoundClassMultiple<
-  T extends Date,
-  U extends List & Serializable,
-  V extends Comparable<V>> {
-}
+    T extends Date, U extends List & Serializable, V extends Comparable<V>> {}

@@ -61,4 +61,3 @@ class LambdaExpression {
     System.out.println(selectCommon.applyAsInt(args, Arrays.asList(ss)));
   }
 }
-

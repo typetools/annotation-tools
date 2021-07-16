@@ -14,19 +14,76 @@ pr:
 
 
 jobs:
-- job: like_travis_build_without_test_jdk8
+- job: build_without_test_jdk11
   pool:
     vmImage: 'ubuntu-latest'
-  container: mdernst/cf-ubuntu-jdk8:latest
+  container: mdernst/cf-ubuntu-jdk11:latest
   steps:
   - checkout: self
     fetchDepth: 25
-  - bash: ./.travis-build-without-test.sh
-    displayName: .travis-build-without-test.sh
-- job: ant_test_jdk8
+  - bash: ./.build-without-test.sh
+    displayName: .build-without-test.sh
+- job: test_jdk11
+  pool:
+    vmImage: 'ubuntu-latest'
+  container: mdernst/cf-ubuntu-jdk11:latest
+  steps:
+  - checkout: self
+    fetchDepth: 25
+  - bash: ./annotation-file-utilities/dev-scripts/test-allTests.sh
+    displayName: test-allTests.sh
+- job: typecheck_jdk11
+  pool:
+    vmImage: 'ubuntu-latest'
+  container: mdernst/cf-ubuntu-jdk11:latest
+  steps:
+  - checkout: self
+    fetchDepth: 25
+  - bash: ./annotation-file-utilities/dev-scripts/test-typecheck.sh
+    displayName: test-typecheck.sh
+- job: misc_jdk11
+  pool:
+    vmImage: 'ubuntu-latest'
+  container: mdernst/cf-ubuntu-jdk11-plus:latest
+  steps:
+  - checkout: self
+    fetchDepth: 25
+  - bash: ./annotation-file-utilities/dev-scripts/test-misc.sh
+    displayName: test-misc.sh
+- job: downstream_jdk11
+  pool:
+    vmImage: 'ubuntu-latest'
+  container: mdernst/cf-ubuntu-jdk11:latest
+  steps:
+  - checkout: self
+    fetchDepth: 25
+  - bash: ./annotation-file-utilities/dev-scripts/test-downstream.sh
+    displayName: test-downstream.sh
+- job: build_without_test_jdk8
   pool:
     vmImage: 'ubuntu-latest'
   container: mdernst/cf-ubuntu-jdk8:latest
+  dependsOn:
+    - build_without_test_jdk11
+    - test_jdk11
+    - typecheck_jdk11
+    - misc_jdk11
+    - downstream_jdk11
+  steps:
+  - checkout: self
+    fetchDepth: 25
+  - bash: ./.build-without-test.sh
+    displayName: .build-without-test.sh
+- job: test_jdk8
+  pool:
+    vmImage: 'ubuntu-latest'
+  container: mdernst/cf-ubuntu-jdk8:latest
+  dependsOn:
+    - build_without_test_jdk11
+    - test_jdk11
+    - typecheck_jdk11
+    - misc_jdk11
+    - downstream_jdk11
   steps:
   - checkout: self
     fetchDepth: 25
@@ -36,6 +93,12 @@ jobs:
   pool:
     vmImage: 'ubuntu-latest'
   container: mdernst/cf-ubuntu-jdk8:latest
+  dependsOn:
+    - build_without_test_jdk11
+    - test_jdk11
+    - typecheck_jdk11
+    - misc_jdk11
+    - downstream_jdk11
   steps:
   - checkout: self
     fetchDepth: 25
@@ -45,6 +108,12 @@ jobs:
   pool:
     vmImage: 'ubuntu-latest'
   container: mdernst/cf-ubuntu-jdk8-plus:latest
+  dependsOn:
+    - build_without_test_jdk11
+    - test_jdk11
+    - typecheck_jdk11
+    - misc_jdk11
+    - downstream_jdk11
   steps:
   - checkout: self
     fetchDepth: 25
@@ -54,6 +123,87 @@ jobs:
   pool:
     vmImage: 'ubuntu-latest'
   container: mdernst/cf-ubuntu-jdk8:latest
+  dependsOn:
+    - build_without_test_jdk11
+    - test_jdk11
+    - typecheck_jdk11
+    - misc_jdk11
+    - downstream_jdk11
+  steps:
+  - checkout: self
+    fetchDepth: 25
+  - bash: ./annotation-file-utilities/dev-scripts/test-downstream.sh
+    displayName: test-downstream.sh
+- job: build_without_test_jdk16
+  pool:
+    vmImage: 'ubuntu-latest'
+  container: mdernst/cf-ubuntu-jdk16:latest
+  dependsOn:
+    - build_without_test_jdk11
+    - test_jdk11
+    - typecheck_jdk11
+    - misc_jdk11
+    - downstream_jdk11
+  steps:
+  - checkout: self
+    fetchDepth: 25
+  - bash: ./.travis-build-without-test.sh
+    displayName: .travis-build-without-test.sh
+- job: test_jdk16
+  pool:
+    vmImage: 'ubuntu-latest'
+  container: mdernst/cf-ubuntu-jdk16:latest
+  dependsOn:
+    - build_without_test_jdk11
+    - test_jdk11
+    - typecheck_jdk11
+    - misc_jdk11
+    - downstream_jdk11
+  steps:
+  - checkout: self
+    fetchDepth: 25
+  - bash: ./annotation-file-utilities/dev-scripts/test-allTests.sh
+    displayName: test-allTests.sh
+- job: typecheck_jdk16
+  pool:
+    vmImage: 'ubuntu-latest'
+  container: mdernst/cf-ubuntu-jdk16:latest
+  dependsOn:
+    - build_without_test_jdk11
+    - test_jdk11
+    - typecheck_jdk11
+    - misc_jdk11
+    - downstream_jdk11
+  steps:
+  - checkout: self
+    fetchDepth: 25
+  - bash: ./annotation-file-utilities/dev-scripts/test-typecheck.sh
+    displayName: test-typecheck.sh
+- job: misc_jdk16
+  pool:
+    vmImage: 'ubuntu-latest'
+  container: mdernst/cf-ubuntu-jdk16-plus:latest
+  dependsOn:
+    - build_without_test_jdk11
+    - test_jdk11
+    - typecheck_jdk11
+    - misc_jdk11
+    - downstream_jdk11
+  steps:
+  - checkout: self
+    fetchDepth: 25
+  - bash: ./annotation-file-utilities/dev-scripts/test-misc.sh
+    displayName: test-misc.sh
+- job: downstream_jdk16
+  pool:
+    vmImage: 'ubuntu-latest'
+  container: mdernst/cf-ubuntu-jdk16:latest
+  dependsOn:
+    - build_without_test_jdk11
+    - test_jdk11
+    - typecheck_jdk11
+    - misc_jdk11
+    - downstream_jdk11
   steps:
   - checkout: self
     fetchDepth: 25

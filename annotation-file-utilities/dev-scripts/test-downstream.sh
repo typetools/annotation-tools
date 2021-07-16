@@ -26,4 +26,4 @@ fi
 "/tmp/$USER/plume-scripts/git-clone-related" typetools checker-framework "${CHECKERFRAMEWORK}"
 (cd "${CHECKERFRAMEWORK}" && checker/bin-devel/build.sh)
 
-(cd "${CHECKERFRAMEWORK}/checker" && ../gradlew wholeProgramInferenceTests)
+(cd "${CHECKERFRAMEWORK}/checker" && ../gradlew ainferTest)

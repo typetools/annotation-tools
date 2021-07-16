@@ -1,13 +1,11 @@
 package annotator.find;
 
-import scenelib.annotations.el.RelativeLocation;
-
 import annotator.Main;
 import annotator.scanner.InstanceOfScanner;
-
 import com.sun.source.tree.InstanceOfTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
+import scenelib.annotations.el.RelativeLocation;
 
 public class InstanceOfCriterion implements Criterion {
 
@@ -85,6 +83,11 @@ public class InstanceOfCriterion implements Criterion {
   }
 
   @Override
+  public boolean isOnlyTypeAnnotationCriterion() {
+    return true;
+  }
+
+  @Override
   public Kind getKind() {
     return Kind.INSTANCE_OF;
   }
@@ -93,5 +96,4 @@ public class InstanceOfCriterion implements Criterion {
   public String toString() {
     return "InstanceOfCriterion: in method: " + methodName + " location: " + loc;
   }
-
 }

@@ -7,6 +7,7 @@ public class AnonInner {
         }
       };
     }
+
     Object m2(String p) {
       return new Object() {
         public Object e2(Object o) {
@@ -14,6 +15,5 @@ public class AnonInner {
         }
       };
     }
-
   }
 }

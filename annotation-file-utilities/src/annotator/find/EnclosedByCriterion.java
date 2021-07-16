@@ -4,8 +4,8 @@ import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
 
 /**
- * Represents the criterion that a program element is enclosed (directly or
- * indirect) by a program element of a certain type.
+ * Represents the criterion that a program element is enclosed (directly or indirect) by a program
+ * element of a certain type.
  */
 final class EnclosedByCriterion implements Criterion {
 
@@ -41,6 +41,11 @@ final class EnclosedByCriterion implements Criterion {
         return true;
       }
     }
+    return false;
+  }
+
+  @Override
+  public boolean isOnlyTypeAnnotationCriterion() {
     return false;
   }
 

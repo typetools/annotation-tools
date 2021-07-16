@@ -1,16 +1,11 @@
 package annotator.find;
 
-import javax.lang.model.element.Modifier;
-
 import annotator.Main;
-
 import com.sun.source.tree.*;
 import com.sun.source.util.TreePath;
+import javax.lang.model.element.Modifier;
 
-/**
- * Represents the criterion that a program element is in a method with a
- * certain name.
- */
+/** Represents the criterion that a program element is in a method with a certain name. */
 final class InMethodCriterion implements Criterion {
 
   public final String name;
@@ -37,8 +32,8 @@ final class InMethodCriterion implements Criterion {
 
   @Override
   public boolean isSatisfiedBy(TreePath path) {
-    Criteria.dbug.debug("InMethodCriterion.isSatisfiedBy(%s); this=%s%n",
-        Main.leafString(path), this.toString());
+    Criteria.dbug.debug(
+        "InMethodCriterion.isSatisfiedBy(%s); this=%s%n", Main.leafString(path), this.toString());
 
     // true if the argument is within a variable declaration's initializer expression.
     boolean inDecl = false;
@@ -70,6 +65,11 @@ final class InMethodCriterion implements Criterion {
     boolean result = inDecl && (staticDecl ? "<clinit>()V" : "<init>()V").equals(name);
     Criteria.dbug.debug("InMethodCriterion.isSatisfiedBy => %s%n", result);
     return result;
+  }
+
+  @Override
+  public boolean isOnlyTypeAnnotationCriterion() {
+    return false;
   }
 
   @Override

@@ -1,23 +1,19 @@
 package scenelib.annotations.io.classfile;
 
-import com.sun.tools.javac.main.CommandLine;
-
-import org.plumelib.options.Option;
-import org.plumelib.options.Options;
-
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.Opcodes;
-
-import scenelib.annotations.el.AScene;
-import scenelib.annotations.io.IndexFileWriter;
-
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.Opcodes;
+import org.plumelib.options.Option;
+import org.plumelib.options.Options;
+import scenelib.annotations.el.AScene;
+import scenelib.annotations.io.IndexFileWriter;
+import scenelib.annotations.util.CommandLineUtils;
 
 /**
- * A <code> ClassFileReader </code> provides methods for reading in annotations
- * from a class file into an {@link scenelib.annotations.el.AScene}.
+ * A <code> ClassFileReader </code> provides methods for reading in annotations from a class file
+ * into an {@link scenelib.annotations.el.AScene}.
  */
 public class ClassFileReader {
   public static final String INDEX_UTILS_VERSION = "Annotation File Utilities v3.9.14";
@@ -34,41 +30,34 @@ public class ClassFileReader {
   @Option("print progress messages")
   public static boolean verbose = false;
 
-  private static String linesep = System.getProperty("line.separator");
+  private static String linesep = System.lineSeparator();
 
-  static String usage
-    = "extract-annotations [options] class1 class2 ..."
-    + linesep
-    + "Each argument is a class a.b.C (that is on the classpath) or a class file"
-    + linesep
-    + "a/b/C.class.  Extracts the annotations from each such argument and prints"
-    + linesep
-    + "them in index-file format to a.b.C.jaif .  Arguments beginning with a"
-    + linesep
-    + "single '@' are interpreted as argument files to be read and expanded into"
-    + linesep
-    + "the command line.  A few options are available only when invoked via the"
-    + linesep
-    + "script extract-annotations, not when invoked as a Java program:"
-    + linesep
-    + "  --debug-script                       - make the extract-annotations script output debugging information"
-    + linesep
-    + "  -cp <classpath>                      - use the given classpath instead of the CLASSPATH environment variable"
-    + linesep
-    + "  -classpath <classpath>               - use the given classpath instead of the CLASSPATH environment variable"
-    + linesep
-    + "Options that are always available:";
+  static String usage =
+      String.join(
+          linesep,
+          "extract-annotations [options] class1 class2 ...",
+          "Each argument is a class a.b.C (that is on the classpath) or a class file",
+          "a/b/C.class.  Extracts the annotations from each such argument and prints",
+          "them in index-file format to a.b.C.jaif .  Arguments beginning with a",
+          "single '@' are interpreted as argument files to be read and expanded into",
+          "the command line.  A few options are available only when invoked via the",
+          "script extract-annotations, not when invoked as a Java program:",
+          "  --debug-script               - make the extract-annotations script output debugging"
+              + " information",
+          "  -cp <classpath>              - use the given classpath instead of the CLASSPATH"
+              + " environment variable",
+          "  -classpath <classpath>       - use the given classpath instead of the CLASSPATH"
+              + " environment variable",
+          "Options that are always available:");
 
   /**
-   * From the command line, read annotations from a class file and write
-   * them to an index file.  Also see the Anncat tool, which is more
-   * versatile (and which calls this as a subroutine).
-   * <p>
+   * From the command line, read annotations from a class file and write them to an index file. Also
+   * see the Anncat tool, which is more versatile (and which calls this as a subroutine).
    *
-   * For usage information, supply the -h or --help option.
-   * <p>
+   * <p>For usage information, supply the -h or --help option.
    *
-   * For programmatic access to this tool, use the read() methods instead.
+   * <p>For programmatic access to this tool, use the read() methods instead.
+   *
    * <p>
    *
    * @param args options and classes to analyze;
@@ -79,14 +68,14 @@ public class ClassFileReader {
     String[] file_args;
 
     try {
-      String[] cl_args = CommandLine.parse(args);
+      String[] cl_args = CommandLineUtils.parseCommandLine(args);
       file_args = options.parse(true, cl_args);
-    } catch (IOException ex) {
+    } catch (Exception ex) {
       System.err.println(ex);
       System.err.println("(For non-argfile beginning with \"@\", use \"@@\" for initial \"@\".");
       System.err.println("Alternative for filenames: indicate directory, e.g. as './@file'.");
       System.err.println("Alternative for flags: use '=', as in '-o=@Deprecated'.)");
-      file_args = null;  // Eclipse compiler issue workaround
+      file_args = null; // Eclipse compiler issue workaround
       System.exit(1);
     }
 
@@ -119,7 +108,7 @@ public class ClassFileReader {
       }
       String className = origName;
       if (origName.endsWith(".class")) {
-          origName = origName.replace(".class", "");
+        origName = origName.replace(".class", "");
       }
 
       AScene scene = new AScene();
@@ -136,12 +125,10 @@ public class ClassFileReader {
         IndexFileWriter.write(scene, outputFile);
       } catch (IOException e) {
         System.out.println("There was an error in reading class: " + origName);
-        System.out.println(
-            "Did you ensure that this class is on your classpath?");
+        System.out.println("Did you ensure that this class is on your classpath?");
         return;
       } catch (Exception e) {
-        System.out.println("Unknown error trying to extract annotations from: " +
-            origName);
+        System.out.println("Unknown error trying to extract annotations from: " + origName);
         System.out.println(e.getMessage());
         e.printStackTrace();
         System.out.println("Please submit a bug report at");
@@ -153,10 +140,7 @@ public class ClassFileReader {
     }
   }
 
-  /**
-   * If s is not a valid representation of a class, print a warning message
-   * and return false.
-   */
+  /** If s is not a valid representation of a class, print a warning message and return false. */
   public static boolean checkClass(String arg) {
     // check for invalid class file paths with '.'
     if (!arg.contains(".class") && arg.contains("/")) {
@@ -169,25 +153,20 @@ public class ClassFileReader {
   }
 
   /**
-   * Reads the annotations from the class file <code> fileName </code>
-   * and inserts them into <code> scene </code>.
-   * <code> fileName </code> should be a file name that can be resolved from
-   * the current working directory, which means it should end in ".class"
-   * for standard Java class files.
+   * Reads the annotations from the class file <code> fileName </code> and inserts them into <code>
+   *  scene </code>. <code> fileName </code> should be a file name that can be resolved from the
+   * current working directory, which means it should end in ".class" for standard Java class files.
    *
    * @param scene the scene into which the annotations should be inserted
-   * @param fileName the file name of the class the annotations should be
-   *                 read from
-   * @throws IOException if there is a problem reading from
-   *                     <code> fileName </code>
+   * @param fileName the file name of the class the annotations should be read from
+   * @throws IOException if there is a problem reading from <code> fileName </code>
    */
   public static void read(AScene scene, String fileName) throws IOException {
     read(scene, new FileInputStream(fileName));
   }
 
   /**
-   * Reads the annotations from the class <code> className </code>,
-   * assumed to be in your classpath,
+   * Reads the annotations from the class <code> className </code>, assumed to be in your classpath,
    * and inserts them into <code> scene </code>.
    *
    * @param scene the scene into which the annotations should be inserted
@@ -199,12 +178,11 @@ public class ClassFileReader {
   }
 
   /**
-   * Reads the annotations from the class file indicated by the InputStream
-   * and inserts them into {@code scene}.
+   * Reads the annotations from the class file indicated by the InputStream and inserts them into
+   * {@code scene}.
    *
    * @param scene the scene into which the annotations should be inserted
-   * @param input an input stream containing the class that the annotations
-   *              should be read from
+   * @param input an input stream containing the class that the annotations should be read from
    * @throws IOException if there is a problem reading from <code> in </code>
    */
   public static void read(AScene scene, InputStream input) throws IOException {
@@ -212,15 +190,15 @@ public class ClassFileReader {
   }
 
   /**
-   * Reads the annotations from the class file indicated by the ClassReader
-   * and inserts them into {@code scene}.
+   * Reads the annotations from the class file indicated by the ClassReader and inserts them into
+   * {@code scene}.
    *
    * @param scene the scene into which the annotations should be inserted
-   * @param classReader the ClassReader for the class thet the annotations
-   *              should be read from
+   * @param classReader the ClassReader for the class thet the annotations should be read from
    */
   public static void read(AScene scene, ClassReader classReader) {
-    ClassAnnotationSceneReader ca = new ClassAnnotationSceneReader(Opcodes.ASM7, classReader, scene, ignore_bridge_methods);
+    ClassAnnotationSceneReader ca =
+        new ClassAnnotationSceneReader(Opcodes.ASM7, classReader, scene, ignore_bridge_methods);
     classReader.accept(ca, 0);
   }
 }

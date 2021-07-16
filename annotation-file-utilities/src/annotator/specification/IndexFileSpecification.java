@@ -1,5 +1,20 @@
 package annotator.specification;
 
+import annotator.Main;
+import annotator.find.AnnotationInsertion;
+import annotator.find.CastInsertion;
+import annotator.find.CloseParenthesisInsertion;
+import annotator.find.ConstructorInsertion;
+import annotator.find.Criteria;
+import annotator.find.GenericArrayLocationCriterion;
+import annotator.find.Insertion;
+import annotator.find.IntersectionTypeLocationCriterion;
+import annotator.find.NewInsertion;
+import annotator.find.ReceiverInsertion;
+import annotator.scanner.MethodOffsetClassVisitor;
+import com.google.common.collect.LinkedHashMultimap;
+import com.google.common.collect.Multimap;
+import com.sun.source.tree.Tree;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -7,15 +22,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
+import org.checkerframework.checker.signature.qual.ClassGetName;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
-
 import org.plumelib.util.FileIOException;
 import org.plumelib.util.Pair;
-import scenelib.type.DeclaredType;
-import scenelib.type.Type;
 import scenelib.annotations.Annotation;
 import scenelib.annotations.el.ABlock;
 import scenelib.annotations.el.AClass;
@@ -36,28 +48,19 @@ import scenelib.annotations.field.AnnotationFieldType;
 import scenelib.annotations.io.ASTPath;
 import scenelib.annotations.io.IndexFileParser;
 import scenelib.annotations.util.coll.VivifyingMap;
-import annotator.find.AnnotationInsertion;
-import annotator.find.CastInsertion;
-import annotator.find.CloseParenthesisInsertion;
-import annotator.find.ConstructorInsertion;
-import annotator.find.Criteria;
-import annotator.find.GenericArrayLocationCriterion;
-import annotator.find.Insertion;
-import annotator.find.IntersectionTypeLocationCriterion;
-import annotator.find.NewInsertion;
-import annotator.find.ReceiverInsertion;
-import annotator.scanner.MethodOffsetClassVisitor;
+import scenelib.type.DeclaredType;
+import scenelib.type.Type;
 
-import com.google.common.collect.LinkedHashMultimap;
-import com.google.common.collect.Multimap;
-import com.sun.source.tree.Tree;
-
+/** Represents the annotations in an index file (a .jaif file). */
 public class IndexFileSpecification {
+  /** Insertion sources. */
   private final Multimap<Insertion, Annotation> insertionSources =
       LinkedHashMultimap.<Insertion, Annotation>create();
+  /** The state of this object. */
   private final List<Insertion> insertions = new ArrayList<>();
-  /** Is a member of insertions (if non-null). */
+  /** An insertion for the default constructor, or null. Is a member of insertions if non-null. */
   private ConstructorInsertion constructorInsertion = null;
+
   private final AScene scene;
   private final String indexFileName;
 
@@ -74,8 +77,7 @@ public class IndexFileSpecification {
 
   public List<Insertion> parse() throws FileIOException {
     try {
-      Map<String, AnnotationDef> annotationDefs =
-          IndexFileParser.parseFile(indexFileName, scene);
+      Map<String, AnnotationDef> annotationDefs = IndexFileParser.parseFile(indexFileName, scene);
       Set<String> defKeys = annotationDefs.keySet();
       Set<String> ambiguous = new LinkedHashSet<>();
       // If a qualified name's unqualified counterpart maps to null in
@@ -86,7 +88,9 @@ public class IndexFileSpecification {
         if (ix >= 0) {
           String name = key.substring(ix + 1);
           // containsKey() would give wrong result here
-          if (annotationDefs.get(name) == null) { ambiguous.add(name); }
+          if (annotationDefs.get(name) == null) {
+            ambiguous.add(name);
+          }
         }
       }
       Insertion.setAlwaysQualify(ambiguous);
@@ -102,7 +106,7 @@ public class IndexFileSpecification {
     }
 
     parseScene();
-//    debug("---------------------------------------------------------");
+    //    debug("---------------------------------------------------------");
     return this.insertions;
   }
 
@@ -130,11 +134,25 @@ public class IndexFileSpecification {
   }
 
   /**
+   * Prints to standard out, if the {@code debug} flag is set.
+   *
+   * @param format a format string
+   * @param args the format string arguments
+   */
+  private static void debug(String format, Object... args) {
+    if (debug) {
+      System.out.printf(format, args);
+    }
+  }
+
+  /**
    * Returns the current scene.
    *
    * @return the current scene
    */
-  public AScene getScene() { return scene; }
+  public AScene getScene() {
+    return scene;
+  }
 
   /** Fill in this.insertions with insertion pairs. */
   private void parseScene() {
@@ -148,8 +166,9 @@ public class IndexFileSpecification {
       parsePackage(clist, entry.getKey(), entry.getValue());
     }
 
-    VivifyingMap<String, AClass> classes = scene.classes;
-    for (Map.Entry<String, AClass> entry : classes.entrySet()) {
+    @SuppressWarnings("signature:assignment") // scene-lib is not fully annotated
+    VivifyingMap<@ClassGetName String, AClass> classes = scene.classes;
+    for (Map.Entry<@ClassGetName String, AClass> entry : classes.entrySet()) {
       String key = entry.getKey();
       AClass clazz = entry.getValue();
       if (key.endsWith(".package-info")) {
@@ -169,8 +188,6 @@ public class IndexFileSpecification {
     parseElement(packageClist, element);
   }
 
-
-
   /**
    * Fill in this.insertions with insertion pairs.
    *
@@ -178,17 +195,18 @@ public class IndexFileSpecification {
    * @param className fully qualified name of class to be parsed
    * @param clazz where to store the class information
    */
-  private void parseClass(CriterionList clist, String className, AClass clazz) {
-    constructorInsertion = null;  // 0 or 1 per class
+  private void parseClass(CriterionList clist, @ClassGetName String className, AClass clazz) {
+    constructorInsertion = null; // 0 or 1 per class
     if (!noAsm) {
       //  load extra info using asm
-      debug("parseClass(" + className + ")");
+      debug("parseClass(%s)", className);
       try {
         ClassReader classReader = new ClassReader(className);
         ClassWriter classWriter = new ClassWriter(classReader, 0);
-        MethodOffsetClassVisitor cv = new MethodOffsetClassVisitor(Opcodes.ASM7, classReader, classWriter);
+        MethodOffsetClassVisitor cv =
+            new MethodOffsetClassVisitor(Opcodes.ASM7, classReader, classWriter);
         classReader.accept(cv, 0);
-        debug("Done reading " + className + ".class");
+        debug("Done reading %s.class", className);
       } catch (IOException e) {
         // If .class file not found, still proceed, in case
         // user only wants method signature annotations.
@@ -196,7 +214,8 @@ public class IndexFileSpecification {
         // found, then issue a warning only if an attempt is made to use
         // the (missing) information.  See
         // https://github.com/typetools/annotation-tools/issues/34 .)
-        System.out.println("Warning: IndexFileSpecification did not find classfile for: " + className);
+        System.out.println(
+            "Warning: IndexFileSpecification did not find classfile for: " + className);
         // throw new RuntimeException("IndexFileSpecification.parseClass: " + e);
       } catch (RuntimeException e) {
         System.err.println("IndexFileSpecification had a problem reading class: " + className);
@@ -221,7 +240,8 @@ public class IndexFileSpecification {
       for (Entry<List<TypePathEntry>, ATypeElement> innerEntry : bound.innerTypes.entrySet()) {
         List<TypePathEntry> innerLoc = innerEntry.getKey();
         AElement ae = innerEntry.getValue();
-        CriterionList innerBoundList = boundList.add(Criteria.atLocation(TypePathEntry.listToTypePath(innerLoc)));
+        CriterionList innerBoundList =
+            boundList.add(Criteria.atLocation(TypePathEntry.listToTypePath(innerLoc)));
         parseElement(innerBoundList, ae);
       }
       CriterionList outerClist = boundList.add(Criteria.atLocation());
@@ -239,7 +259,8 @@ public class IndexFileSpecification {
       for (Entry<List<TypePathEntry>, ATypeElement> innerEntry : ei.innerTypes.entrySet()) {
         List<TypePathEntry> innerLoc = innerEntry.getKey();
         AElement ae = innerEntry.getValue();
-        CriterionList innerBoundList = eiList.add(Criteria.atLocation(TypePathEntry.listToTypePath(innerLoc)));
+        CriterionList innerBoundList =
+            eiList.add(Criteria.atLocation(TypePathEntry.listToTypePath(innerLoc)));
         parseElement(innerBoundList, ae);
       }
       parseElement(eiList, ei);
@@ -248,7 +269,8 @@ public class IndexFileSpecification {
     parseASTInsertions(clist, clazz.insertAnnotations, clazz.insertTypecasts);
 
     for (Map.Entry<String, AField> entry : clazz.fields.entrySet()) {
-//      clist = clist.add(Criteria.notInMethod()); // TODO: necessary? what is in class but not in method?
+      //      clist = clist.add(Criteria.notInMethod()); // TODO: necessary? what is in class but
+      // not in method?
       parseField(clist, entry.getKey(), entry.getValue());
     }
     for (Map.Entry<String, AMethod> entry : clazz.methods.entrySet()) {
@@ -264,7 +286,7 @@ public class IndexFileSpecification {
       parseFieldInit(clist, className, entry.getKey(), entry.getValue());
     }
 
-    debug("parseClass(" + className + "):  done");
+    debug("parseClass(%s):  done%n", className);
   }
 
   /** Fill in this.insertions with insertion pairs. */
@@ -294,13 +316,16 @@ public class IndexFileSpecification {
   // keep the descriptive strings for field initializers and static inits consistent
   // with text used in NewCriterion.
 
-  private void parseFieldInit(CriterionList clist, String className, String fieldName, AExpression exp) {
+  private void parseFieldInit(
+      CriterionList clist, String className, String fieldName, AExpression exp) {
     clist = clist.add(Criteria.inFieldInit(fieldName));
     parseExpression(clist, className, "init for field " + fieldName + "()", exp);
   }
 
   /**
-   * Fill in this.insertions with insertion pairs.
+   * Fills in this.insertions with insertion pairs, and returns the ones that are
+   * AnnotationInsertions.
+   *
    * @param clist the criteria specifying the location of the insertions
    * @param element holds the annotations to be inserted
    * @return a list of the {@link AnnotationInsertion}s that are created
@@ -310,46 +335,62 @@ public class IndexFileSpecification {
   }
 
   /**
-   * Fill in this.insertions with insertion pairs.
+   * Fills in this.insertions with insertion pairs, and returns the ones that are
+   * AnnotationInsertions.
+   *
    * @param clist the criteria specifying the location of the insertions
    * @param element holds the annotations to be inserted
-   * @param isCastInsertion {@code true} if this for a cast insertion, {@code false}
-   *          otherwise.
+   * @param isCastInsertion {@code true} if this for a cast insertion, {@code false} otherwise.
    * @return a list of the {@link AnnotationInsertion}s that are created
    */
-  private List<Insertion> parseElement(CriterionList clist, AElement element,
-      boolean isCastInsertion) {
+  private List<Insertion> parseElement(
+      CriterionList clist, AElement element, boolean isCastInsertion) {
     return parseElement(clist, element, new ArrayList<Insertion>(), isCastInsertion);
   }
 
   /**
-   * Fill in this.insertions with insertion pairs.
+   * Fills in this.insertions with insertion pairs, and returns the ones that are
+   * AnnotationInsertions.
+   *
    * @param clist the criteria specifying the location of the insertions
    * @param element holds the annotations to be inserted
    * @return a list of the {@link AnnotationInsertion}s that are created
    */
-  private List<Insertion> parseElement(CriterionList clist, AElement element,
-      List<Insertion> innerTypeInsertions) {
+  private List<Insertion> parseElement(
+      CriterionList clist, AElement element, List<Insertion> innerTypeInsertions) {
     return parseElement(clist, element, innerTypeInsertions, false);
   }
 
   /**
-   * Fill in this.insertions with insertion pairs.
+   * Fills in this.insertions with insertion pairs, and returns the ones that are
+   * AnnotationInsertions.
+   *
    * @param clist the criteria specifying the location of the insertions
    * @param element holds the annotations to be inserted
-   * @param innerTypeInsertions the insertions on the inner type of this
-   *         element. This is only used for receiver and "new" insertions.
-   *         See {@link ReceiverInsertion} for more details.
-   * @param isCastInsertion {@code true} if this for a cast insertion, {@code false}
-   *          otherwise.
+   * @param innerTypeInsertions the insertions on the inner type of this element. This is only used
+   *     for receiver and "new" insertions. See {@link ReceiverInsertion} for more details.
+   * @param isCastInsertion {@code true} if this for a cast insertion, {@code false} otherwise.
    * @return a list of the {@link AnnotationInsertion}s that are created
    */
-  private List<Insertion> parseElement(CriterionList clist, AElement element,
-      List<Insertion> innerTypeInsertions, boolean isCastInsertion) {
+  private List<Insertion> parseElement(
+      CriterionList clist,
+      AElement element,
+      List<Insertion> innerTypeInsertions,
+      boolean isCastInsertion) {
+    // if (debug) {
+    //   String elementToString = element.toString();
+    //   if (elementToString.length() > 23) {
+    //     elementToString = elementToString.substring(0, 20) + "...";
+    //   }
+    //   debug(
+    //       "entering parseElement(..., \"%s\", %s, %s)%n",
+    //       elementToString, innerTypeInsertions, isCastInsertion);
+    // }
+
     // Use at most one receiver and one cast insertion and add all of the
     // annotations to the one insertion.
     ReceiverInsertion receiver = null;
-    NewInsertion neu = null;
+    NewInsertion newI = null;
     CastInsertion cast = null;
     CloseParenthesisInsertion closeParen = null;
     List<Insertion> annotationInsertions = new ArrayList<>();
@@ -361,17 +402,15 @@ public class IndexFileSpecification {
         // annotations to just insert a cast, or insert a cast with
         // annotations on the compound types.
         Pair<CastInsertion, CloseParenthesisInsertion> pair =
-            createCastInsertion(((ATypeElementWithType) element).getType(),
-                null, innerTypeInsertions, criteria);
+            createCastInsertion(
+                ((ATypeElementWithType) element).getType(), null, innerTypeInsertions, criteria);
         cast = pair.a;
         closeParen = pair.b;
       } else if (!innerTypeInsertions.isEmpty()) {
         if (isOnReceiver(criteria)) {
-          receiver = new ReceiverInsertion(new DeclaredType(),
-              criteria, innerTypeInsertions);
+          receiver = new ReceiverInsertion(new DeclaredType(), criteria, innerTypeInsertions);
         } else if (isOnNew(criteria)) {
-          neu = new NewInsertion(new DeclaredType(),
-              criteria, innerTypeInsertions);
+          newI = new NewInsertion(new DeclaredType(), criteria, innerTypeInsertions);
         }
       }
     }
@@ -381,7 +420,11 @@ public class IndexFileSpecification {
       String annotationString = p.a;
       Annotation annotation = p.b;
       Criteria criteria = clist.criteria();
-      boolean isTypeAnnotationOnly = annotation.def.isOnlyTypeAnnotation();
+      // If the annotation is only a type annotation, it will be inserted on the same line as the
+      // following type.  If the annotation is also a declaration annotation, always insert it on
+      // its own line.
+      boolean isTypeAnnotationOnly =
+          annotation.def.isOnlyTypeAnnotation() || criteria.isOnlyTypeAnnotationCriterion();
 
       if (noTypePath(criteria) && isOnReceiver(criteria)) {
         if (receiver == null) {
@@ -394,20 +437,23 @@ public class IndexFileSpecification {
         }
         addInsertionSource(receiver, annotation);
       } else if (noTypePath(criteria) && isOnNew(criteria)) {
-        if (neu == null) {
+        if (newI == null) {
           DeclaredType type = new DeclaredType();
           type.addAnnotation(annotationString);
-          neu = new NewInsertion(type, criteria, innerTypeInsertions);
-          elementInsertions.add(neu);
+          newI = new NewInsertion(type, criteria, innerTypeInsertions);
+          elementInsertions.add(newI);
         } else {
-          neu.getType().addAnnotation(annotationString);
+          newI.getType().addAnnotation(annotationString);
         }
-        addInsertionSource(neu, annotation);
+        addInsertionSource(newI, annotation);
       } else if (element instanceof ATypeElementWithType) {
         if (cast == null) {
-          Pair<CastInsertion, CloseParenthesisInsertion> insertions = createCastInsertion(
-              ((ATypeElementWithType) element).getType(), annotationString,
-              innerTypeInsertions, criteria);
+          Pair<CastInsertion, CloseParenthesisInsertion> insertions =
+              createCastInsertion(
+                  ((ATypeElementWithType) element).getType(),
+                  annotationString,
+                  innerTypeInsertions,
+                  criteria);
           cast = insertions.a;
           closeParen = insertions.b;
           elementInsertions.add(cast);
@@ -422,131 +468,171 @@ public class IndexFileSpecification {
         if (loc != null && loc.type_index > 0) {
           criteria.add(new IntersectionTypeLocationCriterion(loc));
         }
-        Insertion ins = new AnnotationInsertion(annotationString, criteria,
-                                                !isTypeAnnotationOnly, annotation);
-        debug("parsed: " + ins);
+        Insertion ins =
+            new AnnotationInsertion(annotationString, criteria, !isTypeAnnotationOnly, annotation);
+        debug("parsed: %s%n", ins);
         if (!isCastInsertion) {
-            // Annotations on compound types of a cast insertion will be
-            // inserted directly on the cast insertion.
-            // this.insertions.add(ins);
-            elementInsertions.add(ins);
+          // Annotations on compound types of a cast insertion will be
+          // inserted directly on the cast insertion.
+          // this.insertions.add(ins);
+          elementInsertions.add(ins);
         }
         annotationInsertions.add(ins);
         addInsertionSource(ins, annotation);
       }
+      // if (debug) {
+      //   if (!(annotationInsertions.isEmpty() && elementInsertions.isEmpty())) {
+      //     debug(
+      //         "About to call this.insertions.addAll(elementInsertions):%n"
+      //             + "  elementInsertions = %s%n"
+      //             + "  annotationInsertions = %s%n",
+      //         elementInsertions, annotationInsertions);
+      //   }
+      // }
+
+      // If an insertion I is on the implicit default constructor, then the no-argument constructor
+      // will itself be inserted into the source code, the insertion I will be added to it, and the
+      // insertion I will be removed from the list.
       this.insertions.addAll(elementInsertions);
 
-      // exclude expression annotations
-      if (noTypePath(criteria) && isOnNullaryConstructor(criteria)) {
+      if (debug) {
+        if (!this.insertions.isEmpty()) {
+          debug(
+              "now this.insertions (size %d) = %s%n",
+              insertions.size(), Insertion.collectionToString(insertions));
+        }
+      }
+
+      // Handle elementInsertions.
+
+      if (noTypePath(criteria) && isOnImplicitDefaultConstructor(criteria)) {
+
         if (constructorInsertion == null) {
           DeclaredType type = new DeclaredType(criteria.getClassName());
-          constructorInsertion = new ConstructorInsertion(type, criteria,
-              new ArrayList<Insertion>());
+          constructorInsertion =
+              new ConstructorInsertion(type, criteria, new ArrayList<Insertion>());
           this.insertions.add(constructorInsertion);
+          // debug(
+          //     "Added constructorInsertion to this.insertions, which is now %s%n",
+          //     Insertion.collectionToString(this.insertions));
         } else {
           if (annotator.Main.temporaryDebug) {
-            System.out.printf("Ignoring criteria=%s because constructorInsertion=%s%n", criteria, constructorInsertion);
+            System.out.printf(
+                "Ignoring criteria=%s because constructorInsertion=%s%n",
+                criteria, constructorInsertion);
           }
         }
         // no addInsertionSource, as constructorInsertion is not explicit in scene
         for (Insertion i : elementInsertions) {
           if (i.getKind() == Insertion.Kind.RECEIVER) {
             constructorInsertion.addReceiverInsertion((ReceiverInsertion) i);
+            this.insertions.remove(i);
           } else if (criteria.isOnReturnType()) {
             ((DeclaredType) constructorInsertion.getType()).addAnnotation(annotationString);
           } else if (!isTypeAnnotationOnly) {
             constructorInsertion.addDeclarationInsertion(i);
+            this.insertions.remove(i);
           } else {
             annotationInsertions.add(i);
+            // debug("Added to annotationInsertions: %s%n", i);
           }
         }
       }
       elementInsertions.clear();
     }
     if (receiver != null) {
-        this.insertions.add(receiver);
+      this.insertions.add(receiver);
     }
-    if (neu != null) {
-        this.insertions.add(neu);
+    if (newI != null) {
+      this.insertions.add(newI);
     }
     if (cast != null) {
-        this.insertions.add(cast);
-        this.insertions.add(closeParen);
+      this.insertions.add(cast);
+      this.insertions.add(closeParen);
     }
     if (constructorInsertion != null) {
-        constructorInsertion.setInserted(false);
+      constructorInsertion.setInserted(false);
     }
+
+    // debug("Final this.insertions: %s%n", Insertion.collectionToString(this.insertions));
+    // debug("parseElement(...) => %s%n", Insertion.collectionToString(annotationInsertions));
+
     return annotationInsertions;
   }
 
   private boolean noTypePath(Criteria criteria) {
-    GenericArrayLocationCriterion galc =
-        criteria.getGenericArrayLocation();
+    GenericArrayLocationCriterion galc = criteria.getGenericArrayLocation();
     return galc == null || galc.getLocation().isEmpty();
   }
 
   public static boolean isOnReceiver(Criteria criteria) {
     ASTPath astPath = criteria.getASTPath();
-    if (astPath == null) { return criteria.isOnReceiver(); }
-    if (astPath.isEmpty()) { return false; }
+    if (astPath == null) {
+      return criteria.isOnReceiver();
+    }
+    if (astPath.isEmpty()) {
+      return false;
+    }
     ASTPath.ASTEntry entry = astPath.getLast();
-    return entry.childSelectorIs(ASTPath.PARAMETER)
-        && entry.getArgument() < 0;
+    return entry.childSelectorIs(ASTPath.PARAMETER) && entry.getArgument() < 0;
   }
 
   public static boolean isOnNew(Criteria criteria) {
     ASTPath astPath = criteria.getASTPath();
-    if (astPath == null || astPath.isEmpty()) { return criteria.isOnNew(); }
+    if (astPath == null || astPath.isEmpty()) {
+      return criteria.isOnNew();
+    }
     ASTPath.ASTEntry entry = astPath.getLast();
     Tree.Kind kind = entry.getTreeKind();
-    return kind == Tree.Kind.NEW_ARRAY
+    return (kind == Tree.Kind.NEW_ARRAY
             && entry.childSelectorIs(ASTPath.TYPE)
-            && entry.getArgument() == 0
-        || kind == Tree.Kind.NEW_CLASS
-            && entry.childSelectorIs(ASTPath.IDENTIFIER);
-  }
-
-  private static boolean isOnNullaryConstructor(Criteria criteria) {
-    if (criteria.isOnMethod("<init>()V")) {
-      ASTPath astPath = criteria.getASTPath();
-      if (astPath == null || astPath.isEmpty()) {
-        return !criteria.isOnNew();  // exclude expression annotations
-      }
-      ASTPath.ASTEntry entry = astPath.get(0);
-      return entry.getTreeKind() == Tree.Kind.METHOD
-          && (entry.childSelectorIs(ASTPath.TYPE) || isOnReceiver(criteria));
-    }
-    return false;
+            && entry.getArgument() == 0)
+        || (kind == Tree.Kind.NEW_CLASS && entry.childSelectorIs(ASTPath.IDENTIFIER));
   }
 
   /**
-   * Creates the {@link CastInsertion} and {@link CloseParenthesisInsertion}
-   * for a cast insertion.
+   * Returns true if the Criteria is on an implicit default constructor. Such a constructor was not
+   * defined in source code. It is not considered synthetic, however; the isSynthetic() method
+   * returns false.
+   *
+   * @param criteria the Criteria
+   * @return true if the Criteria is on a synthethic constructor
+   */
+  private static boolean isOnImplicitDefaultConstructor(Criteria criteria) {
+    if (!criteria.isOnMethod("<init>()V")) {
+      return false;
+    }
+    String className = criteria.getClassName();
+    Boolean classHasExplicitConstructor = Main.hasExplicitConstructor.get(className);
+    return Boolean.FALSE.equals(classHasExplicitConstructor);
+  }
+
+  /**
+   * Creates the {@link CastInsertion} and {@link CloseParenthesisInsertion} for a cast insertion.
    *
    * @param type the cast type to insert
-   * @param annotationString the annotation on the outermost type, or
-   *         {@code null} if none. With no outermost annotation this cast
-   *         insertion will either be a cast without any annotations or a cast
-   *         with annotations only on the compound types.
+   * @param annotationString the annotation on the outermost type, or {@code null} if none. With no
+   *     outermost annotation this cast insertion will either be a cast without any annotations or a
+   *     cast with annotations only on the compound types.
    * @param innerTypeInsertions the annotations on the inner types
    * @param criteria the criteria for the location of this insertion
    * @return the {@link CastInsertion} and {@link CloseParenthesisInsertion}
    */
   private Pair<CastInsertion, CloseParenthesisInsertion> createCastInsertion(
-      Type type, String annotationString, List<Insertion> innerTypeInsertions,
-      Criteria criteria) {
+      Type type, String annotationString, List<Insertion> innerTypeInsertions, Criteria criteria) {
     if (annotationString != null) {
       type.addAnnotation(annotationString);
     }
     Insertion.decorateType(innerTypeInsertions, type, criteria.getASTPath());
     CastInsertion cast = new CastInsertion(criteria, type);
-    CloseParenthesisInsertion closeParen = new CloseParenthesisInsertion(
-        criteria, cast.isSeparateLine());
+    CloseParenthesisInsertion closeParen =
+        new CloseParenthesisInsertion(criteria, cast.isSeparateLine());
     return new Pair<>(cast, closeParen);
   }
 
   /**
    * Fill in this.insertions with insertion pairs for the outer and inner types.
+   *
    * @param clist the criteria specifying the location of the insertions
    * @param typeElement holds the annotations to be inserted
    */
@@ -556,20 +642,24 @@ public class IndexFileSpecification {
 
   /**
    * Fill in this.insertions with insertion pairs for the outer and inner types.
+   *
    * @param clist the criteria specifying the location of the insertions
    * @param typeElement holds the annotations to be inserted
-   * @param isCastInsertion {@code true} if this for a cast insertion, {@code false}
-   *          otherwise.
+   * @param isCastInsertion {@code true} if this for a cast insertion, {@code false} otherwise.
    */
-  private void parseInnerAndOuterElements(CriterionList clist,
-      ATypeElement typeElement, boolean isCastInsertion) {
+  private void parseInnerAndOuterElements(
+      CriterionList clist, ATypeElement typeElement, boolean isCastInsertion) {
     List<Insertion> innerInsertions = new ArrayList<>();
     for (Entry<List<TypePathEntry>, ATypeElement> innerEntry : typeElement.innerTypes.entrySet()) {
       List<TypePathEntry> innerLoc = innerEntry.getKey();
       AElement innerElement = innerEntry.getValue();
-      CriterionList innerClist = clist.add(Criteria.atLocation(TypePathEntry.listToTypePath(innerLoc)));
+      CriterionList innerClist =
+          clist.add(Criteria.atLocation(TypePathEntry.listToTypePath(innerLoc)));
       innerInsertions.addAll(parseElement(innerClist, innerElement, isCastInsertion));
     }
+    // if (!innerInsertions.isEmpty()) {
+    //   debug("parseInnerAndOuterElements: innerInsertions = %s%n", innerInsertions);
+    // }
     CriterionList outerClist = clist;
     if (!isCastInsertion) {
       // Cast insertion is never on an existing type.
@@ -579,11 +669,9 @@ public class IndexFileSpecification {
   }
 
   // Returns a string representation of the annotations at the element.
-  private Set<Pair<String, Annotation>>
-  getElementAnnotations(AElement element) {
+  private Set<Pair<String, Annotation>> getElementAnnotations(AElement element) {
     Set<Pair<String, Annotation>> result =
-        new LinkedHashSet<Pair<String, Annotation>>(
-            element.tlAnnotationsHere.size());
+        new LinkedHashSet<Pair<String, Annotation>>(element.tlAnnotationsHere.size());
     for (Annotation a : element.tlAnnotationsHere) {
       AnnotationDef adef = a.def;
       String annotationString = "@" + adef.name;
@@ -615,7 +703,16 @@ public class IndexFileSpecification {
     return fieldType.format(a.fieldValues.get(field));
   }
 
-  private void parseMethod(CriterionList clist, String className, String methodName, AMethod method) {
+  /**
+   * Parses a method and fills in this.insertions.
+   *
+   * @param clist a criterion for the class containing the method being parsed
+   * @param className the name of the containing class
+   * @param methodName the name of the method
+   * @param method the method's annotations (in scene-lib format)
+   */
+  private void parseMethod(
+      CriterionList clist, @ClassGetName String className, String methodName, AMethod method) {
     // Being "in" a method refers to being somewhere in the
     // method's tree, which includes return types, parameters, receiver, and
     // elements inside the method body.
@@ -671,7 +768,8 @@ public class IndexFileSpecification {
     parseExpression(clist, className, methodName, block);
   }
 
-  private void parseExpression(CriterionList clist, String className, String methodName, AExpression exp) {
+  private void parseExpression(
+      CriterionList clist, String className, String methodName, AExpression exp) {
     // parse typecasts of method
     for (Entry<RelativeLocation, ATypeElement> entry : exp.typecasts.entrySet()) {
       RelativeLocation loc = entry.getKey();
@@ -700,8 +798,7 @@ public class IndexFileSpecification {
     for (Entry<RelativeLocation, ATypeElement> entry : exp.refs.entrySet()) {
       RelativeLocation loc = entry.getKey();
       ATypeElement ref = entry.getValue();
-      CriterionList instanceOfClist =
-          clist.add(Criteria.memberReference(methodName, loc));
+      CriterionList instanceOfClist = clist.add(Criteria.memberReference(methodName, loc));
       parseInnerAndOuterElements(instanceOfClist, ref);
     }
 
@@ -709,8 +806,7 @@ public class IndexFileSpecification {
     for (Entry<RelativeLocation, ATypeElement> entry : exp.calls.entrySet()) {
       RelativeLocation loc = entry.getKey();
       ATypeElement call = entry.getValue();
-      CriterionList instanceOfClist =
-          clist.add(Criteria.methodCall(methodName, loc));
+      CriterionList instanceOfClist = clist.add(Criteria.methodCall(methodName, loc));
       parseInnerAndOuterElements(instanceOfClist, call);
     }
 
@@ -723,8 +819,8 @@ public class IndexFileSpecification {
     }
   }
 
-  private void parseLambdaExpression(String className, String methodName,
-      AMethod lambda, CriterionList clist) {
+  private void parseLambdaExpression(
+      String className, String methodName, AMethod lambda, CriterionList clist) {
     for (Entry<Integer, AField> entry : lambda.parameters.entrySet()) {
       Integer index = entry.getKey();
       AField param = entry.getValue();
@@ -735,16 +831,15 @@ public class IndexFileSpecification {
     parseBlock(clist, className, methodName, lambda.body);
   }
 
-  private void parseASTInsertions(CriterionList clist,
+  private void parseASTInsertions(
+      CriterionList clist,
       VivifyingMap<ASTPath, ATypeElement> insertAnnotations,
       VivifyingMap<ASTPath, ATypeElementWithType> insertTypecasts) {
     for (Entry<ASTPath, ATypeElement> entry : insertAnnotations.entrySet()) {
       ASTPath astPath = entry.getKey();
       ATypeElement insertAnnotation = entry.getValue();
-      CriterionList insertAnnotationClist =
-          clist.add(Criteria.astPath(astPath));
-      parseInnerAndOuterElements(insertAnnotationClist,
-          insertAnnotation, true);
+      CriterionList insertAnnotationClist = clist.add(Criteria.astPath(astPath));
+      parseInnerAndOuterElements(insertAnnotationClist, insertAnnotation, true);
     }
     for (Entry<ASTPath, ATypeElementWithType> entry : insertTypecasts.entrySet()) {
       ASTPath astPath = entry.getKey();

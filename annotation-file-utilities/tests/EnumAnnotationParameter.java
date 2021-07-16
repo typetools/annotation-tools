@@ -1,6 +1,5 @@
 package annotator.tests;
 
 public class EnumAnnotationParameter {
-  public void foo() {
-  }
+  public void foo() {}
 }

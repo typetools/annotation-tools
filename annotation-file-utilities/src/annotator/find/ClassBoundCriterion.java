@@ -1,9 +1,8 @@
 package annotator.find;
 
-import scenelib.annotations.el.BoundLocation;
-
-import com.sun.source.util.TreePath;
 import com.sun.source.tree.Tree;
+import com.sun.source.util.TreePath;
+import scenelib.annotations.el.BoundLocation;
 
 public class ClassBoundCriterion implements Criterion {
 
@@ -34,8 +33,12 @@ public class ClassBoundCriterion implements Criterion {
       return false;
     }
 
-    return boundLocCriterion.isSatisfiedBy(path) &&
-      notInMethodCriterion.isSatisfiedBy(path);
+    return boundLocCriterion.isSatisfiedBy(path) && notInMethodCriterion.isSatisfiedBy(path);
+  }
+
+  @Override
+  public boolean isOnlyTypeAnnotationCriterion() {
+    return true;
   }
 
   @Override

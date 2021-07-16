@@ -1,12 +1,10 @@
 package annotator.find;
 
-import java.util.List;
-
-import scenelib.annotations.el.RelativeLocation;
-
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
 import com.sun.tools.javac.tree.JCTree;
+import java.util.List;
+import scenelib.annotations.el.RelativeLocation;
 
 public class TypeArgumentCriterion implements Criterion {
   private final String methodName;
@@ -28,26 +26,34 @@ public class TypeArgumentCriterion implements Criterion {
 
   @Override
   public boolean isSatisfiedBy(TreePath path) {
-    if (path == null || path.getParentPath() == null) { return false; }
+    if (path == null || path.getParentPath() == null) {
+      return false;
+    }
 
     TreePath parentPath = path.getParentPath();
     Tree parent = parentPath.getLeaf();
     List<? extends Tree> typeArgs;
 
     switch (parent.getKind()) {
-    case MEMBER_REFERENCE:
-      typeArgs = ((JCTree.JCMemberReference) parent).getTypeArguments();
-      break;
-    case METHOD_INVOCATION:
-      typeArgs = ((JCTree.JCMethodInvocation) parent).getTypeArguments();
-      break;
-    default:
-      return isSatisfiedBy(parentPath);
+      case MEMBER_REFERENCE:
+        typeArgs = ((JCTree.JCMemberReference) parent).getTypeArguments();
+        break;
+      case METHOD_INVOCATION:
+        typeArgs = ((JCTree.JCMethodInvocation) parent).getTypeArguments();
+        break;
+      default:
+        return isSatisfiedBy(parentPath);
     }
 
     return typeArgs != null
-        && loc.index >= 0 && loc.index < typeArgs.size()
+        && loc.index >= 0
+        && loc.index < typeArgs.size()
         && typeArgs.get(loc.index) == path.getLeaf();
+  }
+
+  @Override
+  public boolean isOnlyTypeAnnotationCriterion() {
+    return true;
   }
 
   @Override
@@ -57,7 +63,6 @@ public class TypeArgumentCriterion implements Criterion {
 
   @Override
   public String toString() {
-    return "TypeArgumentCriterion: in method: " + methodName
-        + " location: " + loc;
+    return "TypeArgumentCriterion: in method: " + methodName + " location: " + loc;
   }
 }

@@ -23,6 +23,4 @@ class BoundZero<U extends @annotator.tests.A @annotator.tests.B @annotator.tests
   class Inner<@X V extends @Y @annotator.tests.A @annotator.tests.B @annotator.tests.C Object> {}
 }
 
-class Outer<S extends @annotator.tests.A @annotator.tests.B @annotator.tests.C Object & java.io.Serializable> {
-}
-
+class Outer<S extends @annotator.tests.A @annotator.tests.B @annotator.tests.C Object & java.io.Serializable> {}

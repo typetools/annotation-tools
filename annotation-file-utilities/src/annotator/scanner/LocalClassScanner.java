@@ -8,16 +8,15 @@ import com.sun.source.util.TreePath;
 import com.sun.source.util.TreePathScanner;
 
 /**
- * LocalClassScanner determines the index of a tree for a local
- * class. If the index is i, it is the ith local class with the class name in
- * the file. Thus, if i = 2, it will have a name of the form
+ * LocalClassScanner determines the index of a tree for a local class. If the index is i, it is the
+ * ith local class with the class name in the file. Thus, if i = 2, it will have a name of the form
  * OuterClass$2InnerClass.
  */
 public class LocalClassScanner extends TreePathScanner<Void, Integer> {
 
   /**
-   * Given a local class, computes and returns its 1-based index in the given
-   * tree representing a local class.
+   * Given a local class, computes and returns its 1-based index in the given tree representing a
+   * local class.
    *
    * @param path the source path ending in the local class
    * @param localClass the local class to search for
@@ -53,8 +52,8 @@ public class LocalClassScanner extends TreePathScanner<Void, Integer> {
   private ClassTree localClass;
 
   /**
-   * Creates a new LocalClassScanner that searches for the index of the given
-   * tree, representing a local class.
+   * Creates a new LocalClassScanner that searches for the index of the given tree, representing a
+   * local class.
    *
    * @param localClass the local class to search for
    */

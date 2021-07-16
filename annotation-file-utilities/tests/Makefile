@@ -16,8 +16,13 @@
 export JAVA?=java -ea
 export JAVAC?=javac
 
+# In Java 8, include Java 9 javac.  Without this, tests fail with:
+#   Exception in thread "main" java.lang.NoSuchFieldError: ANNOTATION_PROCESSOR_MODULE_PATH
 ifeq ($(shell java -version 2>&1 | grep version | grep 1.8 > /dev/null; printf $$?), 0)
-export JAVA:=$(JAVA) -Xbootclasspath/p:$(CURDIR)/../annotation-file-utilities-all.jar
+export JAVA:=$(JAVA) -Xbootclasspath/p:../lib/javac-9+181-r4173-1.jar
+else
+# Need open to access CommandLine.parse dynamically to check its type:
+export JAVA:=$(JAVA) --add-opens jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED --add-opens jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED --add-opens jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED --add-opens jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED  --add-opens jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED
 endif
 
 export SHELL=/bin/bash -o pipefail
@@ -35,7 +40,7 @@ DEBUG :=
 default : all
 
 .PHONY: all
-all : $(DIFFS) abbreviated converted enum-imports ad-hoc issue155 system-test source-extension results
+all : $(DIFFS) abbreviated converted enum-imports ad-hoc issue155 system-test source-extension showdiffs results
 
 .PHONY: abbreviated
 abbreviated:
@@ -65,13 +70,18 @@ source-extension:
 system-test:
 	${MAKE} -C system-test
 
-# Display results of all .diff files.
+# Display results (OK or FAILED) for all .diff files.
 .PHONY: results
 results: bin/VerifyDiffs.class
 	@echo ""
 	@echo "=== RESULTS ==="
 	@echo ""
 	@$(JAVA) -cp bin VerifyDiffs --show_all
+
+# Show all .diff files; good for running under CI.
+.PHONY: showdiffs
+showdiffs: bin/VerifyDiffs.class
+	cat *.diff
 
 # Remakes the little Java program that checks and compares diffs.
 bin/VerifyDiffs.class : VerifyDiffs.java

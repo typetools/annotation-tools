@@ -2,9 +2,13 @@ package annotator.tests;
 
 public class ExtImpl {
   class Top<X, Y> {}
+
   interface Iface<A, B> {}
+
   interface Iface2<C, D> {}
+
   interface Iface3 {}
+
   interface Iface4<T, @org.checkerframework.checker.nullness.qual.NonNull S extends @org.checkerframework.checker.nullness.qual.NonNull @org.checkerframework.checker.nullness.qual.UnknownKeyFor Iface4<T, S>> {}
 
   class C1 extends @A Top<@B Object, @C String> implements @D Iface<@E Integer, @F String> {}
@@ -54,4 +58,3 @@ public class ExtImpl {
     }
   }
 }
-

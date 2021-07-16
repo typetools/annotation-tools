@@ -3,6 +3,12 @@ all: bridge no-bridge
 
 JAVAC?=javac
 
+# In Java 8, include Java 9 javac.  Without this, tests fail with:
+#   Exception in thread "main" java.lang.NoSuchFieldError: ANNOTATION_PROCESSOR_MODULE_PATH
+ifeq ($(shell java -version 2>&1 | grep version | grep 1.8 > /dev/null; printf $$?), 0)
+export JAVA:=$(JAVA) -Xbootclasspath/p:../../../lib/javac-9+181-r4173-1.jar
+endif
+
 JAVACVERSION = $(shell $(JAVAC) -version 2>&1)
 ifeq (1.7.,$(findstring 1.7.,$(JAVACVERSION)))
   JAVACTARGET = -source 7 -target 7

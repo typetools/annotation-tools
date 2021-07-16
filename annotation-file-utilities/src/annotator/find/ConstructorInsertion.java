@@ -1,9 +1,8 @@
 package annotator.find;
 
-import java.util.List;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
-
 import scenelib.type.Type;
 
 public class ConstructorInsertion extends TypedInsertion {
@@ -12,18 +11,16 @@ public class ConstructorInsertion extends TypedInsertion {
 
   /**
    * Construct a ConstructorInsertion.
-   * <p>
-   * To insert the annotation and the constructor (for example,
-   * {@code @Anno Type this}) the name should be set to the type to insert.
-   * This can either be done before calling this constructor, or by modifying
-   * the return value of {@link #getType()}.
+   *
+   * <p>To insert the annotation and the constructor (for example, {@code @Anno Type this}) the name
+   * should be set to the type to insert. This can either be done before calling this constructor,
+   * or by modifying the return value of {@link #getType()}.
    *
    * @param type the type to use when inserting the constructor
    * @param criteria where to insert the text
    * @param innerTypeInsertions the inner types to go on this constructor
    */
-  public ConstructorInsertion(Type type, Criteria criteria,
-      List<Insertion> innerTypeInsertions) {
+  public ConstructorInsertion(Type type, Criteria criteria, List<Insertion> innerTypeInsertions) {
     super(type, criteria, true, innerTypeInsertions);
   }
 
@@ -41,11 +38,23 @@ public class ConstructorInsertion extends TypedInsertion {
       //    isSeparateLine()).getText(comments, abbreviate);
       return "";
     } else {
-      boolean commentAnnotation =
-          comments && getBaseType().getName().isEmpty();
+      boolean commentAnnotation = comments && getBaseType().getName().isEmpty();
       String typeString = typeToString(type, commentAnnotation, true);
-      int ix = typeString.lastIndexOf('$');  // FIXME: exclude '$' in source
-      typeString = typeString.substring(ix+1);
+      int dollarPos = typeString.lastIndexOf('$');
+      if (dollarPos != -1) {
+        typeString = typeString.substring(dollarPos + 1);
+        if (typeString.startsWith("1")) {
+          // HACK: A named class `Local` within a method is recorded in the classfile as
+          // Outer$1Local rather than as Outer$Local.
+          // This hack doesn't handle when there are multiple such named classes in different
+          // methods, nor when a nested class's name really starts with "1".  (I could do the latter
+          // by checking
+          //   String outerName = typeString.substring(0, dollarPos);
+          //   Class<?> outer = Class.forName(outerName);
+          //   Class<?>[] nested = outer.getClasses();
+          typeString = typeString.substring(1);
+        }
+      }
 
       for (Insertion i : declarationInsertions) {
         b.append(i.getText(commentAnnotation, abbreviate)).append(System.lineSeparator());
@@ -70,8 +79,7 @@ public class ConstructorInsertion extends TypedInsertion {
     if (receiverInsertion == null) {
       receiverInsertion = recv;
     } else {
-      receiverInsertion.getInnerTypeInsertions()
-          .addAll(recv.getInnerTypeInsertions());
+      receiverInsertion.getInnerTypeInsertions().addAll(recv.getInnerTypeInsertions());
     }
   }
 
@@ -81,8 +89,7 @@ public class ConstructorInsertion extends TypedInsertion {
   }
 
   @Override
-  protected boolean addLeadingSpace(boolean gotSeparateLine, int pos,
-      char precedingChar) {
+  protected boolean addLeadingSpace(boolean gotSeparateLine, int pos, char precedingChar) {
     return false;
   }
 
@@ -98,9 +105,11 @@ public class ConstructorInsertion extends TypedInsertion {
 
   /**
    * Sets whether this insertion has already been inserted into source code.
-   * @param inserted {@code true} if this insertion has already been inserted,
-   *         {@code false} otherwise.
+   *
+   * @param inserted {@code true} if this insertion has already been inserted, {@code false}
+   *     otherwise.
    */
+  @Override
   public void setInserted(boolean inserted) {
     super.setInserted(false);
     if (receiverInsertion != null) {
@@ -109,5 +118,10 @@ public class ConstructorInsertion extends TypedInsertion {
     for (Insertion insertion : declarationInsertions) {
       insertion.setInserted(false);
     }
+  }
+
+  @Override
+  public String toString() {
+    return "\"" + getText().replace(System.lineSeparator(), " ") + "\" " + super.toString();
   }
 }

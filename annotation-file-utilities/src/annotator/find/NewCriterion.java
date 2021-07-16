@@ -1,14 +1,11 @@
 package annotator.find;
 
-import scenelib.annotations.el.RelativeLocation;
 import annotator.scanner.NewScanner;
-
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
+import scenelib.annotations.el.RelativeLocation;
 
-/**
- * Criterion for being a specific object creation expression.
- */
+/** Criterion for being a specific object creation expression. */
 public class NewCriterion implements Criterion {
 
   private final String methodName;
@@ -19,9 +16,9 @@ public class NewCriterion implements Criterion {
   public NewCriterion(String methodName, RelativeLocation loc) {
     this.methodName = methodName.substring(0, methodName.lastIndexOf(")") + 1);
 
-    if (!(methodName.startsWith("init for field") ||
-            methodName.startsWith("static init number")
-            || methodName.startsWith("instance init number"))) {
+    if (!(methodName.startsWith("init for field")
+        || methodName.startsWith("static init number")
+        || methodName.startsWith("instance init number"))) {
       // keep strings consistent with text used in IndexFileSpecification
       this.inMethodCriterion = Criteria.inMethod(methodName);
     } else {
@@ -48,14 +45,13 @@ public class NewCriterion implements Criterion {
 
     Tree leaf = path.getLeaf();
 
-    if (inMethodCriterion!=null && !inMethodCriterion.isSatisfiedBy(path)) {
+    if (inMethodCriterion != null && !inMethodCriterion.isSatisfiedBy(path)) {
       // If we're not in the method now, the parent path may still be in the method.
       // For example, the current leaf could be inside a method inside of an
       // anonymous inner class defined in another method.
       return this.isSatisfiedBy(path.getParentPath());
     }
-    if (leaf.getKind() == Tree.Kind.NEW_CLASS
-            || leaf.getKind() == Tree.Kind.NEW_ARRAY) {
+    if (leaf.getKind() == Tree.Kind.NEW_CLASS || leaf.getKind() == Tree.Kind.NEW_ARRAY) {
       int indexInSource = NewScanner.indexOfNewTree(path, leaf);
       // System.out.printf("indexInSource=%d%n", indexInSource);
       boolean b;
@@ -72,6 +68,11 @@ public class NewCriterion implements Criterion {
   }
 
   @Override
+  public boolean isOnlyTypeAnnotationCriterion() {
+    return true;
+  }
+
+  @Override
   public Kind getKind() {
     return Kind.NEW;
   }
@@ -80,5 +81,4 @@ public class NewCriterion implements Criterion {
   public String toString() {
     return "NewCriterion in method: " + methodName + " at location " + loc;
   }
-
 }

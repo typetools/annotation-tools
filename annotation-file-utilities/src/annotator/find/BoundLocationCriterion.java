@@ -1,9 +1,5 @@
 package annotator.find;
 
-import java.util.List;
-
-import scenelib.annotations.el.BoundLocation;
-
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
@@ -11,13 +7,14 @@ import com.sun.source.tree.TypeParameterTree;
 import com.sun.source.util.TreePath;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.tree.JCTree.JCExpression;
+import java.util.List;
+import scenelib.annotations.el.BoundLocation;
 
 public class BoundLocationCriterion implements Criterion {
 
   private Criterion parentCriterion;
   private final int boundIndex;
   private final int paramIndex;
-
 
   public BoundLocationCriterion(BoundLocation boundLoc) {
     this(boundLoc.boundIndex, boundLoc.paramIndex);
@@ -51,7 +48,8 @@ public class BoundLocationCriterion implements Criterion {
 
     Tree leaf = path.getLeaf();
 
-    // System.out.printf("BoundLocationCriterion.isSatisfiedBy(%s):%n  leaf=%s (%s)%n", path, leaf, leaf.getClass());
+    // System.out.printf("BoundLocationCriterion.isSatisfiedBy(%s):%n  leaf=%s (%s)%n", path, leaf,
+    // leaf.getClass());
 
     TreePath parentPath = path.getParentPath();
     if (parentPath == null) {
@@ -65,7 +63,8 @@ public class BoundLocationCriterion implements Criterion {
 
     boolean returnValue = false;
 
-    // System.out.printf("BoundLocationCriterion.isSatisfiedBy(%s):%n  leaf=%s (%s)%n  parent=%s (%s)%n", path, leaf, leaf.getClass(), parent, parent.getClass());
+    // System.out.printf("BoundLocationCriterion.isSatisfiedBy(%s):%n  leaf=%s (%s)%n  parent=%s
+    // (%s)%n", path, leaf, leaf.getClass(), parent, parent.getClass());
 
     // if boundIndex is not null, need to check that this is right bound
     // in parent
@@ -76,7 +75,7 @@ public class BoundLocationCriterion implements Criterion {
         if (!bounds.isEmpty() && isInterface((JCExpression) bounds.get(0))) {
           --ix;
         }
-        if (ix < 0 || ix < bounds.size() && bounds.get(ix) == leaf) {
+        if (ix < 0 || (ix < bounds.size() && bounds.get(ix) == leaf)) {
           returnValue = parentCriterion.isSatisfiedBy(parentPath);
         }
       } else if (boundIndex == 0 && leaf instanceof TypeParameterTree) {
@@ -119,6 +118,17 @@ public class BoundLocationCriterion implements Criterion {
     }
   }
 
+  @Override
+  public boolean isOnlyTypeAnnotationCriterion() {
+    return true;
+  }
+
+  /**
+   * Returns true if the given bound is an interface.
+   *
+   * @param bound a type bound
+   * @return true if the given bound is an interface
+   */
   private boolean isInterface(JCExpression bound) {
     Type type = bound.type;
     return type != null && type.tsym != null && type.tsym.isInterface();
@@ -131,7 +141,6 @@ public class BoundLocationCriterion implements Criterion {
 
   @Override
   public String toString() {
-    return "BoundCriterion: at param index: " + paramIndex +
-      " at bound index: " + boundIndex;
+    return "BoundCriterion: at param index: " + paramIndex + " at bound index: " + boundIndex;
   }
 }

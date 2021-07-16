@@ -7,43 +7,36 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import java.util.stream.IntStream;
 import org.checkerframework.checker.nullness.qual.Nullable;
-
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
-
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.TypePath;
 import org.objectweb.asm.TypeReference;
 import org.plumelib.util.CollectionsPlume;
 
 /**
- * An <code>AnnotationVerifier</code> provides a way to check to see if two
- * versions of the same class (from two different <code>.class</code> files),
- * have the same annotations on the same elements.
+ * An <code>AnnotationVerifier</code> provides a way to check to see if two versions of the same
+ * class (from two different <code>.class</code> files), have the same annotations on the same
+ * elements.
  */
 public class AnnotationVerifier {
 
   private static final String lineSep = System.getProperty("line.separator");
 
-  /**
-   * The "correct" version of the class to verify against.
-   */
+  /** The "correct" version of the class to verify against. */
   private ClassRecorder originalVisitor;
 
-  /**
-   * The uncertain version of the class to verify.
-   */
+  /** The uncertain version of the class to verify. */
   private ClassRecorder newVisitor;
 
   /**
-   * Constructs a new <code>AnnotationVerifier</code> that does not yet have
-   * any information about the class.
+   * Constructs a new <code>AnnotationVerifier</code> that does not yet have any information about
+   * the class.
    */
   public AnnotationVerifier() {
     originalVisitor = new ClassRecorder(Opcodes.ASM7);
@@ -51,8 +44,8 @@ public class AnnotationVerifier {
   }
 
   /**
-   * Returns the <code>ClassVisitor</code> which should be made to visit the
-   * version of the class known to be correct.
+   * Returns the <code>ClassVisitor</code> which should be made to visit the version of the class
+   * known to be correct.
    *
    * @return a visitor for the good version of the class
    */
@@ -61,8 +54,8 @@ public class AnnotationVerifier {
   }
 
   /**
-   * Returns the <code>ClassVisitor</code> which should be made to visit the
-   * version of the class being tested.
+   * Returns the <code>ClassVisitor</code> which should be made to visit the version of the class
+   * being tested.
    *
    * @return a visitor the the experimental version of the class
    */
@@ -71,18 +64,20 @@ public class AnnotationVerifier {
   }
 
   /**
-   * Verifies that the visitors returned by {@link #originalVisitor()} and
-   * {@link #newVisitor()} have visited the same class.  This method can only
-   * be called if both visitors have already visited a class.
+   * Verifies that the visitors returned by {@link #originalVisitor()} and {@link #newVisitor()}
+   * have visited the same class. This method can only be called if both visitors have already
+   * visited a class.
    *
-   * @throws AnnotationMismatchException if the two visitors have not visited
-   * two versions of the same class that contain idential annotations
+   * @throws AnnotationMismatchException if the two visitors have not visited two versions of the
+   *     same class that contain idential annotations
    */
   public void verify() {
     if (!newVisitor.name.equals(originalVisitor.name)) {
       throw new AnnotationMismatchException(
-          "Cannot verify two different classes:\n  " +
-          newVisitor.name + "\n  " + originalVisitor.name);
+          "Cannot verify two different classes:\n  "
+              + newVisitor.name
+              + "\n  "
+              + originalVisitor.name);
     }
     newVisitor.verifyAgainst(originalVisitor);
   }
@@ -95,10 +90,9 @@ public class AnnotationVerifier {
     System.out.println(newVisitor.prettyPrint());
   }
 
-
   /**
-   * A ClassRecorder records all the annotations that it visits, and serves
-   * as a ClassVisitor, FieldVisitor, and MethodVisitor.
+   * A ClassRecorder records all the annotations that it visits, and serves as a ClassVisitor,
+   * FieldVisitor, and MethodVisitor.
    */
   private class ClassRecorder extends ClassVisitor {
 
@@ -117,12 +111,8 @@ public class AnnotationVerifier {
     private Map<String, AnnotationRecorder> anns;
     private Map<String, AnnotationRecorder> xanns;
 
-    // method specific annotations
-    private Set<AnnotationRecorder> danns; // default annotations
-    private Map<ParameterDescription, AnnotationRecorder> panns; // parameter annotations
-
     public ClassRecorder(int api) {
-      this(api, "class: ","","");
+      this(api, "class: ", "", "");
     }
 
     public ClassRecorder(int api, String internalDescription, String name, String signature) {
@@ -136,13 +126,16 @@ public class AnnotationVerifier {
 
       anns = new HashMap<>();
       xanns = new HashMap<>();
-
-      danns = new HashSet<>();
-      panns = new HashMap<>();
     }
 
     @Override
-    public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
+    public void visit(
+        int version,
+        int access,
+        String name,
+        String signature,
+        String superName,
+        String[] interfaces) {
       this.name = name;
       this.signature = signature;
       description = description + name;
@@ -150,36 +143,37 @@ public class AnnotationVerifier {
 
     @Override
     public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
-      AnnotationRecorder av = new AnnotationRecorder(api,
-          description + " annotation: " + descriptor);
-      anns.put(descriptor,av);
+      AnnotationRecorder av =
+          new AnnotationRecorder(api, description + " annotation: " + descriptor);
+      anns.put(descriptor, av);
       return av;
     }
 
     @Override
-    public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String descriptor, boolean visible) {
-      AnnotationRecorder av = new AnnotationRecorder(api,
-          description + " annotation: " + descriptor, typeRef, typePath);
-      xanns.put(descriptor,av);
+    public AnnotationVisitor visitTypeAnnotation(
+        int typeRef, TypePath typePath, String descriptor, boolean visible) {
+      AnnotationRecorder av =
+          new AnnotationRecorder(
+              api, description + " annotation: " + descriptor, typeRef, typePath);
+      xanns.put(descriptor, av);
       return av;
     }
 
     @Override
-    public FieldVisitor visitField(int access, String name, String descriptor, String signature, Object value) {
-      FieldRecorder fr =
-        new FieldRecorder(api,
-            description + " field: " + name,
-            name, signature);
+    public FieldVisitor visitField(
+        int access, String name, String descriptor, String signature, Object value) {
+      FieldRecorder fr = new FieldRecorder(api, description + " field: " + name, name, signature);
       fieldRecorders.put(name, fr);
       return fr;
     }
 
     @Override
-    public MethodVisitor visitMethod(int access, String name, String descriptor, String signature, String[] exceptions) {
+    public MethodVisitor visitMethod(
+        int access, String name, String descriptor, String signature, String[] exceptions) {
       MethodRecorder mr =
-        new MethodRecorder(api,
-            description + " method: " + name + descriptor, name+descriptor, signature);
-      methodRecorders.put(name+descriptor, mr);
+          new MethodRecorder(
+              api, description + " method: " + name + descriptor, name + descriptor, signature);
+      methodRecorders.put(name + descriptor, mr);
       return mr;
     }
 
@@ -197,16 +191,21 @@ public class AnnotationVerifier {
         Map<String, AnnotationRecorder> questionableAnns,
         Map<String, AnnotationRecorder> correctAnns) {
       Set<AnnotationRecorder> unresolvedQuestionableAnns =
-        new HashSet<AnnotationRecorder>(questionableAnns.values());
+          new HashSet<AnnotationRecorder>(questionableAnns.values());
 
-      for (Map.Entry<String, AnnotationRecorder> entry :
-        correctAnns.entrySet()) {
+      for (Map.Entry<String, AnnotationRecorder> entry : correctAnns.entrySet()) {
         String name = entry.getKey();
         AnnotationRecorder correctAnn = entry.getValue();
         AnnotationRecorder questionableAnn = questionableAnns.get(name);
         if (questionableAnn == null) {
-          throw new AnnotationMismatchException("{" + description + "}" +
-              "\n  does not contain expected annotation:\n  " + "{" + correctAnn + "}");
+          throw new AnnotationMismatchException(
+              "{"
+                  + description
+                  + "}"
+                  + "\n  does not contain expected annotation:\n  "
+                  + "{"
+                  + correctAnn
+                  + "}");
         }
 
         questionableAnn.verifyAgainst(correctAnn);
@@ -215,25 +214,35 @@ public class AnnotationVerifier {
       }
 
       for (AnnotationRecorder unexpectedAnnOnThis : unresolvedQuestionableAnns) {
-        throw new AnnotationMismatchException("{" + description + "}" +
-            "\n  contains unexpected annotation:\n  " + "{" + unexpectedAnnOnThis + "}");
+        throw new AnnotationMismatchException(
+            "{"
+                + description
+                + "}"
+                + "\n  contains unexpected annotation:\n  "
+                + "{"
+                + unexpectedAnnOnThis
+                + "}");
       }
     }
 
     private void verifyFieldAnns(
-        Map<String, FieldRecorder> questionableMembers,
-        Map<String, FieldRecorder> correctMembers) {
+        Map<String, FieldRecorder> questionableMembers, Map<String, FieldRecorder> correctMembers) {
       Set<FieldRecorder> unresolvedQuestionableMembers =
           new HashSet<>(questionableMembers.values());
 
-      for (Map.Entry<String, FieldRecorder> entry :
-          correctMembers.entrySet()) {
+      for (Map.Entry<String, FieldRecorder> entry : correctMembers.entrySet()) {
         String name = entry.getKey();
         FieldRecorder correctMember = entry.getValue();
         FieldRecorder questionableMember = questionableMembers.get(name);
         if (questionableMember == null) {
-          throw new AnnotationMismatchException("{" + description + "}" +
-              "\n  does not contain expected member:\n  " + "{" + correctMember + "}");
+          throw new AnnotationMismatchException(
+              "{"
+                  + description
+                  + "}"
+                  + "\n  does not contain expected member:\n  "
+                  + "{"
+                  + correctMember
+                  + "}");
         }
 
         questionableMember.verifyAgainst(correctMember);
@@ -246,8 +255,14 @@ public class AnnotationVerifier {
         System.out.println("questionable: " + questionableMembers);
         System.out.println("correct: " + correctMembers);
 
-        throw new AnnotationMismatchException("{" + description + "}" +
-            "\n  contains unexpected member:\n  " + "{" + unexpectedMemberOnThis + "}");
+        throw new AnnotationMismatchException(
+            "{"
+                + description
+                + "}"
+                + "\n  contains unexpected member:\n  "
+                + "{"
+                + unexpectedMemberOnThis
+                + "}");
       }
     }
 
@@ -257,14 +272,19 @@ public class AnnotationVerifier {
       Set<MethodRecorder> unresolvedQuestionableMembers =
           new HashSet<>(questionableMembers.values());
 
-      for (Map.Entry<String, MethodRecorder> entry :
-          correctMembers.entrySet()) {
+      for (Map.Entry<String, MethodRecorder> entry : correctMembers.entrySet()) {
         String name = entry.getKey();
         MethodRecorder correctMember = entry.getValue();
         MethodRecorder questionableMember = questionableMembers.get(name);
         if (questionableMember == null) {
-          throw new AnnotationMismatchException("{" + description + "}" +
-              "\n  does not contain expected member:\n  " + "{" + correctMember + "}");
+          throw new AnnotationMismatchException(
+              "{"
+                  + description
+                  + "}"
+                  + "\n  does not contain expected member:\n  "
+                  + "{"
+                  + correctMember
+                  + "}");
         }
 
         questionableMember.verifyAgainst(correctMember);
@@ -277,11 +297,18 @@ public class AnnotationVerifier {
         System.out.println("questionable: " + questionableMembers);
         System.out.println("correct: " + correctMembers);
 
-        throw new AnnotationMismatchException("{" + description + "}" +
-            "\n  contains unexpected member:\n  " + "{" + unexpectedMemberOnThis + "}");
+        throw new AnnotationMismatchException(
+            "{"
+                + description
+                + "}"
+                + "\n  contains unexpected member:\n  "
+                + "{"
+                + unexpectedMemberOnThis
+                + "}");
       }
     }
 
+    @Override
     public String toString() {
       return description;
     }
@@ -301,14 +328,14 @@ public class AnnotationVerifier {
       lines.add("description: " + description);
       lines.add("  name: " + name);
       lines.add("  signature: " + signature);
-      if (! anns.isEmpty()) {
+      if (!anns.isEmpty()) {
         lines.add("  anns:");
         for (Map.Entry<String, AnnotationRecorder> e : anns.entrySet()) {
           // in the future, maybe get a fuller description
           lines.add("    " + e.getKey() + ": " + e.getValue().description);
         }
       }
-      if (! xanns.isEmpty()) {
+      if (!xanns.isEmpty()) {
         lines.add("  xanns:");
         for (Map.Entry<String, AnnotationRecorder> e : xanns.entrySet()) {
           // in the future, maybe get a fuller description
@@ -347,7 +374,7 @@ public class AnnotationVerifier {
     private Map<ParameterDescription, AnnotationRecorder> panns; // parameter annotations
 
     public MethodRecorder(int api) {
-      this(api, "class: ","","");
+      this(api, "class: ", "", "");
     }
 
     public MethodRecorder(int api, String internalDescription, String name, String signature) {
@@ -365,39 +392,60 @@ public class AnnotationVerifier {
 
     @Override
     public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
-      AnnotationRecorder av = new AnnotationRecorder(api,
-          description + " annotation: " + descriptor);
+      AnnotationRecorder av =
+          new AnnotationRecorder(api, description + " annotation: " + descriptor);
       anns.put(descriptor, av);
       return av;
     }
 
     @Override
-    public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String descriptor, boolean visible) {
-      AnnotationRecorder av = new AnnotationRecorder(api,
-          description + " annotation: " + descriptor, typeRef, typePath);
+    public AnnotationVisitor visitTypeAnnotation(
+        int typeRef, TypePath typePath, String descriptor, boolean visible) {
+      AnnotationRecorder av =
+          new AnnotationRecorder(
+              api, description + " annotation: " + descriptor, typeRef, typePath);
       xanns.put(descriptor, av);
       return av;
     }
 
     @Override
-    public AnnotationVisitor visitInsnAnnotation(int typeRef, TypePath typePath, String descriptor, boolean visible) {
-      AnnotationRecorder av = new AnnotationRecorder(api,
-          description + " annotation: " + descriptor, typeRef, typePath);
+    public AnnotationVisitor visitInsnAnnotation(
+        int typeRef, TypePath typePath, String descriptor, boolean visible) {
+      AnnotationRecorder av =
+          new AnnotationRecorder(
+              api, description + " annotation: " + descriptor, typeRef, typePath);
       xanns.put(descriptor, av);
-      return av;    }
+      return av;
+    }
 
     @Override
-    public AnnotationVisitor visitLocalVariableAnnotation(int typeRef, TypePath typePath, Label[] start, Label[] end,
-                                                          int[] index, String descriptor, boolean visible) {
-      AnnotationRecorder av = new AnnotationRecorder(api,
-          description + " annotation: " + descriptor, typeRef, typePath, start, end, index);
+    public AnnotationVisitor visitLocalVariableAnnotation(
+        int typeRef,
+        TypePath typePath,
+        Label[] start,
+        Label[] end,
+        int[] index,
+        String descriptor,
+        boolean visible) {
+      AnnotationRecorder av =
+          new AnnotationRecorder(
+              api,
+              description + " annotation: " + descriptor,
+              typeRef,
+              typePath,
+              start,
+              end,
+              index);
       xanns.put(descriptor, av);
-      return av;    }
+      return av;
+    }
 
     @Override
-    public AnnotationVisitor visitTryCatchAnnotation(int typeRef, TypePath typePath, String descriptor, boolean visible) {
-      AnnotationRecorder av = new AnnotationRecorder(api,
-          description + " annotation: " + descriptor, typeRef, typePath);
+    public AnnotationVisitor visitTryCatchAnnotation(
+        int typeRef, TypePath typePath, String descriptor, boolean visible) {
+      AnnotationRecorder av =
+          new AnnotationRecorder(
+              api, description + " annotation: " + descriptor, typeRef, typePath);
       xanns.put(descriptor, av);
       return av;
     }
@@ -405,19 +453,17 @@ public class AnnotationVerifier {
     // MethodVisitor methods:
     @Override
     public AnnotationVisitor visitAnnotationDefault() {
-      AnnotationRecorder dr = new AnnotationRecorder(api,
-          description + " default annotation");
+      AnnotationRecorder dr = new AnnotationRecorder(api, description + " default annotation");
       danns.add(dr);
       return dr;
     }
 
     @Override
-    public AnnotationVisitor visitParameterAnnotation(int parameter, String descriptor, boolean visible) {
-      ParameterDescription pd =
-          new ParameterDescription(parameter, descriptor, visible);
+    public AnnotationVisitor visitParameterAnnotation(
+        int parameter, String descriptor, boolean visible) {
+      ParameterDescription pd = new ParameterDescription(parameter, descriptor, visible);
       AnnotationRecorder pr =
-          new AnnotationRecorder(api, description +
-              " parameter annotation: " + pd);
+          new AnnotationRecorder(api, description + " parameter annotation: " + pd);
       panns.put(pd, pr);
       return pr;
     }
@@ -434,14 +480,19 @@ public class AnnotationVerifier {
       Set<AnnotationRecorder> unresolvedQuestionableAnns =
           new HashSet<AnnotationRecorder>(questionableAnns.values());
 
-      for (Map.Entry<String, AnnotationRecorder> entry :
-          correctAnns.entrySet()) {
+      for (Map.Entry<String, AnnotationRecorder> entry : correctAnns.entrySet()) {
         String name = entry.getKey();
         AnnotationRecorder correctAnn = entry.getValue();
         AnnotationRecorder questionableAnn = questionableAnns.get(name);
         if (questionableAnn == null) {
-          throw new AnnotationMismatchException("{" + description + "}" +
-              "\n  does not contain expected annotation:\n  " + "{" + correctAnn + "}");
+          throw new AnnotationMismatchException(
+              "{"
+                  + description
+                  + "}"
+                  + "\n  does not contain expected annotation:\n  "
+                  + "{"
+                  + correctAnn
+                  + "}");
         }
 
         questionableAnn.verifyAgainst(correctAnn);
@@ -450,14 +501,22 @@ public class AnnotationVerifier {
       }
 
       for (AnnotationRecorder unexpectedAnnOnThis : unresolvedQuestionableAnns) {
-        throw new AnnotationMismatchException("{" + description + "}" +
-            "\n  contains unexpected annotation:\n  " + "{" + unexpectedAnnOnThis + "}");
+        throw new AnnotationMismatchException(
+            "{"
+                + description
+                + "}"
+                + "\n  contains unexpected annotation:\n  "
+                + "{"
+                + unexpectedAnnOnThis
+                + "}");
       }
     }
 
+    @Override
     public String toString() {
       return description;
     }
+
     public String prettyPrint() {
       StringBuilder sb = new StringBuilder();
       prettyPrint(sb, "");
@@ -473,14 +532,14 @@ public class AnnotationVerifier {
       lines.add("description: " + description);
       lines.add("  name: " + name);
       lines.add("  signature: " + signature);
-      if (! anns.isEmpty()) {
+      if (!anns.isEmpty()) {
         lines.add("  anns:");
         for (Map.Entry<String, AnnotationRecorder> e : anns.entrySet()) {
           // in the future, maybe get a fuller description
           lines.add("    " + e.getKey() + ": " + e.getValue().description);
         }
       }
-      if (! xanns.isEmpty()) {
+      if (!xanns.isEmpty()) {
         lines.add("  xanns:");
         for (Map.Entry<String, AnnotationRecorder> e : xanns.entrySet()) {
           // in the future, maybe get a fuller description
@@ -506,12 +565,8 @@ public class AnnotationVerifier {
     private Map<String, AnnotationRecorder> anns;
     private Map<String, AnnotationRecorder> xanns;
 
-    // method specific annotations
-    private Set<AnnotationRecorder> danns; // default annotations
-    private Map<ParameterDescription, AnnotationRecorder> panns; // parameter annotations
-
     public FieldRecorder(int api) {
-      this(api, "class: ","","");
+      this(api, "class: ", "", "");
     }
 
     public FieldRecorder(int api, String internalDescription, String name, String signature) {
@@ -522,16 +577,15 @@ public class AnnotationVerifier {
 
       anns = new HashMap<>();
       xanns = new HashMap<>();
-
-      danns = new HashSet<>();
-      panns = new HashMap<>();
     }
 
     @Override
-    public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String descriptor, boolean visible) {
-      AnnotationRecorder av = new AnnotationRecorder(api,
-          description + " annotation: " + descriptor, typeRef, typePath);
-      xanns.put(descriptor,av);
+    public AnnotationVisitor visitTypeAnnotation(
+        int typeRef, TypePath typePath, String descriptor, boolean visible) {
+      AnnotationRecorder av =
+          new AnnotationRecorder(
+              api, description + " annotation: " + descriptor, typeRef, typePath);
+      xanns.put(descriptor, av);
       return av;
     }
 
@@ -547,14 +601,19 @@ public class AnnotationVerifier {
       Set<AnnotationRecorder> unresolvedQuestionableAnns =
           new HashSet<AnnotationRecorder>(questionableAnns.values());
 
-      for (Map.Entry<String, AnnotationRecorder> entry :
-          correctAnns.entrySet()) {
+      for (Map.Entry<String, AnnotationRecorder> entry : correctAnns.entrySet()) {
         String name = entry.getKey();
         AnnotationRecorder correctAnn = entry.getValue();
         AnnotationRecorder questionableAnn = questionableAnns.get(name);
         if (questionableAnn == null) {
-          throw new AnnotationMismatchException("{" + description + "}" +
-              "\n  does not contain expected annotation:\n  " + "{" + correctAnn + "}");
+          throw new AnnotationMismatchException(
+              "{"
+                  + description
+                  + "}"
+                  + "\n  does not contain expected annotation:\n  "
+                  + "{"
+                  + correctAnn
+                  + "}");
         }
 
         questionableAnn.verifyAgainst(correctAnn);
@@ -563,11 +622,18 @@ public class AnnotationVerifier {
       }
 
       for (AnnotationRecorder unexpectedAnnOnThis : unresolvedQuestionableAnns) {
-        throw new AnnotationMismatchException("{" + description + "}" +
-            "\n  contains unexpected annotation:\n  " + "{" + unexpectedAnnOnThis + "}");
+        throw new AnnotationMismatchException(
+            "{"
+                + description
+                + "}"
+                + "\n  contains unexpected annotation:\n  "
+                + "{"
+                + unexpectedAnnOnThis
+                + "}");
       }
     }
 
+    @Override
     public String toString() {
       return description;
     }
@@ -587,14 +653,14 @@ public class AnnotationVerifier {
       lines.add("description: " + description);
       lines.add("  name: " + name);
       lines.add("  signature: " + signature);
-      if (! anns.isEmpty()) {
+      if (!anns.isEmpty()) {
         lines.add("  anns:");
         for (Map.Entry<String, AnnotationRecorder> e : anns.entrySet()) {
           // in the future, maybe get a fuller description
           lines.add("    " + e.getKey() + ": " + e.getValue().description);
         }
       }
-      if (! xanns.isEmpty()) {
+      if (!xanns.isEmpty()) {
         lines.add("  xanns:");
         for (Map.Entry<String, AnnotationRecorder> e : xanns.entrySet()) {
           // in the future, maybe get a fuller description
@@ -609,10 +675,8 @@ public class AnnotationVerifier {
     }
   }
 
-
   /**
-   * An AnnotationRecorder is an TypeAnnotationVisitor that records all the
-   * information it visits.
+   * An AnnotationRecorder is an TypeAnnotationVisitor that records all the information it visits.
    */
   private class AnnotationRecorder extends AnnotationVisitor {
     private String description;
@@ -641,13 +705,21 @@ public class AnnotationVerifier {
       this(api, description, null, null);
     }
 
-    // Note: typeRef is an Integer so we can use it to determine whether the annotation is a type annotation. We can't
+    // Note: typeRef is an Integer so we can use it to determine whether the annotation is a type
+    // annotation. We can't
     //       use TypePath as a TypePath can be null for a type annotation.
     public AnnotationRecorder(int api, String description, Integer typeRef, TypePath typePath) {
       this(api, description, typeRef, typePath, null, null, null);
     }
 
-    public AnnotationRecorder(int api, String description, Integer typeRef, TypePath typePath, Label[] start, Label[] end, int[] index) {
+    public AnnotationRecorder(
+        int api,
+        String description,
+        Integer typeRef,
+        TypePath typePath,
+        Label[] start,
+        Label[] end,
+        int[] index) {
       super(api);
       this.description = description;
       fieldArgsName = new ArrayList<String>();
@@ -675,11 +747,13 @@ public class AnnotationVerifier {
       }
     }
 
+    @Override
     public void visit(String name, Object value) {
       fieldArgsName.add(name);
       fieldArgsValue.add(value);
     }
 
+    @Override
     public AnnotationVisitor visitAnnotation(String name, String descriptor) {
       innerAnnotationArgsName.add(name);
       innerAnnotationArgsDesc.add(descriptor);
@@ -689,6 +763,7 @@ public class AnnotationVerifier {
       return av;
     }
 
+    @Override
     public AnnotationVisitor visitArray(String name) {
       arrayArgs.add(name);
       AnnotationRecorder av = new AnnotationRecorder(api, description + name);
@@ -696,29 +771,29 @@ public class AnnotationVerifier {
       return av;
     }
 
-    public void visitEnd() {
-    }
+    @Override
+    public void visitEnd() {}
 
+    @Override
     public void visitEnum(String name, String descriptor, String value) {
       enumArgsName.add(name);
       enumArgsDesc.add(descriptor);
       enumArgsValue.add(value);
     }
 
+    @Override
     public String toString() {
       return description;
     }
 
     /**
-     * Checks that the information passed into this matches the information
-     * passed into another AnnotationRecorder.  For right now, the order in
-     * which information is passed in does matter.  If there is a conflict in
-     * information, an exception will be thrown.
+     * Checks that the information passed into this matches the information passed into another
+     * AnnotationRecorder. For right now, the order in which information is passed in does matter.
+     * If there is a conflict in information, an exception will be thrown.
      *
-     * @param ar an annotation recorder that has visited the correct information
-     *  this should visit
-     * @throws AnnotationMismatchException if the information visited by this
-     *  does not match the information in ar
+     * @param ar an annotation recorder that has visited the correct information this should visit
+     * @throws AnnotationMismatchException if the information visited by this does not match the
+     *     information in ar
      */
     public void verifyAgainst(AnnotationRecorder ar) {
       StringBuilder sb = new StringBuilder();
@@ -729,16 +804,20 @@ public class AnnotationVerifier {
       verifyList(sb, "visitEnum()", 2, this.enumArgsDesc, ar.enumArgsDesc);
       verifyList(sb, "visitEnum()", 3, this.enumArgsValue, ar.enumArgsValue);
 
-      verifyList(sb, "visitAnnotation()", 1, this.innerAnnotationArgsName, ar.innerAnnotationArgsName);
-      verifyList(sb, "visitAnnotation()", 2, this.innerAnnotationArgsDesc, ar.innerAnnotationArgsDesc);
+      verifyList(
+          sb, "visitAnnotation()", 1, this.innerAnnotationArgsName, ar.innerAnnotationArgsName);
+      verifyList(
+          sb, "visitAnnotation()", 2, this.innerAnnotationArgsDesc, ar.innerAnnotationArgsDesc);
 
       verifyList(sb, "visitArray()", 1, this.arrayArgs, ar.arrayArgs);
 
-
-      if (this.typeReference != ar.typeReference && this.typeReference.getValue() != ar.typeReference.getValue()) {
-        printError(sb, "<one of the type annotation methods>", 1, this.typeReference, ar.typeReference);
+      if (this.typeReference != ar.typeReference
+          && this.typeReference.getValue() != ar.typeReference.getValue()) {
+        printError(
+            sb, "<one of the type annotation methods>", 1, this.typeReference, ar.typeReference);
       }
-      if (this.typePath != ar.typePath && !this.typePath.toString().equals(ar.typePath.toString())) {
+      if (this.typePath != ar.typePath
+          && !this.typePath.toString().equals(ar.typePath.toString())) {
         printError(sb, "<one of the type annotation methods>", 2, this.typePath, ar.typePath);
       }
 
@@ -753,8 +832,8 @@ public class AnnotationVerifier {
       }
       verifyArray(sb, "<one of the type annotation methods>", 5, thisIndexArray, arIndexArray);
 
-      verifyInnerAnnotationRecorder(sb, this.innerAnnotationMap, ar.innerAnnotationMap);
-      verifyInnerAnnotationRecorder(sb, this.arrayMap, ar.arrayMap);
+      verifyInnerAnnotationRecorder(this.innerAnnotationMap, ar.innerAnnotationMap);
+      verifyInnerAnnotationRecorder(this.arrayMap, ar.arrayMap);
 
       if (sb.length() > 0) {
         throw new AnnotationMismatchException(sb.toString());
@@ -762,11 +841,7 @@ public class AnnotationVerifier {
     }
 
     private <T> void verifyArray(
-        StringBuilder sb,
-        String methodName,
-        int parameter,
-        T[] questionable,
-        T[] correct) {
+        StringBuilder sb, String methodName, int parameter, T[] questionable, T[] correct) {
       if (questionable == correct) {
         return;
       }
@@ -779,11 +854,7 @@ public class AnnotationVerifier {
     }
 
     private <T> void verifyList(
-        StringBuilder sb,
-        String methodName,
-        int parameter,
-        List<T> questionable,
-        List<T> correct) {
+        StringBuilder sb, String methodName, int parameter, List<T> questionable, List<T> correct) {
       if (questionable == correct) {
         return;
       }
@@ -798,8 +869,8 @@ public class AnnotationVerifier {
       // new Error("The backtrace:").printStackTrace();
     }
 
-
-    private void printError(StringBuilder sb, String methodName, int parameter, Object questionable, Object correct) {
+    private void printError(
+        StringBuilder sb, String methodName, int parameter, Object questionable, Object correct) {
       sb.append(lineSep);
       sb.append(methodName);
       sb.append(" was called with unexpected information in parameter: ");
@@ -808,35 +879,32 @@ public class AnnotationVerifier {
       sb.append("Description: ");
       sb.append(description);
       sb.append(lineSep);
-      sb.append(String.format("Received (%s): %s%n",
-          questionable == null ? null : questionable.getClass(), questionable));
-      sb.append(String.format("Expected (%s): %s%n",
-          correct == null ? null : correct.getClass(), correct));
+      sb.append(
+          String.format(
+              "Received (%s): %s%n",
+              questionable == null ? null : questionable.getClass(), questionable));
+      sb.append(
+          String.format(
+              "Expected (%s): %s%n", correct == null ? null : correct.getClass(), correct));
     }
 
+    @SuppressWarnings("CollectionIncompatibleType") // TODO!!
     private void verifyInnerAnnotationRecorder(
-        StringBuilder sb,
-        Map<String, AnnotationRecorder> questionableAR,
-        Map<String, AnnotationRecorder> correctAR) {
+        Map<String, AnnotationRecorder> questionableAR, Map<String, AnnotationRecorder> correctAR) {
       // checks on arguments passed in to the methods that created these
       // AnnotationRecorders (i.e. the checks on the String keys on these maps)
       // ensure that these have identical keys
-      for (Map.Entry<String, AnnotationRecorder> questionableEntry :
-        questionableAR.entrySet()) {
-        questionableEntry.getValue().verifyAgainst(
-            correctAR.get(questionableEntry.getClass()));
+      for (Map.Entry<String, AnnotationRecorder> questionableEntry : questionableAR.entrySet()) {
+        questionableEntry.getValue().verifyAgainst(correctAR.get(questionableEntry.getClass()));
       }
     }
-
-
   }
 
   /**
-   * A ParameterDescription is a convenient class used to keep information about
-   * method parameters.  Parameters are equal if they have the same index,
-   * regardless of their description.
+   * A ParameterDescription is a convenient class used to keep information about method parameters.
+   * Parameters are equal if they have the same index, regardless of their description.
    */
-  private class ParameterDescription {
+  private static class ParameterDescription {
     public final int parameter;
     public final String descriptor;
     public final boolean visible;
@@ -847,6 +915,7 @@ public class AnnotationVerifier {
       this.visible = visible;
     }
 
+    @Override
     public boolean equals(@Nullable Object o) {
       if (o instanceof ParameterDescription) {
         ParameterDescription p = (ParameterDescription) o;
@@ -855,24 +924,27 @@ public class AnnotationVerifier {
       return false;
     }
 
+    @Override
     public int hashCode() {
       return parameter * 17;
     }
 
+    @Override
     public String toString() {
-      return
-        "parameter index: " + parameter +
-        " descriptor: " + descriptor +
-        " visible: " + visible;
+      return "parameter index: "
+          + parameter
+          + " descriptor: "
+          + descriptor
+          + " visible: "
+          + visible;
     }
   }
 
   /**
-   * An AnnotationMismatchException is an Exception that indicates that
-   * two versions of the same class do not have the same annotations on
-   * either the class, its field, or its methods.
+   * An AnnotationMismatchException is an Exception that indicates that two versions of the same
+   * class do not have the same annotations on either the class, its field, or its methods.
    */
-  public class AnnotationMismatchException extends RuntimeException {
+  public static class AnnotationMismatchException extends RuntimeException {
     private static final long serialVersionUID = 20060714L; // today's date
 
     /**

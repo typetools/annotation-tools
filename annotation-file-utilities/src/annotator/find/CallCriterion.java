@@ -1,10 +1,9 @@
 package annotator.find;
 
-import scenelib.annotations.el.RelativeLocation;
 import annotator.scanner.MethodCallScanner;
-
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
+import scenelib.annotations.el.RelativeLocation;
 
 public class CallCriterion implements Criterion {
   private final String methodName;
@@ -36,8 +35,7 @@ public class CallCriterion implements Criterion {
       int indexInSource = MethodCallScanner.indexOfMethodCallTree(path, leaf);
       boolean b;
       if (loc.isBytecodeOffset()) {
-        int indexInClass =
-            MethodCallScanner.getMethodCallIndex(methodName, loc.offset);
+        int indexInClass = MethodCallScanner.getMethodCallIndex(methodName, loc.offset);
         b = (indexInSource == indexInClass);
       } else {
         b = (indexInSource == loc.index);
@@ -47,6 +45,13 @@ public class CallCriterion implements Criterion {
       boolean b = this.isSatisfiedBy(path.getParentPath());
       return b;
     }
+  }
+
+  @Override
+  public boolean isOnlyTypeAnnotationCriterion() {
+    // This can probably return true?  No annotations go on it directly,
+    // so rely on some other Criterion in the Criteria to return true.
+    return false;
   }
 
   @Override
