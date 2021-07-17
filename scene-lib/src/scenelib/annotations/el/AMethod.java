@@ -195,12 +195,12 @@ public class AMethod extends ADeclaration {
    * @return an AField representing the expression
    */
   public AField vivifyAndAddTypeMirrorToPrecondition(String expression, TypeMirror type) {
-      AField result = preconditions.getVivify(expression);
-      result.setName(expression);
-      if (result.getTypeMirror() == null) {
-          result.setTypeMirror(type);
-      }
-      return result;
+    AField result = preconditions.getVivify(expression);
+    result.setName(expression);
+    if (result.getTypeMirror() == null) {
+      result.setTypeMirror(type);
+    }
+    return result;
   }
 
   // TODO: `type` is ignored if information is already present.  Is that desirable??
@@ -213,12 +213,12 @@ public class AMethod extends ADeclaration {
    * @return an AField representing the expression
    */
   public AField vivifyAndAddTypeMirrorToPostcondition(String expression, TypeMirror type) {
-      AField result = postconditions.getVivify(expression);
-      result.setName(expression);
-      if (result.getTypeMirror() == null) {
-          result.setTypeMirror(type);
-      }
-      return result;
+    AField result = postconditions.getVivify(expression);
+    result.setName(expression);
+    if (result.getTypeMirror() == null) {
+      result.setTypeMirror(type);
+    }
+    return result;
   }
 
   /**
