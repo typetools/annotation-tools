@@ -45,19 +45,19 @@ public class AMethod extends ADeclaration {
   public final VivifyingMap<TypeIndexLocation, ATypeElement> throwsException =
       ATypeElement.<TypeIndexLocation>newVivifyingLHMap_ATE();
 
-  /** Types of expressions at entry to the method. */
-  // TODO: Later, when the code handles preconditions beyond fields of `this`,
-  // the map key will probably became the string representation of the expression.
+  /**
+   * Types of expressions at entry to the method. The map key is the string representation of the
+   * expression.
+   */
   // TODO: The map value type should probably be ATypeElement instead.
-  public final VivifyingMap<VariableElement, AField> preconditions =
-      AField.<VariableElement>newVivifyingLHMap_AF();
+  public final VivifyingMap<String, AField> preconditions = AField.newVivifyingLHMap_AF();
 
-  /** Types of expressions at exit from the method. */
-  // TODO: Later, when the code handles preconditions beyond fields of `this`,
-  // the map key will probably became the string representation of the expression.
+  /**
+   * Types of expressions at exit from the method. The map key is the string representation of the
+   * expression.
+   */
   // TODO: The map value type should probably be ATypeElement instead.
-  public final VivifyingMap<VariableElement, AField> postconditions =
-      AField.<VariableElement>newVivifyingLHMap_AF();
+  public final VivifyingMap<String, AField> postconditions = AField.newVivifyingLHMap_AF();
 
   /**
    * Clients set this before printing the AMethod.
@@ -194,13 +194,13 @@ public class AMethod extends ADeclaration {
    * Obtain information about an expression at method entry. It can be further operated on to e.g.
    * add a type annotation.
    *
-   * @param varElt the field
+   * @param expression the expression
    * @param type the type of the expression
    * @return an AField representing the expression
    */
-  public AField vivifyAndAddTypeMirrorToPrecondition(VariableElement varElt, TypeMirror type) {
-    AField result = preconditions.getVivify(varElt);
-    result.setName(varElt.toString());
+  public AField vivifyAndAddTypeMirrorToPrecondition(String expression, TypeMirror type) {
+    AField result = preconditions.getVivify(expression);
+    result.setName(expression);
     if (result.getTypeMirror() == null) {
       result.setTypeMirror(type);
     }
@@ -212,13 +212,13 @@ public class AMethod extends ADeclaration {
    * Obtain information about an expression at method exit. It can be further operated on to e.g.
    * add a type annotation.
    *
-   * @param varElt the field
+   * @param expression the expression
    * @param type the type of the expression
    * @return an AField representing the expression
    */
-  public AField vivifyAndAddTypeMirrorToPostcondition(VariableElement varElt, TypeMirror type) {
-    AField result = postconditions.getVivify(varElt);
-    result.setName(varElt.toString());
+  public AField vivifyAndAddTypeMirrorToPostcondition(String expression, TypeMirror type) {
+    AField result = postconditions.getVivify(expression);
+    result.setName(expression);
     if (result.getTypeMirror() == null) {
       result.setTypeMirror(type);
     }
@@ -265,7 +265,7 @@ public class AMethod extends ADeclaration {
    *
    * @return an immutable copy of the vivified preconditions
    */
-  public Map<VariableElement, AField> getPreconditions() {
+  public Map<String, AField> getPreconditions() {
     return ImmutableMap.copyOf(preconditions);
   }
 
@@ -274,7 +274,7 @@ public class AMethod extends ADeclaration {
    *
    * @return an immutable copy of the vivified postconditions
    */
-  public Map<VariableElement, AField> getPostconditions() {
+  public Map<String, AField> getPostconditions() {
     return ImmutableMap.copyOf(postconditions);
   }
 
