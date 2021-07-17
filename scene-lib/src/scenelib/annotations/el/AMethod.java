@@ -45,15 +45,15 @@ public class AMethod extends ADeclaration {
   public final VivifyingMap<TypeIndexLocation, ATypeElement> throwsException =
       ATypeElement.<TypeIndexLocation>newVivifyingLHMap_ATE();
 
-    /** Types of expressions at entry to the method. */
-    // TODO: The map value type should probably be ATypeElement instead.
-    public final VivifyingMap<String, AField> preconditions =
-            AField.newVivifyingLHMap_AF();
+  /** Types of expressions at entry to the method. */
+  // TODO: The map value type should probably be ATypeElement instead.
+  public final VivifyingMap<String, AField> preconditions =
+      AField.newVivifyingLHMap_AF();
 
-    /** Types of expressions at exit from the method. */
-    // TODO: The map value type should probably be ATypeElement instead.
-    public final VivifyingMap<String, AField> postconditions =
-            AField.newVivifyingLHMap_AF();
+  /** Types of expressions at exit from the method. */
+  // TODO: The map value type should probably be ATypeElement instead.
+  public final VivifyingMap<String, AField> postconditions =
+      AField.newVivifyingLHMap_AF();
 
   /**
    * Clients set this before printing the AMethod.
