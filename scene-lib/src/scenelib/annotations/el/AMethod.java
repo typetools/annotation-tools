@@ -47,13 +47,11 @@ public class AMethod extends ADeclaration {
 
   /** Types of expressions at entry to the method. */
   // TODO: The map value type should probably be ATypeElement instead.
-  public final VivifyingMap<String, AField> preconditions =
-      AField.newVivifyingLHMap_AF();
+  public final VivifyingMap<String, AField> preconditions = AField.newVivifyingLHMap_AF();
 
   /** Types of expressions at exit from the method. */
   // TODO: The map value type should probably be ATypeElement instead.
-  public final VivifyingMap<String, AField> postconditions =
-      AField.newVivifyingLHMap_AF();
+  public final VivifyingMap<String, AField> postconditions = AField.newVivifyingLHMap_AF();
 
   /**
    * Clients set this before printing the AMethod.
@@ -187,8 +185,8 @@ public class AMethod extends ADeclaration {
   }
 
   /**
-   * Obtain information about an expression at method entry.
-   * It can be further operated on to e.g. add a type annotation.
+   * Obtain information about an expression at method entry. It can be further operated on to e.g.
+   * add a type annotation.
    *
    * @param expression the expression
    * @param type the type of the expression
@@ -205,8 +203,8 @@ public class AMethod extends ADeclaration {
 
   // TODO: `type` is ignored if information is already present.  Is that desirable??
   /**
-   * Obtain information about an expression at method exit.
-   * It can be further operated on to e.g. add a type annotation.
+   * Obtain information about an expression at method exit. It can be further operated on to e.g.
+   * add a type annotation.
    *
    * @param expression the expression
    * @param type the type of the expression
