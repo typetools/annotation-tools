@@ -71,7 +71,7 @@ dependencies {
     }
     implementation 'org.plumelib:options:1.0.5'
     implementation 'org.plumelib:plume-util:1.5.5'
-    implementation 'org.plumelib:reflection-util:1.0.3'
+    implementation 'org.plumelib:reflection-util:1.0.4'
     // Annotations in checker-qual.jar are used, but no checkers are (currently) run on the code.
     compileOnly 'org.checkerframework:checker-qual:3.16.0'
     implementation 'com.google.errorprone:error_prone_annotations:2.7.1'
