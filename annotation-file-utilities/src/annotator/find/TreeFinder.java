@@ -807,7 +807,9 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       } else {
         assert false
             : "Unexpected child selector in AST path: "
-                + (childSelector == null ? "null" : "\"" + childSelector + "\"");
+                + (childSelector == null
+                    ? "null"
+                    : String.format("[%s] \"%s\"", childSelector.getClass(), childSelector));
         return null;
       }
     }
@@ -1267,7 +1269,10 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       }
 
       if (pos != null) {
-        assert pos >= 0 : String.format("pos: %s%nnode: %s%ninsertion: %s%n", pos, node, i);
+        assert pos >= 0
+            : String.format(
+                "pos: %s%nnode: %s%ninsertion: %s%n",
+                pos, node == null ? "null" : String.format("[%s] %s", node.getClass(), node), i);
         astInsertions.put(insertRecord, i);
       }
       return pos;
