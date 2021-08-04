@@ -84,7 +84,7 @@ dependencies {
     testImplementation group: 'junit', name: 'junit', version: '4.13.2'
     testImplementation 'org.checkerframework:checker-qual:3.16.0'
 
-    errorprone("com.google.errorprone:error_prone_core:2.8.0")
+    errorprone("com.google.errorprone:error_prone_core:2.8.1")
 }
 
 
