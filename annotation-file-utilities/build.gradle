@@ -15,8 +15,7 @@ apply plugin: 'java'
 apply plugin: 'com.github.johnrengelman.shadow'
 
 group 'org.checkerframework'
-// TODO: Use this in the release process.
-version '3.17.0'
+version '3.18.0'
 
 sourceCompatibility = 1.8
 
