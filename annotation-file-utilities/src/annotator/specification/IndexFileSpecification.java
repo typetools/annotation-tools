@@ -26,6 +26,7 @@ import org.checkerframework.checker.signature.qual.ClassGetName;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
+import org.plumelib.reflection.ReflectionPlume;
 import org.plumelib.util.FileIOException;
 import org.plumelib.util.Pair;
 import scenelib.annotations.Annotation;
@@ -216,6 +217,9 @@ public class IndexFileSpecification {
         // https://github.com/typetools/annotation-tools/issues/34 .)
         System.out.println(
             "Warning: IndexFileSpecification did not find classfile for: " + className);
+        System.out.println("The classpath is:");
+        System.out.println(ReflectionPlume.classpathToString());
+        // org.plumelib.util.SystemPlume.sleep(100);
         // throw new RuntimeException("IndexFileSpecification.parseClass", e);
       } catch (RuntimeException e) {
         System.err.println("IndexFileSpecification had a problem reading class: " + className);
