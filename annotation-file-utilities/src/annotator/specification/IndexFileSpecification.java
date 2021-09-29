@@ -216,7 +216,7 @@ public class IndexFileSpecification {
         // https://github.com/typetools/annotation-tools/issues/34 .)
         System.out.println(
             "Warning: IndexFileSpecification did not find classfile for: " + className);
-        // throw new RuntimeException("IndexFileSpecification.parseClass: " + e);
+        // throw new RuntimeException("IndexFileSpecification.parseClass", e);
       } catch (RuntimeException e) {
         System.err.println("IndexFileSpecification had a problem reading class: " + className);
         throw e;
