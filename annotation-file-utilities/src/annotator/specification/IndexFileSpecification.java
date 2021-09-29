@@ -15,7 +15,9 @@ import annotator.scanner.MethodOffsetClassVisitor;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import com.sun.source.tree.Tree;
+import io.github.classgraph.ClassGraph;
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -216,7 +218,11 @@ public class IndexFileSpecification {
         // https://github.com/typetools/annotation-tools/issues/34 .)
         System.out.println(
             "Warning: IndexFileSpecification did not find classfile for: " + className);
-        // throw new RuntimeException("IndexFileSpecification.parseClass: " + e);
+        System.out.println("The classpath is:");
+        for (URI uri : new ClassGraph().getClasspathURIs()) {
+          System.out.println("  " + uri);
+        }
+        // throw new RuntimeException("IndexFileSpecification.parseClass", e);
       } catch (RuntimeException e) {
         System.err.println("IndexFileSpecification had a problem reading class: " + className);
         throw e;
