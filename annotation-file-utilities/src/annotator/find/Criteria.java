@@ -38,6 +38,18 @@ public final class Criteria {
    * @param c the criterion to add
    */
   public void add(Criterion c) {
+    Criterion old = criteria.put(c.getKind(), c);
+    if (old != null && !c.toString().equals(old.toString())) {
+      throw new Error("Overwrote " + c.getKind() + " => " + old + "; new = " + c);
+    }
+  }
+
+  /**
+   * Add a {@code Criterion} to this {@code Criteria}, permitting replacement.
+   *
+   * @param c the criterion to add
+   */
+  /*package-protected*/ void addPermitReplacement(Criterion c) {
     criteria.put(c.getKind(), c);
   }
 
