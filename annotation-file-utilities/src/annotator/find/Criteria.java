@@ -24,6 +24,7 @@ public final class Criteria {
   /** Debugging logger. */
   public static DebugWriter dbug = new DebugWriter(false);
 
+  // NOTE: This does not permit multiple criteria of a given kind.
   /** The set of criterion objects, indexed by kind. */
   private final Map<Criterion.Kind, Criterion> criteria;
 
@@ -121,13 +122,7 @@ public final class Criteria {
    * @return true iff this is the criteria on a receiver
    */
   public boolean isOnReceiver() {
-    for (Criterion c : criteria.values()) {
-      if (c.getKind() == Criterion.Kind.RECEIVER) {
-        return true;
-      }
-    }
-
-    return false;
+    return criteria.containsKey(Criterion.Kind.RECEIVER);
   }
 
   /**
@@ -136,13 +131,7 @@ public final class Criteria {
    * @return true iff this is the criteria on a package
    */
   public boolean isOnPackage() {
-    for (Criterion c : criteria.values()) {
-      if (c.getKind() == Criterion.Kind.PACKAGE) {
-        return true;
-      }
-    }
-
-    return false;
+    return criteria.containsKey(Criterion.Kind.PACKAGE);
   }
 
   /**
@@ -151,13 +140,7 @@ public final class Criteria {
    * @return true iff this is the criteria on a return type
    */
   public boolean isOnReturnType() {
-    for (Criterion c : criteria.values()) {
-      if (c.getKind() == Criterion.Kind.RETURN_TYPE) {
-        return true;
-      }
-    }
-
-    return false;
+    return criteria.containsKey(Criterion.Kind.RETURN_TYPE);
   }
 
   /**
@@ -166,33 +149,25 @@ public final class Criteria {
    * @return true iff this is the criteria on a local variable
    */
   public boolean isOnLocalVariable() {
-    for (Criterion c : criteria.values()) {
-      if (c.getKind() == Criterion.Kind.LOCAL_VARIABLE) {
-        return true;
-      }
-    }
-
-    return false;
+    return criteria.containsKey(Criterion.Kind.LOCAL_VARIABLE);
   }
 
-  /** Determines whether this is the criteria on the RHS of an occurrence of 'instanceof'. */
+  /**
+   * Determines whether this is the criteria on the RHS of an occurrence of 'instanceof'.
+   *
+   * @return true if this is the criteria on the RHS of an occurrence of 'instanceof'
+   */
   public boolean isOnInstanceof() {
-    for (Criterion c : criteria.values()) {
-      if (c.getKind() == Criterion.Kind.INSTANCE_OF) {
-        return true;
-      }
-    }
-    return false;
+    return criteria.containsKey(Criterion.Kind.INSTANCE_OF);
   }
 
-  /** Determines whether this is the criteria on an object initializer. */
+  /**
+   * Determines whether this is the criteria on an object initializer.
+   *
+   * @return true if this is the criteria on an object initializer
+   */
   public boolean isOnNew() {
-    for (Criterion c : criteria.values()) {
-      if (c.getKind() == Criterion.Kind.NEW) {
-        return true;
-      }
-    }
-    return false;
+    return criteria.containsKey(Criterion.Kind.NEW);
   }
 
   /** Determines whether this is the criteria on a class {@code extends} bound. */
@@ -205,16 +180,15 @@ public final class Criteria {
     return false;
   }
 
-  /** Returns true if this Criteria is on the given method. */
+  /**
+   * Returns true if this Criteria is on the given method.
+   *
+   * @param methodname the name of a method
+   * @return true if this Criteria is on the given method
+   */
   public boolean isOnMethod(String methodname) {
-    for (Criterion c : criteria.values()) {
-      if (c.getKind() == Criterion.Kind.IN_METHOD) {
-        if (((InMethodCriterion) c).name.equals(methodname)) {
-          return true;
-        }
-      }
-    }
-    return false;
+    Criterion c = criteria.get(Criterion.Kind.IN_METHOD);
+    return c != null && ((InMethodCriterion) c).name.equals(methodname);
   }
 
   /** Returns true if this Criteria is on a field declaration. */
