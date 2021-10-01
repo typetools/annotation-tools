@@ -345,8 +345,8 @@ public class Insertions implements Iterable<Insertion> {
                     loc.addAll(loc0);
                     loc.addAll(igalc.getLocation());
                     rec1 = extendToInnerType(rec0, loc, node);
-                    icriteria.add(new GenericArrayLocationCriterion());
-                    icriteria.add(new ASTPathCriterion(rec1.astPath));
+                    icriteria.addPermitReplacement(new GenericArrayLocationCriterion());
+                    icriteria.addPermitReplacement(new ASTPathCriterion(rec1.astPath));
                     inner.setInserted(false);
                     if (annotator.Main.temporaryDebug) {
                       System.out.printf(
@@ -770,8 +770,8 @@ public class Insertions implements Iterable<Insertion> {
         //        organized.add(ins);
         // outerInsertions.put(rec, (TypedInsertion) ins);
       } else {
-        criteria.add(new ASTPathCriterion(topLevelTypePath));
-        criteria.add(new GenericArrayLocationCriterion(tpes));
+        criteria.addPermitReplacement(new ASTPathCriterion(topLevelTypePath));
+        criteria.addPermitReplacement(new GenericArrayLocationCriterion(tpes));
         tins.getInnerTypeInsertions().add(ins);
       }
     }
