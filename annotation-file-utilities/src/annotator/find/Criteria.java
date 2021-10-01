@@ -24,7 +24,7 @@ public final class Criteria {
   /** Debugging logger. */
   public static DebugWriter dbug = new DebugWriter(false);
 
-  // NOTE: This does not permit multiple criteria of a given kind.  Is that a problem?
+  // NOTE: This does not permit multiple criteria of a given kind.
   /** The set of criterion objects, indexed by kind. */
   private final Map<Criterion.Kind, Criterion> criteria;
 
