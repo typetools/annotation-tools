@@ -140,12 +140,20 @@ public final class Criteria {
     return criteria.containsKey(Criterion.Kind.LOCAL_VARIABLE);
   }
 
-  /** Determines whether this is the criteria on the RHS of an occurrence of 'instanceof'. */
+  /**
+   * Determines whether this is the criteria on the RHS of an occurrence of 'instanceof'.
+   *
+   * @return true if this is the criteria on the RHS of an occurrence of 'instanceof'
+   */
   public boolean isOnInstanceof() {
     return criteria.containsKey(Criterion.Kind.INSTANCE_OF);
   }
 
-  /** Determines whether this is the criteria on an object initializer. */
+  /**
+   * Determines whether this is the criteria on an object initializer.
+   *
+   * @return true if this is the criteria on an object initializer
+   */
   public boolean isOnNew() {
     return criteria.containsKey(Criterion.Kind.NEW);
   }
@@ -160,7 +168,12 @@ public final class Criteria {
     return false;
   }
 
-  /** Returns true if this Criteria is on the given method. */
+  /**
+   * Returns true if this Criteria is on the given method.
+   *
+   * @param methodname the name of a method
+   * @return true if this Criteria is on the given method
+   */
   public boolean isOnMethod(String methodname) {
     Criterion c = criteria.get(Criterion.Kind.IN_METHOD);
     return c != null && ((InMethodCriterion) c).name.equals(methodname);
