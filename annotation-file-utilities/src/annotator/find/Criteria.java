@@ -80,6 +80,11 @@ public final class Criteria {
             c, c.getClass(), Main.leafString(path));
       }
     }
+
+    if (isSatisfiedByShouldReturnFalse(leaf)) {
+      return false;
+    }
+
     return true;
   }
 
@@ -99,7 +104,30 @@ public final class Criteria {
         dbug.debug("satisfied criterion: %s%n", c);
       }
     }
+
+    if (isSatisfiedByShouldReturnFalse(path.getLeaf())) {
+      return false;
+    }
+
     return true;
+  }
+
+  /**
+   * Returns true if isSatisfiedBy should return false.
+   *
+   * @param leaf the tree at the leaf of the path
+   * @return true if isSatisfiedBy should return false
+   */
+  private boolean isSatisfiedByShouldReturnFalse(Tree leaf) {
+    // A criterion for the constructor method matches a field declaration that has an
+    // initializer, since the initialization conceptually occurs in the constructor.
+
+    // Return true if this is a Criteria for a constructor (no deeper)
+    // and leaf is not the constructor.
+    return (criteria.size() == 2
+        && isOnMethod("<init>()V")
+        && criteria.containsKey(Criterion.Kind.IN_CLASS)
+        && leaf.getKind() != Tree.Kind.METHOD);
   }
 
   /**

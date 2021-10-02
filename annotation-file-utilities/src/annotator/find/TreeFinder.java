@@ -1027,15 +1027,15 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       if (i.isInserted()) {
         // Skip this insertion if it has already been inserted. See
         // the ReceiverInsertion class for details.
-        dbug.debug("  ... already inserted%n");
+        dbug.debug("  ... insertion already inserted%n");
         it.remove();
         continue;
       }
       if (!i.getCriteria().isSatisfiedBy(path, node)) {
-        dbug.debug("  ... not satisfied%n");
+        dbug.debug("  ... insertion not satisfied%n");
         continue;
       } else {
-        dbug.debug("  ... satisfied!%n");
+        dbug.debug("  ... insertion satisfied!%n");
         dbug.debug("    At tree: %s%n", Main.firstLine(node.toString()));
         dbug.debug("    Tree info: %s%n", node.getClass());
 
