@@ -1725,7 +1725,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     DeclaredType staticType = null;
     // For an inner class constructor, the receiver comes from the
     // superclass, so skip past the first type definition.
-    // In JDK 11, the constructor's return type is null; in JDK 16, the return type is void.
+    // In JDK 11, the constructor's return type is null; in JDK 17, the return type is void.
     boolean isCon = ((MethodTree) leaf).getName().contentEquals("<init>");
 
     boolean skip = isCon;

@@ -134,10 +134,10 @@ jobs:
     fetchDepth: 25
   - bash: ./annotation-file-utilities/dev-scripts/test-downstream.sh
     displayName: test-downstream.sh
-- job: build_without_test_jdk16
+- job: build_without_test_jdk17
   pool:
     vmImage: 'ubuntu-latest'
-  container: mdernst/cf-ubuntu-jdk16:latest
+  container: mdernst/cf-ubuntu-jdk17:latest
   dependsOn:
     - build_without_test_jdk11
     - test_jdk11
@@ -149,10 +149,10 @@ jobs:
     fetchDepth: 25
   - bash: ./.travis-build-without-test.sh
     displayName: .travis-build-without-test.sh
-- job: test_jdk16
+- job: test_jdk17
   pool:
     vmImage: 'ubuntu-latest'
-  container: mdernst/cf-ubuntu-jdk16:latest
+  container: mdernst/cf-ubuntu-jdk17:latest
   dependsOn:
     - build_without_test_jdk11
     - test_jdk11
@@ -164,10 +164,10 @@ jobs:
     fetchDepth: 25
   - bash: ./annotation-file-utilities/dev-scripts/test-allTests.sh
     displayName: test-allTests.sh
-- job: typecheck_jdk16
+- job: typecheck_jdk17
   pool:
     vmImage: 'ubuntu-latest'
-  container: mdernst/cf-ubuntu-jdk16:latest
+  container: mdernst/cf-ubuntu-jdk17:latest
   dependsOn:
     - build_without_test_jdk11
     - test_jdk11
@@ -179,10 +179,10 @@ jobs:
     fetchDepth: 25
   - bash: ./annotation-file-utilities/dev-scripts/test-typecheck.sh
     displayName: test-typecheck.sh
-- job: misc_jdk16
+- job: misc_jdk17
   pool:
     vmImage: 'ubuntu-latest'
-  container: mdernst/cf-ubuntu-jdk16-plus:latest
+  container: mdernst/cf-ubuntu-jdk17-plus:latest
   dependsOn:
     - build_without_test_jdk11
     - test_jdk11
@@ -194,10 +194,10 @@ jobs:
     fetchDepth: 25
   - bash: ./annotation-file-utilities/dev-scripts/test-misc.sh
     displayName: test-misc.sh
-- job: downstream_jdk16
+- job: downstream_jdk17
   pool:
     vmImage: 'ubuntu-latest'
-  container: mdernst/cf-ubuntu-jdk16:latest
+  container: mdernst/cf-ubuntu-jdk17:latest
   dependsOn:
     - build_without_test_jdk11
     - test_jdk11
