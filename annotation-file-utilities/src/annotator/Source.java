@@ -90,7 +90,9 @@ public final class Source {
       bytes.write(c);
     }
     in.close();
-    source.append(bytes.toString());
+    @SuppressWarnings("DefaultCharset") // JDK 8 version does not accept UTF_8 argument
+    String bytesString = bytes.toString();
+    source.append(bytesString);
     bytes.close();
     fileManager.close();
   }
