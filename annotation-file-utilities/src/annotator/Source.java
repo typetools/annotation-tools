@@ -90,7 +90,7 @@ public final class Source {
       bytes.write(c);
     }
     in.close();
-    source.append(bytes.toString());
+    source.append(bytes.toString(UTF_8));
     bytes.close();
     fileManager.close();
   }
