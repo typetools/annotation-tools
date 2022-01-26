@@ -89,7 +89,9 @@ dependencies {
 }
 
 tasks.withType(JavaCompile) { compilationTask ->
-  options.errorprone.enabled = !isJava8
+  if (compilationTask.name.startsWith('compileJava')) {
+    options.errorprone.enabled = !isJava8
+  }
 }
 
 compileJava {
