@@ -88,6 +88,9 @@ dependencies {
     errorprone("com.google.errorprone:error_prone_core:${errorproneVersion}")
 }
 
+tasks.withType(JavaCompile) { compilationTask ->
+  options.errorprone.enabled = !isJava8
+}
 
 compileJava {
     sourceCompatibility = 1.8
@@ -104,7 +107,6 @@ compileJava {
     ]
     options.encoding = 'UTF-8'
 
-    options.errorprone.enabled = !isJava8
     options.errorprone.disable(
         // Suggests using an ErrorProne-specific annotation
         "InlineMeSuggester",
