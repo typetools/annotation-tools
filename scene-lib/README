@@ -11,7 +11,7 @@ test/annotations/tests/classfile/cases/
 See file test/annotations/tests/classfile/AnnotationsTest.java for
 some documentation of the testing framework.
 
-TODO: there are currently two "golden" class files: the un-annoted file
+TODO: there are currently two "golden" class files: the un-annotated file
 and the expected output after inserting annotations.
 Additionally, we could compare:
 Unannotated .java --> javac --> .class --> AFU insert into .class --> .class
