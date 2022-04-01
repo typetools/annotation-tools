@@ -15,7 +15,7 @@ apply plugin: 'java'
 apply plugin: 'com.github.johnrengelman.shadow'
 
 group 'org.checkerframework'
-version '3.21.3'
+version '3.21.4'
 
 sourceCompatibility = 1.8
 
