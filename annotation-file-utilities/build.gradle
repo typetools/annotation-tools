@@ -15,7 +15,7 @@ apply plugin: 'java'
 apply plugin: 'com.github.johnrengelman.shadow'
 
 group 'org.checkerframework'
-version '3.22.1'
+version '3.23.0'
 
 sourceCompatibility = 1.8
 
@@ -83,7 +83,7 @@ dependencies {
     implementation 'org.ow2.asm:asm:9.3'
 
     testImplementation group: 'junit', name: 'junit', version: '4.13.2'
-    testImplementation 'org.checkerframework:checker-qual:3.22.1'
+    testImplementation 'org.checkerframework:checker-qual:3.22.2'
 
     errorprone("com.google.errorprone:error_prone_core:${errorproneVersion}")
 }
