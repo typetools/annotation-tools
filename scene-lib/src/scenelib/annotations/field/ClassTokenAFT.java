@@ -28,8 +28,9 @@ public final class ClassTokenAFT extends ScalarAFT {
   }
 
   @Override
-  public String format(Object o) {
-    return ((java.lang.Class<?>) o).getName() + ".class";
+  public void format(StringBuilder sb, Object o) {
+    sb.append(((java.lang.Class<?>) o).getName());
+    sb.append(".class");
   }
 
   @Override

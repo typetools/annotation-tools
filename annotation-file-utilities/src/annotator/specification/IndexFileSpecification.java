@@ -677,34 +677,49 @@ public class IndexFileSpecification {
     Set<Pair<String, Annotation>> result =
         new LinkedHashSet<Pair<String, Annotation>>(element.tlAnnotationsHere.size());
     for (Annotation a : element.tlAnnotationsHere) {
-      AnnotationDef adef = a.def;
-      String annotationString = "@" + adef.name;
+      StringBuilder sb = new StringBuilder();
+      sb.append("@");
+      sb.append(a.def.name);
 
-      if (a.fieldValues.size() == 1 && a.fieldValues.containsKey("value")) {
-        annotationString += "(" + formatFieldValue(a, "value") + ")";
-      } else if (a.fieldValues.size() > 0) {
-        annotationString += "(";
-        boolean first = true;
-        for (String field : a.fieldValues.keySet()) {
-          // parameters of the annotation
-          if (!first) {
-            annotationString += ", ";
+      if (a.fieldValues.size() == 0) {
+        // nothing to do
+      } else {
+        sb.append("(");
+        if (a.fieldValues.size() == 1 && a.fieldValues.containsKey("value")) {
+          formatFieldValue(sb, a, "value");
+        } else {
+          boolean first = true;
+          for (String field : a.fieldValues.keySet()) {
+            // parameters of the annotation
+            if (!first) {
+              sb.append(", ");
+            } else {
+              first = false;
+            }
+            sb.append(field);
+            sb.append("=");
+            formatFieldValue(sb, a, field);
           }
-          annotationString += field + "=" + formatFieldValue(a, field);
-          first = false;
         }
-        annotationString += ")";
+        sb.append(")");
       }
-      // annotationString += " ";
-      result.add(new Pair<>(annotationString, a));
+
+      result.add(new Pair<>(sb.toString(), a));
     }
     return result;
   }
 
-  private String formatFieldValue(Annotation a, String field) {
+  /**
+   * Format an annotation field value.
+   *
+   * @param sb where to format the value to
+   * @param a the annotation whose field to format
+   * @param field which field to format
+   */
+  private void formatFieldValue(StringBuilder sb, Annotation a, String field) {
     AnnotationFieldType fieldType = a.def.fieldTypes.get(field);
     assert fieldType != null;
-    return fieldType.format(a.fieldValues.get(field));
+    fieldType.format(sb, a.fieldValues.get(field));
   }
 
   /**

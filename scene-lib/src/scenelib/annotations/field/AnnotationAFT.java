@@ -34,10 +34,10 @@ public final class AnnotationAFT extends ScalarAFT {
   }
 
   @Override
-  public String format(Object o) {
+  public void format(StringBuilder sb, Object o) {
     // Ensure the argument is an Annotation.
     Annotation anno = (Annotation) o;
-    return anno.toString();
+    anno.toString(sb);
   }
 
   @Override

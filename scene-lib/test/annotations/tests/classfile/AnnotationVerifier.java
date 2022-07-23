@@ -373,10 +373,6 @@ public class AnnotationVerifier {
     private Set<AnnotationRecorder> danns; // default annotations
     private Map<ParameterDescription, AnnotationRecorder> panns; // parameter annotations
 
-    public MethodRecorder(int api) {
-      this(api, "class: ", "", "");
-    }
-
     public MethodRecorder(int api, String internalDescription, String name, String signature) {
       super(api);
       this.description = internalDescription;
@@ -517,12 +513,6 @@ public class AnnotationVerifier {
       return description;
     }
 
-    public String prettyPrint() {
-      StringBuilder sb = new StringBuilder();
-      prettyPrint(sb, "");
-      return sb.toString();
-    }
-
     // pretty-prints this into the given list of lines
     public void prettyPrint(StringBuilder sb, String indent) {
 
@@ -564,10 +554,6 @@ public class AnnotationVerifier {
     // general annotations
     private Map<String, AnnotationRecorder> anns;
     private Map<String, AnnotationRecorder> xanns;
-
-    public FieldRecorder(int api) {
-      this(api, "class: ", "", "");
-    }
 
     public FieldRecorder(int api, String internalDescription, String name, String signature) {
       super(api);
@@ -636,12 +622,6 @@ public class AnnotationVerifier {
     @Override
     public String toString() {
       return description;
-    }
-
-    public String prettyPrint() {
-      StringBuilder sb = new StringBuilder();
-      prettyPrint(sb, "");
-      return sb.toString();
     }
 
     // pretty-prints this into the given list of lines

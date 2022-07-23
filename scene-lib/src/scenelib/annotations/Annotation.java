@@ -227,37 +227,52 @@ public final class Annotation {
     return def.hashCode() + fieldValues.hashCode();
   }
 
-  /** Returns a string representation of this annotation, using valid Java syntax. */
+  /**
+   * Returns a string representation of this annotation, using valid Java syntax.
+   *
+   * @return a string representation of this annotation, using valid Java syntax
+   */
   @Override
   public String toString() {
+    StringBuilder sb = new StringBuilder();
+    toString(sb);
+    return sb.toString();
+  }
+
+  /**
+   * Formats this annotation, using valid Java syntax.
+   *
+   * @param sb where to format the annotation to
+   */
+  public void toString(StringBuilder sb) {
     // TODO: reduce duplication with
     // annotator.specification.IndexFileSpecification.getElementAnnotations(AElement)
-    StringBuilder result = new StringBuilder();
+
     // TODO: figure out how to consider abbreviated annotation names.
     // See annotator.find.AnnotationInsertion.getText(boolean, boolean)
-    result.append("@" + def.name);
+    sb.append("@");
+    sb.append(def.name);
     if (fieldValues.size() == 1 && fieldValues.containsKey("value")) {
       AnnotationFieldType fieldType = def.fieldTypes.get("value");
-      result.append('(');
-      result.append(fieldType.format(fieldValues.get("value")));
-      result.append(')');
+      sb.append('(');
+      fieldType.format(sb, fieldValues.get("value"));
+      sb.append(')');
     } else if (fieldValues.size() > 0) {
-      result.append('(');
+      sb.append('(');
       boolean notfirst = false;
       for (Entry<String, Object> field : fieldValues.entrySet()) {
         // parameters of the annotation
         if (notfirst) {
-          result.append(", ");
+          sb.append(", ");
         } else {
           notfirst = true;
         }
-        result.append(field.getKey() + "=");
+        sb.append(field.getKey() + "=");
         AnnotationFieldType fieldType = def.fieldTypes.get(field.getKey());
-        result.append(fieldType.format(field.getValue()));
+        fieldType.format(sb, field.getValue());
       }
-      result.append(')');
+      sb.append(')');
     }
-    return result.toString();
   }
 }
 
