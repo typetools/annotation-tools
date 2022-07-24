@@ -723,10 +723,10 @@ public final class IndexFileParser {
   /**
    * Parse {@link AnnotationFieldType} of current parsing annotation.
    *
-   * @param annotationFullyQualifiedName the fully-qualified name of the annotation.
-   * @return {@link AnnotationFieldType} of current parsing annotation.
-   * @throws IOException if any IOException happened.
-   * @throws ParseException if any ParseException happened.
+   * @param annotationFullyQualifiedName the fully-qualified name of the annotation
+   * @return {@link AnnotationFieldType} of current parsing annotation
+   * @throws IOException if any IOException happened
+   * @throws ParseException if any ParseException happened
    */
   private AnnotationFieldType parseAFT(String annotationFullyQualifiedName)
       throws IOException, ParseException {

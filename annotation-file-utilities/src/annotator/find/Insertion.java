@@ -91,7 +91,7 @@ public abstract class Insertion {
    * @param comments if true, Java 8 features will be surrounded in comments
    * @param abbreviate if true, the package name will be removed from the annotations. The package
    *     name can be retrieved again by calling the {@link #getPackageNames()} method.
-   * @param gotSeparateLine {@code true} if this insertion is actually added on a separate line.
+   * @param gotSeparateLine {@code true} if this insertion is actually added on a separate line
    * @param pos the source position where this insertion will be inserted
    * @param precedingChar the character directly preceding where this insertion will be inserted.
    *     This value will be ignored if {@code pos} is 0.
@@ -125,11 +125,11 @@ public abstract class Insertion {
    * Indicates if a preceding space should be added to this insertion. Subclasses may override this
    * method for custom leading space rules.
    *
-   * @param gotSeparateLine {@code true} if this insertion is actually added on a separate line.
+   * @param gotSeparateLine {@code true} if this insertion is actually added on a separate line
    * @param pos the source position where this insertion will be inserted
    * @param precedingChar the character directly preceding where this insertion will be inserted.
    *     This value will be ignored if {@code pos} is 0.
-   * @return {@code true} if a leading space should be added, {@code false} otherwise.
+   * @return {@code true} if a leading space should be added, {@code false} otherwise
    */
   protected boolean addLeadingSpace(boolean gotSeparateLine, int pos, char precedingChar) {
     // Don't add a preceding space if this insertion is on its own line,
@@ -147,8 +147,8 @@ public abstract class Insertion {
    * Indicates if a trailing space should be added to this insertion. Subclasses may override this
    * method for custom trailing space rules.
    *
-   * @param gotSeparateLine {@code true} if this insertion is actually added on a separate line.
-   * @return {@code} true if a trailing space should be added, {@code false} otherwise.
+   * @param gotSeparateLine {@code true} if this insertion is actually added on a separate line
+   * @return {@code} true if a trailing space should be added, {@code false} otherwise
    */
   protected boolean addTrailingSpace(boolean gotSeparateLine) {
     // Don't added a trailing space if this insertion is on its own line.
@@ -195,7 +195,7 @@ public abstract class Insertion {
   /**
    * Gets whether this insertion has already been inserted into source code.
    *
-   * @return {@code true} if this insertion has already been inserted, {@code false} otherwise.
+   * @return {@code true} if this insertion has already been inserted, {@code false} otherwise
    */
   public boolean isInserted() {
     return inserted;
@@ -356,7 +356,7 @@ public abstract class Insertion {
    * @param type contains the annotations to write. Only the annotations directly on the type will
    *     be written. Subtypes will be ignored.
    * @param result where to write the annotations
-   * @param comments if {@code true}, Java 8 features will be surrounded in comments.
+   * @param comments if {@code true}, Java 8 features will be surrounded in comments
    * @param abbreviate if {@code true}, the package name will be removed from the annotations. The
    *     package name can be retrieved again by calling the {@link #getPackageNames()} method.
    */
