@@ -528,11 +528,11 @@ javadoc {
     options.addStringOption('Xmaxwarns', '10000')
     if (JavaVersion.current() != JavaVersion.VERSION_1_8) {
       options.JFlags = [
-	  "--add-exports", "jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED",
-	  "--add-exports", "jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED",
-	  "--add-exports", "jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED",
-	  "--add-exports", "jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED",
-	  "--add-exports", "jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED"
+          "--add-exports", "jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED",
+          "--add-exports", "jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED",
+          "--add-exports", "jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED",
+          "--add-exports", "jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED",
+          "--add-exports", "jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED"
       ]
     }
 }
@@ -550,7 +550,7 @@ configurations {
   requireJavadoc
 }
 dependencies {
-  requireJavadoc "org.plumelib:require-javadoc:1.0.3"
+  requireJavadoc "org.plumelib:require-javadoc:1.0.4"
 }
 task requireJavadoc(type: JavaExec) {
   description = 'Ensures that Javadoc documentation exists.'
@@ -781,6 +781,10 @@ task checkFormat(type: Exec, dependsOn: [getCodeFormatScripts, pythonIsInstalled
     executable 'python3'
 
     doFirst {
+        if (isJava8) {
+            println 'The reformat task cannot be run on Java 8.  Please use Java 11+.'
+            return
+        }
         args += "${formatScriptsHome}/check-google-java-format.py"
         args += getJavaFilesToFormat(project.name)
     }
@@ -796,6 +800,10 @@ task reformat(type: Exec, dependsOn: [getCodeFormatScripts, pythonIsInstalled], 
     description 'Format the Java source code'
     executable 'python3'
     doFirst {
+        if (isJava8) {
+            println 'The checkFormat task cannot be run on Java 8.  Please use Java 11+.'
+            return
+        }
         args += "${formatScriptsHome}/run-google-java-format.py"
         args += getJavaFilesToFormat(project.name)
     }

@@ -45,7 +45,7 @@ public class AElement implements Cloneable {
   /**
    * Create a new element with the given description.
    *
-   * @param description the description of the element, used for debugging and diagnostic messages.
+   * @param description the description of the element, used for debugging and diagnostic messages
    */
   AElement(Object description) {
     this(description, false);

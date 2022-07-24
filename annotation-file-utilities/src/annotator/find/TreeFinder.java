@@ -261,7 +261,9 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
       return Pair.of(astRecord(t), i);
     }
 
-    /** @param t an expression for a type */
+    /**
+     * @param t an expression for a type
+     */
     private Pair<ASTRecord, Integer> getBaseTypePosition(JCTree t) {
       while (true) {
         switch (t.getKind()) {

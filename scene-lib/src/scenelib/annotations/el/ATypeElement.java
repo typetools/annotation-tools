@@ -27,7 +27,7 @@ public class ATypeElement extends AElement {
   /**
    * Construct a new ATypeElement from its description.
    *
-   * @param description the description of the type element.
+   * @param description the description of the type element
    */
   ATypeElement(Object description) {
     super(description);
