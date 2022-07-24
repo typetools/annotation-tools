@@ -12,6 +12,9 @@ pr:
 # trigger:
 #   batch: true
 
+# Each *jdkX job depends on build_without_test_jdkX
+# Each jdk8 and jdk11 job depends on all jdk17 jobs
+
 jobs:
 - job: build_without_test_jdk8
   pool:
@@ -33,6 +36,7 @@ jobs:
     vmImage: 'ubuntu-latest'
   container: mdernst/cf-ubuntu-jdk8:latest
   dependsOn:
+    - build_without_test_jdk8
     - build_without_test_jdk17
     - test_jdk17
     - typecheck_jdk17
@@ -48,6 +52,7 @@ jobs:
     vmImage: 'ubuntu-latest'
   container: mdernst/cf-ubuntu-jdk8:latest
   dependsOn:
+    - build_without_test_jdk8
     - build_without_test_jdk17
     - test_jdk17
     - typecheck_jdk17
@@ -63,6 +68,7 @@ jobs:
     vmImage: 'ubuntu-latest'
   container: mdernst/cf-ubuntu-jdk8-plus:latest
   dependsOn:
+    - build_without_test_jdk8
     - build_without_test_jdk17
     - test_jdk17
     - typecheck_jdk17
@@ -78,6 +84,7 @@ jobs:
     vmImage: 'ubuntu-latest'
   container: mdernst/cf-ubuntu-jdk8:latest
   dependsOn:
+    - build_without_test_jdk8
     - build_without_test_jdk17
     - test_jdk17
     - typecheck_jdk17
@@ -93,6 +100,7 @@ jobs:
     vmImage: 'ubuntu-latest'
   container: mdernst/cf-ubuntu-jdk11:latest
   dependsOn:
+    - build_without_test_jdk11
     - build_without_test_jdk17
     - test_jdk17
     - typecheck_jdk17
@@ -108,6 +116,7 @@ jobs:
     vmImage: 'ubuntu-latest'
   container: mdernst/cf-ubuntu-jdk11:latest
   dependsOn:
+    - build_without_test_jdk11
     - build_without_test_jdk17
     - test_jdk17
     - typecheck_jdk17
@@ -123,6 +132,7 @@ jobs:
     vmImage: 'ubuntu-latest'
   container: mdernst/cf-ubuntu-jdk11:latest
   dependsOn:
+    - build_without_test_jdk11
     - build_without_test_jdk17
     - test_jdk17
     - typecheck_jdk17
@@ -138,6 +148,7 @@ jobs:
     vmImage: 'ubuntu-latest'
   container: mdernst/cf-ubuntu-jdk11-plus:latest
   dependsOn:
+    - build_without_test_jdk11
     - build_without_test_jdk17
     - test_jdk17
     - typecheck_jdk17
@@ -153,6 +164,7 @@ jobs:
     vmImage: 'ubuntu-latest'
   container: mdernst/cf-ubuntu-jdk11:latest
   dependsOn:
+    - build_without_test_jdk11
     - build_without_test_jdk17
     - test_jdk17
     - typecheck_jdk17
