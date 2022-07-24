@@ -58,7 +58,7 @@ public class MethodRecorder extends ClassVisitor {
   /**
    * Returns the methods in the class in the order that they occur in the classfile.
    *
-   * @return list containing names of methods in the class.
+   * @return list containing names of methods in the class
    */
   public List<String> getMethods() {
     return Collections.unmodifiableList(methods);
@@ -67,7 +67,7 @@ public class MethodRecorder extends ClassVisitor {
   /**
    * Returns the declaration annotations in the class in the order that they occur in the classfile.
    *
-   * @return list containing names of declaration annotations in the class.
+   * @return list containing names of declaration annotations in the class
    */
   public List<String> getAnnotations() {
     return Collections.unmodifiableList(annotations);
@@ -76,7 +76,7 @@ public class MethodRecorder extends ClassVisitor {
   /**
    * Returns the fields in the class in the order that they occur in the classfile.
    *
-   * @return list containing names of fields in the class.
+   * @return list containing names of fields in the class
    */
   public List<String> getFields() {
     return Collections.unmodifiableList(fields);

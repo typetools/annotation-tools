@@ -103,7 +103,7 @@ public class AnnotationInsertion extends Insertion {
    * Gets the insertion text.
    *
    * @param comments if true, the annotation will be surrounded by block comments
-   * @param abbreviate if true, the package name will be removed from the annotation.
+   * @param abbreviate if true, the package name will be removed from the annotation
    * @return the text to insert
    */
   @Override
@@ -210,7 +210,7 @@ public class AnnotationInsertion extends Insertion {
   /**
    * Returns the annotation being inserted.
    *
-   * @return the annotation being inserted.
+   * @return the annotation being inserted
    */
   public Annotation getAnnotation() {
     return annotation;

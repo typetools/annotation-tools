@@ -1148,7 +1148,7 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
     /**
      * Makes a LocalLocation for this annotation.
      *
-     * @return a LocalLocation for this annotation.
+     * @return a LocalLocation for this annotation
      */
     private LocalLocation makeLocalLocation() {
       return new LocalLocation(start, end, index, localVariableName);
@@ -1171,7 +1171,7 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
      * TypeReference#CLASS_TYPE_PARAMETER_BOUND} or {@link
      * TypeReference#METHOD_TYPE_PARAMETER_BOUND}.
      *
-     * @return the bound location for this annotation.
+     * @return the bound location for this annotation
      */
     private BoundLocation makeBoundLocation() {
       return typeReference.getSort() == TypeReference.CLASS_TYPE_PARAMETER_BOUND
