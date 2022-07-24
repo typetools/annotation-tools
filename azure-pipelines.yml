@@ -100,7 +100,6 @@ jobs:
     vmImage: 'ubuntu-latest'
   container: mdernst/cf-ubuntu-jdk11:latest
   dependsOn:
-    - build_without_test_jdk11
     - build_without_test_jdk17
     - test_jdk17
     - typecheck_jdk17
