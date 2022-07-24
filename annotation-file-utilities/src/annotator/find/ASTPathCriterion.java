@@ -208,7 +208,7 @@ public class ASTPathCriterion implements Criterion {
    *
    * @param next a tree
    * @param node a tree
-   * @return true if the given trees match.
+   * @return true if the given trees match
    */
   private boolean matchNext(Tree next, Tree node) {
     boolean b1 = next instanceof JCTree;
@@ -944,7 +944,7 @@ public class ASTPathCriterion implements Criterion {
    *
    * @param kind1 the first kind to match
    * @param kind2 the second kind to match
-   * @return {@code true} if the kinds match as described above, {@code false} otherwise.
+   * @return {@code true} if the kinds match as described above, {@code false} otherwise
    */
   private boolean kindsMatch(Tree.Kind kind1, Tree.Kind kind2) {
     return kind1 == kind2

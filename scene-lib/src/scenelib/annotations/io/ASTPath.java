@@ -189,7 +189,7 @@ public class ASTPath extends ImmutableStack<ASTPath.ASTEntry>
      * Determines if the given string is equal to this AST path entry's child selector.
      *
      * @param s the string to compare to
-     * @return {@code true} if the string matches the child selector, {@code false} otherwise.
+     * @return {@code true} if the string matches the child selector, {@code false} otherwise
      */
     public boolean childSelectorIs(String s) {
       return childSelector.equals(s);
@@ -1243,7 +1243,7 @@ public class ASTPath extends ImmutableStack<ASTPath.ASTEntry>
      *
      * @param kind1 the first kind to match
      * @param kind2 the second kind to match
-     * @return {@code true} if the kinds match as described above, {@code false} otherwise.
+     * @return {@code true} if the kinds match as described above, {@code false} otherwise
      */
     private static boolean kindsMatch(Tree.Kind kind1, Tree.Kind kind2) {
       return kind1 == kind2
@@ -1341,7 +1341,7 @@ public class ASTPath extends ImmutableStack<ASTPath.ASTEntry>
    * Determines whether an {@code ASTPath} can identify nodes of the given kind.
    *
    * @param kind the kind to test
-   * @return true if the given kind can be identified by an {@code ASTPath}.
+   * @return true if the given kind can be identified by an {@code ASTPath}
    */
   public static boolean isHandled(Tree.Kind kind) {
     switch (kind) {
