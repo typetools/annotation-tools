@@ -95,6 +95,85 @@ jobs:
     fetchDepth: 25
   - bash: ./annotation-file-utilities/dev-scripts/test-downstream.sh
     displayName: test-downstream.sh
+- job: build_without_test_jdk11
+  pool:
+    vmImage: 'ubuntu-latest'
+  container: mdernst/cf-ubuntu-jdk11:latest
+  dependsOn:
+    - build_without_test_jdk17
+    - test_jdk17
+    - typecheck_jdk17
+    - misc_jdk17
+    - downstream_jdk17
+  steps:
+  - checkout: self
+    fetchDepth: 25
+  - bash: ./.build-without-test.sh
+    displayName: .build-without-test.sh
+- job: test_jdk11
+  pool:
+    vmImage: 'ubuntu-latest'
+  container: mdernst/cf-ubuntu-jdk11:latest
+  dependsOn:
+    - build_without_test_jdk11
+    - build_without_test_jdk17
+    - test_jdk17
+    - typecheck_jdk17
+    - misc_jdk17
+    - downstream_jdk17
+  steps:
+  - checkout: self
+    fetchDepth: 25
+  - bash: ./annotation-file-utilities/dev-scripts/test-allTests.sh
+    displayName: test-allTests.sh
+- job: typecheck_jdk11
+  pool:
+    vmImage: 'ubuntu-latest'
+  container: mdernst/cf-ubuntu-jdk11:latest
+  dependsOn:
+    - build_without_test_jdk11
+    - build_without_test_jdk17
+    - test_jdk17
+    - typecheck_jdk17
+    - misc_jdk17
+    - downstream_jdk17
+  steps:
+  - checkout: self
+    fetchDepth: 25
+  - bash: ./annotation-file-utilities/dev-scripts/test-typecheck.sh
+    displayName: test-typecheck.sh
+- job: misc_jdk11
+  pool:
+    vmImage: 'ubuntu-latest'
+  container: mdernst/cf-ubuntu-jdk11-plus:latest
+  dependsOn:
+    - build_without_test_jdk11
+    - build_without_test_jdk17
+    - test_jdk17
+    - typecheck_jdk17
+    - misc_jdk17
+    - downstream_jdk17
+  steps:
+  - checkout: self
+    fetchDepth: 25
+  - bash: ./annotation-file-utilities/dev-scripts/test-misc.sh
+    displayName: test-misc.sh
+- job: downstream_jdk11
+  pool:
+    vmImage: 'ubuntu-latest'
+  container: mdernst/cf-ubuntu-jdk11:latest
+  dependsOn:
+    - build_without_test_jdk11
+    - build_without_test_jdk17
+    - test_jdk17
+    - typecheck_jdk17
+    - misc_jdk17
+    - downstream_jdk17
+  steps:
+  - checkout: self
+    fetchDepth: 25
+  - bash: ./annotation-file-utilities/dev-scripts/test-downstream.sh
+    displayName: test-downstream.sh
 - job: build_without_test_jdk17
   pool:
     vmImage: 'ubuntu-latest'
