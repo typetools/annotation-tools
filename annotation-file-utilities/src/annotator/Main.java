@@ -1244,7 +1244,7 @@ public class Main {
    * Separates the annotation class from its arguments.
    *
    * @param s the string representation of an annotation
-   * @return given <code>@foo(bar)</code> it returns the pair <code>{ @foo, (bar) }</code>.
+   * @return given <code>@foo(bar)</code> it returns the pair <code>{ @foo, (bar) }</code>
    */
   public static Pair<String, String> removeArgs(String s) {
     int pidx = s.indexOf("(");

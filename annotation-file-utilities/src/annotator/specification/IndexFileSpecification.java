@@ -344,7 +344,7 @@ public class IndexFileSpecification {
    *
    * @param clist the criteria specifying the location of the insertions
    * @param element holds the annotations to be inserted
-   * @param isCastInsertion {@code true} if this for a cast insertion, {@code false} otherwise.
+   * @param isCastInsertion {@code true} if this for a cast insertion, {@code false} otherwise
    * @return a list of the {@link AnnotationInsertion}s that are created
    */
   private List<Insertion> parseElement(
@@ -373,7 +373,7 @@ public class IndexFileSpecification {
    * @param element holds the annotations to be inserted
    * @param innerTypeInsertions the insertions on the inner type of this element. This is only used
    *     for receiver and "new" insertions. See {@link ReceiverInsertion} for more details.
-   * @param isCastInsertion {@code true} if this for a cast insertion, {@code false} otherwise.
+   * @param isCastInsertion {@code true} if this for a cast insertion, {@code false} otherwise
    * @return a list of the {@link AnnotationInsertion}s that are created
    */
   private List<Insertion> parseElement(
@@ -649,7 +649,7 @@ public class IndexFileSpecification {
    *
    * @param clist the criteria specifying the location of the insertions
    * @param typeElement holds the annotations to be inserted
-   * @param isCastInsertion {@code true} if this for a cast insertion, {@code false} otherwise.
+   * @param isCastInsertion {@code true} if this for a cast insertion, {@code false} otherwise
    */
   private void parseInnerAndOuterElements(
       CriterionList clist, ATypeElement typeElement, boolean isCastInsertion) {

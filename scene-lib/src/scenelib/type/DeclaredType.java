@@ -124,7 +124,7 @@ public class DeclaredType extends Type {
   /**
    * Gets the inner type. This will be {@code null} if there is none.
    *
-   * @return the inner type or {@code null}.
+   * @return the inner type or {@code null}
    */
   public DeclaredType getInnerType() {
     checkWildcard();
@@ -139,7 +139,7 @@ public class DeclaredType extends Type {
   /**
    * Determines if this type is a wildcard.
    *
-   * @return {@code true} if this type is a wildcard, {@code false} otherwise.
+   * @return {@code true} if this type is a wildcard, {@code false} otherwise
    */
   public boolean isWildcard() {
     return WILDCARD.equals(name);
