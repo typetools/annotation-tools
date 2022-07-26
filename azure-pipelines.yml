@@ -12,14 +12,15 @@ pr:
 # trigger:
 #   batch: true
 
-# Each *jdkX job depends on build_without_test_jdkX
-# Each jdk8 and jdk11 job depends on all jdk17 jobs
+# Each *_jdkX job depends on build_without_test_jdkX.
+# Each jdk8 and jdk11 job depends on canary-jobs (all jdk17 jobs).
+# Each jdk8 and jdk11 job depends on the corresponding jdk17 job.
 
 jobs:
-- job: build_without_test_jdk8
+
+- job: canary_jobs
   pool:
     vmImage: 'ubuntu-latest'
-  container: mdernst/cf-ubuntu-jdk8:latest
   dependsOn:
     - build_without_test_jdk17
     - test_jdk17
@@ -27,21 +28,17 @@ jobs:
     - misc_jdk17
     - downstream_jdk17
   steps:
-  - checkout: self
-    fetchDepth: 25
-  - bash: ./.build-without-test.sh
-    displayName: .build-without-test.sh
+  - bash: true
+    displayName: canary-jobs
+
 - job: test_jdk8
   pool:
     vmImage: 'ubuntu-latest'
   container: mdernst/cf-ubuntu-jdk8:latest
   dependsOn:
     - build_without_test_jdk8
-    - build_without_test_jdk17
     - test_jdk17
-    - typecheck_jdk17
-    - misc_jdk17
-    - downstream_jdk17
+    - canary_jobs
   steps:
   - checkout: self
     fetchDepth: 25
@@ -53,11 +50,8 @@ jobs:
   container: mdernst/cf-ubuntu-jdk8:latest
   dependsOn:
     - build_without_test_jdk8
-    - build_without_test_jdk17
-    - test_jdk17
     - typecheck_jdk17
-    - misc_jdk17
-    - downstream_jdk17
+    - canary_jobs
   steps:
   - checkout: self
     fetchDepth: 25
@@ -69,11 +63,8 @@ jobs:
   container: mdernst/cf-ubuntu-jdk8-plus:latest
   dependsOn:
     - build_without_test_jdk8
-    - build_without_test_jdk17
-    - test_jdk17
-    - typecheck_jdk17
     - misc_jdk17
-    - downstream_jdk17
+    - canary_jobs
   steps:
   - checkout: self
     fetchDepth: 25
@@ -85,11 +76,8 @@ jobs:
   container: mdernst/cf-ubuntu-jdk8:latest
   dependsOn:
     - build_without_test_jdk8
-    - build_without_test_jdk17
-    - test_jdk17
-    - typecheck_jdk17
-    - misc_jdk17
     - downstream_jdk17
+    - canary_jobs
   steps:
   - checkout: self
     fetchDepth: 25
@@ -101,10 +89,7 @@ jobs:
   container: mdernst/cf-ubuntu-jdk11:latest
   dependsOn:
     - build_without_test_jdk17
-    - test_jdk17
-    - typecheck_jdk17
-    - misc_jdk17
-    - downstream_jdk17
+    - canary_jobs
   steps:
   - checkout: self
     fetchDepth: 25
@@ -116,11 +101,8 @@ jobs:
   container: mdernst/cf-ubuntu-jdk11:latest
   dependsOn:
     - build_without_test_jdk11
-    - build_without_test_jdk17
     - test_jdk17
-    - typecheck_jdk17
-    - misc_jdk17
-    - downstream_jdk17
+    - canary_jobs
   steps:
   - checkout: self
     fetchDepth: 25
@@ -132,11 +114,8 @@ jobs:
   container: mdernst/cf-ubuntu-jdk11:latest
   dependsOn:
     - build_without_test_jdk11
-    - build_without_test_jdk17
-    - test_jdk17
     - typecheck_jdk17
-    - misc_jdk17
-    - downstream_jdk17
+    - canary_jobs
   steps:
   - checkout: self
     fetchDepth: 25
@@ -148,11 +127,8 @@ jobs:
   container: mdernst/cf-ubuntu-jdk11-plus:latest
   dependsOn:
     - build_without_test_jdk11
-    - build_without_test_jdk17
-    - test_jdk17
-    - typecheck_jdk17
     - misc_jdk17
-    - downstream_jdk17
+    - canary_jobs
   steps:
   - checkout: self
     fetchDepth: 25
@@ -164,11 +140,8 @@ jobs:
   container: mdernst/cf-ubuntu-jdk11:latest
   dependsOn:
     - build_without_test_jdk11
-    - build_without_test_jdk17
-    - test_jdk17
-    - typecheck_jdk17
-    - misc_jdk17
     - downstream_jdk17
+    - canary_jobs
   steps:
   - checkout: self
     fetchDepth: 25
@@ -187,6 +160,8 @@ jobs:
   pool:
     vmImage: 'ubuntu-latest'
   container: mdernst/cf-ubuntu-jdk17:latest
+  dependsOn:
+    - build_without_test_jdk17
   steps:
   - checkout: self
     fetchDepth: 25
@@ -196,6 +171,8 @@ jobs:
   pool:
     vmImage: 'ubuntu-latest'
   container: mdernst/cf-ubuntu-jdk17:latest
+  dependsOn:
+    - build_without_test_jdk17
   steps:
   - checkout: self
     fetchDepth: 25
@@ -205,6 +182,8 @@ jobs:
   pool:
     vmImage: 'ubuntu-latest'
   container: mdernst/cf-ubuntu-jdk17-plus:latest
+  dependsOn:
+    - build_without_test_jdk17
   steps:
   - checkout: self
     fetchDepth: 25
@@ -214,6 +193,8 @@ jobs:
   pool:
     vmImage: 'ubuntu-latest'
   container: mdernst/cf-ubuntu-jdk17:latest
+  dependsOn:
+    - build_without_test_jdk17
   steps:
   - checkout: self
     fetchDepth: 25
