@@ -17,8 +17,26 @@ public abstract class AnnotationFieldType extends EqualByStringRepresentation {
   @Override
   public abstract String toString();
 
-  /** Formats an annotation field value. */
-  public abstract String format(Object o);
+  /**
+   * Formats an annotation field value.
+   *
+   * @param o the value to format
+   * @return the formatted annotation field value
+   */
+  @Deprecated // TEMPORARY
+  public final String format(Object o) {
+    StringBuilder sb = new StringBuilder();
+    format(sb, o);
+    return sb.toString();
+  }
+
+  /**
+   * Formats an annotation field value.
+   *
+   * @param sb where to format the value to
+   * @param o the value to format
+   */
+  public abstract void format(StringBuilder sb, Object o);
 
   /** Returns true if this value is valid for this AnnotationFieldType. */
   public abstract boolean isValidValue(Object o);
