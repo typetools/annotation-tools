@@ -1,7 +1,6 @@
 package scenelib.annotations.field;
 
 import java.util.Collection;
-import java.util.StringJoiner;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /** An {@link ArrayAFT} represents an annotation field type that is an array. */
@@ -47,17 +46,25 @@ public final class ArrayAFT extends AnnotationFieldType {
   }
 
   @Override
-  public String format(Object o) {
+  public void format(StringBuilder sb, Object o) {
     Collection<?> asCollection = (Collection<?>) o;
-    if (asCollection.size() == 1) {
+    int size = asCollection.size();
+    if (size == 1) {
       Object elt = asCollection.iterator().next();
-      return elementType.format(elt);
+      elementType.format(sb, elt);
+      return;
     }
-    StringJoiner result = new StringJoiner(", ", "{", "}");
+    sb.append("{");
+    boolean notfirst = false;
     for (Object elt : asCollection) {
-      result.add(elementType.format(elt));
+      if (notfirst) {
+        sb.append(", ");
+      } else {
+        notfirst = true;
+      }
+      elementType.format(sb, elt);
     }
-    return result.toString();
+    sb.append("}");
   }
 
   @Override

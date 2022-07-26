@@ -15,7 +15,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.StringJoiner;
 import org.objectweb.asm.TypePath;
 import scenelib.annotations.Annotation;
 import scenelib.annotations.el.AClass;
@@ -104,7 +103,9 @@ public final class IndexFileWriter {
    * @param a the annotation to print
    */
   private void printAnnotation(Annotation a) {
-    pw.print(formatAnnotation(a));
+    StringBuilder sb = new StringBuilder();
+    formatAnnotation(sb, a);
+    pw.print(sb.toString());
   }
 
   private void printAnnotations(Collection<? extends Annotation> annos) {
@@ -470,20 +471,31 @@ public final class IndexFileWriter {
   /**
    * Formats an annotation to be printed in an index file.
    *
+   * @param sb where to format the annotation to
    * @param a the annotation to format
-   * @return the annotation formatted correctly, as a string
    */
-  private static String formatAnnotation(Annotation a) {
-    String annoName = "@" + a.def().name;
+  private static void formatAnnotation(StringBuilder sb, Annotation a) {
+    sb.append("@");
+    sb.append(a.def().name);
     if (a.fieldValues.isEmpty()) {
-      return annoName;
+      return;
     }
-    StringJoiner sj = new StringJoiner(",", annoName + "(", ")");
+
+    sb.append("(");
+    boolean notfirst = false;
     for (Map.Entry<String, Object> f : a.fieldValues.entrySet()) {
+      if (notfirst) {
+        sb.append(",");
+      } else {
+        notfirst = true;
+      }
       AnnotationFieldType aft = a.def().fieldTypes.get(f.getKey());
-      sj.add(f.getKey() + "=" + formatAnnotationValue(aft, f.getValue()));
+      sb.append(f.getKey());
+      sb.append("=");
+      formatAnnotationValue(sb, aft, f.getValue());
     }
-    return sj.toString();
+    sb.append(")");
+    return;
   }
 
   // TODO: Why isn't this just aft.format(o)??
@@ -495,34 +507,56 @@ public final class IndexFileWriter {
    * @param o the value or values to format
    * @return the String representation of the value
    */
+  @Deprecated // TEMPORORY
   public static String formatAnnotationValue(AnnotationFieldType aft, Object o) {
+    StringBuilder sb = new StringBuilder();
+    formatAnnotationValue(sb, aft, o);
+    return sb.toString();
+  }
+
+  /**
+   * Formats a literal argument of an annotation. Public to permit re-use in stub-based
+   * whole-program inference.
+   *
+   * @param sb where to format the arguments to
+   * @param aft the type of the annotation field
+   * @param o the value or values to format
+   */
+  public static void formatAnnotationValue(StringBuilder sb, AnnotationFieldType aft, Object o) {
     if (aft instanceof AnnotationAFT) {
-      return formatAnnotation((Annotation) o);
+      formatAnnotation(sb, (Annotation) o);
     } else if (aft instanceof ArrayAFT) {
-      StringJoiner sj = new StringJoiner(",", "{", "}");
       ArrayAFT aaft = (ArrayAFT) aft;
       List<?> l = (List<?>) o;
+      sb.append("{");
       if (aaft.elementType == null) {
         if (l.size() != 0) {
           throw new AssertionError("nonempty array of unknown type");
         }
       } else {
+        boolean notfirst = false;
         for (Object o2 : l) {
-          sj.add(formatAnnotationValue(aaft.elementType, o2));
+          if (notfirst) {
+            sb.append(",");
+          } else {
+            notfirst = true;
+          }
+          formatAnnotationValue(sb, aaft.elementType, o2);
         }
       }
-      return sj.toString();
+      sb.append("}");
     } else if (aft instanceof ClassTokenAFT) {
-      return aft.format(o);
+      aft.format(sb, o);
     } else if (aft instanceof BasicAFT && o instanceof String) {
-      return Strings.escape((String) o);
+      sb.append(Strings.escape((String) o));
     } else if (aft instanceof BasicAFT && o instanceof Long) {
-      return o.toString() + "L";
+      sb.append(o.toString());
+      sb.append("L");
       // This causes assertion failures.  I'm not sure why.
       // else if (aft instanceof EnumAFT) {
-      //     return aft.format(o);
+      //     aft.format(sb, o);
     } else {
-      return o.toString();
+      sb.append(o.toString());
     }
   }
 

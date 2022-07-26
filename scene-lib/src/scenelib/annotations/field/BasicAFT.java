@@ -82,21 +82,24 @@ public final class BasicAFT extends ScalarAFT {
   }
 
   @Override
-  public String format(Object o) {
+  public void format(StringBuilder sb, Object o) {
     if (type == String.class) {
-      return "\"" + charEscaper.escape((String) o) + "\"";
+      sb.append("\"");
+      sb.append(charEscaper.escape((String) o));
+      sb.append("\"");
     } else if (type == long.class) {
-      return o.toString() + "L";
+      sb.append(o.toString());
+      sb.append("L");
     } else if (type == double.class && Double.isNaN((double) o)) {
       // Don't use "Double.NaN" because it is not parseable if the code imports a `Double` class
       // other than `java.lang.Double`.
-      return "0.0/0.0";
+      sb.append("0.0/0.0");
     } else if (type == float.class && Float.isNaN((float) o)) {
       // Don't use "Float.NaN" because it is not parseable if the code imports a `Float` class
       // other than `java.lang.Float`.
-      return "0.0f/0.0f";
+      sb.append("0.0f/0.0f");
     } else {
-      return o.toString();
+      sb.append(o.toString());
     }
   }
 
