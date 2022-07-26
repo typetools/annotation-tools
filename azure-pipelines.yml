@@ -31,6 +31,18 @@ jobs:
   - bash: true
     displayName: canary-jobs
 
+- job: build_without_test_jdk8
+  pool:
+    vmImage: 'ubuntu-latest'
+  container: mdernst/cf-ubuntu-jdk8:latest
+  dependsOn:
+    - build_without_test_jdk17
+    - canary_jobs
+  steps:
+  - checkout: self
+    fetchDepth: 25
+  - bash: ./.build-without-test.sh
+    displayName: .build-without-test.sh
 - job: test_jdk8
   pool:
     vmImage: 'ubuntu-latest'
