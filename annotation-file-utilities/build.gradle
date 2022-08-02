@@ -679,7 +679,12 @@ task copyToDeployDir {
 }
 
 task releaseBuild(type: GradleBuild) {
-    description 'Build everything required for a release.'
+    description 'Build everything required for a release, after cleanning.'
+    tasks = ['releaseBuildWithoutTest', 'testAnnotator']
+}
+
+task releaseBuildWithoutTest(type: GradleBuild) {
+    description 'Build everything required for a release, without cleaning first.'
     doFirst {
         if (!project.hasProperty('deploy-dir')) {
             throw new RuntimeException("You must specify a deploy-dir, the live site deploy-dir=/cse/www2/types/annotation-file-utilities/releases/_version num_")
@@ -692,7 +697,7 @@ task releaseBuild(type: GradleBuild) {
     startParameter.projectProperties += gradle.startParameter.projectProperties
     startParameter.projectProperties += [release: true.toString()]
 
-    tasks = ['clean', 'zipfile', 'testAnnotator', 'copyToDeployDir']
+    tasks = ['clean', 'zipfile', 'copyToDeployDir']
 }
 
 
