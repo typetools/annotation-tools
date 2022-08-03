@@ -680,7 +680,21 @@ task copyToDeployDir {
 
 task releaseBuild(type: GradleBuild) {
     description 'Build everything required for a release, after cleanning.'
-    tasks = ['releaseBuildWithoutTest', 'testAnnotator']
+    doFirst {
+        if (!project.hasProperty('deploy-dir')) {
+            println project.properties.entrySet()*.toString().sort().toString().replaceAll(", ","\n")
+            throw new RuntimeException("You must specify a deploy-dir. The live site deploy-dir=/cse/www2/types/annotation-file-utilities/releases/VERSIONNUMBER")
+        }
+        if (!project.hasProperty('afu.version')) {
+            println project.properties.entrySet()*.toString().sort().toString().replaceAll(", ","\n")
+            throw new RuntimeException("You must specify an afu.version, such as 3.6.22")
+        }
+    }
+
+    startParameter.projectProperties += gradle.startParameter.projectProperties
+    startParameter.projectProperties += [release: true.toString()]
+
+    tasks = ['clean', 'zipfile', 'testAnnotator', 'copyToDeployDir']
 }
 
 task releaseBuildWithoutTest(type: GradleBuild) {
