@@ -57,7 +57,7 @@ public class AnnotationVerifier {
    * Returns the <code>ClassVisitor</code> which should be made to visit the version of the class
    * being tested.
    *
-   * @return a visitor the the experimental version of the class
+   * @return a visitor for the experimental version of the class
    */
   public ClassVisitor newVisitor() {
     return newVisitor;

@@ -45,7 +45,7 @@ public class ClassFileWriter {
           + "be read and expanded into the command line.  Options:";
 
   /**
-   * Main method meant to a a convenient way to write annotations from an index file to a class
+   * Main method meant to be a convenient way to write annotations from an index file to a class
    * file. For programmatic access to this tool, one should probably use the insert() methods
    * instead.
    *
@@ -170,7 +170,7 @@ public class ClassFileWriter {
    *     file name that can be resolved from the current working directory, which means it should
    *     end in ".class" for standard Java class files.
    * @param overwrite controls behavior when an annotation exists on a particular element in both
-   *     the scene and the class file. If true, then the one from the scene is used; else the the
+   *     the scene and the class file. If true, then the one from the scene is used; else the
    *     existing annotation in the class file is retained.
    * @throws IOException if there is a problem reading from or writing to <code> fileName </code>
    */
@@ -202,7 +202,7 @@ public class ClassFileWriter {
    * @param input the input stream from which to read a class
    * @param out the output stream the merged class should be written to
    * @param overwrite controls behavior when an annotation exists on a particular element in both
-   *     the scene and the class file. If true, then the one from the scene is used; else the the
+   *     the scene and the class file. If true, then the one from the scene is used; else the
    *     existing annotation in the class file is retained.
    * @throws IOException if there is a problem reading from <code> in </code> or writing to <code>
    *      out </code>
@@ -229,7 +229,7 @@ public class ClassFileWriter {
    * @param className the fully qualified class to read
    * @param outputFileName the name of the output file the class should be written to
    * @param overwrite controls behavior when an annotation exists on a particular element in both
-   *     the scene and the class file. If true, then the one from the scene is used; else the the
+   *     the scene and the class file. If true, then the one from the scene is used; else the
    *     existing annotation in the class file is retained.
    * @throws IOException if there is a problem reading from <code> in </code> or writing to <code>
    *      out </code>

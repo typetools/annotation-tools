@@ -32,7 +32,7 @@ public abstract class DefCollector {
   }
 
   // The name "collect" in the methods below means to insert or add to
-  // the the DefCollector.  "Insert" or "add" would have been better, but
+  // the DefCollector.  "Insert" or "add" would have been better, but
   // at least the methods are private.
 
   private AnnotationDef getDef(String name) {
