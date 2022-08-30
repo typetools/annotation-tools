@@ -112,7 +112,7 @@ public class LocalVariableScanner extends CommonScanner {
   }
 
   /**
-   * Gets the name of the local variable in the given method, and at the the given index and offset.
+   * Gets the name of the local variable in the given method, and at the given index and offset.
    *
    * @param varInfo a pair of the method name and a pair of the local variable's index and start
    *     offset

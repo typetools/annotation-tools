@@ -136,9 +136,6 @@ import scenelib.annotations.util.coll.VivifyingMap;
  */
 public class Main {
 
-  /** The system-specific file separator. */
-  private static String fileSep = System.getProperty("file.separator");
-
   // Options
 
   /** Directory in which output files are written. */
@@ -1036,7 +1033,7 @@ public class Main {
             String[] pkgPath = pkg.split("\\.");
             StringBuilder sb = new StringBuilder(outdir);
             for (int i = 0; i < pkgPath.length; i++) {
-              sb.append(fileSep).append(pkgPath[i]);
+              sb.append(File.separator).append(pkgPath[i]);
             }
             outfile = new File(sb.toString(), javafile.getName());
           }
