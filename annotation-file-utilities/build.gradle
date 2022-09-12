@@ -10,9 +10,13 @@ plugins {
 
      // To show task list as a tree, run: ./gradlew <taskname> taskTree
      id 'com.dorongold.task-tree' version '2.1.0'
+
+     // Code formatting; defines targets "spotlessApply" and "spotlessCheck"
+     id "com.diffplug.spotless" version "6.11.0-SNAPSHOT"
 }
 apply plugin: 'java'
 apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'com.diffplug.spotless'
 
 group 'org.checkerframework'
 version '3.25.0'
@@ -830,4 +834,22 @@ task reformat(type: Exec, dependsOn: [getCodeFormatScripts, pythonIsInstalled], 
         args += "${formatScriptsHome}/run-google-java-format.py"
         args += getJavaFilesToFormat(project.name)
     }
+}
+
+spotless {
+  format 'misc', {
+    // define the files to apply `misc` to
+    target '*.gradle', '*.md', '.gitignore'
+
+    // define the steps to apply to those files
+    trimTrailingWhitespace()
+    indentWithSpaces(2)
+    endWithNewline()
+  }
+  java {
+    // TODO: Shouldn't need any target once scene-lib is in the project directory.
+    target files("${rootDir}/src")
+    googleJavaFormat()
+    formatAnnotations()
+  }
 }
