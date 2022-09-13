@@ -33,24 +33,6 @@ ext {
     localRepo = ".git"
 }
 
-
-sourceSets {
-    main.java {
-        srcDirs = ['src', '../scene-lib/src']
-    }
-    test.java {
-        srcDirs += ['../scene-lib/test']
-        include("**/AnnotationsTest.java")
-        include("**/foo/*.java")
-        include("**/AnnotationVerifier.java")
-        include("**/TestSceneLib.java")
-        include("**/Example.java")
-    }
-    test.resources {
-        srcDirs += ['../scene-lib/test']
-        exclude("**/*.java")
-    }
-}
 configurations {
     javacJar
 }
@@ -210,25 +192,26 @@ test {
 task testExample(dependsOn: compileTestJava, group: 'Verification') {
     description 'Run the scene-lib example test.'
     doLast {
-        String testDir = "${projectDir}/../scene-lib/test/annotations/tests/executable/"
+        String testDir = "${projectDir}/src/test/java/annotations/tests/executable/"
+        String resourceDir = "${projectDir}/src/test/resources/annotations/tests/executable/"
         javaexec {
             classpath = files(sourceSets.test.java.outputDir)
             classpath += sourceSets.test.compileClasspath
             mainClass = 'annotations.tests.executable.Example'
             standardOutput = new FileOutputStream("${testDir}/example-stdout.jaif")
 
-            args = ["${testDir}/example-input.jaif",
+            args = ["${resourceDir}/example-input.jaif",
                     "foo.Bar",
                     "${testDir}/example-output.jaif"]
         }
 
-        byte[] goalJaif = Files.readAllBytes(new File(testDir, "example-output.jaif.goal").toPath());
+        byte[] goalJaif = Files.readAllBytes(new File(resourceDir, "example-output.jaif.goal").toPath());
         byte[] outputJaif = Files.readAllBytes(new File(testDir, "example-output.jaif").toPath());
         if (!Arrays.equals(goalJaif, outputJaif)) {
             throw new GradleException("In ${testDir}, file example-output.jaif does not match goal.")
         }
 
-        byte[] goalStdOut = Files.readAllBytes(new File(testDir, "example-stdout.jaif.goal").toPath());
+        byte[] goalStdOut = Files.readAllBytes(new File(resourceDir, "example-stdout.jaif.goal").toPath());
         byte[] stdOut = Files.readAllBytes(new File(testDir, "example-stdout.jaif").toPath());
         if (!Arrays.equals(goalStdOut, stdOut)) {
             throw new GradleException("In ${testDir}, file example-stdout.jaif does not match goal.")
@@ -239,7 +222,7 @@ task testExample(dependsOn: compileTestJava, group: 'Verification') {
 task cleanTestExample {
     description 'Clean the scene-lib example test.'
     doLast {
-        String testDir = "${projectDir}/../scene-lib/test/annotations/tests/executable/"
+        String testDir = "${projectDir}/src/test/java/annotations/tests/executable/"
         delete "${testDir}/example-output.jaif"
         delete "${testDir}/example-stdout.jaif"
     }
@@ -558,7 +541,7 @@ task requireJavadoc(type: JavaExec) {
   description = 'Ensures that Javadoc documentation exists.'
   mainClass = "org.plumelib.javadoc.RequireJavadoc"
   classpath = configurations.requireJavadoc
-  args "annotation-file-utilities/src", "scene-lib/src"
+  args "annotation-file-utilities/src"
   workingDir = "${projectDir}/.."
 }
 // check.dependsOn requireJavadoc
