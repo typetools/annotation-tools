@@ -836,6 +836,7 @@ task reformat(type: Exec, dependsOn: [getCodeFormatScripts, pythonIsInstalled], 
     }
 }
 
+if (!isJava8) {
 spotless {
   format 'misc', {
     // define the files to apply `misc` to
@@ -852,4 +853,5 @@ spotless {
     googleJavaFormat()
     formatAnnotations()
   }
+}
 }
