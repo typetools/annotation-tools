@@ -61,9 +61,6 @@ if [[ "${GROUP}" == "misc" || "${GROUP}" == "all" ]]; then
 
   (cd annotation-file-utilities && ./gradlew checkBasicStyle)
 
-  # TODO: when codebase is reformatted (after merging branches?)
-  # ant check-format
-
   (cd annotation-file-utilities && ./gradlew htmlValidate)
 
   (cd annotation-file-utilities && ./gradlew javadoc)

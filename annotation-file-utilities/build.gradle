@@ -265,7 +265,7 @@ task cleanTestAnnotator(type: Exec) {
 ext.plumeBibHome = "${projectDir}/plume-bib"
 
 task getPlumeBib() {
-    description 'Obtain or update the run-google-java-format scripts.'
+    description 'Obtain or update the plume-bib bibliography.'
     if (file(plumeBibHome).exists()) {
         exec {
             workingDir plumeBibHome
@@ -749,92 +749,6 @@ compileJava.dependsOn installGitHooks
 
 
 /// Code formatting
-
-ext.formatScriptsHome = "${projectDir}/.run-google-java-format"
-
-task getCodeFormatScripts() {
-    description 'Obtain or update the run-google-java-format scripts'
-    if (file(formatScriptsHome).exists()) {
-        exec {
-            workingDir formatScriptsHome
-            executable 'git'
-            args = ['pull', '-q']
-            ignoreExitValue = true
-        }
-    } else {
-        exec {
-            workingDir "${formatScriptsHome}/../"
-            executable 'git'
-            args = ['clone', '-q', '--depth', '1', 'https://github.com/plume-lib/run-google-java-format.git', '.run-google-java-format']
-        }
-    }
-}
-
-/**
- * Returns a list of all the Java files that should be formatted for the given project. These are:
- *
- * All java files in the main sourceSet.
- * All java files in the tests directory that compile.
- *
- * @param projectName name of the project to format
- * @return a list of all Java files that should be formatted for projectName
- */
-List<String> getJavaFilesToFormat(projectName) {
-    List<File> javaFiles = new ArrayList<>();
-    sourceSets.forEach { set ->
-        javaFiles.addAll(set.java.files)
-    }
-
-    // Collect all java files in tests directory
-    fileTree("tests").visit { details ->
-        // If you change this, also change checker/bin-devel/git.pre-commit
-        if (!details.path.contains("nullness-javac-errors")
-                && !details.path.contains("returnsreceiverdelomboked")
-                && !details.path.contains("build")
-                && details.name.endsWith('java')) {
-            javaFiles.add(details.file)
-        }
-    }
-
-    List<String> args = new ArrayList<>();
-    for (File f : javaFiles) {
-        args += relativePath(f)
-    }
-    return args
-}
-
-task checkFormat(type: Exec, dependsOn: [getCodeFormatScripts, pythonIsInstalled], group: 'Format') {
-    description 'Check whether the source code is properly formatted'
-    executable 'python3'
-
-    doFirst {
-        if (isJava8) {
-            println 'The reformat task cannot be run on Java 8.  Please use Java 11+.'
-            return
-        }
-        args += "${formatScriptsHome}/check-google-java-format.py"
-        args += getJavaFilesToFormat(project.name)
-    }
-    ignoreExitValue = true
-    doLast {
-        if (!executionResult.isPresent() || executionResult.get().getExitValue() != 0) {
-            throw new RuntimeException('Found improper formatting, try running:  ./gradlew reformat"')
-        }
-    }
-}
-
-task reformat(type: Exec, dependsOn: [getCodeFormatScripts, pythonIsInstalled], group: 'Format') {
-    description 'Format the Java source code'
-    executable 'python3'
-    doFirst {
-        if (isJava8) {
-            println 'The checkFormat task cannot be run on Java 8.  Please use Java 11+.'
-            return
-        }
-        args += "${formatScriptsHome}/run-google-java-format.py"
-        args += getJavaFilesToFormat(project.name)
-    }
-}
 
 if (!isJava8) {
 spotless {
