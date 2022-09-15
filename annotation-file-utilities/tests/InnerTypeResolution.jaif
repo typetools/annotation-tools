@@ -2,7 +2,7 @@ package java.lang.annotation:
 annotation @Deprecated:
 annotation @Tainted:
 
-package annotator.tests:
+package org.checkerframework.afu.annotator.tests:
 class InnerTypeResolution:
 
     method <init>()V:

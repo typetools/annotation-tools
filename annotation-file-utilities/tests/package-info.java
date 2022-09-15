@@ -1,1 +1,1 @@
-package annotator.tests;
+package org.checkerframework.afu.annotator.tests;

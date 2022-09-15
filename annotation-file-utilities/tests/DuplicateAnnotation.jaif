@@ -3,7 +3,7 @@ annotation @SuppressWarnings:
     String value
 annotation @Deprecated:
 
-package annotator.tests:
+package org.checkerframework.afu.annotator.tests:
 annotation @TA: @java.lang.annotation.Target({java.lang.annotation.ElementType.TYPE_USE})
 
 class DuplicateAnnotation:

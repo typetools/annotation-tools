@@ -1,4 +1,4 @@
-package annotator.tests:
+package org.checkerframework.afu.annotator.tests:
 annotation @A: @java.lang.annotation.Target({java.lang.annotation.ElementType.TYPE_USE})
 annotation @B: @java.lang.annotation.Target({java.lang.annotation.ElementType.TYPE_USE})
 annotation @C: @java.lang.annotation.Target({java.lang.annotation.ElementType.TYPE_USE})

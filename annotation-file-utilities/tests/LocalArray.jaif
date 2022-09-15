@@ -4,7 +4,7 @@ annotation @Tainted: @Retention(value=RUNTIME) @java.lang.annotation.Target(valu
 package java.lang:
 annotation @UnderInitialization: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
 
-package annotator.tests:
+package org.checkerframework.afu.annotator.tests:
 class LocalArray:
 
     method <init>()V:

@@ -6,7 +6,7 @@ annotation @Deprecated:
 package java.lang:
 annotation @Tainted:
 
-package annotator.tests:
+package org.checkerframework.afu.annotator.tests:
 class InnerTypeResolution:
 
     method method01(Ljava/util/Map;)Ljava/util/Map$Entry;: @java.lang.Deprecated

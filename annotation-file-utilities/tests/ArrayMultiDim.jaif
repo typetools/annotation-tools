@@ -8,7 +8,7 @@ annotation @F: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYP
 annotation @G: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
 annotation @H: @Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
 
-package annotator.tests:
+package org.checkerframework.afu.annotator.tests:
 class ArrayMultiDim:
 
     field field:

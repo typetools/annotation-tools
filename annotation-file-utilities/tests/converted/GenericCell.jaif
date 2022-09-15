@@ -7,7 +7,7 @@ annotation @PolyRaw: @java.lang.annotation.Retention(value=RUNTIME) @java.lang.a
 package java.lang:
 annotation @ThisUnderInitialization: @java.lang.annotation.Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
 
-package annotator.tests:
+package org.checkerframework.afu.annotator.tests:
 class GenericCell:
 
     field internalList:

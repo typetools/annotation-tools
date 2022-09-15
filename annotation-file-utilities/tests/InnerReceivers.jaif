@@ -23,7 +23,7 @@ package:
     annotation @P: @java.lang.annotation.Target(value={TYPE_USE})
     annotation @X: @java.lang.annotation.Target(value={TYPE_USE})
 
-package annotator.tests:
+package org.checkerframework.afu.annotator.tests:
     // Try to insert a receiver parameter on a method declaration in an
     // anonymous inner class. This is illegal, so should do nothing.
     class InnerReceivers$1:

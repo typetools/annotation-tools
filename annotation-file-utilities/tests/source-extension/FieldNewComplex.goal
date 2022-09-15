@@ -1,4 +1,4 @@
-package annotator.tests;
+package org.checkerframework.afu.annotator.tests;
 
 public class FieldNewComplex {
   @GUT.quals.Rep FieldNewComplex m(@GUT.quals.Peer FieldNewComplex a, @GUT.quals.Peer FieldNewComplex b, @GUT.quals.Rep FieldNewComplex c) {
