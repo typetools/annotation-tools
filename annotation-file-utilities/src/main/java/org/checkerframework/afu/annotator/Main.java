@@ -80,7 +80,7 @@ import org.checkerframework.afu.scenelib.annotations.util.coll.VivifyingMap;
 
 /**
  * This is the main class for the annotator, which inserts annotations in Java source code. You can
- * call it as {@code java annotator.Main} or by using the shell script {@code
+ * call it as {@code java org.checkerframework.afu.annotator.Main} or by using the shell script {@code
  * insert-annotations-to-source}.
  *
  * <p>It takes as input
@@ -509,7 +509,7 @@ public class Main {
 
     Options options =
         new Options(
-            "java annotator.Main [options] { jaif-file | java-file | @arg-file } ..."
+            "java org.checkerframework.afu.annotator.Main [options] { jaif-file | java-file | @arg-file } ..."
                 + System.lineSeparator()
                 + "(Contents of argfiles are expanded into the argument list.)",
             Main.class);
@@ -678,7 +678,7 @@ public class Main {
     }
 
     if (dbug.isEnabled()) {
-      dbug.debug("In annotator.Main:%n");
+      dbug.debug("In org.checkerframework.afu.annotator.Main:%n");
       dbug.debug("%d insertions, %d .java files%n", insertions.size(), javafiles.size());
       dbug.debug("Insertions:%n");
       for (Insertion insertion : insertions) {
@@ -734,7 +734,7 @@ public class Main {
         SetMultimap<Pair<Integer, ASTPath>, Insertion> positions =
             finder.getPositions(tree, insertions);
         if (dbug.isEnabled()) {
-          dbug.debug("In annotator.Main:%n");
+          dbug.debug("In org.checkerframework.afu.annotator.Main:%n");
           dbug.debug("positions (for %d insertions) = %s%n", insertions.size(), positions);
         }
 
