@@ -6,13 +6,13 @@ set -o xtrace
 export SHELLOPTS
 
 if [ "$(uname)" = "Darwin" ] ; then
-  export JAVA_HOME=${JAVA_HOME:-$(/usr/libexec/java_home)}
+  export JAVA_HOME="${JAVA_HOME:-$(/usr/libexec/java_home)}"
 else
-  export JAVA_HOME=${JAVA_HOME:-$(dirname "$(dirname "$(readlink -f "$(which javac)")")")}
+  export JAVA_HOME="${JAVA_HOME:-$(dirname "$(dirname "$(readlink -f "$(which javac)")")")}"
 fi
 export AFU="${AFU:-$(cd annotation-file-utilities >/dev/null 2>&1 && pwd -P)}"
 export CHECKERFRAMEWORK="${CHECKERFRAMEWORK:-$(cd .. >/dev/null 2>&1 && pwd -P)/checker-framework}"
-export PATH=$AFU/scripts:$JAVA_HOME/bin:$PATH
+export PATH="$AFU/scripts:$JAVA_HOME/bin:$PATH"
 
 if [ -d "/tmp/$USER/plume-scripts" ] ; then
   (cd "/tmp/$USER/plume-scripts" && git pull -q) > /dev/null 2>&1
@@ -36,7 +36,7 @@ status=0
 # For refactorings that touch a lot of code that you don't understand, create
 # top-level file SKIP-REQUIRE-JAVADOC.  Delete it after the pull request is merged.
 if [ -f ../SKIP-REQUIRE-JAVADOC ]; then
-  echo "Skipping Javadoc tasks because file SKIP-REQUIRE-JAVADOC exists"
+  echo "Skipping Javadoc tasks because file SKIP-REQUIRE-JAVADOC exists."
 else
   (./gradlew requireJavadoc --console=plain --warning-mode=all --no-daemon > /tmp/warnings-rjp.txt 2>&1) || true
   "$PLUME_SCRIPTS"/ci-lint-diff /tmp/warnings-rjp.txt || status=1
