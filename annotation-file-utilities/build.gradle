@@ -834,8 +834,6 @@ spotless {
     endWithNewline()
   }
   java {
-    // TODO: Shouldn't need any target once scene-lib is in the project directory.
-    target files("${rootDir}/src")
     googleJavaFormat()
     formatAnnotations()
   }
