@@ -57,13 +57,13 @@ The current AFU source code (3.6.16 as of 11 June 2015) is organized
 into four packages (not counting the
 \texttt{scene\_lib} sub-project):
 \begin{itemize}
-\item  \texttt{annotator}, containing the main class and a class
+\item  \texttt{org.checkerframework.afu.annotator}, containing the main class and a class
 representing source text;
-\item  \texttt{annotator.find},\ containing the classes that implement
+\item  \texttt{org.checkerframework.afu.annotator.find}, containing the classes that implement
 the core insertion logic;
-\item  \texttt{annotator.scanner},\ containing support classes for
-\texttt{annotator.find};\ and
-\item  \texttt{annotator.specification},\ containing classes that
+\item  \texttt{org.checkerframework.afu.annotator.scanner}, containing support classes for
+\texttt{org.checkerframework.afu.annotator.find};\ and
+\item  \texttt{org.checkerframework.afu.annotator.specification}, containing classes that
 manage intermediate representations of the insertions specified in a
 Java Annotation Index File (JAIF).
 \end{itemize}
@@ -72,14 +72,14 @@ first will be simplified somewhat and modified to reflect changes in the
 other packages, the second will be radically simplified, the third will
 remain the same, and the fourth will be eliminated.
 
-The details of \texttt{annotator.scanner}\ are not discussed here, since
+The details of \texttt{org.checkerframework.afu.annotator.scanner}\ are not discussed here, since
 the proposed redesign will neither change them nor be influenced by
-them.  Of the classes in \texttt{annotator.specification},\ only
+them.  Of the classes in \texttt{org.checkerframework.afu.annotator.specification},\ only
 \texttt{IndexFileSpecification},\ which extracts \texttt{Insertion}s
 from \texttt{scene-lib}'s JAIF representation
-(\texttt{scenelib.annotations.el.AScene}), is relevant to the redesign.
+(\texttt{org.checkerframework.afu.scenelib.annotations.el.AScene}), is relevant to the redesign.
 
-By far the largest and most complex package is \texttt{annotator.find}.
+By far the largest and most complex package is \texttt{org.checkerframework.afu.annotator.find}.
 The insertion logic is distributed among \texttt{TreeFinder} and
 numerous implementations of the \texttt{Criterion} and
 \texttt{Insertion} interfaces.  (A \texttt{Criterion} is a reified
@@ -153,7 +153,7 @@ responsibilities of both classes.
 Many of the current supporting classes will be retained as they are.  In
 particular, the new AFU will continue to rely on javac's AST classes and
 parser, and \texttt{scene-lib} probably will need little or no
-modification.  The \texttt{annotator.find} package will be radically
+modification.  The \texttt{org.checkerframework.afu.annotator.find} package will be radically
 simplified with the elimination of the \texttt{Criterion} and
 (possibly) \texttt{Insertion} hierarchies, as the insertion location
 within the AST can be determined directly from the \texttt{Scene}.
@@ -359,7 +359,7 @@ public abstract class AAST extends com.sun.source.Tree {
 }
 
 // main loop
-AAST insertAnnotations(scenelib.annotations.el.AScene scene, AAST aast);
+AAST insertAnnotations(org.checkerframework.afu.scenelib.annotations.el.AScene scene, AAST aast);
 \end{jcode}
 
 \newpage

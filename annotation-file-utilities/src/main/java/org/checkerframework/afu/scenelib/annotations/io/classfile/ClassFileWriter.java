@@ -1,13 +1,13 @@
 package org.checkerframework.afu.scenelib.annotations.io.classfile;
 
 import java.io.*;
+import org.checkerframework.afu.scenelib.annotations.el.AScene;
+import org.checkerframework.afu.scenelib.annotations.io.IndexFileParser;
 import org.checkerframework.afu.scenelib.annotations.util.CommandLineUtils;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Opcodes;
 import org.plumelib.options.Option;
 import org.plumelib.options.Options;
-import org.checkerframework.afu.scenelib.annotations.el.AScene;
-import org.checkerframework.afu.scenelib.annotations.io.IndexFileParser;
 
 /**
  * A <code> ClassFileWriter </code> provides methods for inserting annotations from an {@link
@@ -49,8 +49,8 @@ public class ClassFileWriter {
    * file. For programmatic access to this tool, one should probably use the insert() methods
    * instead.
    *
-   * <p>Usage: java scenelib.annotations.io.ClassFileWriter <em>options</em> [classfile indexfile]
-   * ...
+   * <p>Usage: java org.checkerframework.afu.scenelib.annotations.io.ClassFileWriter
+   * <em>options</em> [classfile indexfile] ...
    *
    * <p><em>options</em> include:
    *

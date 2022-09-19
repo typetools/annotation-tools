@@ -166,8 +166,8 @@ task skinnyJar(type: ShadowJar, dependsOn: compileJava) {
     includeEmptyDirs = false
     destinationDirectory = projectDir
     archiveFileName = 'annotation-file-utilities.jar'
-    include 'scenelib/**/*.class'
-    include 'annotator/**/*.class'
+    include 'org/checkerframework/afu/scenelib/**/*.class'
+    include 'org/checkerframework/afu/annotator/**/*.class'
 }
 
 test {
@@ -560,7 +560,7 @@ task updateUserOptionsJavadoc(type: Javadoc, dependsOn: 'assemble') {
 
   // Include only sources from annotation-file-utilities, not from scene-lib.
   source = fileTree(dir: 'src', include: '**/*.java')
-  exclude 'scenelib.annotations.io.classfile/**'
+  exclude 'org.checkerframework.afu.scenelib.annotations.io.classfile/**'
   classpath = project.sourceSets.main.compileClasspath + project.sourceSets.main.runtimeClasspath
   options.memberLevel = JavadocMemberLevel.PRIVATE
   options.docletpath = project.sourceSets.main.runtimeClasspath as List
@@ -580,7 +580,7 @@ task updateUserOptionsHtml(type: Javadoc, dependsOn: 'assemble') {
 
   // Include only sources from annotation-file-utilities, not from scene-lib.
   source = fileTree(dir: 'src', include: '**/*.java')
-  exclude 'scenelib.annotations.io.classfile/**'
+  exclude 'org.checkerframework.afu.scenelib.annotations.io.classfile/**'
   classpath = project.sourceSets.main.compileClasspath + project.sourceSets.main.runtimeClasspath
   options.memberLevel = JavadocMemberLevel.PRIVATE
   options.docletpath = project.sourceSets.main.runtimeClasspath as List

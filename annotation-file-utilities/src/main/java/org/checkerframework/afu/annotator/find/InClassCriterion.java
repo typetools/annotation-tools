@@ -1,7 +1,5 @@
 package org.checkerframework.afu.annotator.find;
 
-import org.checkerframework.afu.annotator.scanner.AnonymousClassScanner;
-import org.checkerframework.afu.annotator.scanner.LocalClassScanner;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.tree.ExpressionTree;
@@ -11,6 +9,8 @@ import com.sun.source.util.TreePath;
 import java.util.*;
 import java.util.regex.*;
 import javax.lang.model.element.Name;
+import org.checkerframework.afu.annotator.scanner.AnonymousClassScanner;
+import org.checkerframework.afu.annotator.scanner.LocalClassScanner;
 import org.checkerframework.checker.signature.qual.ClassGetName;
 
 // If there are dollar signs in a name, then there are two
@@ -20,9 +20,9 @@ import org.checkerframework.checker.signature.qual.ClassGetName;
 // We need to account for both possibilities (and all combinations of them).
 
 // Example names
-//   annotator.tests.FullClassName
-//   annotator.tests.FullClassName$InnerClass
-//   annotator.tests.FullClassName$0
+//   org.checkerframework.afu.annotator.tests.FullClassName
+//   org.checkerframework.afu.annotator.tests.FullClassName$InnerClass
+//   org.checkerframework.afu.annotator.tests.FullClassName$0
 
 /** Represents the criterion that a program element is in a class with a particular name. */
 public final class InClassCriterion implements Criterion {

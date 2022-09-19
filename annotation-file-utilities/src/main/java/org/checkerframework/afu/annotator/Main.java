@@ -1,19 +1,5 @@
 package org.checkerframework.afu.annotator;
 
-import org.checkerframework.afu.annotator.find.GenericArrayLocationCriterion;
-import org.checkerframework.afu.annotator.find.AnnotationInsertion;
-import org.checkerframework.afu.annotator.find.CastInsertion;
-import org.checkerframework.afu.annotator.find.ConstructorInsertion;
-import org.checkerframework.afu.annotator.find.Criteria;
-import org.checkerframework.afu.annotator.find.Insertion;
-import org.checkerframework.afu.annotator.find.Insertions;
-import org.checkerframework.afu.annotator.find.NewInsertion;
-import org.checkerframework.afu.annotator.find.ReceiverInsertion;
-import org.checkerframework.afu.annotator.find.TreeFinder;
-import org.checkerframework.afu.annotator.find.TypedInsertion;
-import org.checkerframework.afu.annotator.scanner.LocalVariableScanner;
-import org.checkerframework.afu.annotator.scanner.TreePathUtil;
-import org.checkerframework.afu.annotator.specification.IndexFileSpecification;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.SetMultimap;
@@ -42,17 +28,20 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.checkerframework.afu.scenelib.annotations.io.classfile.ClassFileReader;
-import org.checkerframework.afu.scenelib.type.DeclaredType;
-import org.checkerframework.afu.scenelib.type.Type;
-import org.objectweb.asm.TypePath;
-import org.plumelib.options.Option;
-import org.plumelib.options.OptionGroup;
-import org.plumelib.options.Options;
-import org.plumelib.reflection.ReflectionPlume;
-import org.plumelib.util.FileIOException;
-import org.plumelib.util.FilesPlume;
-import org.plumelib.util.Pair;
+import org.checkerframework.afu.annotator.find.AnnotationInsertion;
+import org.checkerframework.afu.annotator.find.CastInsertion;
+import org.checkerframework.afu.annotator.find.ConstructorInsertion;
+import org.checkerframework.afu.annotator.find.Criteria;
+import org.checkerframework.afu.annotator.find.GenericArrayLocationCriterion;
+import org.checkerframework.afu.annotator.find.Insertion;
+import org.checkerframework.afu.annotator.find.Insertions;
+import org.checkerframework.afu.annotator.find.NewInsertion;
+import org.checkerframework.afu.annotator.find.ReceiverInsertion;
+import org.checkerframework.afu.annotator.find.TreeFinder;
+import org.checkerframework.afu.annotator.find.TypedInsertion;
+import org.checkerframework.afu.annotator.scanner.LocalVariableScanner;
+import org.checkerframework.afu.annotator.scanner.TreePathUtil;
+import org.checkerframework.afu.annotator.specification.IndexFileSpecification;
 import org.checkerframework.afu.scenelib.annotations.Annotation;
 import org.checkerframework.afu.scenelib.annotations.el.ABlock;
 import org.checkerframework.afu.scenelib.annotations.el.AClass;
@@ -75,13 +64,24 @@ import org.checkerframework.afu.scenelib.annotations.io.ASTRecord;
 import org.checkerframework.afu.scenelib.annotations.io.DebugWriter;
 import org.checkerframework.afu.scenelib.annotations.io.IndexFileParser;
 import org.checkerframework.afu.scenelib.annotations.io.IndexFileWriter;
+import org.checkerframework.afu.scenelib.annotations.io.classfile.ClassFileReader;
 import org.checkerframework.afu.scenelib.annotations.util.CommandLineUtils;
 import org.checkerframework.afu.scenelib.annotations.util.coll.VivifyingMap;
+import org.checkerframework.afu.scenelib.type.DeclaredType;
+import org.checkerframework.afu.scenelib.type.Type;
+import org.objectweb.asm.TypePath;
+import org.plumelib.options.Option;
+import org.plumelib.options.OptionGroup;
+import org.plumelib.options.Options;
+import org.plumelib.reflection.ReflectionPlume;
+import org.plumelib.util.FileIOException;
+import org.plumelib.util.FilesPlume;
+import org.plumelib.util.Pair;
 
 /**
  * This is the main class for the annotator, which inserts annotations in Java source code. You can
- * call it as {@code java org.checkerframework.afu.annotator.Main} or by using the shell script {@code
- * insert-annotations-to-source}.
+ * call it as {@code java org.checkerframework.afu.annotator.Main} or by using the shell script
+ * {@code insert-annotations-to-source}.
  *
  * <p>It takes as input
  *
@@ -246,8 +246,7 @@ public class Main {
             ASTPath p = entry.getKey();
             ATypeElementWithType e = entry.getValue();
             Type type = e.getType();
-            if (type instanceof DeclaredType
-                && ((DeclaredType) type).getName().isEmpty()) {
+            if (type instanceof DeclaredType && ((DeclaredType) type).getName().isEmpty()) {
               insertAnnotations.put(p, e);
               // visitTypeElement(e, insertAnnotations.getVivify(p));
             } else {
@@ -450,8 +449,7 @@ public class Main {
         if (rec.astPath.isEmpty()) {
           el = decl;
         } else if (ins.getKind() == Insertion.Kind.CAST) {
-          ATypeElementWithType elem =
-              decl.insertTypecasts.getVivify(rec.astPath);
+          ATypeElementWithType elem = decl.insertTypecasts.getVivify(rec.astPath);
           elem.setType(((CastInsertion) ins).getType());
           el = elem;
         } else {
@@ -483,9 +481,9 @@ public class Main {
   //  1. The annotator partially compiles source
   //     files using the compiler API (JSR-199), obtaining an AST.
   //  2. The annotator reads the specification file, producing a set of
-  //     annotator.find.Insertions.  Insertions completely specify what to
+  //     org.checkerframework.afu.annotator.find.Insertions.  Insertions completely specify what to
   //     write (as a String, which is ultimately translated according to the
-  //     keyword file) and how to write it (as annotator.find.Criteria).
+  //     keyword file) and how to write it (as org.checkerframework.afu.annotator.find.Criteria).
   //  3. It then traverses the tree, looking for nodes that satisfy the
   //     Insertion Criteria, translating the Insertion text against the
   //     keyword file, and inserting the annotations into the source file.
@@ -502,14 +500,13 @@ public class Main {
   public static void main(String[] args) throws IOException {
 
     if (verbose) {
-      System.out.printf(
-          "insert-annotations-to-source (%s)%n",
-          ClassFileReader.INDEX_UTILS_VERSION);
+      System.out.printf("insert-annotations-to-source (%s)%n", ClassFileReader.INDEX_UTILS_VERSION);
     }
 
     Options options =
         new Options(
-            "java org.checkerframework.afu.annotator.Main [options] { jaif-file | java-file | @arg-file } ..."
+            "java org.checkerframework.afu.annotator.Main [options] { jaif-file | java-file |"
+                + " @arg-file } ..."
                 + System.lineSeparator()
                 + "(Contents of argfiles are expanded into the argument list.)",
             Main.class);

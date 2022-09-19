@@ -1,6 +1,5 @@
 package org.checkerframework.afu.scenelib.annotations.io;
 
-import org.checkerframework.afu.annotator.find.CaseUtils;
 import com.sun.source.tree.AnnotatedTypeTree;
 import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.ArrayAccessTree;
@@ -61,6 +60,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import org.checkerframework.afu.annotator.find.CaseUtils;
 import org.plumelib.util.ArraysPlume;
 
 /** A path through the AST. */
@@ -359,7 +359,7 @@ public class ASTPath extends ImmutableStack<ASTPath.ASTEntry>
   }
 
   static class Parser {
-    // adapted from scenelib.annotations.io.IndexFileParser
+    // adapted from org.checkerframework.afu.scenelib.annotations.io.IndexFileParser
     // TODO: refactor IndexFileParser to use this class
 
     StreamTokenizer st;
@@ -1423,7 +1423,7 @@ public class ASTPath extends ImmutableStack<ASTPath.ASTEntry>
   }
 } // end of class ASTPath
 
-// This class cannot be moved to (say) package scenelib.annotations.util,
+// This class cannot be moved to (say) package org.checkerframework.afu.scenelib.annotations.util,
 // probably because of the reflection cleverness.
 /**
  * Immutable stack: operations create new stacks rather than mutate the receiver.

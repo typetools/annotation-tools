@@ -246,10 +246,10 @@ public final class Annotation {
    */
   public void toString(StringBuilder sb) {
     // TODO: reduce duplication with
-    // annotator.specification.IndexFileSpecification.getElementAnnotations(AElement)
+    // org.checkerframework.afu.annotator.specification.IndexFileSpecification.getElementAnnotations(AElement)
 
     // TODO: figure out how to consider abbreviated annotation names.
-    // See annotator.find.AnnotationInsertion.getText(boolean, boolean)
+    // See org.checkerframework.afu.annotator.find.AnnotationInsertion.getText(boolean, boolean)
     sb.append("@");
     sb.append(def.name);
     if (fieldValues.size() == 1 && fieldValues.containsKey("value")) {
@@ -276,10 +276,10 @@ public final class Annotation {
   }
 }
 
-// package annotations;
+// package org.checkerframework.afu.annotations;
 //
-// import scenelib.annotations.el.*;
-// import scenelib.annotations.util.coll.Keyer;
+// import org.checkerframework.afu.scenelib.annotations.el.*;
+// import org.checkerframework.afu.scenelib.annotations.util.coll.Keyer;
 //
 // /**
 //  * A top-level annotation containing an ordinary annotation plus a retention

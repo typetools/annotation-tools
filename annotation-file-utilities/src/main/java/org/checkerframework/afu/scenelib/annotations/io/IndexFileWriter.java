@@ -15,19 +15,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.checkerframework.afu.scenelib.annotations.field.AnnotationAFT;
-import org.checkerframework.afu.scenelib.annotations.field.AnnotationFieldType;
-import org.checkerframework.afu.scenelib.annotations.field.ArrayAFT;
-import org.checkerframework.afu.scenelib.annotations.field.BasicAFT;
-import org.checkerframework.afu.scenelib.annotations.field.ClassTokenAFT;
-import org.checkerframework.afu.scenelib.annotations.util.Strings;
-import org.checkerframework.afu.scenelib.annotations.AnnotationBuilder;
-import org.checkerframework.afu.scenelib.type.ArrayType;
-import org.checkerframework.afu.scenelib.type.BoundedType;
-import org.checkerframework.afu.scenelib.type.DeclaredType;
-import org.checkerframework.afu.scenelib.type.Type;
-import org.objectweb.asm.TypePath;
 import org.checkerframework.afu.scenelib.annotations.Annotation;
+import org.checkerframework.afu.scenelib.annotations.AnnotationBuilder;
 import org.checkerframework.afu.scenelib.annotations.el.AClass;
 import org.checkerframework.afu.scenelib.annotations.el.AElement;
 import org.checkerframework.afu.scenelib.annotations.el.AField;
@@ -43,6 +32,17 @@ import org.checkerframework.afu.scenelib.annotations.el.LocalLocation;
 import org.checkerframework.afu.scenelib.annotations.el.RelativeLocation;
 import org.checkerframework.afu.scenelib.annotations.el.TypeIndexLocation;
 import org.checkerframework.afu.scenelib.annotations.el.TypePathEntry;
+import org.checkerframework.afu.scenelib.annotations.field.AnnotationAFT;
+import org.checkerframework.afu.scenelib.annotations.field.AnnotationFieldType;
+import org.checkerframework.afu.scenelib.annotations.field.ArrayAFT;
+import org.checkerframework.afu.scenelib.annotations.field.BasicAFT;
+import org.checkerframework.afu.scenelib.annotations.field.ClassTokenAFT;
+import org.checkerframework.afu.scenelib.annotations.util.Strings;
+import org.checkerframework.afu.scenelib.type.ArrayType;
+import org.checkerframework.afu.scenelib.type.BoundedType;
+import org.checkerframework.afu.scenelib.type.DeclaredType;
+import org.checkerframework.afu.scenelib.type.Type;
+import org.objectweb.asm.TypePath;
 
 /**
  * IndexFileWriter provides two static methods named <code>write</code> that write a given {@link
@@ -378,7 +378,7 @@ public final class IndexFileWriter {
     OurDefCollector odc = new OurDefCollector();
     odc.visit();
 
-    // Then any package scenelib.annotations...
+    // Then any package org.checkerframework.afu.scenelib.annotations...
     for (Map.Entry<String, AElement> pe : scene.packages.entrySet()) {
       AElement elem = pe.getValue();
       if (elem != null && !elem.tlAnnotationsHere.isEmpty()) {
@@ -580,11 +580,11 @@ public final class IndexFileWriter {
    *   <li>There is one case in which, even if a scene is written successfully, reading it back in
    *       produces a different scene. Consider a scene containing two annotations of type Foo, each
    *       with an array field bar. In one annotation, bar is empty and of unknown element type (see
-   *       {@link AnnotationBuilder#addEmptyArrayField}); in the other, bar is
-   *       of known element type. This method will {@linkplain AnnotationDef#unify unify} the two
-   *       definitions of Foo by writing a single definition with known element type. When the index
-   *       file is read into a new scene, the definitions of both annotations will have known
-   *       element type, whereas in the original scene, one had unknown element type.
+   *       {@link AnnotationBuilder#addEmptyArrayField}); in the other, bar is of known element
+   *       type. This method will {@linkplain AnnotationDef#unify unify} the two definitions of Foo
+   *       by writing a single definition with known element type. When the index file is read into
+   *       a new scene, the definitions of both annotations will have known element type, whereas in
+   *       the original scene, one had unknown element type.
    * </ul>
    */
   public static void write(AScene scene, Writer out) throws DefException {
