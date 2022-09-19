@@ -3,13 +3,13 @@ package org.checkerframework.afu.scenelib.annotations.io.classfile;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import org.checkerframework.afu.scenelib.annotations.el.AScene;
 import org.checkerframework.afu.scenelib.annotations.io.IndexFileWriter;
 import org.checkerframework.afu.scenelib.annotations.util.CommandLineUtils;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Opcodes;
 import org.plumelib.options.Option;
 import org.plumelib.options.Options;
-import org.checkerframework.afu.scenelib.annotations.el.AScene;
 
 /**
  * A <code> ClassFileReader </code> provides methods for reading in annotations from a class file

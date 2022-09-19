@@ -15,7 +15,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.checkerframework.checker.signature.qual.BinaryName;
+import org.checkerframework.afu.scenelib.annotations.Annotation;
+import org.checkerframework.afu.scenelib.annotations.AnnotationBuilder;
+import org.checkerframework.afu.scenelib.annotations.AnnotationFactory;
+import org.checkerframework.afu.scenelib.annotations.Annotations;
 import org.checkerframework.afu.scenelib.annotations.el.AClass;
 import org.checkerframework.afu.scenelib.annotations.el.AElement;
 import org.checkerframework.afu.scenelib.annotations.el.AMethod;
@@ -24,11 +27,8 @@ import org.checkerframework.afu.scenelib.annotations.el.ATypeElement;
 import org.checkerframework.afu.scenelib.annotations.el.LocalLocation;
 import org.checkerframework.afu.scenelib.annotations.el.RelativeLocation;
 import org.checkerframework.afu.scenelib.annotations.el.TypePathEntry;
+import org.checkerframework.checker.signature.qual.BinaryName;
 import org.plumelib.util.FileIOException;
-import org.checkerframework.afu.scenelib.annotations.Annotation;
-import org.checkerframework.afu.scenelib.annotations.AnnotationBuilder;
-import org.checkerframework.afu.scenelib.annotations.AnnotationFactory;
-import org.checkerframework.afu.scenelib.annotations.Annotations;
 
 /**
  * <code>JavapParser</code> provides a static method that parses a class dump in the form produced

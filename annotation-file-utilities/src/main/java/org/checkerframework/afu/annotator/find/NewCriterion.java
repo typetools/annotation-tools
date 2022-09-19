@@ -1,8 +1,8 @@
 package org.checkerframework.afu.annotator.find;
 
-import org.checkerframework.afu.annotator.scanner.NewScanner;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
+import org.checkerframework.afu.annotator.scanner.NewScanner;
 import org.checkerframework.afu.scenelib.annotations.el.RelativeLocation;
 
 /** Criterion for being a specific object creation expression. */

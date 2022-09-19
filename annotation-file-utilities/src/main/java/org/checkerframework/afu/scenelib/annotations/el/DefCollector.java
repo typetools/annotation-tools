@@ -2,16 +2,15 @@ package org.checkerframework.afu.scenelib.annotations.el;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
+import org.checkerframework.afu.scenelib.annotations.Annotation;
 import org.checkerframework.afu.scenelib.annotations.field.AnnotationAFT;
 import org.checkerframework.afu.scenelib.annotations.field.AnnotationFieldType;
 import org.checkerframework.afu.scenelib.annotations.io.IndexFileWriter;
-import org.checkerframework.afu.scenelib.annotations.Annotation;
 
 /**
  * A DefCollector supplies a visitor for the annotation definitions in an AScene. First, call the
  * DefCollector constructor passing the AScene. Then, call the visit method. This class exists
- * primarily for the benefit of {@link IndexFileWriter#write(AScene,
- * Writer)}.
+ * primarily for the benefit of {@link IndexFileWriter#write(AScene, Writer)}.
  */
 public abstract class DefCollector {
 

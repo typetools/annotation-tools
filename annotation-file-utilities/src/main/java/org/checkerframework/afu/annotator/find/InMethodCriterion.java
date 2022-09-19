@@ -1,9 +1,9 @@
 package org.checkerframework.afu.annotator.find;
 
-import org.checkerframework.afu.annotator.Main;
 import com.sun.source.tree.*;
 import com.sun.source.util.TreePath;
 import javax.lang.model.element.Modifier;
+import org.checkerframework.afu.annotator.Main;
 
 /** Represents the criterion that a program element is in a method with a certain name. */
 final class InMethodCriterion implements Criterion {

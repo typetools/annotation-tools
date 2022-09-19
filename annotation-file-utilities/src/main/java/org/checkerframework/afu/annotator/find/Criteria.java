@@ -1,5 +1,9 @@
 package org.checkerframework.afu.annotator.find;
 
+import com.sun.source.tree.Tree;
+import com.sun.source.util.TreePath;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import org.checkerframework.afu.annotator.Main;
 import org.checkerframework.afu.scenelib.annotations.el.BoundLocation;
 import org.checkerframework.afu.scenelib.annotations.el.LocalLocation;
@@ -7,10 +11,6 @@ import org.checkerframework.afu.scenelib.annotations.el.RelativeLocation;
 import org.checkerframework.afu.scenelib.annotations.el.TypeIndexLocation;
 import org.checkerframework.afu.scenelib.annotations.io.ASTPath;
 import org.checkerframework.afu.scenelib.annotations.io.DebugWriter;
-import com.sun.source.tree.Tree;
-import com.sun.source.util.TreePath;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.signature.qual.ClassGetName;
 import org.objectweb.asm.TypePath;

@@ -3,8 +3,8 @@ package org.checkerframework.afu.scenelib.annotations.el;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import org.checkerframework.afu.scenelib.annotations.util.coll.VivifyingMap;
 import org.checkerframework.afu.scenelib.annotations.Annotation;
+import org.checkerframework.afu.scenelib.annotations.util.coll.VivifyingMap;
 
 /**
  * An <code>AElement</code> represents a Java element and the annotations it carries. Some <code>

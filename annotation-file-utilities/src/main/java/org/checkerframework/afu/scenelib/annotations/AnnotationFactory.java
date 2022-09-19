@@ -6,9 +6,9 @@ import org.checkerframework.afu.scenelib.annotations.el.AnnotationDef;
 import org.checkerframework.checker.signature.qual.BinaryName;
 
 /**
- * A very simple {@link AnnotationFactory AnnotationFactory} that creates
- * {@link Annotation}s. It is interested in all annotations and determines their definitions
- * automatically from the fields supplied. Use the singleton {@link #saf}.
+ * A very simple {@link AnnotationFactory AnnotationFactory} that creates {@link Annotation}s. It is
+ * interested in all annotations and determines their definitions automatically from the fields
+ * supplied. Use the singleton {@link #saf}.
  */
 public final class AnnotationFactory {
   private AnnotationFactory() {}

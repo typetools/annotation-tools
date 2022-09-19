@@ -1,6 +1,5 @@
 package org.checkerframework.afu.annotator.find;
 
-import org.checkerframework.afu.annotator.Main;
 import com.sun.source.tree.AnnotatedTypeTree;
 import com.sun.source.tree.ArrayTypeTree;
 import com.sun.source.tree.MemberSelectTree;
@@ -17,8 +16,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.lang.model.type.TypeKind;
-import org.objectweb.asm.TypePath;
+import org.checkerframework.afu.annotator.Main;
 import org.checkerframework.afu.scenelib.annotations.el.TypePathEntry;
+import org.objectweb.asm.TypePath;
 
 /**
  * GenericArrayLocationCriterion represents the criterion specifying the location of an element in

@@ -6,11 +6,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.checkerframework.afu.scenelib.annotations.el.AnnotationDef;
 import org.checkerframework.afu.scenelib.annotations.field.AnnotationFieldType;
 import org.checkerframework.afu.scenelib.annotations.field.ArrayAFT;
 import org.checkerframework.afu.scenelib.annotations.field.ScalarAFT;
 import org.checkerframework.checker.signature.qual.BinaryName;
-import org.checkerframework.afu.scenelib.annotations.el.AnnotationDef;
 
 /**
  * An {@link AnnotationBuilder} builds a single annotation object after the annotation's fields have

@@ -1,9 +1,9 @@
 package org.checkerframework.afu.annotator.find;
 
-import org.checkerframework.afu.annotator.scanner.CastScanner;
-import org.checkerframework.afu.scenelib.annotations.el.RelativeLocation;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
+import org.checkerframework.afu.annotator.scanner.CastScanner;
+import org.checkerframework.afu.scenelib.annotations.el.RelativeLocation;
 
 /** Criterion for being a specific type cast expression. */
 public class CastCriterion implements Criterion {

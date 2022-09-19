@@ -5,8 +5,6 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.plumelib.util.FileIOException;
 import org.checkerframework.afu.scenelib.annotations.el.AScene;
 import org.checkerframework.afu.scenelib.annotations.el.DefException;
 import org.checkerframework.afu.scenelib.annotations.io.IndexFileParser;
@@ -14,6 +12,8 @@ import org.checkerframework.afu.scenelib.annotations.io.IndexFileWriter;
 import org.checkerframework.afu.scenelib.annotations.io.JavapParser;
 import org.checkerframework.afu.scenelib.annotations.io.classfile.ClassFileReader;
 import org.checkerframework.afu.scenelib.annotations.io.classfile.ClassFileWriter;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.plumelib.util.FileIOException;
 
 /** Concatenates multiple descriptions of annotations into a single one. */
 public class Anncat {

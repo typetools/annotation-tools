@@ -11,8 +11,8 @@ import javax.lang.model.element.Name;
 import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
-import org.checkerframework.afu.scenelib.annotations.util.coll.VivifyingMap;
 import org.checkerframework.afu.scenelib.annotations.Annotation;
+import org.checkerframework.afu.scenelib.annotations.util.coll.VivifyingMap;
 
 /** An annotated method; contains bounds, return, parameters, receiver, and throws. */
 public class AMethod extends ADeclaration {

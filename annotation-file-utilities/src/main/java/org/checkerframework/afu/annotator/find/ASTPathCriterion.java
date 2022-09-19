@@ -1,6 +1,5 @@
 package org.checkerframework.afu.annotator.find;
 
-import org.checkerframework.afu.annotator.Main;
 import com.sun.source.tree.AnnotatedTypeTree;
 import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.ArrayAccessTree;
@@ -52,6 +51,7 @@ import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.tree.JCTree;
 import java.util.ArrayList;
 import java.util.List;
+import org.checkerframework.afu.annotator.Main;
 import org.checkerframework.afu.scenelib.annotations.io.ASTPath;
 
 /** A criterion to determine if a node matches a path through the AST. */

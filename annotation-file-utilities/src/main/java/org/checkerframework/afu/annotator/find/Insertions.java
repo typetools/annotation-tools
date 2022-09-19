@@ -55,11 +55,10 @@ import org.objectweb.asm.TypePath;
  * files, this class reduces the number of insertions to be considered for any AST node.
  *
  * <p>The class now serves a second purpose, which should probably be separated out: It attaches
- * {@link ASTPath}-based inner type {@link Insertion}s to a {@link
- * TypedInsertion} on the outer type if one exists (see {@link
- * #organizeTypedInsertions(CompilationUnitTree, String, Collection)}. Since getting these
- * insertions right depends on this organization, this class is now essential for correctness, not
- * merely for performance.
+ * {@link ASTPath}-based inner type {@link Insertion}s to a {@link TypedInsertion} on the outer type
+ * if one exists (see {@link #organizeTypedInsertions(CompilationUnitTree, String, Collection)}.
+ * Since getting these insertions right depends on this organization, this class is now essential
+ * for correctness, not merely for performance.
  */
 public class Insertions implements Iterable<Insertion> {
 
@@ -238,8 +237,8 @@ public class Insertions implements Iterable<Insertion> {
    * because 1) insertion proceeds from the end to the beginning of the source and 2) the insertion
    * location does not always exist prior to the top-level type insertion.
    *
-   * <p>This method attaches {@link ASTPath}-based inner type {@link
-   * Insertion}s to a {@link TypedInsertion} on the outer type if one exists.
+   * <p>This method attaches {@link ASTPath}-based inner type {@link Insertion}s to a {@link
+   * TypedInsertion} on the outer type if one exists.
    */
   @SuppressWarnings("CatchAndPrintStackTrace") // maybe rethrow the exception
   private Set<Insertion> organizeTypedInsertions(

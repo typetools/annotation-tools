@@ -30,7 +30,8 @@ class BoundZero<U> {
 
   <T extends java.lang.@Y Object & Comparable<T>> void m5(T o) {}
 
-  <T extends java.lang.@org.checkerframework.afu.annotator.tests.Y Object & Comparable<T>> void m6(T o) {}
+  <T extends java.lang.@org.checkerframework.afu.annotator.tests.Y Object & Comparable<T>> void m6(
+      T o) {}
 
   <T extends Comparable<T>> void m7(T o) {}
 

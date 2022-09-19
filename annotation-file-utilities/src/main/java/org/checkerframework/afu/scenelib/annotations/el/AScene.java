@@ -5,9 +5,9 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import org.checkerframework.afu.scenelib.annotations.Annotation;
 import org.checkerframework.afu.scenelib.annotations.io.IndexFileParser;
 import org.checkerframework.afu.scenelib.annotations.util.coll.VivifyingMap;
-import org.checkerframework.afu.scenelib.annotations.Annotation;
 
 /**
  * An <code>AScene</code> (annotated scene) represents the annotations on a set of Java classes and

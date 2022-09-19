@@ -1,6 +1,5 @@
 package org.checkerframework.afu.annotator.find;
 
-import org.checkerframework.afu.annotator.Main;
 import com.sun.source.tree.AnnotatedTypeTree;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.CompilationUnitTree;
@@ -17,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.checkerframework.afu.annotator.Main;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.signature.qual.BinaryName;
 import org.plumelib.reflection.Signatures;

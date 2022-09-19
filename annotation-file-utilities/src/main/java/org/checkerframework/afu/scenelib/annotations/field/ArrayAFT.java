@@ -1,8 +1,8 @@
 package org.checkerframework.afu.scenelib.annotations.field;
 
 import java.util.Collection;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.afu.scenelib.annotations.AnnotationBuilder;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /** An {@link ArrayAFT} represents an annotation field type that is an array. */
 public final class ArrayAFT extends AnnotationFieldType {

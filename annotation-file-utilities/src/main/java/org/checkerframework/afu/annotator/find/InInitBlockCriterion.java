@@ -1,9 +1,9 @@
 package org.checkerframework.afu.annotator.find;
 
-import org.checkerframework.afu.annotator.scanner.InitBlockScanner;
-import org.checkerframework.afu.annotator.scanner.TreePathUtil;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
+import org.checkerframework.afu.annotator.scanner.InitBlockScanner;
+import org.checkerframework.afu.annotator.scanner.TreePathUtil;
 
 /** Criterion for being within a specific initializer. */
 public class InInitBlockCriterion implements Criterion {

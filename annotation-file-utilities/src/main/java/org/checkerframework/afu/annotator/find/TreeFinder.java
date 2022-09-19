@@ -1,16 +1,5 @@
 package org.checkerframework.afu.annotator.find;
 
-import org.checkerframework.afu.annotator.Main;
-import org.checkerframework.afu.annotator.scanner.TreePathUtil;
-import org.checkerframework.afu.annotator.specification.IndexFileSpecification;
-import org.checkerframework.afu.scenelib.annotations.el.AnnotationDef;
-import org.checkerframework.afu.scenelib.annotations.el.TypePathEntry;
-import org.checkerframework.afu.scenelib.annotations.io.ASTIndex;
-import org.checkerframework.afu.scenelib.annotations.io.ASTPath;
-import org.checkerframework.afu.scenelib.annotations.io.ASTRecord;
-import org.checkerframework.afu.scenelib.annotations.io.DebugWriter;
-import org.checkerframework.afu.scenelib.type.DeclaredType;
-import org.checkerframework.afu.scenelib.type.Type;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.SetMultimap;
@@ -72,6 +61,17 @@ import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.Name;
 import javax.lang.model.type.NullType;
+import org.checkerframework.afu.annotator.Main;
+import org.checkerframework.afu.annotator.scanner.TreePathUtil;
+import org.checkerframework.afu.annotator.specification.IndexFileSpecification;
+import org.checkerframework.afu.scenelib.annotations.el.AnnotationDef;
+import org.checkerframework.afu.scenelib.annotations.el.TypePathEntry;
+import org.checkerframework.afu.scenelib.annotations.io.ASTIndex;
+import org.checkerframework.afu.scenelib.annotations.io.ASTPath;
+import org.checkerframework.afu.scenelib.annotations.io.ASTRecord;
+import org.checkerframework.afu.scenelib.annotations.io.DebugWriter;
+import org.checkerframework.afu.scenelib.type.DeclaredType;
+import org.checkerframework.afu.scenelib.type.Type;
 import org.objectweb.asm.TypePath;
 import org.plumelib.util.Pair;
 

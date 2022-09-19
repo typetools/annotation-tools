@@ -13,7 +13,6 @@ import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
-import org.plumelib.util.FileIOException;
 import org.checkerframework.afu.scenelib.annotations.Annotation;
 import org.checkerframework.afu.scenelib.annotations.Annotations;
 import org.checkerframework.afu.scenelib.annotations.el.ABlock;
@@ -33,6 +32,7 @@ import org.checkerframework.afu.scenelib.annotations.field.AnnotationFieldType;
 import org.checkerframework.afu.scenelib.annotations.io.IndexFileParser;
 import org.checkerframework.afu.scenelib.annotations.io.IndexFileWriter;
 import org.checkerframework.afu.scenelib.annotations.util.CommandLineUtils;
+import org.plumelib.util.FileIOException;
 
 /** Utility for merging index files, including multiple versions for the same class. */
 public class IndexFileMerger {

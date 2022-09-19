@@ -1,8 +1,8 @@
 package org.checkerframework.afu.annotator.find;
 
-import org.checkerframework.afu.annotator.scanner.TreePathUtil;
 import com.sun.source.tree.*;
 import com.sun.source.util.TreePath;
+import org.checkerframework.afu.annotator.scanner.TreePathUtil;
 
 /** Represents the criterion that a program element has a particular type and name. */
 final class IsCriterion implements Criterion {

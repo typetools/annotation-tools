@@ -6,15 +6,15 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.StringJoiner;
+import org.checkerframework.afu.scenelib.annotations.Annotation;
 import org.checkerframework.afu.scenelib.annotations.AnnotationBuilder;
+import org.checkerframework.afu.scenelib.annotations.Annotations;
 import org.checkerframework.afu.scenelib.annotations.field.AnnotationFieldType;
 import org.checkerframework.afu.scenelib.annotations.util.MethodRecorder;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.signature.qual.BinaryName;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Opcodes;
-import org.checkerframework.afu.scenelib.annotations.Annotation;
-import org.checkerframework.afu.scenelib.annotations.Annotations;
 
 /**
  * An annotation type definition, consisting of the annotation name, its meta-annotations, and its

@@ -3,8 +3,8 @@ package org.checkerframework.afu.scenelib.annotations.el;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import org.checkerframework.afu.scenelib.annotations.util.coll.VivifyingMap;
 import org.checkerframework.afu.scenelib.annotations.Annotation;
+import org.checkerframework.afu.scenelib.annotations.util.coll.VivifyingMap;
 
 /**
  * An {@link AElement} that represents a type might have annotations on inner types ("generic/array"

@@ -1,8 +1,8 @@
 package org.checkerframework.afu.scenelib.annotations.field;
 
 import java.util.Map;
-import org.checkerframework.afu.scenelib.annotations.io.IndexFileWriter;
 import org.checkerframework.afu.scenelib.annotations.el.AnnotationDef;
+import org.checkerframework.afu.scenelib.annotations.io.IndexFileWriter;
 import org.checkerframework.afu.scenelib.annotations.util.EqualByStringRepresentation;
 
 /**

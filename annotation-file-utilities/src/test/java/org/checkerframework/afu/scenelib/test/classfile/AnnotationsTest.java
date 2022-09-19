@@ -7,14 +7,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
-import org.junit.Assert;
-import org.junit.Test;
-import org.objectweb.asm.ClassReader;
 import org.checkerframework.afu.scenelib.annotations.el.AScene;
 import org.checkerframework.afu.scenelib.annotations.io.IndexFileParser;
 import org.checkerframework.afu.scenelib.annotations.io.IndexFileWriter;
 import org.checkerframework.afu.scenelib.annotations.io.classfile.ClassFileReader;
 import org.checkerframework.afu.scenelib.annotations.io.classfile.ClassFileWriter;
+import org.junit.Assert;
+import org.junit.Test;
+import org.objectweb.asm.ClassReader;
 
 /**
  * This class is the testing framework for the class file/index file annotations converter. To add a

@@ -1,8 +1,5 @@
 package org.checkerframework.afu.scenelib.annotations.io;
 
-import org.checkerframework.afu.scenelib.annotations.util.JVMNames;
-import org.checkerframework.afu.scenelib.annotations.util.coll.WrapperMap;
-import org.checkerframework.afu.annotator.find.CaseUtils;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.sun.source.tree.AnnotatedTypeTree;
@@ -63,6 +60,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.lang.model.element.Name;
+import org.checkerframework.afu.annotator.find.CaseUtils;
+import org.checkerframework.afu.scenelib.annotations.util.JVMNames;
+import org.checkerframework.afu.scenelib.annotations.util.coll.WrapperMap;
 
 /** Cache of {@code ASTPath} data for the nodes of a compilation unit tree. */
 public class ASTIndex extends WrapperMap<Tree, ASTRecord> {

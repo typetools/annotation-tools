@@ -1,7 +1,5 @@
 package org.checkerframework.afu.annotator.find;
 
-import org.checkerframework.afu.annotator.scanner.LocalVariableScanner;
-import org.checkerframework.afu.scenelib.annotations.el.LocalLocation;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.tree.VariableTree;
@@ -9,6 +7,8 @@ import com.sun.source.util.TreePath;
 import com.sun.tools.javac.util.Pair;
 import java.util.List;
 import java.util.Objects;
+import org.checkerframework.afu.annotator.scanner.LocalVariableScanner;
+import org.checkerframework.afu.scenelib.annotations.el.LocalLocation;
 
 /**
  * Criterion for being a specific local variable.

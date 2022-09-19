@@ -1,9 +1,9 @@
 package org.checkerframework.afu.annotator.find;
 
-import org.checkerframework.afu.annotator.scanner.MethodCallScanner;
-import org.checkerframework.afu.scenelib.annotations.el.RelativeLocation;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
+import org.checkerframework.afu.annotator.scanner.MethodCallScanner;
+import org.checkerframework.afu.scenelib.annotations.el.RelativeLocation;
 
 public class CallCriterion implements Criterion {
   private final String methodName;

@@ -10,9 +10,9 @@ import java.util.List;
 import java.util.Map;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
+import org.checkerframework.afu.scenelib.annotations.Annotation;
 import org.checkerframework.afu.scenelib.annotations.util.coll.VivifyingMap;
 import org.plumelib.util.CollectionsPlume;
-import org.checkerframework.afu.scenelib.annotations.Annotation;
 
 // TODO: Add a method to indicate whether this class in an enum, and one to get the enum fields.
 /** An annotated class. */
