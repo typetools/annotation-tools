@@ -5,7 +5,7 @@ package:
 annotation @NonNegative: @java.lang.annotation.Target(value={TYPE_USE})
 annotation @InnerlyAnnotated: @java.lang.annotation.Target(value={TYPE_USE})
 
-package annotator.tests:
+package org.checkerframework.afu.annotator.tests:
 class InnerClassAnonymous$1:
 
     field serialVersionUID:

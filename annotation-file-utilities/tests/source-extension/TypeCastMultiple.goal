@@ -1,4 +1,4 @@
-package annotator.tests;
+package org.checkerframework.afu.annotator.tests;
 
 import java.util.LinkedList;
 import java.util.List;

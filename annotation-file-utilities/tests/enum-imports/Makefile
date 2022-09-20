@@ -73,7 +73,7 @@ compile : $(SRC)
 output: compile $(JAIF) ../../build/classes/java/main $(AFU_JARS)
 	$(JAVA) \
 	-cp ../../annotation-file-utilities-all.jar \
-	annotator.Main \
+	org.checkerframework.afu.annotator.Main \
 	${DEBUG} \
 	--abbreviate=true \
 	-d output \

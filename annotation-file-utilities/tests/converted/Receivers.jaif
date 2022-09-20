@@ -16,7 +16,7 @@ annotation @B:
 package annotation:
 annotation @C:
 
-package annotator.tests:
+package org.checkerframework.afu.annotator.tests:
 class Receivers:
 
     method m()V:
@@ -39,7 +39,7 @@ class Receivers:
         return:
         insert-annotation Method.parameter -1: @checkers.tainting.quals.Tainted
 
-package annotator.tests:
+package org.checkerframework.afu.annotator.tests:
 class Receivers2:
 
     method m()V:
@@ -58,7 +58,7 @@ class Receivers2:
         return:
         insert-annotation Method.parameter -1, Variable.type: @checkers.tainting.quals.Tainted
 
-package annotator.tests:
+package org.checkerframework.afu.annotator.tests:
 class Receivers3:
 
     method m()V:
@@ -73,7 +73,7 @@ class Receivers3:
         insert-annotation Method.parameter -1, ParameterizedType.typeArgument 1: @annotation.Inner(value=1)
         insert-annotation Method.parameter -1: @checkers.tainting.quals.Tainted
 
-package annotator.tests:
+package org.checkerframework.afu.annotator.tests:
 class Receivers4:
 
     method m()V:
@@ -84,21 +84,21 @@ class Receivers4:
         return:
         insert-annotation Method.parameter -1, Variable.type: @checkers.tainting.quals.Tainted
 
-package annotator.tests:
+package org.checkerframework.afu.annotator.tests:
 class Receivers5:
 
     method m()V:
         return:
         insert-annotation Method.parameter -1: @checkers.tainting.quals.Tainted
 
-package annotator.tests:
+package org.checkerframework.afu.annotator.tests:
 class Receivers6:
 
     method m()V:
         return:
         insert-annotation Method.parameter -1: @checkers.tainting.quals.Tainted
 
-package annotator.tests:
+package org.checkerframework.afu.annotator.tests:
 class Receivers7:
 
     method m()V:
@@ -107,21 +107,21 @@ class Receivers7:
         insert-annotation Method.parameter -1, ParameterizedType.typeArgument 1: @annotation.Inner(value=1)
         insert-annotation Method.parameter -1: @checkers.tainting.quals.Tainted
 
-package annotator.tests:
+package org.checkerframework.afu.annotator.tests:
 class Receivers8:
 
     method m()V:
         return:
         insert-annotation Method.parameter -1, Variable.type: @checkers.tainting.quals.Tainted
 
-package annotator.tests:
+package org.checkerframework.afu.annotator.tests:
 class Receivers9:
 
     method m()V:
         return:
         insert-annotation Method.parameter -1: @checkers.tainting.quals.Tainted @annotation.A @annotation.B @annotation.C
 
-package annotator.tests:
+package org.checkerframework.afu.annotator.tests:
 class Receivers10:
 
     method m()V:

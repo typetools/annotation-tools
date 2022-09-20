@@ -1,4 +1,4 @@
-# Very rough testing framework for the annotator.  Running 'make all' will
+# Very rough testing framework for the org.checkerframework.afu.annotator.  Running 'make all' will
 # look for all myClass.goal files in this directory, run the annotator on the
 # corresponding .jaif and .java files, and then output the difference in a
 # myClass.diff file in this directory.
@@ -104,7 +104,7 @@ bin/annotator/tests/%.class: %.java
 %.output: %.jaif %.java bin/annotator/tests/%.class ../build/classes/java/main ../annotation-file-utilities-all.jar
 	$(JAVA) \
 	-cp ../build/classes/java/main:../annotation-file-utilities-all.jar:bin \
-	annotator.Main \
+	org.checkerframework.afu.annotator.Main \
 	${DEBUG} \
 	--abbreviate=false \
 	-d $*-output \

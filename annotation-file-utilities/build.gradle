@@ -37,24 +37,6 @@ ext {
     localRepo = ".git"
 }
 
-
-sourceSets {
-    main.java {
-        srcDirs = ['src', '../scene-lib/src']
-    }
-    test.java {
-        srcDirs += ['../scene-lib/test']
-        include("**/AnnotationsTest.java")
-        include("**/foo/*.java")
-        include("**/AnnotationVerifier.java")
-        include("**/TestSceneLib.java")
-        include("**/Example.java")
-    }
-    test.resources {
-        srcDirs += ['../scene-lib/test']
-        exclude("**/*.java")
-    }
-}
 configurations {
     javacJar
 }
@@ -130,8 +112,11 @@ shadowJar {
     archiveFileName = 'annotation-file-utilities-all.jar'
     // Don't include any class from the Checker Framework.
     // This should just be checker-qual.
-    exclude 'org/checkerframework/**'
-    doFirst {
+    exclude 'org/checkerframework/checker/**'
+    exclude 'org/checkerframework/framework/**'
+    exclude 'org/checkerframework/dataflow/**'
+
+  doFirst {
         // TODO: The release fails because of this, so skip it for now.
         if (project.hasProperty('release') && false) {
             println 'Relocating packages.'
@@ -181,8 +166,8 @@ task skinnyJar(type: ShadowJar, dependsOn: compileJava) {
     includeEmptyDirs = false
     destinationDirectory = projectDir
     archiveFileName = 'annotation-file-utilities.jar'
-    include 'scenelib/**/*.class'
-    include 'annotator/**/*.class'
+    include 'org/checkerframework/afu/scenelib/**/*.class'
+    include 'org/checkerframework/afu/annotator/**/*.class'
 }
 
 test {
@@ -214,25 +199,26 @@ test {
 task testExample(dependsOn: compileTestJava, group: 'Verification') {
     description 'Run the scene-lib example test.'
     doLast {
-        String testDir = "${projectDir}/../scene-lib/test/annotations/tests/executable/"
+        String testDir = "${projectDir}/src/test/java/org/checkerframework/afu/scenelib/test/executable/"
+        String resourceDir = "${projectDir}/src/test/resources/org/checkerframework/afu/scenelib/test/executable/"
         javaexec {
             classpath = files(sourceSets.test.java.outputDir)
             classpath += sourceSets.test.compileClasspath
-            mainClass = 'annotations.tests.executable.Example'
+            mainClass = 'org.checkerframework.afu.scenelib.test.executable.Example'
             standardOutput = new FileOutputStream("${testDir}/example-stdout.jaif")
 
-            args = ["${testDir}/example-input.jaif",
+            args = ["${resourceDir}/example-input.jaif",
                     "foo.Bar",
                     "${testDir}/example-output.jaif"]
         }
 
-        byte[] goalJaif = Files.readAllBytes(new File(testDir, "example-output.jaif.goal").toPath());
+        byte[] goalJaif = Files.readAllBytes(new File(resourceDir, "example-output.jaif.goal").toPath());
         byte[] outputJaif = Files.readAllBytes(new File(testDir, "example-output.jaif").toPath());
         if (!Arrays.equals(goalJaif, outputJaif)) {
             throw new GradleException("In ${testDir}, file example-output.jaif does not match goal.")
         }
 
-        byte[] goalStdOut = Files.readAllBytes(new File(testDir, "example-stdout.jaif.goal").toPath());
+        byte[] goalStdOut = Files.readAllBytes(new File(resourceDir, "example-stdout.jaif.goal").toPath());
         byte[] stdOut = Files.readAllBytes(new File(testDir, "example-stdout.jaif").toPath());
         if (!Arrays.equals(goalStdOut, stdOut)) {
             throw new GradleException("In ${testDir}, file example-stdout.jaif does not match goal.")
@@ -243,7 +229,7 @@ task testExample(dependsOn: compileTestJava, group: 'Verification') {
 task cleanTestExample {
     description 'Clean the scene-lib example test.'
     doLast {
-        String testDir = "${projectDir}/../scene-lib/test/annotations/tests/executable/"
+        String testDir = "${projectDir}/src/test/java/org/checkerframework/afu/scenelib/test/executable/"
         delete "${testDir}/example-output.jaif"
         delete "${testDir}/example-stdout.jaif"
     }
@@ -562,7 +548,7 @@ task requireJavadoc(type: JavaExec) {
   description = 'Ensures that Javadoc documentation exists.'
   mainClass = "org.plumelib.javadoc.RequireJavadoc"
   classpath = configurations.requireJavadoc
-  args "annotation-file-utilities/src", "scene-lib/src"
+  args "annotation-file-utilities/src"
   workingDir = "${projectDir}/.."
 }
 // check.dependsOn requireJavadoc
@@ -574,7 +560,7 @@ task updateUserOptionsJavadoc(type: Javadoc, dependsOn: 'assemble') {
 
   // Include only sources from annotation-file-utilities, not from scene-lib.
   source = fileTree(dir: 'src', include: '**/*.java')
-  exclude 'scenelib.annotations.io.classfile/**'
+  exclude 'org.checkerframework.afu.scenelib.annotations.io.classfile/**'
   classpath = project.sourceSets.main.compileClasspath + project.sourceSets.main.runtimeClasspath
   options.memberLevel = JavadocMemberLevel.PRIVATE
   options.docletpath = project.sourceSets.main.runtimeClasspath as List
@@ -594,7 +580,7 @@ task updateUserOptionsHtml(type: Javadoc, dependsOn: 'assemble') {
 
   // Include only sources from annotation-file-utilities, not from scene-lib.
   source = fileTree(dir: 'src', include: '**/*.java')
-  exclude 'scenelib.annotations.io.classfile/**'
+  exclude 'org.checkerframework.afu.scenelib.annotations.io.classfile/**'
   classpath = project.sourceSets.main.compileClasspath + project.sourceSets.main.runtimeClasspath
   options.memberLevel = JavadocMemberLevel.PRIVATE
   options.docletpath = project.sourceSets.main.runtimeClasspath as List
@@ -848,8 +834,6 @@ spotless {
     endWithNewline()
   }
   java {
-    // TODO: Shouldn't need any target once scene-lib is in the project directory.
-    target files("${rootDir}/src")
     googleJavaFormat()
     formatAnnotations()
   }

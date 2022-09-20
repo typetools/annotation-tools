@@ -1,4 +1,4 @@
-package annotator.tests;
+package org.checkerframework.afu.annotator.tests;
 
 // This test ensures that no annotation is re-inserted, if it already
 // existed in the original source code.
@@ -25,7 +25,7 @@ public class DuplicateAnnotation {
     Object o = new Object();
   }
 
-  int @annotator.tests.TA [] i;
+  int @org.checkerframework.afu.annotator.tests.TA [] i;
 }
 
 @java.lang.annotation.Target({java.lang.annotation.ElementType.TYPE_USE})

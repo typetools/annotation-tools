@@ -18,7 +18,7 @@ package java.lang:
 annotation @SuppressWarnings:
     String[] value
 
-package annotator.tests:
+package org.checkerframework.afu.annotator.tests:
 
 class ExtImpl$C1:
 extends: @A
@@ -38,7 +38,7 @@ inner-type 3, 1: @F
 
 class ExtImpl$C3:
     method getI1()LIface3;: @SuppressWarnings({})
-    method getI2()Lannotator.tests.ExtImpl$C3$Iface3;: @SuppressWarnings({})
+    method getI2()Lorg.checkerframework.afu.annotator.tests.ExtImpl$C3$Iface3;: @SuppressWarnings({})
     method getI3()LExtImpl$C3$Iface3;: @SuppressWarnings({})
     method getI4()LIface3;: @SuppressWarnings({})
 

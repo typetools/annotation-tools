@@ -1,4 +1,4 @@
-package annotator.tests;
+package org.checkerframework.afu.annotator.tests;
 
 public class DeclarationAnnotation {
   @java.lang.SuppressWarnings("string argument")

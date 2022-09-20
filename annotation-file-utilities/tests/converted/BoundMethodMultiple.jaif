@@ -18,7 +18,7 @@ annotation @E: @java.lang.annotation.Retention(value=RUNTIME) @java.lang.annotat
 package java.lang:
 annotation @F: @java.lang.annotation.Retention(value=RUNTIME) @java.lang.annotation.Target(value={TYPE_USE})
 
-package annotator.tests:
+package org.checkerframework.afu.annotator.tests:
 class BoundMethodMultiple:
 
     method foo(Ljava/lang/Object;)V:
