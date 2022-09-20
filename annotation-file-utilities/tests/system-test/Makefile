@@ -13,7 +13,7 @@ ifeq ($(shell java -version 2>&1 | grep version | grep 1.8 > /dev/null; printf $
 export JAVA:=$(JAVA) -Xbootclasspath/p:../../lib/javac-9+181-r4173-1.jar
 endif
 
-ANNCAT ?= ../../../scene-lib/anncat
+ANNCAT ?= ../../scripts/anncat
 JAVAVERSION = $(shell $(JAVA) -version 2>&1)
 
 #Switch the lines below to deactivate this test
