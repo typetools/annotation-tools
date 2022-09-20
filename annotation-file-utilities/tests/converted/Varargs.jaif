@@ -1,7 +1,7 @@
 package java.lang:
 annotation @Nullable:
 
-package annotator.tests:
+package org.checkerframework.afu.annotator.tests:
 class Varargs:
 
     method m1([Ljava/lang/String;)V:

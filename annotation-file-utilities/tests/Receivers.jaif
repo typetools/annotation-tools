@@ -17,7 +17,7 @@ package trusted.quals:
   annotation @Trusted:
   annotation @PolyTrusted:
 
-package annotator.tests:
+package org.checkerframework.afu.annotator.tests:
 class Receivers:
 
     method m()V:

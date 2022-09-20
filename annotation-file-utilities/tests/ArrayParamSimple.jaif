@@ -5,7 +5,7 @@ annotation @Tainted: @Retention(value=RUNTIME) @java.lang.annotation.Target(valu
 // Note no @Target meta-annotation
 annotation @Nullable:
 
-package annotator.tests:
+package org.checkerframework.afu.annotator.tests:
 class ArrayParamSimple:
 
     method <init>()V:

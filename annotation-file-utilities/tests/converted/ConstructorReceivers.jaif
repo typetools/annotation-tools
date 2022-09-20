@@ -16,7 +16,7 @@ package annotation:
 annotation @Inner: @java.lang.annotation.Target(value={TYPE_USE})
     int value
 
-package annotator.tests:
+package org.checkerframework.afu.annotator.tests:
 class ConstructorReceivers$C0:
 
     method <init>()V:
@@ -25,7 +25,7 @@ class ConstructorReceivers$C0:
     method <init>(I)V:
         insert-annotation Method.parameter -1: @checkers.tainting.quals.Tainted
 
-package annotator.tests:
+package org.checkerframework.afu.annotator.tests:
 class ConstructorReceivers$C1:
 
     method <init>()V:
@@ -34,19 +34,19 @@ class ConstructorReceivers$C1:
     method <init>(I)V:
         insert-annotation Method.parameter -1, Variable.type: @checkers.tainting.quals.Tainted
 
-package annotator.tests:
+package org.checkerframework.afu.annotator.tests:
 class ConstructorReceivers$C2:
 
     method <init>()V:
         insert-annotation Method.parameter -1: @checkers.tainting.quals.Tainted @annotation.A @annotation.B @annotation.C
 
-package annotator.tests:
+package org.checkerframework.afu.annotator.tests:
 class ConstructorReceivers$C3:
 
     method <init>()V:
         insert-annotation Method.parameter -1, Variable.type: @checkers.tainting.quals.Tainted @annotation.A @annotation.B @annotation.C
 
-package annotator.tests:
+package org.checkerframework.afu.annotator.tests:
 class ConstructorReceivers$P0$C4:
 
     method <init>()V:
@@ -55,7 +55,7 @@ class ConstructorReceivers$P0$C4:
     method <init>(I)V:
         insert-annotation Method.parameter -1: @checkers.tainting.quals.Tainted
 
-package annotator.tests:
+package org.checkerframework.afu.annotator.tests:
 class ConstructorReceivers$P0$C5:
 
     method <init>()V:
@@ -64,7 +64,7 @@ class ConstructorReceivers$P0$C5:
     method <init>(I)V:
         insert-annotation Method.parameter -1, Variable.type, ParameterizedType.type, MemberSelect.expression: @checkers.tainting.quals.Tainted
 
-package annotator.tests:
+package org.checkerframework.afu.annotator.tests:
 class ConstructorReceivers$P0$C6:
 
     method <init>()V:
@@ -75,7 +75,7 @@ class ConstructorReceivers$P0$C6:
         insert-annotation Method.parameter -1, ParameterizedType.typeArgument 1: @annotation.Inner(value=1)
         insert-annotation Method.parameter -1: @checkers.tainting.quals.Tainted
 
-package annotator.tests:
+package org.checkerframework.afu.annotator.tests:
 class ConstructorReceivers$P0$C7:
 
     method <init>()V:
@@ -88,7 +88,7 @@ class ConstructorReceivers$P0$C7:
         insert-annotation Method.parameter -1, Variable.type, ParameterizedType.typeArgument 0: @annotation.Inner(value=0)
         insert-annotation Method.parameter -1, Variable.type, ParameterizedType.typeArgument 1: @annotation.Inner(value=1)
 
-package annotator.tests:
+package org.checkerframework.afu.annotator.tests:
 class ConstructorReceivers$P1$C8:
 
     method <init>()V:
@@ -96,7 +96,7 @@ class ConstructorReceivers$P1$C8:
         insert-annotation Method.parameter -1, ParameterizedType.typeArgument 1: @annotation.Inner(value=1)
         insert-annotation Method.parameter -1: @checkers.tainting.quals.Tainted
 
-package annotator.tests:
+package org.checkerframework.afu.annotator.tests:
 class ConstructorReceivers$P1$C9:
 
     method <init>()V:

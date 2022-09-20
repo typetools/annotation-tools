@@ -55,7 +55,7 @@ annotation @N: @java.lang.annotation.Target(value={TYPE_USE})
 package :
 annotation @O: @java.lang.annotation.Target(value={TYPE_USE})
 
-package annotator.tests:
+package org.checkerframework.afu.annotator.tests:
 class InnerReceivers$1$Inner:
 
     method m()V:
@@ -66,7 +66,7 @@ class InnerReceivers$1$Inner:
         return:
         insert-annotation Method.parameter -1, Variable.type: @B
 
-package annotator.tests:
+package org.checkerframework.afu.annotator.tests:
 class InnerReceivers:
 
     method m()V:
@@ -81,7 +81,7 @@ class InnerReceivers:
         return:
         insert-annotation Method.parameter -1, Variable.type: @D1
 
-package annotator.tests:
+package org.checkerframework.afu.annotator.tests:
 class InnerReceivers$Inner1:
 
     method m()V:
@@ -99,7 +99,7 @@ class InnerReceivers$Inner1:
         return:
         insert-annotation Method.parameter -1, Variable.type, ParameterizedType.type, MemberSelect.expression: @F1
 
-package annotator.tests:
+package org.checkerframework.afu.annotator.tests:
 class InnerReceivers$Inner1$Inner2:
 
     method m()V:
@@ -114,7 +114,7 @@ class InnerReceivers$Inner1$Inner2:
         return:
         insert-annotation Method.parameter -1, Variable.type, MemberSelect.expression, ParameterizedType.type, MemberSelect.expression: @H
 
-package annotator.tests:
+package org.checkerframework.afu.annotator.tests:
 class InnerReceivers$StaticInner1:
 
     method m()V:
@@ -129,7 +129,7 @@ class InnerReceivers$StaticInner1:
         return:
         insert-annotation Method.parameter -1, Variable.type: @K
 
-package annotator.tests:
+package org.checkerframework.afu.annotator.tests:
 class InnerReceivers$StaticInner3:
 
     method m()V:
@@ -146,7 +146,7 @@ class InnerReceivers$StaticInner3:
         return:
         insert-annotation Method.parameter -1, Variable.type, ParameterizedType.type: @K
 
-package annotator.tests:
+package org.checkerframework.afu.annotator.tests:
 class Outer$StaticInner2:
 
     method m()V:
@@ -161,7 +161,7 @@ class Outer$StaticInner2:
         return:
         insert-annotation Method.parameter -1, Variable.type: @N
 
-package annotator.tests:
+package org.checkerframework.afu.annotator.tests:
 class Outer$StaticInner2$StaticInner3:
 
     method m()V:

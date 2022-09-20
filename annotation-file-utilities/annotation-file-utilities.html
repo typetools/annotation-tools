@@ -545,16 +545,16 @@ them to the correct part of the <code>AScene</code>. After this, the
 code. It can be run by executing the
 <code>annotation-file-utilities/scripts/insert-annotations-to-source</code>
 script.  The script takes one or more <code>.jaif</code> files, followed by one or more <code>.java</code> source files as arguments. The annotations in the <code>.jaif</code> files are inserted into the <code>.java</code> source files.</p><p>First, an instance of
-<code>annotation-file-utilities/src/annotator/specification/IndexFileSpecification.java</code>
+<code>annotation-file-utilities/src/org/checkerframework/afu/annotator/specification/IndexFileSpecification.java</code>
 is created. Its <code>parse</code> method parses the <code>.jaif</code>
 file into an <code>AScene</code> (as described in
 <a href="#scene-lib">Scene-lib</a>).  The <code>parse</code> method
 calls the <code>parseScene</code> method, which traverses through the
 <code>AScene</code> and creates an
-<code>annotation-file-utilities/src/annotator/specification/CriterionList.java.</code>
+<code>annotation-file-utilities/src/org/checkerframework/afu/annotator/specification/CriterionList.java.</code>
 A <code>CriterionList</code> identifies a unique AST node that is the
 location of an insertion. It contains objects that implement the
-<code>annotation-file-utilities/src/annotator/find/Criterion.java</code>
+<code>annotation-file-utilities/src/org/checkerframework/afu/annotator/find/Criterion.java</code>
 interface.
 Each <code>Criterion</code> has an <code>isSatisifiedBy</code> method —
 a predicate that takes an AST node and returns <code>true</code> if the
@@ -565,7 +565,7 @@ otherwise. To determine if a given node matches a
 <code>Criterion</code> returns <code>true</code> then it is match. If
 one or more <code>Criterion</code>s return <code>false</code> then it is
 not a match.  The various <code>Criterion</code> classes are in the
-<code>annotation-file-utilities/src/annotator/find/</code> directory.
+<code>annotation-file-utilities/src/org/checkerframework/afu/annotator/find/</code> directory.
 For example, take the following source code:</p>
 
 <pre class="verbatim">package afu.example;
@@ -589,15 +589,15 @@ public class Test {
 </li></ul>
 
 <p>After this <code>CriterionList</code> is built up an
-<code>annotation-file-utilities/src/annotator/find/Insertion.java</code>
+<code>annotation-file-utilities/org/checkerframework/afu/src/annotator/find/Insertion.java</code>
 is created.  An <code>Insertion</code> stores an
-<code>annotation-file-utilities/src/annotator/find/Criteria.java</code>
+<code>annotation-file-utilities/org/checkerframework/afu/src/annotator/find/Criteria.java</code>
 (which is created from a <code>CriterionList</code>) and the text to be
 inserted. All of these <code>Insertion</code>s are then added to a
 list. The Java compiler then is called to parse the Java source into an
 abstract syntax tree. This is followed by a call to the
 <code>getPositions</code> method of
-<code>annotation-file-utilities/src/annotator/find/TreeFinder.java</code>,
+<code>annotation-file-utilities/src/org/checkerframework/afu/annotator/find/TreeFinder.java</code>,
 which scans through each node of the abstract syntax trees. For each node,
 it runs through the <code>Criteria</code> for each un-matched
 <code>Insertion</code>. If at least one of the <code>Criteria</code>

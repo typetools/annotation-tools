@@ -1,4 +1,4 @@
-package annotator.tests;
+package org.checkerframework.afu.annotator.tests;
 
 public class InnerReceivers {
 
@@ -18,7 +18,7 @@ public class InnerReceivers {
 
   void m1(InnerReceivers this) {}
 
-  void m2(annotator.tests.InnerReceivers this) {}
+  void m2(org.checkerframework.afu.annotator.tests.InnerReceivers this) {}
 
   class Inner1<Y, Z> {
 
@@ -26,7 +26,7 @@ public class InnerReceivers {
 
     void m1(InnerReceivers.Inner1<Y, Z> this) {}
 
-    void m2(annotator.tests.InnerReceivers.Inner1<Y, Z> this) {}
+    void m2(org.checkerframework.afu.annotator.tests.InnerReceivers.Inner1<Y, Z> this) {}
 
     class Inner2 {
 
@@ -42,7 +42,7 @@ public class InnerReceivers {
 
     void m1(InnerReceivers.StaticInner1 this) {}
 
-    void m2(annotator.tests.InnerReceivers.StaticInner1 this) {}
+    void m2(org.checkerframework.afu.annotator.tests.InnerReceivers.StaticInner1 this) {}
   }
 
   static class StaticInner3<Y, Z> {
@@ -51,7 +51,7 @@ public class InnerReceivers {
 
     void m1(InnerReceivers.StaticInner3<Y, Z> this) {}
 
-    void m2(annotator.tests.InnerReceivers.StaticInner3<Y, Z> this) {}
+    void m2(org.checkerframework.afu.annotator.tests.InnerReceivers.StaticInner3<Y, Z> this) {}
   }
 }
 
@@ -62,7 +62,7 @@ class Outer<K> {
 
     void m1(Outer.StaticInner2 this) {}
 
-    void m2(annotator.tests.Outer.StaticInner2 this) {}
+    void m2(org.checkerframework.afu.annotator.tests.Outer.StaticInner2 this) {}
 
     static class StaticInner3 {
 

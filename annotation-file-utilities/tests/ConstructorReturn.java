@@ -1,4 +1,4 @@
-package annotator.tests;
+package org.checkerframework.afu.annotator.tests;
 
 @java.lang.annotation.Target(value = {java.lang.annotation.ElementType.TYPE_USE})
 @interface AType {}

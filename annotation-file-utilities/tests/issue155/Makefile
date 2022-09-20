@@ -2,7 +2,7 @@
 # compile the .java input. This allows us to test with an
 # invalid setup.
 
-# Very rough testing framework for the annotator.  Running 'make all' will
+# Very rough testing framework for the org.checkerframework.afu.annotator.  Running 'make all' will
 # look for all myClass.goal files in this directory, run the annotator on the
 # corresponding .jaif and .java files, and then output the difference in a
 # myClass.diff file in this directory.
@@ -64,7 +64,7 @@ results: ../bin/VerifyDiffs.class
 %.output: %.jaif %.java ../../build/classes/java/main ../../annotation-file-utilities-all.jar
 	$(JAVA) \
 	-cp ../../build/classes/java/main:../bin:../../annotation-file-utilities-all.jar:bin \
-	annotator.Main \
+	org.checkerframework.afu.annotator.Main \
 	${DEBUG} \
 	--abbreviate=true \
 	-d $*-output \

@@ -1,4 +1,4 @@
-package annotator.tests;
+package org.checkerframework.afu.annotator.tests;
 
 public class FieldNewComplex {
   FieldNewComplex m(FieldNewComplex a, FieldNewComplex b, FieldNewComplex c) {

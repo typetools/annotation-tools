@@ -3,8 +3,8 @@ annotation @A:
 
 annotation @ShouldNotAppearInOutput:
 
-package annotator.tests:
+package org.checkerframework.afu.annotator.tests:
 class MatchReturnValue:
 
-    method clone()Lannotator.tests.MatchReturnValue;: @A
+    method clone()Lorg.checkerframework.afu.annotator.tests.MatchReturnValue;: @A
     method clone()Ljava.lang.Object;: @ShouldNotAppearInOutput

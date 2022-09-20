@@ -1,7 +1,7 @@
 package :
 annotation @X:
 
-package annotator.tests:
+package org.checkerframework.afu.annotator.tests:
 class Initializers:
 
     field s1:
@@ -16,7 +16,7 @@ class Initializers:
     field o2:
         insert-annotation Class.initializer 3, Block.statement 0, Variable.initializer, NewClass.identifier: @X
 
-package annotator.tests:
+package org.checkerframework.afu.annotator.tests:
 class Initializers$MyEnum:
 
     field s:

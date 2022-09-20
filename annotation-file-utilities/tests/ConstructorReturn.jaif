@@ -7,7 +7,7 @@ package:
 package:
   annotation @AType: @java.lang.annotation.Target(value={TYPE_USE})
 
-package annotator.tests:
+package org.checkerframework.afu.annotator.tests:
 
 class ConstructorReturn:
   method ConstructorReturn()V:

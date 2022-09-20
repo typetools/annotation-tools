@@ -1,4 +1,4 @@
-package annotator.tests;
+package org.checkerframework.afu.annotator.tests;
 
 public class ExtImpl {
   class Top<X, Y> {}
@@ -16,23 +16,23 @@ public class ExtImpl {
   class C2 implements Iface<String, Object>, Iface2<Object, Float> {}
 
   class C3 {
-    class Iface3 implements annotator.tests.ExtImpl.Iface3 {}
+    class Iface3 implements org.checkerframework.afu.annotator.tests.ExtImpl.Iface3 {}
 
     /*
      * the jaif file  says that the simple name of
      * the return type in JVM format is
      * LIface3;
      */
-    annotator.tests.ExtImpl.C3.Iface3 getI1() {
+    org.checkerframework.afu.annotator.tests.ExtImpl.C3.Iface3 getI1() {
       return null;
     }
 
     /*
      * in this case, the jaif file uses the fully qualified name
      * for the return type
-     * Lannotator.tests.ExtImpl.C3.Iface3;
+     * Lorg.checkerframework.afu.annotator.tests.ExtImpl.C3.Iface3;
      */
-    annotator.tests.ExtImpl.C3.Iface3 getI2() {
+    org.checkerframework.afu.annotator.tests.ExtImpl.C3.Iface3 getI2() {
       return null;
     }
 
@@ -47,7 +47,7 @@ public class ExtImpl {
     /*
      * in the jaif file, the return type is Iface3
      * (ambiguous: could be short for the interface
-     * annotator.tests.ExtImpl.Iface3)
+     * org.checkerframework.afu.annotator.tests.ExtImpl.Iface3)
      */
     Iface3 getI4() {
       return null;
