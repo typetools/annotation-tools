@@ -27,7 +27,7 @@ cd "${AFU}"
 status=0
 
 # Code style and formatting
-./gradlew checkBasicStyle checkFormat --console=plain --warning-mode=all --no-daemon || status=1
+./gradlew checkBasicStyle spotlessCheck --console=plain --warning-mode=all --no-daemon || status=1
 
 # HTML legality
 ./gradlew htmlValidate --console=plain --warning-mode=all --no-daemon || status=1
