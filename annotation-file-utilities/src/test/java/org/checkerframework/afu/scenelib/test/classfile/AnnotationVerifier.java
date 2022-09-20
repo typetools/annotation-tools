@@ -1,4 +1,4 @@
-package annotations.tests.classfile;
+package org.checkerframework.afu.scenelib.test.classfile;
 
 import java.util.ArrayList;
 import java.util.Arrays;
