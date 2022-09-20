@@ -1,4 +1,4 @@
-package annotations.tests.classfile;
+package org.checkerframework.afu.scenelib.test.classfile;
 
 import java.io.File;
 import java.io.FileInputStream;
