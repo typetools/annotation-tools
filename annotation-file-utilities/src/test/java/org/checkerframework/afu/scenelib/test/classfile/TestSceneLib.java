@@ -1,4 +1,4 @@
-package org.checkerframework.afu.scenelib.test.executable;
+package org.checkerframework.afu.scenelib.test.classfile;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -46,6 +46,13 @@ import org.plumelib.util.FileIOException;
 
 public class TestSceneLib {
   LineNumberReader openPackagedIndexFile(String name) {
+    if (name == null) {
+      throw new RuntimeException("Name is null");
+    }
+    InputStream inputStream = TestSceneLib.class.getResourceAsStream(name);
+    if (inputStream == null) {
+      throw new RuntimeException("Can't find resource " + name);
+    }
     return new LineNumberReader(
         new InputStreamReader((InputStream) TestSceneLib.class.getResourceAsStream(name), UTF_8));
   }

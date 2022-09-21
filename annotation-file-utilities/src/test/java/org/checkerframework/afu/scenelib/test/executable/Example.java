@@ -23,6 +23,7 @@ import org.checkerframework.afu.scenelib.annotations.io.IndexFileWriter;
  * java Example <i>input.jaif</i> <i>ClassToProcess</i> <i>output.jaif</i>
  * </pre>
  */
+// This is run by the Gradle task `testExample`.
 public class Example {
   public static void main(String[] args) {
     AScene scene;
