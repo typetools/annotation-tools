@@ -34,7 +34,7 @@ import org.objectweb.asm.ClassReader;
  * <ul>
  *   <li> {@code cd $t/annotation-tools/scene-lib/test/annotations/tests/classfile/cases}
  *   <li>{@code $ch/bin/javac -g TestLocalVariableA.java}
- *     <li>{@cod emv -pf TestLocalVariableA.class $t/annotation-tools/scene-lib/test/annotations-expected/tests/classfile/cases }
+ *     <li>{@code emv -pf TestLocalVariableA.class $t/annotation-tools/scene-lib/test/annotations-expected/tests/classfile/cases}
  *     <li>{@code (CLASSPATH=$t/scene-lib/test insert-annotations-to-source TestLocalVariableA.jaif TestLocalVariableA.java)}
  *     <li>{@code cd annotated}
  *     <li>{@code $ch/bin/javac -g -cp $t/annotation-tools/scene-lib/bin annotations/tests/classfile/cases/TestLocalVariableA.java}
