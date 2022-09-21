@@ -8,7 +8,7 @@ import com.sun.tools.javac.util.Pair;
 import java.util.List;
 import java.util.Objects;
 import org.checkerframework.afu.annotator.scanner.LocalVariableScanner;
-import org.checkerframework.afu.scenelib.annotations.el.LocalLocation;
+import org.checkerframework.afu.scenelib.el.LocalLocation;
 
 /**
  * Criterion for being a specific local variable.

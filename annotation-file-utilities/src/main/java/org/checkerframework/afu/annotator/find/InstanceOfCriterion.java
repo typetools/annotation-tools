@@ -5,7 +5,7 @@ import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
 import org.checkerframework.afu.annotator.Main;
 import org.checkerframework.afu.annotator.scanner.InstanceOfScanner;
-import org.checkerframework.afu.scenelib.annotations.el.RelativeLocation;
+import org.checkerframework.afu.scenelib.el.RelativeLocation;
 
 public class InstanceOfCriterion implements Criterion {
 

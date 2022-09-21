@@ -1,6 +1,6 @@
 package org.checkerframework.afu.annotator.find;
 
-import org.checkerframework.afu.scenelib.annotations.Annotation;
+import org.checkerframework.afu.scenelib.Annotation;
 import org.plumelib.util.Pair;
 
 /** Specifies an annotation to be inserted into a source file. */

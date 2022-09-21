@@ -4,7 +4,7 @@ import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
 import com.sun.tools.javac.tree.JCTree;
 import java.util.List;
-import org.checkerframework.afu.scenelib.annotations.el.RelativeLocation;
+import org.checkerframework.afu.scenelib.el.RelativeLocation;
 
 public class TypeArgumentCriterion implements Criterion {
   private final String methodName;
