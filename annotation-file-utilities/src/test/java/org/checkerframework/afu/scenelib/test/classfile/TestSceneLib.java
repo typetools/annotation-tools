@@ -46,12 +46,12 @@ import org.plumelib.util.FileIOException;
 
 public class TestSceneLib {
   LineNumberReader openPackagedIndexFile(String name) {
-    if(name == null) {
+    if (name == null) {
       throw new RuntimeException("Name is null");
     }
     InputStream inputStream = TestSceneLib.class.getResourceAsStream(name);
-    if(inputStream == null){
-      throw new RuntimeException("Can't find "+name);
+    if (inputStream == null) {
+      throw new RuntimeException("Can't find " + name);
     }
     return new LineNumberReader(
         new InputStreamReader((InputStream) TestSceneLib.class.getResourceAsStream(name), UTF_8));

@@ -19,7 +19,7 @@ import org.objectweb.asm.ClassReader;
 /**
  * This class is the testing framework for the class file/index file annotations converter.
  *
- * Two types of tests are performed:
+ * <p>Two types of tests are performed:
  *
  * <ul>
  *   <li>"c" tests that call testAgainstClass: Read the annotations from <code>name.jaif</code>,
@@ -31,14 +31,19 @@ import org.objectweb.asm.ClassReader;
  * </ul>
  *
  * To create a new test, do something like the following with a properly-functioning version of AFU:
+ *
  * <ul>
- *   <li> {@code cd $t/annotation-tools/scene-lib/test/annotations/tests/classfile/cases}
+ *   <li>{@code cd $t/annotation-tools/scene-lib/test/annotations/tests/classfile/cases}
  *   <li>{@code $ch/bin/javac -g TestLocalVariableA.java}
- *     <li>{@code emv -pf TestLocalVariableA.class $t/annotation-tools/scene-lib/test/annotations-expected/tests/classfile/cases}
- *     <li>{@code (CLASSPATH=$t/scene-lib/test insert-annotations-to-source TestLocalVariableA.jaif TestLocalVariableA.java)}
- *     <li>{@code cd annotated}
- *     <li>{@code $ch/bin/javac -g -cp $t/annotation-tools/scene-lib/bin annotations/tests/classfile/cases/TestLocalVariableA.java}
- *     <li>{@code cp -p annotations/tests/classfile/cases/TestLocalVariableA.class $t/annotation-tools/scene-lib/test/annotations-expected/tests/classfile/cases/TestLocalVariableA_Expected.class}
+ *   <li>{@code emv -pf TestLocalVariableA.class
+ *       $t/annotation-tools/scene-lib/test/annotations-expected/tests/classfile/cases}
+ *   <li>{@code (CLASSPATH=$t/scene-lib/test insert-annotations-to-source TestLocalVariableA.jaif
+ *       TestLocalVariableA.java)}
+ *   <li>{@code cd annotated}
+ *   <li>{@code $ch/bin/javac -g -cp $t/annotation-tools/scene-lib/bin
+ *       annotations/tests/classfile/cases/TestLocalVariableA.java}
+ *   <li>{@code cp -p annotations/tests/classfile/cases/TestLocalVariableA.class
+ *       $t/annotation-tools/scene-lib/test/annotations-expected/tests/classfile/cases/TestLocalVariableA_Expected.class}
  * </ul>
  *
  * To add a new test,
@@ -54,7 +59,6 @@ import org.objectweb.asm.ClassReader;
  *       method to test against index file; this is just so that JUnit has an accurate count of all
  *       tests.
  * </ul>
- *
  */
 // TODO: there are currently two "golden" class files: the un-annotated file
 // and the expected output after inserting annotations.
