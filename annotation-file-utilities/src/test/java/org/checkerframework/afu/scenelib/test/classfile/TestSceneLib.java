@@ -51,7 +51,7 @@ public class TestSceneLib {
     }
     InputStream inputStream = TestSceneLib.class.getResourceAsStream(name);
     if (inputStream == null) {
-      throw new RuntimeException("Can't find " + name);
+      throw new RuntimeException("Can't find resource " + name);
     }
     return new LineNumberReader(
         new InputStreamReader((InputStream) TestSceneLib.class.getResourceAsStream(name), UTF_8));
