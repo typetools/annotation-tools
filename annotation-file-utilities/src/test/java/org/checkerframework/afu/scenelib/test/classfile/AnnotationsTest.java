@@ -47,7 +47,7 @@ public class AnnotationsTest {
 
   /** The directory in which to find the index files to test. */
   private static final String INDEX_FILE_BASE =
-      "build/resources/test/org/checkerframework/afu/scenelib/test/classfile/cases/";
+      "build/resources/test/annotations/tests/classfile/cases/";
 
   /** The directory in which to find the class files (both .class and _Generated.class) to test. */
   private static final String CLASS_FILE_BASE =
