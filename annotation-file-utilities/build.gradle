@@ -717,12 +717,33 @@ task setLocalRepo(type:Exec) {
     }
 }
 
-task installGitHooks(type: Copy, dependsOn: 'setLocalRepo') {
+task installGitHooks {
+  String repo
+  exec {
+    commandLine 'git', 'worktree', 'list'
+    standardOutput = new ByteArrayOutputStream()
+    doLast {
+      String worktreeList = standardOutput.toString()
+      repo = worktreeList.substring(0, worktreeList.indexOf(" ")) + "/.git"
+    }
+  }
+
+  copy {
+    from files("../.git.pre-commit")
+    rename('.git\\.(.*)', '$1')
+    doLast {
+      into "${repo}/hooks"
+      println repo
+    }
+  }
+}
+task copyGitHooks(type: Copy, dependsOn: 'setLocalRepo') {
     description 'Copies git hooks to .git directory'
     from files(".git.pre-commit")
     rename('.git\\.(.*)', '$1')
     into localRepo + "/hooks"
 }
+
 compileJava.dependsOn installGitHooks
 
 
