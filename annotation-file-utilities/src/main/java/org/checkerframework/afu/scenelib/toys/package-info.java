@@ -4,4 +4,3 @@
     wrappedHeight = {1},
     favoriteClass = Object.class)
 package org.checkerframework.afu.scenelib.toys;
-

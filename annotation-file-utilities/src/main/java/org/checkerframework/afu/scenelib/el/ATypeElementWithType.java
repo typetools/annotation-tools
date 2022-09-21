@@ -2,8 +2,8 @@ package org.checkerframework.afu.scenelib.el;
 
 import java.util.LinkedHashMap;
 import org.checkerframework.afu.scenelib.io.ASTPath;
-import org.checkerframework.afu.scenelib.util.coll.VivifyingMap;
 import org.checkerframework.afu.scenelib.type.Type;
+import org.checkerframework.afu.scenelib.util.coll.VivifyingMap;
 
 /**
  * An {@link ATypeElement} that also stores an un-annotated type. This is useful for cast insertion
