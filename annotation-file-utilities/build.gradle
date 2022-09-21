@@ -31,12 +31,6 @@ repositories {
 // On a Java 9+ JVM, use the host javac, default source/target, and required module flags.
 ext.isJava8 = JavaVersion.current() == JavaVersion.VERSION_1_8
 
-ext {
-    // The local git repository, typically in the .git directory, but not for worktrees.
-    // This value is always overwritten, but Gradle needs the variable to be initialized.
-    localRepo = ".git"
-}
-
 configurations {
     javacJar
 }
@@ -716,20 +710,12 @@ task pythonIsInstalled(type: Exec) {
 }
 
 
-task setLocalRepo(type:Exec) {
-    commandLine 'git', 'worktree', 'list'
-    standardOutput = new ByteArrayOutputStream()
-    doLast {
-       String worktreeList = standardOutput.toString()
-       localRepo = worktreeList.substring(0, worktreeList.indexOf(" ")) + "/.git"
-    }
-}
-
-task installGitHooks(type: Copy, dependsOn: 'setLocalRepo') {
+task installGitHooks(type: Copy) {
     description 'Copies git hooks to .git directory'
-    from files(".git.pre-commit")
+    from files("../.git.pre-commit")
     rename('.git\\.(.*)', '$1')
-    into localRepo + "/hooks"
+    // TODO: This doesn't work for worktrees.
+    into "../.git/hooks"
 }
 compileJava.dependsOn installGitHooks
 
