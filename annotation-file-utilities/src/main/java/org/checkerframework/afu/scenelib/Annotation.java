@@ -278,7 +278,7 @@ public final class Annotation {
 
 // package org.checkerframework.afu.annotations;
 //
-// import org.checkerframework.afu.scenelib.annotations.el.*;
+// import org.checkerframework.afu.scenelib.el.*;
 // import Keyer;
 //
 // /**

@@ -49,8 +49,8 @@ public class ClassFileWriter {
    * file. For programmatic access to this tool, one should probably use the insert() methods
    * instead.
    *
-   * <p>Usage: java org.checkerframework.afu.scenelib.annotations.io.ClassFileWriter
-   * <em>options</em> [classfile indexfile] ...
+   * <p>Usage: java org.checkerframework.afu.scenelib.io.ClassFileWriter <em>options</em> [classfile
+   * indexfile] ...
    *
    * <p><em>options</em> include:
    *

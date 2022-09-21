@@ -378,7 +378,7 @@ public final class IndexFileWriter {
     OurDefCollector odc = new OurDefCollector();
     odc.visit();
 
-    // Then any package org.checkerframework.afu.scenelib.annotations...
+    // Then any package org.checkerframework.afu.scenelib...
     for (Map.Entry<String, AElement> pe : scene.packages.entrySet()) {
       AElement elem = pe.getValue();
       if (elem != null && !elem.tlAnnotationsHere.isEmpty()) {

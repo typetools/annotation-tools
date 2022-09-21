@@ -1423,7 +1423,7 @@ public class ASTPath extends ImmutableStack<ASTPath.ASTEntry>
   }
 } // end of class ASTPath
 
-// This class cannot be moved to (say) package org.checkerframework.afu.scenelib.annotations.util,
+// This class cannot be moved to (say) package org.checkerframework.afu.scenelib.util,
 // probably because of the reflection cleverness.
 /**
  * Immutable stack: operations create new stacks rather than mutate the receiver.

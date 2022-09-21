@@ -552,7 +552,7 @@ task updateUserOptionsJavadoc(type: Javadoc, dependsOn: 'assemble') {
 
   // Include only sources from annotation-file-utilities, not from scene-lib.
   source = fileTree(dir: 'src', include: '**/*.java')
-  exclude 'org.checkerframework.afu.scenelib.annotations.io.classfile/**'
+  exclude 'org.checkerframework.afu.scenelib.io.classfile/**'
   classpath = project.sourceSets.main.compileClasspath + project.sourceSets.main.runtimeClasspath
   options.memberLevel = JavadocMemberLevel.PRIVATE
   options.docletpath = project.sourceSets.main.runtimeClasspath as List
@@ -572,7 +572,7 @@ task updateUserOptionsHtml(type: Javadoc, dependsOn: 'assemble') {
 
   // Include only sources from annotation-file-utilities, not from scene-lib.
   source = fileTree(dir: 'src', include: '**/*.java')
-  exclude 'org.checkerframework.afu.scenelib.annotations.io.classfile/**'
+  exclude 'org.checkerframework.afu.scenelib.io.classfile/**'
   classpath = project.sourceSets.main.compileClasspath + project.sourceSets.main.runtimeClasspath
   options.memberLevel = JavadocMemberLevel.PRIVATE
   options.docletpath = project.sourceSets.main.runtimeClasspath as List
