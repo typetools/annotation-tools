@@ -8,7 +8,7 @@ import com.sun.source.util.TreePath;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.tree.JCTree.JCExpression;
 import java.util.List;
-import org.checkerframework.afu.scenelib.annotations.el.BoundLocation;
+import org.checkerframework.afu.scenelib.el.BoundLocation;
 
 public class BoundLocationCriterion implements Criterion {
 

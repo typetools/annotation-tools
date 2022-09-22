@@ -2,7 +2,7 @@ package org.checkerframework.afu.annotator.find;
 
 import com.sun.source.tree.*;
 import com.sun.source.util.TreePath;
-import org.checkerframework.afu.scenelib.annotations.io.ASTPath;
+import org.checkerframework.afu.scenelib.io.ASTPath;
 
 /**
  * Represents the criterion that a program element is not enclosed by any method (i.e. it's a field,

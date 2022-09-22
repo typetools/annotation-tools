@@ -6,7 +6,7 @@ import com.sun.source.util.TreePath;
 import com.sun.tools.javac.tree.JCTree;
 import java.util.List;
 import org.checkerframework.afu.annotator.scanner.TreePathUtil;
-import org.checkerframework.afu.scenelib.annotations.el.TypeIndexLocation;
+import org.checkerframework.afu.scenelib.el.TypeIndexLocation;
 
 /** A criterion to find a given extends or implements clause. */
 public class ExtImplsLocationCriterion implements Criterion {

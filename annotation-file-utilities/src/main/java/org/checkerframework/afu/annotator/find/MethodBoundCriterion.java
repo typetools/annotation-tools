@@ -2,7 +2,7 @@ package org.checkerframework.afu.annotator.find;
 
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
-import org.checkerframework.afu.scenelib.annotations.el.BoundLocation;
+import org.checkerframework.afu.scenelib.el.BoundLocation;
 
 public class MethodBoundCriterion implements Criterion {
 
