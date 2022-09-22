@@ -719,9 +719,13 @@ task setLocalRepo(type:Exec) {
 
 task installGitHooks(type: Copy, dependsOn: 'setLocalRepo') {
     description 'Copies git hooks to .git directory'
-    from files(".git.pre-commit")
+    from files("../.git.pre-commit")
     rename('.git\\.(.*)', '$1')
-    into localRepo + "/hooks"
+    into "${localRepo}/hooks"
+  doFirst{
+    // setLocalRepo changed the value of `localRepo`, so reset into.
+    into "${localRepo}/hooks"
+  }
 }
 compileJava.dependsOn installGitHooks
 
