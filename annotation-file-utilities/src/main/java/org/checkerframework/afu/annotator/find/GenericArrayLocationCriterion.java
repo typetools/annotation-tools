@@ -17,7 +17,7 @@ import java.util.Collections;
 import java.util.List;
 import javax.lang.model.type.TypeKind;
 import org.checkerframework.afu.annotator.Main;
-import org.checkerframework.afu.scenelib.annotations.el.TypePathEntry;
+import org.checkerframework.afu.scenelib.el.TypePathEntry;
 import org.objectweb.asm.TypePath;
 
 /**

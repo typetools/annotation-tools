@@ -4,8 +4,8 @@ import com.sun.source.tree.IntersectionTypeTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
 import java.util.List;
-import org.checkerframework.afu.scenelib.annotations.el.RelativeLocation;
-import org.checkerframework.afu.scenelib.annotations.io.ASTPath;
+import org.checkerframework.afu.scenelib.el.RelativeLocation;
+import org.checkerframework.afu.scenelib.io.ASTPath;
 
 @SuppressWarnings("MissingSummary") // TODO
 public class IntersectionTypeLocationCriterion implements Criterion {

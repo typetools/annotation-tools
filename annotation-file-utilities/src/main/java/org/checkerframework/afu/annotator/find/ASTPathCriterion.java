@@ -52,7 +52,7 @@ import com.sun.tools.javac.tree.JCTree;
 import java.util.ArrayList;
 import java.util.List;
 import org.checkerframework.afu.annotator.Main;
-import org.checkerframework.afu.scenelib.annotations.io.ASTPath;
+import org.checkerframework.afu.scenelib.io.ASTPath;
 
 /** A criterion to determine if a node matches a path through the AST. */
 public class ASTPathCriterion implements Criterion {

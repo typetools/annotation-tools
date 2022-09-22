@@ -81,8 +81,6 @@ annotation-file-utilities/figures/*.pdf
 annotation-file-utilities/figures/*.png
 annotation-file-utilities/*.png
 
-.run-google-java-format
-
 # User customizations
 Makefile.user
 build.properties

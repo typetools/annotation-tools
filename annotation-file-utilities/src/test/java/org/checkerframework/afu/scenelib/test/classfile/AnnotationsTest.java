@@ -1,4 +1,4 @@
-package annotations.tests.classfile;
+package org.checkerframework.afu.scenelib.test.classfile;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -7,18 +7,46 @@ import java.io.IOException;
 import java.io.InputStream;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
-import org.checkerframework.afu.scenelib.annotations.el.AScene;
-import org.checkerframework.afu.scenelib.annotations.io.IndexFileParser;
-import org.checkerframework.afu.scenelib.annotations.io.IndexFileWriter;
-import org.checkerframework.afu.scenelib.annotations.io.classfile.ClassFileReader;
-import org.checkerframework.afu.scenelib.annotations.io.classfile.ClassFileWriter;
+import org.checkerframework.afu.scenelib.el.AScene;
+import org.checkerframework.afu.scenelib.io.IndexFileParser;
+import org.checkerframework.afu.scenelib.io.IndexFileWriter;
+import org.checkerframework.afu.scenelib.io.classfile.ClassFileReader;
+import org.checkerframework.afu.scenelib.io.classfile.ClassFileWriter;
 import org.junit.Assert;
 import org.junit.Test;
 import org.objectweb.asm.ClassReader;
 
 /**
- * This class is the testing framework for the class file/index file annotations converter. To add a
- * new test,
+ * This class is the testing framework for the class file/index file annotations converter.
+ *
+ * <p>Two types of tests are performed:
+ *
+ * <ul>
+ *   <li>"c" tests that call testAgainstClass: Read the annotations from <code>name.jaif</code>,
+ *       insert them into <code>name.class</code>, write the results to a temporary file
+ *       (name_Generated.class), and compare this generated class file with <code>
+ *       name_Expected.class</code>, asserting that they have the same annotations.
+ *   <li>"i" tests that call testAgainstIndexFile: Read the annotations from the generated class
+ *       file, and check them against the annotations from the index file.
+ * </ul>
+ *
+ * To create a new test, do something like the following with a properly-functioning version of AFU:
+ *
+ * <ul>
+ *   <li>{@code cd $t/annotation-tools/scene-lib/test/annotations/tests/classfile/cases}
+ *   <li>{@code $ch/bin/javac -g TestLocalVariableA.java}
+ *   <li>{@code emv -pf TestLocalVariableA.class
+ *       $t/annotation-tools/scene-lib/test/annotations-expected/tests/classfile/cases}
+ *   <li>{@code (CLASSPATH=$t/scene-lib/test insert-annotations-to-source TestLocalVariableA.jaif
+ *       TestLocalVariableA.java)}
+ *   <li>{@code cd annotated}
+ *   <li>{@code $ch/bin/javac -g -cp $t/annotation-tools/scene-lib/bin
+ *       annotations/tests/classfile/cases/TestLocalVariableA.java}
+ *   <li>{@code cp -p annotations/tests/classfile/cases/TestLocalVariableA.class
+ *       $t/annotation-tools/scene-lib/test/annotations-expected/tests/classfile/cases/TestLocalVariableA_Expected.class}
+ * </ul>
+ *
+ * To add a new test,
  *
  * <ul>
  *   <li>add the class name to array {@link #allTests}
@@ -31,23 +59,19 @@ import org.objectweb.asm.ClassReader;
  *       method to test against index file; this is just so that JUnit has an accurate count of all
  *       tests.
  * </ul>
- *
- * Two types of tests are performed:
- *
- * <ul>
- *   <li>"c" tests that call testAgainstClass: Read the annotations from <code>name.jaif</code>,
- *       insert them into <code>name.class</code>, write the results to a temporary file
- *       (name_Generated.class), and compare this generated class file with <code>
- *       name_Expected.class</code>, asserting that they have the same annotations.
- *   <li>"i" tests that call testAgainstIndexFile: Read the annotations from the generated class
- *       file, and check them against the annotations from the index file.
- * </ul>
  */
+// TODO: there are currently two "golden" class files: the un-annotated file
+// and the expected output after inserting annotations.
+// Additionally, we could compare:
+// Unannotated .java --> javac --> .class --> AFU insert into .class --> .class
+// Unannotated .java --> AFU insert into .java --> javac --> .class
+// that is, compare the result of inserting the annotations directly
+// into the bytecode versus inserting into the source code and compiling.
 public class AnnotationsTest {
 
   /** The directory in which to find the index files to test. */
   private static final String INDEX_FILE_BASE =
-      "build/resources/test/org/checkerframework/afu/scenelib/test/classfile/cases/";
+      "build/resources/test/annotations/tests/classfile/cases/";
 
   /** The directory in which to find the class files (both .class and _Generated.class) to test. */
   private static final String CLASS_FILE_BASE =

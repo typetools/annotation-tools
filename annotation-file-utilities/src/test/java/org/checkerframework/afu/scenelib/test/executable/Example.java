@@ -6,15 +6,15 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
-import org.checkerframework.afu.scenelib.annotations.Annotation;
-import org.checkerframework.afu.scenelib.annotations.Annotations;
-import org.checkerframework.afu.scenelib.annotations.el.AClass;
-import org.checkerframework.afu.scenelib.annotations.el.AMethod;
-import org.checkerframework.afu.scenelib.annotations.el.AScene;
-import org.checkerframework.afu.scenelib.annotations.el.ATypeElement;
-import org.checkerframework.afu.scenelib.annotations.el.DefException;
-import org.checkerframework.afu.scenelib.annotations.io.IndexFileParser;
-import org.checkerframework.afu.scenelib.annotations.io.IndexFileWriter;
+import org.checkerframework.afu.scenelib.Annotation;
+import org.checkerframework.afu.scenelib.Annotations;
+import org.checkerframework.afu.scenelib.el.AClass;
+import org.checkerframework.afu.scenelib.el.AMethod;
+import org.checkerframework.afu.scenelib.el.AScene;
+import org.checkerframework.afu.scenelib.el.ATypeElement;
+import org.checkerframework.afu.scenelib.el.DefException;
+import org.checkerframework.afu.scenelib.io.IndexFileParser;
+import org.checkerframework.afu.scenelib.io.IndexFileWriter;
 
 /**
  * Prints information about Tainted and NonNull annotations on a given class. Invoke as:
@@ -23,6 +23,7 @@ import org.checkerframework.afu.scenelib.annotations.io.IndexFileWriter;
  * java Example <i>input.jaif</i> <i>ClassToProcess</i> <i>output.jaif</i>
  * </pre>
  */
+// This is run by the Gradle task `testExample`.
 public class Example {
   public static void main(String[] args) {
     AScene scene;

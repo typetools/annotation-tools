@@ -1,7 +1,7 @@
 package org.checkerframework.afu.annotator.scanner;
 
 import com.sun.tools.javac.util.Pair;
-import org.checkerframework.afu.scenelib.annotations.io.classfile.CodeOffsetAdapter;
+import org.checkerframework.afu.scenelib.io.classfile.CodeOffsetAdapter;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
