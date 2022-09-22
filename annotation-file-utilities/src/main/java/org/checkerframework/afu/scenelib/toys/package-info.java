@@ -1,3 +1,4 @@
+/** Test of package annotations. */
 @SimplerAnnotation(
     be = BalanceEnum.BALANCED,
     height = 0,
