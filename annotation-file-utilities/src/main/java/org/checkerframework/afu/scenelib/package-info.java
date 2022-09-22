@@ -5,20 +5,19 @@
  * <h2>Structure</h2>
  *
  * <ul>
- *   <li>An {@link org.checkerframework.afu.scenelib.annotations.el.AScene} holds annotations for a
- *       set of classes and packages.
- *   <li>A {@link org.checkerframework.afu.scenelib.annotations.el.AElement} represents one
- *       particular element of a Java program within an <code>AScene</code>.
- *   <li>Package {@link org.checkerframework.afu.scenelib.annotations.io} provides routines to read
- *       and write {@link org.checkerframework.afu.scenelib.annotations.el.AScene}s in various
- *       formats.
- *   <li>An {@link org.checkerframework.afu.scenelib.annotations.Annotation} represents an
- *       annotation (which might be a field of another annotation). It can be attached to an {@link
- *       org.checkerframework.afu.scenelib.annotations.el.AElement}.
- *   <li>An {@link org.checkerframework.afu.scenelib.annotations.el.AnnotationDef} represents an
- *       annotation definition, consisting of a definition name and field names and types ({@link
- *       org.checkerframework.afu.scenelib.annotations.field.AnnotationFieldType}s). It also
- *       indicates the annotation's retention policy.
+ *   <li>An {@link org.checkerframework.afu.scenelib.el.AScene} holds annotations for a set of
+ *       classes and packages.
+ *   <li>A {@link org.checkerframework.afu.scenelib.el.AElement} represents one particular element
+ *       of a Java program within an <code>AScene</code>.
+ *   <li>Package {@link org.checkerframework.afu.scenelib.io} provides routines to read and write
+ *       {@link org.checkerframework.afu.scenelib.el.AScene}s in various formats.
+ *   <li>An {@link org.checkerframework.afu.scenelib.Annotation} represents an annotation (which
+ *       might be a field of another annotation). It can be attached to an {@link
+ *       org.checkerframework.afu.scenelib.el.AElement}.
+ *   <li>An {@link org.checkerframework.afu.scenelib.el.AnnotationDef} represents an annotation
+ *       definition, consisting of a definition name and field names and types ({@link
+ *       org.checkerframework.afu.scenelib.field.AnnotationFieldType}s). It also indicates the
+ *       annotation's retention policy.
  * </ul>
  *
  * <h2>Example</h2>
