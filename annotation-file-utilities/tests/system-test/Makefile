@@ -36,7 +36,7 @@ clean:
 # Step 1: Compile the source with annotations.
 out1:
 	mkdir out1
-	${JAVAC} -source 8 -target 8 -d out1 source-ann/AnnotationTest.java || (\rm -rf out1 && false)
+	${JAVAC} -d out1 source-ann/AnnotationTest.java || (\rm -rf out1 && false)
 
 # Step 2: Convert the annotated class file to an annotation file.
 # Do we get the right annotations?
@@ -60,7 +60,7 @@ check-out2: out2.diff
 # Step 3: Compile the source without annotations.
 out3:
 	mkdir out3
-	${JAVAC} -source 8 -target 8 -d out3 source-plain/AnnotationTest.java || (\rm -rf out3 && false)
+	${JAVAC} -d out3 source-plain/AnnotationTest.java || (\rm -rf out3 && false)
 
 # Step 4: Insert annotations into the class file.
 # Can debug with:  javap -v out4.class
