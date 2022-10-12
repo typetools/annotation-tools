@@ -24,6 +24,6 @@ export PATH=$AFU/scripts:$JAVA_HOME/bin:$PATH
 (cd "${AFU}" && TERM=dumb timeout 300 ./gradlew help </dev/null >/dev/null 2>&1 || TERM=dumb ./gradlew help </dev/null >/dev/null 2>&1 || ./gradlew help)
 
 ## Compile
-(cd "${AFU}" && ./gradlew assemble)
+(cd "${AFU}" && (./gradlew assemble || (sleep 1m && ./gradlew assemble)))
 
 echo Exiting "$(cd "$(dirname "$0")" && pwd -P)/$(basename "$0")" in "$(pwd)"
