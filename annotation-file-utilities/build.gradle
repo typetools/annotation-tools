@@ -50,16 +50,9 @@ dependencies {
     }
     implementation 'org.plumelib:bcel-util:1.1.16'
     if (JavaVersion.current() == JavaVersion.VERSION_1_8) {
-        implementation ('org.apache.commons:commons-text') {
-          version {
-            // 1.9 has a known vulnerability, so avoid it.:
-            // https://nvd.nist.gov/vuln/detail/CVE-2022-42889
-            strictly '1.10.0'
-          }
-        }
-        implementation 'org.plumelib:options:1.0.5'
+        implementation 'org.plumelib:options:1.0.6'
     } else {
-        implementation 'org.plumelib:options:2.0.0'
+        implementation 'org.plumelib:options:2.0.2'
     }
     implementation 'org.plumelib:plume-util:1.6.0'
     implementation 'org.plumelib:reflection-util:1.0.5'
