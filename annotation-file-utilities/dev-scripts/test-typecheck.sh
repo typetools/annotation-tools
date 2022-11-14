@@ -14,6 +14,11 @@ export AFU="${AFU:-$(cd annotation-file-utilities >/dev/null 2>&1 && pwd -P)}"
 export CHECKERFRAMEWORK="${CHECKERFRAMEWORK:-$(cd .. >/dev/null 2>&1 && pwd -P)/checker-framework}"
 export PATH=$AFU/scripts:$JAVA_HOME/bin:$PATH
 
+(cd "${AFU}" && \
+  TERM=dumb timeout 300 ./gradlew --write-verification-metadata sha256 help --dry-run </dev/null >/dev/null 2>&1 || \
+  TERM=dumb ./gradlew --write-verification-metadata sha256 help --dry-run </dev/null >/dev/null 2>&1 || \
+  (sleep 60 && ./gradlew --write-verification-metadata sha256 help --dry-run))
+
 (cd "${AFU}" && ./gradlew assemble)
 
 if [ -d "/tmp/$USER/plume-scripts" ] ; then
