@@ -21,6 +21,11 @@ else
 fi
 PLUME_SCRIPTS="/tmp/$USER/plume-scripts"
 
+(cd "${AFU}" && \
+  TERM=dumb timeout 300 ./gradlew --write-verification-metadata sha256 help --dry-run </dev/null >/dev/null 2>&1 || \
+  TERM=dumb ./gradlew --write-verification-metadata sha256 help --dry-run </dev/null >/dev/null 2>&1 || \
+  (sleep 60 && ./gradlew --write-verification-metadata sha256 help --dry-run))
+
 cd "${AFU}"
 ./gradlew assemble
 
