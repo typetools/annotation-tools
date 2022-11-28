@@ -69,6 +69,9 @@ dependencies {
     testImplementation group: 'junit', name: 'junit', version: '4.13.2'
     testImplementation 'org.checkerframework:checker-qual:3.27.0'
 
+    // For com.google.errorprone.util.ASTHelpers.
+    implementation "com.google.errorprone:error_prone_core:${errorproneVersion}"
+
     errorprone("com.google.errorprone:error_prone_core:${errorproneVersion}")
 }
 
@@ -94,8 +97,6 @@ compileJava {
     options.encoding = 'UTF-8'
 
     options.errorprone.disable(
-        // Suggests using an ErrorProne-specific annotation.
-        "InlineMeSuggester",
         // Suggestion assumes there is no overriding equals() method.
         "NonOverridingEquals",
         // Suggestion is incorrect when using the Checker Framework.
