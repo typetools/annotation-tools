@@ -3,6 +3,7 @@ package org.checkerframework.afu.annotator.find;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.SetMultimap;
+import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.AnnotatedTypeTree;
 import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.ArrayTypeTree;
@@ -275,7 +276,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
             do { // locate pkg name, if any
               JCFieldAccess jfa = (JCFieldAccess) exp;
               exp = jfa.getExpression();
-              if (jfa.sym.isStatic()) {
+              if (ASTHelpers.isStatic(jfa.sym)) {
                 return pathAndPos(
                     exp, getFirstInstanceAfter('.', exp.getEndPosition(tree.endPositions)) + 1);
               }
@@ -284,7 +285,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
             if (exp != null) {
               if (exp.getKind() == Tree.Kind.IDENTIFIER) {
                 Symbol sym = ((JCIdent) exp).sym;
-                if (!(sym.isStatic() || sym.getKind() == ElementKind.PACKAGE)) {
+                if (!(ASTHelpers.isStatic(sym) || sym.getKind() == ElementKind.PACKAGE)) {
                   return pathAndPos(t, t.getStartPosition());
                 }
               }
