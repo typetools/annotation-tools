@@ -478,6 +478,12 @@ public final class Criteria {
     return new GenericArrayLocationCriterion(loc);
   }
 
+  /**
+   * Creates a GenericArrayLocationCriterion for a field.
+   *
+   * @param varName location of the field
+   * @return a GenericArrayLocationCriterion for the given field
+   */
   @Deprecated
   @InlineMe(
       replacement = "new FieldCriterion(varName)",
