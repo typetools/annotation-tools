@@ -64,10 +64,7 @@ public final class Source {
         fileManager.getJavaFileObjectsFromStrings(Collections.singletonList(src));
 
     // Compiler options.
-    // -Xlint:-options is a hack to get around Jenkins build problem:
-    // "target value 1.8 is obsolete and will be removed in a future release"
-    final String[] stringOpts =
-        new String[] {"-g", "-Xlint:-options", "-source", "8", "-target", "8"};
+    final String[] stringOpts = new String[] {"-g"};
     List<String> optsList = Arrays.asList(stringOpts);
 
     // Create a task.

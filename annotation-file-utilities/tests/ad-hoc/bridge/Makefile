@@ -10,9 +10,6 @@ export JAVA:=$(JAVA) -Xbootclasspath/p:../../../lib/javac-9+181-r4173-1.jar
 endif
 
 JAVACVERSION = $(shell $(JAVAC) -version 2>&1)
-ifeq (1.7.,$(findstring 1.7.,$(JAVACVERSION)))
-  JAVACTARGET = -source 7 -target 7
-endif
 
 .PHONY: bridge
 # Counting bridge methods, there should be 3 @A annotations.

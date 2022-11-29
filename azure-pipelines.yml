@@ -14,7 +14,7 @@ pr:
 
 # Each *_jdkX job depends on build_without_test_jdkX.
 # Each jdk8 and jdk11 job depends on canary-jobs (all jdk17 jobs).
-# Each jdk8, jdk11, and jdk18 job depends on the corresponding jdk17 job.
+# Each jdk8, jdk11, and jdk19 job depends on the corresponding jdk17 job.
 
 jobs:
 
@@ -212,10 +212,10 @@ jobs:
     fetchDepth: 25
   - bash: ./annotation-file-utilities/dev-scripts/test-downstream.sh
     displayName: test-downstream.sh
-- job: build_without_test_jdk18
+- job: build_without_test_jdk19
   pool:
     vmImage: 'ubuntu-latest'
-  container: mdernst/cf-ubuntu-jdk18:latest
+  container: mdernst/cf-ubuntu-jdk19:latest
   dependsOn:
     - build_without_test_jdk17
     - canary_jobs
@@ -224,12 +224,12 @@ jobs:
     fetchDepth: 25
   - bash: ./.build-without-test.sh
     displayName: .build-without-test.sh
-- job: test_jdk18
+- job: test_jdk19
   pool:
     vmImage: 'ubuntu-latest'
-  container: mdernst/cf-ubuntu-jdk18:latest
+  container: mdernst/cf-ubuntu-jdk19:latest
   dependsOn:
-    - build_without_test_jdk18
+    - build_without_test_jdk19
     - test_jdk17
     - canary_jobs
   steps:
@@ -237,12 +237,12 @@ jobs:
     fetchDepth: 25
   - bash: ./annotation-file-utilities/dev-scripts/test-allTests.sh
     displayName: test-allTests.sh
-- job: typecheck_jdk18
+- job: typecheck_jdk19
   pool:
     vmImage: 'ubuntu-latest'
-  container: mdernst/cf-ubuntu-jdk18:latest
+  container: mdernst/cf-ubuntu-jdk19:latest
   dependsOn:
-    - build_without_test_jdk18
+    - build_without_test_jdk19
     - typecheck_jdk17
     - canary_jobs
   steps:
@@ -250,12 +250,12 @@ jobs:
     fetchDepth: 25
   - bash: ./annotation-file-utilities/dev-scripts/test-typecheck.sh
     displayName: test-typecheck.sh
-- job: misc_jdk18
+- job: misc_jdk19
   pool:
     vmImage: 'ubuntu-latest'
-  container: mdernst/cf-ubuntu-jdk18-plus:latest
+  container: mdernst/cf-ubuntu-jdk19-plus:latest
   dependsOn:
-    - build_without_test_jdk18
+    - build_without_test_jdk19
     - misc_jdk17
     - canary_jobs
   steps:
@@ -263,12 +263,12 @@ jobs:
     fetchDepth: 25
   - bash: ./annotation-file-utilities/dev-scripts/test-misc.sh
     displayName: test-misc.sh
-- job: downstream_jdk18
+- job: downstream_jdk19
   pool:
     vmImage: 'ubuntu-latest'
-  container: mdernst/cf-ubuntu-jdk18:latest
+  container: mdernst/cf-ubuntu-jdk19:latest
   dependsOn:
-    - build_without_test_jdk18
+    - build_without_test_jdk19
     - downstream_jdk17
     - canary_jobs
   steps:
