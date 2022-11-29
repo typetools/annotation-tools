@@ -101,6 +101,9 @@ compileJava {
         // Suggestion is incorrect when using the Checker Framework.
         "ExtendsObject",
         // Suggests using a class that's in Error Prone itself, not in any library for clients.
+        // It requires "import com.google.errorprone.util.ASTHelpers;", and (in build.gradle)
+        //   implementation "com.google.errorprone:error_prone_core:${errorproneVersion}"
+        // Adding that line in build.gradle causes a javac crash when running the Checker Framework.
         "ASTHelpersSuggestions",
     )
 }
