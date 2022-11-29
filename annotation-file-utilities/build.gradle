@@ -98,14 +98,10 @@ compileJava {
     options.encoding = 'UTF-8'
 
     options.errorprone.disable(
-        // Suggests using an ErrorProne-specific annotation.
-        "InlineMeSuggester",
         // Suggestion assumes there is no overriding equals() method.
         "NonOverridingEquals",
         // Suggestion is incorrect when using the Checker Framework.
-        "ExtendsObject",
-        // Suggests using a class that's in Error Prone itself, not in any library for clients.
-        "ASTHelpersSuggestions",
+        "ExtendsObject"
     )
 }
 
@@ -474,13 +470,14 @@ def createCheckTypeTask(checker, shortName) {
             options.forkOptions.jvmArgs += ["-Xbootclasspath/p:${configurations.javacJar.asPath}".toString()]
         } else {
             options.forkOptions.jvmArgs += [
-                    "--add-opens", "jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED",
-                    "--add-opens", "jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED",
+                    "--add-exports", "jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED",
+                    "--add-exports", "jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED",
+                    "--add-exports", "jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED",
+                    "--add-exports", "jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED",
+                    "--add-exports", "jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED",
+                    "--add-exports", "jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED",
+                    "--add-exports", "jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED",
                     "--add-opens", "jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED",
-                    "--add-opens", "jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED",
-                    "--add-opens", "jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED",
-                    "--add-opens", "jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED",
-                    "--add-opens", "jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED",
             ]
         }
     }

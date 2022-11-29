@@ -1,5 +1,6 @@
 package org.checkerframework.afu.annotator.find;
 
+import com.google.errorprone.annotations.InlineMe;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
 import java.util.LinkedHashMap;
@@ -478,6 +479,9 @@ public final class Criteria {
   }
 
   @Deprecated
+  @InlineMe(
+      replacement = "new FieldCriterion(varName)",
+      imports = "org.checkerframework.afu.annotator.find.FieldCriterion")
   public static final Criterion field(String varName) {
     return new FieldCriterion(varName);
   }

@@ -1,5 +1,6 @@
 package org.checkerframework.afu.scenelib.util;
 
+import com.google.errorprone.annotations.InlineMe;
 import com.sun.source.tree.ArrayTypeTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
@@ -28,6 +29,9 @@ public class JVMNames {
    * @deprecated use {@link #getJVMMethodSignature(MethodTree)}
    */
   @Deprecated // use getJVMMethodSignature(MethodTree)
+  @InlineMe(
+      replacement = "JVMNames.getJVMMethodSignature(methodTree)",
+      imports = "org.checkerframework.afu.scenelib.util.JVMNames")
   public static String getJVMMethodName(MethodTree methodTree) {
     return getJVMMethodSignature(methodTree);
   }
@@ -82,6 +86,9 @@ public class JVMNames {
    * @deprecated use {@link #getJVMMethodSignature(ExecutableElement)}
    */
   @Deprecated // use getJVMMethodSignature(ExecutableElement)
+  @InlineMe(
+      replacement = "JVMNames.getJVMMethodSignature(methodElement)",
+      imports = "org.checkerframework.afu.scenelib.util.JVMNames")
   public static String getJVMMethodName(ExecutableElement methodElement) {
     return getJVMMethodSignature(methodElement);
   }
