@@ -50,9 +50,9 @@ dependencies {
         errorproneJavac("com.google.errorprone:javac:$errorproneJavacVersion")
     }
     if (JavaVersion.current() == JavaVersion.VERSION_1_8) {
-        implementation 'org.plumelib:options:1.0.6'
+        implementation 'org.plumelib:options:2.0.3'
     } else {
-        implementation 'org.plumelib:options:2.0.2'
+        implementation 'org.plumelib:options:2.0.3'
     }
     implementation 'org.plumelib:plume-util:1.6.0'
     implementation 'org.plumelib:reflection-util:1.0.5'
