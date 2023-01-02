@@ -9,7 +9,7 @@ plugins {
     id("net.ltgt.errorprone") version "3.0.1"
 
      // To show task list as a tree, run: ./gradlew <taskname> taskTree
-     id 'com.dorongold.task-tree' version '2.1.0'
+     id 'com.dorongold.task-tree' version '2.1.1'
 
      // Code formatting; defines targets "spotlessApply" and "spotlessCheck"
      id "com.diffplug.spotless" version "6.12.0"
