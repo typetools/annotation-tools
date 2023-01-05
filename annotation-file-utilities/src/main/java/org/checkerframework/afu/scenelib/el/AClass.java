@@ -14,7 +14,6 @@ import org.checkerframework.afu.scenelib.Annotation;
 import org.checkerframework.afu.scenelib.util.coll.VivifyingMap;
 import org.plumelib.util.CollectionsPlume;
 
-// TODO: Add a method to indicate whether this class in an enum, and one to get the enum fields.
 /** An annotated class. */
 public class AClass extends ADeclaration {
   /** The class's annotated type parameter bounds */
@@ -56,6 +55,19 @@ public class AClass extends ADeclaration {
 
   /** The enum constants of this class, or null if this class is not an enum. */
   private /*@MonotonicNonNull*/ List<VariableElement> enumConstants = null;
+
+  /**
+   * The simple class names any of this class's outer classes (or this class) that are annotations.
+   */
+  private final HashSet<String> annotationTypes = new HashSet<>();
+
+  /**
+   * The simple class names any of this class's outer classes (or this class) that are interfaces.
+   */
+  private final HashSet<String> interfaces = new HashSet<>();
+
+  /** The simple class names any of this class's outer classes (or this class) that are records. */
+  private final HashSet<String> records = new HashSet<>();
 
   // debug fields to keep track of all classes created
   // private static List<AClass> debugAllClasses = new ArrayList<>();
@@ -298,6 +310,93 @@ public class AClass extends ADeclaration {
               this.enumConstants, enumConstants));
     }
     this.enumConstants = new ArrayList<>(enumConstants);
+  }
+
+  /**
+   * Checks whether the given class is an annotation.
+   *
+   * @param className the simple class name of this class or one of its outer classes
+   * @return true if the given class is an annotation
+   */
+  public boolean isAnnotation(String className) {
+    return annotationTypes.contains(className);
+  }
+
+  /**
+   * Checks whether this class is an annotation.
+   *
+   * @return true if this class is an annotation
+   */
+  public boolean isAnnotation() {
+    return annotationTypes.contains(this.className);
+  }
+
+  /**
+   * Marks the given simple name as an annotation.
+   *
+   * @param className the simple class name of this class or one of its outer classes
+   * @see #markAsEnum
+   */
+  public void markAsAnnotation(String className) {
+    annotationTypes.add(className);
+  }
+
+  /**
+   * Checks whether the given class is an interface.
+   *
+   * @param className the simple class name of this class or one of its outer classes
+   * @return true if the given class is an interface
+   */
+  public boolean isInterface(String className) {
+    return interfaces.contains(className);
+  }
+
+  /**
+   * Checks whether this class is an interface.
+   *
+   * @return true if this class is an interface
+   */
+  public boolean isInterface() {
+    return interfaces.contains(this.className);
+  }
+
+  /**
+   * Marks the given simple name as an interface.
+   *
+   * @param className the simple class name of this class or one of its outer classes
+   * @see #markAsEnum
+   */
+  public void markAsInterface(String className) {
+    interfaces.add(className);
+  }
+
+  /**
+   * Checks whether the given class is an record.
+   *
+   * @param className the simple class name of this class or one of its outer classes
+   * @return true if the given class is an record
+   */
+  public boolean isRecord(String className) {
+    return records.contains(className);
+  }
+
+  /**
+   * Checks whether this class is an record.
+   *
+   * @return true if this class is an record
+   */
+  public boolean isRecord() {
+    return records.contains(this.className);
+  }
+
+  /**
+   * Marks the given simple name as a record.
+   *
+   * @param className the simple class name of this class or one of its outer classes
+   * @see #markAsEnum
+   */
+  public void markAsRecord(String className) {
+    records.add(className);
   }
 
   /**
