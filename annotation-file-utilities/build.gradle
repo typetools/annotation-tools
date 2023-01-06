@@ -57,7 +57,7 @@ dependencies {
     implementation 'org.plumelib:plume-util:1.6.0'
     implementation 'org.plumelib:reflection-util:1.0.5'
     // Annotations in checker-qual.jar are used, but no checkers are (currently) run on the code.
-    compileOnly 'org.checkerframework:checker-qual:3.28.0'
+    compileOnly 'org.checkerframework:checker-qual:3.29.0'
     ext.errorproneVersion = '2.17.0'
     implementation "com.google.errorprone:error_prone_annotations:${errorproneVersion}"
     implementation ('org.checkerframework.annotatedlib:guava:30.1.1-jre') {
@@ -67,7 +67,7 @@ dependencies {
     implementation 'org.ow2.asm:asm:9.4'
 
     testImplementation group: 'junit', name: 'junit', version: '4.13.2'
-    testImplementation 'org.checkerframework:checker-qual:3.27.0'
+    testImplementation 'org.checkerframework:checker-qual:3.29.0'
 
     implementation "com.google.errorprone:error_prone_annotations:${errorproneVersion}"
 
