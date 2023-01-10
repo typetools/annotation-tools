@@ -58,7 +58,7 @@ dependencies {
     implementation 'org.plumelib:reflection-util:1.0.5'
     // Annotations in checker-qual.jar are used, but no checkers are (currently) run on the code.
     compileOnly 'org.checkerframework:checker-qual:3.29.0'
-    ext.errorproneVersion = '2.17.0'
+    ext.errorproneVersion = '2.18.0'
     implementation "com.google.errorprone:error_prone_annotations:${errorproneVersion}"
     implementation ('org.checkerframework.annotatedlib:guava:30.1.1-jre') {
         // So long as Guava only uses annotations from checker-qual, excluding it should not cause problems.
