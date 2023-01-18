@@ -465,9 +465,6 @@ public final class IndexFileParser {
         if (st.ttype == TT_NUMBER) {
           double n = st.nval;
           st.nextToken();
-          // TODO validate the literal better
-          // HMMM StreamTokenizer can't handle all floating point
-          // numbers.
           if (type == byte.class) {
             val = (byte) n;
           } else if (type == short.class) {
@@ -480,12 +477,14 @@ public final class IndexFileParser {
             matchKeyword("L");
           } else if (type == float.class) {
             val = (float) n;
+            // StreamTokenizer can't handle all floating point numbers, so parse them here.
             if (st.sval.matches("E[0-9]+")) {
               val = Float.parseFloat(val + st.sval);
               st.nextToken();
             }
           } else if (type == double.class) {
             val = n;
+            // StreamTokenizer can't handle all floating point numbers, so parse them here.
             if (st.sval.matches("E[0-9]+")) {
               val = Double.parseDouble(val + st.sval);
               st.nextToken();
