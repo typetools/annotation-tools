@@ -464,9 +464,7 @@ public final class IndexFileParser {
       } else {
         if (st.ttype == TT_NUMBER) {
           double n = st.nval;
-          // TODO validate the literal better
-          // HMMM StreamTokenizer can't handle all floating point
-          // numbers; in particular, scientific notation is a problem
+          st.nextToken();
           if (type == byte.class) {
             val = (byte) n;
           } else if (type == short.class) {
@@ -475,17 +473,24 @@ public final class IndexFileParser {
             val = (int) n;
           } else if (type == long.class) {
             val = (long) n;
-          } else if (type == float.class) {
-            val = (float) n;
-          } else if (type == double.class) {
-            val = n;
-          } else {
-            throw new AssertionError();
-          }
-          st.nextToken();
-          if (type == long.class) {
             // permit optional 'L' character after long literals
             matchKeyword("L");
+          } else if (type == float.class) {
+            val = (float) n;
+            // StreamTokenizer can't handle all floating point numbers, so parse them here.
+            if (st.sval.matches("E[0-9]+")) {
+              val = Float.parseFloat(val + st.sval);
+              st.nextToken();
+            }
+          } else if (type == double.class) {
+            val = n;
+            // StreamTokenizer can't handle all floating point numbers, so parse them here.
+            if (st.sval.matches("E[0-9]+")) {
+              val = Double.parseDouble(val + st.sval);
+              st.nextToken();
+            }
+          } else {
+            throw new AssertionError();
           }
         } else {
           throw new ParseException("Expected a number literal");
