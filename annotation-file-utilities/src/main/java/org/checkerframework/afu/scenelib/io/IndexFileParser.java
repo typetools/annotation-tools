@@ -486,6 +486,16 @@ public final class IndexFileParser {
           if (type == long.class) {
             // permit optional 'L' character after long literals
             matchKeyword("L");
+          } else if (type == double.class) {
+            if (st.sval.matches("E[0-9]+")) {
+              val = Double.parseDouble(val + st.sval);
+              st.nextToken();
+            }
+          } else if (type == float.class) {
+            if (st.sval.matches("E[0-9]+")) {
+              val = Float.parseFloat(val + st.sval);
+              st.nextToken();
+            }
           }
         } else {
           throw new ParseException("Expected a number literal");
