@@ -27,6 +27,7 @@ annotation-file-utilities/design.pdf
 
 annotation-file-utilities/build
 annotation-file-utilities/.gradle
+annotation-file-utilities/gradle/verification-metadata.dryrun.xml
 
 annotation-file-utilities/javadoc
 
