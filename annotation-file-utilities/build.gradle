@@ -382,7 +382,8 @@ task checkBasicStyle(group: 'Format') {
     '*.jaif',
     'CFLogo.ai',
     'logfile.log.rec.index',
-    'annotation-file-format.html'
+    'annotation-file-format.html',
+    'gradlew',
   ]
 
   doLast {
