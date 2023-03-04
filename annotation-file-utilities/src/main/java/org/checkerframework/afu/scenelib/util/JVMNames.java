@@ -153,6 +153,12 @@ public class JVMNames {
     return builder.toString();
   }
 
+  /**
+   * Append, to {@code builder}, the JVML string for {@code typeTree}.
+   *
+   * @param typeTree a type
+   * @param builder where to output the type
+   */
   @SuppressWarnings("signature") // com.sun.source.tree.Tree is not yet annotated
   private static void treeToJVMLString(Tree typeTree, StringBuilder builder) {
     switch (typeTree.getKind()) {

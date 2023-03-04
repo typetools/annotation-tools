@@ -164,6 +164,7 @@ public class Main {
   @Option("-a Abbreviate annotation names")
   public static boolean abbreviate = true;
 
+  /** Don't insert the given annotation. */
   @Option("-o Omit given annotation")
   public static String omit_annotation;
 
