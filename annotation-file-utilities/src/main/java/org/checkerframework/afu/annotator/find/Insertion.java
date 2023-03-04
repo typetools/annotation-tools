@@ -43,13 +43,13 @@ public abstract class Insertion {
 
   /**
    * The package names for the annotations being inserted by this Insertion. This will be empty
-   * unless {@link #getText(boolean, boolean)} is called with abbreviate true.
+   * unless {@link #getText(boolean)} is called with abbreviate=true.
    */
   protected Set<String> packageNames;
 
   /**
    * Set of annotation names that should always be inserted fully-qualified, even when {@link
-   * #getText(boolean, boolean)} is called with abbreviate=true.
+   * #getText(boolean)} is called with abbreviate=true.
    */
   protected static Set<String> alwaysQualify = new LinkedHashSet<>();
 
@@ -82,14 +82,13 @@ public abstract class Insertion {
    * @return the text to insert
    */
   public String getText() {
-    return getText(false, false, true, 0, '\0');
+    return getText(false, true, 0, '\0');
   }
 
   /**
    * Gets the insertion text with a leading and/or trailing space added based on the values of the
    * {@code gotSeparateLine}, {@code pos}, and {@code precedingChar} parameters.
    *
-   * @param comments if true, Java 8 features will be surrounded in comments
    * @param abbreviate if true, the package name will be removed from the annotations. The package
    *     name can be retrieved again by calling the {@link #getPackageNames()} method.
    * @param gotSeparateLine {@code true} if this insertion is actually added on a separate line
@@ -98,9 +97,8 @@ public abstract class Insertion {
    *     This value will be ignored if {@code pos} is 0.
    * @return the text to insert
    */
-  public String getText(
-      boolean comments, boolean abbreviate, boolean gotSeparateLine, int pos, char precedingChar) {
-    String toInsert = getText(comments, abbreviate);
+  public String getText(boolean abbreviate, boolean gotSeparateLine, int pos, char precedingChar) {
+    String toInsert = getText(abbreviate);
     if (!toInsert.isEmpty()) {
       if (addLeadingSpace(gotSeparateLine, pos, precedingChar)) {
         toInsert = " " + toInsert;
@@ -115,12 +113,11 @@ public abstract class Insertion {
   /**
    * Gets the insertion text.
    *
-   * @param comments if true, Java 8 features will be surrounded in comments
    * @param abbreviate if true, the package name will be removed from the annotations. The package
    *     name can be retrieved again by calling the {@link #getPackageNames()} method.
    * @return the text to insert
    */
-  protected abstract String getText(boolean comments, boolean abbreviate);
+  protected abstract String getText(boolean abbreviate);
 
   /**
    * Indicates if a preceding space should be added to this insertion. Subclasses may override this
@@ -160,7 +157,7 @@ public abstract class Insertion {
    * Gets the package name.
    *
    * @return the package name of the annotation being inserted by this Insertion. This will be empty
-   *     unless {@link #getText(boolean, boolean)} is called with abbreviate true.
+   *     unless {@link #getText(boolean)} is called with abbreviate=true.
    */
   public Set<String> getPackageNames() {
     return packageNames;
@@ -288,12 +285,11 @@ public abstract class Insertion {
    * Insertion} class is not available from {@link Type}.
    *
    * @param type the type to convert
-   * @param comments if true, Java 8 features will be surrounded in comments
    * @param abbreviate if true, the package name will be removed from the annotations. The package
    *     name can be retrieved again by calling the {@link #getPackageNames()} method.
    * @return the type as a string
    */
-  public String typeToString(Type type, boolean comments, boolean abbreviate) {
+  public String typeToString(Type type, boolean abbreviate) {
     StringBuilder result = new StringBuilder();
 
     switch (type.getKind()) {
@@ -307,42 +303,42 @@ public abstract class Insertion {
           result.append(typeName.substring(0, sep));
           typeName = typeName.substring(sep);
         }
-        writeAnnotations(type, result, comments, abbreviate);
+        writeAnnotations(type, result, abbreviate);
         result.append(typeName);
         if (!declaredType.isWildcard()) {
           List<Type> typeArguments = declaredType.getTypeParameters();
           if (!typeArguments.isEmpty()) {
             result.append('<');
-            result.append(typeToString(typeArguments.get(0), comments, abbreviate));
+            result.append(typeToString(typeArguments.get(0), abbreviate));
             for (int i = 1; i < typeArguments.size(); i++) {
               result.append(", ");
-              result.append(typeToString(typeArguments.get(i), comments, abbreviate));
+              result.append(typeToString(typeArguments.get(i), abbreviate));
             }
             result.append('>');
           }
           Type innerType = declaredType.getInnerType();
           if (innerType != null) {
             result.append('.');
-            result.append(typeToString(innerType, comments, abbreviate));
+            result.append(typeToString(innerType, abbreviate));
           }
         }
         break;
       case ARRAY:
         ArrayType arrayType = (ArrayType) type;
-        result.append(typeToString(arrayType.getComponentType(), comments, abbreviate));
+        result.append(typeToString(arrayType.getComponentType(), abbreviate));
         if (!arrayType.getAnnotations().isEmpty()) {
           result.append(' ');
         }
-        writeAnnotations(type, result, comments, abbreviate);
+        writeAnnotations(type, result, abbreviate);
         result.append("[]");
         break;
       case BOUNDED:
         BoundedType boundedType = (BoundedType) type;
-        result.append(typeToString(boundedType.getName(), comments, abbreviate));
+        result.append(typeToString(boundedType.getName(), abbreviate));
         result.append(' ');
         result.append(boundedType.getBoundKind());
         result.append(' ');
-        result.append(typeToString(boundedType.getBound(), comments, abbreviate));
+        result.append(typeToString(boundedType.getBound(), abbreviate));
         break;
       default:
         throw new RuntimeException("Illegal kind: " + type.getKind());
@@ -357,15 +353,13 @@ public abstract class Insertion {
    * @param type contains the annotations to write. Only the annotations directly on the type will
    *     be written. Subtypes will be ignored.
    * @param result where to write the annotations
-   * @param comments if {@code true}, Java 8 features will be surrounded in comments
    * @param abbreviate if {@code true}, the package name will be removed from the annotations. The
    *     package name can be retrieved again by calling the {@link #getPackageNames()} method.
    */
-  private void writeAnnotations(
-      Type type, StringBuilder result, boolean comments, boolean abbreviate) {
+  private void writeAnnotations(Type type, StringBuilder result, boolean abbreviate) {
     for (String annotation : type.getAnnotations()) {
       AnnotationInsertion ins = new AnnotationInsertion(annotation);
-      result.append(ins.getText(comments, abbreviate));
+      result.append(ins.getText(abbreviate));
       result.append(" ");
       if (abbreviate) {
         packageNames.addAll(ins.getPackageNames());

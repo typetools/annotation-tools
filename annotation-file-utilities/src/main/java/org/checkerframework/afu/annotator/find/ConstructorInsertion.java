@@ -25,7 +25,7 @@ public class ConstructorInsertion extends TypedInsertion {
   }
 
   @Override
-  protected String getText(boolean comments, boolean abbreviate) {
+  protected String getText(boolean abbreviate) {
     StringBuilder b = new StringBuilder();
     if (annotationsOnly) {
       // List<String> annotations = type.getAnnotations();
@@ -35,11 +35,10 @@ public class ConstructorInsertion extends TypedInsertion {
       //  b.append(' ');
       // }
       // return new AnnotationInsertion(b.toString(), getCriteria(),
-      //    isSeparateLine()).getText(comments, abbreviate);
+      //    isSeparateLine()).getText(abbreviate);
       return "";
     } else {
-      boolean commentAnnotation = comments && getBaseType().getName().isEmpty();
-      String typeString = typeToString(type, commentAnnotation, true);
+      String typeString = typeToString(type, true);
       int dollarPos = typeString.lastIndexOf('$');
       if (dollarPos != -1) {
         typeString = typeString.substring(dollarPos + 1);
@@ -57,14 +56,14 @@ public class ConstructorInsertion extends TypedInsertion {
       }
 
       for (Insertion i : declarationInsertions) {
-        b.append(i.getText(commentAnnotation, abbreviate)).append(System.lineSeparator());
+        b.append(i.getText(abbreviate)).append(System.lineSeparator());
         if (abbreviate) {
           packageNames.addAll(i.getPackageNames());
         }
       }
       b.append("public ").append(typeString).append("(");
       if (receiverInsertion != null && !receiverInsertion.isInserted()) {
-        b.append(receiverInsertion.getText(comments, abbreviate));
+        b.append(receiverInsertion.getText(abbreviate));
       }
       b.append(") { super(); }");
       return b.toString();

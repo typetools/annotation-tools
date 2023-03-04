@@ -155,7 +155,6 @@ public class JVMNames {
 
   @SuppressWarnings("signature") // com.sun.source.tree.Tree is not yet annotated
   private static void treeToJVMLString(Tree typeTree, StringBuilder builder) {
-    // FIXME: not robust in presence of comments
     switch (typeTree.getKind()) {
       case ARRAY_TYPE:
         builder.append('[');
