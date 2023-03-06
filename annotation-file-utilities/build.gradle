@@ -45,12 +45,7 @@ configurations {
 }
 
 dependencies {
-  // TODO: Shouldn't this depend on the JDK at run time?
-  if (JavaVersion.current() == JavaVersion.VERSION_1_8) {
-    implementation 'org.plumelib:options:1.0.6'
-  } else {
-    implementation 'org.plumelib:options:2.0.3'
-  }
+  implementation 'org.plumelib:options:2.0.3'
   implementation 'org.plumelib:plume-util:1.6.5'
   implementation 'org.plumelib:reflection-util:1.0.6'
   // Annotations in checker-qual.jar are used, but no checkers are (currently) run on the code.
