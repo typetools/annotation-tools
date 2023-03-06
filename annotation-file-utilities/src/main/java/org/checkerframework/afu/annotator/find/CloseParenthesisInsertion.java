@@ -11,7 +11,7 @@ public class CloseParenthesisInsertion extends Insertion {
   }
 
   @Override
-  protected String getText(boolean comments, boolean abbreviate) {
+  protected String getText(boolean abbreviate) {
     return "))";
   }
 
