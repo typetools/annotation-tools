@@ -1,3 +1,9 @@
+buildscript {
+  if (JavaVersion.current() == JavaVersion.VERSION_1_8) {
+    throw new Error("Annotation tools can't be build with Java 8.")
+  }
+}
+
 import org.gradle.internal.jvm.Jvm
 import java.nio.file.Files
 
