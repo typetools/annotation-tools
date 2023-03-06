@@ -51,11 +51,11 @@ public class CastInsertion extends Insertion {
   }
 
   @Override
-  protected String getText(boolean comments, boolean abbreviate) {
+  protected String getText(boolean abbreviate) {
     String result =
         onArrayLiteral
-            ? "((new " + typeToString(type, comments, abbreviate) + " "
-            : "((" + typeToString(type, comments, abbreviate) + ") (";
+            ? "((new " + typeToString(type, abbreviate) + " "
+            : "((" + typeToString(type, abbreviate) + ") (";
     return result;
   }
 

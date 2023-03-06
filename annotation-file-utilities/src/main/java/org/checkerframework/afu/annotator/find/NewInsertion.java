@@ -33,7 +33,7 @@ public class NewInsertion extends TypedInsertion {
   }
 
   @Override
-  protected String getText(boolean comments, boolean abbreviate) {
+  protected String getText(boolean abbreviate) {
     if (annotationsOnly || type.getKind() != Type.Kind.ARRAY) {
       StringBuilder b = new StringBuilder();
       List<String> annotations = type.getAnnotations();
@@ -45,15 +45,14 @@ public class NewInsertion extends TypedInsertion {
       }
       AnnotationInsertion aIns =
           new AnnotationInsertion(b.substring(1), getCriteria(), isSeparateLine());
-      String result = aIns.getText(comments, abbreviate);
+      String result = aIns.getText(abbreviate);
       // This is a hack.  There might be other side effects that are needed too.
       // We should avoid making temporary Insertions, due to the design of this program.
       packageNames.addAll(aIns.getPackageNames());
       return result;
     } else {
       DeclaredType baseType = getBaseType();
-      boolean commentAnnotation = (comments && baseType.getName().isEmpty());
-      String result = typeToString(type, commentAnnotation, abbreviate);
+      String result = typeToString(type, abbreviate);
       if (!baseType.getName().isEmpty()) {
         // First, temporarily strip off any qualifiers.
         Matcher matcher = qualifiers.matcher(result);
@@ -73,9 +72,6 @@ public class NewInsertion extends TypedInsertion {
         result = prefix + result;
       }
       result = "new " + result;
-      if (comments) {
-        result = "/*>>> " + result + " */";
-      }
       return result;
     }
   }

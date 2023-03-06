@@ -62,7 +62,7 @@ public class ReceiverInsertion extends TypedInsertion {
   }
 
   @Override
-  protected String getText(boolean comments, boolean abbreviate) {
+  protected String getText(boolean abbreviate) {
     if (annotationsOnly) {
       StringBuilder b = new StringBuilder();
       List<String> annotations = type.getAnnotations();
@@ -74,11 +74,10 @@ public class ReceiverInsertion extends TypedInsertion {
         b.append(' ');
       }
       return new AnnotationInsertion(b.toString(), getCriteria(), isSeparateLine())
-          .getText(comments, abbreviate);
+          .getText(abbreviate);
     } else {
       DeclaredType baseType = getBaseType();
-      boolean commentAnnotation = (comments && baseType.getName().isEmpty());
-      String result = typeToString(type, commentAnnotation, abbreviate);
+      String result = typeToString(type, abbreviate);
       if (!baseType.getName().isEmpty()) {
         result += " ";
         if (qualifyThis) {
@@ -89,9 +88,6 @@ public class ReceiverInsertion extends TypedInsertion {
         result += "this";
         if (addComma) {
           result += ",";
-        }
-        if (comments) {
-          result = "/*>>> " + result + " */";
         }
       }
       return result;

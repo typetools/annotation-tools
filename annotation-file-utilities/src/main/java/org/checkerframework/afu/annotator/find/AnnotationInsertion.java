@@ -102,12 +102,11 @@ public class AnnotationInsertion extends Insertion {
   /**
    * Gets the insertion text.
    *
-   * @param comments if true, the annotation will be surrounded by block comments
    * @param abbreviate if true, the package name will be removed from the annotation
    * @return the text to insert
    */
   @Override
-  protected String getText(boolean comments, boolean abbreviate) {
+  protected String getText(boolean abbreviate) {
     // The method body will build up the result by modifying this variable.
     String result = fullyQualifiedAnnotationText;
     if (abbreviate) {
@@ -135,7 +134,7 @@ public class AnnotationInsertion extends Insertion {
     } else if (generateExtends) {
       result = " extends " + result + " Object";
     }
-    return comments ? "/*" + result + "*/" : result;
+    return result;
   }
 
   /**

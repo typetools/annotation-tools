@@ -113,8 +113,6 @@ import org.plumelib.util.Pair;
  *             --in-place. [default: false]
  *         <li id="option:abbreviate"><b>-a</b> <b>--abbreviate=</b><i>boolean</i>. If true, insert
  *             {@code import} statements as necessary. [default: true]
- *         <li id="option:comments"><b>-c</b> <b>--comments=</b><i>boolean</i>. Insert annotations
- *             in comments [default: false]
  *         <li id="option:omit-annotation"><b>-o</b> <b>--omit-annotation=</b><i>string</i>. Omit
  *             given annotation
  *         <li id="option:nowarn"><b>--nowarn=</b><i>boolean</i>. Suppress warnings about disallowed
@@ -166,9 +164,7 @@ public class Main {
   @Option("-a Abbreviate annotation names")
   public static boolean abbreviate = true;
 
-  @Option("-c Insert annotations in comments")
-  public static boolean comments = false;
-
+  /** Don't insert the given annotation. */
   @Option("-o Omit given annotation")
   public static String omit_annotation;
 
@@ -750,7 +746,7 @@ public class Main {
               AScene scene = scenes.get(arg);
               Multimap<Insertion, Annotation> insertionSources = insertionIndex.get(arg);
               // String text =
-              //  ins.getText(comments, abbreviate, false, 0, '\0');
+              //  ins.getText(abbreviate, false, 0, '\0');
 
               // TODO: adjust for missing end of path (?)
 
@@ -880,7 +876,7 @@ public class Main {
             }
 
             String toInsert =
-                iToInsert.getText(comments, abbreviate, gotSeparateLine, pos, precedingChar)
+                iToInsert.getText(abbreviate, gotSeparateLine, pos, precedingChar)
                     + trailingWhitespace;
             // eliminate duplicates
             if (seen.contains(toInsert)) {
