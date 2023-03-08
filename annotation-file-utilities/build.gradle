@@ -473,6 +473,7 @@ def createCheckTypeTask(checker, shortName) {
       '-proc:only',
       '-Xlint:-processing',
       '-AwarnUnneededSuppressions',
+      '-AwarnRedundantAnnotations',
     ]
     options.fork = true
 
