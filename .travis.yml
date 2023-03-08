@@ -20,11 +20,11 @@ env:
 # But, I don't want to have to put the long script within the jobs:include:
 # block.  So, always use two jobs (use a dummy if necessary).
   matrix:
-    - JDKVER=jdk8 GROUP=test
     - JDKVER=jdk11 GROUP=test
-    - JDKVER=jdk8-plus GROUP=typecheck
-    - JDKVER=jdk8-plus GROUP=misc
-    - JDKVER=jdk8 GROUP=downstream
+    - JDKVER=jdk17 GROUP=test
+    - JDKVER=jdk17-plus GROUP=typecheck
+    - JDKVER=jdk17-plus GROUP=misc
+    - JDKVER=jdk17 GROUP=downstream
 # TODO: enable once all downstream tests work with JDK 11
 # - JDKVER=jdk11 GROUP=downstream
 
