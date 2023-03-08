@@ -1,6 +1,6 @@
 buildscript {
   if (JavaVersion.current() == JavaVersion.VERSION_1_8) {
-    throw new Error("Annotation tools can't be build with Java 8.")
+    throw new Error("Annotation tools can't be built with Java 8.")
   }
 }
 
