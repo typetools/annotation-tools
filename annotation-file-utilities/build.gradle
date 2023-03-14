@@ -180,7 +180,6 @@ test {
           "Skipped: ${result.skippedTestCount}, " +
           "Time elapsed: ${seconds} sec\n"
     }
-
   }
 }
 task testExample(dependsOn: compileTestJava, group: 'Verification') {
