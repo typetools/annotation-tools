@@ -9,7 +9,7 @@ import java.nio.file.Files
 
 plugins {
   // https://plugins.gradle.org/plugin/com.github.johnrengelman.shadow
-  id 'com.github.johnrengelman.shadow' version '8.1.0'
+  id 'com.github.johnrengelman.shadow' version '8.1.1'
   id 'java'
 
   id("net.ltgt.errorprone") version "3.0.1"
