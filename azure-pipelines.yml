@@ -13,8 +13,8 @@ pr:
 #   batch: true
 
 # Each *_jdkX job depends on build_without_test_jdkX.
-# Each jdk8 and jdk11 job depends on canary-jobs (all jdk17 jobs).
-# Each jdk8, jdk11, and jdk19 job depends on the corresponding jdk17 job.
+# Each jdk11 job depends on canary-jobs (all jdk17 jobs).
+# Each jdk11 and jdk19 job depends on the corresponding jdk17 job.
 
 jobs:
 
@@ -31,70 +31,6 @@ jobs:
   - bash: true
     displayName: canary-jobs
 
-- job: build_without_test_jdk8
-  pool:
-    vmImage: 'ubuntu-latest'
-  container: mdernst/cf-ubuntu-jdk8:latest
-  dependsOn:
-    - build_without_test_jdk17
-    - canary_jobs
-  steps:
-  - checkout: self
-    fetchDepth: 25
-  - bash: ./.build-without-test.sh
-    displayName: .build-without-test.sh
-- job: test_jdk8
-  pool:
-    vmImage: 'ubuntu-latest'
-  container: mdernst/cf-ubuntu-jdk8:latest
-  dependsOn:
-    - build_without_test_jdk8
-    - test_jdk17
-    - canary_jobs
-  steps:
-  - checkout: self
-    fetchDepth: 25
-  - bash: ./annotation-file-utilities/dev-scripts/test-allTests.sh
-    displayName: test-allTests.sh
-- job: typecheck_jdk8
-  pool:
-    vmImage: 'ubuntu-latest'
-  container: mdernst/cf-ubuntu-jdk8:latest
-  dependsOn:
-    - build_without_test_jdk8
-    - typecheck_jdk17
-    - canary_jobs
-  steps:
-  - checkout: self
-    fetchDepth: 25
-  - bash: ./annotation-file-utilities/dev-scripts/test-typecheck.sh
-    displayName: test-typecheck.sh
-- job: misc_jdk8
-  pool:
-    vmImage: 'ubuntu-latest'
-  container: mdernst/cf-ubuntu-jdk8-plus:latest
-  dependsOn:
-    - build_without_test_jdk8
-    - misc_jdk17
-    - canary_jobs
-  steps:
-  - checkout: self
-    fetchDepth: 25
-  - bash: ./annotation-file-utilities/dev-scripts/test-misc.sh
-    displayName: test-misc.sh
-- job: downstream_jdk8
-  pool:
-    vmImage: 'ubuntu-latest'
-  container: mdernst/cf-ubuntu-jdk8:latest
-  dependsOn:
-    - build_without_test_jdk8
-    - downstream_jdk17
-    - canary_jobs
-  steps:
-  - checkout: self
-    fetchDepth: 25
-  - bash: ./annotation-file-utilities/dev-scripts/test-downstream.sh
-    displayName: test-downstream.sh
 - job: build_without_test_jdk11
   pool:
     vmImage: 'ubuntu-latest'
