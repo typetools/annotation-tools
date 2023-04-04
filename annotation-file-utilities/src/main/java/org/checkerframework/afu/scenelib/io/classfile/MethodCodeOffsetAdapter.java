@@ -38,7 +38,7 @@ class MethodCodeOffsetAdapter extends MethodVisitor {
    * @param start the offset to the start of the class attributes
    */
   public MethodCodeOffsetAdapter(ClassReader classReader, MethodVisitor methodVisitor, int start) {
-    super(Opcodes.ASM7, methodVisitor);
+    super(Opcodes.ASM8, methodVisitor);
     char[] buf = new char[classReader.header];
     this.classReader = classReader;
     // const pool size is (not lowest) upper bound of string length

@@ -65,7 +65,7 @@ public final class AnnotationDef extends AElement {
     List<String> methods;
     try {
       ClassReader classReader = new ClassReader(name);
-      MethodRecorder methodRecorder = new MethodRecorder(Opcodes.ASM7);
+      MethodRecorder methodRecorder = new MethodRecorder(Opcodes.ASM8);
       classReader.accept(methodRecorder, 0);
       methods = methodRecorder.getMethods();
     } catch (IOException e) {
