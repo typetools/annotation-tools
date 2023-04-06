@@ -97,7 +97,7 @@ public class MethodRecorder extends ClassVisitor {
    */
   public static void main(String[] args) throws IOException {
     ClassReader classReader = new ClassReader("com.google.common.annotations.GwtCompatible");
-    MethodRecorder methodRecorder = new MethodRecorder(Opcodes.ASM7);
+    MethodRecorder methodRecorder = new MethodRecorder(Opcodes.ASM8);
     classReader.accept(methodRecorder, 0);
     System.out.println(methodRecorder.annotations);
     System.out.println(methodRecorder.methods);
