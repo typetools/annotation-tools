@@ -438,7 +438,7 @@ public final class Criteria {
    * @return an "in class" criterion
    */
   public static final Criterion inClass(@ClassGetName String name, boolean exactMatch) {
-    return new InClassCriterion(name, /*exactMatch=*/ true);
+    return new InClassCriterion(name, /* exactMatch= */ true);
   }
 
   /**

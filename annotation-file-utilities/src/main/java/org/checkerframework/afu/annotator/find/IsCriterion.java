@@ -36,7 +36,7 @@ final class IsCriterion implements Criterion {
     }
     Tree tree = path.getLeaf();
     if (TreePathUtil.hasClassKind(tree)) {
-      return InClassCriterion.isSatisfiedBy(path, name, /*exactMatch=*/ true);
+      return InClassCriterion.isSatisfiedBy(path, name, /* exactMatch= */ true);
     }
     if (tree.getKind() != kind) {
       return false;
