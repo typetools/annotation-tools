@@ -252,7 +252,7 @@ public class IndexFileSpecification {
       parseElement(outerClist, bound);
     }
 
-    clist = clist.add(Criteria.inClass(className, /*exactMatch=*/ false));
+    clist = clist.add(Criteria.inClass(className, /* exactMatch= */ false));
 
     VivifyingMap<TypeIndexLocation, ATypeElement> extimpl = clazz.extendsImplements;
     for (Entry<TypeIndexLocation, ATypeElement> entry : extimpl.entrySet()) {
