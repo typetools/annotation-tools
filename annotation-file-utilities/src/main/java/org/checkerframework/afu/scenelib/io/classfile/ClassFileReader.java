@@ -198,7 +198,7 @@ public class ClassFileReader {
    */
   public static void read(AScene scene, ClassReader classReader) {
     ClassAnnotationSceneReader ca =
-        new ClassAnnotationSceneReader(Opcodes.ASM7, classReader, scene, ignore_bridge_methods);
+        new ClassAnnotationSceneReader(Opcodes.ASM8, classReader, scene, ignore_bridge_methods);
     classReader.accept(ca, 0);
   }
 }

@@ -205,7 +205,7 @@ public class IndexFileSpecification {
         ClassReader classReader = new ClassReader(className);
         ClassWriter classWriter = new ClassWriter(classReader, 0);
         MethodOffsetClassVisitor cv =
-            new MethodOffsetClassVisitor(Opcodes.ASM7, classReader, classWriter);
+            new MethodOffsetClassVisitor(Opcodes.ASM8, classReader, classWriter);
         classReader.accept(cv, 0);
         debug("Done reading %s.class", className);
       } catch (IOException e) {
@@ -252,7 +252,7 @@ public class IndexFileSpecification {
       parseElement(outerClist, bound);
     }
 
-    clist = clist.add(Criteria.inClass(className, /*exactMatch=*/ false));
+    clist = clist.add(Criteria.inClass(className, /* exactMatch= */ false));
 
     VivifyingMap<TypeIndexLocation, ATypeElement> extimpl = clazz.extendsImplements;
     for (Entry<TypeIndexLocation, ATypeElement> entry : extimpl.entrySet()) {

@@ -39,8 +39,8 @@ public class AnnotationVerifier {
    * the class.
    */
   public AnnotationVerifier() {
-    originalVisitor = new ClassRecorder(Opcodes.ASM7);
-    newVisitor = new ClassRecorder(Opcodes.ASM7);
+    originalVisitor = new ClassRecorder(Opcodes.ASM8);
+    newVisitor = new ClassRecorder(Opcodes.ASM8);
   }
 
   /**
