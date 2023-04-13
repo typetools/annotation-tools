@@ -85,7 +85,8 @@ public final class LocalLocation {
       flagsField.setAccessible(true);
       bytecodeOffsetField.setAccessible(true);
       FLAG_RESOLVED_FIELD.setAccessible(true);
-      int FLAG_RESOLVED = (Integer) FLAG_RESOLVED_FIELD.get(null);
+      // Label.FLAG_RESOLVED is int, but its value is 4 and `Label.flags` is short
+      short FLAG_RESOLVED = (short) (int) (Integer) FLAG_RESOLVED_FIELD.get(null);
 
       short flags = (Short) flagsField.get(startLabel);
       flags |= FLAG_RESOLVED;
