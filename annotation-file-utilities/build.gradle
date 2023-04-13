@@ -78,7 +78,7 @@ compileJava {
   } else {
     sourceCompatibility = 11
     targetCompatibility = 11
-    ptions.compilerArgs += [
+    options.compilerArgs += [
       '--add-exports',
       'jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED',
       '--add-exports',
