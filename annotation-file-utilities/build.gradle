@@ -27,8 +27,13 @@ apply plugin: 'com.github.johnrengelman.shadow'
 group 'org.checkerframework'
 version '3.33.0'
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+if (JavaVersion.current().compareTo(org.gradle.api.JavaVersion.VERSION_20) < 0) {
+  sourceCompatibility = 1.8
+  targetCompatibility = 1.8
+} else {
+  sourceCompatibility = 11
+  targetCompatibility = 11
+}
 
 repositories {
   mavenCentral()
@@ -67,8 +72,13 @@ dependencies {
 }
 
 compileJava {
-  sourceCompatibility = 1.8
-  targetCompatibility = 1.8
+  if (JavaVersion.current().compareTo(org.gradle.api.JavaVersion.VERSION_20) < 0) {
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+  } else {
+    sourceCompatibility = 11
+    targetCompatibility = 11
+  }
   options.failOnError = true
   options.deprecation = true
   options.compilerArgs += [
@@ -507,7 +517,12 @@ test.dependsOn testAnnotator
 
 javadoc {
   options.memberLevel = JavadocMemberLevel.PUBLIC
-  options.addStringOption('source', '8')
+  if (JavaVersion.current().compareTo(org.gradle.api.JavaVersion.VERSION_20) < 0) {
+    options.addStringOption('source', '8')
+  } else {
+    options.addStringOption('source', '11')
+  }
+
   options.addStringOption('Xdoclint:all', '-quiet')
   options.addStringOption('Xmaxwarns', '10000')
   if (JavaVersion.current() != JavaVersion.VERSION_1_8) {
@@ -568,9 +583,7 @@ task updateUserOptionsJavadoc(type: Javadoc, dependsOn: 'assemble') {
   options.addStringOption("docfile", "${projectDir}/src/annotator/Main.java")
   options.addStringOption("format", "javadoc")
   options.addStringOption("i", "-quiet")
-  if (JavaVersion.current().compareTo(org.gradle.api.JavaVersion.VERSION_1_9) >= 0) {
-    options.addStringOption('source', '8')
-  }
+  options.addStringOption('source', '8')
   options.noTimestamp(false)
   title = ""
 }
@@ -588,9 +601,7 @@ task updateUserOptionsHtml(type: Javadoc, dependsOn: 'assemble') {
   options.addStringOption("docfile", "${projectDir}/annotation-file-utilities.html")
   options.addStringOption("format", "html")
   options.addStringOption("i", "-quiet")
-  if (JavaVersion.current().compareTo(org.gradle.api.JavaVersion.VERSION_1_9) >= 0) {
-    options.addStringOption('source', '8')
-  }
+  options.addStringOption('source', '8')
   options.noTimestamp(false)
   title = ""
 }
