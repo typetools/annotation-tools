@@ -327,109 +327,6 @@ task cleanAnnotationFileFormat {
   }
 }
 
-// Copied from Checker Framework
-task checkBasicStyle(group: 'Format') {
-  description 'Check basic style guidelines.  Not related to Checkstyle tool.'
-
-  String[] ignoreDirectories = [
-    '.git',
-    '.gradle',
-    '.idea',
-    '.plume-scripts',
-    'annotated',
-    'api',
-    'plume-bib',
-    'build',
-    'jdk',
-    'javadoc',
-    "tests"
-  ]
-
-  String[] ignoreFilePatterns = [
-    '*.aux',
-    '*.class',
-    '*.dvi',
-    '*.eps',
-    '*.jaif',
-    '*.jar',
-    '*.jtr',
-    '*.log',
-    '*.patch',
-    '*.pdf',
-    '*.png',
-    '*.sty',
-    '*.zip',
-    '*~',
-    '*.goal',
-    '*.jaif',
-    'CFLogo.ai',
-    'logfile.log.rec.index',
-    'annotation-file-format.html',
-    'gradlew',
-  ]
-
-  doLast {
-    FileTree tree = fileTree(dir: "${projectDir}/../")
-    for (String dir : ignoreDirectories) {
-      tree.exclude "**/${dir}/**"
-    }
-    for (String file : ignoreFilePatterns) {
-      tree.exclude "**/${file}"
-    }
-    boolean failed = false
-    tree.visit {
-      if (!it.file.isDirectory()) {
-        int isBlankLine
-        it.file.eachLine { line ->
-          if (line.endsWith(' ')) {
-            println("Trailing whitespace: ${it.file.absolutePath}")
-            failed = true
-          }
-          if (!line.startsWith('\\') &&
-              (line.matches('^.* (else|finally|try)\\{}.*$')
-              || line.matches('^.*}(catch|else|finally) .*$')
-              || line.matches('^.* (catch|for|if|while)\\('))) {
-            // This runs on non-java files, too.
-            println("Missing space: ${it.file.absolutePath}")
-            failed = true
-          }
-          if (line.isEmpty()) {
-            isBlankLine++;
-          } else {
-            isBlankLine = 0;
-          }
-        }
-
-        if (isBlankLine > 1) {
-          println("Blank line at end of file: ${it.file.absolutePath}")
-          failed = true
-        }
-
-        RandomAccessFile file
-        try {
-          file = new RandomAccessFile(it.file, 'r')
-          int end = file.length() - 1;
-          if (end > 0) {
-            file.seek(end)
-            byte last = file.readByte()
-            if (last != '\n') {
-              println("Missing newline at end of file: ${it.file.absolutePath}")
-              failed = true
-            }
-          }
-        } finally {
-          if (file != null) {
-            file.close()
-          }
-        }
-      }
-    }
-    if (failed) {
-      throw new GradleException("Files do not meet basic style guidelines.")
-    }
-  }
-}
-
 /**
  * Creates a task that runs the checker on the main source set. The task is named
  * "check${shortName}", for example "checkPurity" or "checkNullness".
@@ -750,9 +647,20 @@ compileJava.dependsOn installGitHooks
 /// Code formatting
 
 spotless {
+
+  def doNotFormat = [ // TODO: adjust this
+    'dataflow/manual/examples/',
+    '**/nullness-javac-errors/*',
+    '**/calledmethods-delomboked/*',
+    '**/returnsreceiverdelomboked/*',
+    '**/build/**',
+    '*/dist/**',
+  ]
+
   format 'misc', {
     // define the files to apply `misc` to
-    target '*.gradle', '*.md', '.gitignore'
+    target '*.md', '*.tex', '.gitignore', 'Makefile'
+    targetExclude doNotFormat
 
     // define the steps to apply to those files
     trimTrailingWhitespace()
