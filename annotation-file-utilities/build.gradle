@@ -648,7 +648,8 @@ compileJava.dependsOn installGitHooks
 
 spotless {
 
-  def doNotFormat = [ // TODO: adjust this
+  def doNotFormat = [
+    // TODO: adjust this
     'dataflow/manual/examples/',
     '**/nullness-javac-errors/*',
     '**/calledmethods-delomboked/*',
