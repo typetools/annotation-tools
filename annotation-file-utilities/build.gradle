@@ -17,8 +17,8 @@ plugins {
   // To show task list as a tree, run: ./gradlew <taskname> taskTree
   id 'com.dorongold.task-tree' version '2.1.1'
 
-  // Code formatting; defines targets "spotlessApply" and "spotlessCheck"
-  // Requires Java 11
+  // Code formatting; defines targets "spotlessApply" and "spotlessCheck".
+  // Requires Java 11.
   id "com.diffplug.spotless" version "6.18.0"
 }
 apply plugin: 'java'
