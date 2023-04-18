@@ -32,7 +32,7 @@ cd "${AFU}"
 status=0
 
 ## Code style and formatting
-JAVA_VER=$(java -version 2>&1 | head -1 | cut -d'"' -f2 | sed '/^1\./s///' | cut -d'.' -f1)
+JAVA_VER=$(java -version 2>&1 | head -1 | cut -d'"' -f2 | sed '/^1\./s///' | cut -d'.' -f1 | sed 's/-ea//')
 if [ "${JAVA_VER}" != "8"] && [ "${JAVA_VER}" != "20" ] ; then
   ./gradlew spotlessCheck --console=plain --warning-mode=all --no-daemon || status=1
 fi
