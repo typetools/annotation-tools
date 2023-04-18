@@ -60,7 +60,13 @@ if [[ "${GROUP}" == "misc" || "${GROUP}" == "all" ]]; then
 
   set -e
 
-  (cd annotation-file-utilities && ./gradlew checkBasicStyle)
+  # As of version 2.38.0 (2023-04-06), Spotless does not run under JDK 20.
+  JAVA_VER=$(java -version 2>&1 | head -1 | cut -d'"' -f2 | sed '/^1\./s///' | cut -d'.' -f1 | sed 's/-ea//') && \
+  if [ "$JAVA_VER" = "20" ] ; then
+     echo "Skipping spotlessCheck on JDK 20"
+  else
+    (cd annotation-file-utilities && ./gradlew spotlessCheck)
+  fi
 
   (cd annotation-file-utilities && ./gradlew htmlValidate)
 
