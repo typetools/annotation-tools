@@ -27,7 +27,8 @@ apply plugin: 'com.github.johnrengelman.shadow'
 group 'org.checkerframework'
 version '3.33.0'
 
-if (JavaVersion.current().compareTo(org.gradle.api.JavaVersion.VERSION_20) < 0) {
+// "true ||" is temporary here, because it causes the CF's wpiManyTest to fail.
+if (true || JavaVersion.current().compareTo(org.gradle.api.JavaVersion.VERSION_20) < 0) {
   sourceCompatibility = 1.8
   targetCompatibility = 1.8
 } else {
@@ -72,7 +73,8 @@ dependencies {
 }
 
 compileJava {
-  if (JavaVersion.current().compareTo(org.gradle.api.JavaVersion.VERSION_20) < 0) {
+  // "true ||" is temporary here, because it causes the CF's wpiManyTest to fail.
+  if (true || JavaVersion.current().compareTo(org.gradle.api.JavaVersion.VERSION_20) < 0) {
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
   } else {
@@ -101,12 +103,20 @@ compileJava {
   }
   options.failOnError = true
   options.deprecation = true
-  options.compilerArgs += [
-    '-g',
-    '-Werror',
-    "-Xlint:unchecked",
-    "-Xlint",
-  ]
+  if (JavaVersion.current().compareTo(org.gradle.api.JavaVersion.VERSION_20) >= 0) {
+    // JDK 20 and later deprecate --target 8
+    options.compilerArgs += [
+      '-g',
+      '-Werror',
+      '-Xlint:all,-options',
+    ]
+  } else {
+    options.compilerArgs += [
+      '-g',
+      '-Werror',
+      '-Xlint',
+    ]
+  }
   options.encoding = 'UTF-8'
 
   options.errorprone.disable(
@@ -407,7 +417,8 @@ def createCheckTypeTask(checker, shortName) {
       "jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED",
     ]
 
-    if (JavaVersion.current().compareTo(org.gradle.api.JavaVersion.VERSION_20) < 0) {
+    // "true ||" is temporary here, because it causes the CF's wpiManyTest to fail.
+    if (true || JavaVersion.current().compareTo(org.gradle.api.JavaVersion.VERSION_20) < 0) {
       sourceCompatibility = 1.8
       targetCompatibility = 1.8
     } else {
@@ -462,7 +473,8 @@ test.dependsOn testAnnotator
 
 javadoc {
   options.memberLevel = JavadocMemberLevel.PUBLIC
-  if (JavaVersion.current().compareTo(org.gradle.api.JavaVersion.VERSION_20) < 0) {
+  // "true ||" is temporary here, because it causes the CF's wpiManyTest to fail.
+  if (true || JavaVersion.current().compareTo(org.gradle.api.JavaVersion.VERSION_20) < 0) {
     options.addStringOption('source', '8')
   } else {
     options.addStringOption('source', '11')
