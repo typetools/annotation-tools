@@ -27,8 +27,9 @@ apply plugin: 'com.github.johnrengelman.shadow'
 group 'org.checkerframework'
 version '3.33.0'
 
-// "true ||" is temporary here, because it causes the CF's wpiManyTest to fail.
-if (true || JavaVersion.current().compareTo(org.gradle.api.JavaVersion.VERSION_20) < 0) {
+// This test is for whether the Checker Framework supports (runs under) Java 8.
+// Currently, the Checker Framework does support Java 8.
+if (true /* supports Java 8 */) {
   sourceCompatibility = 1.8
   targetCompatibility = 1.8
 } else {
@@ -73,8 +74,7 @@ dependencies {
 }
 
 compileJava {
-  // "true ||" is temporary here, because it causes the CF's wpiManyTest to fail.
-  if (true || JavaVersion.current().compareTo(org.gradle.api.JavaVersion.VERSION_20) < 0) {
+  if (true /* supports Java 8 */) {
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
   } else {
@@ -417,8 +417,7 @@ def createCheckTypeTask(checker, shortName) {
       "jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED",
     ]
 
-    // "true ||" is temporary here, because it causes the CF's wpiManyTest to fail.
-    if (true || JavaVersion.current().compareTo(org.gradle.api.JavaVersion.VERSION_20) < 0) {
+    if (true /* supports Java 8 */) {
       sourceCompatibility = 1.8
       targetCompatibility = 1.8
     } else {
@@ -473,8 +472,7 @@ test.dependsOn testAnnotator
 
 javadoc {
   options.memberLevel = JavadocMemberLevel.PUBLIC
-  // "true ||" is temporary here, because it causes the CF's wpiManyTest to fail.
-  if (true || JavaVersion.current().compareTo(org.gradle.api.JavaVersion.VERSION_20) < 0) {
+  if (true /* supports Java 8 */) {
     options.addStringOption('source', '8')
   } else {
     options.addStringOption('source', '11')
