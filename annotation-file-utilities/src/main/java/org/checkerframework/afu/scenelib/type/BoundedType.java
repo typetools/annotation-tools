@@ -1,6 +1,7 @@
 package org.checkerframework.afu.scenelib.type;
 
 import java.util.List;
+import java.util.Locale;
 
 /**
  * A Java bounded type. For example:
@@ -25,7 +26,7 @@ public class BoundedType extends Type {
     /** Gets this bound kind in a format that can be inserted into source code. */
     @Override
     public String toString() {
-      return super.toString().toLowerCase();
+      return super.toString().toLowerCase(Locale.getDefault());
     }
   }
 
