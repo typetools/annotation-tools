@@ -2,6 +2,7 @@ package org.checkerframework.afu.annotator.find;
 
 import com.sun.source.tree.*;
 import com.sun.source.util.TreePath;
+import java.util.Locale;
 import org.checkerframework.afu.annotator.scanner.TreePathUtil;
 
 /** Represents the criterion that a program element has a particular type and name. */
@@ -62,6 +63,6 @@ final class IsCriterion implements Criterion {
 
   @Override
   public String toString() {
-    return "is " + kind.toString().toLowerCase() + " '" + name + "'";
+    return "is " + kind.toString().toLowerCase(Locale.getDefault()) + " '" + name + "'";
   }
 }
