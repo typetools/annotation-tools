@@ -15,7 +15,7 @@ export CHECKERFRAMEWORK="${CHECKERFRAMEWORK:-$(cd .. >/dev/null 2>&1 && pwd -P)/
 export PATH="$AFU/scripts:$JAVA_HOME/bin:$PATH"
 
 if [ -d "/tmp/$USER/plume-scripts" ] ; then
-  (cd "/tmp/$USER/plume-scripts" && git pull -q) > /dev/null 2>&1
+  (cd "/tmp/$USER/plume-scripts" && (git pull -q || true)) > /dev/null 2>&1
 else
   mkdir -p "/tmp/$USER" && git -C "/tmp/$USER" clone --depth 1 -q https://github.com/plume-lib/plume-scripts.git
 fi
