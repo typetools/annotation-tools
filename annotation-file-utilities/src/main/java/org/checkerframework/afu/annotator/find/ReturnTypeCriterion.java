@@ -11,8 +11,10 @@ public class ReturnTypeCriterion implements Criterion {
 
   /** The method name. */
   private final String methodName;
+
   /** Matches the containing class. */
   private final Criterion inClassCriterion;
+
   /** Matches the method's signature. */
   private final Criterion sigMethodCriterion;
 

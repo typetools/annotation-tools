@@ -647,6 +647,7 @@ public class ASTPath extends ImmutableStack<ASTPath.ASTEntry>
 
     /** Debugging logger. */
     public static final DebugWriter dbug = new DebugWriter(false);
+
     /** The path associated with this. */
     private ASTPath astPath;
 

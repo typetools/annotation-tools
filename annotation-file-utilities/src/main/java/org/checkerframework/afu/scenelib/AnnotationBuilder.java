@@ -33,6 +33,7 @@ public class AnnotationBuilder {
 
   /** The name of the annotation being built. */
   private @BinaryName String typeName;
+
   /**
    * The top-level meta-annotations that appear directly on the annotation being built. "tl" stands
    * for "top-level".

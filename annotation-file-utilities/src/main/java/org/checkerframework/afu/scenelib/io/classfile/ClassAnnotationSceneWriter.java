@@ -1219,8 +1219,10 @@ public class ClassAnnotationSceneWriter extends CodeOffsetAdapter {
 
     /** Offset from start of class file to code attribute for method. */
     private int codeStart;
+
     /** A set of bytecode offsets to constructor invocations. */
     Set<Integer> constrs;
+
     /** A set of bytecode offsets to lambda invocations. */
     Set<Integer> lambdas;
 

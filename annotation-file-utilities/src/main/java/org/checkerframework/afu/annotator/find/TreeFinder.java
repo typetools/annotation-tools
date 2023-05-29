@@ -84,6 +84,7 @@ import org.plumelib.util.Pair;
 public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
   /** Debugging logger. */
   public static final DebugWriter dbug = new DebugWriter(false);
+
   /** Warning logger. */
   public static final DebugWriter warn = new DebugWriter(false);
 

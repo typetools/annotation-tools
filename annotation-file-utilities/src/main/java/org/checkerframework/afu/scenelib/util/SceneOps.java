@@ -95,6 +95,7 @@ public class SceneOps {
   public static void testDiffEmpties() {
     assert new AScene().equals(diff(new AScene(), new AScene()));
   }
+
   /** Test that X-X=0, for several scenes X. */
   public static void testDiffSame() throws IOException {
     String dirname = "test/annotations/tests/classfile/cases";

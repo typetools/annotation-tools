@@ -68,6 +68,7 @@ public class Insertions implements Iterable<Insertion> {
    */
   // TODO: Inner class name might itself contain "$"; this probably doesn't handle that case.
   private Map<String, Map<String, Set<Insertion>>> store;
+
   /** The number of {@link Insertion}s in this collection. */
   private int size;
 
