@@ -43,10 +43,13 @@ public class IsSigMethodCriterion implements Criterion {
 
   /** The full JVML signature, without return type. */
   private final String signature;
+
   /** The method name. */
   private final String simpleMethodName;
+
   /** List of parameters in Java, not JVML, format. */
   private final List<@BinaryName String> fullyQualifiedParams;
+
   /** Return type in Java, not JVML, format. null if return type is "void". */
   private final @Nullable @BinaryName String returnType;
 

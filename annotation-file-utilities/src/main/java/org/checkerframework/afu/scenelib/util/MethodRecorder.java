@@ -15,8 +15,10 @@ import org.objectweb.asm.*;
 public class MethodRecorder extends ClassVisitor {
   /** Methods of the class. */
   private List<String> methods;
+
   /** Declaration annotations of the class. */
   private List<String> annotations;
+
   /** Fields of the class. */
   private List<String> fields;
 

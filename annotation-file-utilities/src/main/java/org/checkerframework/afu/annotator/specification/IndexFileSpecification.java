@@ -57,8 +57,10 @@ public class IndexFileSpecification {
   /** Insertion sources. */
   private final Multimap<Insertion, Annotation> insertionSources =
       LinkedHashMultimap.<Insertion, Annotation>create();
+
   /** The state of this object. */
   private final List<Insertion> insertions = new ArrayList<>();
+
   /** An insertion for the default constructor, or null. Is a member of insertions if non-null. */
   private ConstructorInsertion constructorInsertion = null;
 

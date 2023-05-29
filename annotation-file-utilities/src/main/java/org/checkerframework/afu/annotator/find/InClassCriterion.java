@@ -32,6 +32,7 @@ public final class InClassCriterion implements Criterion {
 
   /** The class name. */
   public final @ClassGetName String className;
+
   /** If true, require an exact match. */
   private final boolean exactMatch;
 

@@ -28,8 +28,10 @@ public class GenericArrayLocationCriterion implements Criterion {
 
   /** Whether or not to output debug information. */
   private static final boolean debug = false;
+
   /** The location as a list of TypePathEntrys. */
   private final List<TypePathEntry> location;
+
   /** The location as a full TypePath. */
   private final TypePath typePath;
 

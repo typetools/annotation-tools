@@ -29,6 +29,7 @@ public class TypePathEntry {
    * com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry}.
    */
   public final int step;
+
   /**
    * If this represents a type argument (that is, step == TYPE_ARGUMENT), then the index for the
    * type argument. Otherwise, 0.
@@ -38,9 +39,11 @@ public class TypePathEntry {
   /** The canonical ARRAY_ELEMENT TypePathEntry for building TypePaths. */
   public static final @InternedDistinct TypePathEntry ARRAY_ELEMENT =
       new TypePathEntry(TypePath.ARRAY_ELEMENT, 0);
+
   /** The canonical INNER_TYPE TypePathEntry for building TypePaths. */
   public static final @InternedDistinct TypePathEntry INNER_TYPE =
       new TypePathEntry(TypePath.INNER_TYPE, 0);
+
   /** The canonical WILDCARD_BOUND TypePathEntry for building TypePaths. */
   public static final @InternedDistinct TypePathEntry WILDCARD_BOUND =
       new TypePathEntry(TypePath.WILDCARD_BOUND, 0);
