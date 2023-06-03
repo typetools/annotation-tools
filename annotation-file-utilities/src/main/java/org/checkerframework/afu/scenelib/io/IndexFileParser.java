@@ -65,7 +65,7 @@ import org.checkerframework.framework.qual.EnsuresQualifierIf;
 import org.objectweb.asm.TypePath;
 import org.plumelib.util.ArraysPlume;
 import org.plumelib.util.FileIOException;
-import org.plumelib.util.Pair;
+import org.plumelib.util.IPair;
 
 /**
  * IndexFileParser provides static methods {@link #parse(LineNumberReader, String, AScene)}, {@link
@@ -1276,15 +1276,15 @@ public final class IndexFileParser {
         // parseAnnotations(i);
         // parseInnerTypes(i);
         int offset = 0;
-        Pair<ASTPath, TypePath> pair = splitNewArrayType(astPath); // handle special case
+        IPair<ASTPath, TypePath> pair = splitNewArrayType(astPath); // handle special case
         ATypeElement i;
         if (pair == null) {
           i = decl.insertAnnotations.getVivify(astPath);
         } else {
-          i = decl.insertAnnotations.getVivify(pair.a);
-          if (pair.b != null) {
-            i = i.innerTypes.getVivify(TypePathEntry.typePathToList(pair.b));
-            offset = pair.b.getLength();
+          i = decl.insertAnnotations.getVivify(pair.first);
+          if (pair.second != null) {
+            i = i.innerTypes.getVivify(TypePathEntry.typePathToList(pair.second));
+            offset = pair.second.getLength();
           }
         }
         parseAnnotations(i);
@@ -1311,9 +1311,9 @@ public final class IndexFileParser {
    * invariant by separating out the inner type information.
    *
    * @param astPath the ASTPath to process
-   * @return Pair of modified ASTPath and extracted TypePath
+   * @return IPair of modified ASTPath and extracted TypePath
    */
-  private Pair<ASTPath, TypePath> splitNewArrayType(ASTPath astPath) {
+  private IPair<ASTPath, TypePath> splitNewArrayType(ASTPath astPath) {
     ASTPath outerPath = astPath;
     TypePath loc = null;
     int last = astPath.size() - 1;
@@ -1329,7 +1329,7 @@ public final class IndexFileParser {
         }
       }
     }
-    return Pair.of(outerPath, loc);
+    return IPair.of(outerPath, loc);
   }
 
   /**

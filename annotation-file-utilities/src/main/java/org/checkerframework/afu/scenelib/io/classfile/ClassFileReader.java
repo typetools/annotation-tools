@@ -36,9 +36,9 @@ public class ClassFileReader {
       String.join(
           linesep,
           "extract-annotations [options] class1 class2 ...",
-          "Each argument is a class a.b.C (that is on the classpath) or a class file",
+          "Each argument is a class a.second.C (that is on the classpath) or a class file",
           "a/b/C.class.  Extracts the annotations from each such argument and prints",
-          "them in index-file format to a.b.C.jaif .  Arguments beginning with a",
+          "them in index-file format to a.second.C.jaif .  Arguments beginning with a",
           "single '@' are interpreted as argument files to be read and expanded into",
           "the command line.  A few options are available only when invoked via the",
           "script extract-annotations, not when invoked as a Java program:",

@@ -30,11 +30,11 @@ public class ClassFileWriter {
       "usage: insert-annotations [options] class1 indexfile1 class2 indexfile2 ..."
           + ""
           + linesep
-          + "For each class/index file pair (a.b.C a.b.C.jaif), read annotations from"
+          + "For each class/index file pair (a.second.C a.second.C.jaif), read annotations from"
           + linesep
-          + "the index file a.b.C.jaif and insert them into the class a.b.C, then"
+          + "the index file a.second.C.jaif and insert them into the class a.second.C, then"
           + linesep
-          + "output the merged class file to a.b.C.class"
+          + "output the merged class file to a.second.C.class"
           + linesep
           + "Each class is either a fully-qualified name of a class on your classpath,"
           + linesep

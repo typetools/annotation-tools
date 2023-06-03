@@ -14,7 +14,7 @@ import org.checkerframework.afu.scenelib.type.BoundedType;
 import org.checkerframework.afu.scenelib.type.DeclaredType;
 import org.checkerframework.afu.scenelib.type.Type;
 import org.objectweb.asm.TypePath;
-import org.plumelib.util.Pair;
+import org.plumelib.util.IPair;
 import org.plumelib.util.StringsPlume;
 
 /**
@@ -259,7 +259,7 @@ public abstract class Insertion {
    * @return given <code>@com.foo.bar(baz)</code> it returns the pair <code>{ com.foo, @bar(baz) }
    *     </code>.
    */
-  public static Pair<String, String> removePackage(String s) {
+  public static IPair<String, String> removePackage(String s) {
     int nameEnd = s.indexOf("(");
     if (nameEnd == -1) {
       nameEnd = s.length();
@@ -270,13 +270,13 @@ public abstract class Insertion {
       if (!alwaysQualify.contains(basename)) {
         String packageName = s.substring(0, nameEnd);
         if (packageName.startsWith("@")) {
-          return Pair.of(packageName.substring(1), "@" + basename);
+          return IPair.of(packageName.substring(1), "@" + basename);
         } else {
-          return Pair.of(packageName, basename);
+          return IPair.of(packageName, basename);
         }
       }
     }
-    return Pair.of((String) null, s);
+    return IPair.of((String) null, s);
   }
 
   /**

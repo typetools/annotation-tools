@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.plumelib.util.Pair;
+import org.plumelib.util.IPair;
 
 /**
  * NewScanner scans the source tree and determines the index of a given new, where the i^th index
@@ -17,7 +17,7 @@ import org.plumelib.util.Pair;
 public class NewScanner extends CommonScanner {
   private static boolean debug = false;
 
-  static Map<Pair<TreePath, Tree>, Integer> cache = new HashMap<>();
+  static Map<IPair<TreePath, Tree>, Integer> cache = new HashMap<>();
 
   /**
    * Computes the index of the given new tree amongst all new trees inside its method, using 0-based
@@ -31,7 +31,7 @@ public class NewScanner extends CommonScanner {
   public static int indexOfNewTree(TreePath origpath, Tree tree) {
     debug("indexOfNewTree: " + origpath.getLeaf());
 
-    Pair<TreePath, Tree> args = Pair.of(origpath, tree);
+    IPair<TreePath, Tree> args = IPair.of(origpath, tree);
     if (cache.containsKey(args)) {
       return cache.get(args);
     }

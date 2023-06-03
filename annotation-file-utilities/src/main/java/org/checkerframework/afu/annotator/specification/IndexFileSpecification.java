@@ -50,7 +50,7 @@ import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
 import org.plumelib.reflection.ReflectionPlume;
 import org.plumelib.util.FileIOException;
-import org.plumelib.util.Pair;
+import org.plumelib.util.IPair;
 
 /** Represents the annotations in an index file (a .jaif file). */
 public class IndexFileSpecification {
@@ -400,18 +400,18 @@ public class IndexFileSpecification {
     CastInsertion cast = null;
     CloseParenthesisInsertion closeParen = null;
     List<Insertion> annotationInsertions = new ArrayList<>();
-    Set<Pair<String, Annotation>> elementAnnotations = getElementAnnotations(element);
+    Set<IPair<String, Annotation>> elementAnnotations = getElementAnnotations(element);
     if (elementAnnotations.isEmpty()) {
       Criteria criteria = clist.criteria();
       if (element instanceof ATypeElementWithType) {
         // Still insert even if it's a cast insertion with no outer
         // annotations to just insert a cast, or insert a cast with
         // annotations on the compound types.
-        Pair<CastInsertion, CloseParenthesisInsertion> pair =
+        IPair<CastInsertion, CloseParenthesisInsertion> pair =
             createCastInsertion(
                 ((ATypeElementWithType) element).getType(), null, innerTypeInsertions, criteria);
-        cast = pair.a;
-        closeParen = pair.b;
+        cast = pair.first;
+        closeParen = pair.second;
       } else if (!innerTypeInsertions.isEmpty()) {
         if (isOnReceiver(criteria)) {
           receiver = new ReceiverInsertion(new DeclaredType(), criteria, innerTypeInsertions);
@@ -421,10 +421,10 @@ public class IndexFileSpecification {
       }
     }
 
-    for (Pair<String, Annotation> p : elementAnnotations) {
+    for (IPair<String, Annotation> p : elementAnnotations) {
       List<Insertion> elementInsertions = new ArrayList<>();
-      String annotationString = p.a;
-      Annotation annotation = p.b;
+      String annotationString = p.first;
+      Annotation annotation = p.second;
       Criteria criteria = clist.criteria();
       // If the annotation is only a type annotation, it will be inserted on the same line as the
       // following type.  If the annotation is also a declaration annotation, always insert it on
@@ -454,14 +454,14 @@ public class IndexFileSpecification {
         addInsertionSource(newI, annotation);
       } else if (element instanceof ATypeElementWithType) {
         if (cast == null) {
-          Pair<CastInsertion, CloseParenthesisInsertion> insertions =
+          IPair<CastInsertion, CloseParenthesisInsertion> insertions =
               createCastInsertion(
                   ((ATypeElementWithType) element).getType(),
                   annotationString,
                   innerTypeInsertions,
                   criteria);
-          cast = insertions.a;
-          closeParen = insertions.b;
+          cast = insertions.first;
+          closeParen = insertions.second;
           elementInsertions.add(cast);
           elementInsertions.add(closeParen);
           // no addInsertionSource, as closeParen is not explicit in scene
@@ -624,7 +624,7 @@ public class IndexFileSpecification {
    * @param criteria the criteria for the location of this insertion
    * @return the {@link CastInsertion} and {@link CloseParenthesisInsertion}
    */
-  private Pair<CastInsertion, CloseParenthesisInsertion> createCastInsertion(
+  private IPair<CastInsertion, CloseParenthesisInsertion> createCastInsertion(
       Type type, String annotationString, List<Insertion> innerTypeInsertions, Criteria criteria) {
     if (annotationString != null) {
       type.addAnnotation(annotationString);
@@ -633,7 +633,7 @@ public class IndexFileSpecification {
     CastInsertion cast = new CastInsertion(criteria, type);
     CloseParenthesisInsertion closeParen =
         new CloseParenthesisInsertion(criteria, cast.isSeparateLine());
-    return new Pair<>(cast, closeParen);
+    return IPair.of(cast, closeParen);
   }
 
   /**
@@ -675,9 +675,9 @@ public class IndexFileSpecification {
   }
 
   // Returns a string representation of the annotations at the element.
-  private Set<Pair<String, Annotation>> getElementAnnotations(AElement element) {
-    Set<Pair<String, Annotation>> result =
-        new LinkedHashSet<Pair<String, Annotation>>(element.tlAnnotationsHere.size());
+  private Set<IPair<String, Annotation>> getElementAnnotations(AElement element) {
+    Set<IPair<String, Annotation>> result =
+        new LinkedHashSet<IPair<String, Annotation>>(element.tlAnnotationsHere.size());
     for (Annotation a : element.tlAnnotationsHere) {
       StringBuilder sb = new StringBuilder();
       sb.append("@");
@@ -706,7 +706,7 @@ public class IndexFileSpecification {
         sb.append(")");
       }
 
-      result.add(new Pair<>(sb.toString(), a));
+      result.add(IPair.of(sb.toString(), a));
     }
     return result;
   }
