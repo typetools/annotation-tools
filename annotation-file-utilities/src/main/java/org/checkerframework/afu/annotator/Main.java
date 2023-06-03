@@ -76,7 +76,7 @@ import org.plumelib.options.Options;
 import org.plumelib.reflection.ReflectionPlume;
 import org.plumelib.util.FileIOException;
 import org.plumelib.util.FilesPlume;
-import org.plumelib.util.Pair;
+import org.plumelib.util.IPair;
 
 /**
  * This is the main class for the annotator, which inserts annotations in Java source code. You can
@@ -724,7 +724,7 @@ public class Main {
 
         // Create a finder, and use it to get positions.
         TreeFinder finder = new TreeFinder(tree);
-        SetMultimap<Pair<Integer, ASTPath>, Insertion> positions =
+        SetMultimap<IPair<Integer, ASTPath>, Insertion> positions =
             finder.getPositions(tree, insertions);
         if (dbug.isEnabled()) {
           dbug.debug("In org.checkerframework.afu.annotator.Main:%n");
@@ -762,23 +762,23 @@ public class Main {
         verb.debug(
             "getPositions returned %d positions in tree for %s%n", positions.size(), javafilename);
 
-        Set<Pair<Integer, ASTPath>> positionKeysUnsorted = positions.keySet();
-        Set<Pair<Integer, ASTPath>> positionKeysSorted =
-            new TreeSet<Pair<Integer, ASTPath>>(
-                new Comparator<Pair<Integer, ASTPath>>() {
+        Set<IPair<Integer, ASTPath>> positionKeysUnsorted = positions.keySet();
+        Set<IPair<Integer, ASTPath>> positionKeysSorted =
+            new TreeSet<IPair<Integer, ASTPath>>(
+                new Comparator<IPair<Integer, ASTPath>>() {
                   @Override
-                  public int compare(Pair<Integer, ASTPath> p1, Pair<Integer, ASTPath> p2) {
-                    int c = Integer.compare(p2.a, p1.a);
+                  public int compare(IPair<Integer, ASTPath> p1, IPair<Integer, ASTPath> p2) {
+                    int c = Integer.compare(p2.first, p1.first);
                     if (c != 0) {
                       return c;
                     }
-                    return p2.b == null
-                        ? (p1.b == null ? 0 : -1)
-                        : (p1.b == null ? 1 : p2.b.compareTo(p1.b));
+                    return p2.second == null
+                        ? (p1.second == null ? 0 : -1)
+                        : (p1.second == null ? 1 : p2.second.compareTo(p1.second));
                   }
                 });
         positionKeysSorted.addAll(positionKeysUnsorted);
-        for (Pair<Integer, ASTPath> pair : positionKeysSorted) {
+        for (IPair<Integer, ASTPath> pair : positionKeysSorted) {
           boolean receiverInserted = false;
           boolean newInserted = false;
           boolean constructorInserted = false;
@@ -787,15 +787,15 @@ public class Main {
           // The Multimap interface doesn't seem to have a way to specify the order of elements in
           // the collection, so sort them here.
           toInsertList.sort(insertionSorter);
-          dbug.debug("insertion pos: %d%n", pair.a);
+          dbug.debug("insertion pos: %d%n", pair.first);
           dbug.debug("insertions sorted: %s%n", toInsertList);
-          assert pair.a >= 0
-              : "pos is negative: " + pair.a + " " + toInsertList.get(0) + " " + javafilename;
+          assert pair.first >= 0
+              : "pos is negative: " + pair.first + " " + toInsertList.get(0) + " " + javafilename;
           for (Insertion iToInsert : toInsertList) {
             // Possibly add whitespace after the insertion
             String trailingWhitespace = "";
             boolean gotSeparateLine = false;
-            int pos = pair.a; // reset each iteration in case of dyn adjustment
+            int pos = pair.first; // reset each iteration in case of dyn adjustment
             if (iToInsert.isSeparateLine()) {
               // System.out.printf("isSeparateLine=true for insertion at pos %d: %s%n", pos,
               // iToInsert);
@@ -1239,10 +1239,10 @@ public class Main {
    * @param s the string representation of an annotation
    * @return given <code>@foo(bar)</code> it returns the pair <code>{ @foo, (bar) }</code>
    */
-  public static Pair<String, String> removeArgs(String s) {
+  public static IPair<String, String> removeArgs(String s) {
     int pidx = s.indexOf("(");
     return (pidx == -1)
-        ? Pair.of(s, (String) null)
-        : Pair.of(s.substring(0, pidx), s.substring(pidx));
+        ? IPair.of(s, (String) null)
+        : IPair.of(s.substring(0, pidx), s.substring(pidx));
   }
 }

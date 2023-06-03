@@ -84,7 +84,7 @@ public final class InClassCriterion implements Criterion {
     String cname = className;
 
     // It is wrong to work from the leaf up to the root of the tree, which
-    // would fail if the criterion is a.b.c and the actual is a.b.c.c.
+    // would fail if the criterion is a.second.c and the actual is a.second.c.c.
     List<Tree> trees = new ArrayList<>();
     for (Tree tree : path) {
       trees.add(tree);
