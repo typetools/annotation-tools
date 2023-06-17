@@ -162,15 +162,13 @@ public class ASTRecord implements Comparable<ASTRecord> {
 
   @Override
   public String toString() {
-    return new StringBuilder()
-        .append(className == null ? "" : className)
-        .append(":")
-        .append(methodName == null ? "" : methodName)
-        .append(":")
-        .append(varName == null ? "" : varName)
-        .append(":")
-        .append(astPath)
-        .toString();
+    return (className == null ? "" : className)
+        + ":"
+        + (methodName == null ? "" : methodName)
+        + ":"
+        + (varName == null ? "" : varName)
+        + ":"
+        + astPath;
   }
 
   public ASTRecord extend(ASTPath.ASTEntry entry) {
