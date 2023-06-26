@@ -1,6 +1,5 @@
 package org.checkerframework.afu.scenelib.util;
 
-import com.sun.tools.javac.main.CommandLine;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -17,14 +16,23 @@ public class CommandLineUtils {
    */
   public static String[] parseCommandLine(String[] args) {
     try {
+      Class<?> clazz;
       try {
-        Method method = CommandLine.class.getMethod("parse", List.class);
+        clazz = Class.forName("com.sun.tools.javac.main.CommandLine");
+      } catch (ClassNotFoundException e) {
+        clazz = Class.forName("jdk.internal.opt.CommandLine");
+      }
+      try {
+        Method method = clazz.getMethod("parse", List.class);
         return ((List<?>) method.invoke(null, Arrays.asList(args))).toArray(new String[0]);
       } catch (NoSuchMethodException e) {
-        Method method = CommandLine.class.getMethod("parse", String[].class);
+        Method method = clazz.getMethod("parse", String[].class);
         return (String[]) method.invoke(null, (Object) args);
       }
-    } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+    } catch (IllegalAccessException
+        | NoSuchMethodException
+        | InvocationTargetException
+        | ClassNotFoundException e) {
       throw new Error("Cannot access CommandLine.parse", e);
     }
   }
