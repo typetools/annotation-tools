@@ -27,14 +27,16 @@ apply plugin: 'com.github.johnrengelman.shadow'
 group 'org.checkerframework'
 version '3.36.0'
 
-// This test is for whether the Checker Framework supports (runs under) Java 8.
-// Currently, the Checker Framework does support Java 8.
-if (true /* supports Java 8 */) {
-  sourceCompatibility = 1.8
-  targetCompatibility = 1.8
-} else {
-  sourceCompatibility = 11
-  targetCompatibility = 11
+java {
+  // This test is for whether the Checker Framework supports (runs under) Java 8.
+  // Currently, the Checker Framework does support Java 8.
+  if (true /* supports Java 8 */) {
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+  } else {
+    sourceCompatibility = 11
+    targetCompatibility = 11
+  }
 }
 
 repositories {
