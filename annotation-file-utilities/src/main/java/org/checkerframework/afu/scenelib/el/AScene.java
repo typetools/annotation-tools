@@ -74,6 +74,7 @@ public class AScene implements Cloneable {
   public AScene() {}
 
   /** Copy constructor for {@link AScene}. */
+  @SuppressWarnings("this-escape")
   public AScene(AScene scene) {
     for (String key : scene.packages.keySet()) {
       AElement val = scene.packages.get(key);
@@ -173,7 +174,10 @@ public class AScene implements Cloneable {
    * @param s0 the first AScene to compare
    * @param s1 the second Ascene to compare
    */
-  @SuppressWarnings("ReferenceEquality") // testing that cloned value is different
+  @SuppressWarnings({
+    "ReferenceEquality", // testing that cloned value is different
+    "this-escape"
+  })
   public static void checkClone(AScene s0, AScene s1) {
     if (s0 == null) {
       if (s1 != null) {
