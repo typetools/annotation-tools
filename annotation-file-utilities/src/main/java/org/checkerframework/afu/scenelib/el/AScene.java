@@ -73,7 +73,11 @@ public class AScene implements Cloneable {
   /** Creates a new {@link AScene} with no classes or packages. */
   public AScene() {}
 
-  /** Copy constructor for {@link AScene}. */
+  /**
+   * Copy constructor for {@link AScene}.
+   *
+   * @param scene the scene to make a copy of
+   */
   @SuppressWarnings("this-escape")
   public AScene(AScene scene) {
     for (String key : scene.packages.keySet()) {
