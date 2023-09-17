@@ -101,6 +101,8 @@ compileJava {
       'jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED',
       '--add-exports',
       'jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED',
+      '--add-exports',
+      'jdk.internal.opt/jdk.intenal.opt=ALL-UNNAMED',
     ]
   }
   options.failOnError = true
@@ -415,6 +417,8 @@ def createCheckTypeTask(checker, shortName) {
       "jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED",
       "--add-exports",
       "jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED",
+      '--add-exports',
+      'jdk.internal.opt/jdk.intenal.opt=ALL-UNNAMED',
       "--add-opens",
       "jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED",
     ]
@@ -444,6 +448,8 @@ def createCheckTypeTask(checker, shortName) {
         'jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED',
         '--add-exports',
         'jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED',
+        '--add-exports',
+        'jdk.internal.opt/jdk.intenal.opt=ALL-UNNAMED',
       ]
     }
   }
@@ -492,7 +498,9 @@ javadoc {
     "--add-exports",
     "jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED",
     "--add-exports",
-    "jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED"
+    "jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED",
+    '--add-exports',
+    'jdk.internal.opt/jdk.intenal.opt=ALL-UNNAMED',
   ]
 }
 
