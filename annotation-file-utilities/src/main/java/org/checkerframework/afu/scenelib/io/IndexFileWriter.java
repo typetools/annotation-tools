@@ -500,7 +500,6 @@ public final class IndexFileWriter {
       formatAnnotationValue(sb, aft, f.getValue());
     }
     sb.append(")");
-    return;
   }
 
   // TODO: Why isn't this just aft.format(o)??
