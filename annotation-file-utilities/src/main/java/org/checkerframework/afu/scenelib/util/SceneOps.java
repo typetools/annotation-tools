@@ -59,12 +59,13 @@ public class SceneOps {
       IndexFileParser.parseFile(args[2], s2);
       AScene diff = diff(s1, s2);
 
-      try (Writer w =
-          new PrintWriter(new BufferedWriter(new OutputStreamWriter(System.out, UTF_8)))) {
+      Writer w = new PrintWriter(new BufferedWriter(new OutputStreamWriter(System.out, UTF_8)));
+      try {
         IndexFileWriter.write(diff, w);
       } catch (DefException e) {
         exitWithException(e);
       }
+      w.flush();
     } catch (IOException e) {
       exitWithException(e);
     }
