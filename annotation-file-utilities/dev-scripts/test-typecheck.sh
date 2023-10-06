@@ -28,6 +28,6 @@ else
 fi
 
 "/tmp/$USER/plume-scripts/git-clone-related" typetools checker-framework "${CHECKERFRAMEWORK}"
-(cd "${CHECKERFRAMEWORK}" && checker/bin-devel/build.sh)
+(cd "${CHECKERFRAMEWORK}" && ./gradlew assembleForJavac --console=plain -Dorg.gradle.internal.http.socketTimeout=60000 -Dorg.gradle.internal.http.connectionTimeout=60000)
 
 (cd "${AFU}" && ./gradlew checkSignature)
