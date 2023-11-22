@@ -37,7 +37,7 @@ set -e
 if [ -d "/tmp/plume-scripts" ] ; then
   (cd /tmp/plume-scripts && (git pull -q || true)) > /dev/null 2>&1
 else
-  (cd /tmp && git clone --depth 1 -q https://github.com/plume-lib/plume-scripts.git)
+  (cd /tmp && git clone --filter=blob:none -q https://github.com/plume-lib/plume-scripts.git)
 fi
 
 if [[ "${GROUP}" == "test" || "${GROUP}" == "all" ]]; then

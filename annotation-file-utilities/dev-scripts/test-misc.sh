@@ -17,7 +17,7 @@ export PATH="$AFU/scripts:$JAVA_HOME/bin:$PATH"
 if [ -d "/tmp/$USER/plume-scripts" ] ; then
   (cd "/tmp/$USER/plume-scripts" && (git pull -q || true)) > /dev/null 2>&1
 else
-  mkdir -p "/tmp/$USER" && git -C "/tmp/$USER" clone --depth 1 -q https://github.com/plume-lib/plume-scripts.git
+  mkdir -p "/tmp/$USER" && git -C "/tmp/$USER" clone --filter=blob:none -q https://github.com/plume-lib/plume-scripts.git
 fi
 PLUME_SCRIPTS="/tmp/$USER/plume-scripts"
 
