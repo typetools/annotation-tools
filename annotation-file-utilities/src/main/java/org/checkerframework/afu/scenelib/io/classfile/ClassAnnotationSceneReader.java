@@ -28,7 +28,6 @@ import org.checkerframework.afu.scenelib.el.RelativeLocation;
 import org.checkerframework.afu.scenelib.el.TypeIndexLocation;
 import org.checkerframework.afu.scenelib.el.TypePathEntry;
 import org.checkerframework.afu.scenelib.field.AnnotationAFT;
-import org.checkerframework.afu.scenelib.field.AnnotationFieldType;
 import org.checkerframework.afu.scenelib.field.ArrayAFT;
 import org.checkerframework.afu.scenelib.field.BasicAFT;
 import org.checkerframework.afu.scenelib.field.ClassTokenAFT;
@@ -201,8 +200,7 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
     }
     AMethod aMethod = aClass.methods.getVivify(name + descriptor);
     MethodVisitor methodWriter = super.visitMethod(access, name, descriptor, signature, exceptions);
-    return new MethodAnnotationSceneReader(
-        this.api, name, descriptor, signature, aMethod, methodWriter);
+    return new MethodAnnotationSceneReader(this.api, aMethod, methodWriter);
   }
 
   /**
@@ -462,10 +460,8 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
       if (trace) {
         System.out.printf("visitArray(%s) in %s (%s)%n", name, this, this.getClass());
       }
-      ArrayAFT aaft = (ArrayAFT) annotationBuilder.fieldTypes().get(name);
-      ScalarAFT aft = aaft.elementType;
       AnnotationVisitor annotationWriter = this.annotationWriter.visitArray(name);
-      return new ArrayAnnotationSceneReader(this.api, this, name, aft, annotationWriter);
+      return new ArrayAnnotationSceneReader(this.api, this, name, annotationWriter);
     }
 
     /**
@@ -1290,14 +1286,12 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
      * @param api the ASM API version to use
      * @param parent the parent AnnotationSceneReader
      * @param fieldName the name of the field
-     * @param eltType the type of the field
      * @param annotationWriter the writer to output the annotations
      */
     ArrayAnnotationSceneReader(
         int api,
         AnnotationSceneReader parent,
         String fieldName,
-        AnnotationFieldType eltType,
         AnnotationVisitor annotationWriter) {
       super(api, dummyDesc, parent.visible, parent.aElement, annotationWriter);
       if (trace) {
@@ -1493,23 +1487,11 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
      * Constructs a new MethodAnnotationScene reader.
      *
      * @param api the ASM API version to use
-     * @param name (unused)
-     * @param descriptor (unused)
-     * @param signature (unused)
      * @param aMethod the Method to be visisted
      * @param methodWriter a MethodWriter for writing the current field
      */
-    MethodAnnotationSceneReader(
-        int api,
-        String name,
-        String descriptor,
-        String signature,
-        AElement aMethod,
-        MethodVisitor methodWriter) {
+    MethodAnnotationSceneReader(int api, AElement aMethod, MethodVisitor methodWriter) {
       super(api, methodWriter);
-      // this.name = name;
-      // this.descriptor = descriptor;
-      // this.signature = signature;
       this.aMethod = aMethod;
       this.methodWriter = methodWriter;
     }
