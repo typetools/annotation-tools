@@ -527,6 +527,7 @@ public final class Criteria {
    * Creates an IsSigMethodCriterion.
    *
    * @param methodName the method name
+   * @return a new IsSigMethodCriterion
    */
   @SuppressWarnings("signature:argument") // likely bug; value used as both a method & a signature
   public static final Criterion isSigMethod(String methodName) {
