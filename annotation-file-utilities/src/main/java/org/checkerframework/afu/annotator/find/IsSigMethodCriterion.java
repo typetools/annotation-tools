@@ -26,7 +26,7 @@ import org.plumelib.util.CollectionsPlume;
 
 /**
  * A criterion that matches a method with a specific signature (name, argument types, and return
- * type).
+ * type). The signature is given in JVM format.
  */
 public class IsSigMethodCriterion implements Criterion {
 
@@ -44,8 +44,11 @@ public class IsSigMethodCriterion implements Criterion {
   /** Map from compilation unit to Context. */
   private static final Map<CompilationUnitTree, Context> contextCache = new HashMap<>();
 
-  /** The full JVML signature, without return type. */
-  private final String signature;
+  /**
+   * The JVML signature, without return type. This field is used only for diagnostics. Its
+   * components appear in the following fields.
+   */
+  private final String signatureWithoutReturnType;
 
   /** The method name. */
   private final String simpleMethodName;
@@ -59,18 +62,11 @@ public class IsSigMethodCriterion implements Criterion {
   /**
    * Creates a new IsSigMethodCriterion.
    *
-   * @param fullSignature the full JVML signature
+   * @param fullSignature the full JVML signature (that is, a method descriptor)
    */
   public IsSigMethodCriterion(@MethodDescriptor String fullSignature) {
-    this.signature = fullSignature.substring(0, fullSignature.indexOf(")") + 1);
+    this.signatureWithoutReturnType = fullSignature.substring(0, fullSignature.indexOf(")") + 1);
     this.simpleMethodName = fullSignature.substring(0, fullSignature.indexOf("("));
-    //    this.fullyQualifiedParams = new ArrayList<String>();
-    //    for (String s : fullSignature.substring(
-    //        fullSignature.indexOf("(") + 1, fullSignature.indexOf(")")).split(",")) {
-    //      if (s.length() > 0) {
-    //        fullyQualifiedParams.add(s);
-    //      }
-    //    }
     try {
       String jvmlArgs =
           fullSignature.substring(fullSignature.indexOf("("), fullSignature.indexOf(")") + 1);
@@ -423,6 +419,6 @@ public class IsSigMethodCriterion implements Criterion {
 
   @Override
   public String toString() {
-    return "IsSigMethodCriterion: " + signature;
+    return "IsSigMethodCriterion: " + signatureWithoutReturnType;
   }
 }
