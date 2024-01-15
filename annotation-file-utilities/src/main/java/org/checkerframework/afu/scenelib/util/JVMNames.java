@@ -15,6 +15,7 @@ import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.ArrayType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
+import org.checkerframework.checker.signature.qual.FieldDescriptor;
 import org.plumelib.reflection.Signatures;
 
 // TODO: Move much of this class to reflection-util, if no special classpath manipulation is
@@ -177,10 +178,10 @@ public class JVMNames {
   /**
    * Converts a type in JVM format to a type in Java format.
    *
-   * @param a type in JVM format
+   * @param jvmType a type in JVM format
    * @return the type, in Java format
    */
-  public static String jvmlStringToJavaTypeString(@FieldDescriptor String str) {
-    return str.equals("V") ? "void" : Signatures.fieldDescriptorToBinaryName(str);
+  public static String jvmlStringToJavaTypeString(@FieldDescriptor String jvmType) {
+    return jvmType.equals("V") ? "void" : Signatures.fieldDescriptorToBinaryName(jvmType);
   }
 }
