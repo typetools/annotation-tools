@@ -19,7 +19,9 @@ import java.util.Set;
 import org.checkerframework.afu.annotator.Main;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.signature.qual.BinaryName;
+import org.checkerframework.checker.signature.qual.FieldDescriptor;
 import org.plumelib.reflection.Signatures;
+import org.plumelib.util.CollectionsPlume;
 
 /**
  * A criterion that matches a method with a specific signature (name, argument types, and return
@@ -58,7 +60,7 @@ public class IsSigMethodCriterion implements Criterion {
    *
    * @param fullSignature the full JVML signature
    */
-  public IsSigMethodCriterion(String fullSignature) {
+  public IsSigMethodCriterion(@MethodDescriptor String fullSignature) {
     this.signature = fullSignature.substring(0, fullSignature.indexOf(")") + 1);
     this.simpleMethodName = fullSignature.substring(0, fullSignature.indexOf("("));
     //    this.fullyQualifiedParams = new ArrayList<String>();
@@ -68,43 +70,18 @@ public class IsSigMethodCriterion implements Criterion {
     //        fullyQualifiedParams.add(s);
     //      }
     //    }
-    this.fullyQualifiedParams = new ArrayList<>();
     try {
-      parseParams(
-          fullSignature.substring(fullSignature.indexOf("(") + 1, fullSignature.indexOf(")")));
+      String jvmlArgs =
+          fullSignature.substring(fullSignature.indexOf("("), fullSignature.indexOf(")") + 1);
+      this.fullyQualifiedParams =
+          CollectionsPlume.mapList(
+              Signatures::fieldDescriptorToBinaryName, Signatures.splitJvmArglist(jvmlArgs));
     } catch (Exception e) {
-      throw new RuntimeException("Caught exception while parsing method: " + fullSignature, e);
+      throw new RuntimeException("Exception while parsing method: " + fullSignature, e);
     }
-    String returnTypeJvml = fullSignature.substring(fullSignature.indexOf(")") + 1);
+    @Nullable @FieldDescriptor String returnTypeJvml = Signatures.methodDescriptorToReturnType(fullSignature);
     this.returnType =
-        (returnTypeJvml.equals("V")
-            ? null
-            : Signatures.fieldDescriptorToBinaryName(returnTypeJvml));
-  }
-
-  // params is in JVML format
-  private void parseParams(String params) {
-    while (params.length() != 0) {
-      // nextParam is in JVML format
-      String nextParam = readNext(params);
-      params = params.substring(nextParam.length());
-      fullyQualifiedParams.add(Signatures.fieldDescriptorToBinaryName(nextParam));
-    }
-  }
-
-  // strip a JVML type off a string containing multiple concatenated JVML types
-  private String readNext(String restOfParams) {
-    String firstChar = restOfParams.substring(0, 1);
-    if (isPrimitiveLetter(firstChar)) {
-      return firstChar;
-    } else if (firstChar.equals("[")) {
-      return "[" + readNext(restOfParams.substring(1));
-    } else if (firstChar.equals("L")) {
-      return "L" + restOfParams.substring(1, restOfParams.indexOf(";") + 1);
-    } else {
-      throw new RuntimeException(
-          "Unknown method params: " + signature + " with remainder: " + restOfParams);
-    }
+        returnTypeJvml == null ? null : Signatures.fieldDescriptorToBinaryName(returnTypeJvml);
   }
 
   // called by isSatisfiedBy(TreePath), will get compilation unit on its own

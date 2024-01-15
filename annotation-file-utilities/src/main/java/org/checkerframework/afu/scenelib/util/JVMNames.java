@@ -17,6 +17,8 @@ import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import org.plumelib.reflection.Signatures;
 
+// TODO: Move much of this class to reflection-util, if no special classpath manipulation is
+// required to get the com.sun and javax.lang classes on the classpath.
 /** Class to generate class formatted names from Trees. */
 public class JVMNames {
 
@@ -120,9 +122,7 @@ public class JVMNames {
   }
 
   /**
-   * Create a JVML string for a type. Uses {@link Signatures#binaryNameToFieldDescriptor(String)}
-   *
-   * <p>Array strings are built by recursively converting the component type.
+   * Create a JVML string for a type.
    *
    * @param type the Type to convert to JVML
    * @return the JVML representation of type
@@ -174,7 +174,13 @@ public class JVMNames {
     }
   }
 
-  public static String jvmlStringToJavaTypeString(String str) {
+  /**
+   * Converts a type in JVM format to a type in Java format.
+   *
+   * @param a type in JVM format
+   * @return the type, in Java format
+   */
+  public static String jvmlStringToJavaTypeString(@FieldDescriptor String str) {
     return str.equals("V") ? "void" : Signatures.fieldDescriptorToBinaryName(str);
   }
 }
