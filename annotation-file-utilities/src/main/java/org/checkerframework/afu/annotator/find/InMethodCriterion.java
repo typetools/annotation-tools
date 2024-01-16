@@ -5,12 +5,22 @@ import com.sun.source.util.TreePath;
 import javax.lang.model.element.Modifier;
 import org.checkerframework.afu.annotator.Main;
 
+// TODO: the name is sometimes used as a signature and sometimes as a method!
 /** Represents the criterion that a program element is in a method with a certain name. */
 final class InMethodCriterion implements Criterion {
 
+  /** The method name to search for. */
   public final String name;
+
+  /** A criterion for an exact match. */
   private final IsSigMethodCriterion sigMethodCriterion;
 
+  /**
+   * Creates an InMethodCriterion.
+   *
+   * @param name the method name
+   */
+  @SuppressWarnings("signature:argument") // likely bug; value used as both a method & a signature
   InMethodCriterion(String name) {
     this.name = name;
     sigMethodCriterion = new IsSigMethodCriterion(name);

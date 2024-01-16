@@ -19,11 +19,14 @@ import java.util.Set;
 import org.checkerframework.afu.annotator.Main;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.signature.qual.BinaryName;
+import org.checkerframework.checker.signature.qual.FieldDescriptor;
+import org.checkerframework.checker.signature.qual.MethodDescriptor;
 import org.plumelib.reflection.Signatures;
+import org.plumelib.util.CollectionsPlume;
 
 /**
  * A criterion that matches a method with a specific signature (name, argument types, and return
- * type).
+ * type). The signature is given in JVM format.
  */
 public class IsSigMethodCriterion implements Criterion {
 
@@ -41,8 +44,11 @@ public class IsSigMethodCriterion implements Criterion {
   /** Map from compilation unit to Context. */
   private static final Map<CompilationUnitTree, Context> contextCache = new HashMap<>();
 
-  /** The full JVML signature, without return type. */
-  private final String signature;
+  /**
+   * The JVML signature, without return type. This field is used only for diagnostics. Its
+   * components appear in the following fields.
+   */
+  private final String signatureWithoutReturnType;
 
   /** The method name. */
   private final String simpleMethodName;
@@ -56,55 +62,23 @@ public class IsSigMethodCriterion implements Criterion {
   /**
    * Creates a new IsSigMethodCriterion.
    *
-   * @param fullSignature the full JVML signature
+   * @param fullSignature the full JVML signature (that is, a method descriptor)
    */
-  public IsSigMethodCriterion(String fullSignature) {
-    this.signature = fullSignature.substring(0, fullSignature.indexOf(")") + 1);
+  public IsSigMethodCriterion(@MethodDescriptor String fullSignature) {
+    this.signatureWithoutReturnType = fullSignature.substring(0, fullSignature.indexOf(")") + 1);
     this.simpleMethodName = fullSignature.substring(0, fullSignature.indexOf("("));
-    //    this.fullyQualifiedParams = new ArrayList<String>();
-    //    for (String s : fullSignature.substring(
-    //        fullSignature.indexOf("(") + 1, fullSignature.indexOf(")")).split(",")) {
-    //      if (s.length() > 0) {
-    //        fullyQualifiedParams.add(s);
-    //      }
-    //    }
-    this.fullyQualifiedParams = new ArrayList<>();
     try {
-      parseParams(
-          fullSignature.substring(fullSignature.indexOf("(") + 1, fullSignature.indexOf(")")));
+      String jvmlArgs =
+          fullSignature.substring(fullSignature.indexOf("("), fullSignature.indexOf(")") + 1);
+      this.fullyQualifiedParams =
+          CollectionsPlume.mapList(
+              Signatures::fieldDescriptorToBinaryName, Signatures.splitJvmArglist(jvmlArgs));
     } catch (Exception e) {
-      throw new RuntimeException("Caught exception while parsing method: " + fullSignature, e);
+      throw new RuntimeException("Exception while parsing method: " + fullSignature, e);
     }
-    String returnTypeJvml = fullSignature.substring(fullSignature.indexOf(")") + 1);
+    @Nullable @FieldDescriptor String returnTypeJvml = Signatures.methodDescriptorToReturnType(fullSignature);
     this.returnType =
-        (returnTypeJvml.equals("V")
-            ? null
-            : Signatures.fieldDescriptorToBinaryName(returnTypeJvml));
-  }
-
-  // params is in JVML format
-  private void parseParams(String params) {
-    while (params.length() != 0) {
-      // nextParam is in JVML format
-      String nextParam = readNext(params);
-      params = params.substring(nextParam.length());
-      fullyQualifiedParams.add(Signatures.fieldDescriptorToBinaryName(nextParam));
-    }
-  }
-
-  // strip a JVML type off a string containing multiple concatenated JVML types
-  private String readNext(String restOfParams) {
-    String firstChar = restOfParams.substring(0, 1);
-    if (isPrimitiveLetter(firstChar)) {
-      return firstChar;
-    } else if (firstChar.equals("[")) {
-      return "[" + readNext(restOfParams.substring(1));
-    } else if (firstChar.equals("L")) {
-      return "L" + restOfParams.substring(1, restOfParams.indexOf(";") + 1);
-    } else {
-      throw new RuntimeException(
-          "Unknown method params: " + signature + " with remainder: " + restOfParams);
-    }
+        returnTypeJvml == null ? null : Signatures.fieldDescriptorToBinaryName(returnTypeJvml);
   }
 
   // called by isSatisfiedBy(TreePath), will get compilation unit on its own
@@ -443,110 +417,8 @@ public class IsSigMethodCriterion implements Criterion {
     return Kind.SIG_METHOD;
   }
 
-  //  public static String getSignature(MethodTree mt) {
-  //    String sig = mt.getName().toString().trim(); // method name, no parameters
-  //    sig += "(";
-  //    boolean first = true;
-  //    for (VariableTree vt : mt.getParameters()) {
-  //      if (!first) {
-  //        sig += ",";
-  //      }
-  //      sig += getType(vt.getType());
-  //      first = false;
-  //    }
-  //    sig += ")";
-  //
-  //    return sig;
-  //  }
-  //
-  //  private static String getType(Tree t) {
-  //    if (t.getKind() == Tree.Kind.PRIMITIVE_TYPE) {
-  //      return getPrimitiveType((PrimitiveTypeTree) t);
-  //    } else if (t.getKind() == Tree.Kind.IDENTIFIER) {
-  //      return "L" + ((IdentifierTree) t).getName().toString();
-  //    } else if (t.getKind() == Tree.Kind.PARAMETERIZED_TYPE) {
-  //      // don't care about generics due to erasure
-  //      return getType(((ParameterizedTypeTree) t).getType());
-  //    }
-  //    throw new RuntimeException("unable to get type of: " + t);
-  //  }
-  //
-  //  private static String getPrimitiveType(PrimitiveTypeTree pt) {
-  //    TypeKind tk = pt.getPrimitiveTypeKind();
-  //    if (tk == TypeKind.ARRAY) {
-  //      return "[";
-  //    } else if (tk == TypeKind.BOOLEAN) {
-  //      return "Z";
-  //    } else if (tk == TypeKind.BYTE) {
-  //      return "B";
-  //    } else if (tk == TypeKind.CHAR) {
-  //      return "C";
-  //    } else if (tk == TypeKind.DOUBLE) {
-  //      return "D";
-  //    } else if (tk == TypeKind.FLOAT) {
-  //      return "F";
-  //    } else if (tk == TypeKind.INT) {
-  //      return "I";
-  //    } else if (tk == TypeKind.LONG) {
-  //      return "J";
-  //    } else if (tk == TypeKind.SHORT) {
-  //      return "S";
-  //    }
-  //
-  //    throw new RuntimeException("Invalid TypeKind: " + tk);
-  //  }
-
-  /*
-  private boolean isPrimitive(String s) {
-    return
-      s.equals("boolean") ||
-      s.equals("byte") ||
-      s.equals("char") ||
-      s.equals("double") ||
-      s.equals("float") ||
-      s.equals("int") ||
-      s.equals("long") ||
-      s.equals("short");
-  }
-  */
-
-  private boolean isPrimitiveLetter(String s) {
-    return s.equals("Z")
-        || s.equals("B")
-        || s.equals("C")
-        || s.equals("D")
-        || s.equals("F")
-        || s.equals("I")
-        || s.equals("J")
-        || s.equals("S");
-  }
-
-  /*
-  private String primitiveLetter(String s) {
-    if (s.equals("boolean")) {
-      return "Z";
-    } else if (s.equals("byte")) {
-      return "B";
-    } else if (s.equals("char")) {
-      return "C";
-    } else if (s.equals("double")) {
-      return "D";
-    } else if (s.equals("float")) {
-      return "F";
-    } else if (s.equals("int")) {
-      return "I";
-    } else if (s.equals("long")) {
-      return "J";
-    } else if (s.equals("short")) {
-      return "S";
-    } else {
-      throw new RuntimeException("IsSigMethodCriterion: unknown primitive: " + s);
-    }
-  }
-  */
-
   @Override
   public String toString() {
-    return "IsSigMethodCriterion: " + signature;
+    return "IsSigMethodCriterion: " + signatureWithoutReturnType;
   }
 }

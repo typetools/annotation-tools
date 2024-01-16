@@ -523,6 +523,13 @@ public final class Criteria {
     return new ReturnTypeCriterion(className, methodName);
   }
 
+  /**
+   * Creates an IsSigMethodCriterion.
+   *
+   * @param methodName the method name
+   * @return a new IsSigMethodCriterion
+   */
+  @SuppressWarnings("signature:argument") // likely bug; value used as both a method & a signature
   public static final Criterion isSigMethod(String methodName) {
     return new IsSigMethodCriterion(methodName);
   }
