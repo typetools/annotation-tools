@@ -34,10 +34,11 @@ export SHELLOPTS
 
 set -e
 
-if [ -d "/tmp/plume-scripts" ] ; then
-  (cd /tmp/plume-scripts && (git pull -q || true)) > /dev/null 2>&1
+
+if [ -d "/tmp/git-scripts" ] ; then
+  (cd /tmp/git-scripts && (git pull -q || true)) > /dev/null 2>&1
 else
-  (cd /tmp && git clone --filter=blob:none -q https://github.com/plume-lib/plume-scripts.git)
+  (cd /tmp && git clone --filter=blob:none -q https://github.com/plume-lib/git-scripts.git)
 fi
 
 if [[ "${GROUP}" == "test" || "${GROUP}" == "all" ]]; then
@@ -48,7 +49,7 @@ if [[ "${GROUP}" == "typecheck" || "${GROUP}" == "all" ]]; then
   if [ -z "${CHECKERFRAMEWORK}" ] ; then
     CHECKERFRAMEWORK=$(realpath ../checker-framework)
     export CHECKERFRAMEWORK
-    /tmp/plume-scripts/git-clone-related typetools checker-framework "${CHECKERFRAMEWORK}"
+    /tmp/git-scripts/git-clone-related typetools checker-framework "${CHECKERFRAMEWORK}"
     (cd "${CHECKERFRAMEWORK}" && ./.build-without-test.sh downloadjdk)
   fi
 
@@ -75,11 +76,11 @@ fi
 
 if [[ "${GROUP}" == "downstream" || "${GROUP}" == "all" ]]; then
     # checker-framework and its downstream tests
-    /tmp/plume-scripts/git-clone-related typetools checker-framework
+    /tmp/git-scripts/git-clone-related typetools checker-framework
     (cd ../checker-framework/framework && (../gradlew --write-verification-metadata sha256 help --dry-run || (sleep 60s && ../gradlew --write-verification-metadata sha256 help --dry-run)))
     (cd ../checker-framework/framework && ../gradlew ainferTest)
 
-    # /tmp/plume-scripts/git-clone-related typetools checker-framework-inference
+    # /tmp/git-scripts/git-clone-related typetools checker-framework-inference
     # (cd ../checker-framework-inference && ./.build.sh)
 fi
 
