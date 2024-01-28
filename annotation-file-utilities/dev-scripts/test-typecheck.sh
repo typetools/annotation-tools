@@ -17,17 +17,17 @@ export PATH="$AFU/scripts:$JAVA_HOME/bin:$PATH"
 (cd "${AFU}" && \
   TERM=dumb timeout 300s ./gradlew --write-verification-metadata sha256 help --dry-run </dev/null >/dev/null 2>&1 || \
   TERM=dumb ./gradlew --write-verification-metadata sha256 help --dry-run </dev/null >/dev/null 2>&1 || \
-  (sleep 60s && TERM=dumb ./gradlew --write-verification-metadata sha256 help --dry-run))
+  (sleep 60 && TERM=dumb ./gradlew --write-verification-metadata sha256 help --dry-run))
 
 (cd "${AFU}" && ./gradlew assemble)
 
-if [ -d "/tmp/$USER/plume-scripts" ] ; then
-  (cd "/tmp/$USER/plume-scripts" && (git pull -q || true)) > /dev/null 2>&1
+if [ -d "/tmp/$USER/git-scripts" ] ; then
+  (cd "/tmp/$USER/git-scripts" && (git pull -q || true)) > /dev/null 2>&1
 else
-  mkdir -p "/tmp/$USER" && git -C "/tmp/$USER" clone --filter=blob:none -q https://github.com/plume-lib/plume-scripts.git
+  mkdir -p "/tmp/$USER" && git -C "/tmp/$USER" clone --filter=blob:none -q https://github.com/plume-lib/git-scripts.git
 fi
 
-"/tmp/$USER/plume-scripts/git-clone-related" typetools checker-framework "${CHECKERFRAMEWORK}"
+"/tmp/$USER/git-scripts/git-clone-related" typetools checker-framework "${CHECKERFRAMEWORK}"
 (cd "${CHECKERFRAMEWORK}" && ./gradlew assembleForJavac --console=plain -Dorg.gradle.internal.http.socketTimeout=60000 -Dorg.gradle.internal.http.connectionTimeout=60000)
 
 (cd "${AFU}" && ./gradlew checkSignature)

@@ -21,13 +21,13 @@ export PATH="$AFU/scripts:$JAVA_HOME/bin:$PATH"
 
 (cd "${AFU}" && ./gradlew assemble)
 
-if [ -d "/tmp/$USER/plume-scripts" ] ; then
-  (cd "/tmp/$USER/plume-scripts" && (git pull -q || true)) > /dev/null 2>&1
+if [ -d "/tmp/$USER/git-scripts" ] ; then
+  (cd "/tmp/$USER/git-scripts" && (git pull -q || true)) > /dev/null 2>&1
 else
-  mkdir -p "/tmp/$USER" && git -C "/tmp/$USER" clone --filter=blob:none -q https://github.com/plume-lib/plume-scripts.git
+  mkdir -p "/tmp/$USER" && git -C "/tmp/$USER" clone --filter=blob:none -q https://github.com/plume-lib/git-scripts.git
 fi
 
 # checker-framework and its downstream tests
-"/tmp/$USER/plume-scripts/git-clone-related" typetools checker-framework "${CHECKERFRAMEWORK}"
+"/tmp/$USER/git-scripts/git-clone-related" typetools checker-framework "${CHECKERFRAMEWORK}"
 
 (cd "${CHECKERFRAMEWORK}/checker" && ../gradlew ainferTest)
