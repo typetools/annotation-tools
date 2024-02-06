@@ -5,8 +5,8 @@
 # See the Annotation File Utilities documentation for more information.
 
 # A few options are consumed by this script rather than being passed to the
-# underlying Java program.  They must be the first command-line arguments
-# provided.
+# underlying Java program, org.checkerframework.afu.annotator.Main.
+# They must be the first command-line arguments provided.
 DEBUG=0
 CLASSPATH=${CLASSPATH:-}
 while [ "$#" -gt 0 ]; do
@@ -49,9 +49,10 @@ if [ "$DEBUG" = "1" ]; then
   echo "AFU=${AFU}"
   echo "ANNOTATION_FILE_UTILS=${ANNOTATION_FILE_UTILS}"
   echo "JAVAC_JAR=${JAVAC_JAR}"
+  echo "CLASSPATH=${CLASSPATH}"
   # Keep this in sync with the actual command below.
   # shellcheck disable=SC2181 disable=SC2086
-  echo java -ea -Xmx4g ${BOOTCLASSPATH} ${JDK_OPENS} -classpath "${JAVAC_JAR}:${ANNOTATION_FILE_UTILS}:${CLASSPATH}" org.checkerframework.afu.annotator.Main "$@"
+  echo about to run: java -ea -Xmx4g ${BOOTCLASSPATH} ${JDK_OPENS} -classpath "${JAVAC_JAR}:${ANNOTATION_FILE_UTILS}:${CLASSPATH}" org.checkerframework.afu.annotator.Main "$@"
   echo "--- end of insert-annotations-to-source debugging output"
   # echo "--- start of input files"
   # for file in "$@"; do
