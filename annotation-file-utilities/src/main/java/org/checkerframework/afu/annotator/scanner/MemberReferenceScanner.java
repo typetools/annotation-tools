@@ -53,7 +53,7 @@ public class MemberReferenceScanner extends CommonScanner {
     if (tree == node) {
       done = true;
     }
-    return super.visitMemberReference(node, p);
+    return super.visitMemberReference(node, null);
   }
 
   // Map from name of a method to a list of bytecode offsets of all

@@ -66,7 +66,7 @@ public class NewScanner extends CommonScanner {
     if (tree == node) {
       done = true;
     }
-    return super.visitNewClass(node, p);
+    return super.visitNewClass(node, null);
   }
 
   @Override
@@ -77,7 +77,7 @@ public class NewScanner extends CommonScanner {
     if (tree == node) {
       done = true;
     }
-    return super.visitNewArray(node, p);
+    return super.visitNewArray(node, null);
   }
 
   public static void debug(String s) {

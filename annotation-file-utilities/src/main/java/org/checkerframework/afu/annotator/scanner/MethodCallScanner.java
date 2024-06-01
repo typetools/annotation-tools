@@ -53,7 +53,7 @@ public class MethodCallScanner extends CommonScanner {
     if (tree == node) {
       done = true;
     }
-    return super.visitMethodInvocation(node, p);
+    return super.visitMethodInvocation(node, null);
   }
 
   // Map from name of a method to a list of bytecode offsets of all

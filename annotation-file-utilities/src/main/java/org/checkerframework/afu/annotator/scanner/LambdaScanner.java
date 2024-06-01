@@ -59,7 +59,7 @@ public class LambdaScanner extends CommonScanner {
     if (tree == node) {
       done = true;
     }
-    return super.visitLambdaExpression(node, p);
+    return super.visitLambdaExpression(node, null);
   }
 
   // Map from name of a method to a list of bytecode offsets of all
