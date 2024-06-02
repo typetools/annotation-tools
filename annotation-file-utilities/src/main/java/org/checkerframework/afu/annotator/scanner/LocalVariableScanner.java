@@ -84,7 +84,7 @@ public class LocalVariableScanner extends CommonScanner {
         done = true;
       }
     }
-    return p;
+    return null;
   }
 
   // TODO: refactor class keys to avoid so many uses of generics

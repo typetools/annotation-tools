@@ -1114,7 +1114,7 @@ public class Main {
               public Void visitClass(ClassTree ct, Void p) {
                 String className = TreePathUtil.getBinaryName(getCurrentPath());
                 hasExplicitConstructor.put(className, TreePathUtil.hasConstructor(ct));
-                return super.visitClass(ct, p);
+                return super.visitClass(ct, null);
               }
             };
         constructorsScanner.scan(cut, null);

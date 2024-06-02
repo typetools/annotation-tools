@@ -181,7 +181,7 @@ public class IndexFileMerger {
                     @Override
                     public Void visitBlock(ABlock el, Void v) {
                       visitMap(el.locals);
-                      return visitExpression(el, v);
+                      return visitExpression(el, null);
                     }
 
                     @Override
@@ -193,14 +193,14 @@ public class IndexFileMerger {
                       visitMap(el.methods);
                       visitMap(el.fields);
                       visitMap(el.fieldInits);
-                      return visitDeclaration(el, v);
+                      return visitDeclaration(el, null);
                     }
 
                     @Override
                     public Void visitDeclaration(ADeclaration el, Void v) {
                       visitMap(el.insertAnnotations);
                       visitMap(el.insertTypecasts);
-                      return visitElement(el, v);
+                      return visitElement(el, null);
                     }
 
                     @Override
@@ -211,13 +211,13 @@ public class IndexFileMerger {
                       visitMap(el.news);
                       visitMap(el.refs);
                       visitMap(el.typecasts);
-                      return visitElement(el, v);
+                      return visitElement(el, null);
                     }
 
                     @Override
                     public Void visitField(AField el, Void v) {
                       visit(el.init);
-                      return visitDeclaration(el, v);
+                      return visitDeclaration(el, null);
                     }
 
                     @Override
@@ -228,18 +228,18 @@ public class IndexFileMerger {
                       visit(el.returnType);
                       visit(el.body);
                       visitMap(el.throwsException);
-                      return visitDeclaration(el, v);
+                      return visitDeclaration(el, null);
                     }
 
                     @Override
                     public Void visitTypeElement(ATypeElement el, Void v) {
                       visitMap(el.innerTypes);
-                      return visitElement(el, v);
+                      return visitElement(el, null);
                     }
 
                     @Override
                     public Void visitTypeElementWithType(ATypeElementWithType el, Void v) {
-                      return visitTypeElement(el, v);
+                      return visitTypeElement(el, null);
                     }
 
                     @Override

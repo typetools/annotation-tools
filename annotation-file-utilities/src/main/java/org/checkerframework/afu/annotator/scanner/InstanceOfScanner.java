@@ -59,7 +59,7 @@ public class InstanceOfScanner extends CommonScanner {
     if (tree == node) {
       done = true;
     }
-    return super.visitInstanceOf(node, p);
+    return super.visitInstanceOf(node, null);
   }
 
   // Map from name of a method to a list of bytecode offsets of all

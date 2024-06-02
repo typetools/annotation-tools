@@ -9,6 +9,6 @@ public class CommonScanner extends TreePathScanner<Void, Void> {
   // aren't counted.
   @Override
   public Void visitClass(ClassTree node, Void p) {
-    return p;
+    return null;
   }
 }

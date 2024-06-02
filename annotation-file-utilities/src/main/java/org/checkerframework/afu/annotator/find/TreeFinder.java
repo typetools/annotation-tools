@@ -855,7 +855,7 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     // When a method is visited, it is visited for the declaration itself.
     @Override
     public Integer visitMethod(MethodTree node, Void p) {
-      super.visitMethod(node, p);
+      super.visitMethod(node, null);
 
       // System.out.printf("DeclarationPositionFinder.visitMethod()%n");
 
