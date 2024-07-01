@@ -10,7 +10,9 @@ public class TestFieldGeneric<T> {
   Set<TestFieldGeneric> set;
   TestFieldGeneric<T> testFieldGeneric = new TestFieldGeneric<>();
 
-  public TestFieldGeneric() {}
+  public TestFieldGeneric() {
+
+  }
 
   Set<String> otherSet;
 
