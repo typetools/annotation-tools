@@ -24,7 +24,7 @@ export PATH="$AFU/scripts:$JAVA_HOME/bin:$PATH"
 if [ -d "/tmp/$USER/git-scripts" ] ; then
   (cd "/tmp/$USER/git-scripts" && (git pull -q || true)) > /dev/null 2>&1
 else
-  mkdir -p "/tmp/$USER" && git -C "/tmp/$USER" clone --filter=blob:none -q https://github.com/plume-lib/git-scripts.git
+  mkdir -p "/tmp/$USER" && git -C "/tmp/$USER" clone --depth=1 -q https://github.com/plume-lib/git-scripts.git
 fi
 
 "/tmp/$USER/git-scripts/git-clone-related" typetools checker-framework "${CHECKERFRAMEWORK}"
