@@ -1945,9 +1945,9 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
     return getInsertionsByPosition(node, list);
   }
 
-  ///
-  /// TreePath Formatting, for debugging
-  ///
+  //
+  // TreePath Formatting, for debugging
+  //
 
   /**
    * Return a printed representation of a TreePath.
