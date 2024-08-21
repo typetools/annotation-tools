@@ -394,9 +394,9 @@ public final class Criteria {
     return criteria.toString();
   }
 
-  ///////////////////////////////////////////////////////////////////////////
-  /// Factory methods
-  ///
+  // ///////////////////////////////////////////////////////////////////////////
+  // Factory methods
+  //
 
   /**
    * Creates an "is" criterion: that a program element has the specified kind and name.
