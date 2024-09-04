@@ -16,15 +16,15 @@ public interface KeyedSet<K, V> extends Set<V> {
    */
   public abstract Keyer<? extends K, ? super V> getKeyer();
 
-  /**
-   * Calls @{link #add(V, int, int) add(v, THROW_EXCEPTION, IGNORE)} and returns true if <code>v
-   * </code> was added.
-   *
-   * @param v the object to be added
-   * @return <code>true</code> if <code>v</code> was added
-   */
-  // public abstract boolean add(V v); // causes "ambiguities" for some
-  // strange reason
+  // /**
+  //  * Calls @{link #add(V, int, int) add(v, THROW_EXCEPTION, IGNORE)} and returns true if <code>v
+  //  * </code> was added.
+  //  *
+  //  * @param v the object to be added
+  //  * @return <code>true</code> if <code>v</code> was added
+  //  */
+  // public abstract boolean add(V v); // causes "ambiguities" for some strange reason
+
   /** Conflict/equal behavior that does nothing. */
   public static final int IGNORE = -1;
 

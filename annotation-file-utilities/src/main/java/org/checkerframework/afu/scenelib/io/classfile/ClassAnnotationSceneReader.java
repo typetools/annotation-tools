@@ -217,9 +217,9 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
     return descriptor.substring(1, descriptor.length() - 1).replace('/', '.');
   }
 
-  ///////////////////////////////////////////////////////////////////////////
-  /// Inner classes
-  ///
+  // ///////////////////////////////////////////////////////////////////////////
+  // Inner classes
+  //
 
   // Hackish workaround for odd subclassing.
   String dummyDesc = "dummy";
