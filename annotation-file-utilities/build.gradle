@@ -713,7 +713,7 @@ task installGitHooks(type: Copy, dependsOn: 'setLocalRepo') {
 compileJava.dependsOn installGitHooks
 
 
-/// Code formatting
+// Code formatting
 
 spotless {
 
