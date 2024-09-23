@@ -66,13 +66,13 @@ bin/annotator/tests/%.class: %.java
 # Create a symbolic link for a .java file.
 .PRECIOUS: %.java
 %.java:
-	- rm $*.java
+	rm -f $*.java
 	ln -s ../$*.java $*.java
 
 # Create a symbolic link for a .goal file.
 .PRECIOUS: %.goal
 %.goal:
-	- rm $*.goal
+	rm -f $*.goal
 	ln -s ../$*.goal $*.goal
 
 # Actually runs the annotator to create the annotated java file.
