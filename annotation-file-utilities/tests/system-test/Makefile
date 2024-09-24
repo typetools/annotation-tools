@@ -44,7 +44,7 @@ out2.diff: out2.jaif
 	grep -v typecast expected-annos.jaif | grep -v instanceof | grep -v local > expected-annos.jaif.no-cast-no-instanceof
 	grep -v typecast out2.jaif | grep -v instanceof | grep -v local > out2.jaif.no-cast-no-instanceof
 	diff -u expected-annos.jaif.no-cast-no-instanceof out2.jaif.no-cast-no-instanceof > out2.diff
-	rm expected-annos.jaif.no-cast-no-instanceof out2.jaif.no-cast-no-instanceof
+	rm -f expected-annos.jaif.no-cast-no-instanceof out2.jaif.no-cast-no-instanceof
 
 .PHONY: check-out2
 # Fail if out2.diff is non-empty
