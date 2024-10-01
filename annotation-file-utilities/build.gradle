@@ -69,7 +69,7 @@ dependencies {
     exclude group: 'org.checkerframework'
   }
   implementation 'org.ow2.asm:asm:9.7'
-  ext.errorproneVersion = '2.32.0'
+  ext.errorproneVersion = '2.33.0'
   implementation "com.google.errorprone:error_prone_annotations:${errorproneVersion}"
   errorprone("com.google.errorprone:error_prone_core:${errorproneVersion}")
 
