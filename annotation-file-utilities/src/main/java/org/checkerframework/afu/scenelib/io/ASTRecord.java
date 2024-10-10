@@ -10,6 +10,7 @@ import com.sun.source.util.TreePath;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Objects;
+import org.checkerframework.checker.signature.qual.BinaryName;
 
 /**
  * Structure bundling an {@link ASTPath} with information about its starting point. Necessary
@@ -20,7 +21,7 @@ public class ASTRecord implements Comparable<ASTRecord> {
   public final CompilationUnitTree ast;
 
   /** Name of the enclosing class declaration. */
-  public final String className;
+  public final @BinaryName String className;
 
   /** Name of the enclosing method declaration, or null if there is none. */
   public final String methodName;
@@ -33,7 +34,7 @@ public class ASTRecord implements Comparable<ASTRecord> {
 
   public ASTRecord(
       CompilationUnitTree ast,
-      String className,
+      @BinaryName String className,
       String methodName,
       String varName,
       ASTPath astPath) {

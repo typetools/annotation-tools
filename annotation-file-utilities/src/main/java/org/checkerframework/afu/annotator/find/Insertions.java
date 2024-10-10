@@ -46,6 +46,7 @@ import org.checkerframework.afu.scenelib.type.ArrayType;
 import org.checkerframework.afu.scenelib.type.BoundedType;
 import org.checkerframework.afu.scenelib.type.DeclaredType;
 import org.checkerframework.afu.scenelib.type.Type;
+import org.checkerframework.checker.signature.qual.BinaryName;
 import org.objectweb.asm.TypePath;
 
 /**
@@ -85,7 +86,7 @@ public class Insertions implements Iterable<Insertion> {
    * @return {@link java.util.Set} of {@link Insertion}s with an {@link InClassCriterion} for the
    *     given class
    */
-  public Set<Insertion> forClass(CompilationUnitTree cut, String qualifiedClassName) {
+  public Set<Insertion> forClass(CompilationUnitTree cut, @BinaryName String qualifiedClassName) {
     Set<Insertion> set = new LinkedHashSet<>();
     forClass(cut, qualifiedClassName, set);
     return set;
@@ -109,8 +110,9 @@ public class Insertions implements Iterable<Insertion> {
         System.out.printf("forOuterClass(%s): map = %s%n", qualifiedOuterClassName, map);
       }
       Set<Insertion> set = new LinkedHashSet<>();
-      for (String key : map.keySet()) {
-        String qualifiedClassName = qualifiedOuterClassName + key;
+      for (String innerClassPath : map.keySet()) {
+        @SuppressWarnings("signature:assignment") // string concatenation
+        @BinaryName String qualifiedClassName = qualifiedOuterClassName + innerClassPath;
         forClass(cut, qualifiedClassName, set);
       }
       return set;
@@ -118,7 +120,8 @@ public class Insertions implements Iterable<Insertion> {
   }
 
   /** Side-effects {@code result} to add {@link Insertion}s for {@code qualifiedClassName}. */
-  private void forClass(CompilationUnitTree cut, String qualifiedClassName, Set<Insertion> result) {
+  private void forClass(
+      CompilationUnitTree cut, @BinaryName String qualifiedClassName, Set<Insertion> result) {
     if (Main.temporaryDebug) {
       System.out.printf(
           "calling forClass(cut, %s, set of size %d)%n", qualifiedClassName, result.size());
@@ -243,7 +246,7 @@ public class Insertions implements Iterable<Insertion> {
    */
   @SuppressWarnings("CatchAndPrintStackTrace") // maybe rethrow the exception
   private Set<Insertion> organizeTypedInsertions(
-      CompilationUnitTree cut, String className, Collection<Insertion> insertions) {
+      CompilationUnitTree cut, @BinaryName String className, Collection<Insertion> insertions) {
     Map<ASTRecord, TypedInsertion> outerInsertions = new HashMap<>();
     Set<Insertion> innerInsertions = new LinkedHashSet<>();
     List<Insertion> innerInsertionsList = new ArrayList<>();
