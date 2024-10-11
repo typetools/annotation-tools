@@ -398,10 +398,10 @@ def createCheckTypeTask(checker, shortName) {
     description "Run the ${shortName} Checker on the main sources."
     group 'Verification'
     String checkerDist;
-    if (file(System.getenv('CHECKERFRAMEWORK')).exists()) {
-      checkerDist = "${System.getenv('CHECKERFRAMEWORK')}/checker/dist"
-    } else {
+    if (System.getenv('CHECKERFRAMEWORK') == null) {
       checkerDist = "${projectDir}/../../checker-framework/checker/dist"
+    } else {
+      checkerDist = "${System.getenv('CHECKERFRAMEWORK')}/checker/dist"
     }
     // Always run the task.
     outputs.upToDateWhen { false }
