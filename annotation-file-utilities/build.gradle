@@ -397,7 +397,12 @@ def createCheckTypeTask(checker, shortName) {
   tasks.create(name: "check${shortName}", type: JavaCompile) {
     description "Run the ${shortName} Checker on the main sources."
     group 'Verification'
-    String checkerDist = "${projectDir}/../../checker-framework/checker/dist"
+    String checkerDist;
+    if (file(System.getenv('CHECKERFRAMEWORK')).exists()) {
+      checkerDist = "${System.getenv('CHECKERFRAMEWORK')}/checker/dist"
+    } else {
+      checkerDist = "${projectDir}/../../checker-framework/checker/dist"
+    }
     // Always run the task.
     outputs.upToDateWhen { false }
     source = sourceSets.main.java
