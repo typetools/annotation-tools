@@ -32,6 +32,7 @@ import org.checkerframework.afu.scenelib.field.AnnotationFieldType;
 import org.checkerframework.afu.scenelib.io.IndexFileParser;
 import org.checkerframework.afu.scenelib.io.IndexFileWriter;
 import org.checkerframework.afu.scenelib.util.CommandLineUtils;
+import org.checkerframework.checker.signature.qual.BinaryName;
 import org.plumelib.util.FileIOException;
 
 /** Utility for merging index files, including multiple versions for the same class. */
@@ -42,7 +43,7 @@ public class IndexFileMerger {
       System.exit(0);
     }
 
-    final SetMultimap<String, String> annotatedFor = HashMultimap.create();
+    final SetMultimap<@BinaryName String, String> annotatedFor = HashMultimap.create();
     String[] inputArgs;
 
     // TODO: document assumptions
@@ -84,7 +85,8 @@ public class IndexFileMerger {
           int ix = relPath.indexOf(File.separator);
           String subdir = ix < 0 ? relPath : relPath.substring(0, ix);
           // trim .jaif or .jann and subdir, convert directory to package id
-          String classname =
+          @SuppressWarnings("signature:assignment") // string manipulation
+          @BinaryName String classname =
               relPath
                   .substring(0, relPath.lastIndexOf('.'))
                   .substring(relPath.indexOf('/') + 1)
@@ -259,8 +261,9 @@ public class IndexFileMerger {
       AnnotationDef afDef =
           Annotations.createValueAnnotationDef(
               "AnnotatedFor", Collections.<Annotation>emptySet(), stringArray, "IndexFileMerger");
-      for (Map.Entry<String, Collection<String>> entry : annotatedFor.asMap().entrySet()) {
-        String key = entry.getKey();
+      for (Map.Entry<@BinaryName String, Collection<String>> entry :
+          annotatedFor.asMap().entrySet()) {
+        @BinaryName String key = entry.getKey();
         Collection<String> values = entry.getValue();
         Annotation afAnno =
             new Annotation(
