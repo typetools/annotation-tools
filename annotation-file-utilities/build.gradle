@@ -12,7 +12,7 @@ plugins {
   id 'com.github.johnrengelman.shadow' version '8.1.1'
   id 'java'
 
-  id 'net.ltgt.errorprone' version '3.1.0'
+  id 'net.ltgt.errorprone' version '4.1.0'
 
   // To show task list as a tree, run: ./gradlew <taskname> taskTree
   id 'com.dorongold.task-tree' version '4.0.0'
