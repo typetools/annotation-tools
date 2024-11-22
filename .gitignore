@@ -5,6 +5,11 @@ bin
 *~
 TAGS
 
+# Eclipse files
+annotation-file-utilities/.classpath
+annotation-file-utilities/.project
+annotation-file-utilities/.settings
+
 annotation-file-utilities/annotation-file-format.aux
 annotation-file-utilities/annotation-file-format.blg
 annotation-file-utilities/annotation-file-format.dvi
