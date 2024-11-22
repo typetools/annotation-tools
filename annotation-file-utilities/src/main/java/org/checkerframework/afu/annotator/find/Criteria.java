@@ -13,6 +13,7 @@ import org.checkerframework.afu.scenelib.el.TypeIndexLocation;
 import org.checkerframework.afu.scenelib.io.ASTPath;
 import org.checkerframework.afu.scenelib.io.DebugWriter;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.signature.qual.BinaryName;
 import org.checkerframework.checker.signature.qual.ClassGetName;
 import org.objectweb.asm.TypePath;
 
@@ -261,8 +262,8 @@ public final class Criteria {
    *
    * @return class name from {@link InClassCriterion}, or null if none present
    */
-  public @Nullable @ClassGetName String getClassName() {
-    String result = null;
+  public @Nullable @BinaryName String getClassName() {
+    @BinaryName String result = null;
     for (Criterion c : criteria.values()) {
       if (c.getKind() == Criterion.Kind.IN_CLASS) {
         if (result == null) {
