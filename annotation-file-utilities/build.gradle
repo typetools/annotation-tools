@@ -12,7 +12,7 @@ plugins {
   id 'com.github.johnrengelman.shadow' version '8.1.1'
   id 'java'
 
-  id 'net.ltgt.errorprone' version '3.1.0'
+  id 'net.ltgt.errorprone' version '4.1.0'
 
   // To show task list as a tree, run: ./gradlew <taskname> taskTree
   id 'com.dorongold.task-tree' version '4.0.0'
@@ -25,7 +25,7 @@ apply plugin: 'java'
 apply plugin: 'com.github.johnrengelman.shadow'
 
 group 'org.checkerframework'
-version '3.48.0'
+version '3.48.1'
 
 java {
   // This test is for whether the Checker Framework supports (runs under) Java 8.
@@ -59,22 +59,22 @@ configurations {
 
 dependencies {
   // Annotations in checker-qual.jar are used, but no checkers are (currently) run on the code.
-  compileOnly 'org.checkerframework:checker-qual:3.47.0'
+  compileOnly 'org.checkerframework:checker-qual:3.48.2'
 
   implementation 'org.plumelib:options:2.0.3'
-  implementation 'org.plumelib:plume-util:1.9.3'
+  implementation 'org.plumelib:plume-util:1.10.0'
   implementation 'org.plumelib:reflection-util:1.1.4'
   implementation ('org.checkerframework.annotatedlib:guava:33.1.0.2-jre') {
     // So long as Guava only uses annotations from checker-qual, excluding it should not cause problems.
     exclude group: 'org.checkerframework'
   }
-  implementation 'org.ow2.asm:asm:9.7'
-  ext.errorproneVersion = '2.33.0'
+  implementation 'org.ow2.asm:asm:9.7.1'
+  ext.errorproneVersion = '2.35.1'
   implementation "com.google.errorprone:error_prone_annotations:${errorproneVersion}"
   errorprone("com.google.errorprone:error_prone_core:${errorproneVersion}")
 
   testImplementation group: 'junit', name: 'junit', version: '4.13.2'
-  testImplementation 'org.checkerframework:checker-qual:3.47.0'
+  testImplementation 'org.checkerframework:checker-qual:3.48.2'
 }
 
 compileJava {
@@ -397,7 +397,12 @@ def createCheckTypeTask(checker, shortName) {
   tasks.create(name: "check${shortName}", type: JavaCompile) {
     description "Run the ${shortName} Checker on the main sources."
     group 'Verification'
-    String checkerDist = "${projectDir}/../../checker-framework/checker/dist"
+    String checkerDist;
+    if (System.getenv('CHECKERFRAMEWORK') == null) {
+      checkerDist = "${projectDir}/../../checker-framework/checker/dist"
+    } else {
+      checkerDist = "${System.getenv('CHECKERFRAMEWORK')}/checker/dist"
+    }
     // Always run the task.
     outputs.upToDateWhen { false }
     source = sourceSets.main.java
