@@ -664,7 +664,6 @@ public final class IndexFileParser {
               System.err.printf(
                   "WARNING: duplicate annotation of type %s on %s%n", a.def().name, e.description);
             }
-            continue;
           }
         }
         Annotation tla = a;
