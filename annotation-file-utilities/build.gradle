@@ -59,7 +59,7 @@ configurations {
 
 dependencies {
   // Annotations in checker-qual.jar are used, but no checkers are (currently) run on the code.
-  compileOnly 'org.checkerframework:checker-qual:3.48.3'
+  compileOnly 'org.checkerframework:checker-qual:3.48.4'
 
   implementation 'org.plumelib:options:2.0.3'
   implementation 'org.plumelib:plume-util:1.10.0'
@@ -74,7 +74,7 @@ dependencies {
   errorprone("com.google.errorprone:error_prone_core:${errorproneVersion}")
 
   testImplementation group: 'junit', name: 'junit', version: '4.13.2'
-  testImplementation 'org.checkerframework:checker-qual:3.48.3'
+  testImplementation 'org.checkerframework:checker-qual:3.48.4'
 }
 
 compileJava {
