@@ -438,6 +438,7 @@ public final class Criteria {
    * @param exactMatch whether to match only in the class itself, not in its inner classes
    * @return an "in class" criterion
    */
+  // TODO: Should `name` be `@BinaryName`??
   public static final Criterion inClass(@ClassGetName String name, boolean exactMatch) {
     return new InClassCriterion(name, /* exactMatch= */ true);
   }
