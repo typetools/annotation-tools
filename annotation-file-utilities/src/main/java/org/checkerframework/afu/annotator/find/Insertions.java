@@ -109,8 +109,8 @@ public class Insertions implements Iterable<Insertion> {
         System.out.printf("forOuterClass(%s): map = %s%n", qualifiedOuterClassName, map);
       }
       Set<Insertion> set = new LinkedHashSet<>();
-      for (String key : map.keySet()) {
-        String qualifiedClassName = qualifiedOuterClassName + key;
+      for (String innerClassPath : map.keySet()) {
+        String qualifiedClassName = qualifiedOuterClassName + innerClassPath;
         forClass(cut, qualifiedClassName, set);
       }
       return set;

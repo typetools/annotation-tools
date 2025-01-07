@@ -31,6 +31,15 @@ public class ASTRecord implements Comparable<ASTRecord> {
   /** Path through AST, from specified declaration to descendant node. */
   public final ASTPath astPath;
 
+  /**
+   * Creates a new ASTRecord.
+   *
+   * @param ast the AST to which this {@code ASTRecord} pertains
+   * @param className name of the enclosing class declaration
+   * @param methodName name of the enclosing method declaration, or null if there is none
+   * @param varName name of the enclosing variable declaration, or null if there is none
+   * @param astPath path through AST, from specified declaration to descendant node
+   */
   public ASTRecord(
       CompilationUnitTree ast,
       String className,

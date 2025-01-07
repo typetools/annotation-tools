@@ -128,6 +128,11 @@ public class ASTIndex extends WrapperMap<Tree, ASTRecord> {
             }
           }
 
+          /**
+           * Save a class.
+           *
+           * @param node the class
+           */
           private void saveClass(ClassTree node) {
             String className = ((JCTree.JCClassDecl) node).sym.flatname.toString();
             ASTRecord rec = new ASTRecord(cut, className, null, null, ASTPath.empty());
@@ -612,7 +617,8 @@ public class ASTIndex extends WrapperMap<Tree, ASTRecord> {
     ExpressionTree et = cut.getPackageName();
     String pkg = et == null ? "" : et.toString();
     if (!pkg.isEmpty() && rec.className.indexOf('.') < 0) {
-      rec = new ASTRecord(cut, pkg + "." + rec.className, rec.methodName, rec.varName, rec.astPath);
+      String className = pkg + "." + rec.className;
+      rec = new ASTRecord(cut, className, rec.methodName, rec.varName, rec.astPath);
     }
     return revIndex.get(rec);
   }
