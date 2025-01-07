@@ -161,7 +161,7 @@ public class ClassAnnotationSceneWriter extends CodeOffsetAdapter {
       String[] interfaces) {
     classReader.accept(new MethodCodeIndexer(api), 0);
     super.visit(version, access, name, signature, superName, interfaces);
-    // class files store fully quantified class names with '/' instead of '.'
+    // class files store fully qualified class names with '/' instead of '.'
     name = name.replace('/', '.');
     aClass = scene.classes.getVivify(name);
   }
