@@ -39,7 +39,6 @@ import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.TypePath;
 import org.objectweb.asm.TypeReference;
-import org.plumelib.reflection.Signatures;
 
 /**
  * A ClassAnnotationSceneWriter is a {@link org.objectweb.asm.ClassVisitor} that can be used to
@@ -164,7 +163,7 @@ public class ClassAnnotationSceneWriter extends CodeOffsetAdapter {
     classReader.accept(new MethodCodeIndexer(api), 0);
     super.visit(version, access, name, signature, superName, interfaces);
     // class files store fully qualified class names with '/' instead of '.'
-    name = Signatures.classGetNameToBinaryName(name);
+    name = name.replace('/', '.');
     aClass = scene.classes.getVivify(name);
   }
 
