@@ -129,6 +129,11 @@ public class ASTIndex extends WrapperMap<Tree, ASTRecord> {
             }
           }
 
+          /**
+           * Save a class.
+           *
+           * @param node the class
+           */
           private void saveClass(ClassTree node) {
             @BinaryName String className = ((JCTree.JCClassDecl) node).sym.flatname.toString();
             ASTRecord rec = new ASTRecord(cut, className, null, null, ASTPath.empty());
