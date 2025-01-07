@@ -19,7 +19,7 @@ plugins {
 
   // Code formatting; defines targets "spotlessApply" and "spotlessCheck".
   // Requires Java 11.
-  id "com.diffplug.spotless" version "6.25.0"
+  id "com.diffplug.spotless" version "7.0.1"
 }
 apply plugin: 'java'
 apply plugin: 'com.github.johnrengelman.shadow'
