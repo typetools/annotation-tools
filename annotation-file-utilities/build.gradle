@@ -10,7 +10,7 @@ import java.nio.file.Files
 plugins {
   id 'java'
 
-  id 'com.gradleup.shadow' version '8.3.3'
+  id 'com.gradleup.shadow' version '8.3.5'
   id 'net.ltgt.errorprone' version '4.1.0'
 
   // To show task list as a tree, run: ./gradlew <taskname> taskTree
