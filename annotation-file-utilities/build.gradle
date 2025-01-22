@@ -249,6 +249,8 @@ task testExample(type: JavaExec, dependsOn: compileTestJava, group: 'Verificatio
   classpath = files(sourceSets.test.java.classesDirectory)
   classpath += sourceSets.test.compileClasspath
   mainClass = 'org.checkerframework.afu.scenelib.test.executable.Example'
+  file(outputDir).mkdir()
+
   standardOutput = new FileOutputStream("${outputDir}/example-stdout.jaif")
 
   args = [
@@ -256,9 +258,7 @@ task testExample(type: JavaExec, dependsOn: compileTestJava, group: 'Verificatio
     "foo.Bar",
     "${outputDir}/example-output.jaif"
   ]
-  doFirst{
-    file(outputDir).mkdir()
-  }
+
   doLast {
 
     byte[] goalJaif = Files.readAllBytes(new File(resourceDir, "example-output.jaif.goal").toPath());
