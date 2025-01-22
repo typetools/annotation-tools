@@ -290,17 +290,15 @@ task cleanTestAnnotator(type: Exec) {
 
 ext.plumeBibHome = "${projectDir}/plume-bib"
 
-task getPlumeBib() {
+task getPlumeBib(type: Exec) {
   description 'Obtain or update the plume-bib bibliography.'
-  if (file(plumeBibHome).exists()) {
-    exec {
+  doFirst {
+    if (file(plumeBibHome).exists()) {
       workingDir plumeBibHome
       executable 'git'
       args = ['pull', '-q']
       ignoreExitValue = true
-    }
-  } else {
-    exec {
+    } else {
       workingDir "${plumeBibHome}/../"
       executable 'git'
       args = [
