@@ -23,8 +23,8 @@ plugins {
 apply plugin: 'java'
 apply plugin: 'com.gradleup.shadow'
 
-group 'org.checkerframework'
-version '3.48.4'
+group = 'org.checkerframework'
+version = '3.48.4'
 
 java {
   // This test is for whether the Checker Framework supports (runs under) Java 8.
@@ -179,7 +179,7 @@ shadowJar {
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 task allButJavacJar(type: ShadowJar, dependsOn: compileJava) {
-  description 'Builds annotation-file-utilities-all-but-javac.jar with all dependencies except javac.jar.'
+  description = 'Builds annotation-file-utilities-all-but-javac.jar with all dependencies except javac.jar.'
   destinationDirectory = projectDir
   includeEmptyDirs = false
   archiveFileName = 'annotation-file-utilities-all-but-javac.jar'
@@ -208,7 +208,7 @@ task allButJavacJar(type: ShadowJar, dependsOn: compileJava) {
 }
 
 task skinnyJar(type: ShadowJar, dependsOn: compileJava) {
-  description 'Builds annotation-file-utilities.jar with only scene-lib and annotation-file-utilities classes.'
+  description = 'Builds annotation-file-utilities.jar with only scene-lib and annotation-file-utilities classes.'
   includeEmptyDirs = false
   destinationDirectory = projectDir
   archiveFileName = 'annotation-file-utilities.jar'
@@ -223,7 +223,7 @@ test {
     outputs.upToDateWhen { false }
 
     // Show the found unexpected diagnostics and expected diagnostics not found.
-    exceptionFormat "full"
+    exceptionFormat = "full"
     events "failed"
   }
 
@@ -242,7 +242,7 @@ test {
   }
 }
 task testExample(type: JavaExec, dependsOn: compileTestJava, group: 'Verification') {
-  description 'Run the scene-lib example test.'
+  description = 'Run the scene-lib example test.'
   String resourceDir = "${projectDir}/src/test/resources/annotations/tests/executable/"
   String outputDir = "${layout.buildDirectory.get()}/example-test/"
 
@@ -278,13 +278,13 @@ task testExample(type: JavaExec, dependsOn: compileTestJava, group: 'Verificatio
 }
 
 task testAnnotator(type: Exec, dependsOn: assemble, group: 'Verification') {
-  description 'Run the annotator test.'
+  description = 'Run the annotator test.'
   workingDir "${projectDir}/tests/"
   executable 'make'
 }
 
 task cleanTestAnnotator(type: Exec) {
-  description "Clean the annotator test."
+  description = "Clean the annotator test."
   workingDir 'tests/'
   executable 'make'
   args("clean")
@@ -293,7 +293,7 @@ task cleanTestAnnotator(type: Exec) {
 ext.plumeBibHome = "${projectDir}/plume-bib"
 
 task getPlumeBib(type: Exec) {
-  description 'Obtain or update the plume-bib bibliography.'
+  description = 'Obtain or update the plume-bib bibliography.'
   doFirst {
     if (file(plumeBibHome).exists()) {
       workingDir plumeBibHome
@@ -318,7 +318,7 @@ interface InjectedExecOps {
 }
 
 task makeAnnotationFileFormat(dependsOn: getPlumeBib) {
-  description 'Make documentation: annotation-file-format.{html,pdf}.'
+  description = 'Make documentation: annotation-file-format.{html,pdf}.'
   def injected = project.objects.newInstance(InjectedExecOps)
 
   doLast {
@@ -378,7 +378,7 @@ task cleanManual(type: Exec) {
 }
 
 task cleanAnnotationFileFormat {
-  description "Removes generated documentation files."
+  description = "Removes generated documentation files."
   dependsOn(cleanManual)
   doLast {
     delete "annotation-file-format.aux"
@@ -401,8 +401,8 @@ task cleanAnnotationFileFormat {
  */
 def createCheckTypeTask(checker, shortName) {
   tasks.create(name: "check${shortName}", type: JavaCompile) {
-    description "Run the ${shortName} Checker on the main sources."
-    group 'Verification'
+    description = "Run the ${shortName} Checker on the main sources."
+    group = 'Verification'
     String checkerDist;
     if (System.getenv('CHECKERFRAMEWORK') == null) {
       checkerDist = "${projectDir}/../../checker-framework/checker/dist"
@@ -482,7 +482,7 @@ def createCheckTypeTask(checker, shortName) {
 createCheckTypeTask('org.checkerframework.checker.signature.SignatureChecker', 'Signature')
 
 task htmlValidate(type: Exec) {
-  description 'Validate that HTML files are well-formed.'
+  description = 'Validate that HTML files are well-formed.'
   workingDir '../'
   executable 'html5validator'
   args = [
@@ -555,7 +555,7 @@ task updateUserOptions(dependsOn: [
 ]) {}
 
 task updateUserOptionsJavadoc(type: Javadoc, dependsOn: 'assemble') {
-  description "Updates documentation of command-line arguments in Javadoc."
+  description = "Updates documentation of command-line arguments in Javadoc."
 
   // Include only sources from annotation-file-utilities, not from scene-lib.
   source = fileTree(dir: 'src', include: '**/*.java')
@@ -573,7 +573,7 @@ task updateUserOptionsJavadoc(type: Javadoc, dependsOn: 'assemble') {
 }
 
 task updateUserOptionsHtml(type: Javadoc, dependsOn: 'assemble') {
-  description "Updates documentation of command-line arguments in the manual."
+  description = "Updates documentation of command-line arguments in the manual."
 
   // Include only sources from annotation-file-utilities, not from scene-lib.
   source = fileTree(dir: 'src', include: '**/*.java')
@@ -604,7 +604,7 @@ clean {
 ext.tmpAnnotationTools = "${layout.buildDirectory.get()}/tmp-annotation-tools"
 task cloneAndPrepDirectoryForZipfile(type: Exec) {
   dependsOn(assemble, makeAnnotationFileFormat)
-  description 'Copy files from repository to temporary directory from which they will be packaged up.'
+  description = 'Copy files from repository to temporary directory from which they will be packaged up.'
   doFirst {
     delete tmpAnnotationTools
   }
@@ -633,7 +633,7 @@ task cloneAndPrepDirectoryForZipfile(type: Exec) {
 }
 
 task zipfile(type: Zip) {
-  description "create the distribution: annotation-tools.zip"
+  description = "create the distribution: annotation-tools.zip"
   dependsOn(cloneAndPrepDirectoryForZipfile)
   archiveFileName = 'annotation-tools.zip'
   destinationDirectory = projectDir
@@ -641,7 +641,7 @@ task zipfile(type: Zip) {
 }
 
 task copyToDeployDir {
-  description 'copy release to deployDir.'
+  description = 'copy release to deployDir.'
   doLast {
     String deployDir = project.getProperties().get("deploy-dir")
     String afuVersion = project.getProperties().get("afu.version")
@@ -666,7 +666,7 @@ task copyToDeployDir {
 }
 
 task releaseBuild(type: GradleBuild) {
-  description 'Build everything required for a release, after cleanning.'
+  description = 'Build everything required for a release, after cleanning.'
   doFirst {
     if (!project.hasProperty('deploy-dir')) {
       println project.properties.entrySet()*.toString().sort().toString().replaceAll(", ","\n")
@@ -690,7 +690,7 @@ task releaseBuild(type: GradleBuild) {
 }
 
 task releaseBuildWithoutTest(type: GradleBuild) {
-  description 'Build everything required for a release, without cleaning first.'
+  description = 'Build everything required for a release, without cleaning first.'
   doFirst {
     if (!project.hasProperty('deploy-dir')) {
       println project.properties.entrySet()*.toString().sort().toString().replaceAll(", ","\n")
@@ -714,7 +714,7 @@ task releaseBuildWithoutTest(type: GradleBuild) {
 
 
 task pythonIsInstalled(type: Exec) {
-  description "Check that the python3 executable is installed."
+  description = "Check that the python3 executable is installed."
   executable = "python3"
   args "--version"
 }
@@ -730,7 +730,7 @@ task setLocalRepo(type:Exec) {
 }
 
 task installGitHooks(type: Copy, dependsOn: 'setLocalRepo') {
-  description 'Copies git hooks to .git directory'
+  description = 'Copies git hooks to .git directory'
   from files("../.git.pre-commit")
   rename('.git\\.(.*)', '$1')
   into "${localRepo}/hooks"
