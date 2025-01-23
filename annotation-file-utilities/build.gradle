@@ -241,24 +241,27 @@ test {
     }
   }
 }
-task testExample(dependsOn: compileTestJava, group: 'Verification') {
+task testExample(type: JavaExec, dependsOn: compileTestJava, group: 'Verification') {
   description 'Run the scene-lib example test.'
-  doLast {
-    String resourceDir = "${projectDir}/src/test/resources/annotations/tests/executable/"
-    String outputDir = "${project.buildDir}/example-test/"
-    file(outputDir).mkdir()
-    javaexec {
-      classpath = files(sourceSets.test.java.classesDirectory)
-      classpath += sourceSets.test.compileClasspath
-      mainClass = 'org.checkerframework.afu.scenelib.test.executable.Example'
-      standardOutput = new FileOutputStream("${outputDir}/example-stdout.jaif")
+  String resourceDir = "${projectDir}/src/test/resources/annotations/tests/executable/"
+  String outputDir = "${layout.buildDirectory.get()}/example-test/"
 
-      args = [
-        "${resourceDir}/example-input.jaif",
-        "foo.Bar",
-        "${outputDir}/example-output.jaif"
-      ]
-    }
+  classpath = files(sourceSets.test.java.classesDirectory)
+  classpath += sourceSets.test.compileClasspath
+  mainClass = 'org.checkerframework.afu.scenelib.test.executable.Example'
+  doFirst {
+    file(outputDir).mkdir()
+    new File("${outputDir}/example-stdout.jaif").createNewFile()
+
+    standardOutput = new FileOutputStream("${outputDir}/example-stdout.jaif")
+  }
+  args = [
+    "${resourceDir}/example-input.jaif",
+    "foo.Bar",
+    "${outputDir}/example-output.jaif"
+  ]
+
+  doLast {
 
     byte[] goalJaif = Files.readAllBytes(new File(resourceDir, "example-output.jaif.goal").toPath());
     byte[] outputJaif = Files.readAllBytes(new File(outputDir, "example-output.jaif").toPath());
@@ -289,17 +292,15 @@ task cleanTestAnnotator(type: Exec) {
 
 ext.plumeBibHome = "${projectDir}/plume-bib"
 
-task getPlumeBib() {
+task getPlumeBib(type: Exec) {
   description 'Obtain or update the plume-bib bibliography.'
-  if (file(plumeBibHome).exists()) {
-    exec {
+  doFirst {
+    if (file(plumeBibHome).exists()) {
       workingDir plumeBibHome
       executable 'git'
       args = ['pull', '-q']
       ignoreExitValue = true
-    }
-  } else {
-    exec {
+    } else {
       workingDir "${plumeBibHome}/../"
       executable 'git'
       args = [
@@ -311,45 +312,50 @@ task getPlumeBib() {
   }
 }
 
-
+interface InjectedExecOps {
+  @javax.inject.Inject
+  ExecOperations getExecOps()
+}
 
 task makeAnnotationFileFormat(dependsOn: getPlumeBib) {
   description 'Make documentation: annotation-file-format.{html,pdf}.'
+  def injected = project.objects.newInstance(InjectedExecOps)
+
   doLast {
-    exec {
+    injected.execOps.exec {
       executable 'make'
       args = [
         '-C',
         'figures'
       ]
     }
-    exec {
+    injected.execOps.exec {
       executable 'latex'
       args 'annotation-file-format.tex'
     }
 
-    exec {
+    injected.execOps.exec {
       executable 'bibtex'
       args 'annotation-file-format'
       environment BIBINPUTS: ".:${plumeBibHome}"
     }
 
-    exec {
+    injected.execOps.exec {
       executable 'latex'
       args 'annotation-file-format.tex'
     }
 
-    exec {
+    injected.execOps.exec {
       executable 'latex'
       args 'annotation-file-format.tex'
     }
 
-    exec {
+    injected.execOps.exec {
       executable 'pdflatex'
       args 'annotation-file-format.tex'
     }
 
-    exec {
+    injected.execOps.exec {
       executable 'hevea'
       args = [
         "-fix",
@@ -362,9 +368,18 @@ task makeAnnotationFileFormat(dependsOn: getPlumeBib) {
   }
 }
 
+task cleanManual(type: Exec) {
+  executable 'make'
+  args = [
+    '-C',
+    'figures',
+    'clean'
+  ]
+}
+
 task cleanAnnotationFileFormat {
   description "Removes generated documentation files."
-
+  dependsOn(cleanManual)
   doLast {
     delete "annotation-file-format.aux"
     delete "annotation-file-format.dvi"
@@ -375,14 +390,6 @@ task cleanAnnotationFileFormat {
     delete "annotation-file-format.pdf"
     delete "annotation-file-format.toc"
     delete "scene-lib-type-hierarchy.png"
-    exec {
-      executable 'make'
-      args = [
-        '-C',
-        'figures',
-        'clean'
-      ]
-    }
   }
 }
 
@@ -594,20 +601,20 @@ clean {
   delete('annotation-file-utilities.jar','annotation-file-utilities-all.jar', 'annotation-tools.zip')
 }
 
-ext.tmpAnnotationTools = "${buildDir}/tmp-annotation-tools"
-task cloneAndPrepDirectoryForZipfile {
+ext.tmpAnnotationTools = "${layout.buildDirectory.get()}/tmp-annotation-tools"
+task cloneAndPrepDirectoryForZipfile(type: Exec) {
   dependsOn(assemble, makeAnnotationFileFormat)
   description 'Copy files from repository to temporary directory from which they will be packaged up.'
-  doLast {
+  doFirst {
     delete tmpAnnotationTools
-    exec {
-      executable 'git'
-      args = [
-        'clone',
-        '../',
-        "${tmpAnnotationTools}"
-      ]
-    }
+  }
+  executable 'git'
+  args = [
+    'clone',
+    '../',
+    "${tmpAnnotationTools}"
+  ]
+  doLast {
     delete "${tmpAnnotationTools}/scene-lib.orig-hand-annos"
     delete "${tmpAnnotationTools}/.git"
     delete "${tmpAnnotationTools}/.gitignore"
