@@ -12,6 +12,8 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import org.checkerframework.afu.scenelib.Annotation;
 import org.checkerframework.afu.scenelib.util.coll.VivifyingMap;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.plumelib.util.CollectionsPlume;
 
 /** An annotated class. */
@@ -45,7 +47,7 @@ public class AClass extends ADeclaration {
    * The type element representing the class. Clients must call {@link #setTypeElement(TypeElement)}
    * before accessing this field.
    */
-  private /*@MonotonicNonNull*/ TypeElement typeElement = null;
+  private @MonotonicNonNull TypeElement typeElement = null;
 
   /** The fully-qualified name of the annotated class. */
   public final String className;
@@ -54,7 +56,7 @@ public class AClass extends ADeclaration {
   private final HashSet<String> enums = new HashSet<>();
 
   /** The enum constants of this class, or null if this class is not an enum. */
-  private /*@MonotonicNonNull*/ List<VariableElement> enumConstants = null;
+  private @MonotonicNonNull List<VariableElement> enumConstants = null;
 
   /**
    * The simple class names any of this class's outer classes (or this class) that are annotations.
@@ -290,7 +292,7 @@ public class AClass extends ADeclaration {
    *
    * @return the enum constants, or null if this is not an enum
    */
-  public /*@Nullable*/ List<VariableElement> getEnumConstants() {
+  public @Nullable List<VariableElement> getEnumConstants() {
     if (enumConstants == null) {
       return null;
     }
@@ -409,7 +411,7 @@ public class AClass extends ADeclaration {
    *
    * @return a type element representing this class
    */
-  public /*@Nullable*/ TypeElement getTypeElement() {
+  public @Nullable TypeElement getTypeElement() {
     return typeElement;
   }
 

@@ -392,7 +392,7 @@ public final class JavapParser {
         trim("class ");
         trim("interface ");
         int nameEnd = line.indexOf(' ');
-        String className = (nameEnd == -1) ? line : line.substring(0, line.indexOf(' '));
+        @BinaryName String className = (nameEnd == -1) ? line : line.substring(0, line.indexOf(' '));
         String pp = IOUtils.packagePart(className);
         String bp = IOUtils.basenamePart(className);
         nextLine();
