@@ -24,7 +24,7 @@ apply plugin: 'java'
 apply plugin: 'com.gradleup.shadow'
 
 group = 'org.checkerframework'
-version = '3.48.4'
+version = '3.49.0'
 
 java {
   // This test is for whether the Checker Framework supports (runs under) Java 8.
