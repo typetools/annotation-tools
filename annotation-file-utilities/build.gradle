@@ -14,7 +14,7 @@ plugins {
   id 'net.ltgt.errorprone' version '4.1.0'
 
   // To show task list as a tree, run: ./gradlew <taskname> taskTree
-  id 'com.dorongold.task-tree' version '4.0.0'
+  id 'com.dorongold.task-tree' version '4.0.1'
 
   // Code formatting; defines targets "spotlessApply" and "spotlessCheck".
   // Requires Java 11.
