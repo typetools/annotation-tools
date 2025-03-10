@@ -10,11 +10,11 @@ import java.nio.file.Files
 plugins {
   id 'java'
 
-  id 'com.gradleup.shadow' version '8.3.3'
+  id 'com.gradleup.shadow' version '8.3.6'
   id 'net.ltgt.errorprone' version '4.1.0'
 
   // To show task list as a tree, run: ./gradlew <taskname> taskTree
-  id 'com.dorongold.task-tree' version '4.0.0'
+  id 'com.dorongold.task-tree' version '4.0.1'
 
   // Code formatting; defines targets "spotlessApply" and "spotlessCheck".
   // Requires Java 11.
@@ -24,7 +24,7 @@ apply plugin: 'java'
 apply plugin: 'com.gradleup.shadow'
 
 group = 'org.checkerframework'
-version = '3.48.4'
+version = '3.49.1'
 
 java {
   // This test is for whether the Checker Framework supports (runs under) Java 8.
@@ -58,7 +58,7 @@ configurations {
 
 dependencies {
   // Annotations in checker-qual.jar are used, but no checkers are (currently) run on the code.
-  compileOnly 'org.checkerframework:checker-qual:3.48.4'
+  compileOnly 'org.checkerframework:checker-qual:3.49.1'
 
   implementation 'org.plumelib:options:2.0.3'
   implementation 'org.plumelib:plume-util:1.10.0'
@@ -73,7 +73,7 @@ dependencies {
   errorprone("com.google.errorprone:error_prone_core:${errorproneVersion}")
 
   testImplementation group: 'junit', name: 'junit', version: '4.13.2'
-  testImplementation 'org.checkerframework:checker-qual:3.48.4'
+  testImplementation 'org.checkerframework:checker-qual:3.49.1'
 }
 
 compileJava {
