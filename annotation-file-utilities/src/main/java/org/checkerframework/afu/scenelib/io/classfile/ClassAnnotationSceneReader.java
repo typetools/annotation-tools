@@ -36,6 +36,7 @@ import org.checkerframework.afu.scenelib.field.ScalarAFT;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.signature.qual.BinaryName;
 import org.checkerframework.checker.signature.qual.ClassGetName;
+import org.checkerframework.checker.signature.qual.InternalForm;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
@@ -130,10 +131,10 @@ public class ClassAnnotationSceneReader extends CodeOffsetAdapter {
   public void visit(
       int version,
       int access,
-      String name,
+      @InternalForm String name,
       String signature,
       String superName,
-      String[] interfaces) {
+      @InternalForm String @Nullable [] interfaces) {
     classWriter.visit(version, access, name, signature, superName, interfaces);
     aClass = scene.classes.getVivify(name.replace('/', '.'));
   }
