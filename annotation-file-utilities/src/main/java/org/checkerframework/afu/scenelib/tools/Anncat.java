@@ -2,7 +2,10 @@ package org.checkerframework.afu.scenelib.tools;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import org.checkerframework.afu.scenelib.el.AScene;
