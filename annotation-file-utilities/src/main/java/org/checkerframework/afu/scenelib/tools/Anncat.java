@@ -17,6 +17,13 @@ import org.plumelib.util.FileIOException;
 
 /** Concatenates multiple descriptions of annotations into a single one. */
 public class Anncat {
+
+  /** Do not instantiate. */
+  private Anncat() {
+    throw new Error("Do not instantiate");
+  }
+
+  /** Print a usage message to standard error. */
   private static void usage() {
     System.err.println("anncat, part of the Annotation File Utilities");
     System.err.println("(https://checkerframework.org/annotation-file-utilities/)");
