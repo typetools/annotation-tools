@@ -74,10 +74,8 @@ public class AnnotationVerifier {
   public void verify() {
     if (!newVisitor.name.equals(originalVisitor.name)) {
       throw new AnnotationMismatchException(
-          "Cannot verify two different classes:\n  "
-              + newVisitor.name
-              + "\n  "
-              + originalVisitor.name);
+          "Cannot verify two different classes:%n  %s%n  %s",
+          newVisitor.name, originalVisitor.name);
     }
     newVisitor.verifyAgainst(originalVisitor);
   }
@@ -199,13 +197,7 @@ public class AnnotationVerifier {
         AnnotationRecorder questionableAnn = questionableAnns.get(name);
         if (questionableAnn == null) {
           throw new AnnotationMismatchException(
-              "{"
-                  + description
-                  + "}"
-                  + "\n  does not contain expected annotation:\n  "
-                  + "{"
-                  + correctAnn
-                  + "}");
+              "{%s}%n  does not contain expected annotation:%n  {%s}", description, correctAnn);
         }
 
         questionableAnn.verifyAgainst(correctAnn);
@@ -215,13 +207,7 @@ public class AnnotationVerifier {
 
       for (AnnotationRecorder unexpectedAnnOnThis : unresolvedQuestionableAnns) {
         throw new AnnotationMismatchException(
-            "{"
-                + description
-                + "}"
-                + "\n  contains unexpected annotation:\n  "
-                + "{"
-                + unexpectedAnnOnThis
-                + "}");
+            "{%s}%n  contains unexpected annotation:%n  {%s}", description, unexpectedAnnOnThis);
       }
     }
 
@@ -236,13 +222,7 @@ public class AnnotationVerifier {
         FieldRecorder questionableMember = questionableMembers.get(name);
         if (questionableMember == null) {
           throw new AnnotationMismatchException(
-              "{"
-                  + description
-                  + "}"
-                  + "\n  does not contain expected member:\n  "
-                  + "{"
-                  + correctMember
-                  + "}");
+              "{%s}%n  does not contain expected member:%n  {%s}", description, correctMember);
         }
 
         questionableMember.verifyAgainst(correctMember);
@@ -256,13 +236,7 @@ public class AnnotationVerifier {
         System.out.println("correct: " + correctMembers);
 
         throw new AnnotationMismatchException(
-            "{"
-                + description
-                + "}"
-                + "\n  contains unexpected member:\n  "
-                + "{"
-                + unexpectedMemberOnThis
-                + "}");
+            "{%s}%n  contains unexpected member:%n  {%s}", description, unexpectedMemberOnThis);
       }
     }
 
@@ -278,13 +252,7 @@ public class AnnotationVerifier {
         MethodRecorder questionableMember = questionableMembers.get(name);
         if (questionableMember == null) {
           throw new AnnotationMismatchException(
-              "{"
-                  + description
-                  + "}"
-                  + "\n  does not contain expected member:\n  "
-                  + "{"
-                  + correctMember
-                  + "}");
+              "{%s}%n  does not contain expected member:%n  {%s}", description, correctMember);
         }
 
         questionableMember.verifyAgainst(correctMember);
@@ -298,13 +266,7 @@ public class AnnotationVerifier {
         System.out.println("correct: " + correctMembers);
 
         throw new AnnotationMismatchException(
-            "{"
-                + description
-                + "}"
-                + "\n  contains unexpected member:\n  "
-                + "{"
-                + unexpectedMemberOnThis
-                + "}");
+            "{%s}%n  contains unexpected member:%n  {%s}", description, unexpectedMemberOnThis);
       }
     }
 
@@ -482,13 +444,7 @@ public class AnnotationVerifier {
         AnnotationRecorder questionableAnn = questionableAnns.get(name);
         if (questionableAnn == null) {
           throw new AnnotationMismatchException(
-              "{"
-                  + description
-                  + "}"
-                  + "\n  does not contain expected annotation:\n  "
-                  + "{"
-                  + correctAnn
-                  + "}");
+              "{%s}%n  does not contain expected annotation:%n  {%s}", description, correctAnn);
         }
 
         questionableAnn.verifyAgainst(correctAnn);
@@ -498,13 +454,7 @@ public class AnnotationVerifier {
 
       for (AnnotationRecorder unexpectedAnnOnThis : unresolvedQuestionableAnns) {
         throw new AnnotationMismatchException(
-            "{"
-                + description
-                + "}"
-                + "\n  contains unexpected annotation:\n  "
-                + "{"
-                + unexpectedAnnOnThis
-                + "}");
+            "{%s}%n  contains unexpected annotation:%n  {%s}", description, unexpectedAnnOnThis);
       }
     }
 
@@ -593,13 +543,7 @@ public class AnnotationVerifier {
         AnnotationRecorder questionableAnn = questionableAnns.get(name);
         if (questionableAnn == null) {
           throw new AnnotationMismatchException(
-              "{"
-                  + description
-                  + "}"
-                  + "\n  does not contain expected annotation:\n  "
-                  + "{"
-                  + correctAnn
-                  + "}");
+              "{%s}%n  does not contain expected annotation:%n  {%s}", description, correctAnn);
         }
 
         questionableAnn.verifyAgainst(correctAnn);
@@ -609,13 +553,7 @@ public class AnnotationVerifier {
 
       for (AnnotationRecorder unexpectedAnnOnThis : unresolvedQuestionableAnns) {
         throw new AnnotationMismatchException(
-            "{"
-                + description
-                + "}"
-                + "\n  contains unexpected annotation:\n  "
-                + "{"
-                + unexpectedAnnOnThis
-                + "}");
+            "{%s}%n  contains unexpected annotation:%n  {%s}", description, unexpectedAnnOnThis);
       }
     }
 
@@ -934,6 +872,17 @@ public class AnnotationVerifier {
      */
     public AnnotationMismatchException(String msg) {
       super(msg);
+    }
+
+    /**
+     * Constructs a new AnnotationMismatchException with the given error message and arguments.
+     *
+     * @param msg the error as to why the annotations do not match, as a format string
+     * @param args arguments to the format string
+     */
+    @SuppressWarnings("AnnotateFormatMethod")
+    public AnnotationMismatchException(String msg, Object... args) {
+      super(String.format(msg, args));
     }
   }
 }

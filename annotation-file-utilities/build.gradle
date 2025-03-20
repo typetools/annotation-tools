@@ -133,6 +133,8 @@ compileJava {
       //   implementation "com.google.errorprone:error_prone_core:${errorproneVersion}"
       // Adding that line in build.gradle causes a javac crash when running the Checker Framework.
       "ASTHelpersSuggestions",
+      // Suggestion uses a Guava-only annotation.
+      "AnnotateFormatMethod",
       )
 }
 
