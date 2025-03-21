@@ -2,7 +2,10 @@ package org.checkerframework.afu.scenelib.tools;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import org.checkerframework.afu.scenelib.el.AScene;
@@ -17,19 +20,25 @@ import org.plumelib.util.FileIOException;
 
 /** Concatenates multiple descriptions of annotations into a single one. */
 public class Anncat {
+
+  /** Do not instantiate. */
+  private Anncat() {
+    throw new Error("Do not instantiate");
+  }
+
+  /** Print a usage message to standard error. */
   private static void usage() {
-    System.err.print(
-        "anncat, part of the Annotation File Utilities\n"
-            + "(https://checkerframework.org/annotation-file-utilities/)\n"
-            + "usage: anncat <inspec>* [ --out <outspec> ], where:\n"
-            + "    <inspec> ::=\n"
-            + "        ( --javap <in.javap> )\n"
-            + "        | ( --index <in.jaif> )\n"
-            + "        | ( --class <in.class> )\n"
-            + "    <outspec> ::=\n"
-            + "        ( --index <out.jaif> )\n"
-            + "        | ( --class [ --overwrite ] <orig.class> [ --to <out.class> ] )\n"
-            + "If outspec is omitted, default is index file to stdout.\n");
+    System.err.println("anncat, part of the Annotation File Utilities");
+    System.err.println("(https://checkerframework.org/annotation-file-utilities/)");
+    System.err.println("usage: anncat <inspec>* [ --out <outspec> ], where:");
+    System.err.println("    <inspec> ::=");
+    System.err.println("        ( --javap <in.javap> )");
+    System.err.println("        | ( --index <in.jaif> )");
+    System.err.println("        | ( --class <in.class> )");
+    System.err.println("    <outspec> ::=");
+    System.err.println("        ( --index <out.jaif> )");
+    System.err.println("        | ( --class [ --overwrite ] <orig.class> [ --to <out.class> ] )");
+    System.err.println("If outspec is omitted, default is index file to stdout.");
   }
 
   private static void usageAssert(boolean b) {
