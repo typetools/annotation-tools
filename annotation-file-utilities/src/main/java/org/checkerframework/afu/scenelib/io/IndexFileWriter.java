@@ -595,6 +595,8 @@ public final class IndexFileWriter {
    * </code> in index file format; see {@link #write(AScene, Writer)}.
    */
   public static void write(AScene scene, String filename) throws IOException, DefException {
-    write(scene, Files.newBufferedWriter(Paths.get(filename), UTF_8));
+    try (Writer w = Files.newBufferedWriter(Paths.get(filename), UTF_8)) {
+      write(scene, w);
+    }
   }
 }

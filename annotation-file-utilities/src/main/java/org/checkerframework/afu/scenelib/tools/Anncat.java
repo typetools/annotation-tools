@@ -97,7 +97,9 @@ public class Anncat {
           usageAssert(idx == args.length);
           System.err.println("Writing index file to " + outfile + "...");
           // In Java 11, use: new FileWriter(outfile, UTF_8)
-          IndexFileWriter.write(theScene, Files.newBufferedWriter(Paths.get(outfile), UTF_8));
+          try (Writer w = Files.newBufferedWriter(Paths.get(outfile), UTF_8)) {
+            IndexFileWriter.write(theScene, w);
+          }
           System.err.println("Finished.");
         } else if (args[idx].equals("--class")) {
           idx++;
@@ -122,8 +124,10 @@ public class Anncat {
             usageAssert(idx == args.length);
             System.err.println("Reading original class file " + origfile);
             System.err.println("and writing annotated version to " + outfile + "...");
-            ClassFileWriter.insert(
-                theScene, new FileInputStream(origfile), new FileOutputStream(outfile), overwrite);
+            try (FileInputStream fis = new FileInputStream(origfile);
+                FileOutputStream fos = new FileOutputStream(outfile)) {
+              ClassFileWriter.insert(theScene, fis, fos, overwrite);
+            }
             System.err.println("Finished.");
           } else {
             System.err.println("Rewriting class file " + origfile + " with annotations...");

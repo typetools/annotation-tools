@@ -478,8 +478,9 @@ def createCheckTypeTask(checker, shortName) {
   }
 }
 
-// Create checkSignature task
+// Create tasks checkSignature and checkResourceLeak.
 createCheckTypeTask('org.checkerframework.checker.signature.SignatureChecker', 'Signature')
+createCheckTypeTask('org.checkerframework.checker.resourceleak.ResourceLeakChecker', 'ResourceLeak')
 
 task htmlValidate(type: Exec) {
   description = 'Validate that HTML files are well-formed.'

@@ -1843,9 +1843,11 @@ public final class IndexFileParser {
    */
   public static Map<String, AnnotationDef> parseFile(String filename, AScene scene)
       throws IOException {
-    LineNumberReader in = new LineNumberReader(Files.newBufferedReader(Paths.get(filename), UTF_8));
-    IndexFileParser parser = new IndexFileParser(in, filename, scene);
-    return parseAndReturnAnnotationDefs(filename, in, parser);
+    try (LineNumberReader in =
+        new LineNumberReader(Files.newBufferedReader(Paths.get(filename), UTF_8))) {
+      IndexFileParser parser = new IndexFileParser(in, filename, scene);
+      return parseAndReturnAnnotationDefs(filename, in, parser);
+    }
   }
 
   /**

@@ -162,7 +162,9 @@ public class ClassFileReader {
    * @throws IOException if there is a problem reading from <code> fileName </code>
    */
   public static void read(AScene scene, String fileName) throws IOException {
-    read(scene, new FileInputStream(fileName));
+    try (FileInputStream fis = new FileInputStream(fileName)) {
+      read(scene, fis);
+    }
   }
 
   /**

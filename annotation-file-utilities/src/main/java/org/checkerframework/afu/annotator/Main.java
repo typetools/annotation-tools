@@ -1035,12 +1035,12 @@ public class Main {
           }
           outfile.getParentFile().mkdirs();
         }
-        OutputStream output = new FileOutputStream(outfile);
-        if (verbose) {
-          System.out.printf("Writing %s%n", outfile);
+        try (OutputStream output = new FileOutputStream(outfile)) {
+          if (verbose) {
+            System.out.printf("Writing %s%n", outfile);
+          }
+          src.write(output);
         }
-        src.write(output);
-        output.close();
       } catch (IOException e) {
         System.err.println("Problem while writing file " + outfile);
         e.printStackTrace();
