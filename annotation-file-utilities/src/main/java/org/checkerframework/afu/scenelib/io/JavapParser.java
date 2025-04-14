@@ -418,12 +418,13 @@ public final class JavapParser {
   }
 
   public static void parse(String filename, AScene scene) throws IOException, FileIOException {
-    LineNumberReader lnr =
-        new LineNumberReader(Files.newBufferedReader(Paths.get(filename), UTF_8));
-    try {
-      parse(lnr, scene);
-    } catch (ParseException e) {
-      throw new FileIOException(lnr, filename, e);
+    try (LineNumberReader lnr =
+        new LineNumberReader(Files.newBufferedReader(Paths.get(filename), UTF_8))) {
+      try {
+        parse(lnr, scene);
+      } catch (ParseException e) {
+        throw new FileIOException(lnr, filename, e);
+      }
     }
   }
 }

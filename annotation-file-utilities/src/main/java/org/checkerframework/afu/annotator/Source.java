@@ -10,6 +10,7 @@ import java.io.*;
 import java.util.*;
 import javax.tools.*;
 import javax.tools.JavaCompiler.CompilationTask;
+import org.checkerframework.checker.mustcall.qual.Owning;
 
 /**
  * Represents a Java source file. This class provides three major operations: parsing the source
@@ -19,9 +20,8 @@ import javax.tools.JavaCompiler.CompilationTask;
 public final class Source {
 
   private JavaCompiler compiler;
-  private StandardJavaFileManager fileManager;
   private JavacTask task;
-  private StringBuilder source;
+  private final StringBuilder source;
   private DiagnosticCollector<JavaFileObject> diagnostics;
   private String path;
   private Types types;
@@ -55,43 +55,43 @@ public final class Source {
     diagnostics = new DiagnosticCollector<JavaFileObject>();
 
     // Get the file manager for locating input files.
-    this.fileManager = compiler.getStandardFileManager(diagnostics, null, null);
-    if (fileManager == null) {
-      throw new CompilerException("could not get file manager");
+    try (StandardJavaFileManager fileManager =
+        compiler.getStandardFileManager(diagnostics, null, null)) {
+      if (fileManager == null) {
+        throw new CompilerException("could not get file manager");
+      }
+
+      Iterable<? extends JavaFileObject> fileObjs =
+          fileManager.getJavaFileObjectsFromStrings(Collections.singletonList(src));
+
+      // Compiler options.
+      final String[] stringOpts = new String[] {"-g"};
+      List<String> optsList = Arrays.asList(stringOpts);
+
+      // Create a task.
+      // This seems to require that the file names end in .java
+      CompilationTask cTask =
+          compiler.getTask(null, fileManager, diagnostics, optsList, null, fileObjs);
+      if (!(cTask instanceof JavacTask)) {
+        throw new CompilerException("could not get a valid JavacTask: " + cTask.getClass());
+      }
+      this.task = (JavacTask) cTask;
+      this.types = Types.instance(((JavacTaskImpl) cTask).getContext());
+
+      // Read the source file into a buffer.
+      path = src;
+      source = new StringBuilder();
+      try (ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+          FileInputStream in = new FileInputStream(src)) {
+        int c;
+        while ((c = in.read()) != -1) {
+          bytes.write(c);
+        }
+        @SuppressWarnings("DefaultCharset") // JDK 8 version does not accept UTF_8 argument
+        String bytesString = bytes.toString();
+        source.append(bytesString);
+      }
     }
-
-    Iterable<? extends JavaFileObject> fileObjs =
-        fileManager.getJavaFileObjectsFromStrings(Collections.singletonList(src));
-
-    // Compiler options.
-    final String[] stringOpts = new String[] {"-g"};
-    List<String> optsList = Arrays.asList(stringOpts);
-
-    // Create a task.
-    // This seems to require that the file names end in .java
-    CompilationTask cTask =
-        compiler.getTask(null, fileManager, diagnostics, optsList, null, fileObjs);
-    if (!(cTask instanceof JavacTask)) {
-      throw new CompilerException("could not get a valid JavacTask: " + cTask.getClass());
-    }
-    this.task = (JavacTask) cTask;
-    this.types = Types.instance(((JavacTaskImpl) cTask).getContext());
-
-    // Read the source file into a buffer.
-    path = src;
-    source = new StringBuilder();
-    FileInputStream in = new FileInputStream(src);
-    ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-    int c;
-    while ((c = in.read()) != -1) {
-      bytes.write(c);
-    }
-    in.close();
-    @SuppressWarnings("DefaultCharset") // JDK 8 version does not accept UTF_8 argument
-    String bytesString = bytes.toString();
-    source.append(bytesString);
-    bytes.close();
-    fileManager.close();
   }
 
   /**
@@ -185,7 +185,7 @@ public final class Source {
    * @param out the stream for writing the file
    * @throws IOException if the source file couldn't be written
    */
-  public void write(OutputStream out) throws IOException {
+  public void write(@Owning OutputStream out) throws IOException {
     out.write(source.toString().getBytes(UTF_8));
     out.flush();
     out.close();

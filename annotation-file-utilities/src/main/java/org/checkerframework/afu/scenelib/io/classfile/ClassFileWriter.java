@@ -178,17 +178,18 @@ public class ClassFileWriter {
     assert fileName.endsWith(".class");
 
     // can't just call other insert, because this closes the input stream
-    InputStream in = new FileInputStream(fileName);
-    ClassReader classReader = new ClassReader(in);
-    in.close();
+    ClassReader classReader;
+    try (InputStream in = new FileInputStream(fileName)) {
+      classReader = new ClassReader(in);
+    }
 
     ClassAnnotationSceneWriter classAnnotationSceneWriter =
         new ClassAnnotationSceneWriter(Opcodes.ASM8, classReader, scene, overwrite);
     classReader.accept(classAnnotationSceneWriter, 0);
 
-    OutputStream fos = new FileOutputStream(fileName);
-    fos.write(classAnnotationSceneWriter.toByteArray());
-    fos.close();
+    try (OutputStream fos = new FileOutputStream(fileName)) {
+      fos.write(classAnnotationSceneWriter.toByteArray());
+    }
   }
 
   /**
@@ -243,8 +244,8 @@ public class ClassFileWriter {
 
     classReader.accept(classAnnotationSceneWriter, 0);
 
-    OutputStream fos = new FileOutputStream(outputFileName);
-    fos.write(classAnnotationSceneWriter.toByteArray());
-    fos.close();
+    try (OutputStream fos = new FileOutputStream(outputFileName)) {
+      fos.write(classAnnotationSceneWriter.toByteArray());
+    }
   }
 }

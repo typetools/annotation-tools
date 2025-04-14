@@ -53,7 +53,7 @@ if [[ "${GROUP}" == "typecheck" || "${GROUP}" == "all" ]]; then
     (cd "${CHECKERFRAMEWORK}" && ./.build-without-test.sh downloadjdk)
   fi
 
-  (cd annotation-file-utilities && ./gradlew checkSignature)
+  (cd annotation-file-utilities && ./gradlew checkSignature checkResourceLeak)
 fi
 
 if [[ "${GROUP}" == "misc" || "${GROUP}" == "all" ]]; then
