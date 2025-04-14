@@ -8,8 +8,8 @@ import java.util.*;
  *
  * <p>Usage: java VerifyDiffs [--show_all]
  *
- * <p>If --show_all option is used, all tests that pass will also be displayed. If --show_all is not
- * used, and all tests pass, then there will be no output.
+ * <p>If {@code --show_all} option is used, all tests that pass will also be displayed. If {@code
+ * --show_all} is not used, and all tests pass, then there will be no output.
  */
 public class VerifyDiffs {
   private static boolean show_all = false;

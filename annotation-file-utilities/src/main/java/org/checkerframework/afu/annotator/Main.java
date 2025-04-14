@@ -149,13 +149,14 @@ public class Main {
    * files already exist, they are used instead of the .java files. This behavior permits a user to
    * tweak the {@code .jaif} file and re-run the annotator.
    *
-   * <p>Note that if the user runs the annotator with --in-place, makes edits, and then re-runs the
-   * annotator with this --in-place option, those edits are lost. Similarly, if the user runs the
-   * annotator twice in a row with --in-place, only the last set of annotations will appear in the
-   * codebase at the end.
+   * <p>Note that if the user runs the annotator with {@code --in-place}, makes edits, and then
+   * re-runs the annotator with this {@code --in-place} option, those edits are lost. Similarly, if
+   * the user runs the annotator twice in a row with {@code --in-place}, only the last set of
+   * annotations will appear in the codebase at the end.
    *
-   * <p>To preserve changes when using the --in-place option, first remove the backup files. Or, use
-   * the {@code -d .} option, which makes (and reads) no backup, instead of --in-place.
+   * <p>To preserve changes when using the {@code --in-place} option, first remove the backup files.
+   * Or, use the {@code -d .} option, which makes (and reads) no backup, instead of {@code
+   * --in-place}.
    */
   @Option("-i Overwrite original source files")
   public static boolean in_place = false;
