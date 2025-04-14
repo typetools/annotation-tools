@@ -137,6 +137,8 @@ compileJava {
       "ASTHelpersSuggestions",
       // Suggestion uses a Guava-only annotation.
       "AnnotateFormatMethod",
+      // Text blocks were introduced in Java 15.
+      "StringConcatToTextBlock",
       )
 }
 
