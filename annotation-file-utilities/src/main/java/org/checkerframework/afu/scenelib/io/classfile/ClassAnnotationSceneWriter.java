@@ -151,11 +151,12 @@ public class ClassAnnotationSceneWriter extends CodeOffsetAdapter {
     return ((ClassWriter) cv).toByteArray();
   }
 
+  @SuppressWarnings("override.param") // ASM is not annotated
   @Override
   public void visit(
       int version,
       int access,
-      String name,
+      @ClassGetName String name,
       String signature,
       String superName,
       String[] interfaces) {

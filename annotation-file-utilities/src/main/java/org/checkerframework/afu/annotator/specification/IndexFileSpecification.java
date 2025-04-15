@@ -44,6 +44,7 @@ import org.checkerframework.afu.scenelib.io.IndexFileParser;
 import org.checkerframework.afu.scenelib.type.DeclaredType;
 import org.checkerframework.afu.scenelib.type.Type;
 import org.checkerframework.afu.scenelib.util.coll.VivifyingMap;
+import org.checkerframework.checker.signature.qual.BinaryName;
 import org.checkerframework.checker.signature.qual.ClassGetName;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
@@ -169,9 +170,8 @@ public class IndexFileSpecification {
       parsePackage(clist, entry.getKey(), entry.getValue());
     }
 
-    @SuppressWarnings("signature:assignment") // scene-lib is not fully annotated
-    VivifyingMap<@ClassGetName String, AClass> classes = scene.classes;
-    for (Map.Entry<@ClassGetName String, AClass> entry : classes.entrySet()) {
+    VivifyingMap<@BinaryName String, AClass> classes = scene.classes;
+    for (Map.Entry<@BinaryName String, AClass> entry : classes.entrySet()) {
       String key = entry.getKey();
       AClass clazz = entry.getValue();
       if (key.endsWith(".package-info")) {
