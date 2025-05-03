@@ -69,6 +69,7 @@ import org.checkerframework.afu.scenelib.type.DeclaredType;
 import org.checkerframework.afu.scenelib.type.Type;
 import org.checkerframework.afu.scenelib.util.CommandLineUtils;
 import org.checkerframework.afu.scenelib.util.coll.VivifyingMap;
+import org.checkerframework.checker.signature.qual.BinaryName;
 import org.objectweb.asm.TypePath;
 import org.plumelib.options.Option;
 import org.plumelib.options.OptionGroup;
@@ -306,7 +307,7 @@ public class Main {
     final AScene filtered = new AScene();
     filtered.packages.putAll(scene.packages);
     filtered.imports.putAll(scene.imports);
-    for (Map.Entry<String, AClass> entry : scene.classes.entrySet()) {
+    for (Map.Entry<@BinaryName String, AClass> entry : scene.classes.entrySet()) {
       String key = entry.getKey();
       AClass clazz0 = entry.getValue();
       AClass clazz1 = filtered.classes.getVivify(key);
