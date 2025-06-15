@@ -13,8 +13,8 @@ pr:
 #   batch: true
 
 # Each *_jdkX job depends on build_without_test_jdkX.
-# Each jdk11 and jdk17 job depends on canary_jobs (all jdk24 jobs, plus the latest misc job).
-# Each jdk11 and jdk17 job depends on the corresponding jdk24 job.  (This last is gratuitous given the dependence on canary_jabs.)
+# Each jdk11, jdk17, and jdk21 job depends on canary_jobs (all jdk24 jobs, plus the latest misc job).
+# Each jdk11, jdk17, and jdk21 job depends on the corresponding jdk24 job.  (Some of these duplicate the dependence on canary_jabs, but that is harmless.)
 
 jobs:
 
