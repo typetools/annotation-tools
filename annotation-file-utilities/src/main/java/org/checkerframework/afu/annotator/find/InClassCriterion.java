@@ -11,7 +11,7 @@ import java.util.regex.*;
 import javax.lang.model.element.Name;
 import org.checkerframework.afu.annotator.scanner.AnonymousClassScanner;
 import org.checkerframework.afu.annotator.scanner.LocalClassScanner;
-import org.checkerframework.checker.signature.qual.ClassGetName;
+import org.checkerframework.checker.signature.qual.BinaryName;
 
 // If there are dollar signs in a name, then there are two
 // possibilities regarding how the dollar sign got there.
@@ -31,7 +31,7 @@ public final class InClassCriterion implements Criterion {
   static boolean debug = false;
 
   /** The class name. */
-  public final @ClassGetName String className;
+  public final @BinaryName String className;
 
   /** If true, require an exact match. */
   private final boolean exactMatch;
@@ -42,7 +42,7 @@ public final class InClassCriterion implements Criterion {
    * @param className the class name
    * @param exactMatch if true, require an exact match
    */
-  public InClassCriterion(@ClassGetName String className, boolean exactMatch) {
+  public InClassCriterion(@BinaryName String className, boolean exactMatch) {
     this.className = className;
     this.exactMatch = exactMatch;
   }
