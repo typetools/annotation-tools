@@ -775,8 +775,8 @@ public class ASTPathCriterion implements Criterion {
     Tree.Kind kind = entry.getTreeKind();
 
     switch (kind) {
-        // case ANNOTATION:
-        // case INTERFACE:
+      // case ANNOTATION:
+      // case INTERFACE:
       case CLASS: // "extends" clause?
         return ASTPath.isClassEquiv(kind)
             && ix == last
@@ -853,6 +853,12 @@ public class ASTPathCriterion implements Criterion {
     }
   }
 
+  /**
+   * Returns the array depth of the given tree.
+   *
+   * @param tree a tree
+   * @return the array depth of the given tree
+   */
   private static int arrayDepth(Tree tree) {
     if (tree.getKind() == Tree.Kind.NEW_ARRAY) {
       NewArrayTree newArray = (NewArrayTree) tree;

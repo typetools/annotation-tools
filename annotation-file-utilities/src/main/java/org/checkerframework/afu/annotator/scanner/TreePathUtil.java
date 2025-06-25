@@ -45,6 +45,12 @@ public class TreePathUtil {
 
   // classes
 
+  /**
+   * Returns the enclosing class.
+   *
+   * @param path a tree path
+   * @return the enclosing class
+   */
   public static TreePath findEnclosingClass(TreePath path) {
     while (!hasClassKind(path.getLeaf())
         || path.getParentPath().getLeaf().getKind() == Tree.Kind.NEW_CLASS) {
@@ -58,6 +64,12 @@ public class TreePathUtil {
 
   // methods
 
+  /**
+   * Returns the enclosing method.
+   *
+   * @param path a tree path
+   * @return the enclosing method
+   */
   public static TreePath findEnclosingMethod(TreePath path) {
     while (path.getLeaf().getKind() != Tree.Kind.METHOD) {
       path = path.getParentPath();
@@ -70,6 +82,12 @@ public class TreePathUtil {
 
   // Field Initializers
 
+  /**
+   * Returns true if this is a field initialization.
+   *
+   * @param path a tree path
+   * @return true if this is a field initialization
+   */
   public static boolean isFieldInit(TreePath path) {
     return path.getLeaf().getKind() == Tree.Kind.VARIABLE
         && path.getParentPath() != null
