@@ -32,8 +32,10 @@ public class TreePathUtil {
   }
 
   /**
-   * The counting context for new, typecast, instanceof, and locals. This is a path to a method or a
-   * field/instance/static initializer.
+   * Returns the counting context for new, typecast, instanceof, and locals.
+   *
+   * @param path a path to a method or a field/instance/static initializer
+   * @param the counting context for new, typecast, instanceof, and locals
    */
   public static TreePath findCountingContext(TreePath path) {
     while (path != null) {
