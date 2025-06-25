@@ -258,7 +258,7 @@ public class ASTIndex extends WrapperMap<Tree, ASTRecord> {
             }
             saveAll(node.getTypeParameters(), rec, kind, ASTPath.TYPE_PARAMETER);
             for (Tree member : node.getMembers()) {
-              if (member.getKind() == Tree.Kind.BLOCK) {
+              if (member instanceof BlockTree) {
                 save(member, rec, kind, ASTPath.INITIALIZER, i++);
               } else if (ASTPath.isClassEquiv(member.getKind())) {
                 String className = ((JCTree.JCClassDecl) member).sym.flatname.toString();

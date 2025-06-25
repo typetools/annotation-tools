@@ -187,7 +187,7 @@ public class ASTPathCriterion implements Criterion {
     }
 
     if ((i < actualPathLen && matchNext(next, actualPath.get(i)))
-        || (i <= actualPathLen && next.getKind() == Tree.Kind.NEW_ARRAY)) {
+        || (i <= actualPathLen && next instanceof NewArrayTree)) {
       return true;
     }
 
@@ -387,7 +387,7 @@ public class ASTPathCriterion implements Criterion {
             } else if (astNode.childSelectorIs(ASTPath.INITIALIZER)) {
               int i = 0;
               for (Tree member : clazz.getMembers()) {
-                if (member.getKind() == Tree.Kind.BLOCK && arg == i++) {
+                if (member instanceof BlockTree && arg == i++) {
                   return member;
                 }
               }
@@ -571,7 +571,7 @@ public class ASTPathCriterion implements Criterion {
               }
               typeTree = ((NewArrayTree) typeTree).getType();
               while (--arg > 0) {
-                if (typeTree.getKind() != Tree.Kind.ARRAY_TYPE) {
+                if (!(typeTree instanceof ArrayTypeTree)) {
                   return null;
                 }
                 typeTree = ((ArrayTypeTree) typeTree).getType();
@@ -783,12 +783,12 @@ public class ASTPathCriterion implements Criterion {
             && entry.getArgument() == -1
             && entry.childSelectorIs(ASTPath.BOUND);
       case TYPE_PARAMETER:
-        return node.getKind() == Tree.Kind.TYPE_PARAMETER
+        return node instanceof TypeParameterTree
             && ix == last
             && entry.getArgument() == 0
             && entry.childSelectorIs(ASTPath.BOUND);
       case METHOD: // nullary constructor? receiver?
-        if (node.getKind() != Tree.Kind.METHOD) {
+        if (!(node instanceof MethodTree)) {
           return false;
         }
         MethodTree method = (MethodTree) node;
@@ -821,7 +821,7 @@ public class ASTPathCriterion implements Criterion {
         }
         return false;
       case NEW_ARRAY:
-        if (node.getKind() != Tree.Kind.NEW_ARRAY) {
+        if (!(node instanceof NewArrayTree)) {
           return false;
         }
         NewArrayTree newArray = (NewArrayTree) node;
@@ -854,7 +854,7 @@ public class ASTPathCriterion implements Criterion {
   }
 
   private static int arrayDepth(Tree tree) {
-    if (tree.getKind() == Tree.Kind.NEW_ARRAY) {
+    if (tree instanceof NewArrayTree) {
       NewArrayTree newArray = (NewArrayTree) tree;
       Tree type = newArray.getType();
       if (type != null) {
@@ -880,9 +880,9 @@ public class ASTPathCriterion implements Criterion {
         }
       }
       return depth;
-    } else if (tree.getKind() == Tree.Kind.ANNOTATED_TYPE) {
+    } else if (tree instanceof AnnotatedTypeTree) {
       return arrayDepth(((AnnotatedTypeTree) tree).getUnderlyingType());
-    } else if (tree.getKind() == Tree.Kind.ARRAY_TYPE) {
+    } else if (tree instanceof ArrayTypeTree) {
       return 1 + arrayDepth(((ArrayTypeTree) tree).getType());
     } else {
       return 0;
@@ -1081,14 +1081,14 @@ public class ASTPathCriterion implements Criterion {
       // isWildcard(actualNode.getKind())
       // TODO: refactor GenericArrayLoc to use same code?
       Tree ancestor = actualPath.get(i - 1);
-      if (ancestor.getKind() == Tree.Kind.INSTANCE_OF) {
+      if (ancestor instanceof InstanceOfTree) {
         TreeFinder.warn.debug(
             "WARNING: wildcard bounds not allowed "
                 + "in 'instanceof' expression; skipping insertion%n");
         return false;
-      } else if (i > 1 && ancestor.getKind() == Tree.Kind.PARAMETERIZED_TYPE) {
+      } else if (i > 1 && ancestor instanceof ParameterizedTypeTree) {
         ancestor = actualPath.get(i - 2);
-        if (ancestor.getKind() == Tree.Kind.ARRAY_TYPE) {
+        if (ancestor instanceof ArrayTypeTree) {
           TreeFinder.warn.debug(
               "WARNING: wildcard bounds not allowed "
                   + "in 'instanceof' expression; skipping insertion%n");

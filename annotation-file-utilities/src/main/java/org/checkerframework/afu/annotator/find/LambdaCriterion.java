@@ -1,5 +1,6 @@
 package org.checkerframework.afu.annotator.find;
 
+import com.sun.source.tree.LambdaExpressionTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
 import org.checkerframework.afu.annotator.scanner.LambdaScanner;
@@ -50,9 +51,8 @@ public class LambdaCriterion implements Criterion {
       return false;
     }
 
-    if (parent.getKind() == Tree.Kind.LAMBDA_EXPRESSION) {
+    if (parent instanceof LambdaExpressionTree) {
       // LambdaExpressionTree lambdaTree = (LambdaExpressionTree) parent;
-
       int indexInSource = LambdaScanner.indexOfLambdaExpressionTree(path, parent);
       Criteria.dbug.debug("return source: %d%n", indexInSource);
       boolean b;

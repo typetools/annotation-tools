@@ -6,7 +6,9 @@ import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.ModifiersTree;
+import com.sun.source.tree.NewClassTree;
 import com.sun.source.tree.Tree;
+import com.sun.source.tree.VariableTree;
 import com.sun.source.util.TreePath;
 import com.sun.tools.javac.tree.JCTree;
 
@@ -35,7 +37,7 @@ public class TreePathUtil {
    */
   public static TreePath findCountingContext(TreePath path) {
     while (path != null) {
-      if (path.getLeaf().getKind() == Tree.Kind.METHOD || isFieldInit(path) || isInitBlock(path)) {
+      if (path.getLeaf() instanceof MethodTree || isFieldInit(path) || isInitBlock(path)) {
         return path;
       }
       path = path.getParentPath();
@@ -47,7 +49,7 @@ public class TreePathUtil {
 
   public static TreePath findEnclosingClass(TreePath path) {
     while (!hasClassKind(path.getLeaf())
-        || path.getParentPath().getLeaf().getKind() == Tree.Kind.NEW_CLASS) {
+        || path.getParentPath().getLeaf() instanceof NewClassTree) {
       path = path.getParentPath();
       if (path == null) {
         return null;
@@ -59,7 +61,7 @@ public class TreePathUtil {
   // methods
 
   public static TreePath findEnclosingMethod(TreePath path) {
-    while (path.getLeaf().getKind() != Tree.Kind.METHOD) {
+    while (!(path.getLeaf() instanceof MethodTree)) {
       path = path.getParentPath();
       if (path == null) {
         return null;
@@ -71,7 +73,7 @@ public class TreePathUtil {
   // Field Initializers
 
   public static boolean isFieldInit(TreePath path) {
-    return path.getLeaf().getKind() == Tree.Kind.VARIABLE
+    return path.getLeaf() instanceof VariableTree
         && path.getParentPath() != null
         && hasClassKind(path.getParentPath().getLeaf());
   }
@@ -95,7 +97,7 @@ public class TreePathUtil {
   public static boolean isInitBlock(TreePath path) {
     return path.getParentPath() != null
         && hasClassKind(path.getParentPath().getLeaf())
-        && path.getLeaf().getKind() == Tree.Kind.BLOCK;
+        && path.getLeaf() instanceof BlockTree;
   }
 
   public static TreePath findEnclosingInitBlock(TreePath path, boolean isStatic) {
@@ -147,7 +149,7 @@ public class TreePathUtil {
     int ctPos = -1;
 
     for (Tree member : ct.getMembers()) {
-      if (member.getKind() == Tree.Kind.METHOD) {
+      if (member instanceof MethodTree) {
         MethodTree method = (MethodTree) member;
         if (method.getName().contentEquals("<init>")) {
           // The tree contains the implicit default constructor if the user wrote no constructor,

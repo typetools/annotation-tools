@@ -2,6 +2,7 @@ package org.checkerframework.afu.annotator.find;
 
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
+import com.sun.source.tree.VariableTree;
 import com.sun.source.util.TreePath;
 
 public class ReceiverCriterion implements Criterion {
@@ -30,7 +31,7 @@ public class ReceiverCriterion implements Criterion {
       return false;
     }
 
-    if (path.getLeaf().getKind() == Tree.Kind.METHOD) {
+    if (path.getLeaf() instanceof MethodTree) {
       if (isSigMethodCriterion.isSatisfiedBy(path)) {
         MethodTree leaf = (MethodTree) path.getLeaf();
         // If the method already has a receiver, then insert directly on the
@@ -47,8 +48,8 @@ public class ReceiverCriterion implements Criterion {
       // declaration.
       Tree param = null;
       TreePath parent = path;
-      while (parent != null && parent.getLeaf().getKind() != Tree.Kind.METHOD) {
-        if (parent.getLeaf().getKind() == Tree.Kind.VARIABLE) {
+      while (parent != null && !(parent.getLeaf() instanceof MethodTree)) {
+        if (parent.getLeaf() instanceof VariableTree) {
           if (param == null) {
             param = parent.getLeaf();
           } else {

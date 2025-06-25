@@ -1,5 +1,6 @@
 package org.checkerframework.afu.annotator.find;
 
+import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
 import org.checkerframework.afu.annotator.scanner.MethodCallScanner;
@@ -31,7 +32,7 @@ public class CallCriterion implements Criterion {
 
     Tree leaf = path.getLeaf();
 
-    if (leaf.getKind() == Tree.Kind.METHOD_INVOCATION) {
+    if (leaf instanceof MethodInvocationTree) {
       int indexInSource = MethodCallScanner.indexOfMethodCallTree(path, leaf);
       boolean b;
       if (loc.isBytecodeOffset()) {
