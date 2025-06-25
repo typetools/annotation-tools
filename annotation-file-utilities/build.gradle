@@ -68,7 +68,7 @@ dependencies {
     exclude group: 'org.checkerframework'
   }
   implementation 'org.ow2.asm:asm:9.8'
-  ext.errorproneVersion = '2.38.0'
+  ext.errorproneVersion = '2.39.0'
   implementation "com.google.errorprone:error_prone_annotations:${errorproneVersion}"
   errorprone("com.google.errorprone:error_prone_core:${errorproneVersion}")
 
