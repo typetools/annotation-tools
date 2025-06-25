@@ -528,6 +528,12 @@ public class GenericArrayLocationCriterion implements Criterion {
         && fieldAccess.type.tsym.isStatic();
   }
 
+  /**
+   * Returns true if the given tree is generic or an array.
+   *
+   * @param t a tree
+   * @return true if the given tree is generic or an array
+   */
   private boolean isGenericOrArray(Tree t) {
     return ((t instanceof ParameterizedTypeTree)
         || (t instanceof ArrayTypeTree)

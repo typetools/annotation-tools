@@ -853,6 +853,12 @@ public class ASTPathCriterion implements Criterion {
     }
   }
 
+  /**
+   * Returns the array depth of the given tree.
+   *
+   * @param tree a tree
+   * @return the array depth of the given tree
+   */
   private static int arrayDepth(Tree tree) {
     if (tree instanceof NewArrayTree) {
       NewArrayTree newArray = (NewArrayTree) tree;

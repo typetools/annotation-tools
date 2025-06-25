@@ -154,10 +154,14 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
         + (c == '/' ? "" : nonDelimSlash);
   }
 
-  // If this code location is not an array type, return null.  Otherwise,
-  // starting at an array type, walk up the AST as long as still an array,
-  // and stop at the largest containing array (with nothing but arrays in
-  // between).
+  /**
+   * If this code location is not an array type, return null. Otherwise, starting at an array type,
+   * walk up the AST as long as still an array, and stop at the largest containing array (with
+   * nothing but arrays in between).
+   *
+   * @param p a tree path
+   * @return a path to the largest containing array, or null if none
+   */
   public static TreePath largestContainingArray(TreePath p) {
     if (!(p.getLeaf() instanceof ArrayTypeTree)) {
       return null;
@@ -476,6 +480,12 @@ public class TreeFinder extends TreeScanner<Void, List<Insertion>> {
           0);
     }
 
+    /**
+     * Returns the number of array levels in the given tree, which may be 0.
+     *
+     * @param node a tree
+     * @return the number of array levels in the given tree
+     */
     private int arrayLevels(Tree node) {
       int result = 0;
       while (node instanceof ArrayTypeTree) {
