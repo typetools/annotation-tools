@@ -10,7 +10,7 @@ import java.nio.file.Files
 plugins {
   id 'java'
 
-  id 'com.gradleup.shadow' version '8.3.6'
+  id 'com.gradleup.shadow' version '8.3.7'
   id 'net.ltgt.errorprone' version '4.2.0'
 
   // To show task list as a tree, run: ./gradlew <taskname> taskTree
@@ -543,7 +543,7 @@ configurations {
   requireJavadoc
 }
 dependencies {
-  requireJavadoc "org.plumelib:require-javadoc:1.0.9"
+  requireJavadoc "org.plumelib:require-javadoc:2.0.0"
 }
 task requireJavadoc(type: JavaExec) {
   description = 'Ensures that Javadoc documentation exists.'
@@ -551,6 +551,16 @@ task requireJavadoc(type: JavaExec) {
   classpath = configurations.requireJavadoc
   args "annotation-file-utilities/src"
   workingDir = "${projectDir}/.."
+  jvmArgs += [
+    '--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED',
+    '--add-exports=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED',
+    '--add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED',
+    '--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED',
+    '--add-opens=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED',
+    '--add-opens=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED',
+    '--add-opens=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED',
+    '--add-opens=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED',
+  ]
 }
 // check.dependsOn requireJavadoc
 
