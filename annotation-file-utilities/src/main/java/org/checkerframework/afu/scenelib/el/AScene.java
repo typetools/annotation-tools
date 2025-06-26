@@ -8,6 +8,8 @@ import java.util.Set;
 import org.checkerframework.afu.scenelib.Annotation;
 import org.checkerframework.afu.scenelib.io.IndexFileParser;
 import org.checkerframework.afu.scenelib.util.coll.VivifyingMap;
+import org.checkerframework.checker.signature.qual.BinaryName;
+import org.checkerframework.checker.signature.qual.ClassGetName;
 
 /**
  * An <code>AScene</code> (annotated scene) represents the annotations on a set of Java classes and
@@ -57,8 +59,8 @@ public class AScene implements Cloneable {
   public final Map<String, Set<String>> imports = new LinkedHashMap<>();
 
   /** This scene's annotated classes; map key is class name */
-  public final VivifyingMap</*@BinaryName*/ String, AClass> classes =
-      new VivifyingMap<String, AClass>(new LinkedHashMap<>()) {
+  public final VivifyingMap<@BinaryName String, AClass> classes =
+      new VivifyingMap<@BinaryName String, AClass>(new LinkedHashMap<>()) {
         @Override
         public AClass createValueFor(String k) {
           return new AClass(k);
@@ -133,7 +135,7 @@ public class AScene implements Cloneable {
    *
    * @return an immutable map from binary names to AClass objects
    */
-  public Map</*@BinaryName*/ String, AClass> getClasses() {
+  public Map<@ClassGetName String, AClass> getClasses() {
     return ImmutableMap.copyOf(classes);
   }
 

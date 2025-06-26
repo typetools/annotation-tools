@@ -1654,7 +1654,7 @@ public final class IndexFileParser {
   private void parseClass() throws IOException, ParseException {
     expectKeyword("class");
     String basename = expectIdentifier();
-    String fullName = curPkgPrefix + basename;
+    @BinaryName String fullName = curPkgPrefix + basename;
 
     AClass c = scene.classes.getVivify(fullName);
     expectChar(':');

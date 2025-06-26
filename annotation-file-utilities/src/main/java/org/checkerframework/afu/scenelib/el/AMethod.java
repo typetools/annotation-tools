@@ -13,6 +13,7 @@ import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
 import org.checkerframework.afu.scenelib.Annotation;
 import org.checkerframework.afu.scenelib.util.coll.VivifyingMap;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /** An annotated method; contains bounds, return, parameters, receiver, and throws. */
 public class AMethod extends ADeclaration {
@@ -23,14 +24,14 @@ public class AMethod extends ADeclaration {
   public final String methodSignature;
 
   /** The type parameters of this method. */
-  private /*@Nullable*/ List<? extends TypeParameterElement> typeParameters = null;
+  private @Nullable List<? extends TypeParameterElement> typeParameters = null;
 
   /** The method's annotated type parameter bounds. */
   public final VivifyingMap<BoundLocation, ATypeElement> bounds =
       ATypeElement.<BoundLocation>newVivifyingLHMap_ATE();
 
   /** The return type of the method, or null if the method's return type is unknown or void. */
-  private /*@Nullable*/ TypeMirror returnTypeMirror;
+  private @Nullable TypeMirror returnTypeMirror;
 
   /** The method's annotated return type. Non-null even if returnTypeMirror is null. */
   public final ATypeElement returnType; // initialized in constructor
@@ -230,7 +231,7 @@ public class AMethod extends ADeclaration {
    *
    * @return the return type, or null if the return type is unknown or void
    */
-  public /*@Nullable*/ TypeMirror getReturnTypeMirror() {
+  public @Nullable TypeMirror getReturnTypeMirror() {
     return returnTypeMirror;
   }
 
@@ -239,7 +240,7 @@ public class AMethod extends ADeclaration {
    *
    * @param returnTypeMirror the return type
    */
-  public void setReturnTypeMirror(/*@Nullable*/ TypeMirror returnTypeMirror) {
+  public void setReturnTypeMirror(@Nullable TypeMirror returnTypeMirror) {
     if (returnTypeMirror == null) {
       return;
     }

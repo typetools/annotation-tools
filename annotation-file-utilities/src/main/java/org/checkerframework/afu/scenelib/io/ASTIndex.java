@@ -63,6 +63,7 @@ import javax.lang.model.element.Name;
 import org.checkerframework.afu.annotator.find.CaseUtils;
 import org.checkerframework.afu.scenelib.util.JVMNames;
 import org.checkerframework.afu.scenelib.util.coll.WrapperMap;
+import org.checkerframework.checker.signature.qual.BinaryName;
 
 /** Cache of {@code ASTPath} data for the nodes of a compilation unit tree. */
 public class ASTIndex extends WrapperMap<Tree, ASTRecord> {
@@ -134,7 +135,7 @@ public class ASTIndex extends WrapperMap<Tree, ASTRecord> {
            * @param node the class
            */
           private void saveClass(ClassTree node) {
-            String className = ((JCTree.JCClassDecl) node).sym.flatname.toString();
+            @BinaryName String className = ((JCTree.JCClassDecl) node).sym.flatname.toString();
             ASTRecord rec = new ASTRecord(cut, className, null, null, ASTPath.empty());
             counters.push(0);
             node.accept(this, rec);
@@ -261,7 +262,7 @@ public class ASTIndex extends WrapperMap<Tree, ASTRecord> {
               if (member.getKind() == Tree.Kind.BLOCK) {
                 save(member, rec, kind, ASTPath.INITIALIZER, i++);
               } else if (ASTPath.isClassEquiv(member.getKind())) {
-                String className = ((JCTree.JCClassDecl) member).sym.flatname.toString();
+                @BinaryName String className = ((JCTree.JCClassDecl) member).sym.flatname.toString();
                 member.accept(this, new ASTRecord(cut, className, null, null, ASTPath.empty()));
               } else {
                 member.accept(this, rec);
@@ -402,7 +403,7 @@ public class ASTIndex extends WrapperMap<Tree, ASTRecord> {
             saveAll(node.getArguments(), rec, kind, ASTPath.ARGUMENT);
             if (classBody != null) {
               Name name = classBody.getSimpleName();
-              String className = null;
+              @BinaryName String className = null;
               if (name == null || name.toString().isEmpty()) {
                 int i = counters.pop();
                 counters.push(++i);
@@ -617,7 +618,7 @@ public class ASTIndex extends WrapperMap<Tree, ASTRecord> {
     ExpressionTree et = cut.getPackageName();
     String pkg = et == null ? "" : et.toString();
     if (!pkg.isEmpty() && rec.className.indexOf('.') < 0) {
-      String className = pkg + "." + rec.className;
+      @BinaryName String className = pkg + "." + rec.className;
       rec = new ASTRecord(cut, className, rec.methodName, rec.varName, rec.astPath);
     }
     return revIndex.get(rec);
