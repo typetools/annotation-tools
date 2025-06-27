@@ -29,7 +29,7 @@ public class IntersectionTypeLocationCriterion implements Criterion {
     TreePath parentPath = path.getParentPath();
     if (parentPath != null) {
       Tree parent = parentPath.getLeaf();
-      if (parent.getKind() == Tree.Kind.INTERSECTION_TYPE) {
+      if (parent instanceof IntersectionTypeTree) {
         IntersectionTypeTree itt = (IntersectionTypeTree) parent;
         List<? extends Tree> bounds = itt.getBounds();
         Tree leaf = path.getLeaf();

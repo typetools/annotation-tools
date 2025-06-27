@@ -38,7 +38,7 @@ final class InPackageCriterion implements Criterion {
 
     do {
       Tree tree = path.getLeaf();
-      if (tree.getKind() == Tree.Kind.COMPILATION_UNIT) {
+      if (tree instanceof CompilationUnitTree) {
         CompilationUnitTree cu = (CompilationUnitTree) tree;
         ExpressionTree pn = cu.getPackageName();
         if (pn == null) {

@@ -1,6 +1,7 @@
 package org.checkerframework.afu.annotator.find;
 
 import com.sun.source.tree.Tree;
+import com.sun.source.tree.TypeCastTree;
 import com.sun.source.util.TreePath;
 import org.checkerframework.afu.annotator.scanner.CastScanner;
 import org.checkerframework.afu.scenelib.el.RelativeLocation;
@@ -33,7 +34,7 @@ public class CastCriterion implements Criterion {
 
     Tree leaf = path.getLeaf();
 
-    if (leaf.getKind() == Tree.Kind.TYPE_CAST) {
+    if (leaf instanceof TypeCastTree) {
       int indexInSource = CastScanner.indexOfCastTree(path, leaf);
       boolean b;
       if (loc.isBytecodeOffset()) {

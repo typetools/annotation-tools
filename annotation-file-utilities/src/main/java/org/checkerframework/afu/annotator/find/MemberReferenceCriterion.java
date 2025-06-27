@@ -1,5 +1,6 @@
 package org.checkerframework.afu.annotator.find;
 
+import com.sun.source.tree.MemberReferenceTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
 import org.checkerframework.afu.annotator.scanner.MemberReferenceScanner;
@@ -31,7 +32,7 @@ public class MemberReferenceCriterion implements Criterion {
 
     Tree leaf = path.getLeaf();
 
-    if (leaf.getKind() == Tree.Kind.MEMBER_REFERENCE) {
+    if (leaf instanceof MemberReferenceTree) {
       int indexInSource = MemberReferenceScanner.indexOfMemberReferenceTree(path, leaf);
       boolean b;
       if (loc.isBytecodeOffset()) {

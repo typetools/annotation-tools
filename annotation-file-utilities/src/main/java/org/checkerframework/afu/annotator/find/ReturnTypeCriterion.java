@@ -1,5 +1,6 @@
 package org.checkerframework.afu.annotator.find;
 
+import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
 import org.checkerframework.afu.annotator.Main;
@@ -49,7 +50,7 @@ public class ReturnTypeCriterion implements Criterion {
         "ReturnTypeCriterion.isSatisfiedBy(%s); this=%s%n", Main.leafString(path), this.toString());
 
     do {
-      if (path.getLeaf().getKind() == Tree.Kind.METHOD) {
+      if (path.getLeaf() instanceof MethodTree) {
         if (sigMethodCriterion == null || sigMethodCriterion.isSatisfiedBy(path)) {
           // Method and return type verified; now check class.
           path = path.getParentPath();

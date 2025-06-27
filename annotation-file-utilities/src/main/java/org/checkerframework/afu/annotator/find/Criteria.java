@@ -1,6 +1,7 @@
 package org.checkerframework.afu.annotator.find;
 
 import com.google.errorprone.annotations.InlineMe;
+import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
 import java.util.LinkedHashMap;
@@ -128,7 +129,7 @@ public final class Criteria {
     return (criteria.size() == 2
         && isOnMethod("<init>()V")
         && criteria.containsKey(Criterion.Kind.IN_CLASS)
-        && leaf.getKind() != Tree.Kind.METHOD);
+        && !(leaf instanceof MethodTree));
   }
 
   /**

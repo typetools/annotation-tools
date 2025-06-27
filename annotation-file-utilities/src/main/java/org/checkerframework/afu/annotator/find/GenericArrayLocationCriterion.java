@@ -2,11 +2,16 @@ package org.checkerframework.afu.annotator.find;
 
 import com.sun.source.tree.AnnotatedTypeTree;
 import com.sun.source.tree.ArrayTypeTree;
+import com.sun.source.tree.IdentifierTree;
+import com.sun.source.tree.InstanceOfTree;
 import com.sun.source.tree.MemberSelectTree;
+import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.NewArrayTree;
 import com.sun.source.tree.NewClassTree;
 import com.sun.source.tree.ParameterizedTypeTree;
+import com.sun.source.tree.PrimitiveTypeTree;
 import com.sun.source.tree.Tree;
+import com.sun.source.tree.TypeParameterTree;
 import com.sun.source.tree.VariableTree;
 import com.sun.source.tree.WildcardTree;
 import com.sun.source.util.TreePath;
@@ -129,16 +134,16 @@ public class GenericArrayLocationCriterion implements Criterion {
     // a MEMBER_SELECT. This way we'll continue to traverse deeper in the tree
     // to find the correct MEMBER_SELECT.
     Tree child = null;
-    if (leaf.getKind() == Tree.Kind.PARAMETERIZED_TYPE) {
+    if (leaf instanceof ParameterizedTypeTree) {
       child = ((ParameterizedTypeTree) leaf).getType();
-    } else if (leaf.getKind() == Tree.Kind.VARIABLE) {
+    } else if (leaf instanceof VariableTree) {
       child = ((VariableTree) leaf).getType();
-    } else if (leaf.getKind() == Tree.Kind.NEW_CLASS) {
+    } else if (leaf instanceof NewClassTree) {
       child = ((NewClassTree) leaf).getIdentifier();
-    } else if (leaf.getKind() == Tree.Kind.NEW_ARRAY && typePath != null) {
+    } else if (leaf instanceof NewArrayTree && typePath != null) {
       child = ((NewArrayTree) leaf).getType();
     }
-    if (child != null && child.getKind() == Tree.Kind.MEMBER_SELECT) {
+    if (child != null && child instanceof MemberSelectTree) {
       JCExpression exp = ((JCFieldAccess) child).getExpression();
       if ((exp.type != null && exp.type.getKind() == TypeKind.PACKAGE)
           || typePath == null
@@ -147,7 +152,7 @@ public class GenericArrayLocationCriterion implements Criterion {
       }
     }
 
-    if (leaf.getKind() == Tree.Kind.MEMBER_SELECT) {
+    if (leaf instanceof MemberSelectTree) {
       JCFieldAccess fieldAccess = (JCFieldAccess) leaf;
       if (isStatic(fieldAccess)) {
         // If this MEMBER_SELECT is for a static class...
@@ -167,7 +172,7 @@ public class GenericArrayLocationCriterion implements Criterion {
         }
       } else {
         JCExpression exp = fieldAccess.getExpression();
-        if (exp.getKind() == Tree.Kind.MEMBER_SELECT
+        if (exp instanceof MemberSelectTree
             && exp.type != null
             && exp.type.getKind() == TypeKind.PACKAGE) {
           if (typePath == null) {
@@ -192,19 +197,19 @@ public class GenericArrayLocationCriterion implements Criterion {
       Tree parent = path.getParentPath().getLeaf();
 
       boolean result =
-          ((leaf.getKind() == Tree.Kind.NEW_ARRAY)
-              || (leaf.getKind() == Tree.Kind.NEW_CLASS)
-              || (leaf.getKind() == Tree.Kind.ANNOTATED_TYPE
+          ((leaf instanceof NewArrayTree)
+              || (leaf instanceof NewClassTree)
+              || (leaf instanceof AnnotatedTypeTree
                   && isSatisfiedBy(
                       TreePath.getPath(path, ((AnnotatedTypeTree) leaf).getUnderlyingType())))
               || ((isGenericOrArray(leaf)
                       // or, it might be a raw type
-                      || (leaf.getKind() == Tree.Kind.IDENTIFIER) // IdentifierTree
-                      || (leaf.getKind() == Tree.Kind.METHOD) // MethodTree
-                      || (leaf.getKind() == Tree.Kind.TYPE_PARAMETER) // TypeParameterTree
+                      || (leaf instanceof IdentifierTree)
+                      || (leaf instanceof MethodTree)
+                      || (leaf instanceof TypeParameterTree)
                       // I don't know why a GenericArrayLocationCriterion
                       // is being created in this case, but it is.
-                      || (leaf.getKind() == Tree.Kind.PRIMITIVE_TYPE) // PrimitiveTypeTree
+                      || (leaf instanceof PrimitiveTypeTree)
                   // TODO: do we need wildcards here?
                   // || leaf instanceof WildcardTree
                   )
@@ -231,7 +236,7 @@ public class GenericArrayLocationCriterion implements Criterion {
     // place to insert the annotation this is the MEMBER_SELECT it should be
     // inserted on. So remove the rest of the MEMBER_SELECTs to get down to the
     // compound type and make sure the compound type location matches.
-    while (pathRemaining.getParentPath().getLeaf().getKind() == Tree.Kind.MEMBER_SELECT) {
+    while (pathRemaining.getParentPath().getLeaf() instanceof MemberSelectTree) {
       pathRemaining = pathRemaining.getParentPath();
     }
 
@@ -240,7 +245,7 @@ public class GenericArrayLocationCriterion implements Criterion {
     while (locationRemaining.size() != 0) {
       // annotating an inner type
       leaf = pathRemaining.getLeaf();
-      if ((leaf.getKind() == Tree.Kind.NEW_ARRAY) && containsOnlyArray(locationRemaining)) {
+      if ((leaf instanceof NewArrayTree) && containsOnlyArray(locationRemaining)) {
         if (debug) {
           System.out.println("Found a matching NEW_ARRAY");
         }
@@ -255,7 +260,7 @@ public class GenericArrayLocationCriterion implements Criterion {
       }
       Tree parent = parentPath.getLeaf();
 
-      if (parent.getKind() == Tree.Kind.ANNOTATED_TYPE) {
+      if (parent instanceof AnnotatedTypeTree) {
         // If the parent is an annotated type, we did not really go up a level.
         // Therefore, skip up one more level.
         parentPath = parentPath.getParentPath();
@@ -273,12 +278,12 @@ public class GenericArrayLocationCriterion implements Criterion {
 
       TypePathEntry loc = locationRemaining.get(locationRemaining.size() - 1);
       if (loc.step == TypePath.INNER_TYPE) {
-        if (leaf.getKind() == Tree.Kind.PARAMETERIZED_TYPE) {
+        if (leaf instanceof ParameterizedTypeTree) {
           leaf = parent;
           parentPath = parentPath.getParentPath();
           parent = parentPath.getLeaf();
         }
-        if (leaf.getKind() != Tree.Kind.MEMBER_SELECT) {
+        if (!(leaf instanceof MemberSelectTree)) {
           return false;
         }
 
@@ -305,14 +310,14 @@ public class GenericArrayLocationCriterion implements Criterion {
         TreePath gpath = parentPath.getParentPath();
         if (gpath != null) { // TODO: skip over existing annotations?
           Tree gparent = gpath.getLeaf();
-          if (gparent.getKind() == Tree.Kind.INSTANCE_OF) {
+          if (gparent instanceof InstanceOfTree) {
             TreeFinder.warn.debug(
                 "WARNING: wildcard bounds not allowed "
                     + "in 'instanceof' expression; skipping insertion%n");
             return false;
-          } else if (gparent.getKind() == Tree.Kind.PARAMETERIZED_TYPE) {
+          } else if (gparent instanceof ParameterizedTypeTree) {
             gpath = gpath.getParentPath();
-            if (gpath != null && gpath.getLeaf().getKind() == Tree.Kind.ARRAY_TYPE) {
+            if (gpath != null && gpath.getLeaf() instanceof ArrayTypeTree) {
               TreeFinder.warn.debug(
                   "WARNING: wildcard bounds not allowed "
                       + "in generic array type; skipping insertion%n");
@@ -321,7 +326,7 @@ public class GenericArrayLocationCriterion implements Criterion {
           }
         }
         locationRemaining.remove(locationRemaining.size() - 1);
-      } else if (parent.getKind() == Tree.Kind.PARAMETERIZED_TYPE) {
+      } else if (parent instanceof ParameterizedTypeTree) {
         if (loc.step != TypePath.TYPE_ARGUMENT) {
           return false;
         }
@@ -332,7 +337,7 @@ public class GenericArrayLocationCriterion implements Criterion {
         Tree inner = ((ParameterizedTypeTree) parent).getType();
         int i = locationRemaining.size() - 1; // last valid type path index
         locationRemaining.remove(i--);
-        while (inner.getKind() == Tree.Kind.MEMBER_SELECT && !isStatic((JCFieldAccess) inner)) {
+        while (inner instanceof MemberSelectTree && !isStatic((JCFieldAccess) inner)) {
           // fieldAccess.type != null && fieldAccess.type.getKind() == TypeKind.DECLARED
           // && fieldAccess.type.tsym.isStatic()
           // TODO: check whether MEMBER_SELECT indicates inner or qualifier?
@@ -344,10 +349,10 @@ public class GenericArrayLocationCriterion implements Criterion {
           }
           locationRemaining.remove(i--);
           inner = ((MemberSelectTree) inner).getExpression();
-          if (inner.getKind() == Tree.Kind.ANNOTATED_TYPE) {
+          if (inner instanceof AnnotatedTypeTree) {
             inner = ((AnnotatedTypeTree) inner).getUnderlyingType();
           }
-          if (inner.getKind() == Tree.Kind.PARAMETERIZED_TYPE) {
+          if (inner instanceof ParameterizedTypeTree) {
             inner = ((ParameterizedTypeTree) inner).getType();
           }
         }
@@ -362,19 +367,19 @@ public class GenericArrayLocationCriterion implements Criterion {
         boolean found = false;
         if (childTrees.size() > loc.argument) {
           Tree childi = childTrees.get(loc.argument);
-          if (childi.getKind() == Tree.Kind.ANNOTATED_TYPE) {
+          if (childi instanceof AnnotatedTypeTree) {
             childi = ((AnnotatedTypeTree) childi).getUnderlyingType();
           }
           if (childi == leaf) {
             for (TreePath outerPath = parentPath.getParentPath();
-                outerPath.getLeaf().getKind() == Tree.Kind.MEMBER_SELECT
+                outerPath.getLeaf() instanceof MemberSelectTree
                     && !isStatic((JCFieldAccess) outerPath.getLeaf());
                 outerPath = outerPath.getParentPath()) {
               outerPath = outerPath.getParentPath();
-              if (outerPath.getLeaf().getKind() == Tree.Kind.ANNOTATED_TYPE) {
+              if (outerPath.getLeaf() instanceof AnnotatedTypeTree) {
                 outerPath = outerPath.getParentPath();
               }
-              if (outerPath.getLeaf().getKind() != Tree.Kind.PARAMETERIZED_TYPE) {
+              if (!(outerPath.getLeaf() instanceof ParameterizedTypeTree)) {
                 break;
               }
               parentPath = outerPath;
@@ -428,7 +433,7 @@ public class GenericArrayLocationCriterion implements Criterion {
         } else {
           return false;
         }
-      } else if (parent.getKind() == Tree.Kind.ARRAY_TYPE) {
+      } else if (parent instanceof ArrayTypeTree) {
         if (loc.step != TypePath.ARRAY_ELEMENT) {
           return false;
         }
@@ -441,7 +446,7 @@ public class GenericArrayLocationCriterion implements Criterion {
         Tree elt = ((ArrayTypeTree) parent).getType();
         while (locationRemaining.size() > 0
             && locationRemaining.get(locationRemaining.size() - 1).step == TypePath.ARRAY_ELEMENT) {
-          if (elt.getKind() != Tree.Kind.ARRAY_TYPE) { // ArrayTypeTree
+          if (!(elt instanceof ArrayTypeTree)) {
             if (debug) {
               System.out.printf("Element: %s is not an ArrayTypeTree and therefore false.%n", elt);
             }
@@ -467,7 +472,7 @@ public class GenericArrayLocationCriterion implements Criterion {
         } else {
           return false;
         }
-      } else if (parent.getKind() == Tree.Kind.NEW_ARRAY) {
+      } else if (parent instanceof NewArrayTree) {
         if (loc.step != TypePath.ARRAY_ELEMENT) {
           return false;
         }
@@ -530,11 +535,11 @@ public class GenericArrayLocationCriterion implements Criterion {
    * @return true if the given tree is generic or an array
    */
   private boolean isGenericOrArray(Tree t) {
-    return ((t.getKind() == Tree.Kind.PARAMETERIZED_TYPE)
-        || (t.getKind() == Tree.Kind.ARRAY_TYPE)
+    return ((t instanceof ParameterizedTypeTree)
+        || (t instanceof ArrayTypeTree)
         || (t.getKind() == Tree.Kind.EXTENDS_WILDCARD)
         || (t.getKind() == Tree.Kind.SUPER_WILDCARD)
-        || (t.getKind() == Tree.Kind.ANNOTATED_TYPE
+        || (t instanceof AnnotatedTypeTree
             && isGenericOrArray(((AnnotatedTypeTree) t).getUnderlyingType()))
     // Monolithic:  one node for entire "new".  So, handle specially.
     // || (t.getKind() == Tree.Kind.NEW_ARRAY)

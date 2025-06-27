@@ -1,5 +1,7 @@
 package org.checkerframework.afu.annotator.find;
 
+import com.sun.source.tree.NewArrayTree;
+import com.sun.source.tree.NewClassTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
 import org.checkerframework.afu.annotator.scanner.NewScanner;
@@ -51,7 +53,7 @@ public class NewCriterion implements Criterion {
       // anonymous inner class defined in another method.
       return this.isSatisfiedBy(path.getParentPath());
     }
-    if (leaf.getKind() == Tree.Kind.NEW_CLASS || leaf.getKind() == Tree.Kind.NEW_ARRAY) {
+    if (leaf instanceof NewClassTree || leaf instanceof NewArrayTree) {
       int indexInSource = NewScanner.indexOfNewTree(path, leaf);
       // System.out.printf("indexInSource=%d%n", indexInSource);
       boolean b;

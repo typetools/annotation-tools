@@ -1,6 +1,7 @@
 package org.checkerframework.afu.annotator.find;
 
 import com.sun.source.tree.Tree;
+import com.sun.source.tree.VariableTree;
 import com.sun.source.util.TreePath;
 
 public class FieldCriterion implements Criterion {
@@ -32,7 +33,7 @@ public class FieldCriterion implements Criterion {
 
   @Override
   public boolean isSatisfiedBy(TreePath path) {
-    if (path == null || (isDeclaration && path.getLeaf().getKind() != Tree.Kind.VARIABLE)) {
+    if (path == null || (isDeclaration && !(path.getLeaf() instanceof VariableTree))) {
       return false;
     }
 

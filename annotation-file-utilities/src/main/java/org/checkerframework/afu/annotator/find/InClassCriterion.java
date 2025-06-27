@@ -1,5 +1,6 @@
 package org.checkerframework.afu.annotator.find;
 
+import com.sun.source.tree.BlockTree;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.tree.ExpressionTree;
@@ -120,7 +121,7 @@ public final class InClassCriterion implements Criterion {
         case INTERFACE:
         case ENUM:
         case ANNOTATION_TYPE:
-          if (i > 0 && trees.get(i - 1).getKind() == Tree.Kind.NEW_CLASS) {
+          if (i > 0 && trees.get(i - 1) instanceof NewClassTree) {
             // For an anonymous class, the CLASS tree is always directly inside of
             // a NEW_CLASS tree. If that's the case here then skip this iteration
             // since we've already looked at the new class tree in the previous
@@ -129,7 +130,7 @@ public final class InClassCriterion implements Criterion {
           }
           debug("InClassCriterion.isSatisfiedBy:%n  cname=%s%n  tree=%s%n", cname, tree);
 
-          if (i > 0 && trees.get(i - 1).getKind() == Tree.Kind.BLOCK) {
+          if (i > 0 && trees.get(i - 1) instanceof BlockTree) {
             // Section 14.3 of the JLS says "every local class declaration
             // statement is immediately contained by a block".
             checkLocal = true;

@@ -319,11 +319,10 @@ public class Insertions implements Iterable<Insertion> {
                   rec0 = rec.extend(Tree.Kind.NEW_ARRAY, ASTPath.TYPE, 0);
                 }
               } else if (node != null && !nins.getInnerTypeInsertions().isEmpty()) {
-                if (node.getKind() == Tree.Kind.IDENTIFIER) {
+                if (node instanceof IdentifierTree) {
                   node = ASTIndex.getNode(cut, rec.replacePath(p.getParentPath()));
                 }
-                if ((node.getKind() == Tree.Kind.NEW_ARRAY
-                        || node.getKind() == Tree.Kind.ARRAY_TYPE)
+                if ((node instanceof NewArrayTree || node instanceof ArrayTypeTree)
                     && !node.toString().startsWith("{")) {
                   rec = rec.replacePath(p.getParentPath());
 
@@ -372,7 +371,7 @@ public class Insertions implements Iterable<Insertion> {
           int d = newArrayInnerTypeDepth(p);
           if (d > 0) {
             ASTPath temp = p;
-            while (!temp.isEmpty() && (node == null || node.getKind() != Tree.Kind.NEW_ARRAY)) {
+            while (!temp.isEmpty() && (node == null || !(node instanceof NewArrayTree))) {
               // TODO: avoid repeating work of newArrayInnerTypeDepth()
               temp = temp.getParentPath();
               node = ASTIndex.getNode(cut, rec.replacePath(temp));
@@ -660,7 +659,7 @@ public class Insertions implements Iterable<Insertion> {
         rec = rec.extend(entry);
         kind = entry.getTreeKind();
 
-        while (node.getKind() == Tree.Kind.ANNOTATED_TYPE) { // skip
+        while (node instanceof AnnotatedTypeTree) {
           node = ((AnnotatedTypeTree) node).getUnderlyingType();
         }
         if (expectedDepth == 0) {

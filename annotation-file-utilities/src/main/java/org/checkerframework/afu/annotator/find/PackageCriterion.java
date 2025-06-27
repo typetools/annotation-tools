@@ -1,6 +1,7 @@
 package org.checkerframework.afu.annotator.find;
 
 import com.sun.source.tree.*;
+import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.util.TreePath;
 import org.checkerframework.afu.annotator.Main;
 
@@ -31,7 +32,7 @@ final class PackageCriterion implements Criterion {
         "PackageCriterion.isSatisfiedBy(%s, %s); this=%s%n",
         Main.leafString(path), tree, this.toString());
 
-    if (tree.getKind() == Tree.Kind.COMPILATION_UNIT) {
+    if (tree instanceof CompilationUnitTree) {
       CompilationUnitTree cu = (CompilationUnitTree) tree;
       if (cu.getSourceFile().getName().endsWith("package-info.java")) {
         ExpressionTree pn = cu.getPackageName();

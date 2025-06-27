@@ -55,7 +55,7 @@ public class InstanceOfCriterion implements Criterion {
       return false;
     }
 
-    if (parent.getKind() == Tree.Kind.INSTANCE_OF) {
+    if (parent instanceof InstanceOfTree) {
       InstanceOfTree instanceOfTree = (InstanceOfTree) parent;
       if (leaf != instanceOfTree.getType()) {
         Criteria.dbug.debug("return: not type part of instanceof%n");

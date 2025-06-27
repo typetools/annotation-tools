@@ -288,7 +288,7 @@ public class IsSigMethodCriterion implements Criterion {
 
     Tree leaf = path.getLeaf();
 
-    if (leaf.getKind() != Tree.Kind.METHOD) {
+    if (!(leaf instanceof MethodTree)) {
       Criteria.dbug.debug(
           "IsSigMethodCriterion.isSatisfiedBy(%s) => false: not a METHOD tree%n",
           Main.leafString(path));
@@ -335,7 +335,7 @@ public class IsSigMethodCriterion implements Criterion {
       List<? extends Tree> paramBounds = param.getBounds();
       if (paramBounds != null && paramBounds.size() >= 1) {
         Tree boundZero = paramBounds.get(0);
-        if (boundZero.getKind() == Tree.Kind.ANNOTATED_TYPE) {
+        if (boundZero instanceof AnnotatedTypeTree) {
           boundZero = ((AnnotatedTypeTree) boundZero).getUnderlyingType();
         }
         paramClass = boundZero.toString();
@@ -357,7 +357,7 @@ public class IsSigMethodCriterion implements Criterion {
           List<? extends Tree> paramBounds = param.getBounds();
           if (paramBounds != null && paramBounds.size() >= 1) {
             Tree pb = paramBounds.get(0);
-            if (pb.getKind() == Tree.Kind.ANNOTATED_TYPE) {
+            if (pb instanceof AnnotatedTypeTree) {
               pb = ((AnnotatedTypeTree) pb).getUnderlyingType();
             }
             paramClass = pb.toString();
