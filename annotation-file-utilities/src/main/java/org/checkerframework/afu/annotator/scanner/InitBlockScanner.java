@@ -51,7 +51,13 @@ public class InitBlockScanner extends TreePathScanner<Void, Boolean> {
     return super.visitBlock(node, isStatic);
   }
 
-  private static final int getBlockEndPos(JCBlock block) {
+  /**
+   * Returns the end pos for {@code block}.
+   *
+   * @param block a block
+   * @return the end pos for {@code block}
+   */
+  private static int getBlockEndPos(JCBlock block) {
     try {
       return BLOCK_END_POS_FIELD.getInt(block);
     } catch (IllegalAccessException e) {
@@ -59,8 +65,14 @@ public class InitBlockScanner extends TreePathScanner<Void, Boolean> {
     }
   }
 
+  /** Field for JCBlock#endpos or JCBlock#bracePos depending on the version of Java. */
   private static final Field BLOCK_END_POS_FIELD = getBlockEndPosField();
 
+  /**
+   * Returns field for JCBlock#endpos or JCBlock#bracePos depending on the version of Java.
+   *
+   * @return field for JCBlock#endpos or JCBlock#bracePos depending on the version of Java
+   */
   private static Field getBlockEndPosField() {
     try {
       return JCBlock.class.getDeclaredField("endpos");
