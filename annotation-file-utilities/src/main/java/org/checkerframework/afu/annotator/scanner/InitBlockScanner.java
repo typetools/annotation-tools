@@ -63,10 +63,10 @@ public class InitBlockScanner extends TreePathScanner<Void, Boolean> {
 
   private static Field getBlockEndPosField() {
     try {
-      return JCBlock.class.getDeclaredField("bracePos");
+      return JCBlock.class.getDeclaredField("endpos");
     } catch (NoSuchFieldException e1) {
       try {
-        return JCBlock.class.getDeclaredField("endPos");
+        return JCBlock.class.getDeclaredField("bracePos");
       } catch (NoSuchFieldException e2) {
         e2.addSuppressed(e1);
         throw new AssertionError(e2);
