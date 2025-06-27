@@ -176,31 +176,31 @@ public class AClass extends ADeclaration {
     }
     sb.append(linePrefix);
     sb.append("Bounds:" + System.lineSeparator());
-    CollectionsPlume.mapToString(sb, bounds, linePrefix + "  ");
+    CollectionsPlume.mapToStringMultiLine(sb, bounds, linePrefix + "  ");
     sb.append(linePrefix);
     sb.append("Extends/implements:" + System.lineSeparator());
-    CollectionsPlume.mapToString(sb, extendsImplements, linePrefix + "  ");
+    CollectionsPlume.mapToStringMultiLine(sb, extendsImplements, linePrefix + "  ");
     sb.append(linePrefix);
     sb.append("Fields:" + System.lineSeparator());
-    CollectionsPlume.mapToString(sb, fields, linePrefix + "  ");
+    CollectionsPlume.mapToStringMultiLine(sb, fields, linePrefix + "  ");
     sb.append(linePrefix);
     sb.append("Field Initializers:" + System.lineSeparator());
-    CollectionsPlume.mapToString(sb, fieldInits, linePrefix + "  ");
+    CollectionsPlume.mapToStringMultiLine(sb, fieldInits, linePrefix + "  ");
     sb.append(linePrefix);
     sb.append("Static Initializers:" + System.lineSeparator());
-    CollectionsPlume.mapToString(sb, staticInits, linePrefix + "  ");
+    CollectionsPlume.mapToStringMultiLine(sb, staticInits, linePrefix + "  ");
     sb.append(linePrefix);
     sb.append("Instance Initializers:" + System.lineSeparator());
-    CollectionsPlume.mapToString(sb, instanceInits, linePrefix + "  ");
+    CollectionsPlume.mapToStringMultiLine(sb, instanceInits, linePrefix + "  ");
     sb.append(linePrefix);
     sb.append("AST Typecasts:" + System.lineSeparator());
-    CollectionsPlume.mapToString(sb, insertTypecasts, linePrefix + "  ");
+    CollectionsPlume.mapToStringMultiLine(sb, insertTypecasts, linePrefix + "  ");
     sb.append(linePrefix);
     sb.append("AST Annotations:" + System.lineSeparator());
-    CollectionsPlume.mapToString(sb, insertAnnotations, linePrefix + "  ");
+    CollectionsPlume.mapToStringMultiLine(sb, insertAnnotations, linePrefix + "  ");
     sb.append(linePrefix);
     sb.append("Methods:" + System.lineSeparator());
-    CollectionsPlume.mapToString(sb, methods, linePrefix + "  ");
+    CollectionsPlume.mapToStringMultiLine(sb, methods, linePrefix + "  ");
     return sb.toString();
   }
 
