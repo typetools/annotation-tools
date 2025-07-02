@@ -210,9 +210,8 @@ public class TestSceneLib {
     AScene s1 = newScene();
     IndexFileParser.parse(fr, "test1.jaif", s1);
 
-    AClass foo1 = s1.classes.get("p1.Foo");
-    Assert.assertNotNull("Didn't find foo1", foo1);
-    AClass foo = foo1;
+    AClass foo = s1.classes.get("p1.Foo");
+    Assert.assertNotNull("Didn't find foo1", foo);
     boolean sawConstructor = false;
     for (Map.Entry<String, AMethod> me : foo.methods.entrySet()) {
       if (me.getKey().equals("<init>(Ljava/util/Set;)V")) {
