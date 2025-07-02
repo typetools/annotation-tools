@@ -1,10 +1,9 @@
 package org.checkerframework.afu.scenelib.io;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
 import java.io.BufferedWriter;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Performs output to System.out. Has a flag {@code enabled} that controls whether output is
@@ -13,7 +12,8 @@ import java.io.PrintWriter;
 public class DebugWriter {
   /** A PrintWriter for System.out. */
   private PrintWriter out =
-      new PrintWriter(new BufferedWriter(new OutputStreamWriter(System.out, UTF_8)));
+      new PrintWriter(
+          new BufferedWriter(new OutputStreamWriter(System.out, StandardCharsets.UTF_8)));
 
   /** Whether this DebugWriter is enabled. */
   private boolean enabled;
