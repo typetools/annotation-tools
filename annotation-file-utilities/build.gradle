@@ -153,6 +153,21 @@ compileTestJava {
       // Adding that line in build.gradle causes a javac crash when running the Checker Framework.
       "ASTHelpersSuggestions",
       )
+
+  if (JavaVersion.current().compareTo(org.gradle.api.JavaVersion.VERSION_20) >= 0) {
+    // JDK 20 and later deprecate --target 8
+    options.compilerArgs += [
+      '-g',
+      '-Werror',
+      '-Xlint:all,-options',
+    ]
+  } else {
+    options.compilerArgs += [
+      '-g',
+      '-Werror',
+      '-Xlint',
+    ]
+  }
 }
 
 

@@ -54,7 +54,7 @@ public class Example {
       System.out.println("Class " + args[1] + " is not mentioned in annotation file " + args[0]);
       return;
     }
-    AClass clazz = (AClass) clazz1;
+    AClass clazz = clazz1;
 
     for (Map.Entry<String, AMethod> me : clazz.methods.entrySet()) {
       AMethod method = me.getValue();
