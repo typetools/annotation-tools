@@ -30,4 +30,4 @@ fi
 "/tmp/$USER/git-scripts/git-clone-related" typetools checker-framework "${CHECKERFRAMEWORK}"
 (cd "${CHECKERFRAMEWORK}" && ./gradlew assembleForJavac --console=plain -Dorg.gradle.internal.http.socketTimeout=60000 -Dorg.gradle.internal.http.connectionTimeout=60000)
 
-(cd "${AFU}" && ./gradlew checkSignature checkResourceLeak)
+(cd "${AFU}" && ./gradlew checkSignature checkResourceLeak checkFormatter)

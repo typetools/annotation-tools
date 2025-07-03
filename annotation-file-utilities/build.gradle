@@ -153,6 +153,21 @@ compileTestJava {
       // Adding that line in build.gradle causes a javac crash when running the Checker Framework.
       "ASTHelpersSuggestions",
       )
+
+  if (JavaVersion.current().compareTo(org.gradle.api.JavaVersion.VERSION_20) >= 0) {
+    // JDK 20 and later deprecate --target 8
+    options.compilerArgs += [
+      '-g',
+      '-Werror',
+      '-Xlint:all,-options',
+    ]
+  } else {
+    options.compilerArgs += [
+      '-g',
+      '-Werror',
+      '-Xlint',
+    ]
+  }
 }
 
 
@@ -482,9 +497,11 @@ def createCheckTypeTask(checker, shortName) {
   }
 }
 
-// Create tasks checkSignature and checkResourceLeak.
+// Create tasks that run checkers on the code.
 createCheckTypeTask('org.checkerframework.checker.signature.SignatureChecker', 'Signature')
 createCheckTypeTask('org.checkerframework.checker.resourceleak.ResourceLeakChecker', 'ResourceLeak')
+createCheckTypeTask('org.checkerframework.checker.formatter.FormatterChecker', 'Formatter')
+
 
 task htmlValidate(type: Exec) {
   description = 'Validate that HTML files are well-formed.'

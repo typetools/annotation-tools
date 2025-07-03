@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
 import javax.lang.model.element.Name;
 import org.checkerframework.afu.annotator.scanner.AnonymousClassScanner;
 import org.checkerframework.afu.annotator.scanner.LocalClassScanner;
+import org.checkerframework.checker.formatter.qual.FormatMethod;
 import org.checkerframework.checker.signature.qual.ClassGetName;
 
 // If there are dollar signs in a name, then there are two
@@ -284,6 +285,7 @@ public final class InClassCriterion implements Criterion {
    * @param message a format string
    * @param args arguments to the format string
    */
+  @FormatMethod
   private static void debug(String message, Object... args) {
     if (debug) {
       System.out.printf(message, args);
